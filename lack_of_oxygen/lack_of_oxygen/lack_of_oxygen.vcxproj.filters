@@ -3,11 +3,26 @@
   <ItemGroup>
     <ClCompile Include="Glad\glad.c" />
     <ClCompile Include="Main\Main.cpp" />
-    <ClCompile Include="Utilities\utilities.cpp" />
+    <ClCompile Include="System\Movement_System.cpp" />
+    <ClCompile Include="Entity\Entity.cpp" />
+    <ClCompile Include="Component\Component.cpp" />
+    <ClCompile Include="Manager\ECS_Manager.cpp" />
+    <ClCompile Include="Manager\Manager.cpp" />
+    <ClCompile Include="Manager\Log_Manager.cpp" />
+    <ClCompile Include="Utility\Clock.cpp" />
+    <ClCompile Include="Manager\Game_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
-    <ClInclude Include="Utilities\Utilities.h" />
+    <ClInclude Include="System\System.h" />
+    <ClInclude Include="Manager\ECS_Manager.h" />
+    <ClInclude Include="Entity\Entity.h" />
+    <ClInclude Include="Component\Component.h" />
+    <ClInclude Include="System\Movement_System.h" />
+    <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="Manager\Log_Manager.h" />
+    <ClInclude Include="Utility\Clock.h" />
+    <ClInclude Include="Manager\Game_Manager.h" />
   </ItemGroup>
 </Project>
