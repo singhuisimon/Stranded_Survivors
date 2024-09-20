@@ -17,8 +17,12 @@ public:
 
 };
 
-class ColliderComponent: public Component
-{
+
+
+class AABB {
+public: 
 	float width, height;
-	bool isObject; //if there is an object
+	AABB(float Width, float Height) : width(Width), height(Height) {};
 };
+
+
