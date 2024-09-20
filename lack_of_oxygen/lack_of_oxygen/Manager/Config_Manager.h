@@ -1,13 +1,18 @@
 /**
- * @file Config_Manager.h
- * @brief Defines the Config_Manager class for loading and accessing configuration data from a file.
- * @author Simon Chan
- * @date September 21, 2024
- */
+* @file Config_Manager.h
+* @brief Defines the Config_Manager class for loading and accessing configuration data from a file.
+* @author Simon Chan
+* @date September 21, 2024
+*/
 
 #pragma once
 
+#ifndef CONFIG_MANAGER_H
+#define CONFIG_MANAGER_H
+
 #include "Manager.h"
+
+// Include standard headers
 #include <string>
 #include <unordered_map>
 

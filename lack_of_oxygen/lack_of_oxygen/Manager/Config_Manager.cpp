@@ -1,6 +1,14 @@
+// Include base headers
 #include "Config_Manager.h"
+
+// Include standard headers
 #include <fstream>
 #include <sstream>
+
+// Jason file headers
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 namespace lof {
 
