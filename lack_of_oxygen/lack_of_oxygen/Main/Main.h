@@ -30,6 +30,7 @@
 
 // Include Utility headers
 #include "../Utility/Clock.h"
+#include "../Utility/Vector2D.h"
 
 // Include Manager headers
 #include "../Manager/Log_Manager.h"

@@ -11,6 +11,7 @@
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
+    <ClCompile Include="Utility\Matrix3x3.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
     <ClCompile Include="Manager\Config_Manager.cpp" />
@@ -27,6 +28,7 @@
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
+    <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Manager\FPS_Manager.h" />
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Manager\Config_Manager.h" />

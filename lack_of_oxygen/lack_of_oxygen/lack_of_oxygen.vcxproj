@@ -31,6 +31,8 @@
     <ClCompile Include="Manager\Config_Manager.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
+    <ClCompile Include="Utility\Matrix3x3.cpp" />
+    <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -47,7 +49,8 @@
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
-    <ClInclude Include="Utility\FPS.h" />
+    <ClInclude Include="Utility\Matrix3x3.h" />
+    <ClInclude Include="Utility\Vector2D.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
