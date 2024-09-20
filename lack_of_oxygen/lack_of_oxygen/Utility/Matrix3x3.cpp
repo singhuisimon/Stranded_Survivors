@@ -14,7 +14,7 @@ namespace lof
 		}
 	}
 
-	///! Constructor for pointers
+	//! Constructor for pointers
 	Matrix_Lib::Matrix_Lib(const float* arr)
 	{
 		if (arr != nullptr) {
@@ -104,10 +104,10 @@ namespace lof
 	}
 
 	//! Matrix-Vector Multiplication Operator
-	Vector2D operator * (const Matrix_Lib& lhs, const Vector2D& rhs)
+	Vec2D operator * (const Matrix_Lib& lhs, const Vec2D& rhs)
 	{
 		float rhs_zcoord = 1; //sets the vector object's z values to 1 to facilitate multiplying a 2x2 vector with a 3x3 matrix
-		Vector2D result;
+		Vec2D result;
 		result.x = lhs.mtx3x3[0][0] * rhs.x + lhs.mtx3x3[0][1] * rhs.y + lhs.mtx3x3[0][2] * rhs_zcoord;
 		result.y = lhs.mtx3x3[1][0] * rhs.x + lhs.mtx3x3[1][1] * rhs.y + lhs.mtx3x3[1][2] * rhs_zcoord;
 		return result;

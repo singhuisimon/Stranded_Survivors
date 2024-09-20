@@ -68,10 +68,8 @@ namespace lof {
 	}
 
 	//! Unary Operator
-	Vec2D& Vec2D::operator -() const {
-		Vec2D temp(-x, -y);
-
-		return temp;
+	Vec2D Vec2D::operator -() const {
+		return Vec2D(-x, -y);
 	}
 
 	//! Binary + operator
