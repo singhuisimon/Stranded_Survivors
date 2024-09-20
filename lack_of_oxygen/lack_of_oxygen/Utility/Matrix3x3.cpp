@@ -1,6 +1,6 @@
 #include "Matrix3x3.h"
 #include "Vector2D.h"
-#include "main.h"
+//#include "main.h"
 
 namespace lof
 {
@@ -104,10 +104,10 @@ namespace lof
 	}
 
 	//! Matrix-Vector Multiplication Operator
-	CSD1130::Vector2D operator * (const Matrix_Lib& lhs, const CSD1130::Vector2D& rhs)
+	Vector2D operator * (const Matrix_Lib& lhs, const Vector2D& rhs)
 	{
 		float rhs_zcoord = 1; //sets the vector object's z values to 1 to facilitate multiplying a 2x2 vector with a 3x3 matrix
-		CSD1130::Vector2D result;
+		Vector2D result;
 		result.x = lhs.mtx3x3[0][0] * rhs.x + lhs.mtx3x3[0][1] * rhs.y + lhs.mtx3x3[0][2] * rhs_zcoord;
 		result.y = lhs.mtx3x3[1][0] * rhs.x + lhs.mtx3x3[1][1] * rhs.y + lhs.mtx3x3[1][2] * rhs_zcoord;
 		return result;

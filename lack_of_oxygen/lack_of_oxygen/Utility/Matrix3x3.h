@@ -3,6 +3,11 @@
 #include "Vector2D.h"
 
 #pragma once
+
+#ifndef PI
+#define	PI	3.1415926f
+#endif
+
 namespace lof {
 
     typedef struct Matrix_Lib {
@@ -34,7 +39,7 @@ namespace lof {
     Matrix_Lib operator * (const Matrix_Lib& lhs, const Matrix_Lib& rhs);
 
     //! Matrix-Vector Multiplication Operator
-    CSD1130::Vector2D  operator * (const Matrix_Lib& lhs, const CSD1130::Vector2D& rhs);
+    Vector2D  operator * (const Matrix_Lib& lhs, const Vector2D& rhs);
 
     //! Function turns matrix into identity matrix
     void mtx3x3_identity(Matrix_Lib& result);
