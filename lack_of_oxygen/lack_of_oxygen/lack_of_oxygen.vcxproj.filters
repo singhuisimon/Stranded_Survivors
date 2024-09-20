@@ -11,6 +11,7 @@
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
+    <ClCompile Include="System\Collision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -24,5 +25,6 @@
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
+    <ClInclude Include="System\Collision.h" />
   </ItemGroup>
 </Project>

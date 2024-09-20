@@ -27,6 +27,7 @@
     <ClCompile Include="Manager\Game_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
+    <ClCompile Include="System\Collision.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
   </ItemGroup>
@@ -39,6 +40,7 @@
     <ClInclude Include="Manager\Game_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="System\Collision.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
