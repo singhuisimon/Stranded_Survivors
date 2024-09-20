@@ -11,7 +11,7 @@
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
-    <ClCompile Include="Utility\Vector2D.cpp" />
+    <ClCompile Include="Utility\Matrix3x3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -25,6 +25,6 @@
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
-    <ClInclude Include="Utility\Vector2D.h" />
+    <ClInclude Include="Utility\Matrix3x3.h" />
   </ItemGroup>
 </Project>
