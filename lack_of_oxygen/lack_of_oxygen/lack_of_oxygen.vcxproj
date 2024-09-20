@@ -30,6 +30,7 @@
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
+    <ClCompile Include="Utility\Vector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
@@ -44,6 +45,7 @@
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
+    <ClInclude Include="Utility\Vector2D.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
