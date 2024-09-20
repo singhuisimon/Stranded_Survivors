@@ -15,9 +15,12 @@
 namespace lof {
 
     Clock::Clock() {
-        m_previous_time = std::chrono::duration_cast<std::chrono::microseconds>(
+        int64_t current_time = std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::steady_clock::now().time_since_epoch()
         ).count();
+
+        m_previous_time = current_time;
+        m_start_time = current_time; // Initialize start time
     }
 
     int64_t Clock::delta() {
@@ -37,6 +40,14 @@ namespace lof {
         ).count();
 
         return current_time - m_previous_time;
+    }
+
+    int64_t Clock::split_total() const {
+        int64_t current_time = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now().time_since_epoch()
+        ).count();
+
+        return current_time - m_start_time;
     }
 
     void Clock::sleep(int64_t microseconds) {

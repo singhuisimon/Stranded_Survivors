@@ -11,6 +11,7 @@
 // Include other managers
 #include "Log_Manager.h"
 #include "ECS_Manager.h"
+#include "FPS_Manager.h"
 
 namespace lof {
 
@@ -24,14 +25,7 @@ namespace lof {
         return instance;
     }
 
-    /**
-     * @brief Start up all Game_Manager services.
-     *
-     * This method initializes the Game_Manager and other dependent managers.
-     * It should be called before using any Game_Manager functionalities.
-     *
-     * @return 0 if successful, -1 if Log_Manager fails to start, -2 if ECS_Manager fails to start.
-     */
+
     int Game_Manager::start_up() {
         if (is_started()) {
             return 0; // Already started
@@ -39,13 +33,19 @@ namespace lof {
 
         // Start up other managers
         if (LM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Log_Manager start_up() failed");
             return -1;
         }
         if (ECSM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() failed");
             return -2;
         }
+        if (FPSM.start_up() != 0) {
+			LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() failed");
+			return -3;
+        }
 
+        LM.write_log("All Managers started up successfully");
         m_is_started = true;
         return 0;
     }
@@ -56,20 +56,15 @@ namespace lof {
             return;
         }
 
+        // Shut down other managers
         ECSM.shut_down();
         LM.shut_down();
+        FPSM.shut_down();
 
         m_is_started = false;
     }
 
-    /**
-     * @brief Run a single frame of game logic.
-     *
-     * This method updates the game state for a single frame. It should be called
-     * once per frame in the main game loop.
-     *
-     * @param delta_time The time elapsed since the last update, in seconds.
-     */
+
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");

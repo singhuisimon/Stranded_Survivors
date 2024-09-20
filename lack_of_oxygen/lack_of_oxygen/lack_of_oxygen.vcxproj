@@ -24,24 +24,30 @@
     <ClCompile Include="Glad\glad.c" />
     <ClCompile Include="Main\Main.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
+    <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
+    <ClCompile Include="Manager\Config_Manager.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
+    <ClCompile Include="Utility\FPS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
+    <ClInclude Include="Manager\Config_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
+    <ClInclude Include="Manager\FPS_Manager.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
+    <ClInclude Include="Utility\FPS.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

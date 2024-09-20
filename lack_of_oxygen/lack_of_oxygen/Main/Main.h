@@ -34,5 +34,6 @@
 // Include Manager headers
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Game_Manager.h"
+#include "../Manager/FPS_Manager.h"
 
 #endif // LOF_MAIN_H

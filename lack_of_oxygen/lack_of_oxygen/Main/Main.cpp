@@ -16,11 +16,9 @@
 using namespace lof;
 
 // Settings
-const unsigned int SCR_WIDTH = 800;   ///< Screen width
-const unsigned int SCR_HEIGHT = 600;  ///< Screen height
-const int TARGET_FPS = 60;
-const int64_t MICROSECONDS_PER_SECOND = 1000000;
-const int64_t TARGET_TIME = MICROSECONDS_PER_SECOND / TARGET_FPS; // Target frame time in microseconds
+const unsigned int SCR_WIDTH = 800;         //< Screen width
+const unsigned int SCR_HEIGHT = 600;        //< Screen height
+const float FPS_DISPLAY_INTERVAL = 1.0f;    // Update FPS display every 1 second
 
 /**
  * @brief Main function of the application.
@@ -63,47 +61,37 @@ int main(void) {
         glfwTerminate();
         return -1;
     }
+    else {
+        // Write a log message
+        LM.write_log("Game engine started successfully.");
+    }
 
-    // Write a log message
-    LM.write_log("Game engine started successfully.");
-
-    // Game loop setup
-    Clock clock;
-    int64_t adjust_time = 0;
+    // Variables for FPS display
+    float fps = 0.0f;
+    float fps_timer = 0.0f;
 
     // Game loop
     while (!glfwWindowShouldClose(window) && !GM.get_game_over()) {
-        clock.delta(); // Start of frame timing
+        // Start of frame timing
+        FPSM.frame_start();
+
+        // Get delta_time after frame_start()
+        float delta_time = FPSM.get_delta_time(); // Get delta time in seconds
+
+        // Update FPS timer
+        fps_timer += delta_time;
+        if (fps_timer >= FPS_DISPLAY_INTERVAL) {
+            fps = FPSM.get_current_fps();
+            fps_timer = 0.0f;
+
+            // Display or log the FPS
+            std::cout << "Current FPS: " << fps << std::endl;
+        }
 
         // Get input (e.g., keyboard/mouse)
         glfwPollEvents();
 
-        // Frame rate control
-        // Measure the time taken for the main loop to complete so far
-        int64_t loop_time = clock.split();
-
-        // Calculate how long the program should sleep to maintain the target frame time.
-        int64_t intended_sleep_time = TARGET_TIME - loop_time - adjust_time;
-
-        // If the calculated sleep time is positive, the program will sleep for that duration
-        if (intended_sleep_time > 0) {
-            Clock::sleep(intended_sleep_time);
-        }
-
-        // Measure the actual sleep time by splitting the clock again after sleep
-        // and subtracting the loop time from it.
-        int64_t actual_sleep_time = clock.split() - loop_time;
-
-        // Adjust the sleep time for the next frame, compensating for any discrepancy
-        // between the intended sleep time and the actual sleep time.
-        adjust_time = actual_sleep_time - intended_sleep_time;
-
-        // Ensure that adjust_time does not become negative, as negative values
-        // would cause problems in future frame timing calculations.
-        if (adjust_time < 0) adjust_time = 0;
-
         // Update game world state
-        float delta_time = static_cast<float>(clock.split()) / 1000000.0f; // Convert to seconds
         GM.update(delta_time);
 
         // Draw current scene to back buffer
@@ -113,6 +101,9 @@ int main(void) {
 
         // Swap back buffer to current buffer
         glfwSwapBuffers(window);
+
+        // End of frame timing and FPS control
+        FPSM.frame_end();
     }
 
     // Shutdown the Game_Manager
