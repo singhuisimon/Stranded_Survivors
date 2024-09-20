@@ -12,6 +12,7 @@
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
     <ClCompile Include="System\Collision.cpp" />
+    <ClCompile Include="Utility\Matrix3x3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -26,5 +27,6 @@
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
     <ClInclude Include="System\Collision.h" />
+    <ClInclude Include="Utility\Matrix3x3.h" />
   </ItemGroup>
 </Project>
