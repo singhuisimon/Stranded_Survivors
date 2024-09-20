@@ -38,8 +38,8 @@ namespace lof {
     //! Matrix Multiplication Operator
     Matrix_Lib operator * (const Matrix_Lib& lhs, const Matrix_Lib& rhs);
 
-    //! Matrix-Vector Multiplication Operator
-    Vector2D  operator * (const Matrix_Lib& lhs, const Vector2D& rhs);
+    ////! Matrix-Vector Multiplication Operator
+    Vec2D  operator * (const Matrix_Lib& lhs, const Vec2D& rhs);
 
     //! Function turns matrix into identity matrix
     void mtx3x3_identity(Matrix_Lib& result);

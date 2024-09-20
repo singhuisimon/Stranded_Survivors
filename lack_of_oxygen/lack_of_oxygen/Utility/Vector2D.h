@@ -31,7 +31,7 @@ namespace lof {
 		Vec2D& operator /= (float rhs);
 		Vec2D& operator *= (float rhs);
 
-		Vec2D& operator -() const;
+		Vec2D operator -() const;
 
 	} Vector2D, Vec2;
 
