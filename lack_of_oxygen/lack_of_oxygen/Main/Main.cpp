@@ -1,50 +1,64 @@
 /**
  * @file main.cpp
  * @brief Entry point of the game engine application.
- * @details Initializes the game engine, sets up the window, and runs the main loop.
+ * @details Initializes the Game_Manager, loads configurations, sets up the window, and runs the main loop.
  * @author Simon Chan
- * @date September 16, 2024
+ * @date September 21, 2024
  */
 
-// Include file headers
+ // Include file headers
 #include "Main.h"
 
 // Include standard headers
 #include <thread>
 #include <chrono>
+#include <iostream>
+
+// Include for memory leaks
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 using namespace lof;
 
-// Settings
-const unsigned int SCR_WIDTH = 800;   ///< Screen width
-const unsigned int SCR_HEIGHT = 600;  ///< Screen height
-const int TARGET_FPS = 60;
-const int64_t MICROSECONDS_PER_SECOND = 1000000;
-const int64_t TARGET_TIME = MICROSECONDS_PER_SECOND / TARGET_FPS; // Target frame time in microseconds
 
-/**
- * @brief Main function of the application.
- * @return int Exit status of the application.
- * @details Initializes GLFW, creates a window, sets up the ECS, and runs the main game loop.
- */
 int main(void) {
+
+    // --------------------------- Initialization ---------------------------
+
+    // Enable debug heap allocations and automatic leak checking at exit
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+    // -------------------------- GLFW Initialization --------------------------
+
     // Initialize GLFW
     if (!glfwInit()) {
-        std::cout << "Failed to initialize GLFW!" << std::endl;
+        LM.write_log("Failed to initialize GLFW!");
+        std::cerr << "Failed to initialize GLFW!" << std::endl;
         return -1;
+    }
+    else {
+        LM.write_log("GLFW initialized successfully.");
     }
 
     // Set OpenGL version and profile
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Create a windowed mode window and its OpenGL context
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Lack Of Oxygen", NULL, NULL);
+    // --------------------------- Create GLFW Window ---------------------------
+
+    // Create a windowed mode window and its OpenGL context using default values
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
     if (!window) {
         LM.write_log("Failed to create GLFW window!");
+        std::cerr << "Failed to create GLFW window!" << std::endl;
         glfwTerminate();
         return -1;
+    }
+    else {
+        LM.write_log("GLFW window created successfully with size %ux%u.", 800, 600);
+        std::cout << "GLFW window created successfully with size 800x600." << std::endl;
     }
 
     // Make the window's context current
@@ -53,72 +67,125 @@ int main(void) {
     // Load OpenGL function pointers with GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         LM.write_log("Failed to initialize OpenGL function pointers!");
+        std::cerr << "Failed to initialize OpenGL function pointers!" << std::endl;
+        glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
     }
+    else {
+        LM.write_log("GLAD initialized successfully.");
+        std::cout << "GLAD initialized successfully." << std::endl;
+    }
 
-    // Start up the Game_Manager
+    // --------------------------- Start Game_Manager ---------------------------
+
+    // Initialize Game_Manager (which initializes Log_Manager, Config_Manager, ECS_Manager, FPS_Manager, Input_Manager)
     if (GM.start_up() != 0) {
+        std::cerr << "Failed to start Game_Manager!" << std::endl;
         LM.write_log("Failed to start Game_Manager!");
+        glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
     }
+    else {
+        LM.write_log("Game_Manager started up successfully.");
+        std::cout << "Game_Manager started up successfully." << std::endl;
+    }
 
-    // Write a log message
-    LM.write_log("Game engine started successfully.");
+    // --------------------------- Retrieve Configuration ---------------------------
 
-    // Game loop setup
-    Clock clock;
-    int64_t adjust_time = 0;
+    // Retrieve configuration values from Config_Manager
+    const unsigned int SCR_WIDTH = SM.get_scr_width();
+    const unsigned int SCR_HEIGHT = SM.get_scr_height();
+    const float FPS_DISPLAY_INTERVAL = SM.get_fps_display_interval();
+
+    // Log the configuration values
+    LM.write_log("Configuration Values - SCR_WIDTH: %u, SCR_HEIGHT: %u, FPS_DISPLAY_INTERVAL: %.2f",
+        SCR_WIDTH, SCR_HEIGHT, FPS_DISPLAY_INTERVAL);
+    std::cout << "Configuration Values - SCR_WIDTH: " << SCR_WIDTH
+        << ", SCR_HEIGHT: " << SCR_HEIGHT
+        << ", FPS_DISPLAY_INTERVAL: " << FPS_DISPLAY_INTERVAL << std::endl;
+
+    // If the window size from Config_Manager differs from the created window, adjust it
+    if (SCR_WIDTH != 800 || SCR_HEIGHT != 600) {
+        glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
+        LM.write_log("GLFW window size adjusted to %ux%u based on configuration.", SCR_WIDTH, SCR_HEIGHT);
+        std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
+    }
+
+    // -------------------------- Game Loop Setup --------------------------
+
+    // Variables for FPS display
+    float fps = 0.0f;
+    float fps_timer = 0.0f;
+
+    LM.write_log("Entering main game loop.");
+    std::cout << "Entering main game loop." << std::endl;
 
     // Game loop
     while (!glfwWindowShouldClose(window) && !GM.get_game_over()) {
-        clock.delta(); // Start of frame timing
+        // Start of frame timing
+        FPSM.frame_start();
 
-        // Get input (e.g., keyboard/mouse)
-        glfwPollEvents();
+        // Get delta_time after frame_start()
+        float delta_time = FPSM.get_delta_time(); // Get delta time in seconds
 
-        // Frame rate control
-        // Measure the time taken for the main loop to complete so far
-        int64_t loop_time = clock.split();
+        // Update FPS timer
+        fps_timer += delta_time;
+        if (fps_timer >= FPS_DISPLAY_INTERVAL) {
+            fps = FPSM.get_current_fps();
+            fps_timer = 0.0f;
 
-        // Calculate how long the program should sleep to maintain the target frame time.
-        int64_t intended_sleep_time = TARGET_TIME - loop_time - adjust_time;
-
-        // If the calculated sleep time is positive, the program will sleep for that duration
-        if (intended_sleep_time > 0) {
-            Clock::sleep(intended_sleep_time);
+            // Display FPS in console
+            std::cout << "Current FPS: " << fps << std::endl;
         }
 
-        // Measure the actual sleep time by splitting the clock again after sleep
-        // and subtracting the loop time from it.
-        int64_t actual_sleep_time = clock.split() - loop_time;
-
-        // Adjust the sleep time for the next frame, compensating for any discrepancy
-        // between the intended sleep time and the actual sleep time.
-        adjust_time = actual_sleep_time - intended_sleep_time;
-
-        // Ensure that adjust_time does not become negative, as negative values
-        // would cause problems in future frame timing calculations.
-        if (adjust_time < 0) adjust_time = 0;
+        // Poll for and process events
+        glfwPollEvents();
 
         // Update game world state
-        float delta_time = static_cast<float>(clock.split()) / 1000000.0f; // Convert to seconds
         GM.update(delta_time);
 
-        // Draw current scene to back buffer
+        // Check for game_over and set window should close flag
+        if (GM.get_game_over()) {
+            glfwSetWindowShouldClose(window, true);
+            LM.write_log("Main Loop: game_over is true. Setting GLFW window to close.");
+            std::cout << "Main Loop: game_over is true. Setting GLFW window to close." << std::endl;
+        }
+
+        // Render the current frame
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
         // Here you would render your entities
 
-        // Swap back buffer to current buffer
+        // Swap front and back buffers
         glfwSwapBuffers(window);
+
+        // End of frame timing and FPS control
+        FPSM.frame_end();
     }
 
-    // Shutdown the Game_Manager
+    LM.write_log("Exiting main game loop.");
+    std::cout << "Exiting main game loop." << std::endl;
+
+    // --------------------------- Shutdown Sequence ---------------------------
+
+    // Shutdown the Game_Manager (which shuts down all other managers)
     GM.shut_down();
+    LM.write_log("Game_Manager shut down successfully.");
+    std::cout << "Game_Manager shut down successfully." << std::endl;
+
+    // Destroy the window
+    glfwDestroyWindow(window);
+    std::cout << "GLFW window destroyed." << std::endl;
 
     // Terminate GLFW
     glfwTerminate();
+    std::cout << "GLFW terminated." << std::endl;
+
+    // Application exit
+    std::cout << "Application exited successfully." << std::endl;
+
     return 0;
 }

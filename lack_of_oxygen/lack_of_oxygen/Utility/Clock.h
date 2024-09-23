@@ -21,7 +21,8 @@ namespace lof {
      */
     class Clock {
     private:
-        int64_t m_previous_time; ///< Previous call to delta() (in microseconds).
+        int64_t m_previous_time;
+        int64_t m_start_time;
 
     public:
         /**
@@ -40,6 +41,12 @@ namespace lof {
          * @return Time elapsed in microseconds, or -1 if an error occurred.
          */
         int64_t split() const;
+
+        /**
+         * @brief Calculates total time elapsed since last delta() call without resetting the clock.
+         * @return Time elapsed in microseconds, or -1 if an error occurred.
+         */
+        int64_t split_total() const;
 
         /**
          * @brief Sleeps for the specified number of microseconds.

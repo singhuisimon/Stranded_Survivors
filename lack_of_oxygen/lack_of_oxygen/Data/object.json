@@ -1,0 +1,38 @@
+{
+  "object": [
+    {
+      "id": 1,
+      "name": "player",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "rotation": [ 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        },
+        "Model_Component": {
+          "model_name": "square.msh"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "enemy",
+      "components": {
+        "Transform2D": {
+          "position": [ 5.0, 3.0 ],
+          "rotation": [ 45.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        },
+        "Model_Component": {
+          "model_name": "square.msh"
+        }
+      }
+    }
+  ]
+}

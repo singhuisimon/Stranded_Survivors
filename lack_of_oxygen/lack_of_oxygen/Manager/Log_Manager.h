@@ -10,6 +10,9 @@
 #ifndef LOF_LOG_MANAGER_H
 #define LOF_LOG_MANAGER_H
 
+// Macros for accessing manager singleton instances
+#define LM  lof::Log_Manager::get_instance()
+
  // Include base Manager class
 #include "Manager.h"
 
@@ -20,8 +23,6 @@
 #include <mutex>
 
 namespace lof {
-
-#define LM lof::Log_Manager::get_instance()
 
     const std::string LOGFILE_DEFAULT = "Lack_Of_Oxygen.log";
 
@@ -39,14 +40,8 @@ namespace lof {
          */
         Log_Manager();
 
-        /**
-         * @brief Deleted copy constructor to prevent copying.
-         */
+        // Delete copy constructor and assignment operator to prevent copying.
         Log_Manager(const Log_Manager&) = delete;
-
-        /**
-         * @brief Deleted assignment operator to prevent assignment.
-         */
         Log_Manager& operator=(const Log_Manager&) = delete;
 
     public:
