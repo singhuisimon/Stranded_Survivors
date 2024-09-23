@@ -21,7 +21,7 @@ namespace lof {
 
 
     Log_Manager::Log_Manager()
-        : do_flush(false), log_file_name(LOGFILE_DEFAULT) {
+        : do_flush(true), log_file_name(LOGFILE_DEFAULT) {
         set_type("Log_Manager");
         m_is_started = false;
     }

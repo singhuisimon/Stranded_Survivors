@@ -8,6 +8,9 @@
 #ifndef LOF_FPS_MANAGER_H
 #define LOF_FPS_MANAGER_H
 
+// Macros for accessing manager singleton instances
+#define FPSM lof::FPS_Manager::get_instance()
+
  // Include base Manager class
 #include "Manager.h"
 
@@ -18,16 +21,13 @@
 
 namespace lof {
 
-    // Two-letter acronym for easier access to manager.
-#define FPSM lof::FPS_Manager::get_instance()
-
-/**
- * @class FPS_Manager
- * @brief Manages the frame rate of the game loop to maintain consistent FPS.
- *
- * This class is implemented as a singleton and is responsible for
- * controlling the timing of the game loop to achieve a target FPS.
- */
+    /**
+     * @class FPS_Manager
+     * @brief Manages the frame rate of the game loop to maintain consistent FPS.
+     *
+     * This class is implemented as a singleton and is responsible for
+     * controlling the timing of the game loop to achieve a target FPS.
+     */
     class FPS_Manager : public Manager {
     private:
         FPS_Manager();                      // Private since a singleton.

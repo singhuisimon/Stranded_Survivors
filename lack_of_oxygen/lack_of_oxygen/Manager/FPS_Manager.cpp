@@ -93,10 +93,10 @@ namespace lof {
         fps_calculator.update(static_cast<int64_t>(delta_time * MICROSECONDS_PER_SECOND));
 
         // Debug output
-        std::cout << "Loop Time: " << loop_time
-            << ", Intended Sleep: " << intended_sleep_time
-            << ", Actual Sleep: " << actual_sleep_time
-            << ", Adjust Time: " << adjust_time << std::endl;
+        //std::cout << "Loop Time: " << loop_time
+        //    << ", Intended Sleep: " << intended_sleep_time
+        //    << ", Actual Sleep: " << actual_sleep_time
+        //    << ", Adjust Time: " << adjust_time << std::endl;
     }
 
 
