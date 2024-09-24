@@ -1,16 +1,21 @@
 /**
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class methods.
- * @author Simon Chan
- * @date September 16, 2024
+ * @date September 21, 2024
  */
 
-// Include header file
+ // Include header file
 #include "Game_Manager.h"
 
 // Include other managers
 #include "Log_Manager.h"
 #include "ECS_Manager.h"
+#include "FPS_Manager.h"
+#include "Serialization_Manager.h"
+#include "Input_Manager.h"
+
+// Include iostream for console output
+#include <iostream>
 
 namespace lof {
 
@@ -24,52 +29,98 @@ namespace lof {
         return instance;
     }
 
-    /**
-     * @brief Start up all Game_Manager services.
-     *
-     * This method initializes the Game_Manager and other dependent managers.
-     * It should be called before using any Game_Manager functionalities.
-     *
-     * @return 0 if successful, -1 if Log_Manager fails to start, -2 if ECS_Manager fails to start.
-     */
     int Game_Manager::start_up() {
         if (is_started()) {
             return 0; // Already started
         }
 
-        // Start up other managers
+        // Start up Log_Manager first
         if (LM.start_up() != 0) {
+            // If Log_Manager fails to start, there's no way to log the error using LM
             return -1;
         }
+        else {
+            LM.write_log("Game_Manager::start_up(): Log_Manager start_up() successful");
+        }
+
+        // Start up Config_Manager
+        if (SM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Config_Manager start_up() failed");
+            LM.shut_down();
+            return -2;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up() : Config_Manager start_up() successful");
+        }
+
+        // Start up ECS_Manager
         if (ECSM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() failed");
-            return -2;
+            SM.shut_down();
+            LM.shut_down();
+            return -3;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() successful");
+        }
+
+        // Load entities into ECS_Manager
+        if (ECSM.load_entities(SM.get_entities_config(), SM.get_models()) != 0) {
+            LM.write_log("Game_Manager::start_up(): Failed to load entities into ECS_Manager");
+            ECSM.shut_down();
+            SM.shut_down();
+            LM.shut_down();
+            return -4;
+        }
+
+        // Start up FPS_Manager
+        if (FPSM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() failed");
+            ECSM.shut_down();
+            SM.shut_down();
+            LM.shut_down();
+            return -5;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() successful");
+        }
+
+        // Start up Input_Manager
+        if (IM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Input_Manager start_up() failed");
+            FPSM.shut_down();
+            ECSM.shut_down();
+            SM.shut_down();
+            LM.shut_down();
+            return -6;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
 
         m_is_started = true;
+        LM.write_log("Game_Manager::start_up(): Game_Manager started");
+        std::cout << "Game_Manager started successfully." << std::endl;
+
         return 0;
     }
-
 
     void Game_Manager::shut_down() {
         if (!is_started()) {
             return;
         }
 
+        // Shut down managers in reverse order of startup
+        IM.shut_down(); // Input_Manager
+        FPSM.shut_down();
         ECSM.shut_down();
+        SM.shut_down();
         LM.shut_down();
 
         m_is_started = false;
+        std::cout << "Game_Manager shut down successfully." << std::endl;
     }
 
-    /**
-     * @brief Run a single frame of game logic.
-     *
-     * This method updates the game state for a single frame. It should be called
-     * once per frame in the main game loop.
-     *
-     * @param delta_time The time elapsed since the last update, in seconds.
-     */
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
@@ -79,22 +130,31 @@ namespace lof {
         // Update game world state
         ECSM.update(delta_time);
 
+        // Check for game over condition based on input
+        if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
+            set_game_over(true);
+            LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
+            std::cout << "Escape key pressed. Closing the game." << std::endl;
+        }
+
+        // Update Input_Manager
+        IM.update();
+
         m_step_count++;
     }
 
-
     void Game_Manager::set_game_over(bool new_game_over) {
         m_game_over = new_game_over;
+        LM.write_log("Game_Manager::set_game_over(): game_over set to %s", new_game_over ? "true" : "false");
+        std::cout << "Game_Manager::set_game_over(): game_over set to " << (new_game_over ? "true" : "false") << std::endl;
     }
-
 
     bool Game_Manager::get_game_over() const {
         return m_game_over;
     }
 
-
     int Game_Manager::get_step_count() const {
         return m_step_count;
     }
 
-} // end of namespace lof
+} // namespace lof

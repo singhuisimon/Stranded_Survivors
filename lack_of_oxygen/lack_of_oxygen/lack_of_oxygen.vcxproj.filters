@@ -5,7 +5,6 @@
     <ClCompile Include="Main\Main.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
-    <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
@@ -13,6 +12,12 @@
     <ClCompile Include="Manager\Game_Manager.cpp" />
     <ClCompile Include="System\Collision.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
+    <ClCompile Include="Manager\FPS_Manager.cpp" />
+    <ClCompile Include="Utility\FPS.cpp" />
+    <ClCompile Include="Manager\Serialization_Manager.cpp" />
+    <ClCompile Include="Utility\Vector2D.cpp" />
+    <ClCompile Include="Utility\Model.cpp" />
+    <ClCompile Include="Manager\Input_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -28,5 +33,18 @@
     <ClInclude Include="Manager\Game_Manager.h" />
     <ClInclude Include="System\Collision.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
+    <ClInclude Include="Manager\FPS_Manager.h" />
+    <ClInclude Include="Utility\FPS.h" />
+    <ClInclude Include="Manager\Serialization_Manager.h" />
+    <ClInclude Include="Utility\Vector2D.h" />
+    <ClInclude Include="Utility\Model.h" />
+    <ClInclude Include="Manager\Input_Manager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\config.json" />
+    <None Include="Data\square.msh" />
+    <None Include="Data\object.json" />
+    <None Include="Data\triangle.msh" />
+    <None Include="Manager\ECS_Manager.tpp" />
   </ItemGroup>
 </Project>

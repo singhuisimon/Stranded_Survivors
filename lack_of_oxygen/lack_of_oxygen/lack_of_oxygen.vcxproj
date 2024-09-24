@@ -19,35 +19,51 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Glad\glad.c" />
     <ClCompile Include="Main\Main.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
+    <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
+    <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="System\Collision.cpp" />
+    <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
+    <ClCompile Include="Utility\Model.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
+    <ClCompile Include="Utility\FPS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
+    <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
+    <ClInclude Include="Manager\FPS_Manager.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
+    <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="System\Collision.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
+    <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
+    <ClInclude Include="Utility\Model.h" />
     <ClInclude Include="Utility\Vector2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\config.json" />
+    <None Include="Data\object.json" />
+    <None Include="Data\square.msh" />
+    <None Include="Data\triangle.msh" />
+    <None Include="Manager\ECS_Manager.tpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -135,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,7 +168,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

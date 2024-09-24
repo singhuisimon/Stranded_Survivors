@@ -8,7 +8,7 @@
 #ifndef LOF_MANAGER_H
 #define LOF_MANAGER_H
 
- // Include standard headers
+// Include standard headers
 #include <string>
 
 namespace lof {

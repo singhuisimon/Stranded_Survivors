@@ -3,7 +3,7 @@
  * @brief Main header file for the game engine application.
  * @details Includes necessary libraries and headers for the application entry point.
  * @author Simon Chan
- * @date September 15, 2024
+ * @date September 21, 2024
  */
 
 #ifndef LOF_MAIN_H
@@ -25,15 +25,17 @@
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
 #include "../System/System.h"
-#include "../Manager/ECS_Manager.h"
 #include "../System/Movement_System.h"
+#include "../Manager/ECS_Manager.h"
 
 // Include Utility headers
 #include "../Utility/Clock.h"
 #include "../Utility/Vector2D.h"
 
 // Include Manager headers
-#include "../Manager/Log_Manager.h"
 #include "../Manager/Game_Manager.h"
+#include "../Manager/Log_Manager.h"
+#include "../Manager/FPS_Manager.h"
+#include "../Manager/Serialization_Manager.h"
 
 #endif // LOF_MAIN_H
