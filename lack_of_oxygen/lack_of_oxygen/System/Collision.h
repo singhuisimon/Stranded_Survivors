@@ -1,28 +1,67 @@
 #pragma once
 //Collision System
-#include <vector>
+//#include <vector>
 
-class Component {};
+#include "../Utility/Vector2D.h" //to get the library from vector2D.h
 
-class TransformComponent: public Component
+
+namespace lof 
 {
-public: 
-	float m_x, m_y; //position 
-	float m_width, m_height; //size
-	float m_rotation;
+	class Collision_Component
+	{
+	public:
+		float width, height;
 
-	//constructors for transfrom 
-	TransformComponent(float x = 0.0f, float y = 0.0f, float width = 0.0f, float height = 0.0f, float rotation = 0.0f)
-		:m_x(x), m_y(y), m_width(width), m_height(height), m_rotation(rotation) {}
+		//constructor for collision components 
+		Collision_Component(float width, float height);
+	};
 
-};
+	//class for transform component
+	class Transform_Component
+	{
+	public:
+		Vec2D pos; //position 
+		float m_width, m_height; //size
+		float m_rotation; //rotation
+
+		//constructors for transfrom 
+		Transform_Component(float x, float y, float width, float height, float rotation);
+			
+
+	};
 
 
 
-class AABB {
-public: 
-	float width, height;
-	AABB(float Width, float Height) : width(Width), height(Height) {};
-};
+
+	struct AABB {
+
+		Vec2D min;
+		Vec2D max;
+
+		//Constructor to initialize minimun and maximun points
+		AABB(const Vec2D& min, const Vec2D& max);
+
+		static AABB from_Tranform(const Transform_Component& transform);
+
+
+
+	};
+
+	class Collision_System
+	{
+	public:
+		bool CollisionIntersection_RectRect(const AABB& aabb1,
+			const Vec2D& vel1,
+			const AABB& aabb2,
+			const Vec2D& vel2,
+			float& firstTimeOfCollision);
+
+		//function to check if a point is within a box
+		bool is_Intersept_Box(float box_x, float box_y, float width, float height, int mouseX, int mouseY);
+	};
+	
+
+
+}
 
 
