@@ -2,10 +2,13 @@
 //Collision System
 //#include <vector>
 
+
 #include "../Utility/Vector2D.h" //to get the library from vector2D.h
+#include <vector>
+#include "../Entity/Entity.h"
+#include "../Component/Component.h"
 
-
-namespace lof 
+namespace lof
 {
 	class Collision_Component
 	{
@@ -26,12 +29,9 @@ namespace lof
 
 		//constructors for transfrom 
 		Transform_Component(float x, float y, float width, float height, float rotation);
-			
+
 
 	};
-
-
-
 
 	struct AABB {
 
@@ -41,16 +41,14 @@ namespace lof
 		//Constructor to initialize minimun and maximun points
 		AABB(const Vec2D& min, const Vec2D& max);
 
+		//create AACC from transform component
 		static AABB from_Tranform(const Transform_Component& transform);
-
-
-
 	};
 
 	class Collision_System
 	{
 	public:
-		bool CollisionIntersection_RectRect(const AABB& aabb1,
+		bool Collision_Intersection_RectRect(const AABB& aabb1,
 			const Vec2D& vel1,
 			const AABB& aabb2,
 			const Vec2D& vel2,
@@ -58,8 +56,14 @@ namespace lof
 
 		//function to check if a point is within a box
 		bool is_Intersept_Box(float box_x, float box_y, float width, float height, int mouseX, int mouseY);
+
+
+		////to check the object that is collide 
+		//bool Check_Collision(const std::vector<Entity>& entity,
+		//	const std::vector<Position_Component>& pos,
+		//	const std::vector<Velocity_Component>& vel);
 	};
-	
+
 
 
 }
