@@ -7,6 +7,8 @@
 #include <vector>
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
+#include "../Manager/ECS_Manager.h"
+
 
 namespace lof
 {
@@ -62,6 +64,10 @@ namespace lof
 		//bool Check_Collision(const std::vector<Entity>& entity,
 		//	const std::vector<Position_Component>& pos,
 		//	const std::vector<Velocity_Component>& vel);
+		
+		void Collision_Update(std::vector<Entity>& entities, float dt);
+
+		
 	};
 
 

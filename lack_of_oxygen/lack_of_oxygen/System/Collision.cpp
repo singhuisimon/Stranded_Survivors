@@ -211,6 +211,8 @@ namespace lof
 			mouseY >= box_y && mouseY <= (box_y + height);
 	}
 
+
+
 	//bool Check_Collision(const std::vector<Entity>& entity,
 	//	const std::vector<Position_Component>& pos,
 	//	const std::vector<Velocity_Component>& vel)
