@@ -108,18 +108,45 @@ namespace lof {
 
     //class mass component 
     class Mass_Component : public Component {
-    public: 
+    public:
         float mass; //mass of entity
-        float inv_mass; 
+        float inv_mass;
         bool is_static; //to check if the entity is static or not
 
         Mass_Component(float m = 1.0f, bool is_static = false)
             : mass(m), inv_mass((m > 0.0f) ? 1.0f / m : 0.0f), is_static(is_static) {}
 
-        /*void set_mass(float m) {
-            mass = m; 
+        void set_mass(float m) {
+            mass = m;
             inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
-        }*/
+        }
+
+    };
+
+    /**
+    * @class Physics_Component 
+    * @brief Component representing global physics properties
+    */
+
+    class Physics_Component : public Component {
+    public: 
+        Vec2D gravity; 
+        float damping_factor;
+        float max_velocity;
+        Vec2D accumulated_force; //to accumulate forces applied to the entity.
+
+        Physics_Component(Vec2D gravity = Vec2D(0, -9.8f),
+            float damping_factor = 0.90f,
+            float max_velocity = 1000.0f ) 
+            : gravity(gravity), damping_factor(damping_factor), max_velocity(max_velocity), accumulated_force(Vec2D(0,0)) {}
+
+        //Apply force
+        void apply_force(const Vec2D& force) {
+            accumulated_force += force;
+        }
+
+    };
+
     /** // FOR TESTING FIRST (VALUES WILL BE READ FROM A FILE IN THE FUTURE)
     * @class Graphics_Component
     * @brief Component representing an entity's graphical data.
