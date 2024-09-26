@@ -1,5 +1,6 @@
 #include "Collision.h"
 #include "../Component/Component.h"
+
 #include <iostream>
 
 namespace lof
@@ -234,6 +235,15 @@ namespace lof
 			mouseY >= box_y && mouseY <= (box_y + height);
 	}
 
+	void Collision_System::Collision_Update( float dt)
+	{
+		for (const auto& entity_ptr : ecs_manager.get_entities())
+		{
+			EntityID entity_ID = entity_ptr->get_id();
+			if (entity_ptr->has_component(ecs_manager.get_component_id < Collision_Component>())) {
+
+		}
+	}
 	//void Collision_System::Collision_Update(std::vector<Entity>& entities, float dt)
 	//{
 	//	float first_time_collision = 0.0f;

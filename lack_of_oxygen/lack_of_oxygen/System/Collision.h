@@ -3,12 +3,17 @@
 //#include <vector>
 
 
+#include "System.h"
 #include "../Utility/Vector2D.h" //to get the library from vector2D.h
-#include <vector>
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
 #include "../Manager/ECS_Manager.h"
+#include <vector>
 
+namespace lof
+{
+	class ECS_Manager;
+}
 
 namespace lof
 {
@@ -35,8 +40,10 @@ namespace lof
 		static AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision) {}
 	};
 
-	class Collision_System
+	class Collision_System : public System
 	{
+	private:
+		ECS_Manager& ecs_manager;
 	public:
 		struct Line_segment
 		{
@@ -63,9 +70,9 @@ namespace lof
 		bool is_Intersept_Box(float pos_box_x, float pos_box_y, float width_box, float height_boxx, int mouseX, int mouseY);
 
 		//check collision within grid cell
-		void Check_Collision_In_Grid_Cell(const std::vector<Entity>& entities, const AABB& gridCell);
+		/*void Check_Collision_In_Grid_Cell(const std::vector<Entity>& entities, const AABB& gridCell);
 
-		void Update_Grid(std::vector<Entity>& entites);
+		void Update_Grid(std::vector<Entity>& entites);*/
 
 
 		////to check the object that is collide 
@@ -74,7 +81,7 @@ namespace lof
 		//	const std::vector<Velocity_Component>& vel);
 		
 		/*void Collision_Update(std::vector<Entity>& entities, float dt);*/
-
+		void Collision_Update(float dt);
 	};
 
 
