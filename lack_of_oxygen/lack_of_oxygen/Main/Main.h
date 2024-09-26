@@ -9,11 +9,6 @@
 #ifndef LOF_MAIN_H
 #define LOF_MAIN_H
 
- // Include GLAD then GLFW (in this order)
-#define GLFW_INCLUDE_NONE
-#include "../Glad/glad.h"
-#include <GLFW/glfw3.h>
-
 // Include standard headers
 #include <iostream>
 #include <memory>
@@ -37,5 +32,6 @@
 #include "../Manager/Log_Manager.h"
 #include "../Manager/FPS_Manager.h"
 #include "../Manager/Serialization_Manager.h"
+#include "../Manager/Graphics_Manager.h"
 
 #endif // LOF_MAIN_H

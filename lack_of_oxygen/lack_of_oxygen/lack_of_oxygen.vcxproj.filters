@@ -17,6 +17,8 @@
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\Model.cpp" />
     <ClCompile Include="Manager\Input_Manager.cpp" />
+    <ClCompile Include="System\Render_System.cpp" />
+    <ClCompile Include="Manager\Graphics_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -37,6 +39,8 @@
     <ClInclude Include="Utility\Vector2D.h" />
     <ClInclude Include="Utility\Model.h" />
     <ClInclude Include="Manager\Input_Manager.h" />
+    <ClInclude Include="System\Render_System.h" />
+    <ClInclude Include="Manager\Graphics_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
