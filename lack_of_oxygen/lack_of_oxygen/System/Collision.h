@@ -37,7 +37,7 @@ namespace lof
 		AABB(const Vec2D& min, const Vec2D& max);
 
 		//create AABB from transform component
-		static AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision) {}
+		static AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision);
 	};
 
 	class Collision_System : public System
@@ -82,6 +82,7 @@ namespace lof
 		
 		/*void Collision_Update(std::vector<Entity>& entities, float dt);*/
 		void Collision_Update(float dt);
+		//might need: handle collision
 	};
 
 

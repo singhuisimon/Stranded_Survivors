@@ -40,7 +40,7 @@ namespace lof
 		std::cout << "output some to see if got anything on console\n";
 	}
 
-	AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision) 
+	AABB AABB::from_Tranform(const Transform2D& transform, const Collision_Component& collision) 
 	{
 		Vec2D min;
 		Vec2D max;
@@ -61,32 +61,21 @@ namespace lof
 		float& firstTimeOfCollision)
 	{
 
-		if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x) //check for A.max < B.min or A.min > B.min for x axis
+		//check for A.max < B.min or A.min > B.min for x axis & y axis
+		if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x || 
+			aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y) 
 		{
 			return false; //no intersection
 		}
 
-		if (aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y) // check for same thing but for y-axis
-		{
-			return false; //no intersection
-		}
+		float Vb_x = vel2.x - vel1.x;; //initialize Vb for x axis 
+		float Vb_y = vel2.y - vel1.y;; //initialize Vb for y axis
 
-		float Vb_x; //initialize Vb for x axis 
-		Vb_x = vel2.x - vel1.x;
-		float Vb_y; //initialize Vb for y axis
-		Vb_y = vel2.y - vel1.y;
-
-		float dFirst_x; //initialize for dFirst for x-axis
-		dFirst_x = aabb1.max.x - aabb2.min.x;
-
-		float dFirst_y; // initialize for dFrist for y axis
-		dFirst_y = aabb1.max.y - aabb2.min.y;
-
-		float dLast_x; //initialize for dLast for x axis
-		dLast_x = aabb1.min.x - aabb2.max.x;
-
-		float dLast_y; //initialize for dLast for y axis
-		dLast_y = aabb1.min.y - aabb2.max.y;
+		float dFirst_x = aabb1.max.x - aabb2.min.x;  //initialize for dFirst for x-axis
+		float dFirst_y = aabb1.max.y - aabb2.min.y;; // initialize for dFrist for y axis
+		float dLast_x = aabb1.min.x - aabb2.max.x;; //initialize for dLast for x axis
+		float dLast_y = aabb1.min.y - aabb2.max.y;; //initialize for dLast for y axis
+	
 
 		float tFirst = firstTimeOfCollision = 0.0f; //Initialise t first
 		float tLast = 1.0f; //initialize tLast and assume 1 as the time step (g_dt)
@@ -237,12 +226,66 @@ namespace lof
 
 	void Collision_System::Collision_Update( float dt)
 	{
+		//Iterate all the entities in ecs_manager
 		for (const auto& entity_ptr : ecs_manager.get_entities())
 		{
+			//get the ID of the entity
 			EntityID entity_ID = entity_ptr->get_id();
-			if (entity_ptr->has_component(ecs_manager.get_component_id < Collision_Component>())) {
+			//check if entity has a collision component
+			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
+				
+				//get transform component
+				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
+				//get collision component
+				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
+
+				//get velocity component
+				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
+
+
+				//create AABB based on transforrm and collision component
+				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
+
+				//check for collision for all other entities
+				for (const auto& other_entity_ptr : ecs_manager.get_entities())
+				{
+					//if they are the same entity skip
+					if (entity_ptr == other_entity_ptr)
+					{
+						continue;
+					}
+
+					//check if other entity has a collision component
+					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
+					{
+						EntityID Other_entity_ID = other_entity_ptr->get_id();
+						//get other transform component 
+						auto& other_transform1 = ecs_manager.get_component<Transform2D>(Other_entity_ID);
+						//get collision component
+						auto& other_collision1 = ecs_manager.get_component<Collision_Component>(Other_entity_ID);
+
+						//get velocity component
+						auto& other_velocity1 = ecs_manager.get_component<Velocity_Component>(Other_entity_ID);
+
+
+						//create AABB for other entity
+						AABB aabb2 = AABB::from_Tranform(other_transform1, other_collision1);
+						float collision_time = 0.0f;
+
+						//check intersecption between two entities, and consider their vel
+						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, other_velocity1.velocity, collision_time))
+						{
+							std::cout << "yes, is collide\n"; //print to test first
+						}
+
+					}
+
+				}
+
+			}
 
 		}
+		
 	}
 	//void Collision_System::Collision_Update(std::vector<Entity>& entities, float dt)
 	//{
