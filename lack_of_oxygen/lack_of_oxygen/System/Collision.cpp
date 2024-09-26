@@ -1,33 +1,56 @@
 #include "Collision.h"
 #include "../Component/Component.h"
+#include <iostream>
 
 namespace lof
 {
-	//default constructor -  initialize the width height 
-	Collision_Component::Collision_Component(float width, float height)
-		: width(width), height(height) {}
 
-	//constructor for Transform_Component
-	Transform_Component::Transform_Component(float x, float y, float width, float height, float rotation)
-		: pos(x, y), m_width(width), m_height(height), m_rotation(rotation) {}
+	//default constructor -  initialize the width height 
+	//Collision_Component::Collision_Component(float width = 0.0f, float height = 0.0f)
+	//	: width(width), height(height) {
+	//	std::cout << "test for print\n";
+	//}
+
+	////constructor for Transform_Component
+	//Transform_Component::Transform_Component(float x, float y, float width, float height, float rotation)
+	//	: pos(x, y), m_width(width), m_height(height), m_rotation(rotation) {}
 
 	//constructor for AABB
 	AABB::AABB(const Vec2D& min, const Vec2D& max)
 		: min(min), max(max) {}
 
-	AABB AABB::from_Tranform(const Transform_Component& transform)
+	//AABB AABB::from_Tranform(const Transform_Component& transform)
+	//{
+	//	Vec2D min;
+	//	Vec2D max;
+
+	//	//get the 
+	//	min.x = transform.pos.x - (transform.m_width / 2.0f);
+	//	min.y = transform.pos.y - (transform.m_height / 2.0f);
+	//	max.x = transform.pos.x - (transform.m_width / 2.0f);
+	//	max.y = transform.pos.x - (transform.m_height / 2.0f);
+
+	//	return AABB(min, max);
+	//	//calclutate the min and max point based on position and size
+	//}
+
+	void printout()
+	{
+		std::cout << "output some to see if got anything on console\n";
+	}
+
+	AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision) 
 	{
 		Vec2D min;
 		Vec2D max;
 
-		//get the 
-		min.x = transform.pos.x - (transform.m_width / 2.0f);
-		min.y = transform.pos.y - (transform.m_height / 2.0f);
-		max.x = transform.pos.x - (transform.m_width / 2.0f);
-		max.y = transform.pos.x - (transform.m_height / 2.0f);
+		min.x = transform.position.x - (collision.width / 2.0f);
+		min.y = transform.position.y - (collision.height / 2.0f);
 
-		return AABB(min, max);
-		//calclutate the min and max point based on position and size
+		max.x = transform.position.x + (collision.width / 2.0f);
+		max.y = transform.position.y + (collision.height / 2.0f);
+
+		return AABB(min, max); //return the created AABB
 	}
 
 	bool Collision_System::Collision_Intersection_RectRect(const AABB& aabb1,
@@ -73,7 +96,7 @@ namespace lof
 			//case 1 for x-axis
 			if (aabb1.min.x > aabb2.max.x)
 			{
-				return 0;
+				return false;
 			}
 			//case 4 for x-axis
 			if (aabb1.max.x < aabb2.min.x)
@@ -113,7 +136,7 @@ namespace lof
 			//case 3
 			if (aabb1.max.x < aabb2.min.x)
 			{
-				return 0;
+				return false;
 			}
 
 		}
@@ -121,11 +144,11 @@ namespace lof
 			//case 5;
 			if (aabb1.max.x < aabb2.min.x)
 			{
-				return 0;
+				return false;
 			}
 			else if (aabb1.min.x > aabb2.max.x)
 			{
-				return 0;
+				return false;
 			}
 
 		}
@@ -180,18 +203,18 @@ namespace lof
 			//case 3
 			if (aabb1.max.y < aabb2.min.y)
 			{
-				return 0;
+				return false;
 			}
 		}
 		else if (Vb_y == 0) {
 			//case 5;
 			if (aabb1.max.y < aabb2.min.y)
 			{
-				return 0;
+				return false;
 			}
 			else if (aabb1.min.y > aabb2.max.y)
 			{
-				return 0;
+				return false;
 			}
 
 		}
@@ -210,6 +233,20 @@ namespace lof
 		return mouseX >= box_x && mouseY <= (box_x + width) &&
 			mouseY >= box_y && mouseY <= (box_y + height);
 	}
+
+	//void Collision_System::Collision_Update(std::vector<Entity>& entities, float dt)
+	//{
+	//	float first_time_collision = 0.0f;
+
+	//	//iterate the entities
+	//	for (size_t i = 0; i < entities.size(); ++i)
+	//	{
+	//		const Entity& entity_1 = entities[i];
+
+	//		//const Transform2D& transform_1 = entity_1.get_component<Transform2D>();
+	//	}
+	//}
+
 
 
 
