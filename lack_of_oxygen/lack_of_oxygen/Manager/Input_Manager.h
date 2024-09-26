@@ -104,6 +104,7 @@ namespace lof {
          * @brief Reset all key states. Useful when initializing or resetting the game.
          */
         void reset();
+
     };
 
 } // namespace lof

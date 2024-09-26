@@ -25,12 +25,14 @@
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
+    <ClCompile Include="Manager\Graphics_Manager.cpp" />
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="System\Collision.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
+    <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
     <ClCompile Include="Utility\Model.cpp" />
@@ -42,6 +44,7 @@
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
+    <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
     <ClInclude Include="Manager\FPS_Manager.h" />
@@ -51,6 +54,7 @@
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="System\Collision.h" />
     <ClInclude Include="System\Movement_System.h" />
+    <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\FPS.h" />
@@ -151,7 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\glm-0.9.9.8</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

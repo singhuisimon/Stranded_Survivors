@@ -18,6 +18,12 @@
 #include "../Utility/Vector2D.h"
 #include "../Utility/Model.h" 
 
+// FOR TESTING 
+#include "../Glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <glm-0.9.9.8/glm/glm.hpp>
+#include <glm-0.9.9.8/glm/gtc/type_ptr.hpp>
+
 namespace lof {
 
     /**
@@ -97,6 +103,29 @@ namespace lof {
          */
         Velocity_Component(float vx = 0.0f, float vy = 0.0f)
             : velocity(vx, vy) {}
+    };
+
+    /** // FOR TESTING FIRST (VALUES WILL BE READ FROM A FILE IN THE FUTURE)
+    * @class Graphics_Component
+    * @brief Component representing an entity's graphical data.
+    */
+    class Graphics_Component : public Component {
+    public:
+        // Organic members of Graphics_Component
+        glm::mat3 mdl_to_ndc_xform;
+        GLuint mdl_ref, shd_ref;
+        // texture/sprite member in the future
+
+        /**
+         * @brief Constructor for Graphics_Component.
+         * @param mdl_to_ndc_xform Model-to-world-to-NDC transformation.
+         * @param mdl_ref Reference to model
+         * @param shd_ref Reference to shader
+         */
+
+        Graphics_Component(GLuint model, GLuint shader,
+            glm::mat3 xform) : mdl_ref(model), shd_ref(shader), mdl_to_ndc_xform(xform) {}
+
     };
 
 } // namespace lof

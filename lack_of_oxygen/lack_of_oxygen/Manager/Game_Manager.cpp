@@ -13,6 +13,7 @@
 #include "FPS_Manager.h"
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
+#include "Graphics_Manager.h"
 
 // Include iostream for console output
 #include <iostream>
@@ -98,6 +99,20 @@ namespace lof {
             LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
 
+        // Start up Graphics_Manager
+        if (GFXM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
+            FPSM.shut_down();
+            ECSM.shut_down();
+            SM.shut_down();
+            LM.shut_down();
+            IM.shut_down();
+            return -7;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
+        }
+
         m_is_started = true;
         LM.write_log("Game_Manager::start_up(): Game_Manager started");
         std::cout << "Game_Manager started successfully." << std::endl;
@@ -111,6 +126,7 @@ namespace lof {
         }
 
         // Shut down managers in reverse order of startup
+        GFXM.shut_down(); // Graphics_Manager 
         IM.shut_down(); // Input_Manager
         FPSM.shut_down();
         ECSM.shut_down();
@@ -127,6 +143,12 @@ namespace lof {
             return;
         }
 
+        // Update Input_Manager (FOR TESTING: IM.UPDATE() NEW POSTIION)
+        IM.update(); 
+
+        // Update Graphics Manager (FOR TESTING: The update now is to check if 'P' is press to change the render mode)
+        GFXM.update(); 
+
         // Update game world state
         ECSM.update(delta_time);
 
@@ -137,8 +159,8 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
-        // Update Input_Manager
-        IM.update();
+        //// Update Input_Manager (FOR TESTING: IM.UPDATE() ORIGINIAL POSTIION)
+        //IM.update();
 
         m_step_count++;
     }
