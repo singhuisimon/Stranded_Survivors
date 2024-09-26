@@ -5,9 +5,9 @@
       "name": "player",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "rotation": [ 0.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [ -2000.0, -2000.0 ],
+          "rotation":  0.0 ,
+          "scale": [ 750.0, 750.0 ]
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -22,9 +22,43 @@
       "name": "enemy",
       "components": {
         "Transform2D": {
-          "position": [ 5.0, 3.0 ],
-          "rotation": [ 45.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [ 0.0, 0.0 ],
+          "rotation":  45.0 ,
+          "scale": [ 500.0, 500.0 ]
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        },
+        "Model_Component": {
+          "model_name": "square.msh"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "npc1",
+      "components": {
+        "Transform2D": {
+          "position": [ 2500.0, 1200.0 ],
+          "rotation":  45.0 ,
+          "scale": [ 300.0, 300.0 ]
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        },
+        "Model_Component": {
+          "model_name": "square.msh"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "npc2",
+      "components": {
+        "Transform2D": {
+          "position": [ 2500.0, 1700.0 ],
+          "rotation":  45.0 ,
+          "scale": [ 300.0, 300.0 ]
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]

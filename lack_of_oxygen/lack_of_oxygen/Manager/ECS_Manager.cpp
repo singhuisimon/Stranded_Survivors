@@ -12,6 +12,7 @@
 // Include System.h and specific systems as needed
 #include "../System/System.h"
 #include "../System/Movement_System.h" // Include other systems as needed
+#include "../System/Render_System.h" 
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -47,13 +48,16 @@ namespace lof {
             // Register components
             register_component<Transform2D>();
             register_component<Velocity_Component>();
-            register_component<Model_Component>();
+            register_component<Model_Component>(); 
+            register_component<Graphics_Component>(); 
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
             // Add systems
-            add_system(std::make_unique<Movement_System>(*this));
+            add_system(std::make_unique<Movement_System>(*this)); 
+            
             // Add other systems as needed
+            add_system(std::make_unique<Render_System>(*this)); 
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): Started successfully.");
@@ -115,6 +119,14 @@ namespace lof {
             // Create entity
             EntityID new_entity = create_entity();
             LM.write_log("ECS_Manager::load_entities(): Created entity with ID: %u", new_entity);
+
+            // Add Graphics_Component manually for each entity (FOR TESTING) 
+            GLuint mdl_ref = 0; 
+            GLuint shd_ref = 0; 
+            glm::mat3 mdl_to_ndc_xform = glm::mat3{ 0 }; 
+            Graphics_Component graphics_component(mdl_ref, shd_ref, mdl_to_ndc_xform);
+            add_component<Graphics_Component>(new_entity, graphics_component); 
+            LM.write_log("ECS_Manager::load_entities(): Added Graphics_Component MANUALLY to entity ID %u.", new_entity);
 
             // Add components to the entity
             for (const auto& comp_config : entity_config.components) {
@@ -192,6 +204,26 @@ namespace lof {
                     add_component<Model_Component>(new_entity, model_component);
                     LM.write_log("ECS_Manager::load_entities(): Added Model_Component to entity ID %u with model '%s'.", new_entity, model_name.c_str());
                 }
+                //else if (comp_config.type == "Graphics_Component") { // FOR TESTING (ADDING GRAPHICS COMPONENT. Now I'll add manually to all at the top but in the future it will be read from the file)
+                //    // Parse properties    
+                //    GLuint mdl_ref = 0;
+                //    GLuint shd_ref = 0;
+                //    glm::mat3 mdl_to_ndc_xform = glm::mat3{ 0 };
+
+                //    const auto& properties = comp_config.properties;
+
+
+                //    // Parse model_ref
+                //    // Parse shader_ref
+                //    // Parse transformation matrix
+                //    
+
+                //    // Add Graphics_Component
+                //    Graphics_Component graphics_component(mdl_ref, shd_ref, mdl_to_ndc_xform); 
+                //    add_component<Graphics_Component>(new_entity, graphics_component);
+                //    LM.write_log("ECS_Manager::load_entities(): Added Graphics_Component to entity ID %u.", new_entity);
+                //}
+   
                 else {
                     LM.write_log("ECS_Manager::load_entities(): Unknown component type '%s' for entity ID %u.",
                         comp_config.type.c_str(), new_entity);

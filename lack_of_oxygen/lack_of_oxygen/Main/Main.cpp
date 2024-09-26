@@ -45,6 +45,10 @@ int main(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // Additional settings
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+    glfwWindowHint(GLFW_RED_BITS, 8); glfwWindowHint(GLFW_GREEN_BITS, 8);
+    glfwWindowHint(GLFW_BLUE_BITS, 8); glfwWindowHint(GLFW_ALPHA_BITS, 8);
 
     // --------------------------- Create GLFW Window ---------------------------
 
@@ -140,11 +144,11 @@ int main(void) {
             std::cout << "Current FPS: " << fps << std::endl;
         }
 
-        // Poll for and process events
-        glfwPollEvents();
+        // Poll for and process events 
+        glfwPollEvents(); 
 
         // Update game world state
-        GM.update(delta_time);
+        GM.update(delta_time); 
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {
@@ -152,12 +156,6 @@ int main(void) {
             LM.write_log("Main Loop: game_over is true. Setting GLFW window to close.");
             std::cout << "Main Loop: game_over is true. Setting GLFW window to close." << std::endl;
         }
-
-        // Render the current frame
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Here you would render your entities
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
