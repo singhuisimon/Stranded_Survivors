@@ -48,6 +48,7 @@ namespace lof {
             register_component<Transform2D>();
             register_component<Velocity_Component>();
             register_component<Model_Component>();
+            register_component<Mass_Component>();
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 

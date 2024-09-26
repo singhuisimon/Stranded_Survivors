@@ -7,6 +7,7 @@
 #pragma once
 
 #include "System.h"
+#include <iostream>
 
 namespace lof {
 
