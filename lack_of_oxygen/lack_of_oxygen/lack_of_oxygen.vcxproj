@@ -22,6 +22,7 @@
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Glad\glad.c" />
     <ClCompile Include="Main\Main.cpp" />
+    <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
@@ -30,6 +31,7 @@
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
+    <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
@@ -43,6 +45,7 @@
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
+    <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
@@ -51,6 +54,7 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
@@ -153,13 +157,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\glm-0.9.9.8</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core\inc;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib;$(SolutionDir)External_Libraries\lib\FMOD Studio API Windows\core\lib\x64;$(SolutionDir)External_Libraries\lib\FMOD Studio API Windows\studio\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmodstudioL_vc.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,15 +174,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core\inc;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio\inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib;$(SolutionDir)External_Libraries\lib\FMOD Studio API Windows\core\lib\x64;$(SolutionDir)External_Libraries\lib\FMOD Studio API Windows\studio\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

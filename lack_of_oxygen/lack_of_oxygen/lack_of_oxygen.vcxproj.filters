@@ -19,6 +19,8 @@
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
+    <ClCompile Include="Manager\Audio_Manager.cpp" />
+    <ClCompile Include="System\Audio_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -41,6 +43,8 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
+    <ClInclude Include="Manager\Audio_Manager.h" />
+    <ClInclude Include="System\Audio_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
