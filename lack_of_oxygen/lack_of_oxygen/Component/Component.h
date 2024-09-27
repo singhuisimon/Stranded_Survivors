@@ -135,6 +135,10 @@ namespace lof {
         float max_velocity;
         Vec2D accumulated_force; //to accumulate forces applied to the entity.
 
+        /**
+        * @brief Constructor for Physics_Component
+        * @   Sets up the data values required for physics component
+        */
         Physics_Component(Vec2D gravity = Vec2D(0, -9.8f),
             float damping_factor = 0.90f,
             float max_velocity = 1000.0f ) 
