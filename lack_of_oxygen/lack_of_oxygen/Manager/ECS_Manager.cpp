@@ -13,6 +13,7 @@
 #include "../System/System.h"
 #include "../System/Movement_System.h" // Include other systems as needed
 #include "../System/Render_System.h" 
+#include "../System/Collision_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -48,8 +49,11 @@ namespace lof {
             // Register components
             register_component<Transform2D>();
             register_component<Velocity_Component>();
-            register_component<Model_Component>(); 
+            register_component<Model_Component>();
+            register_component<Mass_Component>();
+            register_component<Physics_Component>();
             register_component<Graphics_Component>(); 
+            register_component<Collision_Component>();
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
@@ -58,6 +62,10 @@ namespace lof {
             
             // Add other systems as needed
             add_system(std::make_unique<Render_System>(*this)); 
+
+            //Add collision system
+            add_system(std::make_unique<Collision_System>(*this));
+
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): Started successfully.");
@@ -222,6 +230,14 @@ namespace lof {
                 //    Graphics_Component graphics_component(mdl_ref, shd_ref, mdl_to_ndc_xform); 
                 //    add_component<Graphics_Component>(new_entity, graphics_component);
                 //    LM.write_log("ECS_Manager::load_entities(): Added Graphics_Component to entity ID %u.", new_entity);
+                //}
+                //else if (comp_config.type == "Collision_Component")
+                //{
+
+
+                //    //Add Collision component
+                //    Collision_Component collision_component(width, height);
+                //    add_component <Collision_Component>(new_entity, collision_component);
                 //}
    
                 else {

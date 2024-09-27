@@ -10,6 +10,7 @@
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
+    <ClCompile Include="System\Collision.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
@@ -21,6 +22,7 @@
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
     <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
+    <ClCompile Include="System\Collision_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -34,6 +36,7 @@
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Manager\Game_Manager.h" />
+    <ClInclude Include="System\Collision.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Manager\FPS_Manager.h" />
     <ClInclude Include="Utility\FPS.h" />
@@ -45,6 +48,7 @@
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="System\Audio_System.h" />
+    <ClInclude Include="System\Collision_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

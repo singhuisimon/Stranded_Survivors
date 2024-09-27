@@ -32,6 +32,7 @@
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
+    <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="System\Audio_System.h" />
+    <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
