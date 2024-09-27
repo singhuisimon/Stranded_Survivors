@@ -9,6 +9,7 @@
 #include "../Component/Component.h"
 #include "../Manager/ECS_Manager.h"
 #include <vector>
+#include <iostream>
 
 namespace lof
 {

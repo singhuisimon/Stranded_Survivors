@@ -1,8 +1,6 @@
 #include "Collision.h"
 #include "../Component/Component.h"
 
-#include <iostream>
-
 namespace lof
 {
 
@@ -242,6 +240,8 @@ namespace lof
 				//get velocity component
 				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
 
+				std::cout << "testing:" << entity_ID;
+
 
 				//create AABB based on transforrm and collision component
 				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
@@ -267,6 +267,10 @@ namespace lof
 						//get velocity component
 						auto& other_velocity1 = ecs_manager.get_component<Velocity_Component>(Other_entity_ID);
 
+						std::cout << "testing:" << Other_entity_ID;
+
+						
+
 
 						//create AABB for other entity
 						AABB aabb2 = AABB::from_Tranform(other_transform1, other_collision1);
@@ -287,20 +291,6 @@ namespace lof
 		}
 		
 	}
-	//void Collision_System::Collision_Update(std::vector<Entity>& entities, float dt)
-	//{
-	//	float first_time_collision = 0.0f;
-
-	//	//iterate the entities
-	//	for (size_t i = 0; i < entities.size(); ++i)
-	//	{
-	//		const Entity& entity_1 = entities[i];
-
-	//		//const Transform2D& transform_1 = entity_1.get_component<Transform2D>();
-	//	}
-	//}
-
-
 
 
 	//bool Check_Collision(const std::vector<Entity>& entity,
