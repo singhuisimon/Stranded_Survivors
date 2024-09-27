@@ -1,7 +1,10 @@
+/**
+ * @file Collision_Syetem.cpp
+ * @brief Implements the collsion system.
+ * @author Saw Hui Shan
+ * @date September 21, 2024
+ */
 #pragma once
-//Collision System
-//#include <vector>
-
 
 #include "System.h"
 #include "../Utility/Vector2D.h" //to get the library from vector2D.h
@@ -11,13 +14,15 @@
 #include <vector>
 #include <iostream>
 
-namespace lof
-{
-	class ECS_Manager;
-}
+
+//namespace lof
+//{
+//	class ECS_Manager;
+//}
 
 namespace lof
 {
+	
 	class Collision_Component : public Component
 	{
 	public:

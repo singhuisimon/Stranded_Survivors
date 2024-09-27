@@ -1,42 +1,19 @@
+/**
+ * @file Collision_Syetem.cpp
+ * @brief Implements the collsion system.
+ * @author Saw Hui Shan
+ * @date September 21, 2024
+ */
+
+//include the header file
 #include "Collision_System.h"
 #include "../Component/Component.h"
 
 namespace lof
 {
-
-	//default constructor -  initialize the width height 
-	//Collision_Component::Collision_Component(float width = 0.0f, float height = 0.0f)
-	//	: width(width), height(height) {
-	//	std::cout << "test for print\n";
-	//}
-
-	////constructor for Transform_Component
-	//Transform_Component::Transform_Component(float x, float y, float width, float height, float rotation)
-	//	: pos(x, y), m_width(width), m_height(height), m_rotation(rotation) {}
-
 	//constructor for AABB
 	AABB::AABB(const Vec2D& min, const Vec2D& max)
 		: min(min), max(max) {}
-
-	//AABB AABB::from_Tranform(const Transform_Component& transform)
-	//{
-	//	Vec2D min;
-	//	Vec2D max;
-
-	//	//get the 
-	//	min.x = transform.pos.x - (transform.m_width / 2.0f);
-	//	min.y = transform.pos.y - (transform.m_height / 2.0f);
-	//	max.x = transform.pos.x - (transform.m_width / 2.0f);
-	//	max.y = transform.pos.x - (transform.m_height / 2.0f);
-
-	//	return AABB(min, max);
-	//	//calclutate the min and max point based on position and size
-	//}
-
-	void printout()
-	{
-		std::cout << "output some to see if got anything on console\n";
-	}
 
 	AABB AABB::from_Tranform(const Transform2D& transform, const Collision_Component& collision) 
 	{
@@ -292,7 +269,10 @@ namespace lof
 		
 	}
 
-
+	//void printout()
+	//{
+	//	std::cout << "output some to see if got anything on console\n";
+	//}
 	//bool Check_Collision(const std::vector<Entity>& entity,
 	//	const std::vector<Position_Component>& pos,
 	//	const std::vector<Velocity_Component>& vel)
@@ -306,8 +286,20 @@ namespace lof
 	//	}
 	//}
 
+	//AABB AABB::from_Tranform(const Transform_Component& transform)
+	//{
+	//	Vec2D min;
+	//	Vec2D max;
 
+	//	//get the 
+	//	min.x = transform.pos.x - (transform.m_width / 2.0f);
+	//	min.y = transform.pos.y - (transform.m_height / 2.0f);
+	//	max.x = transform.pos.x - (transform.m_width / 2.0f);
+	//	max.y = transform.pos.x - (transform.m_height / 2.0f);
 
+	//	return AABB(min, max);
+	//	//calclutate the min and max point based on position and size
+	//}
 
 	//int testColl() {
 	//	AABB box1(Vec2D(0.0f, 0.0f), Vec2D(2.0f,2.0f)); // A box at (0,0) to (2,2)
