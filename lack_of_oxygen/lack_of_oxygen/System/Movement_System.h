@@ -7,6 +7,7 @@
 #pragma once
 
 #include "System.h"
+//#include "../Manager/Input_Manager.h"
 
 namespace lof {
 
@@ -36,6 +37,7 @@ namespace lof {
 
     private:
         class ECS_Manager& ecs;
+       // Input_Manager& input_manager; // Add a reference to Input_Manager
     };
 
 } // namespace lof

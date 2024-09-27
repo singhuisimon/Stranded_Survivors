@@ -10,7 +10,7 @@
 
 namespace lof {
 
-    Movement_System::Movement_System(ECS_Manager& ecs_manager)
+    Movement_System::Movement_System(ECS_Manager& ecs_manager) 
         : ecs(ecs_manager) {}
 
     void Movement_System::update(float delta_time) {
@@ -18,19 +18,6 @@ namespace lof {
         const auto& entities = ecs.get_entities();
         for (const auto& entity : entities) {
             EntityID id = entity->get_id();
-
-            Mass_Component* mass = nullptr;
-
-            //skip if the entity does not have mass
-            if (entity->has_component(ecs.get_component_id<Mass_Component>())) {
-
-                mass = &ecs.get_component<Mass_Component>(id);
-
-                std::cout << "Mass of obj: " << mass << std::endl;
-
-                //skip if the entity is static
-                if (mass->is_static) continue;
-            }
 
 
             // Check if entity has both Transform2D, Velocity_Component
@@ -43,17 +30,32 @@ namespace lof {
                 Velocity_Component& velocity = ecs.get_component<Velocity_Component>(id);
                 Physics_Component& physics = ecs.get_component<Physics_Component>(id);
 
-                if (mass && !mass->is_static) {
+                if (physics.is_static) continue;
 
-                    //calculate the acceleration 
+                //// Apply input-based forces to control the entity
+                //Vec2D input_force(0, 0);
+                //if (input_manager.is_key_pressed(GLFW_KEY_A)) { // Replace KEY_LEFT with your input system's key codes
+                //    input_force.x -= 100.0f; // Apply leftward force
+                //}
+                //if (input_manager.is_key_pressed(GLFW_KEY_D)) {
+                //    input_force.x += 100.0f; // Apply rightward force
+                //}
+                //if (input_manager.is_key_pressed(GLFW_KEY_W)) {
+                //    input_force.y += 100.0f; // Apply upward force (e.g., jump)
+                //}
+                //if (input_manager.is_key_pressed(GLFW_KEY_S)) {
+                //    input_force.y -= 100.0f; // Apply downward force
+                //}
 
-                    Vec2D total_force = physics.accumulated_force + (physics.gravity * mass->mass); // F = ma = mg; g as acceleration: a(g) = F / m;
-                    Vec2D acceleration = total_force * mass->inv_mass; // F = ma; a = F / m;
+                //// Apply the input force to the physics component
+                //physics.apply_force(input_force);
+                //    //calculate the acceleration 
+
+                    Vec2D total_force = physics.accumulated_force + (physics.gravity * physics.mass); // F = ma = mg; g as acceleration: a(g) = F / m;
+                    Vec2D acceleration = total_force * physics.inv_mass; // F = ma; a = F / m;
 
                     //update velocity according to the acceleration on each entity
                     velocity.velocity += acceleration * delta_time;
-
-                }
 
                 //dampen velocity
                 velocity.velocity *= physics.damping_factor;
@@ -71,7 +73,6 @@ namespace lof {
                     normalize_vec2d(normalize_result, velocity.velocity);
                     velocity.velocity = normalize_result * physics.max_velocity;
                 }
-
 
                 //reset the accumulated force 
                 physics.accumulated_force = Vec2D(0, 0);
