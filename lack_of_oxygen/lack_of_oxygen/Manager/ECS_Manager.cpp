@@ -50,21 +50,21 @@ namespace lof {
             register_component<Transform2D>();
             register_component<Velocity_Component>();
             register_component<Model_Component>();
+            register_component<Collision_Component>();
             register_component<Mass_Component>();
             register_component<Physics_Component>();
             register_component<Graphics_Component>(); 
-            register_component<Collision_Component>();
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
             // Add systems
             add_system(std::make_unique<Movement_System>(*this)); 
+            //Add collision system
+            add_system(std::make_unique<Collision_System>(*this));
             
             // Add other systems as needed
             add_system(std::make_unique<Render_System>(*this)); 
 
-            //Add collision system
-            add_system(std::make_unique<Collision_System>(*this));
 
 
             m_is_started = true;

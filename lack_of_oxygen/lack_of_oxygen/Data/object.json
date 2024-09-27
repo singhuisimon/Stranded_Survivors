@@ -5,12 +5,12 @@
       "name": "player",
       "components": {
         "Transform2D": {
-          "position": [ -2000.0, -2000.0 ],
+          "position": [ 1000.0, 1000.0 ],
           "rotation":  0.0 ,
           "scale": [ 750.0, 750.0 ]
         },
         "Velocity_Component": {
-          "velocity": [ 0.0, 0.0 ]
+          "velocity": [ 500.0, 500.0 ]
         },
         "Model_Component": {
           "model_name": "square.msh"
