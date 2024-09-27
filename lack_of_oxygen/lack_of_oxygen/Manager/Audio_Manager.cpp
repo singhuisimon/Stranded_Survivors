@@ -51,6 +51,7 @@ namespace lof {
 	}
 
 	//Grant direct access to FMOD system without requiring all operations through Audio_Manager
+	//essentially Stidio::System::getCoreSystem (both works roughly the same just how we want approach the data)
 	FMOD::Studio::System* Audio_Manager::get_studio_system() {
 		return studio_system;
 	}

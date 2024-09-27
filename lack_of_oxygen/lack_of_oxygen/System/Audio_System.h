@@ -6,6 +6,7 @@
 #include "../Manager/Audio_Manager.h"
 
 namespace lof {
+
 	//responsible for playing, stopping, and updating sounds associated with entities
 	class Audio_System {
 
@@ -28,7 +29,7 @@ namespace lof {
 		void register_entity(Entity entity);
 
 	private:
-		FMOD::Studio::System* studioSystem;
+		FMOD::Studio::System* studio_system;
 		std::vector<Entity> entities_with_audio;	//list of entities that have audio
 	};
 }
