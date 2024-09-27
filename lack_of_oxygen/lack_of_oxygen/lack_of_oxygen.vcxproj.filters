@@ -20,6 +20,7 @@
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
+    <ClCompile Include="System\Collision_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
+    <ClInclude Include="System\Collision_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
