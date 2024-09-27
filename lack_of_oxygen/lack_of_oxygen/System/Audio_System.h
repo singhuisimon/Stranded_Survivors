@@ -31,5 +31,10 @@ namespace lof {
 	private:
 		FMOD::Studio::System* studio_system;
 		std::vector<Entity> entities_with_audio;	//list of entities that have audio
+
+		//mock function ->replace with real logic
+		Audio_Component* get_audio_component(Entity entity) {
+			return nullptr;
+		}
 	};
 }
