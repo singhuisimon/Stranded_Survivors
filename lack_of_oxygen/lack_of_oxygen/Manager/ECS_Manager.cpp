@@ -49,9 +49,7 @@ namespace lof {
             // Register components
             register_component<Transform2D>();
             register_component<Velocity_Component>();
-            register_component<Model_Component>();
-            register_component<Mass_Component>();
-            register_component<Physics_Component>();
+            register_component<Model_Component>(); 
             register_component<Graphics_Component>(); 
             register_component<Collision_Component>();
 
