@@ -11,8 +11,6 @@
 
 namespace lof
 {
-
-	
 	//constructor for AABB
 	AABB::AABB(const Vec2D& min, const Vec2D& max)
 		: min(min), max(max) {}
@@ -117,9 +115,7 @@ namespace lof
 			{
 				return false;
 			}
-
 		}
-
 
 		//for y-axis
 		if (Vb_y < 0)
@@ -135,9 +131,7 @@ namespace lof
 				if (tFirst < dFirst_y / Vb_y)
 				{
 					tFirst = dFirst_y / Vb_y;
-
 				}
-
 			}
 			if (aabb1.min.y < aabb2.max.y)
 			{
@@ -145,7 +139,6 @@ namespace lof
 				{
 					tLast = dLast_y / Vb_y;
 				}
-
 			}
 		}
 		else if (Vb_y > 0)
@@ -153,7 +146,6 @@ namespace lof
 			//case 2 for x_axis
 			if (aabb1.min.y > aabb2.max.y)
 			{
-
 				if (tFirst < dLast_y / Vb_y)
 				{
 					tFirst = dLast_y / Vb_y;
@@ -166,7 +158,6 @@ namespace lof
 					tLast = dFirst_y / Vb_y;
 				}
 			}
-
 			//case 3
 			if (aabb1.max.y < aabb2.min.y)
 			{
@@ -183,9 +174,7 @@ namespace lof
 			{
 				return false;
 			}
-
 		}
-
 		//case 6; 
 		if (tFirst > tLast)
 		{
@@ -194,6 +183,7 @@ namespace lof
 
 		return true; //the rectangle intersect
 	}
+
 	Collision_System::Collision_System(ECS_Manager& ecs_manager)
 		: ecs_manager(ecs_manager) {}
 
@@ -221,9 +211,7 @@ namespace lof
 				//get velocity component
 				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
 
-				std::cout << "testing:" << entity_ID;
-
-
+				//std::cout << "testing:" << entity_ID;
 				//create AABB based on transforrm and collision component
 				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
 
@@ -249,9 +237,6 @@ namespace lof
 						auto& other_velocity1 = ecs_manager.get_component<Velocity_Component>(Other_entity_ID);
 
 						std::cout << "testing:" << Other_entity_ID;
-
-						
-
 
 						//create AABB for other entity
 						AABB aabb2 = AABB::from_Tranform(other_transform1, other_collision1);
