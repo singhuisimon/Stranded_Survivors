@@ -1,4 +1,4 @@
-#include "Collision.h"
+#include "Collision_System.h"
 #include "../Component/Component.h"
 
 namespace lof
