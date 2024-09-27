@@ -11,6 +11,8 @@
 
 namespace lof
 {
+
+	
 	//constructor for AABB
 	AABB::AABB(const Vec2D& min, const Vec2D& max)
 		: min(min), max(max) {}
@@ -192,6 +194,8 @@ namespace lof
 
 		return true; //the rectangle intersect
 	}
+	Collision_System::Collision_System(ECS_Manager& ecs_manager)
+		: ecs_manager(ecs_manager) {}
 
 	bool Collision_System::is_Intersept_Box(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
 	{
@@ -199,7 +203,7 @@ namespace lof
 			mouseY >= box_y && mouseY <= (box_y + height);
 	}
 
-	void Collision_System::Collision_Update( float dt)
+	void Collision_System::update( float dt)
 	{
 		//Iterate all the entities in ecs_manager
 		for (const auto& entity_ptr : ecs_manager.get_entities())
@@ -267,6 +271,10 @@ namespace lof
 
 		}
 		
+	}
+
+	std::string Collision_System::get_type() const {
+		return "Collision_System";
 	}
 
 	//void printout()

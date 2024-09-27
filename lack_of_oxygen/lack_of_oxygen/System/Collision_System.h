@@ -23,6 +23,7 @@
 namespace lof
 {
 	
+	
 	class Collision_Component : public Component
 	{
 	public:
@@ -49,8 +50,10 @@ namespace lof
 	class Collision_System : public System
 	{
 	private:
-		ECS_Manager& ecs_manager;
+		class ECS_Manager& ecs_manager;
 	public:
+		Collision_System(ECS_Manager& ecs_manager);
+
 		struct Line_segment
 		{
 			Vec2D m_pt0; //end of point 0
@@ -87,8 +90,10 @@ namespace lof
 		//	const std::vector<Velocity_Component>& vel);
 		
 		/*void Collision_Update(std::vector<Entity>& entities, float dt);*/
-		void Collision_Update(float dt);
+		void update(float dt) override;
 		//might need: handle collision
+
+		std::string get_type() const override;
 	};
 
 

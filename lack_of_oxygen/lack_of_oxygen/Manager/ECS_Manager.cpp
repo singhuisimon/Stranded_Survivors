@@ -13,7 +13,7 @@
 #include "../System/System.h"
 #include "../System/Movement_System.h" // Include other systems as needed
 #include "../System/Render_System.h" 
-//#include "../System/Collision_System.h"
+#include "../System/Collision_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -51,7 +51,7 @@ namespace lof {
             register_component<Velocity_Component>();
             register_component<Model_Component>(); 
             register_component<Graphics_Component>(); 
-            //register_component<Collision_Component>();
+            register_component<Collision_Component>();
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
@@ -62,7 +62,7 @@ namespace lof {
             add_system(std::make_unique<Render_System>(*this)); 
 
             //Add collision system
-            //add_system(std::make_unique<Collision_System>(*this));
+            add_system(std::make_unique<Collision_System>(*this));
 
 
             m_is_started = true;
