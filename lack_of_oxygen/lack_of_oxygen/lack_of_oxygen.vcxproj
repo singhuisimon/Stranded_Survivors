@@ -33,8 +33,8 @@
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
+    <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
-    <ClCompile Include="Utility\Model.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
   </ItemGroup>
@@ -55,14 +55,15 @@
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
+    <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
-    <ClInclude Include="Utility\Model.h" />
     <ClInclude Include="Utility\Vector2D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
-    <None Include="Data\object.json" />
+    <None Include="Data\prefab.json" />
+    <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
     <None Include="Manager\ECS_Manager.tpp" />

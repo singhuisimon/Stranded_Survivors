@@ -31,6 +31,11 @@ const std::size_t MAX_COMPONENTS = 32;
  */
 using ComponentMask = std::bitset<MAX_COMPONENTS>;
 
+/**
+ * @brief Invalid entity ID used to indicate an entity that does not exist.
+ */
+constexpr EntityID INVALID_ENTITY_ID = std::numeric_limits<EntityID>::max();
+
 namespace lof {
 
     /**

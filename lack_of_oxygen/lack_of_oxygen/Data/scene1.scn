@@ -1,0 +1,17 @@
+{
+  "objects": [
+    {
+      "name": "player1",
+      "prefab": "player"
+    },
+    {
+      "name": "dummy_object1",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [100.0, 200.0]
+        }
+      }
+    }
+  ]
+}

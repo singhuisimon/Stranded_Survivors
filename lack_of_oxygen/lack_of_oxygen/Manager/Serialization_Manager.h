@@ -8,7 +8,7 @@
 #define LOF_SERIALIZATION_MANAGER_H
 
  // Macros for accessing manager singleton instances
-#define SM  lof::Serialization_Manager::get_instance()
+#define SM lof::Serialization_Manager::get_instance()
 
 // Include base headers
 #include "Manager.h"
@@ -19,75 +19,11 @@
 
 // Include standard headers
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include <memory>
-
-// Forward declare Model class
-namespace lof {
-    class Model;
-}
+#include <unordered_map>
 
 namespace lof {
-
-    // Define data structures to hold component and entity configurations
-    struct ComponentConfig {
-        std::string type;
-        rapidjson::Value properties;
-
-        // Default constructor
-        ComponentConfig()
-            : properties(rapidjson::kObjectType) {} // Initialize as an object
-
-        // Move constructor
-        ComponentConfig(ComponentConfig&& other) noexcept
-            : type(std::move(other.type)), properties(std::move(other.properties)) {}
-
-        // Move assignment operator
-        ComponentConfig& operator=(ComponentConfig&& other) noexcept {
-            if (this != &other) {
-                type = std::move(other.type);
-                properties = std::move(other.properties);
-            }
-            return *this;
-        }
-
-        // Delete copy constructor and copy assignment operator
-        ComponentConfig(const ComponentConfig&) = delete;
-        ComponentConfig& operator=(const ComponentConfig&) = delete;
-    };
-
-    struct EntityConfig {
-        unsigned int id = 0; // Initialized to 0 by default
-        std::string name;
-        std::string model_filename;
-        std::vector<ComponentConfig> components;
-
-        // Default constructor
-        EntityConfig() = default;
-
-        // Move constructor
-        EntityConfig(EntityConfig&& other) noexcept
-            : id(other.id),
-            name(std::move(other.name)),
-            model_filename(std::move(other.model_filename)),
-            components(std::move(other.components)) {}
-
-        // Move assignment operator
-        EntityConfig& operator=(EntityConfig&& other) noexcept {
-            if (this != &other) {
-                id = other.id;
-                name = std::move(other.name);
-                model_filename = std::move(other.model_filename);
-                components = std::move(other.components);
-            }
-            return *this;
-        }
-
-        // Delete copy constructor and copy assignment operator
-        EntityConfig(const EntityConfig&) = delete;
-        EntityConfig& operator=(const EntityConfig&) = delete;
-    };
 
     /**
      * @class Serialization_Manager
@@ -109,16 +45,18 @@ namespace lof {
         // RapidJSON document for general configuration
         rapidjson::Document m_document;
 
-        // Store entity configurations
-        std::vector<EntityConfig> m_entities_config;
+        // Cache for loaded prefabs
+        std::unordered_map<std::string, rapidjson::Value> m_prefab_map;
 
-        // Map of loaded models
-        std::unordered_map<std::string, std::shared_ptr<Model>> m_models;
+        // Helper function to load the prefab file
+        bool load_prefabs(const std::string& filename);
 
-        // Helper methods
+        // Helper functions to load configuration file
         bool load_config(const std::string& filename);
-        bool load_mesh(const std::string& filename);
-        bool load_object(const std::string& filename);
+
+        // Helper function to merge two JSON objects
+        void merge_objects(const rapidjson::Value& source, 
+            rapidjson::Value& destination, rapidjson::Document::AllocatorType& allocator);
 
     public:
         /**
@@ -143,6 +81,13 @@ namespace lof {
         void shut_down() override;
 
         /**
+         * @brief Load a scene file and create entities and components.
+         * @param filename The path to the scene file.
+         * @return True on success, false on failure.
+         */
+        bool load_scene(const std::string& filename);
+
+        /**
          * @brief Get the screen width from the configuration.
          * @return Screen width.
          */
@@ -160,24 +105,8 @@ namespace lof {
          */
         float get_fps_display_interval() const;
 
-        /**
-         * @brief Get the loaded entity configurations.
-         * @return Vector of EntityConfig.
-         */
-        const std::vector<EntityConfig>& get_entities_config() const;
 
-        /**
-         * @brief Get the loaded models.
-         * @return Map of model names to shared_ptr<Model>.
-         */
-        const std::unordered_map<std::string, std::shared_ptr<Model>>& get_models() const;
-
-        /**
-         * @brief Get a specific model by name.
-         * @param model_name Name of the model.
-         * @return Shared pointer to the model, or nullptr if not found.
-         */
-        std::shared_ptr<Model> get_model(const std::string& model_name) const;
+        const rapidjson::Value* get_prefab(const std::string& prefab_name) const;
     };
 
 } // namespace lof
