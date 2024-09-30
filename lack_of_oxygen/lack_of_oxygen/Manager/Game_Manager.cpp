@@ -17,6 +17,7 @@
 
 // Include iostream for console output
 #include <iostream>
+#include <random>
 
 namespace lof {
 
@@ -35,7 +36,7 @@ namespace lof {
             return 0; // Already started
         }
 
-        // Start up Log_Manager first
+        // -------------------------- Log Manager Start Up --------------------------
         if (LM.start_up() != 0) {
             // If Log_Manager fails to start, there's no way to log the error using LM
             return -1;
@@ -44,70 +45,61 @@ namespace lof {
             LM.write_log("Game_Manager::start_up(): Log_Manager start_up() successful");
         }
 
-        // Start up Config_Manager
-        if (SM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Config_Manager start_up() failed");
-            LM.shut_down();
-            return -2;
-        }
-        else {
-            LM.write_log("Game_Manager::start_up() : Config_Manager start_up() successful");
-        }
-
-        // Start up ECS_Manager
+        // -------------------------- ECS Manager Start Up --------------------------
         if (ECSM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() failed");
-            SM.shut_down();
             LM.shut_down();
-            return -3;
+            return -2;
         }
         else {
             LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() successful");
         }
 
-        // Load entities into ECS_Manager
-        if (ECSM.load_entities(SM.get_entities_config(), SM.get_models()) != 0) {
-            LM.write_log("Game_Manager::start_up(): Failed to load entities into ECS_Manager");
+        // -------------------------- Serialization Manager Start Up -----------------
+        if (SM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Serialization_Manager start_up() failed");
             ECSM.shut_down();
-            SM.shut_down();
             LM.shut_down();
-            return -4;
+            return -3;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up(): Serialization_Manager start_up() successful");
         }
 
-        // Start up FPS_Manager
+        // -------------------------- FPS Manager Start Up --------------------------
         if (FPSM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() failed");
-            ECSM.shut_down();
             SM.shut_down();
+            ECSM.shut_down();
             LM.shut_down();
-            return -5;
+            return -4;
         }
         else {
             LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() successful");
         }
 
-        // Start up Input_Manager
+        // -------------------------- Input Manager Start Up --------------------------
         if (IM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): Input_Manager start_up() failed");
             FPSM.shut_down();
-            ECSM.shut_down();
             SM.shut_down();
+            ECSM.shut_down();
             LM.shut_down();
-            return -6;
+            return -5;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
 
-        // Start up Graphics_Manager
+        // -------------------------- Graphics Manager Start Up --------------------------
         if (GFXM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
-            FPSM.shut_down();
-            ECSM.shut_down();
-            SM.shut_down();
-            LM.shut_down();
             IM.shut_down();
-            return -7;
+            FPSM.shut_down();
+            SM.shut_down();
+            ECSM.shut_down();
+            LM.shut_down();
+            return -6;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
@@ -126,12 +118,12 @@ namespace lof {
         }
 
         // Shut down managers in reverse order of startup
-        GFXM.shut_down(); // Graphics_Manager 
-        IM.shut_down(); // Input_Manager
-        FPSM.shut_down();
-        ECSM.shut_down();
-        SM.shut_down();
-        LM.shut_down();
+        GFXM.shut_down(); // Graphics_Manager
+        IM.shut_down();   // Input_Manager
+        FPSM.shut_down(); // FPS_Manager
+        SM.shut_down();   // Serialization_Manager
+        ECSM.shut_down(); // ECS_Manager
+        LM.shut_down();   // Log_Manager
 
         m_is_started = false;
         std::cout << "Game_Manager shut down successfully." << std::endl;
@@ -143,24 +135,59 @@ namespace lof {
             return;
         }
 
-        // Update Input_Manager (FOR TESTING: IM.UPDATE() NEW POSTIION)
-        IM.update(); 
-
-        // Update Graphics Manager (FOR TESTING: The update now is to check if 'P' is press to change the render mode)
-        GFXM.update(); 
-
-        // Update game world state
-        ECSM.update(delta_time);
-
-        // Check for game over condition based on input
+        // Check for game over condition based on input, before IM update
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             set_game_over(true);
             LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
-        //// Update Input_Manager (FOR TESTING: IM.UPDATE() ORIGINIAL POSTIION)
-        //IM.update();
+        // Check for game over condition based on input, before IM update
+        if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
+            set_game_over(true);
+            LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
+            std::cout << "Escape key pressed. Closing the game." << std::endl;
+        }
+
+        // Clone a game object from a prefab when 'C' key is pressed
+        bool c_key_pressed = IM.is_key_pressed(GLFW_KEY_C);
+        if (c_key_pressed && !c_key_was_pressed_last_frame) {
+            // Clone the entity from the prefab
+            EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
+            if (new_entity != INVALID_ENTITY_ID) {
+                // Generate random position
+                static std::default_random_engine generator;
+                static std::uniform_real_distribution<float> distribution(-500.0f, 500.0f);
+
+                float random_x = distribution(generator);
+                float random_y = distribution(generator);
+
+                // Get the Transform2D component and set its position
+                if (ECSM.has_component<Transform2D>(new_entity)) {
+                    Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
+                    transform.position.x = random_x;
+                    transform.position.y = random_y;
+
+                    LM.write_log("Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
+                }
+                else {
+                    LM.write_log("Cloned entity %u does not have a Transform2D component.", new_entity);
+                }
+            }
+            else {
+                LM.write_log("Failed to clone entity from prefab 'dummy_object'.");
+            }
+        }
+        c_key_was_pressed_last_frame = c_key_pressed;
+
+        // Update Input_Manager
+        IM.update();
+
+        // Update Graphics Manager
+        GFXM.update();
+
+        // Update game world state
+        ECSM.update(delta_time);
 
         m_step_count++;
     }

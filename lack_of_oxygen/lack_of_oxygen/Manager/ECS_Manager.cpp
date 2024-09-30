@@ -21,6 +21,9 @@
 // Include Log_Manager for logging
 #include "Log_Manager.h"
 
+// Include Component_Parser for adding components from JSON
+#include "../Utility/Component_Parser.h"
+
 // Include standard headers
 #include <algorithm>
 #include <cassert>
@@ -46,20 +49,20 @@ namespace lof {
         try {
             LM.write_log("ECS_Manager::start_up(): Registering components.");
 
-            // Register components
+            // Register all components used in the game
             register_component<Transform2D>();
             register_component<Velocity_Component>();
             register_component<Model_Component>();
+            register_component<Mesh_Component>();
+            register_component<Mass_Component>();
             register_component<Physics_Component>();
             register_component<Graphics_Component>(); 
             register_component<Collision_Component>();
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
-            // Add systems
-            add_system(std::make_unique<Movement_System>(*this)); 
-            
-            // Add other systems as needed
+            // Add all systems
+            add_system(std::make_unique<Movement_System>(*this));
             add_system(std::make_unique<Render_System>(*this)); 
 
             //Add collision system
@@ -93,6 +96,30 @@ namespace lof {
         LM.write_log("ECS_Manager::shut_down(): ECS_Manager shut down successfully.");
     }
 
+    void ECS_Manager::add_components_from_json(EntityID entity, const rapidjson::Value& components) {
+        Component_Parser::add_components_from_json(*this, entity, components);
+    }
+
+    EntityID ECS_Manager::clone_entity_from_prefab(const std::string& prefab_name) {
+        const rapidjson::Value* prefab = SM.get_prefab(prefab_name);
+        if (!prefab) {
+            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Prefab '%s' not found.", prefab_name.c_str());
+            return INVALID_ENTITY_ID; // Ensure INVALID_ENTITY_ID is defined appropriately
+        }
+        if (!prefab->HasMember("components") || !(*prefab)["components"].IsObject()) {
+            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Prefab '%s' does not have 'components' object.", prefab_name.c_str());
+            return INVALID_ENTITY_ID;
+        }
+
+        EntityID eid = create_entity();
+        LM.write_log("ECS_Manager::clone_entity_from_prefab(): Created entity from prefab '%s' with ID %u.", prefab_name.c_str(), eid);
+
+        const rapidjson::Value& components = (*prefab)["components"];
+        add_components_from_json(eid, components);
+
+        return eid;
+    }
+
     EntityID ECS_Manager::create_entity() {
         EntityID id = static_cast<EntityID>(entities.size());
         entities.emplace_back(std::make_unique<Entity>(id));
@@ -118,134 +145,6 @@ namespace lof {
 
     const std::vector<std::unique_ptr<Entity>>& ECS_Manager::get_entities() const {
         return entities;
-    }
-
-    int ECS_Manager::load_entities(const std::vector<EntityConfig>& entities_config,
-        const std::unordered_map<std::string, std::shared_ptr<Model>>& models) {
-        for (const auto& entity_config : entities_config) {
-            // Create entity
-            EntityID new_entity = create_entity();
-            LM.write_log("ECS_Manager::load_entities(): Created entity with ID: %u", new_entity);
-
-            // Add Graphics_Component manually for each entity (FOR TESTING) 
-            GLuint mdl_ref = 0; 
-            GLuint shd_ref = 0; 
-            glm::mat3 mdl_to_ndc_xform = glm::mat3{ 0 }; 
-            Graphics_Component graphics_component(mdl_ref, shd_ref, mdl_to_ndc_xform);
-            add_component<Graphics_Component>(new_entity, graphics_component); 
-            LM.write_log("ECS_Manager::load_entities(): Added Graphics_Component MANUALLY to entity ID %u.", new_entity);
-
-            // Add components to the entity
-            for (const auto& comp_config : entity_config.components) {
-                if (comp_config.type == "Transform2D") {
-                    // Parse properties
-                    Vec2D position(0.0f, 0.0f);
-                    float rotation = 0.0f;
-                    Vec2D scale(1.0f, 1.0f);
-
-                    const auto& properties = comp_config.properties;
-
-                    // Parse position
-                    if (properties.HasMember("position") && properties["position"].IsArray() && properties["position"].Size() == 2) {
-                        position.x = properties["position"][0].GetFloat();
-                        position.y = properties["position"][1].GetFloat();
-                    }
-
-                    // Parse rotation
-                    if (properties.HasMember("rotation") && properties["rotation"].IsNumber()) {
-                        rotation = properties["rotation"].GetFloat();
-                    }
-
-                    // Parse scale
-                    if (properties.HasMember("scale") && properties["scale"].IsArray() && properties["scale"].Size() == 2) {
-                        scale.x = properties["scale"][0].GetFloat();
-                        scale.y = properties["scale"][1].GetFloat();
-                    }
-
-                    // Add Transform2D component
-                    Transform2D transform_component(position, rotation, scale);
-                    add_component<Transform2D>(new_entity, transform_component);
-                    LM.write_log("ECS_Manager::load_entities(): Added Transform2D component to entity ID %u.", new_entity);
-                }
-                else if (comp_config.type == "Velocity_Component") {
-                    // Parse properties
-                    float vx = 0.0f;
-                    float vy = 0.0f;
-
-                    const auto& properties = comp_config.properties;
-
-                    // Parse velocity
-                    if (properties.HasMember("velocity") && properties["velocity"].IsArray() && properties["velocity"].Size() == 2) {
-                        vx = properties["velocity"][0].GetFloat();
-                        vy = properties["velocity"][1].GetFloat();
-                    }
-
-                    // Add Velocity_Component
-                    Velocity_Component velocity_component(vx, vy);
-                    add_component<Velocity_Component>(new_entity, velocity_component);
-                    LM.write_log("ECS_Manager::load_entities(): Added Velocity_Component to entity ID %u.", new_entity);
-                }
-                else if (comp_config.type == "Model_Component") {
-                    // Parse properties
-                    std::string model_name = "default_model";
-
-                    const auto& properties = comp_config.properties;
-
-                    // Parse model_name
-                    if (properties.HasMember("model_name") && properties["model_name"].IsString()) {
-                        model_name = properties["model_name"].GetString();
-                    }
-
-                    // Retrieve the loaded model from models map
-                    std::shared_ptr<Model> model = nullptr;
-                    auto it = models.find(model_name);
-                    if (it != models.end()) {
-                        model = it->second;
-                    }
-                    else {
-                        LM.write_log("ECS_Manager::load_entities(): Model '%s' not found for entity ID %u.", model_name.c_str(), new_entity);
-                    }
-
-                    // Add Model_Component with model_ptr
-                    Model_Component model_component(model_name, model);
-                    add_component<Model_Component>(new_entity, model_component);
-                    LM.write_log("ECS_Manager::load_entities(): Added Model_Component to entity ID %u with model '%s'.", new_entity, model_name.c_str());
-                }
-                //else if (comp_config.type == "Graphics_Component") { // FOR TESTING (ADDING GRAPHICS COMPONENT. Now I'll add manually to all at the top but in the future it will be read from the file)
-                //    // Parse properties    
-                //    GLuint mdl_ref = 0;
-                //    GLuint shd_ref = 0;
-                //    glm::mat3 mdl_to_ndc_xform = glm::mat3{ 0 };
-
-                //    const auto& properties = comp_config.properties;
-
-
-                //    // Parse model_ref
-                //    // Parse shader_ref
-                //    // Parse transformation matrix
-                //    
-
-                //    // Add Graphics_Component
-                //    Graphics_Component graphics_component(mdl_ref, shd_ref, mdl_to_ndc_xform); 
-                //    add_component<Graphics_Component>(new_entity, graphics_component);
-                //    LM.write_log("ECS_Manager::load_entities(): Added Graphics_Component to entity ID %u.", new_entity);
-                //}
-                //else if (comp_config.type == "Collision_Component")
-                //{
-
-
-                //    //Add Collision component
-                //    Collision_Component collision_component(width, height);
-                //    add_component <Collision_Component>(new_entity, collision_component);
-                //}
-   
-                else {
-                    LM.write_log("ECS_Manager::load_entities(): Unknown component type '%s' for entity ID %u.",
-                        comp_config.type.c_str(), new_entity);
-                }
-            }
-        }
-        return 0;
     }
 
 } // namespace lof
