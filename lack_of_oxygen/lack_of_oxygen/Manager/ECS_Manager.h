@@ -71,6 +71,20 @@ namespace lof {
         // Entity management
         EntityID create_entity();
 
+        /**
+         * @brief Clone an entity based on a prefab.
+         * @param prefab_name The name of the prefab to clone from.
+         * @return The ID of the newly created entity, or INVALID_ENTITY_ID if failed.
+         */
+        EntityID clone_entity_from_prefab(const std::string& prefab_name);
+
+        /**
+         * @brief Add components to an entity from JSON data.
+         * @param entity The entity ID.
+         * @param components The JSON value containing component data.
+         */
+        void add_components_from_json(EntityID entity, const rapidjson::Value& components);
+
         // Component management
         template<typename T>
         void register_component();
@@ -96,10 +110,6 @@ namespace lof {
 
         // Access entities
         const std::vector<std::unique_ptr<Entity>>& get_entities() const;
-
-        // Load entities from configuration data
-        int load_entities(const std::vector<EntityConfig>& entities_config,
-            const std::unordered_map<std::string, std::shared_ptr<Model>>& models);
     };
 
 } // namespace lof
