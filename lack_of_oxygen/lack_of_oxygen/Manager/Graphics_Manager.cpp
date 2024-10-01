@@ -18,6 +18,7 @@ namespace lof {
         set_type("Graphics_Manager");
         m_is_started = false;
         render_mode = GL_FILL;
+        set_time(0);
     }
 
 

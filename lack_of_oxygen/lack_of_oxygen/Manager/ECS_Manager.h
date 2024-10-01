@@ -108,6 +108,9 @@ namespace lof {
         void add_system(std::unique_ptr<System> system);
         void update(float delta_time);
 
+        // Accsessing each system
+        const std::vector<std::unique_ptr<System>>& get_systems() const;
+
         // Access entities
         const std::vector<std::unique_ptr<Entity>>& get_entities() const;
     };

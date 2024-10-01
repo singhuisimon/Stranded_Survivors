@@ -24,6 +24,7 @@ namespace lof {
         last_frame_start_time(0),
         fps_calculator(60) {
         set_type("FPS_Manager");
+        set_time(0);
     }
 
     FPS_Manager& FPS_Manager::get_instance() {

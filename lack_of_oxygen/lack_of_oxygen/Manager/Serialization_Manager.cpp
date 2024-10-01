@@ -53,6 +53,7 @@ namespace lof {
         m_fps_display_interval(1.0f),
         m_data_directory("..\\..\\lack_of_oxygen\\Data") { // Initialize m_data_directory
         set_type("Serialization_Manager");
+        set_time(0);
     }
 
     Serialization_Manager& Serialization_Manager::get_instance() {

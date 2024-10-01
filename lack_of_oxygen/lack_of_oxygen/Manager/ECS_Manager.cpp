@@ -39,6 +39,7 @@ namespace lof {
     ECS_Manager::ECS_Manager() {
         set_type("ECS_Manager");
         m_is_started = false;
+        set_time(0);
     }
 
     int ECS_Manager::start_up() {
@@ -131,6 +132,10 @@ namespace lof {
         return id;
     }
 
+    const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{
+        return systems;
+    }
+
     void ECS_Manager::add_system(std::unique_ptr<System> system) {
         // Get the system type before moving
         std::string system_type = system->get_type();
@@ -143,7 +148,13 @@ namespace lof {
 
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
+
+            // Getting delta time for each system
+            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+            // Updating each system
             system->update(delta_time);
+            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            
         }
     }
 

@@ -26,6 +26,8 @@ namespace lof {
 
     // Private constructor
     Input_Manager::Input_Manager() {
+        set_type("Input_Manager");
+        set_time(0);
         // Initialize all key states to NONE
     }
 

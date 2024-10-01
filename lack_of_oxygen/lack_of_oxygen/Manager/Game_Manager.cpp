@@ -21,9 +21,15 @@
 
 namespace lof {
 
+
+    /*int64_t ecs_time = 0;
+    int64_t graphics_time = 0;
+    int64_t im_time = 0;*/
+
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
+        set_time(0);
     }
 
     Game_Manager& Game_Manager::get_instance() {
@@ -179,15 +185,24 @@ namespace lof {
             }
         }
         c_key_was_pressed_last_frame = c_key_pressed;
-
+        
+        // Getting delta time for Input Manager
+        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Input_Manager
         IM.update();
+        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - IM.get_time());
 
+        // Getting delta time for Graphics Manager
+        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Graphics Manager
         GFXM.update();
+        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
+        // Getting delta time for ECS Manager
+        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update game world state
         ECSM.update(delta_time);
+        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
 
         m_step_count++;
     }
