@@ -122,6 +122,10 @@ namespace lof {
         float inv_mass;
         bool is_static; //to check if the entity is static or not
 
+        bool is_grounded; //to indicate whether the entity is on the ground
+        bool is_jumping; //to indicate whether the entity is jumping
+        float jump_force; //the force applied during a jump
+
         /**
            * @brief Constructor for Physics_Component
            * @   Sets up the data values required for physics component
@@ -130,7 +134,8 @@ namespace lof {
             float damping_factor = 0.90f,
             float max_velocity = 1000.0f,
             float mass = 1.0f,
-            bool is_static = false)
+            bool is_static = false, 
+            float jump_force = 300.0f) //adjust later
 
             : gravity(gravity),
             damping_factor(damping_factor),
@@ -138,11 +143,18 @@ namespace lof {
             accumulated_force(Vec2D(0, 0)),
             mass(mass),
             inv_mass((mass > 0.0f) ? 1.0f / mass : 0.0f),
-            is_static(is_static) {}
+            is_static(is_static),
+            is_grounded(false),
+            is_jumping(false),
+            jump_force(jump_force) {}
 
         //Apply force
         void apply_force(const Vec2D& force) {
             accumulated_force += force;
+        }
+
+        void reset_forces() {
+            accumulated_force = Vec2D(0, 0);
         }
 
         //set the mass of the object
@@ -150,7 +162,6 @@ namespace lof {
             mass = m;
             inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
         }
-
     };
 
 

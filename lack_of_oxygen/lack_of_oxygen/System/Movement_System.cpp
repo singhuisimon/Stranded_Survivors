@@ -35,7 +35,7 @@ namespace lof {
                 if (physics.is_static) continue;
 
                 //apply speed 
-                float speed = 600.f; 
+                float speed = 500.f; 
 
         
                  // Update position based on velocity and delta_time and input
@@ -103,7 +103,7 @@ namespace lof {
                 }
 
                 //reset the accumulated force 
-                physics.accumulated_force = Vec2D(0, 0);
+                physics.reset_forces();
 
             }
         }
