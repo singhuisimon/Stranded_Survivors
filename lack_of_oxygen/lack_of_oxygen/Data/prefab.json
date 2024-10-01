@@ -19,7 +19,10 @@
           "max_velocity": 1000.0,
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 1.0,
-          "is_static": false
+          "is_static": false,
+          "is_grounded": false,
+          "is_jumping": false,
+          "jump_force": 300.0
         },
         "Graphics_Component": {
           "mdl_ref": 0,
@@ -55,7 +58,10 @@
           "max_velocity": 1000.0,
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 2.0,
-          "is_static": true
+          "is_static": true,
+          "is_grounded": true,
+          "is_jumping": false,
+          "jump_force": 0.0
         },
         "Graphics_Component": {
           "mdl_ref": 0,

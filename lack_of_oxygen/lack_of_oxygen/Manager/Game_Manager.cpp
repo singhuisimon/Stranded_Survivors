@@ -143,6 +143,17 @@ namespace lof {
             std::cout << "Left mouse button pressed." << std::endl;
         }
 
+        try {
+            // Simulate a crash when the 'P' key is pressed
+            if (IM.is_key_pressed(GLFW_KEY_P)) {
+                LM.write_log("Game_Manager::update(): Simulated crash. 'P' key was pressed.");
+                throw std::runtime_error("Simulated crash: 'P' key was pressed.");
+            }
+        }
+        catch (const std::exception& e) {
+            LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
+        }
+
         // Check for game over condition based on input, before IM update
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             set_game_over(true);

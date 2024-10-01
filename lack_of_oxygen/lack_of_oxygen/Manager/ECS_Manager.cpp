@@ -181,12 +181,12 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
             system->update(delta_time);
-            LM.write_log("ECS_Manager::update(): Updated system '%s'.", system->get_type().c_str());
+            // LM.write_log("ECS_Manager::update(): Updated system '%s'.", system->get_type().c_str());
         }
     }
 
     const std::vector<std::unique_ptr<Entity>>& ECS_Manager::get_entities() const {
-        LM.write_log("ECS_Manager::get_entities(): Retrieving list of entities.");
+        //LM.write_log("ECS_Manager::get_entities(): Retrieving list of entities.");
         return entities;
     }
 

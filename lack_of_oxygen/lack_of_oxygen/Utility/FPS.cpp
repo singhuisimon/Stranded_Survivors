@@ -1,8 +1,13 @@
 /**
  * @file FPS.cpp
- * @brief Implements the FPS class methods for calculating current FPS.
+ * @brief Implements the FPS class helper functions for calculating current FPS.
+ * @author Simon Chan
+ * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+// Include header file
 #include "FPS.h"
 
 namespace lof {

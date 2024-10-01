@@ -76,7 +76,7 @@ namespace lof {
         if (last_frame_start_time != DEFAULT_LAST_FRAME_START_TIME) {
             int64_t frame_duration = current_time - last_frame_start_time;
             delta_time = static_cast<float>(frame_duration) / MICROSECONDS_PER_SECOND;
-            LM.write_log("FPS_Manager::frame_start(): Calculated delta_time = %.6f seconds.", delta_time);
+            //LM.write_log("FPS_Manager::frame_start(): Calculated delta_time = %.6f seconds.", delta_time);
         }
 
         // Update last_frame_start_time
@@ -84,7 +84,7 @@ namespace lof {
 
         // Start of frame timing
         clock.delta();
-        LM.write_log("FPS_Manager::frame_start(): Frame timing started.");
+        //LM.write_log("FPS_Manager::frame_start(): Frame timing started.");
     }
 
     void FPS_Manager::frame_end() {
@@ -97,10 +97,10 @@ namespace lof {
         // If the calculated sleep time is positive, the program will sleep for that duration
         if (intended_sleep_time > 0) {
             Clock::sleep(intended_sleep_time);
-            LM.write_log("FPS_Manager::frame_end(): Slept for %lld microseconds to maintain target FPS.", intended_sleep_time);
+            //LM.write_log("FPS_Manager::frame_end(): Slept for %lld microseconds to maintain target FPS.", intended_sleep_time);
         }
         else {
-            LM.write_log("FPS_Manager::frame_end(): No sleep needed. Loop time exceeded target.");
+            //LM.write_log("FPS_Manager::frame_end(): No sleep needed. Loop time exceeded target.");
         }
 
         // Measure the actual sleep time by splitting the clock again after sleep
@@ -109,29 +109,23 @@ namespace lof {
 
         // Adjust the sleep time for the next frame, compensating for any discrepancy
         adjust_time = actual_sleep_time - intended_sleep_time;
-        LM.write_log("FPS_Manager::frame_end(): Adjust time set to %lld microseconds.", adjust_time);
+        //LM.write_log("FPS_Manager::frame_end(): Adjust time set to %lld microseconds.", adjust_time);
 
         // Update FPS calculator with the total time for the frame (in microseconds)
         fps_calculator.update(static_cast<int64_t>(delta_time * MICROSECONDS_PER_SECOND));
-
-        // Log current FPS
-        LM.write_log("FPS_Manager::frame_end(): Current FPS = %.2f.", fps_calculator.get_fps());
     }
 
     float FPS_Manager::get_delta_time() const {
-        LM.write_log("FPS_Manager::get_delta_time(): Returning delta_time = %.6f seconds.", delta_time);
         return delta_time;
     }
 
     float FPS_Manager::get_current_fps() const {
         float current_fps = fps_calculator.get_fps();
-        LM.write_log("FPS_Manager::get_current_fps(): Current FPS = %.2f.", current_fps);
         return current_fps;
     }
 
     void FPS_Manager::reset_fps() {
         fps_calculator.reset();
-        LM.write_log("FPS_Manager::reset_fps(): FPS calculator reset.");
     }
 
 } // namespace lof

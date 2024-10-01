@@ -1,10 +1,13 @@
 /**
  * @file ComponentParser.cpp
  * @brief Implements the ComponentParser utility class methods.
+ * @author Simon Chan
  * @date October 1, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
- // Include base file
+// Include header file
 #include "Component_Parser.h"
 
 // Include Managers
@@ -24,6 +27,7 @@ namespace lof {
             std::string component_name = it->name.GetString();
             const rapidjson::Value& component_data = it->value;
 
+            // ------------------------------------ Transform2D -------------------------------------------
             if (component_name == "Transform2D") {
                 // Parse Transform2D component
                 Transform2D transform;
@@ -45,6 +49,7 @@ namespace lof {
                 ecs_manager.add_component<Transform2D>(entity, transform);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Transform2D component to entity ID %u.", entity);
             }
+            // ------------------------------------ Velocity_Component -------------------------------------------
             else if (component_name == "Velocity_Component") {
                 // Parse Velocity_Component
                 Velocity_Component velocity;
@@ -58,6 +63,7 @@ namespace lof {
                 ecs_manager.add_component<Velocity_Component>(entity, velocity);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Velocity_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Mesh_Component -------------------------------------------
             else if (component_name == "Mesh_Component") {
                 // Parse Mesh_Component
                 Mesh_Component mesh;
@@ -69,35 +75,56 @@ namespace lof {
                 ecs_manager.add_component<Mesh_Component>(entity, mesh);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Mesh_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Physics_Component -------------------------------------------
             else if (component_name == "Physics_Component") {
                 // Parse Physics_Component
                 Physics_Component physics_component;
+
                 if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
                     const rapidjson::Value& grav = component_data["gravity"];
                     physics_component.gravity.x = grav[0].GetFloat();
                     physics_component.gravity.y = grav[1].GetFloat();
                 }
+
                 if (component_data.HasMember("damping_factor") && component_data["damping_factor"].IsNumber()) {
                     physics_component.damping_factor = component_data["damping_factor"].GetFloat();
                 }
+
                 if (component_data.HasMember("max_velocity") && component_data["max_velocity"].IsNumber()) {
                     physics_component.max_velocity = component_data["max_velocity"].GetFloat();
                 }
+
                 if (component_data.HasMember("accumulated_force") && component_data["accumulated_force"].IsArray()) {
                     const rapidjson::Value& acc_force = component_data["accumulated_force"];
                     physics_component.accumulated_force.x = acc_force[0].GetFloat();
                     physics_component.accumulated_force.y = acc_force[1].GetFloat();
                 }
+
                 if (component_data.HasMember("mass") && component_data["mass"].IsNumber()) {
                     physics_component.set_mass(component_data["mass"].GetFloat());
                 }
+
                 if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
                     physics_component.is_static = component_data["is_static"].GetBool();
                 }
+
+                if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
+                    physics_component.is_grounded = component_data["is_grounded"].GetBool();
+                }
+
+                if (component_data.HasMember("is_jumping") && component_data["is_jumping"].IsBool()) {
+                    physics_component.is_jumping = component_data["is_jumping"].GetBool();
+                }
+
+                if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
+                    physics_component.jump_force = component_data["jump_force"].GetFloat();
+                }
+
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Graphics_Component -------------------------------------------
             else if (component_name == "Graphics_Component") {
                 // Parse Graphics_Component
                 Graphics_Component graphics_component;
@@ -151,6 +178,24 @@ namespace lof {
                 ecs_manager.add_component<Graphics_Component>(entity, graphics_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Graphics_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Collision_Component -------------------------------------------
+            else if (component_name == "Collision_Component") {
+                // Parse Collision_Component
+                Collision_Component collision_component;
+
+                if (component_data.HasMember("width") && component_data["width"].IsNumber()) {
+                    collision_component.width = component_data["width"].GetFloat();
+                }
+
+                if (component_data.HasMember("height") && component_data["height"].IsNumber()) {
+                    collision_component.height = component_data["height"].GetFloat();
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<Collision_Component>(entity, collision_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
+            }
+            // ------------------------------------ Unknown Component -------------------------------------------
             else {
                 LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
             }

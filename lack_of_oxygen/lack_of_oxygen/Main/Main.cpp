@@ -4,6 +4,9 @@
  * @details Initializes the Game_Manager, loads configurations, sets up the window, and runs the main loop.
  * @author Simon Chan
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
  // Include file headers
@@ -22,6 +25,7 @@
 #include <crtdbg.h>
 
 using namespace lof;
+
 
 
 int main(void) {
