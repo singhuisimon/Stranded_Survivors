@@ -7,8 +7,6 @@
 #pragma once
 
 #include "System.h"
-//#include "../Manager/Input_Manager.h"
-
 namespace lof {
 
     /**

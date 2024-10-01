@@ -52,6 +52,6 @@ namespace lof {
 
     void Clock::sleep(int64_t microseconds) {
         std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
-    }
+  }
 
 } // end of namespace lof

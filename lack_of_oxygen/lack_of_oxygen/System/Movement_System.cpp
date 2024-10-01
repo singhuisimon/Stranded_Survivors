@@ -7,6 +7,8 @@
 #include "Movement_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
+#include "../Manager/Input_Manager.h"
+
 
 namespace lof {
 
@@ -32,46 +34,72 @@ namespace lof {
 
                 if (physics.is_static) continue;
 
-                //// Apply input-based forces to control the entity
-                //Vec2D input_force(0, 0);
-                //if (input_manager.is_key_pressed(GLFW_KEY_A)) { // Replace KEY_LEFT with your input system's key codes
-                //    input_force.x -= 100.0f; // Apply leftward force
-                //}
-                //if (input_manager.is_key_pressed(GLFW_KEY_D)) {
-                //    input_force.x += 100.0f; // Apply rightward force
-                //}
-                //if (input_manager.is_key_pressed(GLFW_KEY_W)) {
-                //    input_force.y += 100.0f; // Apply upward force (e.g., jump)
-                //}
-                //if (input_manager.is_key_pressed(GLFW_KEY_S)) {
-                //    input_force.y -= 100.0f; // Apply downward force
-                //}
+                //apply speed 
+                float speed = 600.f; 
 
-                //// Apply the input force to the physics component
-                //physics.apply_force(input_force);
-                //    //calculate the acceleration 
+        
+                 // Update position based on velocity and delta_time and input
+                if (IM.is_key_held(GLFW_KEY_W)) {
 
-                    Vec2D total_force = physics.accumulated_force + (physics.gravity * physics.mass); // F = ma = mg; g as acceleration: a(g) = F / m;
-                    Vec2D acceleration = total_force * physics.inv_mass; // F = ma; a = F / m;
+                    velocity.velocity.y = speed; 
 
-                    //update velocity according to the acceleration on each entity
-                    velocity.velocity += acceleration * delta_time;
+                }
+                else if (IM.is_key_held(GLFW_KEY_S)) {
+
+                    velocity.velocity.y = -speed;
+
+                }
+                else {
+                    velocity.velocity.y = 0; 
+                }
+
+
+                if (IM.is_key_held(GLFW_KEY_A)) {
+
+                    velocity.velocity.x = -speed;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_D)) {
+
+                    velocity.velocity.x = speed;
+
+                }
+                else {
+                    velocity.velocity.x = 0;
+                }
+
+                //calculate the acceleration 
+
+                Vec2D total_force = physics.accumulated_force + (physics.gravity * physics.mass); // F = ma = mg; g as acceleration: a(g) = F / m;
+                Vec2D acceleration = total_force * physics.inv_mass; // F = ma; a = F / m;
+
+                //update velocity according to the acceleration on each entity
+                velocity.velocity += acceleration * delta_time;
+
 
                 //dampen velocity
                 velocity.velocity *= physics.damping_factor;
 
-                // Update position based on velocity and delta_time
+
                 transform.position += velocity.velocity * delta_time;
+
 
                 //clamp velocity to max velocity 
                 float squared_velocity = square_length_vec2d(velocity.velocity);
 
-                // length of entity's velocity > max_velocity
-                if (squared_velocity > physics.max_velocity * physics.max_velocity) {
+                //squared max_velocity 
+                float squared_max_vel = physics.max_velocity * physics.max_velocity; 
 
-                    Vec2D normalize_result;
-                    normalize_vec2d(normalize_result, velocity.velocity);
-                    velocity.velocity = normalize_result * physics.max_velocity;
+
+                // length of entity's velocity > max_velocity
+                if (squared_velocity > squared_max_vel) {
+
+
+                        Vec2D normalize_result;
+                        normalize_vec2d(normalize_result, velocity.velocity);
+                        velocity.velocity = normalize_result * physics.max_velocity;
+
+
                 }
 
                 //reset the accumulated force 
