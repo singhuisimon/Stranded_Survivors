@@ -18,18 +18,20 @@ namespace lof {
 
     // Updates the model-to-world-to-NDC transformation matrix of the component per frame.
     void Render_System::update(float delta_time) {
+        // unreferenced parameter for now
+        delta_time;
+
         for (const auto& entity_ptr : ecs_manager.get_entities()) {
             EntityID entity_id = entity_ptr->get_id();
 
             // Check if the entity has Graphics and Transform components 
-            
             if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>())) {
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
-                auto& velocity= ecs_manager.get_component<Velocity_Component>(entity_id); 
+                //auto& velocity= ecs_manager.get_component<Velocity_Component>(entity_id);
 
-                /////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
+                ///////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
                 GLfloat scale_change = 2.5f;
                 if (IM.is_key_held(GLFW_KEY_9)) {
                     LM.write_log("Render_System::update(): '9' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
@@ -47,10 +49,9 @@ namespace lof {
                         transform.scale.y = 0.0f;
                     }
                 }
-                ///////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
+                /////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
 
-
-                ///////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
+                /////////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
                 GLfloat rot_change = 30.0f * (GLfloat)delta_time;
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
                     LM.write_log("Render_System::update(): 'LEFT' key pressed, rotation of entity %u increased by %f.", entity_id, rot_change);
@@ -60,39 +61,15 @@ namespace lof {
                     LM.write_log("Render_System::update(): 'RIGHT' key pressed, rotation of entity %u decreased by %f.", entity_id, rot_change);
                     transform.rotation -= rot_change;
                 }
-                ///////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
+                /////////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
 
-                ///////////////////////FOR TESTING MOVEMENT/////////////////////////////////
-                if (entity_id == 0) {
-                    //GLfloat movement_speed = 100.0f * (GLfloat)delta_time;
-                    velocity.velocity.x *delta_time;
-                    velocity.velocity.y *  delta_time;
-                    if (IM.is_key_held(GLFW_KEY_W)) {
-                        LM.write_log("Render_System::update(): 'W' key pressed, entity %u move up by %f.", entity_id, velocity.velocity.y);
-                        transform.position.y += velocity.velocity.y * delta_time;;
-                    }
-                    if (IM.is_key_held(GLFW_KEY_A)) {
-                        LM.write_log("Render_System::update(): 'A' key pressed, entity %u left up by %f.", entity_id, velocity.velocity.x);
-                        transform.position.x -= velocity.velocity.x * delta_time;;
-                    }
-                    if (IM.is_key_held(GLFW_KEY_S)) {
-                        LM.write_log("Render_System::update(): 'S' key pressed, entity %u down up by %f.", entity_id, velocity.velocity.y);
-                        transform.position.y -= velocity.velocity.y * delta_time;;
-                    }
-                    if (IM.is_key_held(GLFW_KEY_D)) {
-                        LM.write_log("Render_System::update(): 'D' key pressed, entity %u right up by %f.", entity_id, velocity.velocity.x);
-                        transform.position.x += velocity.velocity.x * delta_time;;
-                    }
-                }
-
-                /////////////////////////FOR TESTING MOVEMENT/////////////////////////////////
 
                 // Compute object scale matrix
                 glm::mat3 scale_mat{ transform.scale.x, 0, 0,
                                      0, transform.scale.y, 0,
                                      0, 0, 1 };
 
-                //// Compute current orientation of object (Uncomment to rotate)
+                //// Compute current orientation of object (Uncomment to rotate by itself)
                 //GLfloat angle_speed = 30.0f; // FOR TESTING (HARDCODED VALUE) 
                 //transform.rotation += (angle_speed * (GLfloat)delta_time); 
                 GLfloat rad_disp = glm::radians(transform.rotation);
@@ -115,7 +92,7 @@ namespace lof {
 
                 // Compute model-to-world-to-NDC transformation matrix and store it in the component
                 graphics.mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
-                //LM.write_log("Render_System::update(): entity ID %u update successful. Updated position is %f, %f.", entity_id, transform.position.x, transform.position.y);
+                LM.write_log("Render_System::update(): entity ID %u update successful. Updated position is %f, %f.", entity_id, transform.position.x, transform.position.y);
             }
         }
 
@@ -129,7 +106,7 @@ namespace lof {
             glLineWidth(5.0f);
             break;
         case GL_POINT:
-            glPointSize(10.0f);
+            glPointSize(5.0f);
             break;
         default:
             break;
@@ -163,21 +140,31 @@ namespace lof {
                 GFXM.program_use(shaders[graphics.shd_ref]);
 
                 // Bind object's VAO handle
-                glBindVertexArray(models[graphics.mdl_ref].vaoid);
+                glBindVertexArray(models[graphics.model_name].vaoid);
 
-                // Pass object's mdl_to_ndc_xform to vertex shader
-                GLint uniform_location = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC");
-                if (uniform_location >= 0) {
-                    glUniformMatrix3fv(uniform_location, 1, GL_FALSE, glm::value_ptr(graphics.mdl_to_ndc_xform));
+                // Pass object's color to fragment shader uniform variable uColor
+                GLint color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uColor");
+                if (color_uniform_loc >= 0) {
+                    glUniform3fv(color_uniform_loc, 1, &graphics.color[0]);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Uniform variable doesn't exist!");
+                    LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Pass object's mdl_to_ndc_xform to vertex shader
+                GLint mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC_Mat");
+                if (mat_uniform_loc >= 0) {
+                    glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
+                }
+                else {
+                    LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
                 // Render objects
-                glDrawElements(models[graphics.mdl_ref].primitive_type, models[graphics.mdl_ref].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                //LM.write_log("Render_System::draw(): entity ID %u rendered successfully at position %f, %f.", entity_id, transform.position.x, transform.position.y);
+                glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                LM.write_log("Render_System::draw(): entity ID %u rendered successfully at position %f, %f.", entity_id, transform.position.x, transform.position.y);
 
                 // Clean up by unbinding the VAO and ending the shader program
                 glBindVertexArray(0);

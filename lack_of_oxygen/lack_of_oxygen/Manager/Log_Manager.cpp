@@ -28,6 +28,7 @@ namespace lof {
         set_type("Log_Manager");
         // By default, the log file will flush after each write, for immediate logging 
         m_is_started = false;
+        set_time(0);
     }
 
 

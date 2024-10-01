@@ -10,9 +10,6 @@
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
         },
-        "Mesh_Component": {
-          "mesh_name": "square"
-        },
         "Physics_Component": {
           "gravity": [ 0.0, -9.8 ],
           "damping_factor": 0.90,
@@ -25,7 +22,8 @@
           "jump_force": 300.0
         },
         "Graphics_Component": {
-          "mdl_ref": 0,
+          "model_name": "square",
+          "color": [ 0.0, 1.0, 0.0 ],
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -49,9 +47,6 @@
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
         },
-        "Mesh_Component": {
-          "mesh_name": "square"
-        },
         "Physics_Component": {
           "gravity": [ 0.0, -9.8 ],
           "damping_factor": 0.90,
@@ -64,7 +59,8 @@
           "jump_force": 0.0
         },
         "Graphics_Component": {
-          "mdl_ref": 0,
+          "model_name": "circle",
+          "color": [ 0.0, 0.0, 1.0 ],
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],

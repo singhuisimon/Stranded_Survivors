@@ -160,8 +160,27 @@ int main(void) {
         // Poll for and process events 
         glfwPollEvents(); 
 
+        // Getting delta time for Game Manager/game loop
+        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update game world state
-        GM.update(delta_time); 
+        GM.update(delta_time);
+        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
+
+       
+        // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
+        if (IM.is_key_held(GLFW_KEY_T)) {
+
+            system_performance(GM.get_time(), IM.get_time(), IM.get_type());
+            system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+            system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
+
+            for (auto& system : ECSM.get_systems()) {
+                system_performance(GM.get_time(), system->get_time(), system->get_type());
+            }
+
+            std::cout << std::endl;
+        }
+
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {

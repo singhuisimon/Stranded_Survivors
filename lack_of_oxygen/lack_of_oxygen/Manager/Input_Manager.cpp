@@ -28,7 +28,9 @@ namespace lof {
 
     // Private constructor
     Input_Manager::Input_Manager() {
-        // Initialize all key and mouse button states to NONE
+        set_type("Input_Manager");
+        set_time(0);
+        // Initialize all key states to NONE
     }
 
     // Set the key state

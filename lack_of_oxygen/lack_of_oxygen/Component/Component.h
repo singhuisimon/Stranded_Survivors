@@ -71,24 +71,6 @@ namespace lof {
             : position(pos), rotation(rot), scale(scl) {}
     };
 
-
-    /**
-     * @class Mesh_Component
-     * @brief Stores the model name for an entity.
-     */
-    class Mesh_Component : public Component {
-    public:
-        std::string mesh_name;  ///< Name of the model (e.g., "square").
-
-        /**
-         * @brief Constructor for Model_Component.
-         * @param name Name identifier for the model.
-         */
-        Mesh_Component(const std::string& name = "")
-            : mesh_name(name) {}
-    };
-
-
     /**
      * @class Velocity_Component
      * @brief Component representing an entity's velocity.
@@ -105,7 +87,6 @@ namespace lof {
         Velocity_Component(float vx = 0.0f, float vy = 0.0f)
             : velocity(vx, vy) {}
     };
-
 
     /**
     * @class Physics_Component
@@ -163,22 +144,22 @@ namespace lof {
             inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
         }
     };
-
-
-    /** // FOR TESTING FIRST (VALUES WILL BE READ FROM A FILE IN THE FUTURE)
+    /**
     * @class Graphics_Component
     * @brief Component representing an entity's graphical data.
     */
     class Graphics_Component : public Component {
     public:
         // Organic members of Graphics_Component
+        std::string model_name;
+        glm::vec3 color;
+        // sprite value
+        GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
-        GLuint mdl_ref, shd_ref;
-        // texture/sprite member in the future
 
         // Default constructor
         Graphics_Component()
-            : mdl_ref(0), shd_ref(0), mdl_to_ndc_xform(glm::mat3(0.0f)) {}
+            : model_name("square"), color(0.0f, 0.0f, 0.0f), shd_ref(0), mdl_to_ndc_xform(glm::mat3(0.0f)) {}
 
         /**
          * @brief Constructor for Graphics_Component.
@@ -187,10 +168,10 @@ namespace lof {
          * @param shd_ref Reference to shader
          */
 
-        Graphics_Component(GLuint model, GLuint shader,
-            glm::mat3 xform) : mdl_ref(model), shd_ref(shader), mdl_to_ndc_xform(xform) {}
+        Graphics_Component(std::string mdl_name, glm::vec3 clr, GLuint shader,
+            glm::mat3 xform) : model_name(mdl_name), color(clr), shd_ref(shader), mdl_to_ndc_xform(xform) {}
 
-    };
+    }; 
 
 
     class Collision_Component : public Component

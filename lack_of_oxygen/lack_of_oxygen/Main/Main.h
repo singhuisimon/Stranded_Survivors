@@ -26,6 +26,7 @@
 // Include Utility headers
 #include "../Utility/Clock.h"
 #include "../Utility/Vector2D.h"
+#include "../Utility/Matrix3x3.h"
 
 // Include Manager headers
 #include "../Manager/Game_Manager.h"

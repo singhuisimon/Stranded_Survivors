@@ -44,8 +44,7 @@ namespace lof {
     ECS_Manager::ECS_Manager() {
         set_type("ECS_Manager");
         m_is_started = false;
-        // Optionally, log initialization
-        LM.write_log("ECS_Manager::ECS_Manager(): ECS_Manager instance created.");
+        set_time(0);
     }
 
     int ECS_Manager::start_up() {
@@ -63,10 +62,10 @@ namespace lof {
 
             register_component<Velocity_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Velocity_Component'.");
-
-            register_component<Mesh_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Mesh_Component'.");
-
+            //register_component<Model_Component>();
+            //register_component<Collision_Component>();
+            //register_component<Mesh_Component>();
+            //register_component<Mass_Component>();
             register_component<Physics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 
@@ -79,13 +78,9 @@ namespace lof {
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
             // Add systems
-            add_system(std::make_unique<Movement_System>(*this)); 
-            //Add collision system
-            add_system(std::make_unique<Collision_System>(*this));
-            
-            // Add other systems as needed
-            // Add all systems
-            add_system(std::make_unique<Movement_System>(*this));
+            //add_system(std::make_unique<Movement_System>(*this)); 
+            //add_system(std::make_unique<Collision_System>(*this));
+            //add_system(std::make_unique<Movement_System>(*this));
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
             add_system(std::make_unique<Render_System>(*this));
@@ -169,6 +164,10 @@ namespace lof {
         return id;
     }
 
+    const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{
+        return systems;
+    }
+
     void ECS_Manager::add_system(std::unique_ptr<System> system) {
         // Get the system type before moving
         std::string system_type = system->get_type();
@@ -180,8 +179,13 @@ namespace lof {
 
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
+
+            // Getting delta time for each system
+            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+            // Updating each system
             system->update(delta_time);
-            // LM.write_log("ECS_Manager::update(): Updated system '%s'.", system->get_type().c_str());
+            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            
         }
     }
 

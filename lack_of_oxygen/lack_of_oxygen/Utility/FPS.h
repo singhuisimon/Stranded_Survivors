@@ -13,6 +13,9 @@
  // Include necessary headers
 #include <deque>
 #include <cstdint>
+#include <string>
+#include <iostream>
+#include <iomanip>
 
 namespace lof {
 
@@ -53,6 +56,14 @@ namespace lof {
          */
         void reset();
     };
+
+    /**
+    * @brief Calculates and prints out the percentage of the given mamager/system's time with that of the entire game loop.
+    * @param gm_time Time consumption of the game loop (Game Manager's consumption time).
+    * @param system_time Time consumption of the manager/system.
+    * @param name Name of manager/system.
+    */
+    void system_performance(int64_t gm_time, int64_t system_time, std::string name);
 
 } // namespace lof
 
