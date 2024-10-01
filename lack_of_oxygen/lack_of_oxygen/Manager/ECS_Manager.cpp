@@ -55,7 +55,7 @@ namespace lof {
             //register_component<Model_Component>();
             register_component<Collision_Component>();
             register_component<Mesh_Component>();
-            register_component<Mass_Component>();
+            //register_component<Mass_Component>();
             register_component<Physics_Component>();
             register_component<Graphics_Component>(); 
 
