@@ -69,20 +69,6 @@ namespace lof {
                 ecs_manager.add_component<Mesh_Component>(entity, mesh);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Mesh_Component to entity ID %u.", entity);
             }
-            //else if (component_name == "Mass_Component") {
-            //    // Parse Mass_Component
-            //    Mass_Component mass_component;
-            //    if (component_data.HasMember("mass") && component_data["mass"].IsNumber()) {
-            //        mass_component.set_mass(component_data["mass"].GetFloat());
-            //    }
-            //    if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
-            //        mass_component.is_static = component_data["is_static"].GetBool();
-            //    }
-
-                // Add component to entity
-                ecs_manager.add_component<Mass_Component>(entity, mass_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Mass_Component to entity ID %u.", entity);
-            }
             else if (component_name == "Physics_Component") {
                 // Parse Physics_Component
                 Physics_Component physics_component;
@@ -108,9 +94,6 @@ namespace lof {
                 if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
                     physics_component.is_static = component_data["is_static"].GetBool();
                 }
-
-
-
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);

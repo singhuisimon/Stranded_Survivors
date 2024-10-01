@@ -67,9 +67,6 @@ namespace lof {
             register_component<Mesh_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Mesh_Component'.");
 
-            register_component<Mass_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Mass_Component'.");
-
             register_component<Physics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 

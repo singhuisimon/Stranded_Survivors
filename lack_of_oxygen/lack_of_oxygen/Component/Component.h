@@ -107,24 +107,6 @@ namespace lof {
     };
 
 
-    ////class mass component 
-    //class Mass_Component : public Component {
-    //public:
-    //    float mass; //mass of entity
-    //    float inv_mass;
-    //    bool is_static; //to check if the entity is static or not
-
-    //    Mass_Component(float m = 1.0f, bool is_static = false)
-    //        : mass(m), inv_mass((m > 0.0f) ? 1.0f / m : 0.0f), is_static(is_static) {}
-
-    //    void set_mass(float m) {
-    //        mass = m;
-    //        inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
-    //    }
-
-    //};
-
-
     /**
     * @class Physics_Component
     * @brief Component representing global physics properties
