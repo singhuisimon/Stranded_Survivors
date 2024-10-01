@@ -32,6 +32,7 @@
 // Include standard headers
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 
 namespace lof {
 
@@ -54,18 +55,15 @@ namespace lof {
         }
 
         try {
+            // Register all components used in the game
             LM.write_log("ECS_Manager::start_up(): Registering components.");
 
-            // Register all components used in the game
             register_component<Transform2D>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Transform2D'.");
 
             register_component<Velocity_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Velocity_Component'.");
-            //register_component<Model_Component>();
-            //register_component<Collision_Component>();
-            //register_component<Mesh_Component>();
-            //register_component<Mass_Component>();
+
             register_component<Physics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 
@@ -75,18 +73,15 @@ namespace lof {
             register_component<Collision_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
 
+            // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
-            // Add systems
-            //add_system(std::make_unique<Movement_System>(*this)); 
-            //add_system(std::make_unique<Collision_System>(*this));
-            //add_system(std::make_unique<Movement_System>(*this));
+            add_system(std::make_unique<Movement_System>(*this));
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
             add_system(std::make_unique<Render_System>(*this));
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            // Add collision system
             add_system(std::make_unique<Collision_System>(*this));
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 

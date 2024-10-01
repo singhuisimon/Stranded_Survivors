@@ -20,6 +20,7 @@
 // Include iostream for console output
 #include <iostream>
 #include <random>
+#include <chrono>
 
 namespace lof {
 
