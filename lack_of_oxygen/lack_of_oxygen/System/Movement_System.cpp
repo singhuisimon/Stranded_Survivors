@@ -50,7 +50,7 @@ namespace lof {
 
                 }
                 else {
-                    velocity.velocity.y = 0; 
+                    velocity.velocity.y += physics.gravity.y * delta_time; 
                 }
 
 
@@ -103,7 +103,7 @@ namespace lof {
                 }
 
                 //reset the accumulated force 
-                physics.accumulated_force = Vec2D(0, 0);
+                physics.reset_forces();
 
             }
         }
