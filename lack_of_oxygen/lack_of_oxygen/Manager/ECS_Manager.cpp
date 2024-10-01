@@ -81,6 +81,12 @@ namespace lof {
 
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
+            // Add systems
+            add_system(std::make_unique<Movement_System>(*this)); 
+            //Add collision system
+            add_system(std::make_unique<Collision_System>(*this));
+            
+            // Add other systems as needed
             // Add all systems
             add_system(std::make_unique<Movement_System>(*this));
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");

@@ -107,22 +107,22 @@ namespace lof {
     };
 
 
-    //class mass component 
-    class Mass_Component : public Component {
-    public:
-        float mass; //mass of entity
-        float inv_mass;
-        bool is_static; //to check if the entity is static or not
+    ////class mass component 
+    //class Mass_Component : public Component {
+    //public:
+    //    float mass; //mass of entity
+    //    float inv_mass;
+    //    bool is_static; //to check if the entity is static or not
 
-        Mass_Component(float m = 1.0f, bool is_static = false)
-            : mass(m), inv_mass((m > 0.0f) ? 1.0f / m : 0.0f), is_static(is_static) {}
+    //    Mass_Component(float m = 1.0f, bool is_static = false)
+    //        : mass(m), inv_mass((m > 0.0f) ? 1.0f / m : 0.0f), is_static(is_static) {}
 
-        void set_mass(float m) {
-            mass = m;
-            inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
-        }
+    //    void set_mass(float m) {
+    //        mass = m;
+    //        inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
+    //    }
 
-    };
+    //};
 
 
     /**
@@ -136,19 +136,39 @@ namespace lof {
         float max_velocity;
         Vec2D accumulated_force; //to accumulate forces applied to the entity.
 
+        float mass; //mass of entity
+        float inv_mass;
+        bool is_static; //to check if the entity is static or not
+
         /**
            * @brief Constructor for Physics_Component
            * @   Sets up the data values required for physics component
            */
         Physics_Component(Vec2D gravity = Vec2D(0, -9.8f),
             float damping_factor = 0.90f,
-            float max_velocity = 1000.0f)
-            : gravity(gravity), damping_factor(damping_factor), max_velocity(max_velocity), accumulated_force(Vec2D(0, 0)) {}
+            float max_velocity = 1000.0f,
+            float mass = 1.0f,
+            bool is_static = false)
+
+            : gravity(gravity),
+            damping_factor(damping_factor),
+            max_velocity(max_velocity),
+            accumulated_force(Vec2D(0, 0)),
+            mass(mass),
+            inv_mass((mass > 0.0f) ? 1.0f / mass : 0.0f),
+            is_static(is_static) {}
 
         //Apply force
         void apply_force(const Vec2D& force) {
             accumulated_force += force;
         }
+
+        //set the mass of the object
+        void set_mass(float m) {
+            mass = m;
+            inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
+        }
+
     };
 
 
@@ -178,6 +198,17 @@ namespace lof {
             glm::mat3 xform) : mdl_ref(model), shd_ref(shader), mdl_to_ndc_xform(xform) {}
 
     };
+
+    class Collision_Component : public Component
+    {
+    public:
+        float width, height;
+
+        //constructor for collision components 
+        Collision_Component(float width = 0.0f, float height = 0.0f)
+            : width(width), height(height) {}
+    };
+
 
 } // namespace lof
 

@@ -13,15 +13,13 @@
         "Mesh_Component": {
           "mesh_name": "square"
         },
-        "Mass_Component": {
-          "mass": 1.0,
-          "is_static": false
-        },
         "Physics_Component": {
           "gravity": [ 0.0, -9.8 ],
           "damping_factor": 0.90,
           "max_velocity": 1000.0,
-          "accumulated_force": [ 0.0, 0.0 ]
+          "accumulated_force": [ 0.0, 0.0 ],
+          "mass": 1.0,
+          "is_static": false
         },
         "Graphics_Component": {
           "mdl_ref": 0,
@@ -47,15 +45,13 @@
         "Mesh_Component": {
           "mesh_name": "square"
         },
-        "Mass_Component": {
-          "mass": 2.0,
-          "is_static": false
-        },
         "Physics_Component": {
           "gravity": [ 0.0, -9.8 ],
           "damping_factor": 0.90,
           "max_velocity": 1000.0,
-          "accumulated_force": [ 0.0, 0.0 ]
+          "accumulated_force": [ 0.0, 0.0 ],
+          "mass": 2.0,
+          "is_static": true
         },
         "Graphics_Component": {
           "mdl_ref": 0,
