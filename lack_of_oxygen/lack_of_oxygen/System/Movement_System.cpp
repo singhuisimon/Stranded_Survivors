@@ -35,7 +35,7 @@ namespace lof {
                 if (physics.is_static) continue;
 
                 //apply speed 
-                float speed = 600.f; 
+                float speed = 500.f; 
 
         
                  // Update position based on velocity and delta_time and input
@@ -50,7 +50,7 @@ namespace lof {
 
                 }
                 else {
-                    velocity.velocity.y += physics.gravity.y * delta_time; 
+                    velocity.velocity.y = 0; 
                 }
 
 

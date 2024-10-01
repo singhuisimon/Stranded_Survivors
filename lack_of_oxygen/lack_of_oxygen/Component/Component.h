@@ -154,14 +154,8 @@ namespace lof {
 
         //set the mass of the object
         void set_mass(float m) {
-            if (m <= 0.0f) {
-                mass = 0.0f; 
-                inv_mass = 0.0f;
-            }
-            else {
-                mass = m; 
-                inv_mass = 1.0f / m;
-            }
+            mass = m;
+            inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
         }
     };
     /** // FOR TESTING FIRST (VALUES WILL BE READ FROM A FILE IN THE FUTURE)
