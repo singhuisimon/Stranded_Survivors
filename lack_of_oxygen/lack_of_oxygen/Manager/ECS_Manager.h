@@ -10,7 +10,7 @@
 // Macros for accessing manager singleton instances
 #define ECSM lof::ECS_Manager::get_instance()
 
- // Include base headers
+ // Include header file
 #include "Manager.h"
 
 // Include other necessary headers
@@ -39,8 +39,10 @@ namespace lof {
         // Private constructor for singleton pattern
         ECS_Manager();
 
-        // Member variables
+        // Entity storage
         std::vector<std::unique_ptr<Entity>> entities;
+
+        // System storage
         std::vector<std::unique_ptr<System>> systems;
 
         // Component storage
@@ -49,7 +51,7 @@ namespace lof {
         std::unordered_map<std::size_t, const std::type_info*> id_to_component_type;
         std::size_t next_component_id = 0;
 
-        // Helper methods
+        // Helper member functions
         template<typename T>
         std::vector<std::unique_ptr<Component>>& get_component_array();
 

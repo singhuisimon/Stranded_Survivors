@@ -1,19 +1,18 @@
 /**
  * @file Component.h
  * @brief Defines the base Component class and specific component types for the Entity Component System (ECS).
- * @details This file establishes the foundation for creating various game object properties and behaviors.
- *          It includes the base Component class and derived classes for position, velocity, and model components.
+ * @author Simon Chan
  * @date September 15, 2024
  */
+#pragma once
 
 #ifndef LOF_COMPONENT_H
 #define LOF_COMPONENT_H
 
- // Include standard headers
+// Include standard headers
 #include <cstdint>
 #include <string>
 #include <memory>
-
 // Include Utility headers
 #include "../Utility/Vector2D.h"
 
@@ -43,6 +42,7 @@ namespace lof {
         virtual ~Component() = default;
     };
 
+
     /**
      * @class Transform2D
      * @brief Represents the position, rotation, and scale of an entity in 2D space.
@@ -69,6 +69,24 @@ namespace lof {
             : position(pos), rotation(rot), scale(scl) {}
     };
 
+
+    /**
+     * @class Mesh_Component
+     * @brief Stores the model name for an entity.
+     */
+    class Mesh_Component : public Component {
+    public:
+        std::string mesh_name;  ///< Name of the model (e.g., "square").
+
+        /**
+         * @brief Constructor for Model_Component.
+         * @param name Name identifier for the model.
+         */
+        Mesh_Component(const std::string& name = "")
+            : mesh_name(name) {}
+    };
+
+
     /**
      * @class Velocity_Component
      * @brief Component representing an entity's velocity.
@@ -86,21 +104,6 @@ namespace lof {
             : velocity(vx, vy) {}
     };
 
-    /**
-     * @class Model_Component
-     * @brief Stores the model name for an entity.
-     */
-    class Mesh_Component : public Component {
-    public:
-        std::string mesh_name;  ///< Name of the model (e.g., "square").
-
-        /**
-         * @brief Constructor for Model_Component.
-         * @param name Name identifier for the model.
-         */
-        Mesh_Component(const std::string& name = "")
-            : mesh_name(name) {}
-    };
 
     //class mass component 
     class Mass_Component : public Component {
@@ -118,6 +121,7 @@ namespace lof {
         }
 
     };
+
 
     /**
     * @class Physics_Component
@@ -144,6 +148,8 @@ namespace lof {
             accumulated_force += force;
         }
     };
+
+
     /** // FOR TESTING FIRST (VALUES WILL BE READ FROM A FILE IN THE FUTURE)
     * @class Graphics_Component
     * @brief Component representing an entity's graphical data.

@@ -1,7 +1,6 @@
 /**
  * @file Entity.cpp
- * @brief Implements the Entity class methods.
- * @details This file contains the implementation of the Entity class methods for managing components.
+ * @brief Implements the Entity class member functions.
  * @author Simon Chan
  * @date September 15, 2024
  */

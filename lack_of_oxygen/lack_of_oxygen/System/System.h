@@ -2,11 +2,14 @@
  * @file System.h
  * @brief Defines the base System class for the Entity Component System (ECS).
  * @details Systems are responsible for implementing game logic that operates on entities with specific components.
+ * @author Simon Chan
  * @date September 15, 2024
  */
 
-#pragma once
+#ifndef LOF_SYSTEM_H
+#define LOF_SYSTEM_H
 
+// Include standard headers
 #include <string>
 
 namespace lof {
@@ -36,3 +39,5 @@ namespace lof {
     };
 
 } // namespace lof
+
+#endif // LOF_SYSTEM_H

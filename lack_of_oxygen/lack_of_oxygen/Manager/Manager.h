@@ -20,8 +20,8 @@ namespace lof {
     class Manager {
 
     protected:
-        std::string m_type;    //< Manager type identifier.
-        bool m_is_started;     //< True if start_up() succeeded.
+        std::string m_type;    // Manager type identifier.
+        bool m_is_started;     // True if start_up() succeeded.
 
         /**
          * @brief Set the type identifier of the Manager.
