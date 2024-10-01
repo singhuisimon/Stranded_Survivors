@@ -52,7 +52,7 @@ namespace lof {
             // Register all components used in the game
             register_component<Transform2D>();
             register_component<Velocity_Component>();
-            register_component<Model_Component>();
+            //register_component<Model_Component>();
             register_component<Collision_Component>();
             register_component<Mesh_Component>();
             register_component<Mass_Component>();
