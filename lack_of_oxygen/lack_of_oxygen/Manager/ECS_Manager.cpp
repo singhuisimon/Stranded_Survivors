@@ -53,9 +53,7 @@ namespace lof {
             // Register all components used in the game
             register_component<Transform2D>();
             register_component<Velocity_Component>();
-            //register_component<Model_Component>();
             register_component<Collision_Component>();
-            register_component<Mesh_Component>();
             //register_component<Mass_Component>();
             register_component<Physics_Component>();
             register_component<Graphics_Component>(); 
@@ -64,15 +62,9 @@ namespace lof {
 
             // Add systems
             add_system(std::make_unique<Movement_System>(*this)); 
-            //Add collision system
             add_system(std::make_unique<Collision_System>(*this));
-            
-            // Add other systems as needed
-            // Add all systems
             add_system(std::make_unique<Movement_System>(*this));
             add_system(std::make_unique<Render_System>(*this)); 
-
-
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): Started successfully.");

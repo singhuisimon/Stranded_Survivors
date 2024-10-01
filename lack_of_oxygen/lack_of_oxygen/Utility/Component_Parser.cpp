@@ -58,17 +58,6 @@ namespace lof {
                 ecs_manager.add_component<Velocity_Component>(entity, velocity);
                 LM.write_log("Added Velocity_Component to entity ID %u.", entity);
             }
-            else if (component_name == "Mesh_Component") {
-                // Parse Mesh_Component
-                Mesh_Component mesh;
-                if (component_data.HasMember("mesh_name") && component_data["mesh_name"].IsString()) {
-                    mesh.mesh_name = component_data["mesh_name"].GetString();
-                }
-
-                // Add component to entity
-                ecs_manager.add_component<Mesh_Component>(entity, mesh);
-                LM.write_log("Added Mesh_Component to entity ID %u.", entity);
-            }
             else if (component_name == "Physics_Component") {
                 // Parse Physics_Component
                 Physics_Component physics_component;
@@ -105,11 +94,18 @@ namespace lof {
                 // Parse Graphics_Component
                 Graphics_Component graphics_component;
 
-                if (component_data.HasMember("mdl_ref") && component_data["mdl_ref"].IsUint()) {
-                    graphics_component.mdl_ref = component_data["mdl_ref"].GetUint();
+                if (component_data.HasMember("model_name") && component_data["model_name"].IsString()) {
+                    graphics_component.model_name = component_data["model_name"].GetString();
                 }
                 else {
-                    graphics_component.mdl_ref = 0; // Default value
+                    graphics_component.model_name = "square"; // Default value
+                }
+
+                if (component_data.HasMember("color") && component_data["color"].IsArray()) {
+                    const rapidjson::Value& clr = component_data["color"];
+                    graphics_component.color.x = clr[0].GetFloat();
+                    graphics_component.color.y = clr[1].GetFloat();
+                    graphics_component.color.z = clr[2].GetFloat();
                 }
 
                 if (component_data.HasMember("shd_ref") && component_data["shd_ref"].IsUint()) {
