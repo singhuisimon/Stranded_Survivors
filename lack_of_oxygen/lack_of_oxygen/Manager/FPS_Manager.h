@@ -3,8 +3,11 @@
  * @brief Defines the FPS_Manager class for managing the frame rate of the game loop.
  * @author Simon Chan
  * @date September 20, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+#pragma once
 #ifndef LOF_FPS_MANAGER_H
 #define LOF_FPS_MANAGER_H
 
@@ -31,13 +34,13 @@ namespace lof {
     class FPS_Manager : public Manager {
     private:
         FPS_Manager();                      // Private since a singleton.
-        FPS_Manager(FPS_Manager const&);    // Don't allow copy.
-        void operator=(FPS_Manager const&); // Don't allow assignment.
 
-        // Timing variables
+        // Constant variables
         const int TARGET_FPS;                       // Target frames per second
         const int64_t MICROSECONDS_PER_SECOND;      // Microseconds in a second
         const int64_t TARGET_TIME;                  // Target frame time in microseconds
+
+        // Mutable variables
         int64_t adjust_time;                        // Adjustment time for sleep discrepancies
         int64_t last_frame_start_time;              // Time when the last frame started
 
@@ -47,7 +50,7 @@ namespace lof {
         // Delta time for the current frame
         float delta_time;
 
-        // FPS calculator
+        // FPS calculator from FPS.cpp
         FPS fps_calculator;
 
     public:
@@ -56,6 +59,10 @@ namespace lof {
          * @return Reference to the FPS_Manager instance.
          */
         static FPS_Manager& get_instance();
+
+        // Delete copy constructor and assignment operator
+        FPS_Manager(const FPS_Manager&) = delete;
+        FPS_Manager& operator=(const FPS_Manager&) = delete;
 
         /**
          * @brief Start up the FPS_Manager.

@@ -1,9 +1,13 @@
 /**
  * @file ECS_Manager.h
  * @brief Declares the ECS_Manager class for managing the ECS.
+ * @author Simon Chan
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+#pragma once
 #ifndef LOF_ECS_MANAGER_H
 #define LOF_ECS_MANAGER_H
 
@@ -47,6 +51,7 @@ namespace lof {
 
         // Component storage
         std::unordered_map<std::type_index, std::vector<std::unique_ptr<Component>>> component_arrays;
+        // Component identification
         std::unordered_map<std::type_index, std::size_t> component_type_to_id;
         std::unordered_map<std::size_t, const std::type_info*> id_to_component_type;
         std::size_t next_component_id = 0;
@@ -87,7 +92,7 @@ namespace lof {
          */
         void add_components_from_json(EntityID entity, const rapidjson::Value& components);
 
-        // Component management
+        // Component template functions
         template<typename T>
         void register_component();
 

@@ -29,6 +29,7 @@
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
+    <ClCompile Include="Manager\Message_Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
@@ -45,6 +46,7 @@
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
+    <ClInclude Include="Manager\Message_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
     <ClInclude Include="Manager\FPS_Manager.h" />
@@ -58,6 +60,7 @@
     <ClInclude Include="System\System.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
+    <ClInclude Include="Utility\Constant.h" />
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Utility\Vector2D.h" />

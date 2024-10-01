@@ -3,15 +3,16 @@
  * @brief Manages logging functionality within the game engine.
  * @author Simon Chan
  * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
 #pragma once
-
 #ifndef LOF_LOG_MANAGER_H
 #define LOF_LOG_MANAGER_H
 
 // Macros for accessing manager singleton instances
-#define LM  lof::Log_Manager::get_instance()
+#define LM lof::Log_Manager::get_instance()
 
  // Include base Manager class
 #include "Manager.h"
@@ -20,7 +21,6 @@
 #include <string>
 #include <fstream>
 #include <memory>
-#include <mutex>
 
 namespace lof {
 

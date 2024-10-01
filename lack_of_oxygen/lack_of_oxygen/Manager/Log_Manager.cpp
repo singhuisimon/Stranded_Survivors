@@ -1,8 +1,11 @@
 /**
  * @file Log_Manager.cpp
- * @brief Implements the Log_Manager class methods.
+ * @brief Implements the Log_Manager class helper functions.
  * @author Simon Chan
  * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 // Include header file
@@ -23,6 +26,7 @@ namespace lof {
     Log_Manager::Log_Manager()
         : do_flush(true), log_file_name(LOGFILE_DEFAULT) {
         set_type("Log_Manager");
+        // By default, the log file will flush after each write, for immediate logging 
         m_is_started = false;
     }
 

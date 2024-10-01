@@ -26,7 +26,7 @@ namespace lof {
 
                 mass = &ecs.get_component<Mass_Component>(id);
 
-                std::cout << "Mass of obj: " << mass << std::endl;
+                //std::cout << "Mass of obj: " << mass << std::endl;
 
                 //skip if the entity is static
                 if (mass->is_static) continue;

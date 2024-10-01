@@ -3,8 +3,11 @@
  * @brief Defines the Entity class for the Entity Component System (ECS).
  * @author Simon Chan
  * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+#pragma once
 #ifndef LOF_ENTITY_H
 #define LOF_ENTITY_H
 

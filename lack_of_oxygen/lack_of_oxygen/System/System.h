@@ -1,11 +1,13 @@
 /**
  * @file System.h
  * @brief Defines the base System class for the Entity Component System (ECS).
- * @details Systems are responsible for implementing game logic that operates on entities with specific components.
  * @author Simon Chan
  * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+#pragma once
 #ifndef LOF_SYSTEM_H
 #define LOF_SYSTEM_H
 

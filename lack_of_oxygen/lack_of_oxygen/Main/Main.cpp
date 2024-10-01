@@ -13,6 +13,8 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <iomanip>    // For std::fixed and std::setprecision
+#include <sstream>    // For std::stringstream
 
 // Include for memory leaks
 #define _CRTDBG_MAP_ALLOC
@@ -134,10 +136,17 @@ int main(void) {
         // Get delta_time after frame_start()
         float delta_time = FPSM.get_delta_time(); // Get delta time in seconds
 
+        // Get FPS
+        fps = FPSM.get_current_fps();
+
+        // Update window title with FPS
+        std::stringstream ss;
+        ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
+        glfwSetWindowTitle(window, ss.str().c_str());
+        
         // Update FPS timer
         fps_timer += delta_time;
         if (fps_timer >= FPS_DISPLAY_INTERVAL) {
-            fps = FPSM.get_current_fps();
             fps_timer = 0.0f;
 
             // Display FPS in console

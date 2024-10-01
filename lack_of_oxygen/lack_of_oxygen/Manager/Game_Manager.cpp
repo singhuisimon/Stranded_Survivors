@@ -1,9 +1,11 @@
 /**
  * @file Game_Manager.cpp
- * @brief Implements the Game_Manager class methods.
+ * @brief Implements the Game_Manager class helper functions.
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
  // Include header file
 #include "Game_Manager.h"
 
@@ -135,11 +137,10 @@ namespace lof {
             return;
         }
 
-        // Check for game over condition based on input, before IM update
-        if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
-            set_game_over(true);
-            LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
-            std::cout << "Escape key pressed. Closing the game." << std::endl;
+        // Check if the left mouse button was pressed
+        if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            // Handle left mouse button press
+            std::cout << "Left mouse button pressed." << std::endl;
         }
 
         // Check for game over condition based on input, before IM update
@@ -151,13 +152,13 @@ namespace lof {
 
         // Clone a game object from a prefab when 'C' key is pressed
         bool c_key_pressed = IM.is_key_pressed(GLFW_KEY_C);
-        if (c_key_pressed && !c_key_was_pressed_last_frame) {
+        if (IM.is_key_pressed(GLFW_KEY_C) && !c_key_was_pressed_last_frame) {
             // Clone the entity from the prefab
             EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
             if (new_entity != INVALID_ENTITY_ID) {
                 // Generate random position
                 static std::default_random_engine generator;
-                static std::uniform_real_distribution<float> distribution(-500.0f, 500.0f);
+                static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
 
                 float random_x = distribution(generator);
                 float random_y = distribution(generator);
@@ -168,14 +169,14 @@ namespace lof {
                     transform.position.x = random_x;
                     transform.position.y = random_y;
 
-                    LM.write_log("Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
+                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
                 }
                 else {
-                    LM.write_log("Cloned entity %u does not have a Transform2D component.", new_entity);
+                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
                 }
             }
             else {
-                LM.write_log("Failed to clone entity from prefab 'dummy_object'.");
+                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
         }
         c_key_was_pressed_last_frame = c_key_pressed;

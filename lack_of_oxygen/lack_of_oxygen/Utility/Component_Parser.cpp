@@ -43,7 +43,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Transform2D>(entity, transform);
-                LM.write_log("Added Transform2D component to entity ID %u.", entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Transform2D component to entity ID %u.", entity);
             }
             else if (component_name == "Velocity_Component") {
                 // Parse Velocity_Component
@@ -56,7 +56,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Velocity_Component>(entity, velocity);
-                LM.write_log("Added Velocity_Component to entity ID %u.", entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Velocity_Component to entity ID %u.", entity);
             }
             else if (component_name == "Mesh_Component") {
                 // Parse Mesh_Component
@@ -67,7 +67,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Mesh_Component>(entity, mesh);
-                LM.write_log("Added Mesh_Component to entity ID %u.", entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Mesh_Component to entity ID %u.", entity);
             }
             else if (component_name == "Mass_Component") {
                 // Parse Mass_Component
@@ -81,7 +81,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Mass_Component>(entity, mass_component);
-                LM.write_log("Added Mass_Component to entity ID %u.", entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Mass_Component to entity ID %u.", entity);
             }
             else if (component_name == "Physics_Component") {
                 // Parse Physics_Component
@@ -105,7 +105,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);
-                LM.write_log("Added Physics_Component to entity ID %u.", entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);
             }
             else if (component_name == "Graphics_Component") {
                 // Parse Graphics_Component
@@ -158,12 +158,11 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Graphics_Component>(entity, graphics_component);
-                LM.write_log("Added Graphics_Component to entity ID %u.", entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Graphics_Component to entity ID %u.", entity);
             }
             else {
-                LM.write_log("Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
+                LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
             }
         }
     }
-
 } // namespace lof
