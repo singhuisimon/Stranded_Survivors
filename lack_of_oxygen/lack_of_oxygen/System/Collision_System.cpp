@@ -208,7 +208,7 @@ namespace lof
 			//
 			//LM.write_log("Entity id %u",entity_ID);
 			
-			ecs_manager.add_component<Collision_Component>(entity_ID, Collision_Component{ 500.0f,500.0f });
+			//ecs_manager.add_component<Collision_Component>(entity_ID, Collision_Component{ 500.0f,500.0f });
 			//check if entity has a collision component
 			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
 				LM.write_log("Entity id %u", entity_ID);
@@ -218,6 +218,7 @@ namespace lof
 				//LM.write_log("transform 1 componenet for first entity id x:%f y:%f from entity: %u", transform1.position.x, transform1.position.y, entity_ID);
 				//get collision component
 				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
+				
 
 				//get velocity component
 				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
