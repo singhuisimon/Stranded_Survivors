@@ -191,6 +191,17 @@ namespace lof {
 
     };
 
+    class Collision_Component : public Component
+    {
+    public:
+        float width, height;
+
+        //constructor for collision components 
+        Collision_Component(float width = 0.0f, float height = 0.0f)
+            : width(width), height(height) {}
+    };
+
+
 } // namespace lof
 
 #endif // LOF_COMPONENT_H
