@@ -33,6 +33,9 @@ namespace lof {
         bool m_game_over;   // True -> game loop should stop.
         int m_step_count;   // Count of game loop iterations.
 
+        // Flag to prevent multiple key presses for cloning
+        bool c_key_was_pressed_last_frame = false; 
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.

@@ -16,7 +16,6 @@
 
 // Include Utility headers
 #include "../Utility/Vector2D.h"
-#include "../Utility/Model.h" 
 
 // FOR TESTING 
 #include "../Glad/glad.h"
@@ -42,24 +41,6 @@ namespace lof {
          * @brief Virtual destructor for the Component class.
          */
         virtual ~Component() = default;
-    };
-
-    /**
-     * @class Model_Component
-     * @brief Component representing the model associated with an entity.
-     */
-    class Model_Component : public Component {
-    public:
-        std::string model_name;                          ///< Name of the model (e.g., "square").
-        std::shared_ptr<Model> model_ptr;                ///< Pointer to the loaded Model.
-
-        /**
-         * @brief Constructor for Model_Component.
-         * @param name Name identifier for the model.
-         * @param model Pointer to the loaded Model.
-         */
-        Model_Component(const std::string& name = "", std::shared_ptr<Model> model = nullptr)
-            : model_name(name), model_ptr(model) {}
     };
 
     /**
@@ -105,6 +86,22 @@ namespace lof {
             : velocity(vx, vy) {}
     };
 
+    /**
+     * @class Model_Component
+     * @brief Stores the model name for an entity.
+     */
+    class Mesh_Component : public Component {
+    public:
+        std::string mesh_name;  ///< Name of the model (e.g., "square").
+
+        /**
+         * @brief Constructor for Model_Component.
+         * @param name Name identifier for the model.
+         */
+        Mesh_Component(const std::string& name = "")
+            : mesh_name(name) {}
+    };
+
     //class mass component 
     class Mass_Component : public Component {
     public:
@@ -126,7 +123,6 @@ namespace lof {
     * @class Physics_Component
     * @brief Component representing global physics properties
     */
-
     class Physics_Component : public Component {
     public:
         Vec2D gravity;
@@ -147,7 +143,6 @@ namespace lof {
         void apply_force(const Vec2D& force) {
             accumulated_force += force;
         }
-
     };
     /** // FOR TESTING FIRST (VALUES WILL BE READ FROM A FILE IN THE FUTURE)
     * @class Graphics_Component
@@ -159,6 +154,10 @@ namespace lof {
         glm::mat3 mdl_to_ndc_xform;
         GLuint mdl_ref, shd_ref;
         // texture/sprite member in the future
+
+        // Default constructor
+        Graphics_Component()
+            : mdl_ref(0), shd_ref(0), mdl_to_ndc_xform(glm::mat3(0.0f)) {}
 
         /**
          * @brief Constructor for Graphics_Component.

@@ -15,10 +15,10 @@
     <ClCompile Include="Utility\FPS.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
-    <ClCompile Include="Utility\Model.cpp" />
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
+    <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="Manager\Assets_Manager.cpp" />
   </ItemGroup>
@@ -39,18 +39,19 @@
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Utility\Vector2D.h" />
-    <ClInclude Include="Utility\Model.h" />
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
+    <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="Manager\Assets_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
     <None Include="Data\square.msh" />
-    <None Include="Data\object.json" />
+    <None Include="Data\scene1.scn" />
     <None Include="Data\triangle.msh" />
     <None Include="Manager\ECS_Manager.tpp" />
+    <None Include="Data\prefab.json" />
   </ItemGroup>
 </Project>
