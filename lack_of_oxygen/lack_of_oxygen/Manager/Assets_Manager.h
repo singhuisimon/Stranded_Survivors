@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <map>
+#include <map> //std::map
 
 #include "../Manager/Manager.h"
 
@@ -37,6 +37,10 @@ namespace lof
 		void Load_Font(std::string name, std::string file_Name);
 
 		std::shared_ptr<T>Get_Font(std::string name);
+
+		bool Assets_Exists(const std::string& name) const;
+
+		void Unload_Assets(const std::string name);
 
 	};
 

@@ -1,17 +1,19 @@
 /**
- * @file Collision_Syetem.cpp
- * @brief Implements the collsion system.
+ * @file Collision_Syetem.h
+ * @brief Implements the declaration of collsion system.
  * @author Saw Hui Shan
  * @date September 21, 2024
  */
 #pragma once
 
-#include "System.h"
+// Include other necessary headers
 #include "../Utility/Vector2D.h" //to get the library from vector2D.h
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
 #include "../Manager/ECS_Manager.h"
-#include <vector>
+#include "System.h"
+
+//include standard header
 #include <iostream>
 
 
@@ -22,53 +24,103 @@
 
 namespace lof
 {
-
+	/**
+	* @class AABB
+	* @brief It represent the axis-aligned bounding boxes which determine whether the 2 game odject are overlapping each other.
+	*/
 	struct AABB {
 
-		Vec2D min;
-		Vec2D max;
+		Vec2D min; // minimum point of the bounding box
+		Vec2D max; // maximum point of the bounding box
 
-		//Constructor to initialize minimun and maximun points of AABB
+		
+		/**
+		* @brief Constructor to initialize minimun and maximun points of AABB
+		* @param min Minimum corner of the bounding box
+		* @param max Maximum corner of the bounding box
+		*/
 		AABB(const Vec2D& min, const Vec2D& max);
 
-		//create AABB from transform component
+		
+		/**
+		* @brief create AABB from transform component and collision component 
+		* @param transform Tranform data including position, rotation, scale
+		* @param collision Collision component data including width and height 
+		* @return AABB instance 
+		*/
 		static AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision);
 	};
+	
 
+	/**
+	* @class Collision System
+	* @brief Handles collision detection between entities
+	*/
 	class Collision_System : public System
 	{
 	private:
+		
 		class ECS_Manager& ecs_manager;
 	public:
+		/**
+		* @brief Collision System constructor which initialize the collision system with ECS manager
+		* @param ecs_maager Reference to ECS manager
+		*/
 		Collision_System(ECS_Manager& ecs_manager);
 
-		struct Line_segment
-		{
-			Vec2D m_pt0; //end of point 0
-			Vec2D m_pt1; //end of point 1
-			Vec2D m_normal; //normalized outward normal
-		};
+		//struct Line_segment
+		//{
+		//	Vec2D m_pt0; //end of point 0
+		//	Vec2D m_pt1; //end of point 1
+		//	Vec2D m_normal; //normalized outward normal
+		//};
 
-		struct Circle
-		{
-			Vec2D m_centre;
-			float m_radius;
-		};
+		//struct Circle
+		//{
+		//	Vec2D m_centre;
+		//	float m_radius;
+		//};
 
 
-		//for rectRect
+		/**
+		* @brief Check for intersection between rectangles
+		* @param aabb1 First AABB
+		* @param vel1 First velocity
+		* @param aabb2 Second AABB
+		* @param vel2 Second AABB
+		* @param firstTimeOfCollsion Output param to hold the time of collision 
+		* @return True if rectangle intersept, false otherwise
+		*/
 		bool Collision_Intersection_RectRect(const AABB& aabb1,
 											const Vec2D& vel1,
 											const AABB& aabb2,
 											const Vec2D& vel2,
 											float& firstTimeOfCollision);
 
-		//function to check if a point is within a box
-		bool is_Intersept_Box(float pos_box_x, float pos_box_y, float width_box, float height_boxx, int mouseX, int mouseY);
+		/**
+		* @brief Check check if a point is within a box
+		* @param pos_box_x Position of x for the rectangle
+		* @param pos_box_y Position of y for the rectangle
+		* @param width_box Width of the rectangle
+		* @param height_box Height of the rectangle
+		* @param mouseX Position x of the mouse 
+		* @param mouseY Position y of the mouse 
+		* @return True if mouse intersept the box, false otherwise
+		*/
+		bool is_Intersept_Box(float pos_box_x, float pos_box_y, float width_box, float height_box, int mouseX, int mouseY);
 
-		void update(float dt) override;
+
+		/**
+		* @brief Update the collision system
+		* @param delta_time Delta time since the last update. 
+		*/
+		void update(float delta_time) override;
 		//might need: handle collision
 
+		/**
+		* @brief Returns the type of the collision system
+		* @return string representing the type
+		*/
 		std::string get_type() const override;
 	};
 }

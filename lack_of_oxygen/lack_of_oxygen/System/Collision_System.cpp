@@ -5,16 +5,20 @@
  * @date September 21, 2024
  */
 
-//include the header file
-#include "Collision_System.h"
-#include "../Component/Component.h"
+ // Include standard headers
 #include <iostream>
+
+// Include headers
+#include "Collision_System.h"
+
+// Include other necessary headers
+#include "../Component/Component.h"
 #include "../System/Render_System.h"
 
 
 namespace lof
 {
-	//constructor for AABB
+	
 	AABB::AABB(const Vec2D& min, const Vec2D& max)
 		: min(min), max(max) {}
 
@@ -199,18 +203,15 @@ namespace lof
 	}
 
 	
-	void Collision_System::update(float dt)
+	void Collision_System::update(float delta_time)
 	{
 		//Iterate all the entities in ecs_manager
 		for (const auto& entity_ptr : ecs_manager.get_entities())
 		{
 			//get the ID of the entity
 			EntityID entity_ID = entity_ptr->get_id();
-
-			//
 			//LM.write_log("Entity id %u",entity_ID);
 			
-			//ecs_manager.add_component<Collision_Component>(entity_ID, Collision_Component{ 500.0f,500.0f });
 			//check if entity has a collision component
 			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
 				// LM.write_log("Entity id %u", entity_ID);
@@ -218,6 +219,7 @@ namespace lof
 				//get transform component
 				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
 				//LM.write_log("transform 1 componenet for first entity id x:%f y:%f from entity: %u", transform1.position.x, transform1.position.y, entity_ID);
+				// 
 				//get collision component
 				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
 				
@@ -225,11 +227,9 @@ namespace lof
 				//get velocity component
 				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
 				//LM.write_log("velocity componenet for first entity id x:%f y:%f from entity: %u", velocity1.velocity.x, velocity1.velocity.y, entity_ID);
-				//std::cout << "testing:" << entity_ID;
+				
 				//create AABB based on transforrm and collision component
 				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
-				//LM.write_log("AABB1 x-axis will be min: %f max: %f  from entity: %u ", aabb1.min.x, aabb1.min.x, entity_ID);
-				//LM.write_log("AABB1 y-axis will be min: %f max: %f  from entity: %u", aabb1.max.y, aabb1.max.y, entity_ID);
 				// LM.write_log("AABB 1: Min(%f, %f) Max(%f, %f) from entity %u", aabb1.min.x, aabb1.min.y, aabb1.max.x, aabb1.max.y,entity_ID);
 				//LM.write_log("AABB 1: Min(%f, %f) Max(%f, %f)", aabb1.min.x, aabb1.min.y, aabb1.max.x, aabb1.max.y);
 				
@@ -239,18 +239,18 @@ namespace lof
 					//if they are the same entity skip
 					if (entity_ptr == other_entity_ptr)
 					{
-						//LM.write_log("yes they are same entity %u and &u!!!!!!");
 						continue;
 					}
 
 					//check if other entity has a collision component
 					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
 					{
-						//LM.write_log("yes other entity!!!!!!");
 						EntityID Other_entity_ID = other_entity_ptr->get_id();
 						// LM.write_log("Other Entity id %u", Other_entity_ID);
+						// 
 						//get other transform component 
 						auto& other_transform1 = ecs_manager.get_component<Transform2D>(Other_entity_ID);
+
 						//get collision component
 						auto& other_collision1 = ecs_manager.get_component<Collision_Component>(Other_entity_ID);
 
@@ -258,17 +258,15 @@ namespace lof
 						auto& other_velocity1 = ecs_manager.get_component<Velocity_Component>(Other_entity_ID);
 						//LM.write_log("velocity componenet for other  x:%f y:%f from entity: %u", other_velocity1.velocity.x, other_velocity1.velocity.y, Other_entity_ID);
 
-						//std::cout << "testing:" << Other_entity_ID;
-
 						//create AABB for other entity
 						AABB aabb2 = AABB::from_Tranform(other_transform1, other_collision1);
 						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
+
 						float collision_time = 0.0f;
 
 						//check intersecption between two entities, and consider their vel
 						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, other_velocity1.velocity, collision_time))
 						{
-							//std::cout << "yes, is collide\n"; //print to test first
 
 							if (velocity1.velocity.x == 0.0f && velocity1.velocity.y == 0.0f &&
 								other_velocity1.velocity.x == 0.0f && other_velocity1.velocity.y == 0.0f) {
@@ -278,6 +276,7 @@ namespace lof
 
 							LM.write_log("yes! it collide");
 							std::cout << "yes !!! collide\n";
+							
 						}
 					
 					}
@@ -293,75 +292,6 @@ namespace lof
 	std::string Collision_System::get_type() const {
 		return "Collision_System";
 	}
-
-	//******************************************Original Collision_System::update code*********************************//
-
-	//void Collision_System::update( float dt)
-	//{
-	//	//Iterate all the entities in ecs_manager
-	//	for (const auto& entity_ptr : ecs_manager.get_entities())
-	//	{
-	//		//get the ID of the entity
-	//		EntityID entity_ID = entity_ptr->get_id();
-	//		//check if entity has a collision component
-	//		if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
-	//			
-	//			//get transform component
-	//			auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
-	//			//get collision component
-	//			auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
-
-	//			//get velocity component
-	//			auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
-
-	//			//std::cout << "testing:" << entity_ID;
-	//			//create AABB based on transforrm and collision component
-	//			AABB aabb1 = AABB::from_Tranform(transform1, collision1);
-
-	//			//check for collision for all other entities
-	//			for (const auto& other_entity_ptr : ecs_manager.get_entities())
-	//			{
-	//				//if they are the same entity skip
-	//				if (entity_ptr == other_entity_ptr)
-	//				{
-	//					continue;
-	//				}
-
-	//				//check if other entity has a collision component
-	//				if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
-	//				{
-	//					EntityID Other_entity_ID = other_entity_ptr->get_id();
-	//					//get other transform component 
-	//					auto& other_transform1 = ecs_manager.get_component<Transform2D>(Other_entity_ID);
-	//					//get collision component
-	//					auto& other_collision1 = ecs_manager.get_component<Collision_Component>(Other_entity_ID);
-
-	//					//get velocity component
-	//					auto& other_velocity1 = ecs_manager.get_component<Velocity_Component>(Other_entity_ID);
-
-	//					std::cout << "testing:" << Other_entity_ID;
-
-	//					//create AABB for other entity
-	//					AABB aabb2 = AABB::from_Tranform(other_transform1, other_collision1);
-	//					float collision_time = 0.0f;
-
-	//					//check intersecption between two entities, and consider their vel
-	//					if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, other_velocity1.velocity, collision_time))
-	//					{
-	//						std::cout << "yes, is collide\n"; //print to test first
-	//					}
-
-	//				}
-
-	//			}
-
-	//		}
-
-	//	}
-	//	
-	//}
-
-	//******************************************Original Collision_System::update code*********************************//
 
 }
 
