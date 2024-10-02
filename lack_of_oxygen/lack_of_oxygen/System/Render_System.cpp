@@ -92,7 +92,7 @@ namespace lof {
 
                 // Compute model-to-world-to-NDC transformation matrix and store it in the component
                 graphics.mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
-                LM.write_log("Render_System::update(): entity ID %u update successful. Updated position is %f, %f.", entity_id, transform.position.x, transform.position.y);
+                //LM.write_log("Render_System::update(): entity ID %u update successful. Updated position is %f, %f.", entity_id, transform.position.x, transform.position.y);
             }
         }
 
@@ -164,7 +164,7 @@ namespace lof {
 
                 // Render objects
                 glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                LM.write_log("Render_System::draw(): entity ID %u rendered successfully at position %f, %f.", entity_id, transform.position.x, transform.position.y);
+                //LM.write_log("Render_System::draw(): entity ID %u rendered successfully at position %f, %f.", entity_id, transform.position.x, transform.position.y);
 
                 // Clean up by unbinding the VAO and ending the shader program
                 glBindVertexArray(0);
