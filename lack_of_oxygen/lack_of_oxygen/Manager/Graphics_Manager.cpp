@@ -7,6 +7,7 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
+#include <mutex>
 
 namespace lof {
 

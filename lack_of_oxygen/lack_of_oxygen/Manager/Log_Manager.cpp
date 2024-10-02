@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <iomanip>
 #include <sstream>
+#include <mutex>
 
 namespace lof {
 
