@@ -36,8 +36,10 @@ namespace lof {
                     transform.position.x = pos[0].GetFloat();
                     transform.position.y = pos[1].GetFloat();
                 }
-                if (component_data.HasMember("rotation") && component_data["rotation"].IsNumber()) {
-                    transform.rotation = component_data["rotation"].GetFloat();
+                if (component_data.HasMember("orientation") && component_data["orientation"].IsArray()) {
+                    const rapidjson::Value& ori = component_data["orientation"];
+                    transform.orientation.x = ori[0].GetFloat();
+                    transform.orientation.y = ori[1].GetFloat();
                 }
                 if (component_data.HasMember("scale") && component_data["scale"].IsArray()) {
                     const rapidjson::Value& scale = component_data["scale"];

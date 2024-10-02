@@ -31,48 +31,82 @@ namespace lof {
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
                 //auto& velocity= ecs_manager.get_component<Velocity_Component>(entity_id);
 
-                ///////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
-                GLfloat scale_change = 2.5f;
-                if (IM.is_key_held(GLFW_KEY_9)) {
-                    LM.write_log("Render_System::update(): '9' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
-                    transform.scale.x += scale_change;
-                    transform.scale.y += scale_change;
-                }
-                else if (IM.is_key_held(GLFW_KEY_0)) {
-                    LM.write_log("Render_System::update(): '0' key pressed, scale of entity %u decreased by %f.", entity_id, scale_change);
-                    if (transform.scale.x > 0.0f || transform.scale.y > 0.0f) {
-                        transform.scale.x -= scale_change;
-                        transform.scale.y -= scale_change;
+                if (GFXM.get_debug_mode() == GL_TRUE) {
+                    ///////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
+                    GLfloat scale_change = 100.0f * (GLfloat)delta_time;
+                    if (IM.is_key_held(GLFW_KEY_9)) {
+                        LM.write_log("Render_System::update(): '9' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
+                        transform.scale.x += scale_change;
+                        transform.scale.y += scale_change;
                     }
-                    else {
-                        transform.scale.x = 0.0f;
-                        transform.scale.y = 0.0f;
+                    else if (IM.is_key_held(GLFW_KEY_0)) {
+                        LM.write_log("Render_System::update(): '0' key pressed, scale of entity %u decreased by %f.", entity_id, scale_change);
+                        if (transform.scale.x > 0.0f || transform.scale.y > 0.0f) {
+                            transform.scale.x -= scale_change;
+                            transform.scale.y -= scale_change;
+                        }
+                        else {
+                            transform.scale.x = 0.0f;
+                            transform.scale.y = 0.0f;
+                        }
                     }
-                }
-                /////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
+                    /////////////////////////FOR TESTING OF CHANGE IN SCALE/////////////////////////////////
 
-                /////////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
-                GLfloat rot_change = 30.0f * (GLfloat)delta_time;
-                if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                    LM.write_log("Render_System::update(): 'LEFT' key pressed, rotation of entity %u increased by %f.", entity_id, rot_change);
-                    transform.rotation += rot_change;
-                }
-                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                    LM.write_log("Render_System::update(): 'RIGHT' key pressed, rotation of entity %u decreased by %f.", entity_id, rot_change);
-                    transform.rotation -= rot_change;
-                }
-                /////////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
+                    /////////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
+                    if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                        GLfloat rot_change = transform.orientation.y * (GLfloat)delta_time;
+                        transform.orientation.x += rot_change;
+                        LM.write_log("Render_System::update(): 'LEFT' key pressed, entity %u rotated by %f.", entity_id, rot_change);
+                    }
+                    else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                        GLfloat rot_change = transform.orientation.y * (GLfloat)delta_time;
+                        transform.orientation.x -= rot_change;
+                        LM.write_log("Render_System::update(): 'RIGHT' key pressed, entity %u rotated by %f.", entity_id, rot_change);
+                    }
+                    /////////////////////////FOR TESTING OF CHANGE IN ROTATION/////////////////////////////////
 
+                    //// Update position based on velocity and delta_time and input
+                    //GLfloat speed = 500.0f;
+                    //if (IM.is_key_held(GLFW_KEY_W)) {
+
+                    //    velocity.velocity.y = speed;
+
+                    //}
+                    //else if (IM.is_key_held(GLFW_KEY_S)) {
+
+                    //    velocity.velocity.y = -speed;
+
+                    //}
+                    //else {
+                    //    velocity.velocity.y = 0;
+                    //}
+
+
+                    //if (IM.is_key_held(GLFW_KEY_A)) {
+
+                    //    velocity.velocity.x = -speed;
+
+                    //}
+                    //else if (IM.is_key_held(GLFW_KEY_D)) {
+
+                    //    velocity.velocity.x = speed;
+
+                    //}
+                    //else {
+                    //    velocity.velocity.x = 0;
+                    //}
+
+                    //transform.position += velocity.velocity * (GLfloat) delta_time;
+                }
 
                 // Compute object scale matrix
                 glm::mat3 scale_mat{ transform.scale.x, 0, 0,
                                      0, transform.scale.y, 0,
                                      0, 0, 1 };
 
-                //// Compute current orientation of object (Uncomment to rotate by itself)
-                //GLfloat angle_speed = 30.0f; // FOR TESTING (HARDCODED VALUE) 
-                //transform.rotation += (angle_speed * (GLfloat)delta_time); 
-                GLfloat rad_disp = glm::radians(transform.rotation);
+                // Compute current orientation of object (Uncomment to rotate by itself)
+                //transform.orientation.x += (transform.orientation.y * (GLfloat)delta_time); 
+                GLfloat rad_disp = glm::radians(transform.orientation.x);
 
                 // Compute object rotational matrix 
                 glm::mat3 rot_mat{ glm::cos(rad_disp), glm::sin(rad_disp), 0,
@@ -92,7 +126,7 @@ namespace lof {
 
                 // Compute model-to-world-to-NDC transformation matrix and store it in the component
                 graphics.mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
-                LM.write_log("Render_System::update(): entity ID %u update successful. Updated position is %f, %f.", entity_id, transform.position.x, transform.position.y);
+                //LM.write_log("Render_System::update(): entity ID %u update successful. Updated position is %f, %f.", entity_id, transform.position.x, transform.position.y);
             }
         }
 
@@ -119,7 +153,6 @@ namespace lof {
     // Renders the entity onto the window based on the graphics components
     void Render_System::draw() {
 
-
         // Provide model-to-world-to-NDC transformation matrix to vertex shader
         // Render and cleaning up
         for (const auto& entity_ptr : ecs_manager.get_entities()) {
@@ -130,7 +163,9 @@ namespace lof {
                 entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) {
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
-                auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
+                auto& transform = ecs_manager.get_component<Transform2D>(entity_id); // For Debugging
+
+                auto& velocity = ecs_manager.get_component<Velocity_Component>(entity_id); // For Debugging
 
                 // Get shaders and models container 
                 auto& shaders = GFXM.get_shader_program_storage();
@@ -164,12 +199,80 @@ namespace lof {
 
                 // Render objects
                 glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                LM.write_log("Render_System::draw(): entity ID %u rendered successfully at position %f, %f.", entity_id, transform.position.x, transform.position.y);
+                //LM.write_log("Render_System::draw(): entity ID %u rendered successfully at position %f, %f.", entity_id, transform.position.x, transform.position.y);
 
+                if (GFXM.get_debug_mode() == GL_TRUE) { // Draw debugging line if velocity is present
+                    glBindVertexArray(models["debug_line"].vaoid);
+                    if (color_uniform_loc >= 0) {
+                        glm::vec3 line_color = { 0.0f, 0.0f, 0.0f }; // black
+                        glUniform3fv(color_uniform_loc, 1, &line_color[0]);
+                    }
+
+                    // Draw the line according to movement
+                    if (mat_uniform_loc >= 0) {
+                        //// Compute object scale matrix
+                        glm::mat3 scale_mat{ transform.scale.x * 1.5, 0, 0,
+                                             0, transform.scale.y * 1.5, 0,
+                                             0, 0, 1 };
+                        LM.write_log("velocity %f, %f", velocity.velocity.x, velocity.velocity.y); // FOR TESTING
+                        //// compute current orientation of line
+                        GLfloat direction{ 0.0f };
+                        if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
+                            if (velocity.velocity.x > 0.0f) {
+                                direction = -90.0f; // Move right 
+                            }
+                            else {
+                                direction = 90.0f; // Move left 
+                            }
+                        }
+                        else if (velocity.velocity.y && (velocity.velocity.x == 0.0f)) {
+                            if (velocity.velocity.y > 0.0f) {
+                                direction = 0.0f; // Move up 
+                            }
+                            else {
+                                direction = 180.0f; // Move down 
+                            }
+                        }
+                        else if (velocity.velocity.x > 0.0f && velocity.velocity.y > 0.0f) { // Top right
+                            direction = -45.0f;
+                        }
+                        else if (velocity.velocity.x < 0.0f && velocity.velocity.y > 0.0f) { // Top left
+                            direction = 45.0f;
+                        }
+                        else if (velocity.velocity.x > 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                            direction = -135.0f;
+                        }
+                        else if (velocity.velocity.x < 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                            direction = 135.0f;
+                        }
+
+                        GLfloat rad_disp = glm::radians(direction);
+
+                        // Compute object rotational matrix 
+                        glm::mat3 rot_mat{ glm::cos(rad_disp), glm::sin(rad_disp), 0,
+                                          -glm::sin(rad_disp), glm::cos(rad_disp), 0,
+                                          0, 0, 1 };
+
+                        // Compute object translation matrix
+                        glm::mat3 trans_mat{ 1, 0, 0,
+                                             0, 1, 0,
+                                             transform.position.x, transform.position.y, 1 };
+
+                        // Compute world scale matrix
+                        double const WorldRange{ 3000.0 };
+                        glm::mat3 world_scale{ 1.0 / WorldRange, 0, 0,
+                                               0, 1.0 / WorldRange, 0,
+                                               0, 0, 1 };
+
+                        glm::mat3 new_mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
+                        glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &new_mdl_to_ndc_xform[0][0]);
+                    }
+                    glLineWidth(5.0f);
+                    glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                }
                 // Clean up by unbinding the VAO and ending the shader program
                 glBindVertexArray(0);
                 GFXM.program_free();
-
             }
         }
     }

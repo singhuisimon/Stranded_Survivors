@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+
 // Include Utility headers
 #include "../Utility/Vector2D.h"
 
@@ -51,15 +52,15 @@ namespace lof {
      */
     class Transform2D : public Component {
     public:
-        Vec2D position;  ///< Position of the entity in world space.
-        float rotation;  ///< Rotation of the entity in degrees.
-        Vec2D scale;     ///< Scale of the entity.
+        Vec2D position;     ///< Position of the entity in world space.
+        Vec2D orientation;  ///< Orientation of the entity in degrees.
+        Vec2D scale;        ///< Scale of the entity.
 
         /**
          * @brief Default constructor initializing position, rotation, and scale.
          */
         Transform2D()
-            : position(0.0f, 0.0f), rotation(0.0f), scale(1.0f, 1.0f) {}
+            : position(0.0f, 0.0f), orientation(0.0f, 0.0f), scale(1.0f, 1.0f) {}
 
         /**
          * @brief Parameterized constructor.
@@ -67,9 +68,10 @@ namespace lof {
          * @param rot Initial rotation in degrees.
          * @param scl Initial scale.
          */
-        Transform2D(const Vec2D& pos, float rot, const Vec2D& scl)
-            : position(pos), rotation(rot), scale(scl) {}
+        Transform2D(const Vec2D& pos, Vec2D& ori, const Vec2D& scl)
+            : position(pos), orientation(ori), scale(scl) {}
     };
+
 
     /**
      * @class Velocity_Component
