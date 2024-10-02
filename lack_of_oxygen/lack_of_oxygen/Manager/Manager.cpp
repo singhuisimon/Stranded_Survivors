@@ -1,8 +1,11 @@
 /**
  * @file Manager.cpp
- * @brief Implements the Manager class methods.
+ * @brief Implements the base manager class function declarations.
  * @author Simon Chan
  * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 // Include header file
@@ -17,6 +20,7 @@ namespace lof {
 
 
     void Manager::set_type(const std::string& new_type) {
+        // Set Manager Type
         m_type = new_type;
     }
 
@@ -27,17 +31,20 @@ namespace lof {
 
 
     int Manager::start_up() {
+        // Base implementation sets the started flag to true
         m_is_started = true;
-        return 0;
+        return 0;   // Success
     }
 
 
     void Manager::shut_down() {
+        // Base implementation sets the started flag to false
         m_is_started = false;
     }
 
 
     bool Manager::is_started() const {
+        // Check if the Manager is started
         return m_is_started;
     }
 

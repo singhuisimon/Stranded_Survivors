@@ -188,7 +188,9 @@ namespace lof
 	}
 
 	Collision_System::Collision_System(ECS_Manager& ecs_manager)
-		: ecs_manager(ecs_manager) {}
+		: ecs_manager(ecs_manager) {
+		set_time(0);
+	}
 
 	bool Collision_System::is_Intersept_Box(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
 	{
@@ -211,7 +213,7 @@ namespace lof
 			//ecs_manager.add_component<Collision_Component>(entity_ID, Collision_Component{ 500.0f,500.0f });
 			//check if entity has a collision component
 			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
-				LM.write_log("Entity id %u", entity_ID);
+				// LM.write_log("Entity id %u", entity_ID);
 
 				//get transform component
 				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
@@ -228,7 +230,7 @@ namespace lof
 				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
 				//LM.write_log("AABB1 x-axis will be min: %f max: %f  from entity: %u ", aabb1.min.x, aabb1.min.x, entity_ID);
 				//LM.write_log("AABB1 y-axis will be min: %f max: %f  from entity: %u", aabb1.max.y, aabb1.max.y, entity_ID);
-				LM.write_log("AABB 1: Min(%f, %f) Max(%f, %f) from entity %u", aabb1.min.x, aabb1.min.y, aabb1.max.x, aabb1.max.y,entity_ID);
+				// LM.write_log("AABB 1: Min(%f, %f) Max(%f, %f) from entity %u", aabb1.min.x, aabb1.min.y, aabb1.max.x, aabb1.max.y,entity_ID);
 				//LM.write_log("AABB 1: Min(%f, %f) Max(%f, %f)", aabb1.min.x, aabb1.min.y, aabb1.max.x, aabb1.max.y);
 				
 				//check for collision for all other entities
@@ -246,7 +248,7 @@ namespace lof
 					{
 						//LM.write_log("yes other entity!!!!!!");
 						EntityID Other_entity_ID = other_entity_ptr->get_id();
-						LM.write_log("Other Entity id %u", Other_entity_ID);
+						// LM.write_log("Other Entity id %u", Other_entity_ID);
 						//get other transform component 
 						auto& other_transform1 = ecs_manager.get_component<Transform2D>(Other_entity_ID);
 						//get collision component
@@ -260,7 +262,7 @@ namespace lof
 
 						//create AABB for other entity
 						AABB aabb2 = AABB::from_Tranform(other_transform1, other_collision1);
-						LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
+						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
 						float collision_time = 0.0f;
 
 						//check intersecption between two entities, and consider their vel

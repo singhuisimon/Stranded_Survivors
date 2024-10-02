@@ -4,14 +4,11 @@
       "components": {
         "Transform2D": {
           "position": [ -2000.0, -2000.0 ],
-          "rotation": 0.0,
+          "orientation": [ 0.0, 30.0 ],
           "scale": [ 750.0, 750.0 ]
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
-        },
-        "Mesh_Component": {
-          "mesh_name": "square"
         },
         "Physics_Component": {
           "gravity": [ 0.0, -9.8 ],
@@ -19,16 +16,24 @@
           "max_velocity": 1000.0,
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 1.0,
-          "is_static": false
+          "is_static": false,
+          "is_grounded": false,
+          "is_jumping": false,
+          "jump_force": 300.0
         },
         "Graphics_Component": {
-          "mdl_ref": 0,
+          "model_name": "square",
+          "color": [ 0.0, 1.0, 0.0 ],
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
         }
       }
     },
@@ -36,14 +41,11 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, 0.0 ],
-          "rotation": 45.0,
+          "orientation": [ 45.0, 30.0 ], 
           "scale": [ 500.0, 500.0 ]
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
-        },
-        "Mesh_Component": {
-          "mesh_name": "square"
         },
         "Physics_Component": {
           "gravity": [ 0.0, -9.8 ],
@@ -51,16 +53,24 @@
           "max_velocity": 1000.0,
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 2.0,
-          "is_static": true
+          "is_static": true,
+          "is_grounded": true,
+          "is_jumping": false,
+          "jump_force": 0.0
         },
         "Graphics_Component": {
-          "mdl_ref": 0,
+          "model_name": "triangle",
+          "color": [ 0.0, 0.0, 1.0 ],
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
         }
       }
     }

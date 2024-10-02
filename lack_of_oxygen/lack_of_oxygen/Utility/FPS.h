@@ -1,14 +1,21 @@
 /**
  * @file FPS.h
  * @brief Defines the FPS class for calculating and retrieving the current FPS.
+ * @author Simon Chan
+ * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
 #ifndef LOF_FPS_H
 #define LOF_FPS_H
 
  // Include necessary headers
 #include <deque>
 #include <cstdint>
+#include <string>
+#include <iostream>
+#include <iomanip>
 
 namespace lof {
 
@@ -49,6 +56,14 @@ namespace lof {
          */
         void reset();
     };
+
+    /**
+    * @brief Calculates and prints out the percentage of the given mamager/system's time with that of the entire game loop.
+    * @param gm_time Time consumption of the game loop (Game Manager's consumption time).
+    * @param system_time Time consumption of the manager/system.
+    * @param name Name of manager/system.
+    */
+    void system_performance(int64_t gm_time, int64_t system_time, std::string name);
 
 } // namespace lof
 

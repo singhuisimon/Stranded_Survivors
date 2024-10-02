@@ -1,9 +1,11 @@
 /**
  * @file Game_Manager.cpp
- * @brief Implements the Game_Manager class methods.
+ * @brief Implements the Game_Manager class helper functions.
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
  // Include header file
 #include "Game_Manager.h"
 
@@ -18,12 +20,19 @@
 // Include iostream for console output
 #include <iostream>
 #include <random>
+#include <chrono>
 
 namespace lof {
+
+
+    /*int64_t ecs_time = 0;
+    int64_t graphics_time = 0;
+    int64_t im_time = 0;*/
 
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
+        set_time(0);
     }
 
     Game_Manager& Game_Manager::get_instance() {
@@ -135,11 +144,21 @@ namespace lof {
             return;
         }
 
-        // Check for game over condition based on input, before IM update
-        if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
-            set_game_over(true);
-            LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
-            std::cout << "Escape key pressed. Closing the game." << std::endl;
+        // Check if the left mouse button was pressed
+        if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            // Handle left mouse button press
+            std::cout << "Left mouse button pressed." << std::endl;
+        }
+
+        try {
+            // Simulate a crash when the 'P' key is pressed
+            if (IM.is_key_pressed(GLFW_KEY_P)) {
+                LM.write_log("Game_Manager::update(): Simulated crash. 'P' key was pressed.");
+                throw std::runtime_error("Simulated crash: 'P' key was pressed.");
+            }
+        }
+        catch (const std::exception& e) {
+            LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
         }
 
         // Check for game over condition based on input, before IM update
@@ -151,13 +170,13 @@ namespace lof {
 
         // Clone a game object from a prefab when 'C' key is pressed
         bool c_key_pressed = IM.is_key_pressed(GLFW_KEY_C);
-        if (c_key_pressed && !c_key_was_pressed_last_frame) {
+        if (IM.is_key_pressed(GLFW_KEY_C) && !c_key_was_pressed_last_frame) {
             // Clone the entity from the prefab
             EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
             if (new_entity != INVALID_ENTITY_ID) {
                 // Generate random position
                 static std::default_random_engine generator;
-                static std::uniform_real_distribution<float> distribution(-500.0f, 500.0f);
+                static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
 
                 float random_x = distribution(generator);
                 float random_y = distribution(generator);
@@ -168,26 +187,35 @@ namespace lof {
                     transform.position.x = random_x;
                     transform.position.y = random_y;
 
-                    LM.write_log("Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
+                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
                 }
                 else {
-                    LM.write_log("Cloned entity %u does not have a Transform2D component.", new_entity);
+                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
                 }
             }
             else {
-                LM.write_log("Failed to clone entity from prefab 'dummy_object'.");
+                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
         }
         c_key_was_pressed_last_frame = c_key_pressed;
-
+        
+        // Getting delta time for Input Manager
+        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Input_Manager
         IM.update();
+        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - IM.get_time());
 
+        // Getting delta time for Graphics Manager
+        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Graphics Manager
         GFXM.update();
+        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
+        // Getting delta time for ECS Manager
+        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update game world state
         ECSM.update(delta_time);
+        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
 
         m_step_count++;
     }
