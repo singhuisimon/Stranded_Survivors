@@ -38,6 +38,14 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
+	// ------------------------------ Audio_Manager.cpp --------------------------------
+	// Music Wav Directory
+	constexpr const char* MUSICPATH1 = "C:/Users/Admin/source/repos/Stranded_Survivors/lack_of_oxygen/lack_of_oxygen/Data/audio_test1.wav";
+	constexpr const char* MUSICPATH2 = "C:/Users/Admin/source/repos/Stranded_Survivors/lack_of_oxygen/lack_of_oxygen/Data/audio_test2.wav";
+
+	constexpr int TRACK1 = 1;
+	constexpr int TRACK2 = 2;
+
 } // namespace lof
 
 #endif // CONSTANTS_H

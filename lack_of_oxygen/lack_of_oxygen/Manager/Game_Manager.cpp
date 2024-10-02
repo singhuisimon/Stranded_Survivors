@@ -115,7 +115,6 @@ namespace lof {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
         }
         // -------------------------- Audio Manager Start Up --------------------------
-
         if (AM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
             GFXM.shut_down();
@@ -127,11 +126,7 @@ namespace lof {
             return -7;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() successful");
-            AM.load_bgm("C:\\Users\\Admin\\source\\repos\\Stranded_Survivors\\lack_of_oxygen\\lack_of_oxygen\\Data\\TapTapHeroes_Level 3&4_BGM_Linear_85-BPM.wav",
-                "C:\\Users\\Admin\\source\\repos\\Stranded_Survivors\\lack_of_oxygen\\lack_of_oxygen\\Data\\uxg3815_c.zhihaoangus_project.wav");
-            
-            LM.write_log("BGM Audio successfully loaded");
+            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() successful"); 
         }
 
         m_is_started = true;
@@ -220,15 +215,18 @@ namespace lof {
         }
         c_key_was_pressed_last_frame = c_key_pressed;
         
-        //bool o_key_is_being_press = IM.is_key_pressed(GLFW_KEY_O);
-        //o_key_was_pressed = o_key_is_being_press;
-        if (IM.is_key_pressed(GLFW_KEY_1)) {
-            AM.play_bgm(1);
+        //Play Audio BGM
+        //check if key 0 is press if so play track1
+        if (IM.is_key_pressed(GLFW_KEY_0)) {
+            AM.play_bgm(TRACK1);
         }
-        else if (IM.is_key_pressed(GLFW_KEY_2)) {
-            AM.play_bgm(2);
+        
+        //check if key 9 is press if so play track2
+        if (IM.is_key_pressed(GLFW_KEY_9)) {
+            AM.play_bgm(TRACK2);
         }
 
+        //check if key L is press if so stop music
         if (IM.is_key_pressed(GLFW_KEY_L)) {
             AM.stop_bgm();
         }
@@ -251,7 +249,11 @@ namespace lof {
         ECSM.update(delta_time);
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
 
+        // Getting delta time for Audio Manager
+        //AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        // Update Audio Manager
         AM.update();
+        //AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - AM.get_time());
 
         m_step_count++;
     }
