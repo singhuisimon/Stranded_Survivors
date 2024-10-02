@@ -8,6 +8,8 @@
  // Include header file
 #include "Graphics_Manager.h" 
 #include <mutex>
+#define STB_IMAGE_IMPLEMENTATION 
+#include "STB/stb_image.h"  // For loading textures/sprites 
 
 namespace lof {
 
@@ -71,8 +73,6 @@ namespace lof {
         if (!add_model("../lack_of_oxygen/Data/models.msh")) {
             LM.write_log("Fail to add model.");
             return -1;
-        } else {
-            LM.write_log("Graphics_Manager::start_up(): Succesfully added model.");
         }
 
         m_is_started = true;
@@ -100,6 +100,16 @@ namespace lof {
         } else if (IM.is_key_held(GLFW_KEY_3)) {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             render_mode = GL_POINT; 
+        }
+
+        // Toggle debug mode
+        if (IM.is_key_held(GLFW_KEY_B)) {
+            LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
+            is_debug_mode = GL_TRUE;
+        }
+        else if (IM.is_key_held(GLFW_KEY_N)) {
+            LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
+            is_debug_mode = GL_FALSE;
         }
     }
 
@@ -131,7 +141,7 @@ namespace lof {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
             input_file.close();
-            LM.write_log("Unable to open %s", file_name);
+            LM.write_log("Unable to open %s", file_name.c_str());
             return GL_FALSE;
         }
         input_file.seekg(0, std::ios::beg);
@@ -139,7 +149,7 @@ namespace lof {
         // Model data
         std::vector<glm::vec2> pos_vtx;
         std::vector<GLushort> vtx_idx;
-        Graphics_Manager::Model mdl;
+        Graphics_Manager::Model mdl{};
 
         // For reading file to store model data
         std::string model_name, prefix, file_line;
@@ -172,7 +182,7 @@ namespace lof {
                     vtx_idx.emplace_back(idx);
                 }
             }
-            else if (prefix == "t" || prefix == "f" || prefix == "s") { // Get primitive type
+            else if (prefix == "t" || prefix == "f" || prefix == "s" || prefix == "l") { // Get primitive type
                 if (prefix == "t") {
                     mdl.primitive_type = GL_TRIANGLES;
                 }
@@ -181,6 +191,9 @@ namespace lof {
                 }
                 else if (prefix == "s") {
                     mdl.primitive_type = GL_TRIANGLE_STRIP;
+                }
+                else if (prefix == "l") {
+                    mdl.primitive_type = GL_LINES;
                 }
             }
             else if (prefix == "e") { // Indicates end of model data, signal to make model
@@ -214,18 +227,22 @@ namespace lof {
                 // Return an appropriately initialized instance of GLApp::GLModel
                 mdl.vaoid = vaoid;
                 if (mdl.primitive_type == GL_TRIANGLES || mdl.primitive_type == GL_TRIANGLE_STRIP) {
-                    mdl.primitive_cnt = pos_vtx.size() - 2; // number of primitives
+                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 2; // number of primitives
                 }
                 else if (mdl.primitive_type == GL_TRIANGLE_FAN) {
-                    mdl.primitive_cnt = vtx_idx.size() - 2; // number of primitives
+                    mdl.primitive_cnt = (GLuint)vtx_idx.size() - 2; // number of primitives
+                }
+                else if (mdl.primitive_type == GL_LINES) {
+                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 1; // number of primitives
                 }
                 mdl.draw_cnt = (GLuint)vtx_idx.size();
                 model_storage[model_name] = mdl;
-                LM.write_log("Graphics_Manager::add_model(): %s model successfully created and stored.", model_name);
+                LM.write_log("Graphics_Manager::add_model(): %s model successfully created and stored.", model_name.c_str());
 
                 // Clear model data for next model
                 pos_vtx.clear();
                 vtx_idx.clear();
+                model_name = "";
             }
         }
         // Close file
@@ -244,6 +261,10 @@ namespace lof {
 
     GLenum& Graphics_Manager::get_render_mode() {
         return render_mode;
+    }
+
+    GLboolean& Graphics_Manager::get_debug_mode() {
+        return is_debug_mode;
     }
 
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {

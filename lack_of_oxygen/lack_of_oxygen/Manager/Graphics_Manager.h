@@ -14,8 +14,8 @@
 #include "Manager.h"
 
  // Include other necessary headers
-#include "Log_Manager.h"    // (For Logging)
-#include "Input_Manager.h"  // (To check for input)
+#include "Log_Manager.h"    // For Logging
+#include "Input_Manager.h"  // To check for input
 
  // Include OpenGL headers
 #define GLFW_INCLUDE_NONE
@@ -136,6 +136,11 @@ namespace lof {
          * @brief Get a reference to the rendering mode.
          */
         GLenum& get_render_mode();
+
+        /**
+         * @brief Get flag of the debug mode.
+         */
+        GLboolean& get_debug_mode();
 
         /**
         * @brief Compile the shaders, link the shader objects to create an executable,
