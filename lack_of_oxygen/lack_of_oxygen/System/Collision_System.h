@@ -59,7 +59,7 @@ namespace lof
 	class Collision_System : public System
 	{
 	private:
-		
+
 		class ECS_Manager& ecs_manager;
 	public:
 		/**
@@ -68,34 +68,20 @@ namespace lof
 		*/
 		Collision_System(ECS_Manager& ecs_manager);
 
-		//struct Line_segment
-		//{
-		//	Vec2D m_pt0; //end of point 0
-		//	Vec2D m_pt1; //end of point 1
-		//	Vec2D m_normal; //normalized outward normal
-		//};
-
-		//struct Circle
-		//{
-		//	Vec2D m_centre;
-		//	float m_radius;
-		//};
-
-
 		/**
 		* @brief Check for intersection between rectangles
 		* @param aabb1 First AABB
 		* @param vel1 First velocity
 		* @param aabb2 Second AABB
 		* @param vel2 Second AABB
-		* @param firstTimeOfCollsion Output param to hold the time of collision 
+		* @param firstTimeOfCollsion Output param to hold the time of collision
 		* @return True if rectangle intersept, false otherwise
 		*/
 		bool Collision_Intersection_RectRect(const AABB& aabb1,
-											const Vec2D& vel1,
-											const AABB& aabb2,
-											const Vec2D& vel2,
-											float& firstTimeOfCollision);
+			const Vec2D& vel1,
+			const AABB& aabb2,
+			const Vec2D& vel2,
+			float& firstTimeOfCollision);
 
 		/**
 		* @brief Check check if a point is within a box
@@ -103,13 +89,31 @@ namespace lof
 		* @param pos_box_y Position of y for the rectangle
 		* @param width_box Width of the rectangle
 		* @param height_box Height of the rectangle
-		* @param mouseX Position x of the mouse 
-		* @param mouseY Position y of the mouse 
+		* @param mouseX Position x of the mouse
+		* @param mouseY Position y of the mouse
 		* @return True if mouse intersept the box, false otherwise
 		*/
 		bool is_Intersept_Box(float pos_box_x, float pos_box_y, float width_box, float height_box, int mouseX, int mouseY);
 
+		/**
+		* @brief Compute the overlap between AABBs. It determines the amount of overlap for both x-axis and y-axis.
+		* @param aabb1 First aabb object
+		* @param aabb2 Second aabb object
+		* @return The Vec2D value can be use to resolve the collisions
+		*/
+		Vec2D Compute_Overlap(const AABB& aabb1, const AABB& aabb2);
 
+		/**
+		* @brief Resolve the collision between an dynamic object and static object for rectangle based on AABB
+		* @param aabb1 First aabb object
+		* @param aabb2 Second aabb object
+		* @param transform1 The transfrom (position) of dynamic object
+		* @param transform2 The transform (position) of static object
+		* @param Overlap The overlap between AABBs along the x and y axis
+		* @return The Vec2D value can be use to resolve the collisions
+		*/
+		void Resolve_Collision_Static_Dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Transform2D& transform2, const Vec2D& overlap);
+	
 		/**
 		* @brief Update the collision system
 		* @param delta_time Delta time since the last update. 
