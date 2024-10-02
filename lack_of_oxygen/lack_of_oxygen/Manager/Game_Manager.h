@@ -39,9 +39,6 @@ namespace lof {
         // Flag to prevent multiple key presses for cloning
         bool c_key_was_pressed_last_frame = false; 
 
-        // Flag to check if P was press
-        //bool o_key_was_pressed = false;
-
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
