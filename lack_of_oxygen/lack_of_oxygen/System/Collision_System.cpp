@@ -314,7 +314,6 @@ namespace lof
 			if (aabb1.min.y < aabb2.min.y) { // dynamic object move from bottom to top at the bottom side of static object 
 
 				transform1.position.y -= Overlap.y; 
-				std::cout << "it is less aabb1 test tes teststette   \n";
 				
 			}
 			else if (aabb1.max.y > aabb2.min.y) { // dynamic object move from top to bottom at the top side of static object 
@@ -421,7 +420,6 @@ namespace lof
 	* @brief Returns the type of the collision system
 	* @return string representing the type
 	*/
-
 	std::string Collision_System::get_type() const {
 		return "Collision_System";
 	}
