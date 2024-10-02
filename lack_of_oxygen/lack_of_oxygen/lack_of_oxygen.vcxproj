@@ -71,6 +71,7 @@
     <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
+    <None Include="Manager\Assets_Manager.tpp" />
     <None Include="Manager\ECS_Manager.tpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

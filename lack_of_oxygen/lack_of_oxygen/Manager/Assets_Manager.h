@@ -22,6 +22,16 @@
 
 namespace lof 
 {
+
+	class Assets_Components
+	{
+		std::string filename;
+		float width;
+		float height;
+		
+		Assets_Components(const std::string filename, float width, float height) : filename(filename), width(width), height(height) {}
+	};
+
 	template <typename T>
 	class Assets_Manager: public manager
 	{
