@@ -2,15 +2,18 @@
  * @file Game_Manager.h
  * @brief Defines the Game_Manager class for managing the game state and logic.
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+#pragma once
 #ifndef LOF_GAME_MANAGER_H
 #define LOF_GAME_MANAGER_H
 
 // Macros for accessing manager singleton instances
 #define GM  lof::Game_Manager::get_instance()
 
- // Include base Manager class
+// Include base Manager class
 #include "Manager.h"
 
 namespace lof {

@@ -7,6 +7,9 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
+#include <mutex>
+#define STB_IMAGE_IMPLEMENTATION 
+#include "STB/stb_image.h"  // For loading textures/sprites 
 
 namespace lof {
 
@@ -18,6 +21,7 @@ namespace lof {
         set_type("Graphics_Manager");
         m_is_started = false;
         render_mode = GL_FILL;
+        set_time(0);
     }
 
 
@@ -42,7 +46,7 @@ namespace lof {
         }
 
         // Set framebuffer with color (Background color)
-        glClearColor(1.f, 1.f, 1.f, 1.f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Set viewport position and dimensions
         glViewport(0, 0, 1024, 768);
@@ -52,8 +56,8 @@ namespace lof {
 
         // Read file to initialize shaders 
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
-        std::make_pair<std::string, std::string> ("../lack_of_oxygen/Shaders/my-tutorial-3.vert", 
-                                                  "../lack_of_oxygen/Shaders/my-tutorial-3.frag")
+        std::make_pair<std::string, std::string>("../lack_of_oxygen/Shaders/lack-of-oxygen-1.vert",
+                                                 "../lack_of_oxygen/Shaders/lack-of-oxygen-1.frag")
         };
 
         // Create shader program from shader files and insert 
@@ -66,11 +70,9 @@ namespace lof {
         }
 
         // Add models (Will move this to serialization side)
-        if (!add_model()) {
+        if (!add_model("../lack_of_oxygen/Data/models.msh")) {
             LM.write_log("Fail to add model.");
             return -1;
-        } else {
-            LM.write_log("Graphics_Manager::start_up(): Succesfully added model.");
         }
 
         m_is_started = true;
@@ -99,6 +101,16 @@ namespace lof {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             render_mode = GL_POINT; 
         }
+
+        // Toggle debug mode
+        if (IM.is_key_held(GLFW_KEY_B)) {
+            LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
+            is_debug_mode = GL_TRUE;
+        }
+        else if (IM.is_key_held(GLFW_KEY_N)) {
+            LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
+            is_debug_mode = GL_FALSE;
+        }
     }
 
     // Add a shader program into the shader program storage.
@@ -123,175 +135,119 @@ namespace lof {
     }
 
     // Add a model into the model storage.
-    GLboolean Graphics_Manager::add_model() {
+    GLboolean Graphics_Manager::add_model(std::string const& file_name) {
 
-        ///////////////////////////// SQUARE ////////////////////////////////////////
-        // store vertices in a box centered at (0,0) with size 1 x 1 defined in NDC
-        GLushort const slice_size{ 2 };
-        GLushort const stack_size{ 2 };
-        std::vector<glm::vec2> pos_vtx(slice_size * stack_size);
-        for (GLushort stack = 0, i = 0; stack < stack_size; ++stack) {
-            for (GLushort slice = 0; slice < slice_size; ++slice) {
-                pos_vtx[i].x = ((1.0f / (float)(slice_size - 1)) * (float)slice - 0.5f);
-                pos_vtx[i].y = ((1.0f / (float)(stack_size - 1)) * (float)stack - 0.5f);
-                i++;
-            }
+        ///////////////////////////// MODEL TESTING NEW STORAGE////////////////////////////////////////
+        std::ifstream input_file{ file_name, std::ios::in };
+        if (!input_file) {
+            input_file.close();
+            LM.write_log("Unable to open %s", file_name.c_str());
+            return GL_FALSE;
         }
+        input_file.seekg(0, std::ios::beg);
 
-        // randomly generate rgb values for each point and store
-        // them in a seperate vector container
-        std::vector<glm::vec3> clr_vtx(pos_vtx.size());
-        for (size_t i = 0; i < pos_vtx.size(); ++i) {
-            clr_vtx[i].x = 0.00f;
-            clr_vtx[i].y = 0.00f;
-            clr_vtx[i].z = 1.00f;
-        }
-
+        // Model data
+        std::vector<glm::vec2> pos_vtx;
         std::vector<GLushort> vtx_idx;
-        for (GLushort row = 1; row < stack_size; ++row) {
-            GLushort strip_vtx = slice_size * row;
-            for (GLushort col = 0; col < slice_size; ++col) {
-                vtx_idx.emplace_back((unsigned short)(strip_vtx + col));
-                vtx_idx.emplace_back((unsigned short)(strip_vtx + col - slice_size));
+        Graphics_Manager::Model mdl{};
+
+        // For reading file to store model data
+        std::string model_name, prefix, file_line;
+        GLboolean is_model_exist{ GL_FALSE };
+        while (getline(input_file, file_line)) {
+            // First, skip line if it's related to existing model
+            if (is_model_exist) {
+                continue;
+            }
+            std::istringstream file_line_ss{ file_line };
+            file_line_ss >> prefix;
+            if (prefix == "m") { // Get model name
+                file_line_ss >> model_name;
+                if (model_storage.find(model_name) != model_storage.end()) { // Check if model exists in storage
+                    is_model_exist = GL_TRUE;
+                }
+                else {
+                    is_model_exist = GL_FALSE;
+                }
+            }
+            else if (prefix == "v") { // Get vertex position
+                glm::vec2 pos{};
+                file_line_ss >> pos.x;
+                file_line_ss >> pos.y;
+                pos_vtx.emplace_back(pos);
+            }
+            else if (prefix == "i") { // Get vertex index
+                GLushort idx;
+                while (file_line_ss >> idx) {
+                    vtx_idx.emplace_back(idx);
+                }
+            }
+            else if (prefix == "t" || prefix == "f" || prefix == "s" || prefix == "l") { // Get primitive type
+                if (prefix == "t") {
+                    mdl.primitive_type = GL_TRIANGLES;
+                }
+                else if (prefix == "f") {
+                    mdl.primitive_type = GL_TRIANGLE_FAN;
+                }
+                else if (prefix == "s") {
+                    mdl.primitive_type = GL_TRIANGLE_STRIP;
+                }
+                else if (prefix == "l") {
+                    mdl.primitive_type = GL_LINES;
+                }
+            }
+            else if (prefix == "e") { // Indicates end of model data, signal to make model
+
+                // Generate a VAO handle to encapsulate the VBO(s) and
+                // state of the triangle mesh
+                GLuint vbo_hdl;
+                glCreateBuffers(1, &vbo_hdl);
+                glNamedBufferStorage(vbo_hdl, sizeof(glm::vec2) * pos_vtx.size(),
+                    pos_vtx.data(), GL_DYNAMIC_STORAGE_BIT);
+
+                // encapsulate information about contents of VBO and VBO handle to VAO
+                GLuint vaoid;
+                glCreateVertexArrays(1, &vaoid);
+
+                // for position vertex, we use vertex attribute index 0
+                // and vertex buffer binding point 0 
+                glEnableVertexArrayAttrib(vaoid, 0);
+                glVertexArrayVertexBuffer(vaoid, 1, vbo_hdl, 0, sizeof(glm::vec2));
+                glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
+                glVertexArrayAttribBinding(vaoid, 0, 1);
+
+                GLuint ebo_hdl;
+                glCreateBuffers(1, &ebo_hdl);
+                glNamedBufferStorage(ebo_hdl, sizeof(GLushort) * vtx_idx.size(),
+                    reinterpret_cast<GLvoid*>(vtx_idx.data()),
+                    GL_DYNAMIC_STORAGE_BIT);
+                glVertexArrayElementBuffer(vaoid, ebo_hdl);
+                glBindVertexArray(0);
+
+                // Return an appropriately initialized instance of GLApp::GLModel
+                mdl.vaoid = vaoid;
+                if (mdl.primitive_type == GL_TRIANGLES || mdl.primitive_type == GL_TRIANGLE_STRIP) {
+                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 2; // number of primitives
+                }
+                else if (mdl.primitive_type == GL_TRIANGLE_FAN) {
+                    mdl.primitive_cnt = (GLuint)vtx_idx.size() - 2; // number of primitives
+                }
+                else if (mdl.primitive_type == GL_LINES) {
+                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 1; // number of primitives
+                }
+                mdl.draw_cnt = (GLuint)vtx_idx.size();
+                model_storage[model_name] = mdl;
+                LM.write_log("Graphics_Manager::add_model(): %s model successfully created and stored.", model_name.c_str());
+
+                // Clear model data for next model
+                pos_vtx.clear();
+                vtx_idx.clear();
+                model_name = "";
             }
         }
-
-        // Generate a VAO handle to encapsulate the VBO(s) and
-        // state of the triangle mesh
-        GLuint vbo_hdl;
-        glCreateBuffers(1, &vbo_hdl);
-        glNamedBufferStorage(vbo_hdl,
-            sizeof(glm::vec2) * pos_vtx.size() + sizeof(glm::vec3) * clr_vtx.size(),
-            nullptr, GL_DYNAMIC_STORAGE_BIT);
-        glNamedBufferSubData(vbo_hdl, 0,
-            sizeof(glm::vec2) * pos_vtx.size(), pos_vtx.data());
-        glNamedBufferSubData(vbo_hdl, sizeof(glm::vec2) * pos_vtx.size(),
-            sizeof(glm::vec3) * clr_vtx.size(), clr_vtx.data());
-
-        // encapsulate information about contents of VBO and VBO handle to VAO
-        GLuint vaoid;
-        glCreateVertexArrays(1, &vaoid);
-
-        // for position vertex, we use vertex attribute index 0
-        // and vertex buffer binding point 0
-        glEnableVertexArrayAttrib(vaoid, 0);
-        glVertexArrayVertexBuffer(vaoid, 0, vbo_hdl, 0, sizeof(glm::vec2));
-        glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(vaoid, 0, 0);
-
-        // for vertex color array, we use vertex attribute index 1
-        // and vertex buffer binding point 1
-        glEnableVertexArrayAttrib(vaoid, 1);
-        glVertexArrayVertexBuffer(vaoid, 1, vbo_hdl,
-            sizeof(glm::vec2) * pos_vtx.size(), sizeof(glm::vec3));
-        glVertexArrayAttribFormat(vaoid, 1, 3, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(vaoid, 1, 1);
-
-        GLuint ebo_hdl;
-        glCreateBuffers(1, &ebo_hdl);
-        glNamedBufferStorage(ebo_hdl, sizeof(GLushort) * vtx_idx.size(),
-            reinterpret_cast<GLvoid*>(vtx_idx.data()),
-            GL_DYNAMIC_STORAGE_BIT);
-        glVertexArrayElementBuffer(vaoid, ebo_hdl);
-        glBindVertexArray(0);
-
-        // Return an appropriately initialized instance of GLApp::GLModel
-        Graphics_Manager::Model mdl;
-        mdl.vaoid = vaoid;
-        mdl.primitive_type = GL_TRIANGLE_STRIP;
-        mdl.draw_cnt = (GLuint)vtx_idx.size();
-        mdl.primitive_cnt = 2;
-        model_storage.emplace_back(mdl);
-        ///////////////////////////// SQUARE ////////////////////////////////////////
-
-        ///////////////////////////// STAR ////////////////////////////////////////
-        //// store vertices in a box centered at (0,0) with size 1 x 1 defined in NDC
-        //GLushort n_tri = 4;
-        //std::vector<glm::vec2>pos_vtx(n_tri * 2);
-
-        //pos_vtx[0].x = 0.0f;
-        //pos_vtx[0].y = 1.0f;
-        //pos_vtx[1].x = -0.30f;
-        //pos_vtx[1].y = 0.30f;
-        //pos_vtx[2].x = -1.0f;
-        //pos_vtx[2].y = 0.0f;
-        //pos_vtx[3].x = -0.30f;
-        //pos_vtx[3].y = -0.30f;
-
-        //pos_vtx[4].x = 0.0f;
-        //pos_vtx[4].y = -1.0f;
-        //pos_vtx[5].x = 0.30f;
-        //pos_vtx[5].y = -0.30f;
-        //pos_vtx[6].x = 1.0f;
-        //pos_vtx[6].y = 0.0f;
-        //pos_vtx[7].x = 0.30f;
-        //pos_vtx[7].y = 0.30f;
-
-
-        //// randomly generate rgb values for each point and store
-        //// them in a seperate vector container
-        ////std::uniform_real_distribution<float> urdf(0.0f, 1.0f);
-        //std::vector<glm::vec3> clr_vtx(pos_vtx.size());
-        //for (size_t i = 0; i < pos_vtx.size(); ++i) {
-        //    clr_vtx[i].x = 0.0f;
-        //    clr_vtx[i].y = 0.0f;
-        //    clr_vtx[i].z = 1.0f;
-        //}
-
-
-        //// index buffer for mystery model
-        //std::vector<GLushort> vtx_idx{ 0, 7, 1, 3, 2, 1, 3, 5, 4, 3, 5, 7, 6 };
-
-        //// Generate a VAO handle to encapsulate the VBO(s) and
-        //// state of the triangle mesh
-        //GLuint vbo_hdl;
-        //glCreateBuffers(1, &vbo_hdl);
-
-        //glNamedBufferStorage(vbo_hdl,
-        //    sizeof(glm::vec2) * pos_vtx.size() + sizeof(glm::vec3) * clr_vtx.size(),
-        //    nullptr, GL_DYNAMIC_STORAGE_BIT);
-        //glNamedBufferSubData(vbo_hdl, 0,
-        //    sizeof(glm::vec2) * pos_vtx.size(), pos_vtx.data());
-        //glNamedBufferSubData(vbo_hdl, sizeof(glm::vec2) * pos_vtx.size(),
-        //    sizeof(glm::vec3) * clr_vtx.size(), clr_vtx.data());
-
-        //// encapsulate information about contents of VBO and VBO handle to VAO
-        //GLuint vaoid;
-        //glCreateVertexArrays(1, &vaoid);
-
-        //// for position vertex, we use vertex attribute index 0
-        //// and vertex buffer binding point 2
-        //glEnableVertexArrayAttrib(vaoid, 0);
-        //glVertexArrayVertexBuffer(vaoid, 2, vbo_hdl, 0, sizeof(glm::vec2));
-        //glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
-        //glVertexArrayAttribBinding(vaoid, 0, 2);
-
-        //// for vertex color array, we use vertex attribute index 1
-        //// and vertex buffer binding point 4
-        //glEnableVertexArrayAttrib(vaoid, 1);
-        //glVertexArrayVertexBuffer(vaoid, 4, vbo_hdl,
-        //    sizeof(glm::vec2) * pos_vtx.size(), sizeof(glm::vec3));
-        //glVertexArrayAttribFormat(vaoid, 1, 3, GL_FLOAT, GL_FALSE, 0);
-        //glVertexArrayAttribBinding(vaoid, 1, 4);
-
-        //GLuint ebo_hdl;
-        //glCreateBuffers(1, &ebo_hdl);
-        //glNamedBufferStorage(ebo_hdl, sizeof(GLushort) * vtx_idx.size(),
-        //    reinterpret_cast<GLvoid*>(vtx_idx.data()),
-        //    GL_DYNAMIC_STORAGE_BIT);
-        //glVertexArrayElementBuffer(vaoid, ebo_hdl);
-        //glBindVertexArray(0);
-
-        //// Return an appropriately initialized instance of GLApp::GLModel
-        //Graphics_Manager::Model mdl;
-        //mdl.vaoid = vaoid;
-        //mdl.primitive_type = GL_TRIANGLE_STRIP;
-        //mdl.draw_cnt = vtx_idx.size();
-        //mdl.primitive_cnt = n_tri * 3 - 1;
-        //model_storage.emplace_back(mdl); 
-        ///////////////////////////// STAR ////////////////////////////////////////
-
-        LM.write_log("Graphics_Manager::add_model(): Model successfully created.");
+        // Close file
+        input_file.close();
+        LM.write_log("Graphics_Manager::add_model(): All models successfully created and stored.");
         return GL_TRUE;
     }
 
@@ -305,6 +261,10 @@ namespace lof {
 
     GLenum& Graphics_Manager::get_render_mode() {
         return render_mode;
+    }
+
+    GLboolean& Graphics_Manager::get_debug_mode() {
+        return is_debug_mode;
     }
 
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {
@@ -335,17 +295,12 @@ namespace lof {
                 LM.write_log("Graphics_Manager::compile_shader(): Error opening file %s.", file_name.c_str());
                 return GL_FALSE; 
             }
-            //std::stringstream ss; 
-            //ss << istream_file.rdbuf(); 
-            //istream_file.close(); 
-            //GLchar const* shader_code[] = { (ss.str()).c_str()};
 
             std::stringstream ss; 
             ss << istream_file.rdbuf(); 
             istream_file.close(); 
             std::string const shader_src = ss.str();
             GLchar const* shader_code[] = { shader_src.c_str()};
-
 
             // Create shader object and load shader code with it
             GLuint shader_obj = 0;

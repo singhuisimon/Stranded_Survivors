@@ -4,6 +4,9 @@
  * @details Initializes the Game_Manager, loads configurations, sets up the window, and runs the main loop.
  * @author Simon Chan
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
  // Include file headers
@@ -13,6 +16,8 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <iomanip>    // For std::fixed and std::setprecision
+#include <sstream>    // For std::stringstream
 
 // Include for memory leaks
 #define _CRTDBG_MAP_ALLOC
@@ -20,6 +25,7 @@
 #include <crtdbg.h>
 
 using namespace lof;
+
 
 
 int main(void) {
@@ -134,10 +140,17 @@ int main(void) {
         // Get delta_time after frame_start()
         float delta_time = FPSM.get_delta_time(); // Get delta time in seconds
 
+        // Get FPS
+        fps = FPSM.get_current_fps();
+
+        // Update window title with FPS
+        std::stringstream ss;
+        ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
+        glfwSetWindowTitle(window, ss.str().c_str());
+        
         // Update FPS timer
         fps_timer += delta_time;
         if (fps_timer >= FPS_DISPLAY_INTERVAL) {
-            fps = FPSM.get_current_fps();
             fps_timer = 0.0f;
 
             // Display FPS in console
@@ -147,8 +160,27 @@ int main(void) {
         // Poll for and process events 
         glfwPollEvents(); 
 
+        // Getting delta time for Game Manager/game loop
+        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update game world state
-        GM.update(delta_time); 
+        GM.update(delta_time);
+        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
+
+       
+        // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
+        if (IM.is_key_held(GLFW_KEY_T)) {
+
+            system_performance(GM.get_time(), IM.get_time(), IM.get_type());
+            system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+            system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
+
+            for (auto& system : ECSM.get_systems()) {
+                system_performance(GM.get_time(), system->get_time(), system->get_type());
+            }
+
+            std::cout << std::endl;
+        }
+
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {

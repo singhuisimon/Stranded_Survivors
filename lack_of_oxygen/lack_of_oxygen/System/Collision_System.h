@@ -22,18 +22,6 @@
 
 namespace lof
 {
-	
-	
-	class Collision_Component : public Component
-	{
-	public:
-		float width, height;
-
-		//constructor for collision components 
-		Collision_Component(float width = 0.0f, float height = 0.0f)
-			: width(width), height(height) {}
-	};
-
 
 	struct AABB {
 
@@ -78,28 +66,11 @@ namespace lof
 		//function to check if a point is within a box
 		bool is_Intersept_Box(float pos_box_x, float pos_box_y, float width_box, float height_boxx, int mouseX, int mouseY);
 
-		//check collision within grid cell
-		/*void Check_Collision_In_Grid_Cell(const std::vector<Entity>& entities, const AABB& gridCell);
-
-		void Update_Grid(std::vector<Entity>& entites);*/
-
-
-		////to check the object that is collide 
-		//bool Check_Collision(const std::vector<Entity>& entity,
-		//	const std::vector<Position_Component>& pos,
-		//	const std::vector<Velocity_Component>& vel);
-		
-		/*void Collision_Update(std::vector<Entity>& entities, float dt);*/
 		void update(float dt) override;
 		//might need: handle collision
 
 		std::string get_type() const override;
 	};
-
-
-
-
-
 }
 
 

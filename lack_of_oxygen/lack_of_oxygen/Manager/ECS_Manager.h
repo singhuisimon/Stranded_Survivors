@@ -1,16 +1,20 @@
 /**
  * @file ECS_Manager.h
  * @brief Declares the ECS_Manager class for managing the ECS.
+ * @author Simon Chan
  * @date September 21, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
+#pragma once
 #ifndef LOF_ECS_MANAGER_H
 #define LOF_ECS_MANAGER_H
 
 // Macros for accessing manager singleton instances
 #define ECSM lof::ECS_Manager::get_instance()
 
- // Include base headers
+ // Include header file
 #include "Manager.h"
 
 // Include other necessary headers
@@ -39,17 +43,20 @@ namespace lof {
         // Private constructor for singleton pattern
         ECS_Manager();
 
-        // Member variables
+        // Entity storage
         std::vector<std::unique_ptr<Entity>> entities;
+
+        // System storage
         std::vector<std::unique_ptr<System>> systems;
 
         // Component storage
         std::unordered_map<std::type_index, std::vector<std::unique_ptr<Component>>> component_arrays;
+        // Component identification
         std::unordered_map<std::type_index, std::size_t> component_type_to_id;
         std::unordered_map<std::size_t, const std::type_info*> id_to_component_type;
         std::size_t next_component_id = 0;
 
-        // Helper methods
+        // Helper member functions
         template<typename T>
         std::vector<std::unique_ptr<Component>>& get_component_array();
 
@@ -85,7 +92,7 @@ namespace lof {
          */
         void add_components_from_json(EntityID entity, const rapidjson::Value& components);
 
-        // Component management
+        // Component template functions
         template<typename T>
         void register_component();
 
@@ -107,6 +114,9 @@ namespace lof {
         // System management
         void add_system(std::unique_ptr<System> system);
         void update(float delta_time);
+
+        // Accsessing each system
+        const std::vector<std::unique_ptr<System>>& get_systems() const;
 
         // Access entities
         const std::vector<std::unique_ptr<Entity>>& get_entities() const;

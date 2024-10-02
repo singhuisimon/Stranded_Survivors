@@ -1,3 +1,12 @@
+/**
+ * @file ComponentParser.cpp
+ * @brief Declares the ComponentParser utility class methods.
+ * @author Simon Chan
+ * @date October 1, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #pragma once
 #ifndef COMPONENT_PARSER_H
 #define COMPONENT_PARSER_H

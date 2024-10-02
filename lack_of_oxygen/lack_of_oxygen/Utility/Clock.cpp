@@ -3,8 +3,10 @@
  * @brief Implements the Clock class methods for precise time measurements and sleep functionality.
  * @author Simon Chan
  * @date September 15, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
 // Include header file
 #include "Clock.h"
 
@@ -52,6 +54,6 @@ namespace lof {
 
     void Clock::sleep(int64_t microseconds) {
         std::this_thread::sleep_for(std::chrono::microseconds(microseconds));
-    }
+  }
 
 } // end of namespace lof

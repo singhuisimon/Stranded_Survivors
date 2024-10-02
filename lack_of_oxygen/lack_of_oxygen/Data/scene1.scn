@@ -9,7 +9,25 @@
       "prefab": "dummy_object",
       "components": {
         "Transform2D": {
-          "position": [100.0, 200.0]
+          "position": [ 100.0, 200.0 ]
+        }
+      }
+    },
+    {
+      "name": "dummy_object2",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 100.0, 200.0 ]
+        }
+      }
+    },
+    {
+      "name": "dummy_object3",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 100.0, 200.0 ]
         }
       }
     }

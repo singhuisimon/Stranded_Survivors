@@ -2,8 +2,10 @@
  * @file Serialization_Manager.h
  * @brief Defines the Serialization_Manager class for handling serialization and configuration data.
  * @date September 22, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
 #ifndef LOF_SERIALIZATION_MANAGER_H
 #define LOF_SERIALIZATION_MANAGER_H
 
@@ -106,6 +108,11 @@ namespace lof {
         float get_fps_display_interval() const;
 
 
+        /**
+         * @brief Retrieve a prefab configuration by its name.
+         * @param prefab_name The name of the prefab to retrieve.
+         * @return A constant pointer to the prefab's JSON value if found; otherwise, nullptr.
+         */
         const rapidjson::Value* get_prefab(const std::string& prefab_name) const;
     };
 
