@@ -22,7 +22,6 @@
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Glad\glad.c" />
     <ClCompile Include="Main\Main.cpp" />
-    <ClCompile Include="Manager\Assets_Manager.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
@@ -45,7 +44,6 @@
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
-    <ClInclude Include="Manager\Assets_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
