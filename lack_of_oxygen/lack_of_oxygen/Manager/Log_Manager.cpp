@@ -11,6 +11,9 @@
 // Include header file
 #include "Log_Manager.h"
 
+// Include constants
+#include "../Utility/Constant.h"
+
 // Include standard headers
 #include <cstdarg>
 #include <cstdio>
@@ -98,15 +101,15 @@ namespace lof {
         int64_t current_time = clock.split_total();
 
         // Convert microseconds to hours, minutes, seconds, milliseconds
-        int64_t total_milliseconds = current_time / 1000;
-        int64_t total_seconds = total_milliseconds / 1000;
-        int64_t total_minutes = total_seconds / 60;
-        int64_t total_hours = total_minutes / 60;
+        int64_t total_milliseconds = current_time / MILLISECONDS_PER_SECOND;
+        int64_t total_seconds = total_milliseconds / MILLISECONDS_PER_SECOND;
+        int64_t total_minutes = total_seconds / SECONDS_PER_MINUTE;
+        int64_t total_hours = total_minutes / MINUTES_PER_HOUR;
 
-        int64_t milliseconds = total_milliseconds % 1000;
-        int64_t seconds = total_seconds % 60;
-        int64_t minutes = total_minutes % 60;
-        int64_t hours = total_hours % 24;
+        int64_t milliseconds = total_milliseconds % MILLISECONDS_PER_SECOND;
+        int64_t seconds = total_seconds % SECONDS_PER_MINUTE;
+        int64_t minutes = total_minutes % MINUTES_PER_HOUR;
+        int64_t hours = total_hours % HOURS_PER_DAY;
 
         // Format time as [HH:MM:SS.mmm]
         std::stringstream time_stream;
