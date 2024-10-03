@@ -8,6 +8,7 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
+#include "../Utility/Constant.h"
 
 
 namespace lof {
@@ -36,55 +37,36 @@ namespace lof {
 
                 if (physics.is_static) continue;
 
-                //apply speed 
-                float speed = 500.f; 
-
-                //remove them later
-                 
-                bool is_jumping = false;
-                bool is_grounded = false;
-
-                float jump_force = 600.f;
-
                 // Handle jumping
-                if (IM.is_key_pressed(GLFW_KEY_SPACE)  && !physics.is_jumping) {
+                if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
+
                     // Apply jump force
-                    velocity.velocity.y += jump_force;
-                   is_jumping = true; // Mark as jumping
-                   is_grounded = false; // Leave the ground
+                    velocity.velocity.y = physics.jump_force;
+
+                    //update the position 
+                    transform.position += velocity.velocity * delta_time;
+
+
+                   physics.is_jumping = true; // Mark as jumping
+                   physics.is_grounded = false; // Leave the ground
                 }
+               
 
                 // Apply gravity if the entity is not grounded
-                if (!is_grounded) {
-                    velocity.velocity.y += physics.gravity.y * delta_time;
+                if (!physics.is_grounded) {
+
+                    velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
                 }
 
-
-#if 0
-                 // Update position based on velocity and delta_time and input
-                if (IM.is_key_held(GLFW_KEY_W)) {
-
-                    velocity.velocity.y = speed; 
-
-                }
-                else if (IM.is_key_held(GLFW_KEY_S)) {
-
-                    velocity.velocity.y = -speed;
-
-                }
-                else {
-                    velocity.velocity.y = 0; 
-                }
-#endif
-
+                //check for keyboard input
                 if (IM.is_key_held(GLFW_KEY_A)) {
 
-                    velocity.velocity.x = -speed;  //move left
+                    velocity.velocity.x = -DEFAULT_SPEED;//move left
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_D)) {
 
-                    velocity.velocity.x = speed;  //move right
+                    velocity.velocity.x = DEFAULT_SPEED;  //move right
 
                 }
                 else {
@@ -106,15 +88,12 @@ namespace lof {
 
                 transform.position += velocity.velocity * delta_time;
 
-
-                std::cout << "DEBUG: Position ( " << transform.position.x << ", " << transform.position.y << " )" << std::endl;
-
                 // Simulate landing (basic placeholder logic)
-                if (transform.position.y >= SM.get_scr_height() * 2) { // Assuming y=0 is the ground level
-                    transform.position.y = SM.get_scr_height() * 2;
+                if (transform.position.y <= DEFAULT_SCREEN_HEIGHT) { // Assuming y=0 is the ground level
+                    transform.position.y = DEFAULT_SCREEN_HEIGHT;
                     velocity.velocity.y = 0;
-                    physics.is_grounded = true;
-                    physics.is_jumping = false;
+                    physics.is_grounded = true;  //character is on the ground
+                    physics.is_jumping = false;  //reset the jump state
                 }
 
 
@@ -128,11 +107,9 @@ namespace lof {
                 // length of entity's velocity > max_velocity
                 if (squared_velocity > squared_max_vel) {
 
-
                         Vec2D normalize_result;
                         normalize_vec2d(normalize_result, velocity.velocity);
                         velocity.velocity = normalize_result * physics.max_velocity;
-
 
                 }
 

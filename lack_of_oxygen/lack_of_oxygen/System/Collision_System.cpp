@@ -275,8 +275,7 @@ namespace lof
 								// If both objects are stationary, skip collision check
 								continue;
 							}
-
-							LM.write_log("yes! it collide");
+							LM.write_log("yes! it collide\n");
 							std::cout << "yes !!! collide\n";
 						}
 					
