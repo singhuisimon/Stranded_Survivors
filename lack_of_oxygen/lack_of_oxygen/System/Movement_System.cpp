@@ -36,6 +36,13 @@ namespace lof {
 
                 if (physics.is_static) continue;
 
+                std::cout << "Entity " << id << "is_grounded = " << physics.is_grounded
+                    << ", is_jumping = " << physics.is_jumping << std::endl;
+
+                if (physics.is_grounded) {
+                    velocity.velocity.y = 0.0f; //reset the vertical velocity
+                }
+
                 // Handle jumping
                 if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
 
@@ -55,6 +62,15 @@ namespace lof {
                 if (!physics.is_grounded) {
 
                     velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
+                }
+                if (physics.is_grounded) {
+                    //velocity.velocity.y = 0.0f; //reset the vertical velocity
+
+                    physics.gravity.y = 0.0f;
+                }
+                else {
+                    physics.gravity.y = DEFAULT_GRAVITY;
+                    physics.is_grounded = false;
                 }
 
                 //check for keyboard input
@@ -108,6 +124,8 @@ namespace lof {
 
                 //reset the accumulated force 
                 physics.reset_forces();
+                //physics.is_grounded = false;
+                //physics.is_jumping = false;
 
             }
         }
