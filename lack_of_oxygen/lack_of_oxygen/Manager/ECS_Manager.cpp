@@ -68,11 +68,11 @@ namespace lof {
             register_component<Physics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 
-            register_component<Graphics_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
-
             register_component<Collision_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
+
+            register_component<Graphics_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
 
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");

@@ -385,7 +385,7 @@ namespace lof
 						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
 
 						float collision_time = delta_time;// 0.0f;
-
+						
 						//check intersecption between two entities, and consider their vel
 						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
 						{
@@ -401,7 +401,7 @@ namespace lof
 							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
 
 							if (Overlap.y > 0) {
-								velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
+								//velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
 								physic1.is_grounded = true;   // Entity is now grounded
 							}
 
@@ -409,9 +409,9 @@ namespace lof
 							if (Overlap.x > 0 && Overlap.y > 0) 
 							{
 								// Collision detected, stop both objects
-								velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
-								velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
-								physic1.is_grounded = true;
+								//velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
+								//velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
+								//physic1.is_grounded = true;
 
 					
 								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);

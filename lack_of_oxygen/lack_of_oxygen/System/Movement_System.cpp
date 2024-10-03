@@ -36,11 +36,14 @@ namespace lof {
 
                 if (physics.is_static) continue;
 
+                std::cout << "Entity " << id << "is_grounded = " << physics.is_grounded 
+                    << ", is_jumping = " << physics.is_jumping << std::endl;
+
                 // Handle jumping
                 if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
 
-                    // Apply jump force
-                    velocity.velocity.y = physics.jump_force;
+                   // Apply jump force
+                   velocity.velocity.y = physics.jump_force;
 
                    physics.is_jumping = true; // Mark as jumping
                    physics.is_grounded = false; // Leave the ground
@@ -53,6 +56,18 @@ namespace lof {
                     std::cout << "Player is not grounded \n"; 
                     velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
                 }
+
+                if (physics.is_grounded) {
+                    //velocity.velocity.y = 0.0f; //reset the vertical velocity
+
+                    physics.gravity.y = 0.0f;
+                }
+                else {
+                    physics.gravity.y = DEFAULT_GRAVITY;
+                    physics.is_grounded = false;
+                }
+
+
 
                 //check for keyboard input
                 if (IM.is_key_held(GLFW_KEY_A)) {
@@ -102,15 +117,14 @@ namespace lof {
                 transform.position += velocity.velocity * delta_time;
 
                 //reset the accumulated force 
-                physics.reset_forces();
+                physics.reset_forces(); 
 
-                //reset the condiitons
-                physics.is_grounded = false;
-                physics.is_jumping = false;
-
+ 
             }
         }
     }
+
+
 
     std::string Movement_System::get_type() const {
         return "Movement_System";

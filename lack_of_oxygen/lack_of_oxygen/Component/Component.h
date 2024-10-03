@@ -95,6 +95,14 @@ namespace lof {
     * @class Physics_Component
     * @brief Component representing global physics properties
     */
+
+    /*
+    enum MovementState {
+        ONGROUND, 
+        JUMPING, 
+        FALLING
+    };*/
+
     class Physics_Component : public Component {
     public:
         Vec2D gravity;
