@@ -11,15 +11,15 @@
           "velocity": [ 0.0, 0.0 ]
         },
         "Physics_Component": {
-          "gravity": [ 0.0, -9.8 ],
+          "gravity": [ 0.0, -980.0 ],
           "damping_factor": 0.90,
-          "max_velocity": 1000.0,
+          "max_velocity": 30000.0,
           "accumulated_force": [ 0.0, 0.0 ],
-          "mass": 1.0,
+          "mass": 20.0,
           "is_static": false,
           "is_grounded": false,
           "is_jumping": false,
-          "jump_force": 300.0
+          "jump_force": 10000.0
         },
         "Graphics_Component": {
           "model_name": "square",
@@ -48,7 +48,7 @@
           "velocity": [ 0.0, 0.0 ]
         },
         "Physics_Component": {
-          "gravity": [ 0.0, -9.8 ],
+          "gravity": [ 0.0, -400.0 ],
           "damping_factor": 0.90,
           "max_velocity": 1000.0,
           "accumulated_force": [ 0.0, 0.0 ],

@@ -44,6 +44,21 @@ namespace lof {
 	constexpr int MINUTES_PER_HOUR = 60;
 	constexpr int HOURS_PER_DAY = 24;
 
+
+	// ----------------------------- Component.h -------------------------------------------
+	//Physics component constants 
+	constexpr float DEFAULT_GRAVITY = -980.f;
+	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
+	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
+	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
+
+
+	// ----------------------------- Movement_System.cpp -------------------------------------------
+    //Movement_System constants
+
+	constexpr float DEFAULT_SPEED = 1000.0f;
+	constexpr float GRAVITY_ACCELERATOR = 10.0f;
+
 	// ------------------------------ Audio_Manager.cpp --------------------------------
 	// Music Wav Directory
 	constexpr const char* MUSICPATH1 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test1.wav";
