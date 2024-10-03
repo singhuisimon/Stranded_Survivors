@@ -14,7 +14,6 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
-#include "../Utility/Constant.h"
 
 // Initialize Value
 float OVERLAP_X = 0.0f;
@@ -72,10 +71,15 @@ namespace lof
 			aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y) 
 		{
 			return false; //no intersection
+		 
 		}
+
 
 		float Vb_x = vel2.x - vel1.x;; //initialize Vb for x axis 
 		float Vb_y = vel2.y - vel1.y;; //initialize Vb for y axis
+
+		/*if (Vb_x == 0 && (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x)) return false;
+		if (Vb_y == 0 && (aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y)) return false;*/
 
 		float dFirst_x = aabb1.max.x - aabb2.min.x;  //initialize for dFirst for x-axis
 		float dFirst_y = aabb1.max.y - aabb2.min.y;; // initialize for dFrist for y axis
@@ -223,8 +227,14 @@ namespace lof
 	*/
 	Collision_System::Collision_System(ECS_Manager& ecs_manager)
 		: ecs_manager(ecs_manager) {
-		set_time(DEFAULT_START_TIME);
+		set_time(0);
 	}
+
+	//bool Collision_System::is_dynamic_object(EntityID entity_ID) {
+	//	// Check if the object has velocity or other properties indicating it's dynamic
+	//	auto& velocity = ecs_manager.get_component<Velocity_Component>(entity_ID);
+	//	return velocity.velocity.x != 0 || velocity.velocity.y != 0;
+	//}
 
 	/**
 	* @brief Check check if a point is within a box
@@ -339,10 +349,14 @@ namespace lof
 			EntityID entity_ID = entity_ptr->get_id();
 			//LM.write_log("Entity id %u",entity_ID);
 
-			//check if entity has a collision component
-			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
-				// LM.write_log("Entity id %u", entity_ID);
+			std::cout << entity_ID << "\n";
+			
+			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
+			//check if entity has a collision component
+			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())&& !physic1.is_static) {
+				// LM.write_log("Entity id %u", entity_ID);
+				
 				//get transform component
 				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
 				//get collision component
@@ -352,7 +366,7 @@ namespace lof
 
 				auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
-
+				
 				//create AABB based on transforrm and collision component for object 1
 				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
 				
@@ -378,6 +392,8 @@ namespace lof
 
 						//get velocity component
 						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
+						auto& physic2 = ecs_manager.get_component<Physics_Component>(Other_Entity_ID);
+						
 
 						
 						//create AABB for other entity
@@ -395,14 +411,18 @@ namespace lof
 								// If both objects are stationary, skip collision check
 								continue;
 							}
-							if (IM.is_key_held(GLFW_KEY_M))
-							LM.write_log("Collision_Syetem::update():Yes, Collision is detected.");
+							if (IM.is_key_held(GLFW_KEY_M)) {
+								LM.write_log("Collision_Syetem::update():Yes, Collision is detected.");
+							}
 							
+							std::cout << "yes !!!is collide\n";
 							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
 
 							if (Overlap.y > 0) {
 								velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
 								physic1.is_grounded = true;   // Entity is now grounded
+								
+								
 							}
 
 							// Determine if there is an overlap
@@ -413,14 +433,28 @@ namespace lof
 								velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
 								velocity2.velocity.x = 0.0f;
 								velocity2.velocity.x = 0.0f;
-								physic1.is_grounded = true;
-
-					
-								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-								if (physic1.is_grounded)
+								
+								
+								if (!physic1.is_static && physic2.is_static)
 								{
-									physic1.is_jumping = false;
+									Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
+									if (physic1.is_grounded)
+									{
+										physic1.is_jumping = false;
+									}
 								}
+								else if (physic1.is_static && physic2.is_static)
+								{
+									Resolve_Collision_Static_Dynamic(aabb2, aabb1, transform2, Overlap);
+								}
+
+
+								
+								//}
+
+
+								//Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
+								
 								
 							}
 
