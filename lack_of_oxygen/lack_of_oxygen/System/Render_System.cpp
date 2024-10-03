@@ -7,10 +7,13 @@
 
  // Include header file
 #include "Render_System.h"
+#include "../Utility/Constant.h"
 
 namespace lof {
 
-    Render_System::Render_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {}
+    Render_System::Render_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {
+        set_time(DEFAULT_START_TIME);
+    }
 
     std::string Render_System::get_type() const {
         return "Render_System";

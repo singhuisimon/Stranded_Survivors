@@ -10,12 +10,11 @@
 #include "../Manager/Input_Manager.h"
 #include "../Utility/Constant.h"
 
-
 namespace lof {
 
     Movement_System::Movement_System(ECS_Manager& ecs_manager)
         : ecs(ecs_manager) {
-        set_time(0);   
+        set_time(DEFAULT_START_TIME);
     }
 
     void Movement_System::update(float delta_time) {

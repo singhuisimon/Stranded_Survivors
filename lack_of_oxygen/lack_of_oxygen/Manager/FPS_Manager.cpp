@@ -29,7 +29,7 @@ namespace lof {
         last_frame_start_time(DEFAULT_LAST_FRAME_START_TIME),
         fps_calculator(DEFAULT_TARGET_FPS) { // Initialize with TARGET_FPS
         set_type("FPS_Manager");
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
         LM.write_log("FPS_Manager::FPS_Manager(): Initialized with TARGET_FPS = %d.", TARGET_FPS);
     }
 

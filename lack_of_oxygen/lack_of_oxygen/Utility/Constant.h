@@ -38,6 +38,16 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
+	// --------------------------- Managers/System Files ---------------------------------------
+	// System Performance Constants
+	constexpr int64_t DEFAULT_START_TIME = 0;
+	constexpr float UPON_PERCENTAGE = 100.0f;
+	constexpr int DEBUG_LEFT_WIDTH = 17;
+	constexpr int DEBUG_RIGHT_WIDTH = 5;
+
+	// ------------------------------ Matrix3x3.cpp --------------------------------------------
+	constexpr float PI_VALUE = 3.1415926f;
+	constexpr float PI_VALUE_DEGREES = 180.0f;
 	// Time Conversion Constants
 	constexpr int MILLISECONDS_PER_SECOND = 1000;
 	constexpr int SECONDS_PER_MINUTE = 60;

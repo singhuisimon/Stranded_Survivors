@@ -10,6 +10,7 @@
 
 // Include header file
 #include "Log_Manager.h"
+#include "../Utility/Constant.h"
 
 // Include constants
 #include "../Utility/Constant.h"
@@ -31,7 +32,7 @@ namespace lof {
         : do_flush(true), log_file_name(LOGFILE_DEFAULT) {
         set_type("Log_Manager");
         m_is_started = false;
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
 
