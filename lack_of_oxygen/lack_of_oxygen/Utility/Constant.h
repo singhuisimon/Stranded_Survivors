@@ -38,6 +38,12 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
+	// Time Conversion Constants
+	constexpr int MILLISECONDS_PER_SECOND = 1000;
+	constexpr int SECONDS_PER_MINUTE = 60;
+	constexpr int MINUTES_PER_HOUR = 60;
+	constexpr int HOURS_PER_DAY = 24;
+
 
 	// ----------------------------- Component.h -------------------------------------------
 	//Physics component constants 

@@ -394,8 +394,8 @@ namespace lof
 								// If both objects are stationary, skip collision check
 								continue;
 							}
-
-							LM.write_log("yes! It is collide");
+							if (IM.is_key_held(GLFW_KEY_M))
+							LM.write_log("Collision_Syetem::update():Yes, Collision is detected.");
 							
 							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
 
@@ -425,6 +425,10 @@ namespace lof
 
 						}
 
+						else if (IM.is_key_held(GLFW_KEY_M))
+						{
+							LM.write_log("Collision_Syetem::update():No, Collision is not detected.");
+						}
 					}
 
 				}
