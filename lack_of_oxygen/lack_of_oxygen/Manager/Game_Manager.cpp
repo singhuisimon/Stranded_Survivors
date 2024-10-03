@@ -16,6 +16,7 @@
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
+#include "Audio_Manager.h"
 
 // Include iostream for console output
 #include <iostream>
@@ -113,6 +114,20 @@ namespace lof {
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
         }
+        // -------------------------- Audio Manager Start Up --------------------------
+        if (AM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+            GFXM.shut_down();
+            IM.shut_down();
+            FPSM.shut_down();
+            SM.shut_down();
+            ECSM.shut_down();
+            LM.shut_down();
+            return -7;
+        }
+        else {
+            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() successful"); 
+        }
 
         m_is_started = true;
         LM.write_log("Game_Manager::start_up(): Game_Manager started");
@@ -127,6 +142,7 @@ namespace lof {
         }
 
         // Shut down managers in reverse order of startup
+        AM.shut_down();   // Audio_Manager
         GFXM.shut_down(); // Graphics_Manager
         IM.shut_down();   // Input_Manager
         FPSM.shut_down(); // FPS_Manager
@@ -199,6 +215,22 @@ namespace lof {
         }
         c_key_was_pressed_last_frame = c_key_pressed;
         
+        //Play Audio BGM
+        //check if key 0 is press if so play track1
+        if (IM.is_key_pressed(GLFW_KEY_0)) {
+            AM.play_bgm(TRACK1);
+        }
+        
+        //check if key 9 is press if so play track2
+        if (IM.is_key_pressed(GLFW_KEY_9)) {
+            AM.play_bgm(TRACK2);
+        }
+
+        //check if key L is press if so stop music
+        if (IM.is_key_pressed(GLFW_KEY_L)) {
+            AM.stop_bgm();
+        }
+
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Input_Manager
@@ -216,6 +248,12 @@ namespace lof {
         // Update game world state
         ECSM.update(delta_time);
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
+
+        // Getting delta time for Audio Manager
+        //AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        // Update Audio Manager
+        AM.update();
+        //AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - AM.get_time());
 
         m_step_count++;
     }
