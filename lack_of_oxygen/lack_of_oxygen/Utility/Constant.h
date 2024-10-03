@@ -40,8 +40,8 @@ namespace lof {
 
 	// ------------------------------ Audio_Manager.cpp --------------------------------
 	// Music Wav Directory
-	constexpr const char* MUSICPATH1 = "C:/Users/Admin/source/repos/Stranded_Survivors/lack_of_oxygen/lack_of_oxygen/Data/audio_test1.wav";
-	constexpr const char* MUSICPATH2 = "C:/Users/Admin/source/repos/Stranded_Survivors/lack_of_oxygen/lack_of_oxygen/Data/audio_test2.wav";
+	constexpr const char* MUSICPATH1 = "C:\\Users\\Admin\\source\\repos\\Stranded_Survivors\\lack_of_oxygen\\lack_of_oxygen\\Data\\audio_test1.wav";
+	constexpr const char* MUSICPATH2 = "C:\\Users\\Admin\\source\\repos\\Stranded_Survivors\\lack_of_oxygen\\lack_of_oxygen\\Data\\audio_test2.wav";
 
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
