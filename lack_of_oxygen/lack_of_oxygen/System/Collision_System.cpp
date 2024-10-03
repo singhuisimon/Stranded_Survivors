@@ -378,7 +378,7 @@ namespace lof
 						AABB aabb2 = AABB::from_Tranform(transform2, collision2);
 						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
 
-						float collision_time = 0.0f;
+						float collision_time = delta_time;// 0.0f;
 
 						//check intersecption between two entities, and consider their vel
 						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
