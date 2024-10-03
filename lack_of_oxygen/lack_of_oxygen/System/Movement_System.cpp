@@ -43,10 +43,6 @@ namespace lof {
                     // Apply jump force
                     velocity.velocity.y = physics.jump_force;
 
-                    //update the position 
-                    transform.position += velocity.velocity * delta_time;
-
-
                    physics.is_jumping = true; // Mark as jumping
                    physics.is_grounded = false; // Leave the ground
                 }
@@ -55,6 +51,7 @@ namespace lof {
                 // Apply gravity if the entity is not grounded
                 if (!physics.is_grounded) {
 
+                    std::cout << "Player is not grounded \n"; 
                     velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
                 }
 
@@ -86,11 +83,6 @@ namespace lof {
                 velocity.velocity *= physics.damping_factor;
 
 
-                transform.position += velocity.velocity * delta_time;
-
- 
-
-
                 //clamp velocity to max velocity 
                 float squared_velocity = square_length_vec2d(velocity.velocity);
 
@@ -107,8 +99,15 @@ namespace lof {
 
                 }
 
+                //update the position 
+                transform.position += velocity.velocity * delta_time;
+
                 //reset the accumulated force 
                 physics.reset_forces();
+
+                //reset the condiitons
+                physics.is_grounded = false;
+                physics.is_jumping = false;
 
             }
         }
