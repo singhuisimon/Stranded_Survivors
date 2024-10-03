@@ -290,7 +290,7 @@ namespace lof
 	* @param Overlap The overlap between AABBs along the x and y axis
 	* @return The Vec2D value can be use to resolve the collisions
 	*/
-	void Collision_System::Resolve_Collision_Static_Dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Transform2D& transform2, const Vec2D& Overlap)
+	void Collision_System::Resolve_Collision_Static_Dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, const Vec2D& Overlap)
 	{
 
 		bool resolve_x = (Overlap.x < Overlap.y);
@@ -402,7 +402,7 @@ namespace lof
 								velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
 
 
-								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, transform2, Overlap);
+								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
 
 							}
 
