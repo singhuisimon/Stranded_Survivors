@@ -56,8 +56,11 @@
     <None Include="Data\triangle.msh" />
     <None Include="Manager\ECS_Manager.tpp" />
     <None Include="Data\prefab.json" />
+    <None Include="Data\models.msh" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
+    <Media Include="Data\audio_test1.wav" />
+    <Media Include="Data\audio_test2.wav" />
   </ItemGroup>
 </Project>

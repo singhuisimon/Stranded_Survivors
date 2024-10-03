@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
+    <None Include="Data\models.msh" />
     <None Include="Data\prefab.json" />
     <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
@@ -76,6 +77,8 @@
     <None Include="Manager\ECS_Manager.tpp" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="Data\audio_test1.wav" />
+    <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
