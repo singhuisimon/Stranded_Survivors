@@ -138,7 +138,7 @@ namespace lof {
     // Add a model into the model storage.
     GLboolean Graphics_Manager::add_model(std::string const& file_name) {
 
-        ///////////////////////////// MODEL TESTING NEW STORAGE////////////////////////////////////////
+        // Read file containing model data
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
             input_file.close();
