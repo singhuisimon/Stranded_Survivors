@@ -55,7 +55,7 @@ namespace lof {
         m_fps_display_interval(DEFAULT_FPS_DISPLAY_INTERVAL),
         m_data_directory(BASE_DATA_DIR) { // Initialize m_data_directory
         set_type("Serialization_Manager");
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
     Serialization_Manager& Serialization_Manager::get_instance() {

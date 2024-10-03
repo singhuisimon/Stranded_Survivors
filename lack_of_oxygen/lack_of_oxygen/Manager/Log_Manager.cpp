@@ -10,6 +10,7 @@
 
 // Include header file
 #include "Log_Manager.h"
+#include "../Utility/Constant.h"
 
 // Include standard headers
 #include <cstdarg>
@@ -29,7 +30,7 @@ namespace lof {
         set_type("Log_Manager");
         // By default, the log file will flush after each write, for immediate logging 
         m_is_started = false;
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
 

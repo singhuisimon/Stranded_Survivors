@@ -1,6 +1,16 @@
+/**
+ * @file Matrix3x3.cpp
+ * @brief Definitions of memeber and non-member functions of struct Matrix_Lib
+ * @author Liliana Hanawardani
+ * @date September 20, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "Matrix3x3.h"
 #include "Vector2D.h"
-//#include "main.h"
+#include "../Utility/Constant.h"
 
 namespace lof
 {
@@ -185,7 +195,7 @@ namespace lof
 		result.mtx3x3[2][1] = 0;
 		result.mtx3x3[2][2] = 1; //sets the object's z values to 1 as per the rotation matrix
 
-		float angle_rad = angle * PI / 180; //converts the value of the angle from degree to radian
+		float angle_rad = angle * PI_VALUE / PI_VALUE_DEGREES; //converts the value of the angle from degree to radian
 		result.mtx3x3[0][0] = cos(angle_rad);
 		result.mtx3x3[0][1] = -sin(angle_rad);
 		result.mtx3x3[1][0] = sin(angle_rad);

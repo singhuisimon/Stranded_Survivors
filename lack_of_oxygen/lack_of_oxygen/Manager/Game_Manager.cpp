@@ -17,6 +17,8 @@
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
 
+#include "../Utility/Constant.h"
+
 // Include iostream for console output
 #include <iostream>
 #include <random>
@@ -32,7 +34,7 @@ namespace lof {
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
     Game_Manager& Game_Manager::get_instance() {

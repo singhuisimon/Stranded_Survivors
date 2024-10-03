@@ -7,6 +7,7 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
+#include "../Utility/Constant.h"
 #include <mutex>
 #define STB_IMAGE_IMPLEMENTATION 
 #include "STB/stb_image.h"  // For loading textures/sprites 
@@ -21,7 +22,7 @@ namespace lof {
         set_type("Graphics_Manager");
         m_is_started = false;
         render_mode = GL_FILL;
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
 
