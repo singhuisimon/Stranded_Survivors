@@ -410,6 +410,8 @@ namespace lof
 								// Collision detected, stop both objects
 								velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
 								velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
+								velocity2.velocity.x = 0.0f;
+								velocity2.velocity.x = 0.0f;
 								physic1.is_grounded = true;
 
 					
@@ -422,10 +424,6 @@ namespace lof
 							}
 
 						}
-
-						//if (is_Intersept_Box()
-
-
 
 					}
 
