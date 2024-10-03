@@ -14,6 +14,7 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
+#include "../Utility/Constant.h"
 
 // Initialize Value
 float OVERLAP_X = 0.0f;
@@ -222,7 +223,7 @@ namespace lof
 	*/
 	Collision_System::Collision_System(ECS_Manager& ecs_manager)
 		: ecs_manager(ecs_manager) {
-		set_time(0);
+		set_time(DEFAULT_START_TIME);
 	}
 
 	/**

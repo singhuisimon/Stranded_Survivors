@@ -1,37 +1,37 @@
 /**
  * @file Graphics_Manager.cpp
  * @brief Implements the Graphics_Manager class methods.
- * @author Chua Wen Bin Kenny
+ * @author Chua Wen Bin Kenny (100%)
  * @date September 18, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
  // Include header file
 #include "Graphics_Manager.h" 
-#include <mutex>
-#define STB_IMAGE_IMPLEMENTATION 
-#include "STB/stb_image.h"  // For loading textures/sprites 
 
 namespace lof {
 
     std::unique_ptr<Graphics_Manager> Graphics_Manager::instance;
     std::once_flag Graphics_Manager::once_flag;
 
-
+    // Constructor
     Graphics_Manager::Graphics_Manager() {
         set_type("Graphics_Manager");
         m_is_started = false;
         render_mode = GL_FILL;
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
-
+    // Destructor
     Graphics_Manager::~Graphics_Manager() {
         if (is_started()) {
             shut_down();
         }
     }
 
-
+    // Singleton
     Graphics_Manager& Graphics_Manager::get_instance() {
         std::call_once(once_flag, []() {
             instance.reset(new Graphics_Manager);
@@ -39,7 +39,8 @@ namespace lof {
         return *instance;
     }
 
-
+    // Initialize the manager by setting up the viewport and loading assets such
+    // as shader programs and models
     int Graphics_Manager::start_up() {
         if (is_started()) {
             return 0; // Already started
@@ -49,15 +50,17 @@ namespace lof {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Set viewport position and dimensions
-        glViewport(0, 0, 1024, 768);
+        GLuint scr_width = SM.get_scr_width();
+        GLuint scr_height = SM.get_scr_height();
+        glViewport(0, 0, scr_width, scr_height); 
 
         // Set up default render mode 
         render_mode = GL_FILL; 
 
         // Read file to initialize shaders 
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
-        std::make_pair<std::string, std::string>("../lack_of_oxygen/Shaders/lack-of-oxygen-1.vert",
-                                                 "../lack_of_oxygen/Shaders/lack-of-oxygen-1.frag")
+        std::make_pair<std::string, std::string>(DEFAULT_VERTEX_SHADER_PATH,
+                                                 DEFAULT_FRAGMENT_SHADER_PATH)
         };
 
         // Create shader program from shader files and insert 
@@ -70,7 +73,7 @@ namespace lof {
         }
 
         // Add models (Will move this to serialization side)
-        if (!add_model("../lack_of_oxygen/Data/models.msh")) {
+        if (!add_model(DEFAULT_MODEL_FILE_PATH)) {
             LM.write_log("Fail to add model.");
             return -1;
         }
@@ -79,17 +82,17 @@ namespace lof {
         return 0;
     }
 
+    // Shut down the manager when game is shutting down
     void Graphics_Manager::shut_down() {
         if (!is_started()) {
             return; // Not started
         }
 
-        // Free resources if needed
-
         m_is_started = false;
     }
 
-    void Graphics_Manager::update() { // Update details, add mesh/textures/sprits/fonts, etc
+    // Update rendering details according to inputs
+    void Graphics_Manager::update() { 
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
         if (IM.is_key_held(GLFW_KEY_1)) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
@@ -102,7 +105,7 @@ namespace lof {
             render_mode = GL_POINT; 
         }
 
-        // Toggle debug mode
+        // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_held(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
             is_debug_mode = GL_TRUE;
@@ -120,6 +123,7 @@ namespace lof {
             shader_files.emplace_back(std::make_pair(GL_VERTEX_SHADER, file.first));
             shader_files.emplace_back(std::make_pair(GL_FRAGMENT_SHADER, file.second));
 
+            // Compile the shaders to make a shader program
             ShaderProgram shader_program;
             if (!(Graphics_Manager::compile_shader(shader_files, shader_program))) {
                 LM.write_log("Graphics_Manager::add_shader_program(): Shader program failed to compile.");
@@ -127,14 +131,12 @@ namespace lof {
             }
             // Insert shader program into container
             shader_program_storage.emplace_back(shader_program);
-            LM.write_log("shader_program.program_handle value is %u", shader_program.program_handle);
             LM.write_log("Graphics_Manager::add_shader_program(): Shader program compiled successfully.");
         }
-
         return GL_TRUE;
     }
 
-    // Add a model into the model storage.
+    // Add models into the model storage.
     GLboolean Graphics_Manager::add_model(std::string const& file_name) {
 
         // Read file containing model data
@@ -199,17 +201,17 @@ namespace lof {
             else if (prefix == "e") { // Indicates end of model data, signal to make model
 
                 // Generate a VAO handle to encapsulate the VBO(s) and
-                // state of the triangle mesh
+                // state of the mesh
                 GLuint vbo_hdl;
                 glCreateBuffers(1, &vbo_hdl);
                 glNamedBufferStorage(vbo_hdl, sizeof(glm::vec2) * pos_vtx.size(),
                     pos_vtx.data(), GL_DYNAMIC_STORAGE_BIT);
 
-                // encapsulate information about contents of VBO and VBO handle to VAO
+                // Encapsulate information about contents of VBO and VBO handle to VAO
                 GLuint vaoid;
                 glCreateVertexArrays(1, &vaoid);
 
-                // for position vertex, we use vertex attribute index 0
+                // For position vertex, we use vertex attribute index 0
                 // and vertex buffer binding point 0 
                 glEnableVertexArrayAttrib(vaoid, 0);
                 glVertexArrayVertexBuffer(vaoid, 1, vbo_hdl, 0, sizeof(glm::vec2));
@@ -224,16 +226,16 @@ namespace lof {
                 glVertexArrayElementBuffer(vaoid, ebo_hdl);
                 glBindVertexArray(0);
 
-                // Return an appropriately initialized instance of GLApp::GLModel
+                // Return an appropriately initialized instance of a model
                 mdl.vaoid = vaoid;
                 if (mdl.primitive_type == GL_TRIANGLES || mdl.primitive_type == GL_TRIANGLE_STRIP) {
                     mdl.primitive_cnt = (GLuint)pos_vtx.size() - 2; // number of primitives
                 }
                 else if (mdl.primitive_type == GL_TRIANGLE_FAN) {
-                    mdl.primitive_cnt = (GLuint)vtx_idx.size() - 2; // number of primitives
+                    mdl.primitive_cnt = (GLuint)vtx_idx.size() - 2; 
                 }
                 else if (mdl.primitive_type == GL_LINES) {
-                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 1; // number of primitives
+                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 1; 
                 }
                 mdl.draw_cnt = (GLuint)vtx_idx.size();
                 model_storage[model_name] = mdl;
@@ -251,22 +253,27 @@ namespace lof {
         return GL_TRUE;
     }
 
+    // Return reference to shader program storage
     Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() {
         return shader_program_storage;
     }
 
+    // Return reference to model storage
     Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() {
         return model_storage;
     }
 
+    // Return state of current render mode
     GLenum& Graphics_Manager::get_render_mode() {
         return render_mode;
     }
 
+    // Return state of current debig mode
     GLboolean& Graphics_Manager::get_debug_mode() {
         return is_debug_mode;
     }
 
+    // Compilation of vertex and fragment shaders to make a shader program
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {
         // Read each shader file details such as shader type and file path
         for (auto& file : shader_files) {
@@ -352,19 +359,21 @@ namespace lof {
         return GL_TRUE;
     }
 
+    // Get a shader program ready to use
     void Graphics_Manager::program_use(ShaderProgram shader) {
         if (shader.program_handle > 0 && shader.link_status == GL_TRUE) {
             glUseProgram(shader.program_handle);
         }
     }
 
+    // Free shader program
     void Graphics_Manager::program_free() {
         glUseProgram(0);
     }
 
+    // Return the handle of the shader program
     GLuint Graphics_Manager::get_shader_program_handle(ShaderProgram shader) const {
         return shader.program_handle;
     }
-
 
 } // namespace lof
