@@ -22,8 +22,8 @@
           "scale": [ 1800.0, 500.0 ]
         },
         "Collision_Component": {
-          "width": 1800.0,
-          "height": 500.0
+          "width": 1700.0,
+          "height": 400.0
         }
       }
     },
@@ -36,8 +36,8 @@
           "scale": [ 1800.0, 500.0 ]
         },
         "Collision_Component": {
-          "width": 1800.0,
-          "height": 500.0
+          "width": 1700.0,
+          "height": 400.0
         }
       }
     },

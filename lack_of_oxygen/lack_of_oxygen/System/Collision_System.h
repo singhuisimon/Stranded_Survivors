@@ -114,8 +114,15 @@ namespace lof
 		* @param Overlap The overlap between AABBs along the x and y axis
 		* @return The Vec2D value can be use to resolve the collisions
 		*/
+#if 1
 		void Resolve_Collision_Static_Dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, const Vec2D& overlap);
-	
+#endif
+#if 0
+		void Resolve_Collision_Static_Dynamic(const AABB& aabb1, const AABB& aabb2, Vec2D& transform1, const Vec2D& overlap);
+#endif
+#if 0
+		void Resolve_Collision_Static_Dynamic(AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Collision_Component& collision1, Velocity_Component& velocity, const Vec2D& Overlap);
+#endif
 		/**
 		* @brief Update the collision system
 		* @param delta_time Delta time since the last update. 

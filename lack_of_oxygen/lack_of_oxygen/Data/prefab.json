@@ -69,8 +69,8 @@
           ]
         },
         "Collision_Component": {
-          "width":  500.0,
-          "height": 500.0
+          "width":  400.0,
+          "height": 400.0
         }
       }
     }

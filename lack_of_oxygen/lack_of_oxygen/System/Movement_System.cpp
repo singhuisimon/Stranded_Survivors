@@ -56,6 +56,15 @@ namespace lof {
                     std::cout << "Player is not grounded \n"; 
                     velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
                 }
+                if (physics.is_grounded) {
+                    //velocity.velocity.y = 0.0f; //reset the vertical velocity
+
+                    physics.gravity.y = 0.0f;
+                }
+                else {
+                    physics.gravity.y = DEFAULT_GRAVITY;
+                    physics.is_grounded = false;
+                }
 
                 if (physics.is_grounded) {
                     //velocity.velocity.y = 0.0f; //reset the vertical velocity
