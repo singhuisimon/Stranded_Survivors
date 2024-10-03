@@ -22,6 +22,9 @@
 #include <fstream>
 #include <memory>
 
+// Include Utility headers
+#include "../Utility/Clock.h"
+
 namespace lof {
 
     const std::string LOGFILE_DEFAULT = "Lack_Of_Oxygen.log";
@@ -34,6 +37,7 @@ namespace lof {
         bool do_flush;
         std::ofstream log_file;
         std::string log_file_name;
+        Clock clock;                  //< Clock instance to track elapsed time since start
 
         /**
          * @brief Private constructor to enforce singleton pattern.
