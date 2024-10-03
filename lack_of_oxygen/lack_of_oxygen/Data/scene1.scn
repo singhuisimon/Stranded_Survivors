@@ -6,7 +6,7 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, 0.0 ],
-          "scale": [ 6000.0, 6000.0 ]
+          "scale": [ 12000.0, 12000.0 ]
         },
         "Graphics_Component": {
           "color": [ 0.5, 0.5, 0.5 ]
