@@ -18,6 +18,7 @@
 
 // Include Utility headers
 #include "../Utility/Vector2D.h"
+#include "../Utility/Constant.h"
 
 // FOR TESTING 
 #include "../Glad/glad.h"
@@ -109,16 +110,18 @@ namespace lof {
         bool is_jumping; //to indicate whether the entity is jumping
         float jump_force; //the force applied during a jump
 
+
+    public:
         /**
            * @brief Constructor for Physics_Component
            * @   Sets up the data values required for physics component
            */
-        Physics_Component(Vec2D gravity = Vec2D(0, -9.8f),
-            float damping_factor = 0.90f,
-            float max_velocity = 1000.0f,
+        Physics_Component(Vec2D gravity = Vec2D(0, DEFAULT_GRAVITY),
+            float damping_factor = DEFAULT_DAMPING_FACTOR,
+            float max_velocity = DEFAULT_MAX_VELOCITY,
             float mass = 1.0f,
             bool is_static = false, 
-            float jump_force = 300.0f) //adjust later
+            float jump_force = DEFAULT_JUMP_FORCE ) //adjust later
 
             : gravity(gravity),
             damping_factor(damping_factor),

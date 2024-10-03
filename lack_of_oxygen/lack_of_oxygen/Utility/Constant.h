@@ -16,10 +16,10 @@ namespace lof {
 
 	// ------------------------------ Serialization_Manager.cpp --------------------------------
 	// Data Directory Constants
-	constexpr const char* BASE_DATA_DIR = "..\\..\\lack_of_oxygen\\Data\\";
-	constexpr const char* CONFIG_PATH = "..\\..\\lack_of_oxygen\\Data\\config.json";
-	constexpr const char* PREFABS_PATH = "..\\..\\lack_of_oxygen\\Data\\prefab.json";
-	constexpr const char* SCENE_PATH = "..\\..\\lack_of_oxygen\\Data\\scene1.scn";
+	// constexpr const char* BASE_DATA_DIR = "..\\..\\lack_of_oxygen\\Data\\";
+	constexpr const char* CONFIG_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\config.json";
+	constexpr const char* PREFABS_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\prefab.json";
+	constexpr const char* SCENE_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\scene1.scn";
 
 	// Screen Configuration Constants
 	constexpr int DEFAULT_SCREEN_WIDTH = 800;
@@ -48,6 +48,34 @@ namespace lof {
 	// ------------------------------ Matrix3x3.cpp --------------------------------------------
 	constexpr float PI_VALUE = 3.1415926f;
 	constexpr float PI_VALUE_DEGREES = 180.0f;
+	// Time Conversion Constants
+	constexpr int MILLISECONDS_PER_SECOND = 1000;
+	constexpr int SECONDS_PER_MINUTE = 60;
+	constexpr int MINUTES_PER_HOUR = 60;
+	constexpr int HOURS_PER_DAY = 24;
+
+
+	// ----------------------------- Component.h -------------------------------------------
+	//Physics component constants 
+	constexpr float DEFAULT_GRAVITY = -980.f;
+	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
+	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
+	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
+
+
+	// ----------------------------- Movement_System.cpp -------------------------------------------
+    //Movement_System constants
+
+	constexpr float DEFAULT_SPEED = 1000.0f;
+	constexpr float GRAVITY_ACCELERATOR = 10.0f;
+
+	// ------------------------------ Audio_Manager.cpp --------------------------------
+	// Music Wav Directory
+	constexpr const char* MUSICPATH1 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test1.wav";
+	constexpr const char* MUSICPATH2 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test2.wav";
+
+	constexpr int TRACK1 = 1;
+	constexpr int TRACK2 = 2;
 
 } // namespace lof
 
