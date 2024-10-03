@@ -30,6 +30,7 @@ namespace lof {
 		return *this;
 	}
 
+	//!
 	Vec2D::Vec2D(const Vec2D& rhs) {
 		x = rhs.x;
 		y = rhs.y;

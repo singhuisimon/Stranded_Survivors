@@ -16,10 +16,10 @@ namespace lof {
 
 	// ------------------------------ Serialization_Manager.cpp --------------------------------
 	// Data Directory Constants
-	constexpr const char* BASE_DATA_DIR = "..\\..\\lack_of_oxygen\\Data\\";
-	constexpr const char* CONFIG_PATH = "..\\..\\lack_of_oxygen\\Data\\config.json";
-	constexpr const char* PREFABS_PATH = "..\\..\\lack_of_oxygen\\Data\\prefab.json";
-	constexpr const char* SCENE_PATH = "..\\..\\lack_of_oxygen\\Data\\scene1.scn";
+	// constexpr const char* BASE_DATA_DIR = "..\\..\\lack_of_oxygen\\Data\\";
+	constexpr const char* CONFIG_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\config.json";
+	constexpr const char* PREFABS_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\prefab.json";
+	constexpr const char* SCENE_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\scene1.scn";
 
 	// Screen Configuration Constants
 	constexpr int DEFAULT_SCREEN_WIDTH = 800;
@@ -53,6 +53,13 @@ namespace lof {
 	constexpr float DEFAULT_SPEED = 1000.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
+	// ------------------------------ Audio_Manager.cpp --------------------------------
+	// Music Wav Directory
+	constexpr const char* MUSICPATH1 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test1.wav";
+	constexpr const char* MUSICPATH2 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test2.wav";
+
+	constexpr int TRACK1 = 1;
+	constexpr int TRACK2 = 2;
 
 } // namespace lof
 
