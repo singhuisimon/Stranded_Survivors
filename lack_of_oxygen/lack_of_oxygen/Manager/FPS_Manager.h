@@ -44,7 +44,7 @@ namespace lof {
         int64_t adjust_time;                        // Adjustment time for sleep discrepancies
         int64_t last_frame_start_time;              // Time when the last frame started
 
-        // Clock for timing
+        // Clock instance for timing
         Clock clock;
 
         // Delta time for the current frame
