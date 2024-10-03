@@ -68,7 +68,7 @@ namespace lof {
 	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
 	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
 	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
-
+	constexpr const char* DEFAULT_MODEL_NAME = "square";
 	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
 	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
