@@ -88,13 +88,7 @@ namespace lof {
 
                 transform.position += velocity.velocity * delta_time;
 
-                // Simulate landing (basic placeholder logic)
-                if (transform.position.y <= DEFAULT_SCREEN_HEIGHT) { // Assuming y=0 is the ground level
-                    transform.position.y = DEFAULT_SCREEN_HEIGHT;
-                    velocity.velocity.y = 0;
-                    physics.is_grounded = true;  //character is on the ground
-                    physics.is_jumping = false;  //reset the jump state
-                }
+ 
 
 
                 //clamp velocity to max velocity 

@@ -281,6 +281,8 @@ namespace lof
 		return Vec2D(OVERLAP_X, OVERLAP_Y);
 	}
 
+
+
 	/**
 	* @brief Resolve the collision between an dynamic object and static object for rectangle based on AABB
 	* @param aabb1 First aabb object
@@ -346,7 +348,9 @@ namespace lof
 				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
 				//get velocity component
 				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
-				
+
+				auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
+
 
 				//create AABB based on transforrm and collision component for object 1
 				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
@@ -373,6 +377,7 @@ namespace lof
 
 						//get velocity component
 						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
+
 						
 						//create AABB for other entity
 						AABB aabb2 = AABB::from_Tranform(transform2, collision2);
@@ -394,19 +399,33 @@ namespace lof
 							
 							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
 
+							if (Overlap.y > 0) {
+								velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
+								physic1.is_grounded = true;   // Entity is now grounded
+							}
+
 							// Determine if there is an overlap
 							if (Overlap.x > 0 && Overlap.y > 0) 
 							{
 								// Collision detected, stop both objects
 								velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
 								velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
+								physic1.is_grounded = true;
 
-
+					
 								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-
+								if (physic1.is_grounded)
+								{
+									physic1.is_jumping = false;
+								}
+								
 							}
 
 						}
+
+						//if (is_Intersept_Box()
+
+
 
 					}
 
