@@ -8,6 +8,7 @@
  */
  // Include header
 #include "Input_Manager.h"
+#include "../Utility/Constant.h"
 
 // Include Log_Manager for logging
 #include "Log_Manager.h"
@@ -29,7 +30,7 @@ namespace lof {
     // Private constructor
     Input_Manager::Input_Manager() {
         set_type("Input_Manager");
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
         // Initialize all key states to NONE
     }
 

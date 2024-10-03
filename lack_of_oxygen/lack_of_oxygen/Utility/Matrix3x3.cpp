@@ -1,10 +1,20 @@
+/**
+ * @file Matrix3x3.cpp
+ * @brief Definitions of memeber and non-member functions of struct Matrix_Lib
+ * @author Liliana Hanawardani
+ * @date September 20, 2024
+ * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "Matrix3x3.h"
 #include "Vector2D.h"
-//#include "main.h"
+#include "../Utility/Constant.h"
 
 namespace lof
 {
-	//! Default Constructors
+	// Default Constructors
 	Matrix_Lib::Matrix_Lib()
 	{
 		for (int i = 0; i < 3; ++i) {
@@ -14,20 +24,26 @@ namespace lof
 		}
 	}
 
-	//! Constructor for pointers
+	// Constructor for pointers
 	Matrix_Lib::Matrix_Lib(const float* arr)
 	{
-		if (arr != nullptr) {
-			for (int i = 0; i < 3; ++i) {
-				for (int j = 0; j < 3; ++j) {
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 3; ++j) {
+
+				if (arr != nullptr) {
 					mtx3x3[i][j] = *arr;
 					arr++;
 				}
+				else {
+
+					mtx3x3[i][j] = 0;
+				}
 			}
 		}
+		
 	}
 
-	//! Overload Constructor
+	// Overload Constructor
 	Matrix_Lib::Matrix_Lib(float _00, float _01, float _02,
 		float _10, float _11, float _12,
 		float _20, float _21, float _22)
@@ -44,7 +60,7 @@ namespace lof
 
 	}
 
-	//! Copy Constructors
+	// Copy Constructors
 	Matrix_Lib::Matrix_Lib(Matrix_Lib const& rhs) {
 
 		for (int i = 0; i < 3; ++i) {
@@ -54,7 +70,7 @@ namespace lof
 		}
 	}
 
-	//! Copy Assignmnet
+	// Copy Assignmnet
 	Matrix_Lib& Matrix_Lib::operator=(const Matrix_Lib& rhs)
 	{
 		for (int i = 0; i < 3; ++i) {
@@ -67,7 +83,7 @@ namespace lof
 	}
 
 
-	//! Assignment Operators
+	// Assignment Operators
 	Matrix_Lib& Matrix_Lib::operator *= (const Matrix_Lib& rhs)
 	{
 		Matrix_Lib stored;
@@ -88,7 +104,7 @@ namespace lof
 		return *this;
 	}
 
-	//! Matrix Multiplication Operator
+	// Matrix Multiplication Operator
 	Matrix_Lib operator * (const Matrix_Lib& lhs, const Matrix_Lib& rhs)
 	{
 		Matrix_Lib result;
@@ -103,7 +119,7 @@ namespace lof
 		return result;
 	}
 
-	//! Matrix-Vector Multiplication Operator
+	// Matrix-Vector Multiplication Operator
 	Vec2D operator * (const Matrix_Lib& lhs, const Vec2D& rhs)
 	{
 		float rhs_zcoord = 1; //sets the vector object's z values to 1 to facilitate multiplying a 2x2 vector with a 3x3 matrix
@@ -113,7 +129,7 @@ namespace lof
 		return result;
 	}
 
-	//! Function turns matrix into identity matrix
+	// Function turns matrix into identity matrix
 	void mtx3x3_identity(Matrix_Lib& result)
 	{
 		result.mtx3x3[0][0] = 1;
@@ -129,7 +145,7 @@ namespace lof
 		result.mtx3x3[2][2] = 1;
 	}
 
-	//! Function creates a translation matrix from x & y and saves it in result
+	// Function creates a translation matrix from x & y and saves it in result
 	void mtx3x3_translate(Matrix_Lib& result, float x, float y)
 	{
 		result.mtx3x3[0][0] = 1;
@@ -145,7 +161,7 @@ namespace lof
 		result.mtx3x3[2][2] = 1;
 	}
 
-	//! Function creates a scaling matrix from x & y and saves it in result
+	// Function creates a scaling matrix from x & y and saves it in result
 	void mtx3x3_scale(Matrix_Lib& result, float x, float y)
 	{
 		result.mtx3x3[0][0] = x;
@@ -161,7 +177,7 @@ namespace lof
 		result.mtx3x3[2][2] = 1;
 	}
 
-	//! Function creates a rotation matrix from "angle" whose value is in radian and saves it in result
+	// Function creates a rotation matrix from "angle" whose value is in radian and saves it in result
 	void Mmtx3x3_rot_rad(Matrix_Lib& result, float angle)
 	{
 		result.mtx3x3[0][2] = 0;
@@ -176,7 +192,7 @@ namespace lof
 		result.mtx3x3[1][1] = cos(angle);
 	}
 
-	//! Function creates a rotation matrix from "angle" whose value is in degree and saves it in result
+	// Function creates a rotation matrix from "angle" whose value is in degree and saves it in result
 	void mtx3x3_rot_deg(Matrix_Lib& result, float angle)
 	{
 		result.mtx3x3[0][2] = 0;
@@ -185,14 +201,14 @@ namespace lof
 		result.mtx3x3[2][1] = 0;
 		result.mtx3x3[2][2] = 1; //sets the object's z values to 1 as per the rotation matrix
 
-		float angle_rad = angle * PI / 180; //converts the value of the angle from degree to radian
+		float angle_rad = angle * PI_VALUE / PI_VALUE_DEGREES; //converts the value of the angle from degree to radian
 		result.mtx3x3[0][0] = cos(angle_rad);
 		result.mtx3x3[0][1] = -sin(angle_rad);
 		result.mtx3x3[1][0] = sin(angle_rad);
 		result.mtx3x3[1][1] = cos(angle_rad);
 	}
 
-	//! Function creates a transpose matrix of matrix and saves it in result
+	// Function creates a transpose matrix of matrix and saves it in result
 	void mtx3x3_transpose(Matrix_Lib& result, const Matrix_Lib& pMtx)
 	{
 		float store1 = pMtx.mtx3x3[0][1]; //to go to m10
@@ -218,7 +234,7 @@ namespace lof
 	}
 
 
-	// !Function calculates the inverse matrix of matrix and saves it in result
+	// Function calculates the inverse matrix of matrix and saves it in result
 	//! If the matrix inversion fails, result would be set to NULL
 	void mtx3x3_inverse(Matrix_Lib* result, float* determinant, const Matrix_Lib& matrix)
 	{

@@ -13,6 +13,7 @@
 
 // Include standard headers
 #include <string>
+#include "../Utility/Constant.h"
 
 namespace lof {
 
@@ -23,7 +24,7 @@ namespace lof {
     class Manager {
 
     private:
-        int64_t manager_time = 0; // Private data member to store manager's consumption time in game loop.
+        int64_t manager_time = DEFAULT_START_TIME; // Private data member to store manager's consumption time in game loop.
 
     protected:
         std::string m_type;    // Manager type identifier.

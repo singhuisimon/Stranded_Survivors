@@ -1,35 +1,66 @@
 {
   "objects": [
     {
+      "name": "background",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "scale": [ 6000.0, 6000.0 ]
+        },
+        "Graphics_Component": {
+          "color": [ 0.5, 0.5, 0.5 ]
+        },
+        "Collision_Component": {
+          "width": 0,
+          "height": 0
+        }
+      }
+    },
+    {
+      "name": "platform1",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 100.0, 200.0 ],
+          "scale": [ 1800.0, 500.0 ]
+        },
+        "Collision_Component": {
+          "width": 1800.0,
+          "height": 500.0
+        }
+      }
+    },
+    {
+      "name": "platform2",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 1000.0, -1500.0 ],
+          "scale": [ 1800.0, 500.0 ]
+        },
+        "Collision_Component": {
+          "width": 1800.0,
+          "height": 500.0
+        }
+      }
+    },
+    {
+      "name": "dummy",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 300.0, -1000.0 ],
+          "scale": [ 500.0, 500.0 ]
+        },
+        "Graphics_Component": {
+          "color": [ 1.0, 0.0, 0.0 ]
+        }
+      }
+    },
+    {
       "name": "player1",
       "prefab": "player"
-    },
-    {
-      "name": "dummy_object1",
-      "prefab": "dummy_object",
-      "components": {
-        "Transform2D": {
-          "position": [ 100.0, 200.0 ]
-        }
-      }
-    },
-    {
-      "name": "dummy_object2",
-      "prefab": "dummy_object",
-      "components": {
-        "Transform2D": {
-          "position": [ 100.0, 200.0 ]
-        }
-      }
-    },
-    {
-      "name": "dummy_object3",
-      "prefab": "dummy_object",
-      "components": {
-        "Transform2D": {
-          "position": [ 100.0, 200.0 ]
-        }
-      }
     }
   ]
 }

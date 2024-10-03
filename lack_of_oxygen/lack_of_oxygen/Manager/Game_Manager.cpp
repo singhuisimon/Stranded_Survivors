@@ -18,6 +18,8 @@
 #include "Graphics_Manager.h"
 #include "Audio_Manager.h"
 
+#include "../Utility/Constant.h"
+
 // Include iostream for console output
 #include <iostream>
 #include <random>
@@ -33,7 +35,7 @@ namespace lof {
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
     Game_Manager& Game_Manager::get_instance() {
@@ -250,10 +252,10 @@ namespace lof {
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
 
         // Getting delta time for Audio Manager
-        //AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Audio Manager
         AM.update();
-        //AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - AM.get_time());
+        AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - AM.get_time());
 
         m_step_count++;
     }
