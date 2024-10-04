@@ -68,6 +68,16 @@ namespace lof
 		*/
 		Collision_System(ECS_Manager& ecs_manager);
 
+		
+		struct CollisionPair {
+		EntityID entity1;
+		EntityID entity2;
+		Vec2D overlap;
+		};
+
+		
+
+
 		/**
 		* @brief Check for intersection between rectangles
 		* @param aabb1 First AABB
@@ -104,6 +114,24 @@ namespace lof
 		* @return The Vec2D value can be use to resolve the collisions
 		*/
 		Vec2D Compute_Overlap(const AABB& aabb1, const AABB& aabb2);
+
+		/**
+		* @brief Check if the collsion is collide for every entities
+		* @param collisions A references to a vector of Collision pair object for their overlap information
+		* @param aabb2 Second aabb object
+		* @param delta_time The time for the last update
+
+		*/
+		void Collision_Check_Collide(std::vector<CollisionPair>& collisions, float delta_time);
+
+
+		/**
+		* @brief Resolve the collison if they have colllied and update the position and velocities of involved entities
+		* to resolve the collision and ensure they no longer overlap
+		* @param collisions A references to a vector of Collision pair object for their overlap information
+
+		*/
+		void Resolve_Collsion_Event(const std::vector<CollisionPair>& collisions);
 
 		/**
 		* @brief Resolve the collision between an dynamic object and static object for rectangle based on AABB
