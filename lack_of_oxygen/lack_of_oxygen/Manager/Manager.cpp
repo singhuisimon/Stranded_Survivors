@@ -48,4 +48,13 @@ namespace lof {
         return m_is_started;
     }
 
+    int64_t Manager::get_time() const {
+        return manager_time;
+    }
+
+    void Manager::set_time(int64_t time) {
+        // Change the value of private member variable manager_time
+        manager_time = time;
+    }
+
 } // namespace lof

@@ -58,7 +58,7 @@ namespace lof {
     };
 
     /**
-    * @brief Calculates and prints out the percentage of the given mamager/system's time with that of the entire game loop.
+    * @brief Calculates and prints out the percentage of the given managerm's time with that of the entire game loop.
     * @param gm_time Time consumption of the game loop (Game Manager's consumption time).
     * @param system_time Time consumption of the manager/system.
     * @param name Name of manager/system.

@@ -13,6 +13,7 @@
 
 // Include standard headers
 #include <string>
+#include "../Utility/Constant.h"
 
 namespace lof {
 
@@ -23,7 +24,7 @@ namespace lof {
     class System {
     private:
 
-        int64_t system_time = 0; // Private data member to store system's consumption time in game loop.
+        int64_t system_time = DEFAULT_START_TIME; // Private data member to store system's consumption time in game loop.
 
     public:
         /**
@@ -47,7 +48,7 @@ namespace lof {
          * @brief Virtual function to get the system time private member of the System class.
          * @return The system's consumption time.
          */
-        virtual int64_t get_time() const {
+        int64_t get_time() const {
             return system_time;
         }
 
@@ -55,7 +56,7 @@ namespace lof {
          * @brief Virtual function to set the system time private member of the System class.
          * @param time The value of time to set the private member variable.
          */
-        virtual void set_time(int64_t time) {
+        void set_time(int64_t time) {
             system_time = time;
         }
     };

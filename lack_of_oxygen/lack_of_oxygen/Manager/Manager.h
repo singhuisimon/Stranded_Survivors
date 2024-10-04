@@ -24,6 +24,7 @@ namespace lof {
     class Manager {
 
     private:
+
         int64_t manager_time = DEFAULT_START_TIME; // Private data member to store manager's consumption time in game loop.
 
     protected:
@@ -72,20 +73,16 @@ namespace lof {
 
 
         /**
-         * @brief Virtual function to get the manager_time private member of the Manager class.
+         * @brief Function to get the manager_time private member of the Manager class.
          * @return The manager's consumption time.
          */
-        virtual int64_t get_time() const {
-            return manager_time;
-        }
+        int64_t get_time() const;
 
         /**
-         * @brief Virtual function to set the manager_time private member of the System class.
+         * @brief Function to set the manager_time private member of the System class.
          * @param time The value of time to set the private member variable.
          */
-        virtual void set_time(int64_t time) {
-            manager_time = time;
-        }
+        void set_time(int64_t time);
     };
 
 } // namespace lof
