@@ -14,7 +14,6 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
-#include "../Utility/Constant.h"
 
 // Initialize Value
 float OVERLAP_X = 0.0f;
@@ -221,10 +220,7 @@ namespace lof
 	* @brief Collision System constructor which initialize the collision system with ECS manager
 	* @param ecs_maager Reference to ECS manager
 	*/
-	Collision_System::Collision_System(ECS_Manager& ecs_manager)
-		: ecs_manager(ecs_manager) {
-		set_time(DEFAULT_START_TIME);
-	}
+	Collision_System::Collision_System(ECS_Manager& ecs_manager): ecs_manager(ecs_manager) {}
 
 	/**
 	* @brief Check check if a point is within a box

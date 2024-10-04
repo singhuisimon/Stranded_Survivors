@@ -14,9 +14,7 @@
 
 namespace lof {
 
-    Render_System::Render_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {
-        set_time(DEFAULT_START_TIME);
-    }
+    Render_System::Render_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {}
 
     std::string Render_System::get_type() const {
         return "Render_System";

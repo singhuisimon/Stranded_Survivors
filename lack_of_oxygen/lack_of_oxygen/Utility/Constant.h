@@ -45,11 +45,11 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
-	// -----------------------------All System/Manager.cpp Files -------------------------------
+	// ------------------------- System.cpp and Manager.cpp Files -------------------------------
 	// System Performance Constants
 	constexpr int64_t DEFAULT_START_TIME = 0;
 
-	// ----------------------------- FPS.cpp -----------------------------------------
+	// ----------------------------------- FPS.cpp ----------------------------------------------
 	// System Performance Constants
 	constexpr float UPON_PERCENTAGE = 100.0f;
 	constexpr int DEBUG_LEFT_WIDTH = 17;

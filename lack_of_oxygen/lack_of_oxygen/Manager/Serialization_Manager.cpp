@@ -45,7 +45,6 @@ namespace lof {
         m_scr_height(DEFAULT_SCREEN_HEIGHT),
         m_fps_display_interval(DEFAULT_FPS_DISPLAY_INTERVAL) {
         set_type("Serialization_Manager");
-        set_time(DEFAULT_START_TIME);
 
         LM.write_log("Serialization_Manager::Serialization_Manager(): Initialized with default configurations.");
     }

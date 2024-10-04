@@ -21,7 +21,6 @@ namespace lof {
 	//constructor
 	Audio_Manager::Audio_Manager() : audio_system(nullptr), track1(nullptr), track2(nullptr), current_channel(nullptr) {
 		audio_system = new Audio_System();
-		set_time(DEFAULT_START_TIME);
 		set_type("Audio_Manager");
 	}
 

@@ -8,14 +8,10 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
-#include "../Utility/Constant.h"
 
 namespace lof {
 
-    Movement_System::Movement_System(ECS_Manager& ecs_manager)
-        : ecs(ecs_manager) {
-        set_time(DEFAULT_START_TIME);
-    }
+    Movement_System::Movement_System(ECS_Manager& ecs_manager): ecs(ecs_manager) {}
 
     void Movement_System::update(float delta_time) {
         // Iterate through all entities and update positions based on velocity
