@@ -334,9 +334,10 @@ namespace lof
 			//get the ID of the entity
 			EntityID entity_ID = entity_ptr->get_id();
 			//LM.write_log("Entity id %u",entity_ID);
+			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
 			//check if entity has a collision component
-			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>())) {
+			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>()) && !physic1.is_static) {
 				// LM.write_log("Entity id %u", entity_ID);
 
 				//get transform component
@@ -346,7 +347,6 @@ namespace lof
 				//get velocity component
 				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
 
-				auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
 
 				//create AABB based on transforrm and collision component for object 1

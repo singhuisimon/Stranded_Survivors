@@ -28,6 +28,7 @@
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Component_Parser.h" // Adding components from JSON
 #include "../Utility/Constant.h"
+#include "../Utility/Path_Helper.h"
 
 // Include standard headers
 #include <fstream>
@@ -65,25 +66,27 @@ namespace lof {
     int Serialization_Manager::start_up() {
         m_is_started = true;
 
-        // Load general configuration
-        if (!load_config(CONFIG_PATH)) { // Use CONFIG_PATH from Constant.h
-            LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", CONFIG_PATH);
-            return -1; // Error loading configuration file
+        // Load general configuration using Path_Helper
+        std::string config_path = Path_Helper::get_config_path();
+        if (!load_config(config_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
+            return -1;
         }
 
-        // Load prefabs
-        if (!load_prefabs(PREFABS_PATH)) { // Use PREFABS_PATH from Constant.h
-            LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", PREFABS_PATH);
-            return -2; // Error loading prefab file
+        // Load prefabs using Path_Helper
+        std::string prefabs_path = Path_Helper::get_prefabs_path();
+        if (!load_prefabs(prefabs_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
+            return -2;
         }
 
-        // Load scene file
-        if (!load_scene(SCENE_PATH)) { // Use SCENE_PATH from Constant.h
-            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", SCENE_PATH);
-            return -3; // Error loading scene file
+        // Load scene file using Path_Helper
+        std::string scene_path = Path_Helper::get_scene_path();
+        if (!load_scene(scene_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
+            return -3;
         }
 
-        // All files loaded successfully
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
     }

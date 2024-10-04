@@ -9,6 +9,7 @@
  */
 
 #include "../Manager/Audio_Manager.h"
+#include "../Utility/Path_Helper.h"
 
 namespace lof {
 
@@ -43,8 +44,11 @@ namespace lof {
 			return -1;
 		}
 
+		const std::string music_path1 = Path_Helper::get_music_path1();
+		const std::string music_path2 = Path_Helper::get_music_path2();
+
 		//load the background music
-		this->load_bgm(MUSICPATH1, MUSICPATH2);
+		this->load_bgm(music_path1, music_path2);
 
 		m_is_started = true;
 		return 0;
