@@ -206,7 +206,10 @@ namespace lof {
 
     }; 
 
-
+    /**
+    * @class Collision_Component
+    * @brief Component representing an entity's component data.
+    */
     class Collision_Component : public Component
     {
     public:
