@@ -26,7 +26,7 @@ namespace lof {
         for (const auto& entity_ptr : ecs_manager.get_entities()) {
             EntityID entity_id = entity_ptr->get_id();
 
-            // Check if the entity has Graphics, Transform and Collision components 
+            // Check if the entity has Graphics and Transform components
             if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) &&
                 entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) {
 
@@ -135,7 +135,7 @@ namespace lof {
         for (const auto& entity_ptr : ecs_manager.get_entities()) {
             EntityID entity_id = entity_ptr->get_id();
 
-            // Check if the entity has Graphics, Transform and Collision components 
+            // Check if the entity has Graphics and Transform components 
             if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) &&
                 entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) {
 
