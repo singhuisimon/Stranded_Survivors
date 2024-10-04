@@ -17,7 +17,6 @@
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
 #include "Audio_Manager.h"
-
 #include "../Utility/Constant.h"
 
 // Include iostream for console output
@@ -26,11 +25,6 @@
 #include <chrono>
 
 namespace lof {
-
-
-    /*int64_t ecs_time = 0;
-    int64_t graphics_time = 0;
-    int64_t im_time = 0;*/
 
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {

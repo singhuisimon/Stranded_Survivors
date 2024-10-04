@@ -17,6 +17,7 @@
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 20.0,
           "is_static": false,
+          "is_moveable": true,
           "is_grounded": false,
           "is_jumping": false,
           "jump_force": 10000.0
@@ -54,6 +55,7 @@
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 2.0,
           "is_static": true,
+          "is_moveable": false,
           "is_grounded": false,
           "is_jumping": false,
           "jump_force": 0.0

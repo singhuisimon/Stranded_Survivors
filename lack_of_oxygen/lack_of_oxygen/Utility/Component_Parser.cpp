@@ -65,6 +65,7 @@ namespace lof {
                 ecs_manager.add_component<Velocity_Component>(entity, velocity);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Velocity_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Physics_Component -------------------------------------------
             else if (component_name == "Physics_Component") {
                 // Parse Physics_Component
                 Physics_Component physics_component;
@@ -95,6 +96,10 @@ namespace lof {
 
                 if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
                     physics_component.is_static = component_data["is_static"].GetBool();
+                }
+
+                if (component_data.HasMember("is_moveable") && component_data["is_moveable"].IsBool()) {
+                    physics_component.is_moveable = component_data["is_moveable"].GetBool();
                 }
 
                 if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
