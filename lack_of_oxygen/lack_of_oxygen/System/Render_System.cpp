@@ -1,6 +1,6 @@
 /**
  * @file Render_System.cpp
- * @brief Implements the Render_System class for the ECS that 
+ * @brief Implements the Render_System class for the ECS that
  *        updates the transformation and rendering details of the entity.
  * @author Chua Wen Bin Kenny (100%)
  * @date September 18, 2024
@@ -14,9 +14,7 @@
 
 namespace lof {
 
-    Render_System::Render_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {
-        set_time(DEFAULT_START_TIME);
-    }
+    Render_System::Render_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {}
 
     std::string Render_System::get_type() const {
         return "Render_System";
@@ -29,44 +27,43 @@ namespace lof {
             EntityID entity_id = entity_ptr->get_id();
 
             // Check if the entity has Graphics, Transform and Collision components 
-            if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) && 
-                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>()) &&
-                entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>())) { 
+            if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) &&
+                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) {
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
-                auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);
 
                 // Update component if debug mode is ON
                 if (GFXM.get_debug_mode() == GL_TRUE) {
                     if (entity_id != 0) { // Temporary object background unaffected
                         // Scaling update when up or down arrow key pressed
-                        GLfloat scale_change = DEFAULT_SCALE_CHANGE * (GLfloat)delta_time; 
+                        auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);
+                        GLfloat scale_change = DEFAULT_SCALE_CHANGE * (GLfloat)delta_time;
                         if (IM.is_key_held(GLFW_KEY_UP)) {
                             LM.write_log("Render_System::update(): 'UP' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
                             transform.scale.x += scale_change;
                             transform.scale.y += scale_change;
-                            collision.width   += scale_change;
-                            collision.height  += scale_change;
+                            collision.width += scale_change;
+                            collision.height += scale_change;
                         }
                         else if (IM.is_key_held(GLFW_KEY_DOWN)) {
                             LM.write_log("Render_System::update(): 'DOWN' key pressed, scale of entity %u decreased by %f.", entity_id, scale_change);
                             if (transform.scale.x > 0.0f) {
                                 transform.scale.x -= scale_change;
-                                collision.width   -= scale_change;  
+                                collision.width -= scale_change;
                             }
                             else {
                                 transform.scale.x = 0.0f;
-                                collision.width   = 0.0f;
+                                collision.width = 0.0f;
                             }
 
                             if (transform.scale.y > 0.0f) {
                                 transform.scale.y -= scale_change;
-                                collision.height  -= scale_change;
+                                collision.height -= scale_change;
                             }
                             else {
                                 transform.scale.y = 0.0f;
-                                collision.height  = 0.0f;
+                                collision.height = 0.0f;
                             }
                         }
 
@@ -127,7 +124,7 @@ namespace lof {
         default:
             break;
         }
-        
+
         // Draw all objects
         Render_System::draw();
     }
@@ -139,14 +136,11 @@ namespace lof {
             EntityID entity_id = entity_ptr->get_id();
 
             // Check if the entity has Graphics, Transform and Collision components 
-            if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) && 
-                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>()) && 
-                entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>())) { 
+            if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) &&
+                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) {
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);        // For Debugging
-                auto& velocity = ecs_manager.get_component<Velocity_Component>(entity_id);  // For Debugging 
-                auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);// For Debugging
 
                 // Get shaders and models container 
                 auto& shaders = GFXM.get_shader_program_storage();
@@ -180,17 +174,22 @@ namespace lof {
 
                 // Render objects
                 if (entity_id == 0) { // Set background object to always render in fill mode
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                     glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
                     glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode());
                 }
                 else {
-                    glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL); 
+                    glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
                 }
 
                 // Draw debugging features if debug mode is ON
-                if (GFXM.get_debug_mode() == GL_TRUE) { 
+                
+                if (GFXM.get_debug_mode() == GL_TRUE) {
                     if (entity_id != 0) { // Background object unaffected               
+                        auto& velocity = ecs_manager.get_component<Velocity_Component>(entity_id);  // For Debugging  
+                        auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);// For Debugging
+
+                        
                         std::vector<glm::mat3> box_mdl_to_ndc_xform;
 
                         // Compute mdl_to_ndc_xform for each line of AABB box
@@ -207,7 +206,7 @@ namespace lof {
                                                     0, 0, 1 };
 
                             // Compute current orientation of each line 
-                            GLfloat AABB_rad_disp = glm::radians(i * DEFAULT_ROTATION); 
+                            GLfloat AABB_rad_disp = glm::radians(i * DEFAULT_ROTATION);
 
                             // Compute line rotational matrix 
                             glm::mat3 AABB_rot_mat{ glm::cos(AABB_rad_disp), glm::sin(AABB_rad_disp), 0,
@@ -237,7 +236,7 @@ namespace lof {
 
                         // Drawing AABB box line by line
                         for (std::size_t i = 0; i < 4; ++i) {
-                            glLineWidth(DEFAULT_AABB_WIDTH); 
+                            glLineWidth(DEFAULT_AABB_WIDTH);
                             glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
                             glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
 
@@ -255,7 +254,7 @@ namespace lof {
                                                  0, 0, 1 };
 
                             // compute current orientation of line
-                            GLfloat direction{ 0.0f }; 
+                            GLfloat direction{ 0.0f };
                             if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
                                 if (velocity.velocity.x > 0.0f) {
                                     direction = -DEFAULT_ROTATION; // Move right 

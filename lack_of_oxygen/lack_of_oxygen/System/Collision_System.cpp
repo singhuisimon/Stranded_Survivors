@@ -3,6 +3,10 @@
  * @brief Implements the collsion system.
  * @author Saw Hui Shan
  * @date September 21, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+
  */
 
  // Include standard headers
@@ -14,7 +18,6 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
-#include "../Utility/Constant.h"
 
 // Initialize Value
 float OVERLAP_X = 0.0f;
@@ -221,10 +224,7 @@ namespace lof
 	* @brief Collision System constructor which initialize the collision system with ECS manager
 	* @param ecs_maager Reference to ECS manager
 	*/
-	Collision_System::Collision_System(ECS_Manager& ecs_manager)
-		: ecs_manager(ecs_manager) {
-		set_time(DEFAULT_START_TIME);
-	}
+	Collision_System::Collision_System(ECS_Manager& ecs_manager): ecs_manager(ecs_manager) {}
 
 	/**
 	* @brief Check check if a point is within a box
@@ -442,6 +442,107 @@ namespace lof
 		Collision_System::Collision_Check_Collide(collisions, delta_time); // Check for collisions and fill the collision list
 		Collision_System::Resolve_Collsion_Event(collisions);
 		
+		//Iterate all the entities in ecs_manager
+		for (const auto& entity_ptr : ecs_manager.get_entities())
+		{
+			//get the ID of the entity
+			EntityID entity_ID = entity_ptr->get_id();
+			//LM.write_log("Entity id %u",entity_ID);
+			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
+
+			//check if entity has a collision component
+			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>()) && !physic1.is_static) {
+				// LM.write_log("Entity id %u", entity_ID);
+
+				//get transform component
+				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
+				//get collision component
+				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
+				//get velocity component
+				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
+
+
+
+				//create AABB based on transforrm and collision component for object 1
+				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
+				
+				//check for collision for all other entities
+				for (const auto& other_entity_ptr : ecs_manager.get_entities())
+				{
+					//if they are the same entity skip
+					if (entity_ptr == other_entity_ptr)
+					{
+						continue;
+					}
+
+					//check if other entity has a collision component
+					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
+					{
+						EntityID Other_Entity_ID = other_entity_ptr->get_id();
+			
+						//get other transform component 
+						auto& transform2 = ecs_manager.get_component<Transform2D>(Other_Entity_ID);
+
+						//get collision component
+						auto& collision2 = ecs_manager.get_component<Collision_Component>(Other_Entity_ID);
+
+						//get velocity component
+						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
+
+						
+						//create AABB for other entity
+						AABB aabb2 = AABB::from_Tranform(transform2, collision2);
+						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
+
+						float collision_time = delta_time;// 0.0f;
+
+						//check intersecption between two entities, and consider their vel
+						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
+						{
+
+							if (velocity1.velocity.x == 0.0f && velocity1.velocity.y == 0.0f &&
+								velocity2.velocity.x == 0.0f && velocity2.velocity.y == 0.0f) {
+								// If both objects are stationary, skip collision check
+								continue;
+							}
+							if (IM.is_key_held(GLFW_KEY_M))
+							LM.write_log("Collision_Syetem::update():Yes, Collision is detected.");
+							
+							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
+
+							if (Overlap.y > 0) {
+								velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
+								physic1.is_grounded = true;   // Entity is now grounded
+							}
+
+							// Determine if there is an overlap
+							if (Overlap.x > 0 && Overlap.y > 0) 
+							{
+								// Collision detected, stop both objects
+								velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
+								velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
+								physic1.is_grounded = true;
+
+					
+								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
+								if (physic1.is_grounded)
+								{
+									physic1.is_jumping = false;
+								}
+								
+							}
+
+						}
+						else if (IM.is_key_held(GLFW_KEY_M))
+						{
+							LM.write_log("Collision_Syetem::update():No, Collision is not detected.");
+						}
+					}
+
+				}
+
+			}
+		}
 	}
 
 	/**

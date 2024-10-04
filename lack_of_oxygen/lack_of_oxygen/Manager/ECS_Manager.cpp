@@ -28,7 +28,6 @@
 
 // Include Component_Parser for adding components from JSON
 #include "../Utility/Component_Parser.h"
-#include "../Utility/Constant.h"
 
 // Include standard headers
 #include <algorithm>
@@ -46,7 +45,6 @@ namespace lof {
     ECS_Manager::ECS_Manager() {
         set_type("ECS_Manager");
         m_is_started = false;
-        set_time(DEFAULT_START_TIME);
     }
 
     int ECS_Manager::start_up() {
