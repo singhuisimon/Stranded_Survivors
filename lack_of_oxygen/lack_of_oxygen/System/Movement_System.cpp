@@ -23,7 +23,7 @@ namespace lof {
         for (const auto& entity : entities) {
             EntityID id = entity->get_id();
 
-
+            
             // Check if entity has both Transform2D, Velocity_Component
             if (entity->has_component(ecs.get_component_id<Transform2D>()) &&
                 entity->has_component(ecs.get_component_id<Velocity_Component>()) &&
@@ -34,72 +34,64 @@ namespace lof {
                 Velocity_Component& velocity = ecs.get_component<Velocity_Component>(id);
                 Physics_Component& physics = ecs.get_component<Physics_Component>(id);
 
-                if (physics.is_static) continue;
+                //skip non movable entities platforms
+                if (!physics.is_moveable) continue;
 
-                std::cout << "Entity " << id << "is_grounded = " << physics.is_grounded 
-                    << ", is_jumping = " << physics.is_jumping << std::endl;
-
-                // Handle jumping
-                if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
-
-                   // Apply jump force
-                   velocity.velocity.y = physics.jump_force;
-
-                   physics.is_jumping = true; // Mark as jumping
-                   physics.is_grounded = false; // Leave the ground
-                }
-               
-
-                // Apply gravity if the entity is not grounded
-                if (!physics.is_grounded) {
-
-                    std::cout << "Player is not grounded \n"; 
+                // apply gravity to all movable entities
+                    //apply gravity 
                     velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
-                }
-                if (physics.is_grounded) {
-                    //velocity.velocity.y = 0.0f; //reset the vertical velocity
 
-                    physics.gravity.y = 0.0f;
-                }
-                else {
-                    physics.gravity.y = DEFAULT_GRAVITY;
-                    physics.is_grounded = false;
-                }
+                    std::cout << "Velocity Y of the player = " << velocity.velocity.y << std::endl;
 
-                if (physics.is_grounded) {
-                    //velocity.velocity.y = 0.0f; //reset the vertical velocity
+                    if (physics.is_grounded) {
+                        velocity.velocity.y = 0.0f;
+                    }
 
-                    physics.gravity.y = 0.0f;
-                }
-                else {
-                    physics.gravity.y = DEFAULT_GRAVITY;
-                    physics.is_grounded = false;
-                }
+                
+
+                //apply gravity to non-static movable (player)
+                    if (!physics.is_static) {
+
+                        std::cout << "Entity " << id << "is_grounded = " << physics.is_grounded
+                            << ", is_jumping = " << physics.is_jumping << std::endl;
+
+                        // Handle jumping
+                        if (IM.is_key_held(GLFW_KEY_SPACE) && physics.is_grounded && !physics.is_jumping) {
+
+                            // Apply jump force
+                            velocity.velocity.y = physics.jump_force;
+
+                            physics.is_jumping = true; // Mark as jumping
+                            physics.is_grounded = false; // Leave the ground
+                        }
 
 
+                        //check for keyboard input
+                        if (IM.is_key_held(GLFW_KEY_A)) {
 
-                //check for keyboard input
-                if (IM.is_key_held(GLFW_KEY_A)) {
+                            velocity.velocity.x = -DEFAULT_SPEED;//move left
 
-                    velocity.velocity.x = -DEFAULT_SPEED;//move left
+                        }
+                        else if (IM.is_key_held(GLFW_KEY_D)) {
 
-                }
-                else if (IM.is_key_held(GLFW_KEY_D)) {
+                            velocity.velocity.x = DEFAULT_SPEED;  //move right
 
-                    velocity.velocity.x = DEFAULT_SPEED;  //move right
+                        }
+                        else {
+                            velocity.velocity.x = 0;
+                        }
 
-                }
-                else {
-                    velocity.velocity.x = 0;
-                }
+                    }
 
-                //calculate the acceleration 
+                    //calculate the acceleration 
 
-                Vec2D total_force = physics.accumulated_force + (physics.gravity * physics.mass); // F = ma = mg; g as acceleration: a(g) = F / m;
-                Vec2D acceleration = total_force * physics.inv_mass; // F = ma; a = F / m;
+                    Vec2D total_force = physics.accumulated_force + (physics.gravity * physics.mass); // F = ma = mg; g as acceleration: a(g) = F / m;
+                    Vec2D acceleration = total_force * physics.inv_mass; // F = ma; a = F / m;
 
-                //update velocity according to the acceleration on each entity
-                velocity.velocity += acceleration * delta_time;
+                    //update velocity according to the acceleration on each entity
+                    velocity.velocity += acceleration * delta_time;
+
+                
 
 
                 //dampen velocity
@@ -125,10 +117,11 @@ namespace lof {
                 //update the position 
                 transform.position += velocity.velocity * delta_time;
 
+
+                std::cout << "Player's position ( " << transform.position.x << ", " << transform.position.y << ")\n";
                 //reset the accumulated force 
                 physics.reset_forces(); 
 
- 
             }
         }
     }
@@ -139,4 +132,6 @@ namespace lof {
         return "Movement_System";
     }
 
-} // namespace lof
+}
+
+// namespace lof
