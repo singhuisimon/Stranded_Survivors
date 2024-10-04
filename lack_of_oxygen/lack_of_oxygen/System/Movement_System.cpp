@@ -108,6 +108,8 @@ namespace lof {
 
                 //reset the accumulated force 
                 physics.reset_forces();
+                physics.is_grounded = false;
+                physics.is_jumping = false;
 
             }
         }
