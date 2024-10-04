@@ -105,6 +105,7 @@ namespace lof {
         float mass; //mass of entity
         float inv_mass;
         bool is_static; //to check if the entity is static or not
+        bool is_moveable; //to check if the entity is moveable or not
 
         bool is_grounded; //to indicate whether the entity is on the ground
         bool is_jumping; //to indicate whether the entity is jumping
@@ -121,6 +122,7 @@ namespace lof {
             float max_velocity = DEFAULT_MAX_VELOCITY,
             float mass = 1.0f,
             bool is_static = false, 
+            bool is_moveable = false,
             float jump_force = DEFAULT_JUMP_FORCE ) //adjust later
 
             : gravity(gravity),
@@ -130,6 +132,7 @@ namespace lof {
             mass(mass),
             inv_mass((mass > 0.0f) ? 1.0f / mass : 0.0f),
             is_static(is_static),
+            is_moveable(is_moveable),
             is_grounded(false),
             is_jumping(false),
             jump_force(jump_force) {}
