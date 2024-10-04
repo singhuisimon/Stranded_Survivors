@@ -42,19 +42,6 @@
       }
     },
     {
-      "name": "dummy",
-      "prefab": "dummy_object",
-      "components": {
-        "Transform2D": {
-          "position": [ 300.0, -1000.0 ],
-          "scale": [ 500.0, 500.0 ]
-        },
-        "Graphics_Component": {
-          "color": [ 1.0, 0.0, 0.0 ]
-        }
-      }
-    },
-    {
       "name": "player1",
       "prefab": "player"
     }
