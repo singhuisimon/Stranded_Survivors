@@ -8,13 +8,13 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
-
+#include "../Utility/Constant.h"
 
 namespace lof {
 
     Movement_System::Movement_System(ECS_Manager& ecs_manager)
         : ecs(ecs_manager) {
-        set_time(0);   
+        set_time(DEFAULT_START_TIME);
     }
 
     void Movement_System::update(float delta_time) {
@@ -36,34 +36,36 @@ namespace lof {
 
                 if (physics.is_static) continue;
 
-                //apply speed 
-                float speed = 500.f; 
+                // Handle jumping
+                if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
 
-        
-                 // Update position based on velocity and delta_time and input
-                if (IM.is_key_held(GLFW_KEY_W)) {
+                    // Apply jump force
+                    velocity.velocity.y = physics.jump_force;
 
-                    velocity.velocity.y = speed; 
+                    //update the position 
+                    transform.position += velocity.velocity * delta_time;
 
+
+                   physics.is_jumping = true; // Mark as jumping
+                   physics.is_grounded = false; // Leave the ground
                 }
-                else if (IM.is_key_held(GLFW_KEY_S)) {
+               
 
-                    velocity.velocity.y = -speed;
+                // Apply gravity if the entity is not grounded
+                if (!physics.is_grounded) {
 
+                    velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
                 }
-                else {
-                    velocity.velocity.y = 0; 
-                }
 
-
+                //check for keyboard input
                 if (IM.is_key_held(GLFW_KEY_A)) {
 
-                    velocity.velocity.x = -speed;
+                    velocity.velocity.x = -DEFAULT_SPEED;//move left
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_D)) {
 
-                    velocity.velocity.x = speed;
+                    velocity.velocity.x = DEFAULT_SPEED;  //move right
 
                 }
                 else {
@@ -85,6 +87,8 @@ namespace lof {
 
                 transform.position += velocity.velocity * delta_time;
 
+ 
+
 
                 //clamp velocity to max velocity 
                 float squared_velocity = square_length_vec2d(velocity.velocity);
@@ -96,11 +100,9 @@ namespace lof {
                 // length of entity's velocity > max_velocity
                 if (squared_velocity > squared_max_vel) {
 
-
                         Vec2D normalize_result;
                         normalize_vec2d(normalize_result, velocity.velocity);
                         velocity.velocity = normalize_result * physics.max_velocity;
-
 
                 }
 

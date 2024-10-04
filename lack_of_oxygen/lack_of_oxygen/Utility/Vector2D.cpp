@@ -1,8 +1,11 @@
 /**
  * @file Vector2D.cpp
- * @brief Declarations for the construction of struct Vector 2D
- * @author Amanda Leow Boon Suan
+ * @brief Defintion for the functions in struct Vector 2D.
+ * @author Amanda Leow Boon Suan (100%)
  * @date September 20, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #include "Vector2D.h"
@@ -30,6 +33,7 @@ namespace lof {
 		return *this;
 	}
 
+	//!
 	Vec2D::Vec2D(const Vec2D& rhs) {
 		x = rhs.x;
 		y = rhs.y;

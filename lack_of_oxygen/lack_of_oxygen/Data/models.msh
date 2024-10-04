@@ -1,12 +1,24 @@
-m square    # prefix m indicates model
-v -0.5 -0.5 # prefix v indicates vertex position attribute
-v 0.5 -0.5  # my attributes: -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5. s 2 0 s 3 1
-v 0.5 0.5
+m line		# prefix m indicates model
+v 0.0 -0.5  # prefix v indicates vertex position attribute
+v 0.0 0.5 
+i 0 1		# prefix i indicates vertex index 
+l			# prefix l = GL_LINES, t = GL_TRIANGLES, f = GL_TRIANGLE_FAN, s = GL_TRIANGLE_STRIP. These are ways which triangle primitives are rendered as
+e			# prefix e indicates end of model data
+m debug_line
+v 0.0 0.0
+v 0.0 0.5 
+i 0 1
+l
+e
+m square    
+v -0.5 -0.5 
+v 0.5 -0.5  
 v -0.5 0.5
-i 0 1 2     # prefix i indicates vertex index 
-i 2 3 0     
-t			# prefix t = GL_TRIANGLES, f = GL_TRIANGLE_FAN, s = GL_TRIANGLE_STRIP
-e			# these are ways which triangle primitives are rendered as
+v 0.5 0.5
+i 2 0		
+i 3 1     
+s			
+e	
 m triangle
 v -0.5 -0.5 
 v 0.5 -0.5

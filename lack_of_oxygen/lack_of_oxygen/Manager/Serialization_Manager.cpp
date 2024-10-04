@@ -1,11 +1,13 @@
 /**
  * @file Serialization_Manager.cpp
  * @brief Implements the Serialization_Manager class methods.
- * @date September 21, 2024
+ * @author Simon Chan
+ * @date September 22, 2024
  * Copyright (C) 20xx DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
  // Include header file
 #include "Serialization_Manager.h"
 
@@ -30,70 +32,82 @@
 // Include standard headers
 #include <fstream>
 #include <sstream>
-#include <windows.h> // For GetModuleFileNameA
-#include <unordered_map>
-#include <string>
-
-namespace {
-    /**
-     * @brief Retrieves the directory of the executable.
-     * @return The executable's directory as a string.
-     */
-    std::string get_executable_directory() {
-        char buffer[MAX_PATH];
-        GetModuleFileNameA(NULL, buffer, MAX_PATH);
-        std::string::size_type pos = std::string(buffer).find_last_of("\\/");
-        return std::string(buffer).substr(0, pos);
-    }
-}
+#include <cassert>
 
 namespace lof {
 
+    /**
+     * @brief Private constructor for the singleton pattern.
+     * Initializes member variables with default values.
+     */
     Serialization_Manager::Serialization_Manager()
         : m_scr_width(DEFAULT_SCREEN_WIDTH),
         m_scr_height(DEFAULT_SCREEN_HEIGHT),
-        m_fps_display_interval(DEFAULT_FPS_DISPLAY_INTERVAL),
-        m_data_directory(BASE_DATA_DIR) { // Initialize m_data_directory
+        m_fps_display_interval(DEFAULT_FPS_DISPLAY_INTERVAL) {
         set_type("Serialization_Manager");
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
+
+        LM.write_log("Serialization_Manager::Serialization_Manager(): Initialized with default configurations.");
     }
 
+    /**
+     * @brief Retrieves the singleton instance of Serialization_Manager.
+     * @return Reference to the singleton instance.
+     */
     Serialization_Manager& Serialization_Manager::get_instance() {
         static Serialization_Manager instance;
         return instance;
     }
 
+    /**
+     * @brief Starts up the Serialization_Manager by loading configuration, prefabs, and scene files.
+     * @return 0 on success, negative value on failure.
+     */
     int Serialization_Manager::start_up() {
         m_is_started = true;
 
         // Load general configuration
-        if (!load_config(CONFIG_PATH)) {
+        if (!load_config(CONFIG_PATH)) { // Use CONFIG_PATH from Constant.h
             LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", CONFIG_PATH);
             return -1; // Error loading configuration file
         }
 
         // Load prefabs
-        if (!load_prefabs(PREFABS_PATH)) {
+        if (!load_prefabs(PREFABS_PATH)) { // Use PREFABS_PATH from Constant.h
             LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", PREFABS_PATH);
             return -2; // Error loading prefab file
         }
 
         // Load scene file
-        if (!load_scene(SCENE_PATH)) {
+        if (!load_scene(SCENE_PATH)) { // Use SCENE_PATH from Constant.h
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", SCENE_PATH);
             return -3; // Error loading scene file
         }
+
         // All files loaded successfully
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
     }
 
+    /**
+     * @brief Shuts down the Serialization_Manager by clearing loaded data and caches.
+     */
     void Serialization_Manager::shut_down() {
         LM.write_log("Serialization_Manager::shut_down(): Shutting down Serialization_Manager.");
         m_document.SetNull();           // Clear the document
+        m_prefab_map.clear();           // Clear the prefab cache
         m_is_started = false;
     }
 
+    /**
+     * @brief Merges two JSON objects. Source object's members are merged into the destination object.
+     * If a member exists in both objects and both are objects, the merge is performed recursively.
+     * Otherwise, the destination's member is overwritten by the source's member.
+     *
+     * @param source The source JSON object to merge from.
+     * @param destination The destination JSON object to merge into.
+     * @param allocator The RapidJSON allocator to use for memory management.
+     */
     void Serialization_Manager::merge_objects(const rapidjson::Value& source,
         rapidjson::Value& destination,
         rapidjson::Document::AllocatorType& allocator) {
@@ -125,15 +139,19 @@ namespace lof {
         }
     }
 
-    bool Serialization_Manager::load_config(const std::string& filename) {
-        // Log the full path being used
-        std::string full_path = get_executable_directory() + "\\" + filename;
-        LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", full_path.c_str());
+    /**
+     * @brief Loads the configuration file and initializes screen settings and FPS display interval.
+     *
+     * @param filepath The complete path to the configuration file.
+     * @return True if loading and parsing are successful, false otherwise.
+     */
+    bool Serialization_Manager::load_config(const char* filepath) {
+        LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
 
         // Read the JSON file into a string
-        std::ifstream ifs(full_path);
+        std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_config(): Failed to open configuration file: %s", full_path.c_str());
+            LM.write_log("Serialization_Manager::load_config(): Failed to open configuration file: %s", filepath);
             return false;
         }
 
@@ -180,19 +198,24 @@ namespace lof {
         else {
             LM.write_log("Serialization_Manager::load_config(): FPS_DISPLAY_INTERVAL is missing or not a number. Using default value: %.2f", m_fps_display_interval);
         }
-        LM.write_log("Serialization_Manager::load_config(): Configuration loaded successfully");
+
+        LM.write_log("Serialization_Manager::load_config(): Configuration loaded successfully.");
         return true;
     }
 
-    bool Serialization_Manager::load_prefabs(const std::string& filename) {
-        // Construct the full path to the prefab file
-        std::string prefab_path = get_executable_directory() + "\\" + filename;
-        LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", prefab_path.c_str());
+    /**
+     * @brief Loads the prefab file and caches the prefab definitions for quick access.
+     *
+     * @param filepath The complete path to the prefab file.
+     * @return True if loading and parsing are successful, false otherwise.
+     */
+    bool Serialization_Manager::load_prefabs(const char* filepath) {
+        LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
 
         // Read and parse the prefab file
-        std::ifstream ifs(prefab_path);
+        std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_prefabs(): Failed to open prefab file: %s", prefab_path.c_str());
+            LM.write_log("Serialization_Manager::load_prefabs(): Failed to open prefab file: %s", filepath);
             return false;
         }
 
@@ -228,19 +251,23 @@ namespace lof {
             LM.write_log("Serialization_Manager::load_prefabs(): Loaded prefab '%s' into cache.", prefab_name.c_str());
         }
 
-        LM.write_log("Serialization_Manager::load_prefabs(): Prefabs loaded successfully");
+        LM.write_log("Serialization_Manager::load_prefabs(): Prefabs loaded successfully.");
         return true;
     }
 
-    bool Serialization_Manager::load_scene(const std::string& filename) {
-        // Construct the full path to the scene file
-        std::string full_path = get_executable_directory() + "\\" + filename;
-        LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", full_path.c_str());
+    /**
+     * @brief Loads the scene file, creates entities, and assigns components based on the scene and prefabs.
+     *
+     * @param filename The complete path to the scene file.
+     * @return True if loading and parsing are successful, false otherwise.
+     */
+    bool Serialization_Manager::load_scene(const char* filename) {
+        LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
 
         // Read and parse the scene file
-        std::ifstream ifs(full_path);
+        std::ifstream ifs(filename);
         if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_scene(): Failed to open scene file: %s", full_path.c_str());
+            LM.write_log("Serialization_Manager::load_scene(): Failed to open scene file: %s", filename);
             return false;
         }
 
@@ -274,7 +301,7 @@ namespace lof {
                 entity_name = obj["name"].GetString();
             }
             else {
-                LM.write_log("Serialization_Manager::load_scene(): Entity at index %u is missing 'name' or 'name' is not a string. Skipping.", i);
+                LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Skipping.", i);
                 continue;
             }
 
@@ -316,26 +343,46 @@ namespace lof {
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
         }
 
-        LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", full_path.c_str());
+        LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
     }
 
-    // Getter functions
+    /**
+     * @brief Retrieves the screen width from the configuration.
+     *
+     * @return Screen width as an unsigned integer.
+     */
     unsigned int Serialization_Manager::get_scr_width() const {
         LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
         return m_scr_width;
     }
 
+    /**
+     * @brief Retrieves the screen height from the configuration.
+     *
+     * @return Screen height as an unsigned integer.
+     */
     unsigned int Serialization_Manager::get_scr_height() const {
         LM.write_log("Serialization_Manager::get_scr_height(): Returning SCR_HEIGHT: %u", m_scr_height);
         return m_scr_height;
     }
 
+    /**
+     * @brief Retrieves the FPS display interval from the configuration.
+     *
+     * @return FPS display interval as a float.
+     */
     float Serialization_Manager::get_fps_display_interval() const {
         LM.write_log("Serialization_Manager::get_fps_display_interval(): Returning FPS_DISPLAY_INTERVAL: %.2f", m_fps_display_interval);
         return m_fps_display_interval;
     }
 
+    /**
+     * @brief Retrieves a prefab's JSON configuration by its name.
+     *
+     * @param prefab_name The name of the prefab to retrieve.
+     * @return A constant pointer to the prefab's JSON value if found; otherwise, nullptr.
+     */
     const rapidjson::Value* Serialization_Manager::get_prefab(const std::string& prefab_name) const {
         auto it = m_prefab_map.find(prefab_name);
         if (it != m_prefab_map.end()) {

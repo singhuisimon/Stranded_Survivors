@@ -1,11 +1,13 @@
 /**
  * @file Serialization_Manager.h
  * @brief Defines the Serialization_Manager class for handling serialization and configuration data.
+ * @author Simon Chan
  * @date September 22, 2024
  * Copyright (C) 20xx DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
 #ifndef LOF_SERIALIZATION_MANAGER_H
 #define LOF_SERIALIZATION_MANAGER_H
 
@@ -21,8 +23,6 @@
 
 // Include standard headers
 #include <string>
-#include <vector>
-#include <memory>
 #include <unordered_map>
 
 namespace lof {
@@ -30,6 +30,8 @@ namespace lof {
     /**
      * @class Serialization_Manager
      * @brief Manages loading and providing access to configuration and serialization data.
+     *
+     * This class follows the Singleton pattern to ensure a single instance throughout the application's lifecycle.
      */
     class Serialization_Manager : public Manager {
     private:
@@ -41,9 +43,6 @@ namespace lof {
         unsigned int m_scr_height;
         float m_fps_display_interval;
 
-        // Data directory path
-        std::string m_data_directory;
-
         // RapidJSON document for general configuration
         rapidjson::Document m_document;
 
@@ -51,14 +50,15 @@ namespace lof {
         std::unordered_map<std::string, rapidjson::Value> m_prefab_map;
 
         // Helper function to load the prefab file
-        bool load_prefabs(const std::string& filename);
+        bool load_prefabs(const char* filepath);
 
-        // Helper functions to load configuration file
-        bool load_config(const std::string& filename);
+        // Helper function to load configuration file
+        bool load_config(const char* filepath);
 
         // Helper function to merge two JSON objects
-        void merge_objects(const rapidjson::Value& source, 
-            rapidjson::Value& destination, rapidjson::Document::AllocatorType& allocator);
+        void merge_objects(const rapidjson::Value& source,
+            rapidjson::Value& destination,
+            rapidjson::Document::AllocatorType& allocator);
 
     public:
         /**
@@ -87,7 +87,7 @@ namespace lof {
          * @param filename The path to the scene file.
          * @return True on success, false on failure.
          */
-        bool load_scene(const std::string& filename);
+        bool load_scene(const char* filename);
 
         /**
          * @brief Get the screen width from the configuration.

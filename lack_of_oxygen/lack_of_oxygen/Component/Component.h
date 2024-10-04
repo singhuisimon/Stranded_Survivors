@@ -15,8 +15,10 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+
 // Include Utility headers
 #include "../Utility/Vector2D.h"
+#include "../Utility/Constant.h"
 
 // FOR TESTING 
 #include "../Glad/glad.h"
@@ -51,15 +53,15 @@ namespace lof {
      */
     class Transform2D : public Component {
     public:
-        Vec2D position;  ///< Position of the entity in world space.
-        float rotation;  ///< Rotation of the entity in degrees.
-        Vec2D scale;     ///< Scale of the entity.
+        Vec2D position;     ///< Position of the entity in world space.
+        Vec2D orientation;  ///< Orientation of the entity in degrees.
+        Vec2D scale;        ///< Scale of the entity.
 
         /**
          * @brief Default constructor initializing position, rotation, and scale.
          */
         Transform2D()
-            : position(0.0f, 0.0f), rotation(0.0f), scale(1.0f, 1.0f) {}
+            : position(0.0f, 0.0f), orientation(0.0f, 0.0f), scale(1.0f, 1.0f) {}
 
         /**
          * @brief Parameterized constructor.
@@ -67,9 +69,10 @@ namespace lof {
          * @param rot Initial rotation in degrees.
          * @param scl Initial scale.
          */
-        Transform2D(const Vec2D& pos, float rot, const Vec2D& scl)
-            : position(pos), rotation(rot), scale(scl) {}
+        Transform2D(const Vec2D& pos, Vec2D& ori, const Vec2D& scl)
+            : position(pos), orientation(ori), scale(scl) {}
     };
+
 
     /**
      * @class Velocity_Component
@@ -107,16 +110,18 @@ namespace lof {
         bool is_jumping; //to indicate whether the entity is jumping
         float jump_force; //the force applied during a jump
 
+
+    public:
         /**
            * @brief Constructor for Physics_Component
            * @   Sets up the data values required for physics component
            */
-        Physics_Component(Vec2D gravity = Vec2D(0, -9.8f),
-            float damping_factor = 0.90f,
-            float max_velocity = 1000.0f,
+        Physics_Component(Vec2D gravity = Vec2D(0, DEFAULT_GRAVITY),
+            float damping_factor = DEFAULT_DAMPING_FACTOR,
+            float max_velocity = DEFAULT_MAX_VELOCITY,
             float mass = 1.0f,
             bool is_static = false, 
-            float jump_force = 300.0f) //adjust later
+            float jump_force = DEFAULT_JUMP_FORCE ) //adjust later
 
             : gravity(gravity),
             damping_factor(damping_factor),
@@ -150,16 +155,14 @@ namespace lof {
     */
     class Graphics_Component : public Component {
     public:
-        // Organic members of Graphics_Component
         std::string model_name;
         glm::vec3 color;
-        // sprite value
         GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
 
         // Default constructor
         Graphics_Component()
-            : model_name("square"), color(0.0f, 0.0f, 0.0f), shd_ref(0), mdl_to_ndc_xform(glm::mat3(0.0f)) {}
+            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
 
         /**
          * @brief Constructor for Graphics_Component.

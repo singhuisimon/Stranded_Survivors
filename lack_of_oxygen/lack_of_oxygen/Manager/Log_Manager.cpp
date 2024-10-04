@@ -10,25 +10,29 @@
 
 // Include header file
 #include "Log_Manager.h"
+#include "../Utility/Constant.h"
+
+// Include constants
+#include "../Utility/Constant.h"
 
 // Include standard headers
 #include <cstdarg>
 #include <cstdio>
 #include <iomanip>
 #include <sstream>
+#include <mutex>
 
 namespace lof {
 
     std::unique_ptr<Log_Manager> Log_Manager::instance;
     std::once_flag Log_Manager::once_flag;
 
-
+    // flush set to true by default
     Log_Manager::Log_Manager()
         : do_flush(true), log_file_name(LOGFILE_DEFAULT) {
         set_type("Log_Manager");
-        // By default, the log file will flush after each write, for immediate logging 
         m_is_started = false;
-        set_time(0);
+        set_time(DEFAULT_START_TIME);
     }
 
 
@@ -65,6 +69,13 @@ namespace lof {
         }
 
         m_is_started = true;
+
+        // Reset the Clock to start timing from now
+        clock = Clock(); // Reinitialize the clock
+
+        // Optionally, log the start-up event with timestamp
+        write_log("Log_Manager::start_up(): Logging started. Log file: %s", log_file_name.c_str());
+
         return 0;
     }
 
@@ -87,6 +98,30 @@ namespace lof {
             return -1; // Log_Manager not started or log file not open
         }
 
+        // Get current elapsed time in microseconds since start
+        int64_t current_time = clock.split_total();
+
+        // Convert microseconds to hours, minutes, seconds, milliseconds
+        int64_t total_milliseconds = current_time / MILLISECONDS_PER_SECOND;
+        int64_t total_seconds = total_milliseconds / MILLISECONDS_PER_SECOND;
+        int64_t total_minutes = total_seconds / SECONDS_PER_MINUTE;
+        int64_t total_hours = total_minutes / MINUTES_PER_HOUR;
+
+        int64_t milliseconds = total_milliseconds % MILLISECONDS_PER_SECOND;
+        int64_t seconds = total_seconds % SECONDS_PER_MINUTE;
+        int64_t minutes = total_minutes % MINUTES_PER_HOUR;
+        int64_t hours = total_hours % HOURS_PER_DAY;
+
+        // Format time as [HH:MM:SS.mmm]
+        std::stringstream time_stream;
+        time_stream << "["
+            << std::setfill('0') << std::setw(2) << hours << ":"
+            << std::setfill('0') << std::setw(2) << minutes << ":"
+            << std::setfill('0') << std::setw(2) << seconds << "."
+            << std::setfill('0') << std::setw(3) << milliseconds
+            << "] ";
+
+        // Format the log message
         char buffer[1024];
         va_list args;
         va_start(args, fmt);
@@ -97,12 +132,15 @@ namespace lof {
             return -1; // Error during formatting
         }
 
-        log_file << buffer << std::endl;
+        // Write the timestamped log entry
+        log_file << time_stream.str() << buffer << std::endl;
 
         if (do_flush) {
             log_file.flush();
         }
 
+        // Optionally, return the number of characters written
+        // Here, we return the number of characters in the user message
         return written;
     }
 
