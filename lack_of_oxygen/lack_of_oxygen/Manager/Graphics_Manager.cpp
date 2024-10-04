@@ -10,6 +10,7 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
+#include "../Utility/Path_Helper.h" // For file path resolution
 
 namespace lof {
 
@@ -55,12 +56,15 @@ namespace lof {
         glViewport(0, 0, scr_width, scr_height); 
 
         // Set up default render mode 
-        render_mode = GL_FILL; 
+        render_mode = GL_FILL;
+
+        std::string vertex_path = Path_Helper::get_vertex_shader_path();
+        std::string fragment_path = Path_Helper::get_fragment_shader_path();
 
         // Read file to initialize shaders 
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
-        std::make_pair<std::string, std::string>(DEFAULT_VERTEX_SHADER_PATH,
-                                                 DEFAULT_FRAGMENT_SHADER_PATH)
+        std::make_pair<std::string, std::string>(vertex_path.c_str(),
+                                                 fragment_path.c_str())
         };
 
         // Create shader program from shader files and insert 
@@ -72,8 +76,10 @@ namespace lof {
             LM.write_log("Graphics_Manager::start_up(): Succesfully added shader program.");
         }
 
+        std::string mesh_path = Path_Helper::get_model_file_path();
+
         // Add models (Will move this to serialization side)
-        if (!add_model(DEFAULT_MODEL_FILE_PATH)) {
+        if (!add_model(mesh_path.c_str())) {
             LM.write_log("Fail to add model.");
             return -1;
         }
