@@ -29,7 +29,6 @@ namespace lof {
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
-        set_time(DEFAULT_START_TIME);
     }
 
     Game_Manager& Game_Manager::get_instance() {

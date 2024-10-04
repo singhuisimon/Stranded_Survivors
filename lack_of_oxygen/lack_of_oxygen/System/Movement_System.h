@@ -1,8 +1,13 @@
 /**
- * @file Movement_System.h
- * @brief Defines the Movement_System class for handling entity movement.
+ * @file Movement_System.cpp
+ * @brief Implements the physics (gravity, jumping) and movement for the game entities
+ * @author Wai Lwin Thit
  * @date September 15, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
 
 #pragma once
 
@@ -35,7 +40,6 @@ namespace lof {
 
     private:
         class ECS_Manager& ecs;
-       // Input_Manager& input_manager; // Add a reference to Input_Manager
     };
 
 } // namespace lof

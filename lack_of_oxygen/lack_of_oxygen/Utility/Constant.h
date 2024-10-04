@@ -24,9 +24,9 @@ namespace lof {
 	// ------------------------------ Serialization_Manager.cpp --------------------------------
 	// Data Directory Constants
 	// constexpr const char* BASE_DATA_DIR = "..\\..\\lack_of_oxygen\\Data\\";
-	constexpr const char* CONFIG_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\config.json";
-	constexpr const char* PREFABS_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\prefab.json";
-	constexpr const char* SCENE_PATH = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\scene1.scn";
+	//constexpr const char* CONFIG_PATH = "../lack_of_oxygen/Data/config.json";
+	//constexpr const char* PREFABS_PATH = "../lack_of_oxygen/Data/prefab.json";
+	//constexpr const char* SCENE_PATH = "../lack_of_oxygen/Data/scene1.scn";
 
 	// Screen Configuration Constants
 	constexpr int DEFAULT_SCREEN_WIDTH = 800;
@@ -45,11 +45,11 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
-	// -----------------------------All System/Manager.cpp Files -------------------------------
+	// ------------------------- System.cpp and Manager.cpp Files -------------------------------
 	// System Performance Constants
 	constexpr int64_t DEFAULT_START_TIME = 0;
 
-	// ----------------------------- FPS.cpp -----------------------------------------
+	// ----------------------------------- FPS.cpp ----------------------------------------------
 	// System Performance Constants
 	constexpr float UPON_PERCENTAGE = 100.0f;
 	constexpr int DEBUG_LEFT_WIDTH = 17;
@@ -86,8 +86,8 @@ namespace lof {
 
 	// ------------------------------ Audio_Manager.cpp --------------------------------
 	// Music Wav Directory
-	constexpr const char* MUSICPATH1 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test1.wav";
-	constexpr const char* MUSICPATH2 = "..\\..\\lack_of_oxygen\\Data\\..\\lack_of_oxygen\\Data\\audio_test2.wav";
+	//constexpr const char* MUSICPATH1 = "../lack_of_oxygen/Data/audio_test1.wav";
+	//constexpr const char* MUSICPATH2 = "../lack_of_oxygen/Data/audio_test2.wav";
 
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
@@ -107,7 +107,7 @@ namespace lof {
 	// ------------------------------ Graphics_System.cpp --------------------------------
 	constexpr const char* DEFAULT_VERTEX_SHADER_PATH = "../lack_of_oxygen/Shaders/lack_of_oxygen_1.vert";
 	constexpr const char* DEFAULT_FRAGMENT_SHADER_PATH = "../lack_of_oxygen/Shaders/lack_of_oxygen_1.frag";
-	constexpr const char* DEFAULT_MODEL_FILE_PATH = "../lack_of_oxygen/Data/models.msh";
+	//constexpr const char* DEFAULT_MODEL_FILE_PATH = "../lack_of_oxygen/Data/models.msh";
 
 } // namespace lof
 

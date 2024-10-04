@@ -3,7 +3,7 @@
  * @brief Defines the base Component class and specific component types for the Entity Component System (ECS).
  * @author Simon Chan
  * @date September 15, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -114,9 +114,19 @@ namespace lof {
 
     public:
         /**
-           * @brief Constructor for Physics_Component
-           * @   Sets up the data values required for physics component
-           */
+     * @brief Constructor for Physics_Component.
+     *
+     * Initializes the physics properties of the entity, including gravity, damping factor, max velocity,
+     * mass, static state, movability, and jump force.
+     *
+     * @param gravity The gravity vector affecting the entity. Default is (0, DEFAULT_GRAVITY).
+     * @param damping_factor The factor to dampen velocity over time. Default is DEFAULT_DAMPING_FACTOR.
+     * @param max_velocity The maximum velocity of the entity. Default is DEFAULT_MAX_VELOCITY.
+     * @param mass The mass of the entity. Default is 1.0f.
+     * @param is_static Indicates if the entity is static. Default is false.
+     * @param is_moveable Indicates if the entity can be moved. Default is false.
+     * @param jump_force The force applied during a jump. Default is DEFAULT_JUMP_FORCE.
+     */
         Physics_Component(Vec2D gravity = Vec2D(0, DEFAULT_GRAVITY),
             float damping_factor = DEFAULT_DAMPING_FACTOR,
             float max_velocity = DEFAULT_MAX_VELOCITY,
@@ -137,16 +147,33 @@ namespace lof {
             is_jumping(false),
             jump_force(jump_force) {}
 
-        //Apply force
+        /**
+         * @brief Applies a force to the entity.
+         *
+         * Adds the given force to the accumulated forces acting on the entity.
+         *
+         * @param force The force vector to be applied.
+         */
+
         void apply_force(const Vec2D& force) {
             accumulated_force += force;
         }
-
+        /**
+         * @brief Resets all accumulated forces acting on the entity.
+         *
+         * Sets the accumulated force to zero, preparing the entity for the next physics update.
+         */
         void reset_forces() {
             accumulated_force = Vec2D(0, 0);
         }
 
-        //set the mass of the object
+           /**
+            * @brief Sets the mass of the entity.
+            *
+            * Adjusts the mass and its inverse. If the mass is zero or negative, the inverse mass is set to zero.
+            *
+            * @param m The new mass of the entity.
+            */        
         void set_mass(float m) {
             mass = m;
             inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
@@ -179,7 +206,10 @@ namespace lof {
 
     }; 
 
-
+    /**
+    * @class Collision_Component
+    * @brief Component representing an entity's component data.
+    */
     class Collision_Component : public Component
     {
     public:
