@@ -37,6 +37,9 @@ namespace lof {
                 //skip non movable entities platforms
                 if (!physics.is_moveable) continue;
 
+                //manually disable collision influence for testing
+                physics.is_grounded = false; 
+
                 // apply gravity to all movable entities
                     //apply gravity 
                     velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
@@ -44,7 +47,10 @@ namespace lof {
                     std::cout << "Velocity Y of the player = " << velocity.velocity.y << std::endl;
 
                     if (physics.is_grounded) {
-                        velocity.velocity.y = 0.0f;
+
+                        std::cout << "player is grounded!" << '\n';
+                        physics.gravity.y = 0.0f;
+
                     }
 
                 

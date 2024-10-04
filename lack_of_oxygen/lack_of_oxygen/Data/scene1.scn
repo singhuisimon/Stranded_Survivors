@@ -24,6 +24,10 @@
         "Collision_Component": {
           "width": 1700.0,
           "height": 400.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "is_movable": false
         }
       }
     },
@@ -38,6 +42,10 @@
         "Collision_Component": {
           "width": 1700.0,
           "height": 400.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "is_movable":  false
         }
       }
     },
@@ -51,12 +59,21 @@
         },
         "Graphics_Component": {
           "color": [ 1.0, 0.0, 0.0 ]
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "is_movable": true
         }
       }
     },
     {
       "name": "player1",
-      "prefab": "player"
+      "prefab": "player",
+      "components": {
+        "Transform2D": {
+          "position":  [500.0, -1000.0]
+        }
+      }
     }
    
   ]

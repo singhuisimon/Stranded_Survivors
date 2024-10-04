@@ -968,372 +968,147 @@ namespace lof
 
 	}
 
-	
+	void Collision_System::update(float delta_time)
+	{
+
+		std::vector<CollisionPair> collisions;
+		AABB aabb1{ {0,0}, {0,0} };
+		AABB aabb2{ {0,0}, {0,0} };
+		// First pass: Detect all collisions
+		for (const auto& entity_ptr : ecs_manager.get_entities())
+		{
+			EntityID entity_ID = entity_ptr->get_id();
+			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
+
+			if (entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()) && !physic1.is_static) {
+				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
+				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
+				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
+
+				aabb1 = AABB::from_Tranform(transform1, collision1);
+
+				for (const auto& other_entity_ptr : ecs_manager.get_entities())
+				{
+					if (entity_ptr == other_entity_ptr) continue; // Skip self collision
+
+					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
+					{
+						EntityID Other_Entity_ID = other_entity_ptr->get_id();
+						auto& transform2 = ecs_manager.get_component<Transform2D>(Other_Entity_ID);
+						auto& collision2 = ecs_manager.get_component<Collision_Component>(Other_Entity_ID);
+						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
+						auto& physic2 = ecs_manager.get_component<Physics_Component>(Other_Entity_ID);
+
+						aabb2 = AABB::from_Tranform(transform2, collision2);
+
+						float collision_time = delta_time;
+
+						// Check for collision
+						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
+						{
+							// Store detected collision
+							//Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
+							collisions.push_back({ entity_ID, Other_Entity_ID, Compute_Overlap(aabb1, aabb2) });
+							std::cout << "Collision detected between Entity " << entity_ID << " and Entity " << Other_Entity_ID << "\n";
+							//Compute_Overlap(aabb1, aabb2);
+						}
+					}
+				}
+			}
+		}
+
+		bool is_collide = false;
+
+		// Second pass: Resolve all detected collisions
+		for (const auto& collision : collisions)
+		{
+			auto& transform1 = ecs_manager.get_component<Transform2D>(collision.entity1);
+			auto& velocity1 = ecs_manager.get_component<Velocity_Component>(collision.entity1);
+			auto& physic1 = ecs_manager.get_component<Physics_Component>(collision.entity1);
+
+			auto& transform2 = ecs_manager.get_component<Transform2D>(collision.entity2);
+			auto& velocity2 = ecs_manager.get_component<Velocity_Component>(collision.entity2);
+			auto& physic2 = ecs_manager.get_component<Physics_Component>(collision.entity2);
+
+			float aabb1_width = (aabb1.max.x - aabb1.min.x) / 2; // width of the object a
+			float aabb2_width = (aabb2.max.y - aabb2.min.y) / 2;
+			std::cout << "width of aabb" << aabb1_width << "\n";
+
+			if (collision.overlap.y > 0) {
+				std::cout << "yes it is overlap yyyyy " << "\n";
+				physic1.is_grounded = true;   // Entity is now groundeds
+
+				std::cout << physic1.is_grounded << std::endl;
+				//physic1.gravity.y = 0.0f;
+				//velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
+				std::cout << physic1.gravity.y << "\n";
+			}
+
+
 #if 0
-	/**
-	* @brief Update the collision system
-	* @param delta_time Delta time since the last update.
-	*/
-	void Collision_System::update(float delta_time)
-	{
-		//Iterate all the entities in ecs_manager
-		for (const auto& entity_ptr : ecs_manager.get_entities())
-		{
-			//get the ID of the entity
-			EntityID entity_ID = entity_ptr->get_id();
-			//LM.write_log("Entity id %u",entity_ID);
-
-			//std::cout << entity_ID << "\n";
-
-		
-			std::cout << "EntityID: id: " << entity_ID << '\n';
-
-			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
-
-			//check if entity has a collision component
-			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>()) && !physic1.is_static) {
-				// LM.write_log("Entity id %u", entity_ID);\
-
-				std::cout << "EntityID: id: " << entity_ID << '\n';
+			else physic1.is_grounded = false;
 
 
-				//get transform component
-				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
-				//get collision component
-				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
-				//get velocity component
-				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
+			if (!physic1.is_jumping && physic1.is_grounded)
+			{
+				physic1.is_grounded = true;
 
-				//auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
-
-
-				//create AABB based on transforrm and collision component for object 1
-				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
-
-				//check for collision for all other entities
-				for (const auto& other_entity_ptr : ecs_manager.get_entities())
+				if (physic1.is_grounded)
 				{
-					//if they are the same entity skip
-					if (entity_ptr == other_entity_ptr)
-					{
-						continue;
-					}
+					std::cout << "is grounded is true or not " << physic1.is_grounded << "\n";
+				}
+				if (physic1.is_jumping && physic1.is_grounded)
+				{
+					std::cout << "is grounded\n";
+					std::cout << "is jumping\n";
+					physic1.is_grounded = false;
+					physic1.gravity.y = -980.0f;
 
-					//check if other entity has a collision component
-					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
-					{
-						EntityID Other_Entity_ID = other_entity_ptr->get_id();
-
-						//get other transform component 
-						auto& transform2 = ecs_manager.get_component<Transform2D>(Other_Entity_ID);
-
-						//get collision component
-						auto& collision2 = ecs_manager.get_component<Collision_Component>(Other_Entity_ID);
-
-						//get velocity component
-						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
-						auto& physic2 = ecs_manager.get_component<Physics_Component>(Other_Entity_ID);
-
-
-
-						//create AABB for other entity
-						AABB aabb2 = AABB::from_Tranform(transform2, collision2);
-						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
-
-						float collision_time = delta_time;// 0.0f;
-
-						//check interception between two entities, and consider their vel
-						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
-						{
-							
-							//if (velocity1.velocity.x == 0.0f && velocity1.velocity.y == 0.0f &&
-							//	velocity2.velocity.x == 0.0f && velocity2.velocity.y == 0.0f) {
-							//	// If both objects are stationary, skip collision check
-							//	continue;
-							//}
-							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
-
-							if (Other_Entity_ID == 1 || Other_Entity_ID == 2)
-							{
-								physic1.is_grounded = true;
-
-								//if (!physic1.is_jumping && physic1.is_grounded == false)
-								//{
-								//	physic1.gravity.y = 0.0f; // Stop applying gravity while grounded
-								//	velocity1.velocity.y = 0.0f; // Stop vertical movemen
-
-								//}
-								
-
-								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-							
-							}
-							else {
-								physic1.is_grounded = false;
-								//physic1.gravity.y = 0.0f;
-							}
-							
-							
-							//std::cout << "yes !!!is collide\n";
-							
-
-							/*if (physic1.is_static && physic2.is_static)
-							{
-								physic1.is_grounded = true;
-								continue;
-							}*/
-
-							if (IM.is_key_held(GLFW_KEY_M)) {
-								LM.write_log("Collision_Syetem::update():Yes, Collision is detected.");
-							}
-
-							
-							
-
-							//if (Overlap.y > 0 && transform1.position.y < transform2.position.y) { // Player on top of a platform
-							//	velocity1.velocity.y = 0.0f;  // Stop falling
-							//	physic1.is_grounded = true;   // Entity is grounded
-							//}
-
-
-
-						//	if (Other_Entity_ID == 3 && !physic1.is_static)
-						//	{
-
-						//		Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-						//	}
-
-						//	if (Overlap.y > 0) {
-						//		velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
-						//		//physic1.is_grounded = true;   // Entity is now grounded
-						//	}
-
-						//	// Determine if there is an overlap
-						//	if (Overlap.x > 0 && Overlap.y > 0)
-						//	{
-						//		// Collision detected, stop both objects
-						//		velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
-						//		velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
-						//	
-						//		
-						//		Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-						//	
-						//	}
-
-						//	if (Overlap.y > 0 && transform1.position.y < transform2.position.y) {
-						//		velocity1.velocity.y = 0.0f;  // Stop falling
-						//		physic1.is_grounded = true;   // Entity is grounded
-						//	}
-
-						//}
-
-						//else if (IM.is_key_held(GLFW_KEY_M))
-						//{
-						//	LM.write_log("Collision_Syetem::update():No, Collision is not detected.");
-						//}
-						// }
-						}
-						/*else {
-							physic1.is_grounded = false;
-							
-						}*/
-						
-						
-					}
-					std::cout << "gravity of player 1 " << physic1.gravity.x << "   " << physic1.gravity.y << "\n";
-					std::cout << "physic is grounded for player 1 in collisison " << physic1.is_grounded << "\n";
+					//std::cout << "is grounded\n";
 
 				}
+
 			}
-		}
-	}
 #endif
-	void Collision_System::update(float delta_time)
-	{
-		//Iterate all the entities in ecs_manager
-		for (const auto& entity_ptr : ecs_manager.get_entities())
-		{
-			//get the ID of the entity
-			EntityID entity_ID = entity_ptr->get_id();
-			//LM.write_log("Entity id %u",entity_ID);
-
-			//std::cout << entity_ID << "\n";
-
-			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
-
-			//check if entity has a collision component
-			if (entity_ptr->has_component(ecs_manager.get_component_id< Collision_Component>()) && !physic1.is_static) {
-				// LM.write_log("Entity id %u", entity_ID);
-
-				//get transform component
-				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
-				//get collision component
-				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
-				//get velocity component
-				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
-
-				//auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
-
-
-				//create AABB based on transforrm and collision component for object 1
-				AABB aabb1 = AABB::from_Tranform(transform1, collision1);
-
-				//check for collision for all other entities
-				for (const auto& other_entity_ptr : ecs_manager.get_entities())
-				{
-					//if they are the same entity skip
-					if (entity_ptr == other_entity_ptr)
-					{
-						continue;
-					}
-
-					//check if other entity has a collision component
-					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
-					{
-						EntityID Other_Entity_ID = other_entity_ptr->get_id();
-
-						//get other transform component 
-						auto& transform2 = ecs_manager.get_component<Transform2D>(Other_Entity_ID);
-
-						//get collision component
-						auto& collision2 = ecs_manager.get_component<Collision_Component>(Other_Entity_ID);
-
-						//get velocity component
-						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
-						auto& physic2 = ecs_manager.get_component<Physics_Component>(Other_Entity_ID);
-
-
-
-						//create AABB for other entity
-						AABB aabb2 = AABB::from_Tranform(transform2, collision2);
-						// LM.write_log("AABB 2: Min(%f, %f) Max(%f, %f) from entity %u", aabb2.min.x, aabb2.min.y, aabb2.max.x, aabb2.max.y, Other_entity_ID);
-
-						float collision_time = delta_time;// 0.0f;
-
-						std::cout << "Before collision detection\n";
-
-						//check intersecption between two entities, and consider their vel
-						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
-						{
-							Vec2D Overlap = Compute_Overlap(aabb1, aabb2);
-
-
-							if (Other_Entity_ID == 1 || Other_Entity_ID == 2) //platforms 
-							{
-
-								////check the overlap 
-								//if (Overlap.y > 0) { //
-								//	physic1.is_grounded = true; //***
-								//}
-								//else {
-								//	physic1.is_grounded = false;
-								//}
-
-								physic1.is_grounded = 0.0f;
-
-								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-
-							}
-							if (Other_Entity_ID == 3 && !physic1.is_static)
-							{
-								Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-								// Check the overlap and adjust position and velocity accordingly
-								if (Overlap.y > 0) // Colliding from above
-								{
-									transform1.position.x -= Overlap.x; // 
-									velocity1.velocity.y = 0.0f; // Stop falling
-									physic1.is_grounded = true; // Entity is now grounded
-								}
-								else if (Overlap.x > 0) // Colliding from the side
-								{
-									// Resolve based on which overlap is smaller
-									if (Overlap.x < Overlap.y) {
-										if (transform1.position.x < transform2.position.x) {
-											transform1.position.x -= Overlap.x; // Move player left to resolve overlap
-										}
-										else {
-											transform1.position.x += Overlap.x; // Move player right to resolve overlap
-										}
-										velocity1.velocity.x = 0.0f; // Stop horizontal movement
-									}
-								}
-							}
+			/*else {
+	  physic1.gravity.y = -980.0f;
+	  physic1.is_grounded = false;
+	}*/
+	// Horizontal collision resolution
+	//if (collision.overlap.x != 0)
+	//{
+	//  std::cout << "Horizontal overlap detected\n";
+	//  if (velocity1.velocity.x > 0 && transform1.position.x < transform2.position.x) {
+	//    transform1.position.x -= (collision.overlap.x - aabb1_width); // Move back left by overlap amount
+	//    velocity1.velocity.x = 0.0f;        // Stop horizontal velocity
+	//  }
+	//  // Move from right to left
+	//  else if (velocity1.velocity.x < 0 && transform1.position.x > transform2.position.x) {
+	//    transform1.position.x = (collision.overlap.x  - aabb1_width); // Move back right by overlap amount
+	//    velocity1.velocity.x = 0.0f;        // Stop horizontal velocity
+	//  }
+	//}
 
 
 
 
-							//std::cout << "yes !!!is collide\n";
 
 
-							/*if (physic1.is_static && physic2.is_static)
-							{
-							  physic1.is_grounded = true;
-							  continue;
-							}*/
+			for (const auto& entity_ptr : ecs_manager.get_entities())
+			{
+				EntityID entity_ID = entity_ptr->get_id();
+				auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
-							if (IM.is_key_held(GLFW_KEY_M)) {
-								LM.write_log("Collision_Syetem::update():Yes, Collision is detected.");
-							}
-
-
-
-
-							//if (Overlap.y > 0 && transform1.position.y < transform2.position.y) { // Player on top of a platform
-							//  velocity1.velocity.y = 0.0f;  // Stop falling
-							//  physic1.is_grounded = true;   // Entity is grounded
-							//}
-
-
-
-						  //  if (Other_Entity_ID == 3 && !physic1.is_static)
-						  //  {
-
-						  //    Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-						  //  }
-
-						  //  if (Overlap.y > 0) {
-						  //    velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
-						  //    //physic1.is_grounded = true;   // Entity is now grounded
-						  //  }
-
-						  //  // Determine if there is an overlap
-						  //  if (Overlap.x > 0 && Overlap.y > 0)
-						  //  {
-						  //    // Collision detected, stop both objects
-						  //    velocity1.velocity.x = 0.0f; // Stop the first object's horizontal movement
-						  //    velocity1.velocity.y = 0.0f; // Stop the first object's vertical movement
-						  //  
-						  //    
-						  //    Resolve_Collision_Static_Dynamic(aabb1, aabb2, transform1, Overlap);
-						  //  
-						  //  }
-
-						  //  if (Overlap.y > 0 && transform1.position.y < transform2.position.y) {
-						  //    velocity1.velocity.y = 0.0f;  // Stop falling
-						  //    physic1.is_grounded = true;   // Entity is grounded
-						  //  }
-
-						  //}
-
-						  //else if (IM.is_key_held(GLFW_KEY_M))
-						  //{
-						  //  LM.write_log("Collision_Syetem::update():No, Collision is not detected.");
-						  //}
-						  // }
-						}
-
-
-
-					}
-					std::cout << "gravity of player 1 " << physic1.gravity.x << "   " << physic1.gravity.y << "\n";
-					//std::cout << "physic is grounded for player 1 in collisison " << physic1.is_grounded << "\n";
-
+				if (!physic1.is_grounded) {
+					physic1.gravity.y = -980.0f; // Re-enable gravity when not grounded
+					physic1.is_grounded = true;
 				}
 			}
+
 		}
+
+
 	}
-
-
 	/**
 	* @brief Returns the type of the collision system
 	* @return string representing the type

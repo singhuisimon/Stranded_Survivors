@@ -24,6 +24,12 @@
 
 namespace lof
 {
+
+	struct CollisionPair {
+		EntityID entity1;
+		EntityID entity2;
+		Vec2D overlap;
+	};
 	/**
 	* @class AABB
 	* @brief It represent the axis-aligned bounding boxes which determine whether the 2 game odject are overlapping each other.
