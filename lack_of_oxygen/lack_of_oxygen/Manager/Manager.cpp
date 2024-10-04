@@ -1,7 +1,7 @@
 /**
  * @file Manager.cpp
  * @brief Implements the base manager class function declarations.
- * @author Simon Chan (100%)
+ * @author Simon Chan (77.777%), Liliana Hanawardani (22.222%)
  * @date September 15, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
