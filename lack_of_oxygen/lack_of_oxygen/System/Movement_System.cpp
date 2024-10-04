@@ -1,7 +1,11 @@
 /**
  * @file Movement_System.cpp
- * @brief Implements the Movement_System class.
+ * @brief Implements the physics (gravity, jumping) and movement for the game entities
+ * @author Wai Lwin Thit 
  * @date September 15, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #include "Movement_System.h"
@@ -30,17 +34,14 @@ namespace lof {
                 Velocity_Component& velocity = ecs.get_component<Velocity_Component>(id);
                 Physics_Component& physics = ecs.get_component<Physics_Component>(id);
 
+                //skip processing for static entities
                 if (physics.is_static) continue;
 
-                // Handle jumping
+                // Handle jumping mechanics
                 if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
 
                     // Apply jump force
                     velocity.velocity.y = physics.jump_force;
-
-                    //update the position 
-                    transform.position += velocity.velocity * delta_time;
-
 
                    physics.is_jumping = true; // Mark as jumping
                    physics.is_grounded = false; // Leave the ground
@@ -80,11 +81,8 @@ namespace lof {
                 //dampen velocity
                 velocity.velocity *= physics.damping_factor;
 
-
+                //update the position based on velocity
                 transform.position += velocity.velocity * delta_time;
-
- 
-
 
                 //clamp velocity to max velocity 
                 float squared_velocity = square_length_vec2d(velocity.velocity);
