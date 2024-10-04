@@ -28,17 +28,16 @@ namespace lof {
 
             // Check if the entity has Graphics, Transform and Collision components 
             if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) && 
-                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>()) &&
-                entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>())) { 
+                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) { 
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
-                auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);
 
                 // Update component if debug mode is ON
                 if (GFXM.get_debug_mode() == GL_TRUE) {
                     if (entity_id != 0) { // Temporary object background unaffected
                         // Scaling update when up or down arrow key pressed
+                        auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);
                         GLfloat scale_change = DEFAULT_SCALE_CHANGE * (GLfloat)delta_time; 
                         if (IM.is_key_held(GLFW_KEY_UP)) {
                             LM.write_log("Render_System::update(): 'UP' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
@@ -138,8 +137,7 @@ namespace lof {
 
             // Check if the entity has Graphics, Transform and Collision components 
             if (entity_ptr->has_component(ecs_manager.get_component_id<Graphics_Component>()) && 
-                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>()) && 
-                entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>())) { 
+                entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) { 
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);        // For Debugging
