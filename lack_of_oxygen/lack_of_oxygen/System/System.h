@@ -1,7 +1,7 @@
 /**
  * @file System.h
  * @brief Defines the base System class for the Entity Component System (ECS).
- * @author Simon Chan
+ * @author Simon Chan(63.636%), Liliana (36.363%)
  * @date September 15, 2024
  * Copyright (C) 20xx DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

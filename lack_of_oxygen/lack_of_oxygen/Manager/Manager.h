@@ -1,7 +1,7 @@
 /**
  * @file Manager.h
  * @brief Base class for all managers in the system.
- * @author Simon Chan
+ * @author Simon Chan (85.185%), Liliana Hanawardani 
  * @date September 15, 2024
  * Copyright (C) 20xx DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
