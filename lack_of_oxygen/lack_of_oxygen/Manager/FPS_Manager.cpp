@@ -1,8 +1,9 @@
 /**
  * @file FPS_Manager.cpp
  * @brief Implements the FPS_Manager class methods for managing frame rate control in the game loop.
+ * @author Simon Chan (98.684%), Liliana Hanawardani (1.315%)
  * @date September 20, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

@@ -2,9 +2,9 @@
  * @file main.cpp
  * @brief Entry point of the game engine application.
  * @details Initializes the Game_Manager, loads configurations, sets up the window, and runs the main loop.
- * @author Simon Chan
+ * @author Simon Chan (89.516%), Liliana Hanawardani (10.483%)
  * @date September 21, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

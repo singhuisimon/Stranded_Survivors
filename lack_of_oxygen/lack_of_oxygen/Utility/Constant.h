@@ -1,8 +1,9 @@
 /**
  * @file Constant.h
  * @brief Defines constant values used across the project.
+ * @author Simon Chan (92.307%), Wai Lwin Thit (11.538%), Liliana Hanawardani (11.538%), Amanda Leow Boon Suan (7.692)
  * @date October 01, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

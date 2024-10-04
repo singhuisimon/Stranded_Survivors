@@ -1,8 +1,9 @@
 /**
  * @file Game_Manager.h
  * @brief Defines the Game_Manager class for managing the game state and logic.
- * @date September 21, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * @author Simon Chan (100%)
+ * @date September 21, 2024 
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

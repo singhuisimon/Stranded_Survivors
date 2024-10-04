@@ -1,7 +1,7 @@
 /**
  * @file ECS_Manager.tpp
  * @brief Definition for the ECS_Manager template class for managing the ECS.
- * @author Simon Chan
+ * @author Simon Chan (100%)
  * @date September 21, 2024
  * Copyright (C) 20xx DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

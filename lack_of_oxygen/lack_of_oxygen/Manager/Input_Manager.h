@@ -1,8 +1,9 @@
 /**
  * @file Input_Manager.h
  * @brief Defines the Input_Manager class for handling user inputs, including keyboard and mouse.
+ * @author Simon Chan (100%)
  * @date September 23, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

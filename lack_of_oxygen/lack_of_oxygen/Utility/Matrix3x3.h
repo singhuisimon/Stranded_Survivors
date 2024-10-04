@@ -1,9 +1,9 @@
 /**
  * @file Matrix3x3.h
  * @brief Declarations of memeber and non-member functions of struct Matrix_Lib
- * @author Liliana Hanawardani
+ * @author Liliana Hanawardani (100%)
  * @date September 20, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

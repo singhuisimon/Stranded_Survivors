@@ -4,6 +4,9 @@
  * @details Includes necessary libraries and headers for the application entry point.
  * @author Simon Chan (90.909%), Liliana Hanawardani (9.090%)
  * @date September 21, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #ifndef LOF_MAIN_H

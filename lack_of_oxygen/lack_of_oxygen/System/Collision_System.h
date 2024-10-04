@@ -1,7 +1,7 @@
 /**
  * @file Collision_Syetem.h
  * @brief Implements the declaration of collsion system.
- * @author Saw Hui Shan
+ * @author Saw Hui Shan (100%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

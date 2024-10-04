@@ -1,8 +1,9 @@
 /**
  * @file Input_Manager.cpp
  * @brief Implements the Input_Manager class methods, including mouse input handling.
+ * @author Simon Chan (99.346%), Liliana Hanawardani (0.653%)
  * @date September 23, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

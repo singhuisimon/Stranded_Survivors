@@ -1,9 +1,9 @@
 /**
  * @file FPS_Manager.h
  * @brief Defines the FPS_Manager class for managing the frame rate of the game loop.
- * @author Simon Chan
+ * @author Simon Chan (100%)
  * @date September 20, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
