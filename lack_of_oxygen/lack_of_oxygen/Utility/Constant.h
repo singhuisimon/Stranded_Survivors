@@ -12,6 +12,13 @@
 
 #include <string>
 
+ // Include OpenGL headers
+#define GLFW_INCLUDE_NONE
+#include "../Glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <glm-0.9.9.8/glm/glm.hpp>
+#include <glm-0.9.9.8/glm/gtc/type_ptr.hpp>
+
 namespace lof {
 
 	// ------------------------------ Serialization_Manager.cpp --------------------------------
@@ -66,7 +73,10 @@ namespace lof {
 	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
 	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
 	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
-
+	constexpr const char* DEFAULT_MODEL_NAME = "square";
+	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
+	constexpr unsigned int DEFAULT_SHADER_REF = 0;
+	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
 
 	// ----------------------------- Movement_System.cpp -------------------------------------------
     //Movement_System constants
@@ -81,6 +91,23 @@ namespace lof {
 
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
+
+	// ------------------------------ Render_System.cpp --------------------------------
+	// Graphics Component constants
+	constexpr GLfloat DEFAULT_WORLD_RANGE = 3000.0f;
+	constexpr GLfloat DEFAULT_ROTATION = 90.0f;
+	constexpr GLfloat DEFAULT_LINE_WIDTH = 5.0f;
+	constexpr GLfloat DEFAULT_POINT_SIZE = 5.0f;
+	
+	// Debugging constants
+	constexpr float DEFAULT_SCALE_CHANGE = 100.0f;
+	constexpr GLfloat DEFAULT_AABB_WIDTH = 2.0f;
+	constexpr GLfloat DEFAULT_VELOCITY_LINE_LENGTH = 1.5f;
+
+	// ------------------------------ Graphics_System.cpp --------------------------------
+	constexpr const char* DEFAULT_VERTEX_SHADER_PATH = "../lack_of_oxygen/Shaders/lack_of_oxygen_1.vert";
+	constexpr const char* DEFAULT_FRAGMENT_SHADER_PATH = "../lack_of_oxygen/Shaders/lack_of_oxygen_1.frag";
+	constexpr const char* DEFAULT_MODEL_FILE_PATH = "../lack_of_oxygen/Data/models.msh";
 
 } // namespace lof
 

@@ -155,16 +155,14 @@ namespace lof {
     */
     class Graphics_Component : public Component {
     public:
-        // Organic members of Graphics_Component
         std::string model_name;
         glm::vec3 color;
-        // sprite value
         GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
 
         // Default constructor
         Graphics_Component()
-            : model_name("square"), color(0.0f, 0.0f, 0.0f), shd_ref(0), mdl_to_ndc_xform(glm::mat3(0.0f)) {}
+            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
 
         /**
          * @brief Constructor for Graphics_Component.
