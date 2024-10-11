@@ -1,7 +1,7 @@
 /**
  * @file Movement_System.cpp
  * @brief Implements the physics (gravity, jumping) and movement for the game entities
- * @author Wai Lwin Thit 
+ * @author Wai Lwin Thit (100%)
  * @date September 15, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

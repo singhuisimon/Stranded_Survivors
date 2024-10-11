@@ -1,9 +1,9 @@
 /**
  * @file Serialization_Manager.cpp
  * @brief Implements the Serialization_Manager class methods.
- * @author Simon Chan
- * @date September 22, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * @author Simon Chan (99.581%), Liliana Hanawardani (0.418%)
+ * @date September 22, 2024 
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

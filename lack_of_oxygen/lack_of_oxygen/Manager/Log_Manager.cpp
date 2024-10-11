@@ -1,9 +1,9 @@
 /**
  * @file Log_Manager.cpp
  * @brief Implements the Log_Manager class helper functions.
- * @author Simon Chan
+ * @author Simon Chan (98.888%), Liliana Hanawardani (1.111%)
  * @date September 15, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

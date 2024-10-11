@@ -1,8 +1,9 @@
 /**
  * @file Constant.h
  * @brief Defines constant values used across the project.
+ * @author Simon Chan (92.307%), Wai Lwin Thit (11.538%), Liliana Hanawardani (11.538%), Amanda Leow Boon Suan (7.692)
  * @date October 01, 2024
- * Copyright (C) 20xx DigiPen Institute of Technology.
+ * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -22,12 +23,6 @@
 namespace lof {
 
 	// ------------------------------ Serialization_Manager.cpp --------------------------------
-	// Data Directory Constants
-	// constexpr const char* BASE_DATA_DIR = "..\\..\\lack_of_oxygen\\Data\\";
-	//constexpr const char* CONFIG_PATH = "../lack_of_oxygen/Data/config.json";
-	//constexpr const char* PREFABS_PATH = "../lack_of_oxygen/Data/prefab.json";
-	//constexpr const char* SCENE_PATH = "../lack_of_oxygen/Data/scene1.scn";
-
 	// Screen Configuration Constants
 	constexpr int DEFAULT_SCREEN_WIDTH = 800;
 	constexpr int DEFAULT_SCREEN_HEIGHT = 600;
@@ -85,9 +80,7 @@ namespace lof {
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
 	// ------------------------------ Audio_Manager.cpp --------------------------------
-	// Music Wav Directory
-	//constexpr const char* MUSICPATH1 = "../lack_of_oxygen/Data/audio_test1.wav";
-	//constexpr const char* MUSICPATH2 = "../lack_of_oxygen/Data/audio_test2.wav";
+
 
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
@@ -105,9 +98,7 @@ namespace lof {
 	constexpr GLfloat DEFAULT_VELOCITY_LINE_LENGTH = 1.5f;
 
 	// ------------------------------ Graphics_System.cpp --------------------------------
-	constexpr const char* DEFAULT_VERTEX_SHADER_PATH = "../lack_of_oxygen/Shaders/lack_of_oxygen_1.vert";
-	constexpr const char* DEFAULT_FRAGMENT_SHADER_PATH = "../lack_of_oxygen/Shaders/lack_of_oxygen_1.frag";
-	//constexpr const char* DEFAULT_MODEL_FILE_PATH = "../lack_of_oxygen/Data/models.msh";
+
 
 } // namespace lof
 
