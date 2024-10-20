@@ -187,12 +187,13 @@ namespace lof {
     public:
         std::string model_name;
         glm::vec3 color;
+        std::string texture_name; 
         GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
 
         // Default constructor
         Graphics_Component()
-            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
+            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), texture_name(DEFAULT_TEXTURE_NAME), shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
 
         /**
          * @brief Constructor for Graphics_Component.
@@ -201,8 +202,8 @@ namespace lof {
          * @param shd_ref Reference to shader
          */
 
-        Graphics_Component(std::string mdl_name, glm::vec3 clr, GLuint shader,
-            glm::mat3 xform) : model_name(mdl_name), color(clr), shd_ref(shader), mdl_to_ndc_xform(xform) {}
+        Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader,glm::mat3 xform) : 
+                           model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
 
     }; 
 

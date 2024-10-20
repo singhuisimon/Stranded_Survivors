@@ -88,19 +88,34 @@ namespace lof {
         return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\audio_test2.wav";
     }
 
-    // Function to get the path to the vertex shader file
-    std::string Path_Helper::get_vertex_shader_path() {
+    // Function to get the path to the vertex shader file 1
+    std::string Path_Helper::get_vertex_shader_path_1() {
         return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Shaders\\lack_of_oxygen_1.vert";
     }
 
-    // Function to get the path to the fragment shader file
-    std::string Path_Helper::get_fragment_shader_path() {
+    // Function to get the path to the fragment shader file 1
+    std::string Path_Helper::get_fragment_shader_path_1() {
         return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Shaders\\lack_of_oxygen_1.frag";
+    }
+
+    // Function to get the path to the vertex shader file 2
+    std::string Path_Helper::get_vertex_shader_path_2() {
+        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Shaders\\lack_of_oxygen_2.vert";
+    }
+
+    // Function to get the path to the fragment shader file 2
+    std::string Path_Helper::get_fragment_shader_path_2() {
+        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Shaders\\lack_of_oxygen_2.frag";
     }
 
     // Function to get the path to the model file
     std::string Path_Helper::get_model_file_path() {
         return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\models.msh";
+    }
+
+    // Function to get the path to the texture file
+    std::string Path_Helper::get_texture_file_path() {
+        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Textures\\Texture_Names.txt";
     }
 
 
