@@ -342,45 +342,49 @@ namespace lof
 		for (const auto& entity_ptr : ecs_manager.get_entities())
 		{
 			EntityID entity_ID = entity_ptr->get_id();
-			auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
-			// Check if entity has a collision component and is dynamic
-			if (entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()) && !physic1.is_static)
-			{
-				auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
-				auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
-				auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
+			if (entity_ptr->has_component(ecs_manager.get_component_id<Physics_Component>())) {
+				auto& physic1 = ecs_manager.get_component<Physics_Component>(entity_ID);
 
-				// Create AABB for object 1
-				aabb1 = AABB::from_Tranform(transform1, collision1);
-
-				// Check for collisions with other entities
-				for (const auto& other_entity_ptr : ecs_manager.get_entities())
+				// Check if entity has a collision component and is dynamic
+				if (entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()) && !physic1.is_static)
 				{
-					// Skip if it's the same entity
-					if (entity_ptr == other_entity_ptr)
-						continue;
+					auto& transform1 = ecs_manager.get_component<Transform2D>(entity_ID);
+					auto& collision1 = ecs_manager.get_component<Collision_Component>(entity_ID);
+					auto& velocity1 = ecs_manager.get_component<Velocity_Component>(entity_ID);
 
-					// Check if other entity has a collision component
-					if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
+					// Create AABB for object 1
+					aabb1 = AABB::from_Tranform(transform1, collision1);
+
+					// Check for collisions with other entities
+					for (const auto& other_entity_ptr : ecs_manager.get_entities())
 					{
-						EntityID Other_Entity_ID = other_entity_ptr->get_id();
-						auto& transform2 = ecs_manager.get_component<Transform2D>(Other_Entity_ID);
-						auto& collision2 = ecs_manager.get_component<Collision_Component>(Other_Entity_ID);
-						auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
+						// Skip if it's the same entity
+						if (entity_ptr == other_entity_ptr)
+							continue;
 
-						// Create AABB for the other entity
-						aabb2 = AABB::from_Tranform(transform2, collision2);
-
-						// Check for intersection between two entities
-						float collision_time = delta_time;
-						if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
+						// Check if other entity has a collision component
+						if (other_entity_ptr->has_component(ecs_manager.get_component_id<Collision_Component>()))
 						{
-							// Store collision pair and overlap information
-							collisions.push_back({ entity_ID, Other_Entity_ID, Compute_Overlap(aabb1, aabb2) });
+							EntityID Other_Entity_ID = other_entity_ptr->get_id();
+							auto& transform2 = ecs_manager.get_component<Transform2D>(Other_Entity_ID);
+							auto& collision2 = ecs_manager.get_component<Collision_Component>(Other_Entity_ID);
+							auto& velocity2 = ecs_manager.get_component<Velocity_Component>(Other_Entity_ID);
+
+							// Create AABB for the other entity
+							aabb2 = AABB::from_Tranform(transform2, collision2);
+
+							// Check for intersection between two entities
+							float collision_time = delta_time;
+							if (Collision_Intersection_RectRect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time))
+							{
+								// Store collision pair and overlap information
+								collisions.push_back({ entity_ID, Other_Entity_ID, Compute_Overlap(aabb1, aabb2) });
+							}
 						}
 					}
 				}
+
 			}
 		}
 

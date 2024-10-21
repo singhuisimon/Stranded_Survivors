@@ -38,8 +38,6 @@
 
 namespace lof {
 
-
-
     class Graphics_Manager : public Manager {
     private:
 
@@ -61,7 +59,6 @@ namespace lof {
         // Struct of data to create a model
         struct Model {
             GLenum primitive_type;
-            GLuint primitive_cnt;
             GLuint vaoid;
             GLuint draw_cnt;
         };
@@ -72,8 +69,10 @@ namespace lof {
             GLboolean link_status = GL_FALSE;
         };
 
+        // Storages
         using MODELS = std::map<std::string, Graphics_Manager::Model>;
         using SHADERS = std::vector<ShaderProgram>;
+        using TEXTURES = std::map<std::string, GLuint>; 
 
         // Data members
         static std::unique_ptr<Graphics_Manager> instance;
@@ -83,6 +82,7 @@ namespace lof {
 
         // Storage for models and shader programs 
         MODELS model_storage;
+        TEXTURES texture_storage; 
         SHADERS shader_program_storage;
 
     public:
@@ -127,9 +127,17 @@ namespace lof {
          * @brief Add a model into the model storage.
          * 
          * @param file_name The filepath to the models that are being added.
-         * @return True if models are added successfully, false otherwise.
+         * @return True if the models are added successfully, false otherwise.
          */
         GLboolean add_model(std::string const& file_name);
+
+        /** 
+         * @brief Add a texture into the texture storage.
+         * 
+         * @param file_name The filepath to the textures that are being added.
+         * @return True if the textures are added successfully, false otherwise.
+         */
+        GLboolean add_textures(std::string const& file_name);
 
         /**
          * @brief Get a reference to the shader program container.
@@ -140,6 +148,11 @@ namespace lof {
          * @brief Get a reference to the model container.
          */
         MODELS& get_model_storage();
+
+        /** 
+         * @brief Get a reference to the texture container.
+         */
+        TEXTURES& get_texture_storage(); 
 
         /**
          * @brief Get a reference to the rendering mode.

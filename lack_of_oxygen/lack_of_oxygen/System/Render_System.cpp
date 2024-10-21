@@ -33,51 +33,48 @@ namespace lof {
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
                 auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
 
-                // Update component if debug mode is ON
-                if (GFXM.get_debug_mode() == GL_TRUE) {
-                    if (entity_id != 0) { // Temporary object background unaffected
-                        // Scaling update when up or down arrow key pressed
-                        auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);
-                        GLfloat scale_change = DEFAULT_SCALE_CHANGE * (GLfloat)delta_time;
-                        if (IM.is_key_held(GLFW_KEY_UP)) {
-                            LM.write_log("Render_System::update(): 'UP' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
-                            transform.scale.x += scale_change;
-                            transform.scale.y += scale_change;
-                            collision.width += scale_change;
-                            collision.height += scale_change;
+                if (entity_id != 0) { // Background object unaffected
+                    // Scaling update when up or down arrow key pressed
+                    auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);
+                    GLfloat scale_change = DEFAULT_SCALE_CHANGE * (GLfloat)delta_time;
+                    if (IM.is_key_held(GLFW_KEY_UP)) {
+                        LM.write_log("Render_System::update(): 'UP' key pressed, scale of entity %u increased by %f.", entity_id, scale_change);
+                        transform.scale.x += scale_change;
+                        transform.scale.y += scale_change;
+                        collision.width += scale_change;
+                        collision.height += scale_change;
+                    }
+                    else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                        LM.write_log("Render_System::update(): 'DOWN' key pressed, scale of entity %u decreased by %f.", entity_id, scale_change);
+                        if (transform.scale.x > 0.0f) {
+                            transform.scale.x -= scale_change;
+                            collision.width -= scale_change;
                         }
-                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                            LM.write_log("Render_System::update(): 'DOWN' key pressed, scale of entity %u decreased by %f.", entity_id, scale_change);
-                            if (transform.scale.x > 0.0f) {
-                                transform.scale.x -= scale_change;
-                                collision.width -= scale_change;
-                            }
-                            else {
-                                transform.scale.x = 0.0f;
-                                collision.width = 0.0f;
-                            }
-
-                            if (transform.scale.y > 0.0f) {
-                                transform.scale.y -= scale_change;
-                                collision.height -= scale_change;
-                            }
-                            else {
-                                transform.scale.y = 0.0f;
-                                collision.height = 0.0f;
-                            }
+                        else {
+                            transform.scale.x = 0.0f;
+                            collision.width = 0.0f;
                         }
 
-                        // Rotation update when left or right arrow key pressed
-                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                            GLfloat rot_change = transform.orientation.y * (GLfloat)delta_time;
-                            transform.orientation.x += rot_change;
-                            LM.write_log("Render_System::update(): 'LEFT' key pressed, entity %u rotated by %f.", entity_id, rot_change);
+                        if (transform.scale.y > 0.0f) {
+                            transform.scale.y -= scale_change;
+                            collision.height -= scale_change;
                         }
-                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                            GLfloat rot_change = transform.orientation.y * (GLfloat)delta_time;
-                            transform.orientation.x -= rot_change;
-                            LM.write_log("Render_System::update(): 'RIGHT' key pressed, entity %u rotated by %f.", entity_id, rot_change);
+                        else {
+                            transform.scale.y = 0.0f;
+                            collision.height = 0.0f;
                         }
+                    }
+
+                    // Rotation update when left or right arrow key pressed
+                    if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                        GLfloat rot_change = transform.orientation.y * (GLfloat)delta_time;
+                        transform.orientation.x += rot_change;
+                        LM.write_log("Render_System::update(): 'LEFT' key pressed, entity %u rotated by %f.", entity_id, rot_change);
+                    }
+                    else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                        GLfloat rot_change = transform.orientation.y * (GLfloat)delta_time;
+                        transform.orientation.x -= rot_change;
+                        LM.write_log("Render_System::update(): 'RIGHT' key pressed, entity %u rotated by %f.", entity_id, rot_change);
                     }
                 }
 
@@ -100,8 +97,8 @@ namespace lof {
                                      transform.position.x, transform.position.y, 1 };
 
                 // Compute world scale matrix
-                glm::mat3 world_scale{ 1.0 / DEFAULT_WORLD_RANGE, 0, 0,
-                                       0, 1.0 / DEFAULT_WORLD_RANGE, 0,
+                glm::mat3 world_scale{ 1.0 / SM.get_scr_width(), 0, 0,
+                                       0, 1.0 / SM.get_scr_height(), 0,
                                        0, 0, 1 };
 
                 // Compute model-to-world-to-NDC transformation matrix and store it in the graphics component
@@ -125,6 +122,10 @@ namespace lof {
             break;
         }
 
+        // Enabling Alpha Blending to blend texture to background
+        glEnable(GL_BLEND); 
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
         // Draw all objects
         Render_System::draw();
     }
@@ -140,24 +141,59 @@ namespace lof {
                 entity_ptr->has_component(ecs_manager.get_component_id<Transform2D>())) {
 
                 auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
-                auto& transform = ecs_manager.get_component<Transform2D>(entity_id);        // For Debugging
+                auto& transform = ecs_manager.get_component<Transform2D>(entity_id); // For Debug Mode
 
                 // Get shaders and models container 
                 auto& shaders = GFXM.get_shader_program_storage();
                 auto& models = GFXM.get_model_storage();
+                auto& textures = GFXM.get_texture_storage();  
 
-                // Start the shader program that the entity will use for rendering
+                // Start the shader program that the entity will use for rendering 
                 GFXM.program_use(shaders[graphics.shd_ref]);
 
                 // Bind object's VAO handle
                 glBindVertexArray(models[graphics.model_name].vaoid);
 
+                // Check if entity has a texture
+                if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
+                    // Assign texture object to use texture image unit 6 
+                    glBindTextureUnit(6, textures[graphics.texture_name]); 
+                    LM.write_log("Render_System::draw(): texture name: %s.", graphics.texture_name.c_str()); 
+
+                    // Set texture flag to be true
+                    GLuint tex_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "TexFlag"); 
+                    if (tex_flag_true_loc >= 0) { 
+                        glUniform1ui(tex_flag_true_loc, GL_TRUE); 
+                    } else {
+                        LM.write_log("Render_System::draw(): Texture flag boolean doesn't exist."); 
+                        std::exit(EXIT_FAILURE); 
+                    }
+
+                    // Get fragment shader to use texture image unit 6
+                    GLuint tex_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex2d"); 
+                    if (tex_uniform_loc >= 0) { 
+                        glUniform1i(tex_uniform_loc, 6); 
+                    } else {
+                        LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist."); 
+                        std::exit(EXIT_FAILURE); 
+                    }
+                } else {
+                    // Set texture flag to be false
+                    GLuint tex_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "TexFlag"); 
+                    if (tex_flag_false_loc >= 0) {
+                        glUniform1ui(tex_flag_false_loc, GL_FALSE);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Texture flag boolean doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+                }
+
                 // Pass object's color to fragment shader uniform variable uColor
                 GLint color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uColor");
                 if (color_uniform_loc >= 0) {
                     glUniform3fv(color_uniform_loc, 1, &graphics.color[0]);
-                }
-                else {
+                } else {
                     LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
@@ -166,30 +202,26 @@ namespace lof {
                 GLint mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC_Mat");
                 if (mat_uniform_loc >= 0) {
                     glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
-                }
-                else {
+                } else {
                     LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
                 // Render objects
                 if (entity_id == 0) { // Set background object to always render in fill mode
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                    glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                    glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode());
-                }
-                else {
-                    glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+                    glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL); 
+                    glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode()); 
+                } else {
+                    glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL); 
                 }
 
                 // Draw debugging features if debug mode is ON
-                
-                if (GFXM.get_debug_mode() == GL_TRUE) {
-                    if (entity_id != 0) { // Background object unaffected               
+                if (entity_id != 0) { // Background object unaffected 
+                    if (GFXM.get_debug_mode() == GL_TRUE) {                
                         auto& velocity = ecs_manager.get_component<Velocity_Component>(entity_id);  // For Debugging  
                         auto& collision = ecs_manager.get_component<Collision_Component>(entity_id);// For Debugging
 
-                        
                         std::vector<glm::mat3> box_mdl_to_ndc_xform;
 
                         // Compute mdl_to_ndc_xform for each line of AABB box
@@ -219,8 +251,8 @@ namespace lof {
                                                       transform.position.x, transform.position.y, 1 };
 
                             // Compute world scale matrix
-                            glm::mat3 world_scale{ 1.0 / DEFAULT_WORLD_RANGE, 0, 0,
-                                                   0, 1.0 / DEFAULT_WORLD_RANGE, 0,
+                            glm::mat3 world_scale{ 1.0 / SM.get_scr_width(), 0, 0,
+                                                   0, 1.0 / SM.get_scr_height(), 0,
                                                    0, 0, 1 };
 
                             // Compute model-to-world-to-NDC transformation matrix for line and store it for the AABB box
@@ -228,25 +260,38 @@ namespace lof {
                             box_mdl_to_ndc_xform.emplace_back(result_xform);
                         }
 
-                        // Set draw color for AABB box and velocity line to black
-                        glm::vec3 AABB_box_color{ 0.0f, 0.0f, 0.0f };
-                        if (color_uniform_loc >= 0) {
-                            glUniform3fv(color_uniform_loc, 1, &AABB_box_color[0]);
+                        // Free texture shader program to allow models shader program to bind and start  
+                        GFXM.program_free(); 
+                        GFXM.program_use(shaders[graphics.shd_ref + 1]); 
+
+                        // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
+                        GLint debug_color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uColor");
+                        glm::vec3 debug_color{ 0.0f, 0.0f, 0.0f }; 
+                        if (debug_color_uniform_loc >= 0) {
+                            glUniform3fv(debug_color_uniform_loc, 1, &debug_color[0]);
+                        } else {
+                            LM.write_log("Render_System::draw(): Debug Color uniform variable doesn't exist.");
+                            std::exit(EXIT_FAILURE);
                         }
-
-                        // Drawing AABB box line by line
-                        for (std::size_t i = 0; i < 4; ++i) {
-                            glLineWidth(DEFAULT_AABB_WIDTH);
-                            glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
-                            glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-
+                        // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat");
+                        if (debug_mat_uniform_loc >= 0) {
+                            // Drawing AABB box line by line
+                            for (std::size_t i = 0; i < 4; ++i) {
+                                glLineWidth(DEFAULT_AABB_WIDTH);
+                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
+                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                            }
+                        } else {
+                            LM.write_log("Render_System::draw(): Debug Matrix uniform variable doesn't exist.");
+                            std::exit(EXIT_FAILURE);
                         }
 
                         // Set up to draw velocity line
-                        glBindVertexArray(models["debug_line"].vaoid);
+                        glBindVertexArray(models["debug_line"].vaoid);  
 
                         // Draw the line according to velocity
-                        if (mat_uniform_loc >= 0) {
+                        if (debug_mat_uniform_loc >= 0) {
 
                             // Compute line scale matrix
                             glm::mat3 scale_mat{ transform.scale.x * DEFAULT_VELOCITY_LINE_LENGTH, 0, 0,
@@ -298,13 +343,13 @@ namespace lof {
                                                  transform.position.x, transform.position.y, 1 };
 
                             // Compute world scale matrix
-                            glm::mat3 world_scale{ 1.0 / DEFAULT_WORLD_RANGE, 0, 0,
-                                                   0, 1.0 / DEFAULT_WORLD_RANGE, 0,
+                            glm::mat3 world_scale{ 1.0 / SM.get_scr_width(), 0, 0,
+                                                   0, 1.0 / SM.get_scr_height(), 0,
                                                    0, 0, 1 };
 
                             // Set line mdl_to_ndc_xform to the vertex shader
                             glm::mat3 line_mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
-                            glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
+                            glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
                         }
                         glLineWidth(DEFAULT_LINE_WIDTH);
                         glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
