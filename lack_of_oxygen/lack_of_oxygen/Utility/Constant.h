@@ -87,10 +87,11 @@ namespace lof {
 
 	// ------------------------------ Render_System.cpp --------------------------------
 	// Graphics Component constants
-	constexpr GLfloat DEFAULT_WORLD_RANGE = 3000.0f;
+	//constexpr GLfloat DEFAULT_WORLD_RANGE = 3000.0f;
 	constexpr GLfloat DEFAULT_ROTATION = 90.0f;
 	constexpr GLfloat DEFAULT_LINE_WIDTH = 5.0f;
 	constexpr GLfloat DEFAULT_POINT_SIZE = 5.0f;
+	constexpr const char* DEFAULT_TEXTURE_NAME = "notex";
 	
 	// Debugging constants
 	constexpr float DEFAULT_SCALE_CHANGE = 100.0f;

@@ -12,6 +12,10 @@
 #include "Graphics_Manager.h" 
 #include "../Utility/Path_Helper.h" // For file path resolution
 
+// FOR TESTING (texture loading)
+#define STB_IMAGE_IMPLEMENTATION 
+#include "STB/stb_image.h"  // For loading textures/sprites 
+
 namespace lof {
 
     std::unique_ptr<Graphics_Manager> Graphics_Manager::instance;
@@ -57,13 +61,15 @@ namespace lof {
         // Set up default render mode 
         render_mode = GL_FILL;
 
-        std::string vertex_path = Path_Helper::get_vertex_shader_path();
-        std::string fragment_path = Path_Helper::get_fragment_shader_path();
+        std::string vertex_path_1 = Path_Helper::get_vertex_shader_path_1();
+        std::string fragment_path_1 = Path_Helper::get_fragment_shader_path_1();
+        std::string vertex_path_2 = Path_Helper::get_vertex_shader_path_2();
+        std::string fragment_path_2 = Path_Helper::get_fragment_shader_path_2();
 
         // Read file to initialize shaders 
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
-        std::make_pair<std::string, std::string>(vertex_path.c_str(),
-                                                 fragment_path.c_str())
+        std::make_pair<std::string, std::string>(vertex_path_1.c_str(), fragment_path_1.c_str()),
+        std::make_pair<std::string, std::string>(vertex_path_2.c_str(), fragment_path_2.c_str()) 
         };
 
         // Create shader program from shader files and insert 
@@ -72,15 +78,22 @@ namespace lof {
             LM.write_log("Graphics_Manager::start_up(): Fail to add shader program.");
             return -1;
         } else {
-            LM.write_log("Graphics_Manager::start_up(): Succesfully added shader program.");
+            LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
 
         std::string mesh_path = Path_Helper::get_model_file_path();
+        std::string texture_path = Path_Helper::get_texture_file_path();
 
-        // Add models (Will move this to serialization side)
+        // Add models
         if (!add_model(mesh_path.c_str())) {
-            LM.write_log("Fail to add model.");
-            return -1;
+            LM.write_log("Fail to add models.");
+            return -2;
+        }
+
+        // Add textures
+        if (!add_textures(texture_path.c_str())) {
+            LM.write_log("Fail to add textures.");
+            return -3;
         }
 
         m_is_started = true;
@@ -136,7 +149,9 @@ namespace lof {
             }
             // Insert shader program into container
             shader_program_storage.emplace_back(shader_program);
-            LM.write_log("Graphics_Manager::add_shader_program(): Shader program compiled successfully.");
+            std::size_t shader_idx = shader_program_storage.size() - 1;
+            LM.write_log("Graphics_Manager::add_shader_program(): Shader program handle is %u.", shader_program.program_handle);
+            LM.write_log("Graphics_Manager::add_shader_program(): Shader program %u created, compiled and added successfully.", shader_idx);
         }
         return GL_TRUE;
     }
@@ -154,6 +169,11 @@ namespace lof {
         input_file.seekg(0, std::ios::beg);
 
         // Model data
+        struct TexVtxData { 
+            glm::vec2 pos{}; 
+            glm::vec2 tex{}; 
+        };
+        std::vector<TexVtxData> TexVtxArr;
         std::vector<glm::vec2> pos_vtx;
         std::vector<GLushort> vtx_idx;
         Graphics_Manager::Model mdl{};
@@ -178,10 +198,20 @@ namespace lof {
                 }
             }
             else if (prefix == "v") { // Get vertex position
-                glm::vec2 pos{};
-                file_line_ss >> pos.x;
-                file_line_ss >> pos.y;
-                pos_vtx.emplace_back(pos);
+                if (model_name == "square") { 
+                    TexVtxData data; 
+                    file_line_ss >> data.pos.x; 
+                    file_line_ss >> data.pos.y;  
+                    file_line_ss >> data.tex.x; 
+                    file_line_ss >> data.tex.y;  
+                    TexVtxArr.emplace_back(data); 
+                }
+                else {
+                    glm::vec2 pos{}; 
+                    file_line_ss >> pos.x; 
+                    file_line_ss >> pos.y; 
+                    pos_vtx.emplace_back(pos); 
+                } 
             }
             else if (prefix == "i") { // Get vertex index
                 GLushort idx;
@@ -205,25 +235,53 @@ namespace lof {
             }
             else if (prefix == "e") { // Indicates end of model data, signal to make model
 
-                // Generate a VAO handle to encapsulate the VBO(s) and
-                // state of the mesh
-                GLuint vbo_hdl;
-                glCreateBuffers(1, &vbo_hdl);
-                glNamedBufferStorage(vbo_hdl, sizeof(glm::vec2) * pos_vtx.size(),
-                    pos_vtx.data(), GL_DYNAMIC_STORAGE_BIT);
+                // Add position vertex and texture coordinates data together
+                std::size_t data_size{}; 
+                if (model_name == "square") { 
+                    data_size = sizeof(TexVtxData); 
+                } else {
+                    data_size = sizeof(glm::vec2); 
+                }
+                LM.write_log("Data_size values are: %u", data_size); 
 
-                // Encapsulate information about contents of VBO and VBO handle to VAO
+                // Setting up VBO, VAO, and EBO
+                GLuint vbo_hdl;
                 GLuint vaoid;
+                GLuint ebo_hdl;
+
+                // encapsulate information about contents of VBO and VBO handle to VAO 
                 glCreateVertexArrays(1, &vaoid);
 
-                // For position vertex, we use vertex attribute index 0
-                // and vertex buffer binding point 0 
-                glEnableVertexArrayAttrib(vaoid, 0);
-                glVertexArrayVertexBuffer(vaoid, 1, vbo_hdl, 0, sizeof(glm::vec2));
-                glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
-                glVertexArrayAttribBinding(vaoid, 0, 1);
+                if (model_name == "square") {
+                    // Generate a VAO handle to encapsulate the VBO(s) and
+                    // state of the mesh
+                    glCreateBuffers(1, &vbo_hdl);
+                    glNamedBufferStorage(vbo_hdl, data_size * TexVtxArr.size(),
+                        TexVtxArr.data(), GL_DYNAMIC_STORAGE_BIT);
 
-                GLuint ebo_hdl;
+                    // for assigning texture coordinates, we use vertex attribute index 1
+                    // and vertex buffer binding point 7
+                    glEnableVertexArrayAttrib(vaoid, 1);
+                    glVertexArrayVertexBuffer(vaoid, 7, vbo_hdl, sizeof(glm::vec2), (GLsizei)data_size);
+                    glVertexArrayAttribFormat(vaoid, 1, 2, GL_FLOAT, GL_FALSE, 0);
+                    glVertexArrayAttribBinding(vaoid, 1, 7);
+
+                }
+                else {
+                    // Generate a VAO handle to encapsulate the VBO(s) and
+                    // state of the mesh
+                    glCreateBuffers(1, &vbo_hdl);
+                    glNamedBufferStorage(vbo_hdl, data_size * pos_vtx.size(),
+                        pos_vtx.data(), GL_DYNAMIC_STORAGE_BIT);
+                }
+
+                // for position vertex, we use vertex attribute index 0
+                // and vertex buffer binding point 6 
+                glEnableVertexArrayAttrib(vaoid, 0);
+                glVertexArrayVertexBuffer(vaoid, 6, vbo_hdl, 0, (GLsizei)data_size);
+                glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
+                glVertexArrayAttribBinding(vaoid, 0, 6);
+
                 glCreateBuffers(1, &ebo_hdl);
                 glNamedBufferStorage(ebo_hdl, sizeof(GLushort) * vtx_idx.size(),
                     reinterpret_cast<GLvoid*>(vtx_idx.data()),
@@ -233,15 +291,6 @@ namespace lof {
 
                 // Return an appropriately initialized instance of a model
                 mdl.vaoid = vaoid;
-                if (mdl.primitive_type == GL_TRIANGLES || mdl.primitive_type == GL_TRIANGLE_STRIP) {
-                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 2; // number of primitives
-                }
-                else if (mdl.primitive_type == GL_TRIANGLE_FAN) {
-                    mdl.primitive_cnt = (GLuint)vtx_idx.size() - 2; 
-                }
-                else if (mdl.primitive_type == GL_LINES) {
-                    mdl.primitive_cnt = (GLuint)pos_vtx.size() - 1; 
-                }
                 mdl.draw_cnt = (GLuint)vtx_idx.size();
                 model_storage[model_name] = mdl;
                 LM.write_log("Graphics_Manager::add_model(): %s model successfully created and stored.", model_name.c_str());
@@ -258,6 +307,67 @@ namespace lof {
         return GL_TRUE;
     }
 
+    GLboolean Graphics_Manager::add_textures(std::string const& file_name) {
+        // Create filepath for textures from texture name text file
+        std::ifstream input_file{ file_name, std::ios::in }; 
+        if (!input_file) { 
+            input_file.close(); 
+            LM.write_log("Unable to open %s", file_name.c_str()); 
+            return GL_FALSE; 
+        }
+        input_file.seekg(0, std::ios::beg);
+
+        std::string tex_name; 
+        while (getline(input_file, tex_name)) {
+            std::string tex_filepath = "../lack_of_oxygen/Data/Textures/" + tex_name + ".png";
+
+            // Checking if file exists
+            std::ifstream ifs{ tex_filepath, std::ios::binary };
+            if (!ifs) {
+                LM.write_log("Graphics_Manager::add_texture(): %s does not exist!!!!!", tex_filepath.c_str());
+                return GL_FALSE; 
+            }
+            ifs.seekg(0, std::ios::beg);
+
+            int width{ 0 }, height{ 0 }, channels{ 0 };
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char* tex_data = stbi_load(tex_filepath.c_str(), &width, &height, &channels, 4);
+
+            // Create and initialize a texture object that encapsulates a 2D texture
+            GLuint tex_id{};
+            if (tex_data) {
+                glGenTextures(1, &tex_id);
+                glBindTexture(GL_TEXTURE_2D, tex_id);
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+                // Allocate memory for texture data and upload it
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+                glBindTexture(GL_TEXTURE_2D, 0);
+
+                // Free data
+                stbi_image_free(tex_data);
+            }
+            else {
+                stbi_image_free(tex_data);
+                LM.write_log("Graphics_Manager::add_texture(): %s texture data failed to load.", tex_name.c_str());
+                return GL_FALSE;
+            }
+
+            // Add texture object id to texture storage
+            texture_storage[tex_name] = tex_id;
+            //LM.write_log("Graphics_Manager::add_texture(): tex_id = %u.", tex_id);
+            LM.write_log("Graphics_Manager::add_texture(): %s texture data successfully added.", tex_name.c_str());
+        }
+        // Close file
+        input_file.close();
+        LM.write_log("Graphics_Manager::add_texture(): All textures successfully created and stored.");
+        return GL_TRUE;
+    }
+
     // Return reference to shader program storage
     Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() {
         return shader_program_storage;
@@ -266,6 +376,11 @@ namespace lof {
     // Return reference to model storage
     Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() {
         return model_storage;
+    }
+
+    // Return reference to texture storage
+    Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() {
+        return texture_storage;
     }
 
     // Return state of current render mode
@@ -298,7 +413,7 @@ namespace lof {
                     LM.write_log("Graphics_Manager::compile_shader(): Cannot create program handle");
                     return GL_FALSE;
                 }
-                LM.write_log("Graphics_Manager::compile_shader(): Program handle created");
+                LM.write_log("Graphics_Manager::compile_shader(): Program handle %u created", shader.program_handle);
             }
 
             // Read code from shader file

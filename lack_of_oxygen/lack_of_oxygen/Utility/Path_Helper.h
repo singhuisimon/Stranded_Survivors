@@ -42,9 +42,12 @@ namespace lof {
         static std::string get_scene_path();
         static std::string get_music_path1();
         static std::string get_music_path2();
-        static std::string get_vertex_shader_path();
-        static std::string get_fragment_shader_path();
+        static std::string get_vertex_shader_path_1();
+        static std::string get_fragment_shader_path_1();
+        static std::string get_vertex_shader_path_2();
+        static std::string get_fragment_shader_path_2();
         static std::string get_model_file_path();
+        static std::string get_texture_file_path();
     };
 
 } // namespace lof

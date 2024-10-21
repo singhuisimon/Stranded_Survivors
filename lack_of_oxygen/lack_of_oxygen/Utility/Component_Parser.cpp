@@ -127,7 +127,7 @@ namespace lof {
                     graphics_component.model_name = component_data["model_name"].GetString();
                 }
                 else {
-                    graphics_component.model_name = "square"; // Default value
+                    graphics_component.model_name = DEFAULT_MODEL_NAME; // Default value
                 }
 
                 if (component_data.HasMember("color") && component_data["color"].IsArray()) {
@@ -135,6 +135,13 @@ namespace lof {
                     graphics_component.color.x = clr[0].GetFloat();
                     graphics_component.color.y = clr[1].GetFloat();
                     graphics_component.color.z = clr[2].GetFloat();
+                }
+
+                if (component_data.HasMember("texture_name") && component_data["texture_name"].IsString()) {
+                    graphics_component.texture_name = component_data["texture_name"].GetString();
+                }
+                else {
+                    graphics_component.texture_name = DEFAULT_TEXTURE_NAME; // Default value
                 }
 
                 if (component_data.HasMember("shd_ref") && component_data["shd_ref"].IsUint()) {
