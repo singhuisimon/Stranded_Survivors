@@ -18,6 +18,7 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
+#include "../Utility/Constant.h"
 
 // Initialize Value
 float OVERLAP_X = 0.0f;
@@ -40,19 +41,25 @@ namespace lof
 	* @param collision Collision component data including width and height
 	* @return AABB instance
 	*/
+#if 1
 	AABB AABB::from_Tranform(const Transform2D& transform, const Collision_Component& collision)
 	{
-		Vec2D min;
-		Vec2D max;
+		Vec2D boundingRect_min;
+		Vec2D boundingRect_max;
 
-		min.x = transform.position.x - (collision.width / 2.0f);
-		min.y = transform.position.y - (collision.height / 2.0f);
 
-		max.x = transform.position.x + (collision.width / 2.0f);
-		max.y = transform.position.y + (collision.height / 2.0f);
+		boundingRect_min.x = transform.position.x - (collision.width / 2.0f);
+		boundingRect_min.y = transform.position.y - (collision.height / 2.0f);
 
-		return AABB(min, max); //return the created AABB
+		boundingRect_max.x = transform.position.x + (collision.width / 2.0f);
+		boundingRect_max.y = transform.position.y + (collision.height / 2.0f);
+
+
+
+		return AABB(boundingRect_min, boundingRect_max); //return the created AABB
 	}
+#endif
+
 
 	/**
 	* @brief Check for intersection between rectangles
@@ -333,6 +340,7 @@ namespace lof
 	* @param delta_time The time for the last update
 
 	*/
+#if 1
 	void Collision_System::Collision_Check_Collide(std::vector<CollisionPair>& collisions, float delta_time)
 	{
 		AABB aabb1{ {0,0}, {0,0} };
@@ -389,6 +397,7 @@ namespace lof
 		}
 
 	}
+#endif
 
 	/**
 	* @brief Resolve the collison if they have colllied and update the position and velocities of involved entities
@@ -396,7 +405,8 @@ namespace lof
 	* @param collisions A references to a vector of Collision pair object for their overlap information
 
 	*/
-	void Collision_System::Resolve_Collsion_Event(const std::vector<CollisionPair>& collisions)
+#if 1
+	void Collision_System::Resolve_Collsion_Event(const std::vector<CollisionPair>& collisions, float delta_time)
 	{
 		for (const auto& collision : collisions)
 		{
@@ -413,29 +423,41 @@ namespace lof
 
 			AABB second_form = AABB::from_Tranform(transform2, collision.entity2);
 
+			float collision_time = 1.0f;
+			Vec2D correction = collision.overlap * (1.0f - collision_time);
+
+			// Resolve the collision based on overlap and direction of motion
 			if (collision.overlap.y > 0) {
-				velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
+				//velocity1.velocity.y = 0.0f;  // Stop falling when hitting platform
 				physic1.is_grounded = true;   // Entity is now grounded
+				transform1.position.y -= correction.y; // Move up to resolve collision
 			}
 
-			if (collision.overlap.x > 0 && collision.overlap.y > 0)
-			{
-				// Collision detected, stop both objects
-				velocity1.velocity.x = 0.0f;
-				velocity1.velocity.y = 0.0f;
-				physic1.is_grounded = true;
+			if (collision.overlap.x != 0) {
+				// Move left or right based on which side is colliding
+				if (collision.overlap.x > 0) {
+					transform1.position.x -= correction.x; // Move left
+				}
+				else if (collision.overlap.x < 0) // Collided on the right side
+        {
+            transform1.position.x += correction.x; // Move right
+        }
+
 			}
-			// Resolve the collision
-			Resolve_Collision_Static_Dynamic(first_form, second_form, transform1, collision.overlap);
 
 			// Additional handling after resolution (e.g., setting grounded status)
 			if (physic1.is_grounded)
 			{
+				///velocity1.velocity.y += physic1.gravity.y * delta_time;
 				physic1.is_jumping = false;
 			}
 
 		}
 	}
+#endif
+
+
+
 	/**
 	* @brief Update the collision system
 	* @param delta_time Delta time since the last update.
@@ -444,7 +466,7 @@ namespace lof
 	{
 		std::vector<CollisionPair> collisions;
 		Collision_System::Collision_Check_Collide(collisions, delta_time); // Check for collisions and fill the collision list
-		Collision_System::Resolve_Collsion_Event(collisions);
+		Collision_System::Resolve_Collsion_Event(collisions,delta_time);
 	}
 
 	/**

@@ -101,6 +101,10 @@ namespace lof {
 	// ------------------------------ Graphics_System.cpp --------------------------------
 
 
+	// ------------------------------ Collision_System.cpp --------------------------------
+	constexpr const float         BOUNDING_RECT_SIZE = 1.0f;
+
+
 } // namespace lof
 
 #endif // CONSTANTS_H

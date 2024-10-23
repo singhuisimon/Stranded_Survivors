@@ -46,6 +46,8 @@ namespace lof
 		* @return AABB instance 
 		*/
 		static AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision);
+
+		//static AABB from_Transform(const Transform2D& transform, const Collision_Component& collision, const Vec2D& velocity, float delta_time);
 	};
 	
 
@@ -128,7 +130,7 @@ namespace lof
 		* @param collisions A references to a vector of Collision pair object for their overlap information
 
 		*/
-		void Resolve_Collsion_Event(const std::vector<CollisionPair>& collisions);
+		void Resolve_Collsion_Event(const std::vector<CollisionPair>& collisions, float delta_time);
 
 		/**
 		* @brief Resolve the collision between an dynamic object and static object for rectangle based on AABB
