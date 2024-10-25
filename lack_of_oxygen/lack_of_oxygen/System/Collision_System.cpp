@@ -18,7 +18,6 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
-#include "../Utility/Constant.h"
 #include "../Manager/ECS_Manager.h"
 
 // Initialize Value
@@ -28,31 +27,21 @@ float OVERLAP_Y = 0.0f;
 
 namespace lof {
 
-	/**
-	* @brief create AABB from transform component and collision component
-	* @param transform Tranform data including position, rotation, scale
-	* @param collision Collision component data including width and height
-	* @return AABB instance
-	*/
-#if 1
-	AABB AABB::from_Tranform(const Transform2D& transform, const Collision_Component& collision)
-	{
-		Vec2D boundingRect_min;
-		Vec2D boundingRect_max;
+    AABB::AABB(const Vec2D& min, const Vec2D& max)
+        : min(min), max(max) {}
 
+    AABB AABB::from_transform(const Transform2D& transform, const Collision_Component& collision) {
+        Vec2D min;
+        Vec2D max;
 
-		boundingRect_min.x = transform.position.x - (collision.width / 2.0f);
-		boundingRect_min.y = transform.position.y - (collision.height / 2.0f);
+        min.x = transform.position.x - (collision.width / 2.0f);
+        min.y = transform.position.y - (collision.height / 2.0f);
 
-		boundingRect_max.x = transform.position.x + (collision.width / 2.0f);
-		boundingRect_max.y = transform.position.y + (collision.height / 2.0f);
+        max.x = transform.position.x + (collision.width / 2.0f);
+        max.y = transform.position.y + (collision.height / 2.0f);
 
-
-
-		return AABB(boundingRect_min, boundingRect_max); //return the created AABB
-	}
-#endif
-
+        return AABB(min, max);
+    }
 
     Collision_System::Collision_System() {
         // Set the required components for this system
