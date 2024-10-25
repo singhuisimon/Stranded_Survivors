@@ -113,8 +113,7 @@ namespace lof {
     void Serialization_Manager::merge_objects(const rapidjson::Value& source,
         rapidjson::Value& destination,
         rapidjson::Document::AllocatorType& allocator) {
-        LM.write_log("Serialization_Manager::merge_objects(): Merging objects from source to destination.");
-
+        LM.write_log("Serialization_Manager::merge_objects(): Updating prefab values with specifed values.");
         assert(source.IsObject());
         assert(destination.IsObject());
 

@@ -22,6 +22,7 @@
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
+    <ClCompile Include="Utility\Path_Helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -48,6 +49,8 @@
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="Utility\Constant.h" />
+    <ClInclude Include="Utility\Path_Helper.h" />
+    <ClInclude Include="Utility\Type.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

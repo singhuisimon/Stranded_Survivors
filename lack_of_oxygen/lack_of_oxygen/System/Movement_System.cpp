@@ -9,121 +9,82 @@
  */
 
 #include "Movement_System.h"
+#include "../Utility/Constant.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
 
 namespace lof {
 
-    Movement_System::Movement_System(ECS_Manager& ecs_manager): ecs(ecs_manager) {}
+    Movement_System::Movement_System() {
+        // Set the required components for this system
+        signature.set(ECSM.get_component_id<Transform2D>());
+        signature.set(ECSM.get_component_id<Velocity_Component>());
+        signature.set(ECSM.get_component_id<Physics_Component>());
+    }
 
     void Movement_System::update(float delta_time) {
-        // Iterate through all entities and update positions based on velocity
-        const auto& entities = ecs.get_entities();
-        for (const auto& entity : entities) {
-            EntityID id = entity->get_id();
+        // Iterate through entities matching the system's signature
+        for (EntityID entity_id : get_entities()) {
 
+            auto& transform = ECSM.get_component<Transform2D>(entity_id);
+            auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);
+            auto& physics = ECSM.get_component<Physics_Component>(entity_id);
 
-            // Check if entity has both Transform2D, Velocity_Component
-            if (entity->has_component(ecs.get_component_id<Transform2D>()) &&
-                entity->has_component(ecs.get_component_id<Velocity_Component>()) &&
-                entity->has_component(ecs.get_component_id<Physics_Component>()))
-                {
+            // Skip processing for static entities
+            if (physics.is_static)
+                continue;
 
-                Transform2D& transform = ecs.get_component<Transform2D>(id);
-                Velocity_Component& velocity = ecs.get_component<Velocity_Component>(id);
-                Physics_Component& physics = ecs.get_component<Physics_Component>(id);
+            // Handle jumping mechanics
+            if (IM.is_key_held(GLFW_KEY_SPACE) && physics.is_grounded && !physics.is_jumping) {
+                // Apply jump force
+                physics.apply_force(Vec2D(0.0f, physics.jump_force * physics.mass));
 
-                //skip processing for static entities
-                if (physics.is_static) continue;
-
-                std::cout << "Entity " << id << "is_grounded = " << physics.is_grounded
-                    << ", is_jumping = " << physics.is_jumping << std::endl;
-
-                if (physics.is_grounded) {
-                    velocity.velocity.y = 0.0f; //reset the vertical velocity
-                }
-
-                // Handle jumping
-                // Handle jumping mechanics
-                if (IM.is_key_held(GLFW_KEY_SPACE) &&physics.is_grounded && !physics.is_jumping) {
-
-                    // Apply jump force
-                    velocity.velocity.y = physics.jump_force;
-
-                   physics.is_jumping = true; // Mark as jumping
-                   physics.is_grounded = false; // Leave the ground
-                }
-               
-
-                // Apply gravity if the entity is not grounded
-                if (!physics.is_grounded) {
-
-                    velocity.velocity.y += physics.gravity.y * delta_time * GRAVITY_ACCELERATOR; //change in velocity over time
-                }
-                if (physics.is_grounded) {
-                    //velocity.velocity.y = 0.0f; //reset the vertical velocity
-
-                    physics.gravity.y = 0.0f;
-                }
-                else {
-                    physics.gravity.y = DEFAULT_GRAVITY;
-                    physics.is_grounded = false;
-                }
-
-                //check for keyboard input
-                if (IM.is_key_held(GLFW_KEY_A)) {
-
-                    velocity.velocity.x = -DEFAULT_SPEED;//move left
-
-                }
-                else if (IM.is_key_held(GLFW_KEY_D)) {
-
-                    velocity.velocity.x = DEFAULT_SPEED;  //move right
-
-                }
-                else {
-                    velocity.velocity.x = 0;
-                }
-
-                //calculate the acceleration 
-
-                Vec2D total_force = physics.accumulated_force + (physics.gravity * physics.mass); // F = ma = mg; g as acceleration: a(g) = F / m;
-                Vec2D acceleration = total_force * physics.inv_mass; // F = ma; a = F / m;
-
-                //update velocity according to the acceleration on each entity
-                velocity.velocity += acceleration * delta_time;
-
-
-                //dampen velocity
-                velocity.velocity *= physics.damping_factor;
-
-                //update the position based on velocity
-                transform.position += velocity.velocity * delta_time;
-
-                //clamp velocity to max velocity 
-                float squared_velocity = square_length_vec2d(velocity.velocity);
-
-                //squared max_velocity 
-                float squared_max_vel = physics.max_velocity * physics.max_velocity; 
-
-
-                // length of entity's velocity > max_velocity
-                if (squared_velocity > squared_max_vel) {
-
-                        Vec2D normalize_result;
-                        normalize_vec2d(normalize_result, velocity.velocity);
-                        velocity.velocity = normalize_result * physics.max_velocity;
-
-                }
-
-                //reset the accumulated force 
-                physics.reset_forces();
-                physics.is_jumping = false;
-                physics.is_grounded = false;
-                
-
+                physics.is_jumping = true;   // Mark as jumping
+                physics.is_grounded = false; // Leave the ground
             }
+
+            // Apply gravity
+            physics.apply_force(physics.gravity * physics.mass);
+
+            // Handle horizontal movement
+            if (IM.is_key_held(GLFW_KEY_A)) {
+                // Apply force to move left
+                physics.apply_force(Vec2D(-10.f, 0.0f));
+            }
+            else if (IM.is_key_held(GLFW_KEY_D)) {
+                // Apply force to move right
+                physics.apply_force(Vec2D(10.f, 0.0f));
+            }
+
+            // Calculate the acceleration
+            Vec2D acceleration = physics.accumulated_force * physics.inv_mass;
+
+            // Update velocity according to the acceleration
+            velocity.velocity += acceleration * delta_time;
+
+            // Dampen velocity
+            velocity.velocity *= physics.damping_factor;
+
+            // Update the position based on velocity
+            transform.position += velocity.velocity * delta_time;
+
+            // Clamp velocity to max velocity
+            float squared_velocity = square_length_vec2d(velocity.velocity);
+            float squared_max_vel = physics.max_velocity * physics.max_velocity;
+
+            // If length of entity's velocity > max_velocity
+            if (squared_velocity > squared_max_vel) {
+                Vec2D normalize_result;
+                normalize_vec2d(normalize_result, velocity.velocity);
+                velocity.velocity = normalize_result * physics.max_velocity;
+            }
+
+            // Reset the accumulated force
+            physics.reset_forces();
+
+            // Do not reset is_grounded or is_jumping here
+            // Let the collision system update is_grounded
         }
     }
 
