@@ -7,117 +7,106 @@
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-#ifndef LOF_ECS_MANAGER_TPP
-#define LOF_ECS_MANAGER_TPP
 
 namespace lof {
 
-template<typename T>
-void ECS_Manager::register_component() {
-    std::type_index typeIndex(typeid(T));
+    template<typename T>
+    void ECS_Manager::register_component() {
+        std::type_index typeIndex(typeid(T));
 
-    // Ensure component type hasn't been registered before
-    assert(component_type_to_id.find(typeIndex) == component_type_to_id.end() && "Component type already registered.");
+        // Ensure component type hasn't been registered before
+        assert(component_type_to_id.find(typeIndex) == component_type_to_id.end() && "Component type already registered.");
 
-    component_type_to_id[typeIndex] = next_component_id;
-    id_to_component_type[next_component_id] = &typeid(T);
-    component_arrays[typeIndex] = std::vector<std::unique_ptr<Component>>(entities.size());
+        component_type_to_id[typeIndex] = next_component_id;
+        id_to_component_type[next_component_id] = &typeid(T);
+        component_arrays[typeIndex] = std::vector<std::unique_ptr<Component>>(entities.size());
 
-    next_component_id++;
-}
+        next_component_id++;
 
-template<typename T>
-void ECS_Manager::add_component(EntityID entity, T component) {
-    std::type_index typeIndex(typeid(T));
-
-    // Ensure component type is registered
-    assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
-
-    // Ensure entity ID is valid
-    assert(entity < entities.size() && "Entity ID out of range.");
-
-    // Add component to entity
-    entities[entity]->add_component(component_type_to_id[typeIndex]);
-
-    // Store component
-    auto& componentArray = get_component_array<T>();
-
-    // Resize the component array if necessary
-    if (componentArray.size() <= entity) {
-        componentArray.resize(entities.size());
+        // Ensure next_component_id doesn't exceed MAX_COMPONENTS
+        assert(next_component_id <= MAX_COMPONENTS && "Exceeded maximum number of components.");
     }
 
-    componentArray[entity] = std::make_unique<T>(component);
-}
+    template<typename T>
+    void ECS_Manager::add_component(EntityID entity, T component) {
+        std::type_index typeIndex(typeid(T));
 
-template<typename T>
-void ECS_Manager::remove_component(EntityID entity) {
-    std::type_index typeIndex(typeid(T));
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
 
-    // Ensure component type is registered
-    assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
 
-    // Ensure entity ID is valid
-    assert(entity < entities.size() && "Entity ID out of range.");
+        // Add component to entity
+        entities[entity]->add_component(component_type_to_id[typeIndex]);
 
-    // Remove component from entity
-    entities[entity]->remove_component(component_type_to_id[typeIndex]);
+        // Store component
+        auto& componentArray = get_component_array<T>();
 
-    // Remove component from storage
-    auto& componentArray = get_component_array<T>();
-    componentArray[entity].reset();
-}
+        // Resize the component array if necessary
+        if (componentArray.size() <= entity) {
+            componentArray.resize(entities.size());
+        }
 
-template<typename T>
-T& ECS_Manager::get_component(EntityID entity) {
-    std::type_index typeIndex(typeid(T));
+        componentArray[entity] = std::make_unique<T>(component);
 
-    // Ensure component type is registered
-    assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+        // Update systems
+        update_entity_in_systems(entity);
+    }
 
-    // Ensure entity ID is valid
-    assert(entity < entities.size() && "Entity ID out of range.");
+    template<typename T>
+    void ECS_Manager::remove_component(EntityID entity) {
+        std::type_index typeIndex(typeid(T));
 
-    // Ensure entity has the component
-    assert(entities[entity]->has_component(component_type_to_id[typeIndex]) && "Entity does not have component.");
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
 
-    auto& componentArray = get_component_array<T>();
-    return *static_cast<T*>(componentArray[entity].get());
-}
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
 
-template<typename T>
-bool ECS_Manager::has_component(EntityID entity) const {
-    std::type_index typeIndex(typeid(T));
+        // Remove component from entity
+        entities[entity]->remove_component(component_type_to_id[typeIndex]);
 
-    // Ensure component type is registered
-    assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+        // Remove component from storage
+        auto& componentArray = get_component_array<T>();
+        componentArray[entity].reset();
 
-    // Ensure entity ID is valid
-    assert(entity < entities.size() && "Entity ID out of range.");
+        // Update systems
+        update_entity_in_systems(entity);
+    }
 
-    return entities[entity]->has_component(component_type_to_id.at(typeIndex));
-}
+    template<typename T>
+    bool ECS_Manager::has_component(EntityID entity) const {
+        std::type_index typeIndex(typeid(T));
 
-template<typename T>
-std::size_t ECS_Manager::get_component_id() const {
-    std::type_index typeIndex(typeid(T));
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
 
-    // Ensure component type is registered
-    assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
 
-    return component_type_to_id.at(typeIndex);
-}
+        return entities[entity]->has_component(component_type_to_id.at(typeIndex));
+    }
 
-template<typename T>
-std::vector<std::unique_ptr<Component>>& ECS_Manager::get_component_array() {
-    std::type_index typeIndex(typeid(T));
+    template<typename T>
+    std::size_t ECS_Manager::get_component_id() const {
+        std::type_index typeIndex(typeid(T));
 
-    // Ensure component type is registered
-    assert(component_arrays.find(typeIndex) != component_arrays.end() && "Component type not registered.");
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
 
-    return component_arrays[typeIndex];
-}
+        return component_type_to_id.at(typeIndex);
+    }
+
+    template<typename T>
+    std::vector<std::unique_ptr<Component>>& ECS_Manager::get_component_array() {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        assert(component_arrays.find(typeIndex) != component_arrays.end() && "Component type not registered.");
+
+        return component_arrays[typeIndex];
+    }
 
 } // namespace lof
 
-#endif // LOF_ECS_MANAGER_TPP

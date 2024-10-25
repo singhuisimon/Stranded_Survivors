@@ -13,7 +13,11 @@
 
 // Include standard headers
 #include <string>
+#include <unordered_set>       // For std::unordered_set
+
+// Include other necessary headers
 #include "../Utility/Constant.h"
+#include "../Utility/Type.h"  // Include shared types
 
 namespace lof {
 
@@ -21,7 +25,19 @@ namespace lof {
      * @class System
      * @brief Abstract base class for all systems in the ECS.
      */
-    class System {
+    class System { 
+    protected:
+        Signature signature;                      ///< Components required by the system
+        std::unordered_set<EntityID> entities;    ///< Entities matching the system's signature
+
+        /**
+         * @brief Get the list of entities the system processes.
+         * @return A constant reference to the set of entity IDs.
+         */
+        const std::unordered_set<EntityID>& get_entities() const {
+            return entities;
+        }
+
     private:
 
         int64_t system_time = DEFAULT_START_TIME; // Private data member to store system's consumption time in game loop.
@@ -59,8 +75,31 @@ namespace lof {
         void set_time(int64_t time) {
             system_time = time;
         }
-    };
 
+        /**
+         * @brief Add an entity to the system's entity list.
+         * @param entity The ID of the entity to add.
+         */
+        void add_entity(EntityID entity) {
+            entities.insert(entity);
+        }
+
+        /**
+         * @brief Remove an entity from the system's entity list.
+         * @param entity The ID of the entity to remove.
+         */
+        void remove_entity(EntityID entity) {
+            entities.erase(entity);
+        }
+
+        /**
+         * @brief Get the system's component signature.
+         * @return The system's signature.
+         */
+        const Signature& get_signature() const {
+            return signature;
+        }
+    };
 } // namespace lof
 
 #endif // LOF_SYSTEM_H

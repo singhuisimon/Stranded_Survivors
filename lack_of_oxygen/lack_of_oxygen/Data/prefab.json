@@ -46,21 +46,6 @@
           "orientation": [ 0.0, 30.0 ],
           "scale": [ 300.0, 100.0 ]
         },
-        "Velocity_Component": {
-          "velocity": [ 0.0, 0.0 ]
-        },
-        "Physics_Component": {
-          "gravity": [ 0.0, -400.0 ],
-          "damping_factor": 0.90,
-          "max_velocity": 1000.0,
-          "accumulated_force": [ 0.0, 0.0 ],
-          "mass": 2.0,
-          "is_static": true,
-          "is_moveable": false,
-          "is_grounded": false,
-          "is_jumping": false,
-          "jump_force": 0.0
-        },
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 0.0, 0.0, 1.0 ],

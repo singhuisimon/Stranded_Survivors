@@ -9,6 +9,9 @@
  */
 #pragma once
 
+#ifndef LOF_COLLISION_SYSTEM_H
+#define LOF_COLLISION_SYSTEM_H
+
 // Include other necessary headers
 #include "../Utility/Vector2D.h" //to get the library from vector2D.h
 #include "../Entity/Entity.h"
@@ -19,141 +22,114 @@
 //include standard header
 #include <iostream>
 
-namespace lof
-{
-	/**
-	* @class AABB
-	* @brief It represent the axis-aligned bounding boxes which determine whether the 2 game odject are overlapping each other.
-	*/
-	struct AABB {
+namespace lof {
 
-		Vec2D min; // minimum point of the bounding box
-		Vec2D max; // maximum point of the bounding box
+    /**
+     * @struct AABB
+     * @brief Represents axis-aligned bounding boxes for collision detection.
+     */
+    struct AABB {
+        Vec2D min; ///< Minimum point of the bounding box
+        Vec2D max; ///< Maximum point of the bounding box
 
-		
-		/**
-		* @brief Constructor to initialize minimun and maximun points of AABB
-		* @param min Minimum corner of the bounding box
-		* @param max Maximum corner of the bounding box
-		*/
-		AABB(const Vec2D& min, const Vec2D& max);
+        /**
+         * @brief Constructor to initialize minimum and maximum points of AABB.
+         * @param min Minimum corner of the bounding box.
+         * @param max Maximum corner of the bounding box.
+         */
+        AABB(const Vec2D& min, const Vec2D& max);
 
-		
-		/**
-		* @brief create AABB from transform component and collision component 
-		* @param transform Tranform data including position, rotation, scale
-		* @param collision Collision component data including width and height 
-		* @return AABB instance 
-		*/
-		static AABB from_Tranform(const Transform2D& transform, const Collision_Component& collision);
-	};
-	
+        /**
+         * @brief Create AABB from Transform2D and Collision_Component.
+         * @param transform Transform component data including position, rotation, scale.
+         * @param collision Collision component data including width and height.
+         * @return AABB instance.
+         */
+        static AABB from_transform(const Transform2D& transform, const Collision_Component& collision);
+    };
 
-	/**
-	* @class Collision System
-	* @brief Handles collision detection between entities
-	*/
-	class Collision_System : public System
-	{
-	private:
+    /**
+     * @struct CollisionPair
+     * @brief Represents a pair of entities that have collided, along with overlap information.
+     */
+    struct CollisionPair {
+        EntityID entity1;
+        EntityID entity2;
+        Vec2D overlap;
+    };
 
-		class ECS_Manager& ecs_manager;
-	public:
-		/**
-		* @brief Collision System constructor which initialize the collision system with ECS manager
-		* @param ecs_maager Reference to ECS manager
-		*/
-		Collision_System(ECS_Manager& ecs_manager);
+    /**
+     * @class Collision_System
+     * @brief Handles collision detection and resolution between entities.
+     */
+    class Collision_System : public System {
+    public:
+        /**
+         * @brief Constructor for Collision_System.
+         * Initializes the system's signature.
+         */
+        Collision_System();
 
-		
-		struct CollisionPair {
-		EntityID entity1;
-		EntityID entity2;
-		Vec2D overlap;
-		};
+        /**
+         * @brief Update the collision system.
+         * @param delta_time Delta time since the last update.
+         */
+        void update(float delta_time) override;
 
-		
+        /**
+         * @brief Returns the type of the collision system.
+         * @return String representing the type.
+         */
+        std::string get_type() const override;
 
+    private:
+        /**
+         * @brief Check for intersection between rectangles.
+         * @param aabb1 First AABB.
+         * @param vel1 First velocity.
+         * @param aabb2 Second AABB.
+         * @param vel2 Second velocity.
+         * @param firstTimeOfCollision Output param to hold the time of collision.
+         * @return True if rectangles intersect, false otherwise.
+         */
+        bool collision_intersection_rect_rect(const AABB& aabb1,
+            const Vec2D& vel1,
+            const AABB& aabb2,
+            const Vec2D& vel2,
+            float& firstTimeOfCollision);
 
-		/**
-		* @brief Check for intersection between rectangles
-		* @param aabb1 First AABB
-		* @param vel1 First velocity
-		* @param aabb2 Second AABB
-		* @param vel2 Second AABB
-		* @param firstTimeOfCollsion Output param to hold the time of collision
-		* @return True if rectangle intersept, false otherwise
-		*/
-		bool Collision_Intersection_RectRect(const AABB& aabb1,
-			const Vec2D& vel1,
-			const AABB& aabb2,
-			const Vec2D& vel2,
-			float& firstTimeOfCollision);
+        /**
+         * @brief Compute the overlap between AABBs.
+         * @param aabb1 First AABB object.
+         * @param aabb2 Second AABB object.
+         * @return The Vec2D value representing the overlap.
+         */
+        Vec2D compute_overlap(const AABB& aabb1, const AABB& aabb2);
 
-		/**
-		* @brief Check check if a point is within a box
-		* @param pos_box_x Position of x for the rectangle
-		* @param pos_box_y Position of y for the rectangle
-		* @param width_box Width of the rectangle
-		* @param height_box Height of the rectangle
-		* @param mouseX Position x of the mouse
-		* @param mouseY Position y of the mouse
-		* @return True if mouse intersept the box, false otherwise
-		*/
-		bool is_Intersept_Box(float pos_box_x, float pos_box_y, float width_box, float height_box, int mouseX, int mouseY);
+        /**
+         * @brief Check if collisions occur between entities.
+         * @param collisions A reference to a vector of CollisionPair objects for their overlap information.
+         * @param delta_time The time since the last update.
+         */
+        void collision_check_collide(std::vector<CollisionPair>& collisions, float delta_time);
 
-	
+        /**
+         * @brief Resolve collisions and update the positions and velocities of involved entities.
+         * @param collisions A reference to a vector of CollisionPair objects for their overlap information.
+         */
+        void resolve_collision_event(const std::vector<CollisionPair>& collisions);
 
-		/**
-		* @brief Compute the overlap between AABBs. It determines the amount of overlap for both x-axis and y-axis.
-		* @param aabb1 First aabb object
-		* @param aabb2 Second aabb object
-		* @return The Vec2D value can be use to resolve the collisions
-		*/
-		Vec2D Compute_Overlap(const AABB& aabb1, const AABB& aabb2);
+        /**
+         * @brief Resolve collision between a dynamic object and a static object.
+         * @param aabb1 First AABB object.
+         * @param aabb2 Second AABB object.
+         * @param transform1 The Transform2D of the dynamic object.
+         * @param velocity1 The velocity of the dynamic object.
+         * @param overlap The overlap between AABBs along the x and y axis.
+         */
+        void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+    };
 
-		/**
-		* @brief Check if the collsion is collide for every entities
-		* @param collisions A references to a vector of Collision pair object for their overlap information
-		* @param aabb2 Second aabb object
-		* @param delta_time The time for the last update
+} // namespace lof
 
-		*/
-		void Collision_Check_Collide(std::vector<CollisionPair>& collisions, float delta_time);
-
-
-		/**
-		* @brief Resolve the collison if they have colllied and update the position and velocities of involved entities
-		* to resolve the collision and ensure they no longer overlap
-		* @param collisions A references to a vector of Collision pair object for their overlap information
-
-		*/
-		void Resolve_Collsion_Event(const std::vector<CollisionPair>& collisions);
-
-		/**
-		* @brief Resolve the collision between an dynamic object and static object for rectangle based on AABB
-		* @param aabb1 First aabb object
-		* @param aabb2 Second aabb object
-		* @param transform1 The transfrom (position) of dynamic object
-		* @param transform2 The transform (position) of static object
-		* @param Overlap The overlap between AABBs along the x and y axis
-		* @return The Vec2D value can be use to resolve the collisions
-		*/
-		void Resolve_Collision_Static_Dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, const Vec2D& overlap);
-	
-		/**
-		* @brief Update the collision system
-		* @param delta_time Delta time since the last update. 
-		*/
-		void update(float delta_time) override;
-		//might need: handle collision
-
-		/**
-		* @brief Returns the type of the collision system
-		* @return string representing the type
-		*/
-		std::string get_type() const override;
-	};
-}
-
-
+#endif // LOF_COLLISION_SYSTEM_H
