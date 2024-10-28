@@ -19,129 +19,245 @@ namespace lof {
 		return instance;
 	}
 
-	//constructor
-	Audio_Manager::Audio_Manager() : audio_system(nullptr), track1(nullptr), track2(nullptr), current_channel(nullptr) {
-		audio_system = new Audio_System();
-		set_type("Audio_Manager");
-	}
-
-	//destructor
-	Audio_Manager::~Audio_Manager() {
+	Audio_Manager::Audio_Manager() {}
+	Audio_Manager::~Audio_Manager(){
 		shutdown();
-		delete audio_system;
-		audio_system = nullptr;
 	}
 
-	//initialize the system and start up the manager
-	int Audio_Manager::start_up() {
-		if (is_started()) {
-			return 0; // Already started
-		}
+	//int Audio_Manager::start_up() {
+	//	if (is_started()) {
+	//		return 0;
+	//	}
+	//	audio_system = std::make_unique<Audio_System>();
+	//	if (!audio_system->initialize()) {
+	//		LM.write_log("Failed to start up audio_system and manager");
+	//		return -1;
+	//	}
+	//	m_is_started = true;
+	//	return 0;
+	//}
+	//void Audio_Manager::update(float delta_time) {
+	//	if (audio_system) {
+	//		audio_system->update(delta_time);
+	//	}
+	//}
+	//void Audio_Manager::shutdown() {
+	//	if (audio_system) {
+	//		audio_system->shutdown();
+	//		audio_system.reset(); //reset the smart pointer, releasing the memory it holds
+	//	}
 
-		//initialize the audio_system
-		if (!audio_system->initialize()) {
-			LM.write_log("Audio_Manager::start_up(): Failed to initialize Audio_Manager");
-			return -1;
-		}
+	//	for (auto& sound_map : soundmap) {
+	//		if (sound_map.second) {
+	//			sound_map.second->release();
+	//		}
+	//	}
+	//	soundmap.clear();
+	//	eventmap.clear();
+	//}
 
-		const std::string music_path1 = Path_Helper::get_music_path1();
-		const std::string music_path2 = Path_Helper::get_music_path2();
+	//void Audio_Manager::load_audio(const std::string& filepath, const std::string& sound_name) {
+	//	FMOD::Sound* sound = nullptr;
+	//	audio_system->loadsound(filepath, sound);
+	//	if (sound) {
+	//		soundmap[sound_name] = sound;
+	//	}
+	//	else {
+	//		LM.write_log("Failed to load audio: %s.", &sound_name);;
+	//	}
+	//}
+	//void Audio_Manager::load_event(const std::string& event_name) {
+	//	FMOD::Studio::EventInstance* instance = nullptr;
+	//	audio_system->loadevent(event_name, instance);
+	//	if (instance) {
+	//		eventmap[event_name] = instance;
+	//	}
+	//	else {
+	//		LM.write_log("Failed to load event: %s", &event_name);
+	//	}
+	//}
 
-		//load the background music
-		this->load_bgm(music_path1, music_path2);
+	//void Audio_Manager::play_sound(const std::string& sound_name) {
+	//	auto it = soundmap.find(sound_name);
+	//	if (it != soundmap.end()) {
+	//		LM.write_log("Sound not found: %s.", &sound_name);
+	//	}
+	//	audio_system->play_sound(it->second);
+	//}
+	//void Audio_Manager::stop_sound(const std::string& sound_name) {
+	//	auto it = soundmap.find(sound_name);
+	//	if (it != soundmap.end()) {
+	//		LM.write_log("Sound not found: %s.", &sound_name);
+	//	}
+	//	audio_system->stop_sound(it->second);
+	//}
+	//void Audio_Manager::pause_sound(const std::string& sound_name) {
+	//	auto it = soundmap.find(sound_name);
+	//	if (it != soundmap.end()) {
+	//		LM.write_log("Sound not found: %s.", &sound_name);
+	//	}
+	//	audio_system->pause_sound(it->second);
+	//}
+	//void Audio_Manager::resume_sound(const std::string& sound_name) {
+	//	auto it = soundmap.find(sound_name);
+	//	if (it != soundmap.end()) {
+	//		LM.write_log("Sound not found: %s.", &sound_name);
+	//	}
+	//	audio_system->resume_sound(it->second);
+	//}
 
-		m_is_started = true;
-		return 0;
-	}
+	//void Audio_Manager::play_event(const std::string& event_name) {
+	//	auto it = eventmap.find(event_name);
+	//	if (it == eventmap.end()) {
+	//		LM.write_log("Event not found: %s.", &event_name);
+	//	}
+	//	audio_system->play_event(it->second);
+	//}
+	//void Audio_Manager::stop_event(const std::string& event_name) {
+	//	auto it = eventmap.find(event_name);
+	//	if (it == eventmap.end()) {
+	//		LM.write_log("Event not found: %s.", &event_name);
+	//	}
+	//	audio_system->stop_event(it->second);
+	//}
+	//void Audio_Manager::pause_event(const std::string& event_name) {
+	//	auto it = eventmap.find(event_name);
+	//	if (it == eventmap.end()) {
+	//		LM.write_log("Event not found: %s.", &event_name);
+	//	}
+	//	audio_system->pause_event(it->second);
+	//}
+	//void Audio_Manager::resume_event(const std::string& event_name) {
+	//	auto it = eventmap.find(event_name);
+	//	if (it == eventmap.end()) {
+	//		LM.write_log("Event not found: %s.", &event_name);
+	//	}
+	//	audio_system->resume_event(it->second);
+	//}
 
-	//update the audio_system
-	void Audio_Manager::update() {
-		audio_system->update();
-	}
+	////constructor
+	//Audio_Manager::Audio_Manager() : audio_system(nullptr), track1(nullptr), track2(nullptr), current_channel(nullptr) {
+	//	audio_system = new Audio_System();
+	//	set_type("Audio_Manager");
+	//}
 
-	//shutdown the audio system and audio manager
-	void Audio_Manager::shutdown() {
-		if (!is_started()) {
-			return; // Not started
-		}
+	////destructor
+	//Audio_Manager::~Audio_Manager() {
+	//	shutdown();
+	//	delete audio_system;
+	//	audio_system = nullptr;
+	//}
 
-		if (track1) {
-			track1->release();
-			track1 = nullptr;
-		}
-		if (track2) {
-			track2->release();
-			track2 = nullptr;
-		}
-		audio_system->shutdown();
+	////initialize the system and start up the manager
+	//int Audio_Manager::start_up() {
+	//	if (is_started()) {
+	//		return 0; // Already started
+	//	}
 
-		LM.write_log("Audio_Manager::shutdown() Successfully shutdown audio");
+	//	//initialize the audio_system
+	//	if (!audio_system->initialize()) {
+	//		LM.write_log("Audio_Manager::start_up(): Failed to initialize Audio_Manager");
+	//		return -1;
+	//	}
 
-		m_is_started = false;
-	}
+	//	const std::string music_path1 = Path_Helper::get_music_path1();
+	//	const std::string music_path2 = Path_Helper::get_music_path2();
 
-	//load the background music track onto the system
-	void Audio_Manager::load_bgm(const std::string& track1_path, const std::string& track2_path) {
-		track1 = audio_system->load_sound(track1_path);
+	//	//load the background music
+	//	this->load_bgm(music_path1, music_path2);
 
-		//check if track1 failed to load
-		if (!track1) {
-			LM.write_log("Audio_Manager::load_bgm() Fail to load track1.");
-			return;
-		}
-		else {
-			LM.write_log("Audio_Manager::load_bgm() Successful in loading the BGM track1.");
-		}
+	//	m_is_started = true;
+	//	return 0;
+	//}
 
-		track2 = audio_system->load_sound(track2_path);
+	////update the audio_system
+	//void Audio_Manager::update() {
+	//	audio_system->update();
+	//}
 
-		//check if track2 failed to load
-		if (!track2) {
-			LM.write_log("Audio_Manager::load_bgm() Fail to load track2.");
-			return;
-		}
-		else {
-			LM.write_log("Audio_Manager::load_bgm() Successful in loading the BGM track2.");
-		}
-		
-	}
+	////shutdown the audio system and audio manager
+	//void Audio_Manager::shutdown() {
+	//	if (!is_started()) {
+	//		return; // Not started
+	//	}
 
-	//play the background music based on the tracknumber indicated
-	void Audio_Manager::play_bgm(int track_number) {
-		//check if track_number is valid
-		if (track_number < 1 || track_number > 2) {
-			LM.write_log("Audio_Manager::play_bgm(): Invalid track number");
-			return;
-		}
+	//	if (track1) {
+	//		track1->release();
+	//		track1 = nullptr;
+	//	}
+	//	if (track2) {
+	//		track2->release();
+	//		track2 = nullptr;
+	//	}
+	//	audio_system->shutdown();
 
-		//if current channel has a sound playing stop the sound.
-		if (current_channel) {
-			current_channel->stop();
-		}
+	//	LM.write_log("Audio_Manager::shutdown() Successfully shutdown audio");
 
-		//check the track_number and if track exist. if so play that track
-		if (track_number == 1 && track1) {
-			current_channel = audio_system->play_sound(track1, true);
-			LM.write_log("Audio_Manager::play_bgm(): Playing bgm track1.");
-		}
-		else if (track_number == 2 && track2) {
-			current_channel = audio_system->play_sound(track2, true);
-			LM.write_log("Audio_Manager::play_bgm(): Playing bgm track2");
-		}
-		else {
-			//std::cerr << "Audio_Manager::play_bgm() invalid number of track/ track not loaded" << std::endl;
-			LM.write_log("Audio_Manager::play_bgm() invalid number of track/ track not loaded");
-		}
-	}
+	//	m_is_started = false;
+	//}
 
-	//stop the current playing bgm audio.
-	void Audio_Manager::stop_bgm() {
-		if (current_channel) {
-			current_channel->stop();
-			current_channel = nullptr;
-			LM.write_log("Audio_Manager::stop_bgm(): Successfully stop bgm.");
-		}
-	}
+	////load the background music track onto the system
+	//void Audio_Manager::load_bgm(const std::string& track1_path, const std::string& track2_path) {
+	//	track1 = audio_system->load_sound(track1_path);
+
+	//	//check if track1 failed to load
+	//	if (!track1) {
+	//		LM.write_log("Audio_Manager::load_bgm() Fail to load track1.");
+	//		return;
+	//	}
+	//	else {
+	//		LM.write_log("Audio_Manager::load_bgm() Successful in loading the BGM track1.");
+	//	}
+
+	//	track2 = audio_system->load_sound(track2_path);
+
+	//	//check if track2 failed to load
+	//	if (!track2) {
+	//		LM.write_log("Audio_Manager::load_bgm() Fail to load track2.");
+	//		return;
+	//	}
+	//	else {
+	//		LM.write_log("Audio_Manager::load_bgm() Successful in loading the BGM track2.");
+	//	}
+	//	
+	//}
+
+	////play the background music based on the tracknumber indicated
+	//void Audio_Manager::play_bgm(int track_number) {
+	//	//check if track_number is valid
+	//	if (track_number < 1 || track_number > 2) {
+	//		LM.write_log("Audio_Manager::play_bgm(): Invalid track number");
+	//		return;
+	//	}
+
+	//	//if current channel has a sound playing stop the sound.
+	//	if (current_channel) {
+	//		current_channel->stop();
+	//	}
+
+	//	//check the track_number and if track exist. if so play that track
+	//	if (track_number == 1 && track1) {
+	//		current_channel = audio_system->play_sound(track1, true);
+	//		LM.write_log("Audio_Manager::play_bgm(): Playing bgm track1.");
+	//	}
+	//	else if (track_number == 2 && track2) {
+	//		current_channel = audio_system->play_sound(track2, true);
+	//		LM.write_log("Audio_Manager::play_bgm(): Playing bgm track2");
+	//	}
+	//	else {
+	//		//std::cerr << "Audio_Manager::play_bgm() invalid number of track/ track not loaded" << std::endl;
+	//		LM.write_log("Audio_Manager::play_bgm() invalid number of track/ track not loaded");
+	//	}
+	//}
+
+	////stop the current playing bgm audio.
+	//void Audio_Manager::stop_bgm() {
+	//	if (current_channel) {
+	//		current_channel->stop();
+	//		current_channel = nullptr;
+	//		LM.write_log("Audio_Manager::stop_bgm(): Successfully stop bgm.");
+	//	}
+	//}
 
 	
 }

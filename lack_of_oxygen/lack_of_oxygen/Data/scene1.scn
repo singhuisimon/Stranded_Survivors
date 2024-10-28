@@ -18,6 +18,13 @@
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
+        },
+        "Audio_Component": {
+          "filename": "audio_test1",
+          "audio_state": 1,
+          "audio_type": 0,
+          "volume": 0.5,
+          "islooping": false
         }
       }
     },

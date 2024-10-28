@@ -41,6 +41,7 @@
     <ClCompile Include="Utility\Path_Helper.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
+    <ClCompile Include="Utility\Vector3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
@@ -68,6 +69,7 @@
     <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Vector2D.h" />
+    <ClInclude Include="Utility\Vector3D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
@@ -170,7 +172,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -192,7 +194,7 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
