@@ -52,6 +52,7 @@
     <ClInclude Include="Utility\Constant.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Vector3D.h" />
+    <ClInclude Include="Utility\Type.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

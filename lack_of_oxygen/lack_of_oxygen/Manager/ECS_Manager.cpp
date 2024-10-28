@@ -24,11 +24,12 @@
 // Include Entity.h
 #include "../Entity/Entity.h"
 
+// Include Utility headers
+#include "../Utility/Type.h" // Include shared types
+#include "../Utility/Component_Parser.h" // Include Component_Parser for adding components from JSON
+
 // Include Log_Manager for logging
 #include "Log_Manager.h"
-
-// Include Component_Parser for adding components from JSON
-#include "../Utility/Component_Parser.h"
 
 // Include standard headers
 #include <algorithm>
@@ -79,13 +80,13 @@ namespace lof {
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
-            add_system(std::make_unique<Movement_System>(*this));
+            add_system(std::make_unique<Movement_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
-            add_system(std::make_unique<Render_System>(*this));
+            add_system(std::make_unique<Render_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<Collision_System>(*this));
+            add_system(std::make_unique<Collision_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
             add_system(std::make_unique<Audio_System>(*this));
@@ -133,7 +134,6 @@ namespace lof {
     void ECS_Manager::add_components_from_json(EntityID entity, const rapidjson::Value& components) {
         LM.write_log("ECS_Manager::add_components_from_json(): Adding components to entity ID %u.", entity);
         Component_Parser::add_components_from_json(*this, entity, components);
-        LM.write_log("ECS_Manager::add_components_from_json(): Components added to entity ID %u.", entity);
     }
 
     EntityID ECS_Manager::clone_entity_from_prefab(const std::string& prefab_name) {
@@ -162,7 +162,29 @@ namespace lof {
         EntityID id = static_cast<EntityID>(entities.size());
         entities.emplace_back(std::make_unique<Entity>(id));
         LM.write_log("ECS_Manager::create_entity(): Created entity with ID %u.", id);
+
+        // Update systems with the new entity
+        update_entity_in_systems(id);
+
         return id;
+    }
+
+    void ECS_Manager::destroy_entity(EntityID entity) {
+        // Remove entity from systems
+        for (auto& system : systems) {
+            system->remove_entity(entity);
+        }
+
+        // Remove components associated with the entity
+        for (auto& pair : component_arrays) {
+            const std::type_index& typeIndex = pair.first;
+            auto& componentArray = pair.second;
+            if (entity < componentArray.size()) {
+                componentArray[entity].reset();
+            }
+        }
+
+        LM.write_log("ECS_Manager::destroy_entity(): Destroyed entity with ID %u.", entity);
     }
 
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{
@@ -193,6 +215,26 @@ namespace lof {
     const std::vector<std::unique_ptr<Entity>>& ECS_Manager::get_entities() const {
         //LM.write_log("ECS_Manager::get_entities(): Retrieving list of entities.");
         return entities;
+    }
+
+    void ECS_Manager::update_entity_in_systems(EntityID entity) {
+        const ComponentMask& entity_mask = entities[entity]->get_component_mask();
+
+        for (auto& system : systems) {
+            const Signature& system_signature = system->get_signature();
+
+            // Check if entity_mask includes all bits set in system_signature
+            bool matches = (entity_mask & system_signature) == system_signature;
+
+            if (matches) {
+                system->add_entity(entity);
+                LM.write_log("Entity %u added to system %s.", entity, system->get_type().c_str());
+            }
+            else {
+                system->remove_entity(entity);
+                LM.write_log("Entity %u removed from system %s.", entity, system->get_type().c_str());
+            }
+        }
     }
 
 } // namespace lof

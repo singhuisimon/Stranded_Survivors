@@ -68,6 +68,7 @@
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
+    <ClInclude Include="Utility\Type.h" />
     <ClInclude Include="Utility\Vector2D.h" />
     <ClInclude Include="Utility\Vector3D.h" />
   </ItemGroup>

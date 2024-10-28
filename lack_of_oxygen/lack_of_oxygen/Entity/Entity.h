@@ -15,17 +15,8 @@
 #include <cstdint>
 #include <bitset>
 
- /// Maximum number of components an entity can have
-const std::size_t MAX_COMPONENTS = 32;
-
-/// Alias for the entity identifier type
-using EntityID = std::uint32_t;
-
-/// Alias for the data structure that is used to store component
-using ComponentMask = std::bitset<MAX_COMPONENTS>;
-
-/// Constant representing an invalid entity ID
-constexpr EntityID INVALID_ENTITY_ID = std::numeric_limits<EntityID>::max();
+// Include other necessary headers
+#include "../Utility/Type.h" // For MAX_COMPONENTS, EntityID, and ComponentMask
 
 namespace lof {
 

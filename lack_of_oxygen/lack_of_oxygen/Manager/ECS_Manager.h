@@ -11,10 +11,10 @@
 #ifndef LOF_ECS_MANAGER_H
 #define LOF_ECS_MANAGER_H
 
-// Macros for accessing manager singleton instances
+ // Macros for accessing manager singleton instances
 #define ECSM lof::ECS_Manager::get_instance()
 
- // Include header file
+// Include header file
 #include "Manager.h"
 
 // Include other necessary headers
@@ -60,6 +60,12 @@ namespace lof {
         template<typename T>
         std::vector<std::unique_ptr<Component>>& get_component_array();
 
+        /**
+         * @brief Update systems' entity lists based on an entity's signature.
+         * @param entity The ID of the entity to update.
+         */
+        void update_entity_in_systems(EntityID entity);
+
     public:
         /**
          * @brief Get the singleton instance of ECS_Manager.
@@ -77,6 +83,9 @@ namespace lof {
 
         // Entity management
         EntityID create_entity();
+
+        // Entity destruction
+        void destroy_entity(EntityID entity);
 
         /**
          * @brief Clone an entity based on a prefab.
@@ -115,16 +124,136 @@ namespace lof {
         void add_system(std::unique_ptr<System> system);
         void update(float delta_time);
 
-        // Accsessing each system
+        // Accessing each system
         const std::vector<std::unique_ptr<System>>& get_systems() const;
 
         // Access entities
         const std::vector<std::unique_ptr<Entity>>& get_entities() const;
     };
 
-} // namespace lof
+    // Template Definitions
+    // **All template definitions are within the `lof` namespace**
 
-// Include template implementations at the end of the header file
-#include "ECS_Manager.tpp"
+    template<typename T>
+    void ECS_Manager::register_component() {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type hasn't been registered before
+        assert(component_type_to_id.find(typeIndex) == component_type_to_id.end() && "Component type already registered.");
+
+        component_type_to_id[typeIndex] = next_component_id;
+        id_to_component_type[next_component_id] = &typeid(T);
+        component_arrays[typeIndex] = std::vector<std::unique_ptr<Component>>(entities.size());
+
+        next_component_id++;
+
+        // Ensure next_component_id doesn't exceed MAX_COMPONENTS
+        // Assuming MAX_COMPONENTS is defined elsewhere
+        assert(next_component_id <= MAX_COMPONENTS && "Exceeded maximum number of components.");
+    }
+
+    template<typename T>
+    void ECS_Manager::add_component(EntityID entity, T component) {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
+
+        // Add component to entity
+        entities[entity]->add_component(component_type_to_id[typeIndex]);
+
+        // Store component
+        auto& componentArray = get_component_array<T>();
+
+        // Resize the component array if necessary
+        if (componentArray.size() <= entity) {
+            componentArray.resize(entities.size());
+        }
+
+        componentArray[entity] = std::make_unique<T>(component);
+
+        // Update systems
+        update_entity_in_systems(entity);
+    }
+
+    template<typename T>
+    void ECS_Manager::remove_component(EntityID entity) {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
+
+        // Remove component from entity
+        entities[entity]->remove_component(component_type_to_id[typeIndex]);
+
+        // Remove component from storage
+        auto& componentArray = get_component_array<T>();
+        componentArray[entity].reset();
+
+        // Update systems
+        update_entity_in_systems(entity);
+    }
+
+    template<typename T>
+    T& ECS_Manager::get_component(EntityID entity) {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
+
+        auto& componentArray = get_component_array<T>();
+
+        // Ensure the component exists on the entity
+        assert(componentArray[entity] && "Component not found on entity.");
+
+        return *static_cast<T*>(componentArray[entity].get());
+    }
+
+    template<typename T>
+    bool ECS_Manager::has_component(EntityID entity) const {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        if (component_type_to_id.find(typeIndex) == component_type_to_id.end()) {
+            return false;
+        }
+
+        // Ensure entity ID is valid
+        assert(entity < entities.size() && "Entity ID out of range.");
+
+        const auto& componentArray = component_arrays.at(typeIndex);
+        return componentArray[entity] != nullptr;
+    }
+
+    template<typename T>
+    std::size_t ECS_Manager::get_component_id() const {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        assert(component_type_to_id.find(typeIndex) != component_type_to_id.end() && "Component type not registered.");
+
+        return component_type_to_id.at(typeIndex);
+    }
+
+    template<typename T>
+    std::vector<std::unique_ptr<Component>>& ECS_Manager::get_component_array() {
+        std::type_index typeIndex(typeid(T));
+
+        // Ensure component type is registered
+        assert(component_arrays.find(typeIndex) != component_arrays.end() && "Component type not registered.");
+
+        return component_arrays[typeIndex];
+    }
+
+} // namespace lof
 
 #endif // LOF_ECS_MANAGER_H
