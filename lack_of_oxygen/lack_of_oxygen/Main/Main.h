@@ -38,7 +38,7 @@
 #include "../Manager/Serialization_Manager.h"
 #include "../Manager/Graphics_Manager.h"
 #include "../Manager/Audio_Manager.h"
-//#include "../Manager/IMGUI_Manager.h" // will cause an error when uncommented
+#include "../Manager/IMGUI_Manager.h"
 
 #include "../IMGUI/imgui.h"
 #include "../IMGUI/imgui_impl_glfw.h"

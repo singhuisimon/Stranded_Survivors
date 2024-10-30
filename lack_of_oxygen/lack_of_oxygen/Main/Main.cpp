@@ -26,8 +26,6 @@
 
 using namespace lof;
 
-
-
 int main(void) {
 
     // --------------------------- Initialization ---------------------------
@@ -102,6 +100,12 @@ int main(void) {
         std::cout << "Game_Manager started up successfully." << std::endl;
     }
 
+    // --------------------------- Start IMGUI_Manager ---------------------------
+
+    IMGUIM.start_up(window); // Might need to integrate with game manager 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    bool level_editor_mode = false;
+
     // --------------------------- Retrieve Configuration ---------------------------
 
     // Retrieve configuration values from Config_Manager
@@ -132,17 +136,6 @@ int main(void) {
     LM.write_log("Entering main game loop.");
     std::cout << "Entering main game loop." << std::endl;
 
-    //!! IMGUI IMPLEMENTATION
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
-
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     // Game loop
     while (!glfwWindowShouldClose(window) && !GM.get_game_over()) {
         // Start of frame timing
@@ -171,15 +164,21 @@ int main(void) {
         // Poll for and process events 
         glfwPollEvents(); 
 
+
+        if (IM.is_key_held(GLFW_KEY_I)) {
+            level_editor_mode = !level_editor_mode;
+        }
+
         // Getting delta time for Game Manager/game loop
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update game world state
         GM.update(delta_time);
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
 
-       
+      
+
         // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
-        if (IM.is_key_held(GLFW_KEY_T)) {
+        if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
             system_performance(GM.get_time(), IM.get_time(), IM.get_type());
             system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
             system_performance(GM.get_time(), AM.get_time(), AM.get_type());
@@ -192,46 +191,20 @@ int main(void) {
             std::cout << std::endl;
         }
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        if (level_editor_mode) {
+            std::cout << "level editor mode is on" << std::endl;
 
+            // Start the Dear ImGui frame
+            IMGUIM.start_frame();
+            // Example From GitHib
+            //IMGUIM.example_demo(show_demo_window, show_another_window, clear_color, io);
+            IMGUIM.imgui_game_objects_list();
+            // Rendering
+            IMGUIM.render();
 
-        static float f = 0.0f;
-        static int counter = 0;
-
-        ImGui::Begin("Hello, world!");                
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
-
-
-        // Render windows if the corresponding checkbox is checked
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);  // This renders the ImGui demo window
-
-        if (show_another_window) {
-            ImGui::Begin("Another Window", &show_another_window);  // Open another window
-            ImGui::Text("Hello from another window!");  // Add content to the window
-            ImGui::End();  // Close the window
         }
 
-
-        // Rendering
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    
 
   
 
@@ -249,9 +222,7 @@ int main(void) {
         FPSM.frame_end();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    IMGUIM.shut_down();
 
     glfwDestroyWindow(window);
     glfwTerminate();

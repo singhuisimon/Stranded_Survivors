@@ -174,6 +174,7 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
 
+
             // Getting delta time for each system
             system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
             // Updating each system
