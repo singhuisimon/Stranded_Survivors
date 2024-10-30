@@ -7,24 +7,25 @@
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
-
 #pragma once
+#ifndef LOF_MOVEMENT_SYSTEM_H
+#define LOF_MOVEMENT_SYSTEM_H
 
 #include "System.h"
+
 namespace lof {
 
     /**
      * @class Movement_System
-     * @brief System responsible for updating entities' positions based on their velocities.
+     * @brief System responsible for updating entities' positions based on their velocities and physics.
      */
     class Movement_System : public System {
     public:
         /**
          * @brief Constructor for Movement_System.
-         * @param ecs_manager Reference to the ECS_Manager.
+         * Initializes the system's signature.
          */
-        Movement_System(class ECS_Manager& ecs_manager);
+        Movement_System();
 
         /**
          * @brief Updates the system.
@@ -37,9 +38,8 @@ namespace lof {
          * @return The string "Movement_System".
          */
         std::string get_type() const override;
-
-    private:
-        class ECS_Manager& ecs;
     };
 
 } // namespace lof
+
+#endif // LOF_MOVEMENT_SYSTEM_H

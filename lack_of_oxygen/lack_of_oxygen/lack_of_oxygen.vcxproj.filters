@@ -68,6 +68,7 @@
     <ClInclude Include="IMGUI\imgui_impl_opengl3.h" />
     <ClInclude Include="IMGUI\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
+    <ClInclude Include="Utility\Type.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

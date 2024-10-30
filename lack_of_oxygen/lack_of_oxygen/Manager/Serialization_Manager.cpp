@@ -113,8 +113,6 @@ namespace lof {
     void Serialization_Manager::merge_objects(const rapidjson::Value& source,
         rapidjson::Value& destination,
         rapidjson::Document::AllocatorType& allocator) {
-        LM.write_log("Serialization_Manager::merge_objects(): Merging objects from source to destination.");
-
         assert(source.IsObject());
         assert(destination.IsObject());
 
@@ -124,15 +122,18 @@ namespace lof {
             if (destination.HasMember(key)) {
                 // If both values are objects, merge them recursively
                 if (itr->value.IsObject() && destination[key].IsObject()) {
+                    LM.write_log("Serialization_Manager::merge_objects(): Merging object at key '%s'.", key);
                     merge_objects(itr->value, destination[key], allocator);
                 }
                 else {
                     // Overwrite the value in the destination
+                    LM.write_log("Serialization_Manager::merge_objects(): Overwriting key '%s'.", key);
                     destination[key].CopyFrom(itr->value, allocator);
                 }
             }
             else {
                 // Add the new key-value pair to the destination
+                LM.write_log("Serialization_Manager::merge_objects(): Adding key '%s'.", key);
                 rapidjson::Value name(key, allocator);
                 rapidjson::Value value;
                 value.CopyFrom(itr->value, allocator);
@@ -140,6 +141,7 @@ namespace lof {
             }
         }
     }
+
 
     /**
      * @brief Loads the configuration file and initializes screen settings and FPS display interval.
