@@ -117,7 +117,8 @@ namespace lof {
             const Vec2D& vel1,
             const AABB& aabb2,
             const Vec2D& vel2,
-            float& firstTimeOfCollision);
+            float& firstTimeOfCollision, 
+            float delta_time);
 
         //static Collision_System& get_instance() {
         //    static Collision_System instance; // Guaranteed to be destroyed
