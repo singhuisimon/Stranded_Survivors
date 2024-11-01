@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <variant>
 #include <algorithm>
 #include <unordered_map>
 
@@ -230,17 +231,18 @@ namespace lof {
     */
     class Audio_Component : public Component {
     private:
+        //std::string entityid; //convert entityID into a string to be used as key
         std::string filename;
+        //std::vector<std::string> filenames;//can be vector//need rethink abit more
         PlayState audio_state;
         AudioType audio_type;
-        FileFormat file_format;
+        //FileFormat file_format;
+        //AudioCommand audio_command;
 
         float volume;   //range of using FMOD is 0.0f to 1.0f <- has already been clamp to not exceed
+        float pitch;
         bool islooping;
         bool is3d;
-
-        std::unordered_map<std::string, int> active_channels_id;
-        std::unordered_map<std::string, FMOD::Studio::EventInstance*> event_instances;
 
         Vec3D position; //position of where the sound is emitting from
         float mindist;  //the min range for listener to be in to hear the sound (closer)
@@ -248,14 +250,12 @@ namespace lof {
         
     public:
 
-        Audio_Component() : filename(""), audio_state(STOPPED), audio_type(SFX), file_format(WAV),
-            volume(1.0f), islooping(false), is3d(false), active_channels_id(), event_instances(), position(),
-            mindist(1.0f), maxdist(100.0f) {}
+        Audio_Component() : filename(""), audio_state(PLAYING), audio_type(SFX), volume(1.0f),
+            pitch(1.0f), islooping(false), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
 
-        Audio_Component(const std::string& filename, AudioType audio_type, float volume, bool is_3d = false, bool islooping = false) :
-            filename(filename), audio_state(STOPPED), audio_type(audio_type), file_format(WAV),
-            volume(std::clamp(volume, 0.0f, 1.0f)), islooping(islooping), is3d(is_3d), active_channels_id(),
-            event_instances(), position(), mindist(1.0f), maxdist(100.0f) {}
+        Audio_Component(const std::string& filename, AudioType audio_type, float volume, float pitch_v, bool is_3d = false, bool islooping = false) :
+            filename(filename), audio_state(PLAYING), audio_type(audio_type),
+            volume(std::clamp(volume, 0.0f, 1.0f)), pitch(std::clamp(pitch_v, 0.5f, 2.0f)), islooping(islooping), is3d(is_3d), position(), mindist(1.0f), maxdist(100.0f) {}
 
         void set_filename(const std::string filepath) { this->filename = filepath;}
         const std::string& get_filename() const { return filename; }
@@ -266,53 +266,23 @@ namespace lof {
         void set_audio_type(AudioType type) { this->audio_type = type;}
         AudioType get_audio_type() const { return audio_type; }
 
-        void set_file_format(FileFormat type) { this->file_format = type; }
-        FileFormat get_file_format() const { return file_format; }
+        //void set_file_format(FileFormat type) { this->file_format = type; }
+        //FileFormat get_file_format() const { return file_format; }
+
+        //void set_audio_command(AudioCommand command) { this->audio_command = command; }
+        //AudioCommand get_audio_command() const { return audio_command; }
 
         void set_volume(float new_volume) { this->volume = std::clamp(new_volume, 0.0f, 1.0f); }
         float get_volume() const { return volume;  }
+
+        void set_pitch(float new_pitch) { this->pitch = std::clamp(new_pitch, 0.5f, 2.0f); }
+        float get_pich() const { return pitch;  }
 
         void set_is_looping(bool loop) { this->islooping = loop; }
         bool get_is_looping() const { return islooping; }
 
         void set_is3d(bool is_3d) { this->is3d = is_3d; }
         bool get_is3d() const { return is3d; };
-
-        int get_channel(const std::string& sound_name) const {
-            auto it = active_channels_id.find(sound_name);
-            if (it != active_channels_id.end()) {
-                return it->second;
-            }
-            return -1;  //sound not found;
-        }
-        void add_channel(const std::string& sound_name, int channel_id) { active_channels_id[sound_name] = channel_id; }
-        void remove_channel(const std::string& sound_name) { active_channels_id.erase(sound_name); }
-        bool has_channel(const std::string& sound_name) const { return active_channels_id.find(sound_name) != active_channels_id.end(); }
-        void clear_all_channels() { active_channels_id.clear(); }
-
-        void add_event_instance(const std::string& event_name, FMOD::Studio::EventInstance* instance) { event_instances[event_name] = instance; }
-        FMOD::Studio::EventInstance* get_event_instance(const std::string& event_name) {
-            auto it = event_instances.find(event_name);
-            return it != event_instances.end() ? it->second : nullptr;
-        }
-
-        bool has_event_instance(const std::string& event_name) const { return event_instances.find(event_name) != event_instances.end(); }
-        void remove_event_instance(const std::string& event_name) {
-            auto it = event_instances.find(event_name);
-            if (it != event_instances.end()) {
-                it->second->release();
-                event_instances.erase(it);
-            }
-        }
-
-        void clear_all_event_instances() {
-            for (auto& [name, instance] : event_instances) {
-                if (instance) {
-                    instance->release();
-                }
-            }
-            event_instances.clear();
-        }
 
         void set_position(const Vec3D& pos) { position = pos; }
         Vec3D get_position() const { return position; }

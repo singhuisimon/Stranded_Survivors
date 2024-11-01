@@ -13,7 +13,6 @@
 namespace lof {
 
 	void Audio_System::initializegroups() {
-		//core_system->createChannelGroup("Master Group", &mastergroup);
 		core_system->getMasterChannelGroup(&mastergroup);
 		core_system->createChannelGroup("BGM Group", &bgmgroup);
 		core_system->createChannelGroup("SFX Group", &sfxgroup);
@@ -22,328 +21,340 @@ namespace lof {
 		mastergroup->addGroup(sfxgroup);
 	}
 
-	bool Audio_System::is_sound_loaded(const std::string& sound_path) const {
-		return sounds.find(sound_path) != sounds.end();
+	Audio_System::Audio_System() : core_system(nullptr), studio_system(nullptr) {
+		signature.set(ECSM.get_component_id<Audio_Component>());
+		initializegroups();
+		if (initialize()) {
+			LM.write_log("successfully initialize audio system.");
+		}
 	}
 
-	Audio_System::Audio_System() : core_system(nullptr), studio_system(nullptr), ecs_manager(ecs_manager) {}
-	Audio_System::Audio_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager), core_system(nullptr), studio_system(nullptr) {}
 	Audio_System::~Audio_System() {
 		shutdown();
 	}
 
-	int Audio_System::errorcheck(std::string function_name, std::string function_purpose, FMOD_RESULT result) {
+	int Audio_System::errorcheck(FMOD_RESULT result, std::string function_name, std::string function_purpose) {
 		if (result != FMOD_OK) {
-			LM.write_log("%s: failure to %s. FMOD Error: %s.", function_name, function_purpose, FMOD_ErrorString(result));
+			LM.write_log("%s failed to %s. FMOD Error: %s.", function_name, function_purpose, FMOD_ErrorString(result));
 			return -1;
 		}
-		LM.write_log("%s: %s successfully executed.", function_name, function_purpose);
+		LM.write_log("%s successfully executed %s.", function_name, function_purpose);
 		return 0;
 	}
 
 	bool Audio_System::initialize() {
-		if (errorcheck("Audio_System", "create studio", FMOD::Studio::System::create(&studio_system)) != 0) {
-			return false;
-		}
-		if (errorcheck("Audio_System", "initialize studio", studio_system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr)) != 0) {
-			return false;
-		}
-		if (errorcheck("Audio_System", "get system", studio_system->getCoreSystem(&core_system)) != 0) {
-			return false;
-		}
-		/*if (errorcheck("Audio_System", "set 3D setting", core_system->set3DSettings()) != 0) {
-			return false;
-		}*/
-		/*if (errorcheck("Audio_System", "initialize system", core_system->init(512, FMOD_INIT_NORMAL, 0)) != 0) {
-			return false;
-		}*/
+		FMOD_RESULT result;
 
-		initializegroups();
+		result = FMOD::Studio::System::create(&studio_system);
+		if (errorcheck(result) != 0) {
+			return false;
+		}
+		result = studio_system->getCoreSystem(&core_system);
+		if (errorcheck(result) != 0) {
+			return false;
+		}
+		result = studio_system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_3D_RIGHTHANDED, nullptr);
+		if (errorcheck(result) != 0) {
+			return false;
+		}
 		return true;
 	}
+
 	void Audio_System::update(float delta_time) {
-		core_system->update();
-		studio_system->update();
+		const auto& entities = get_entities();
+		std::vector<std::string> stopchannel;
+		for (EntityID entity : entities) {
+			if (!ECSM.has_component<Audio_Component>(entity)) {
+				continue;	//need not process if entity has no audio
+			}
+			Audio_Component& audio = ECSM.get_component<Audio_Component>(entity);
+			PlayState state = audio.get_audio_state();
+			std::string filepath = audio.get_filename();	//the key for sound
+			std::string key_id = filepath + std::to_string(entity);	//the key for channel
+			switch (state) {
+				case PLAYING:
+					play_sound(filepath, key_id);
+					std::cout << entity << "sound is playing" << std::endl;
+					break;
+				case STOPPED:
+					stopchannel.push_back(key_id);
+					//stop_sound(key_id);
+					break;
+				case PAUSEDSOUND:
+					pause_resume_sound(key_id, true);
+					break;
+				case RESUMESOUND:
+					pause_resume_sound(key_id, false);
+				default:
+					//nothing to be done? since play state is none
+					break;
+			}
+			std::cout << "this entity is in the audio system " << entity <<"\n";
+		}
+		for (std::string const& key : stopchannel) {
+			stop_sound(key);
+		}
+		errorcheck(core_system->update());
 	}
 
 	void Audio_System::shutdown() {
+
+		for (auto [filepath, sound] : sound_map) {
+			unload_sound(filepath);
+		}
+
+		//clear the unorderedmap
+		sound_map.clear();
+		channel_map.clear();
+		
 		if (core_system) {
-			core_system->close();
-			core_system->release();
+			errorcheck(core_system->close());
+			errorcheck(core_system->release());
 			core_system = nullptr;
 		}
 		if (studio_system) {
-			studio_system->release();
+			errorcheck(studio_system->release());
 			studio_system = nullptr;
 		}
 	}
 
-	void Audio_System::loadsound(const std::string filepath, FMOD::Sound*& sound) {
-		if (!is_sound_loaded(filepath)) {
-			if (errorcheck("Audio_System::loadsound", "load sound", core_system->createSound(filepath.c_str(), FMOD_DEFAULT, nullptr, &sound)) != 0) {
-				sound = nullptr;
-			}
-
-		}
-	}
-
-	void Audio_System::loadbank(const std::string filepath, FMOD::Studio::Bank*& bank) {
-		errorcheck("Audio_System::loadbank", "load bank", studio_system->loadBankFile(filepath.c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &bank));
-	}
-
-	void Audio_System::loadevent(const std::string& event_name, FMOD::Studio::EventInstance*& instance) {
-		FMOD::Studio::EventDescription* event_desc = get_event_description(event_name);
-		if (event_desc) {
-			errorcheck("Audio_System::loadevent", "load event", event_desc->createInstance(&instance));
-			if (instance) {
-				event_instances[event_name] = instance;
-			}
-		}
-		
-	}
-	
-	void Audio_System::play_sound(const std::string& sound_id, float volume, bool is_looping, FMOD::Channel*& channel, FMOD::ChannelGroup*& channelgrp ) {
-		FMOD::Sound* sound = sounds[sound_id];
-		if (sound) {
-			if (errorcheck("Audio_System::play_sound", "play sound", core_system->playSound(sound, channelgrp, false, &channel)) != 0) {
-				return;
-			}
-			channel->setVolume(volume);
-			if (is_looping) {
-				channel->setMode(FMOD_LOOP_NORMAL);
-				channel->setLoopCount(-1); //infinite loop
-
-			}
-		}
-		else {
-			LM.write_log("Audio_System::play_sound failed to play. Error: Sound not found %s.", sound_id.c_str());
-		}
-		LM.write_log("Audio_System::play_sound successfully executed.");
-	}
-
-	void Audio_System::stop_sound(FMOD::Channel* channel) {
-		if (channel) {
-			errorcheck("Audio_System::stop_sound", "stop sound", channel->stop());
-		}
-		LM.write_log("Audio_System::stop_sound failed to execute due to invalid channel.");
-	}
-
-	void Audio_System::pause_sound(FMOD::Channel* channel) {
-		if (channel) {
-			errorcheck("Audio_System::pause_sound", "pause sound", channel->setPaused(true));
-		}
-		LM.write_log("Audio_System::paused_sound failed to execute due to invalid channel.");
-	}
-
-	void Audio_System::resume_sound(FMOD::Channel* channel) {
-		if (channel) {
-			errorcheck("Audio_System::resume_sound", "resume sound", channel->setPaused(false));
-		}
-		LM.write_log("Audio_System::resume_sound failed to execute due to invalid channel.");
-	}
-
-	void Audio_System::play_event(FMOD::Studio::EventInstance* instance) {
-		if (instance) {
-			errorcheck("Audio_System::play_event", "play event", instance->start());
-		}
-		LM.write_log("Audio_System::play_event failed to execute due to invalid instance.");
-	}
-
-	void Audio_System::stop_event(FMOD::Studio::EventInstance* instance) {
-		if (instance) {
-			errorcheck("Audio_System::stop_event", "stop event", instance->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT));
-		}
-		LM.write_log("Audio_System::stop_event failed to execute due to invalid instance.");
-	}
-
-	void Audio_System::pause_event(FMOD::Studio::EventInstance* instance) {
-		if (instance) {
-			errorcheck("Audio_System::pause_event", "pause event", instance->setPaused(true));
-		}
-		LM.write_log("Audio_System::pause_event failed to execute due to invalid instance.");
-	}
-
-	void Audio_System::resume_event(FMOD::Studio::EventInstance* instance) {
-		if (instance) {
-			errorcheck("Audio_System::resume_event", "resume event", instance->setPaused(false));
-		}
-		LM.write_log("Audio_System::resume_event failed to execute due to invalid instance.");
-	}
-	
-	void Audio_System::pause_bgm_group() {
-		errorcheck("Audio_System::pause_bgm_group","pause group",bgmgroup->setPaused(true));
-	}
-	void Audio_System::resume_bgm_group() {
-		errorcheck("Audio_System::resume_bgm_group", "resume group", bgmgroup->setPaused(false));
-	}
-	void Audio_System::pause_sfx_group() {
-		errorcheck("Audio_System::pause_sfx_group", "pause group", sfxgroup->setPaused(true));
-	}
-	void Audio_System::resume_sfx_group() {
-		errorcheck("Audio_System::resume_sfx_group", "resume group", sfxgroup->setPaused(false));
-	}
-
-	float Audio_System::get_bgmgroup_volume() const {
-		float volume = 1.0f;
-		//errorcheck("Audio_System::get_bgmgroup_volume","get bgm group volume", bgmgroup->getVolume(&volume));
-		bgmgroup->getVolume(&volume);
-		return volume;
-	}
-	void Audio_System::set_bgmgroup_volume(float volume) {
-		errorcheck("Audio_System::set_bgmgroup_volume", "set bgm group volume", bgmgroup->setVolume(volume));
-	}
-
-	float Audio_System::get_sfxgroup_volume() const {
-		float volume = 1.0f;
-		sfxgroup->getVolume(&volume);
-		return volume;
-	}
-	void Audio_System::set_sfxgroup_volume(float volume) {
-		errorcheck("Audio_System::set_sfxgroup_volume", "set sfx group volume", sfxgroup->setVolume(volume));
-	}
-
-	void Audio_System::play_audio_component(Audio_Component& audio_component){
-		FMOD::ChannelGroup* channelgrp = nullptr;
-		if (audio_component.get_audio_type() == SFX) {
-			channelgrp = sfxgroup;
-		}
-		else if (audio_component.get_audio_type() == BGM) {
-			channelgrp = bgmgroup;
-		}
-
-		FMOD::Channel* channel = nullptr;
-
-		if (audio_component.get_file_format() == WAV) {
-			play_sound(audio_component.get_filename(), audio_component.get_volume(), audio_component.get_is_looping(), channel, channelgrp);
-			//audio_component.set_channel(channel);
-		}
-		else if (audio_component.get_audio_type() == BGM) {
-			FMOD::Studio::EventInstance* event_instance = nullptr;
-			loadevent(audio_component.get_filename(), event_instance);
-			if (event_instance) {
-				play_event(event_instance);
-				audio_component.add_event_instance(audio_component.get_filename(), event_instance);
-			}
-		}
-		else {
-			LM.write_log("Audio_System::play_audio_component unable to play due to unsupported file format %s.", audio_component.get_filename());
-		}
-	}
-	
-	void Audio_System::stop_audio_component(Audio_Component& audio_component){
-		//int channel = audio_component.get_channel()
-		if (audio_component.get_event_instance(audio_component.get_filename())) {
-			stop_event(audio_component.get_event_instance(audio_component.get_filename()));
-		}
-		/*else if (channel) {
-			stop_sound(channel);
-		}*/
-	}
-	
-	void Audio_System::set_audio_component_volume(Audio_Component& audio_component, float volume) {}
-
-	void Audio_System::add_event_description(const std::string& event_id, FMOD::Studio::EventDescription* event_description) {}
-	void Audio_System::remove_event_description(const std::string& event_id) {}
-	void Audio_System::clear_event_description() {}
-	void Audio_System::print_event_descriptions() {} //debugging purposes.
-
-	void Audio_System::add_sound(const std::string& sound_id, FMOD::Sound* sound){}
-	void Audio_System::remove_sound(const std::string& sound_id) {}
-	void Audio_System::clear_sounds() {}
-	void Audio_System::print_sounds() {}	//debugging purposes.
-
-	void Audio_System::setchannel_3D_pos(FMOD::Channel* channel, const Vec3D& pos) {
-		if (channel) {
-			FMOD_VECTOR fmod_pos = { pos.x, pos.y, pos.z };
-			channel->set3DAttributes(&fmod_pos, nullptr);
-		}
-	}
-
-	FMOD::System* Audio_System::get_core_system() const {}
-	FMOD::Studio::System* Audio_System::get_studio_system() const {}
-
-	FMOD::Studio::EventDescription* Audio_System::get_event_description(const std::string& event_id){
-		FMOD::Studio::EventDescription* description = nullptr;
-		errorcheck("", "", studio_system->getEvent(event_id.c_str(), &description));
-		return description;
-	}
-	FMOD::Sound* Audio_System::get_sound(const std::stringstream& sound_id) {}
-
-	FMOD::ChannelGroup* Audio_System::get_bgmgroup() {
-		return bgmgroup;
-	}
-	FMOD::ChannelGroup* Audio_System::get_sfxgroup() {
-		return sfxgroup;
-	}
-	FMOD::ChannelGroup* Audio_System::get_mastergroup() {
-		return mastergroup;
-	}
 
 	std::string Audio_System::get_type() const {
 		return "Audio_System";
 	}
 
-	//Audio_System::Audio_System() : core_system(nullptr), studio_system(nullptr), ecs_manager(ecs_manager), bgmgroup(nullptr), sfxgroup(nullptr), mastergroup(nullptr)
-	//{
-	//	LM.write_log("default audio system constructor used.");
-	//}
+	void Audio_System::load_sound(const std::string& file_path) {
+		if (sound_map.find(file_path) != sound_map.end()) {
+			//sound is already loaded in the map.
+			return;
+		}
+		FMOD::Sound* sound = nullptr;
+		FMOD_MODE mode = FMOD_DEFAULT;
+		FMOD_RESULT result = core_system->createSound(file_path.c_str(), mode, 0, &sound);
+		if (errorcheck(result,"Audio_System::load_sound():", "create sound") != 0) {
+			return;
+		}
+		std::pair<std::string, FMOD::Sound*> pair = std::make_pair(file_path, sound);
+		sound_map.insert(pair);
 
-	//Audio_System::Audio_System(ECS_Manager& ecs_manager) : core_system(nullptr), studio_system(nullptr), ecs_manager(ecs_manager), bgmgroup(nullptr), sfxgroup(nullptr), mastergroup(nullptr)
-	//{
-	//	LM.write_log("param constructor used in audio system.");
-	//}
+		LM.write_log("Audio_Sytem::load_sound(): Successfully loaded the sound from system.");
+		return;
+	}
 
-	//Audio_System::~Audio_System() {
-	//	shutdown();
-	//}
-	//
-	//bool Audio_System::initialize() {
-	//	FMOD_RESULT result;
+	void Audio_System::play_sound(const std::string& file_path, std::string& entity_num) {
+		if (sound_map.find(file_path) == sound_map.end()) {
+			load_sound(file_path);
+		}
 
-	//	result = FMOD::Studio::System::create(&studio_system);
+		FMOD::Channel* channel = nullptr;
+		auto sound = sound_map.find(file_path);
+		FMOD_RESULT result = core_system->playSound(sound->second, nullptr, false, &channel);
+		if (errorcheck(result) != 0) {
+			return;
+		}
+		else {
+			std::string key = file_path + entity_num;
+			std::pair<std::string, FMOD::Channel*> pair = std::make_pair(key, channel);
+			channel_map.insert(pair);
+		}
+	}
 
-	//	//check if the creatoin of the studio system is successful
-	//	if (result != FMOD_OK) {
-	//		LM.write_log("Fail to create studio system. Error: ", FMOD_ErrorString(result));
-	//		return false;
-	//	}
+	void Audio_System::pause_resume_sound(const std::string& channel_key, bool pause) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
+			LM.write_log("Audio_System::pause_resume_sound: failed to pause/resume sound as sound isn't even playing in the channel.");
+			return;
+		}
+		auto channel = channel_map.find(channel_key);
 
-	//	result = studio_system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
+		//check pause state of channel
+		bool is_currchannel_pause;
+		channel->second->getPaused(&is_currchannel_pause);
 
-	//	//check if the initialization of the studio system is successful
-	//	if (result != FMOD_OK) {
-	//		LM.write_log("Fail to initialize studio system. Error: ", FMOD_ErrorString(result));
-	//		return false;
-	//	}
+		//based off the user command if its pause or not.
+		if (pause) {
+			//if it is pause determine if there is a need to set pause at all based off the current pause state of channel
+			//if ispaused is false, means channel is still playing thereafter we need set it to pause
+			if (!is_currchannel_pause) {
+				errorcheck(channel->second->setPaused(pause));
+			}
+			else {
+				return;
+			}
+		}
+		else {	//if pause is false this means they want to resume the sound if its paused.
+			if (is_currchannel_pause) {
+				//if current channel is paused and the command is to set it to resume/not pause
+				errorcheck(channel->second->setPaused(pause)); //set the pause to be false, aka resume the sound.
+			}
+			else {
+				return;
+			}
+		}
 
-	//	result = studio_system->getCoreSystem(&core_system);
+	}
 
-	//	//check if creation of the core system is successful
-	//	if (result != FMOD_OK) {
-	//		LM.write_log("Audio_System::initialize() Fail to create core system. Error: ");
-	//		LM.write_log(FMOD_ErrorString(result));
-	//		return false;
-	//	}
+	void Audio_System::stop_sound(const std::string& channel_key) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
+			LM.write_log("Audio_System::stop_sound: failed to stop sound as sound isn't even playing in the channel.");
+			return;
+		}
+		auto channel = channel_map.find(channel_key);
 
-	//	result = core_system->init(512, FMOD_INIT_NORMAL, 0);
+		bool playstate_currchannel;
+		channel->second->isPlaying(&playstate_currchannel);
+		if (playstate_currchannel) {
+			errorcheck(channel->second->stop()); //if the channel is playing stop it
+		}
+		else {
+			return;
+		}
+	}
 
-	//	//check if the initialization of the core system is successful
-	//	if (result != FMOD_OK) {
-	//		LM.write_log("Audio_System::initialize(): Fail to initalize core system. Error:");
-	//		LM.write_log(FMOD_ErrorString(result));
-	//		return false;
-	//	}
+	void Audio_System::unload_sound(const std::string& filepath) {
+		if (sound_map.find(filepath) == sound_map.end()) {
+			return; //this means sound is not loaded which means no need to unload at all
+		}
+		auto sound = sound_map.find(filepath);
+		FMOD_RESULT result = sound->second->release();	//release the sound
+		if (errorcheck(result) != 0) {
+			return;
+		}
+		sound_map.erase(sound);	//erase it from the map
+		LM.write_log("Audio_System::unload_sound: successfully unloaded the sound %s", filepath);
+	}
 
-	//	
+	//set and getters for channel & channel group
+	void Audio_System::set_channel_pitch(const std::string& channel_key, float pitch) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
+			LM.write_log("Audio_System::set_channel_pitch: failed to set channel pitch as channel is not in channel map.");
+			return;
+		}
+		auto channel = channel_map.find(channel_key);
+		errorcheck(channel->second->setPitch(pitch));
+	}
 
-	//	LM.write_log( "FMOD core and studio system successfully initialize.");
+	void Audio_System::set_channel_volume(const std::string& channel_key, float volume) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
+			LM.write_log("Audio_System::set_channel_volume: failed to set channel volume as channel is not in channel map.");
+			return;
+		}
+		auto channel = channel_map.find(channel_key);
+		errorcheck(channel->second->setVolume(volume));
+	}
 
-	//	initializegroups();
+	void Audio_System::pause_bgm_group() {
+		bool pause;
+		bgmgroup->getPaused(&pause);
+		if (pause) {
+			return;
+		}
+		else {
+			errorcheck(bgmgroup->setPaused(true));
+		}
+	}
+	void Audio_System::resume_bgm_group() {
+		bool pause;
+		bgmgroup->getPaused(&pause);
+		if (pause) {
+			errorcheck(bgmgroup->setPaused(false));
+		}
+		else {
+			return;
+		}
+	}
 
-	//	return true;
-	//}
+	void Audio_System::pause_sfx_group() {
+		bool pause;
+		sfxgroup->getPaused(&pause);
+		if (pause) {
+			return;
+		}
+		else {
+			errorcheck(sfxgroup->setPaused(true));
+		}
+	}
+	void Audio_System::resume_sfx_group() {
+		bool pause;
+		sfxgroup->getPaused(&pause);
+		if (pause) {
+			errorcheck(sfxgroup->setPaused(false));
+		}
+		else {
+			return;
+		}
+	}
 
+	float Audio_System::get_bgmgroup_volume() const {
+		float volume;
+		bgmgroup->getVolume(&volume);
+		return volume;
+	}
 
+	void Audio_System::set_bgmgroup_volume(float volume) {
+		errorcheck(bgmgroup->setVolume(volume));
+	}
+
+	float Audio_System::get_bgmgroup_pitch() const {
+		float pitch;
+		bgmgroup->getPitch(&pitch);
+		return pitch;
+	}
+
+	void Audio_System::set_bgmgroup_pitch(float pitch) {
+		errorcheck(bgmgroup->setPitch(pitch));
+	}
+
+	float Audio_System::get_sfxgroup_volume() const {
+		float volume;
+		sfxgroup->getVolume(&volume);
+		return volume;
+	}
+
+	void Audio_System::set_sfxgroup_volume(float volume) {
+		errorcheck(sfxgroup->setVolume(volume));
+	}
+
+	float Audio_System::get_sfxgroup_pitch() const {
+		float pitch;
+		sfxgroup->getPitch(&pitch);
+		return pitch;
+	}
+
+	void Audio_System::set_sfxgroup_pitch(float pitch) {
+		errorcheck(sfxgroup->setPitch(pitch));
+	}
+
+	float Audio_System::get_mastergroup_volume() const {
+		float volume;
+		mastergroup->getVolume(&volume);
+		return volume;
+	}
+
+	void Audio_System::set_mastergroup_volume(float volume) {
+		errorcheck(mastergroup->setVolume(volume));
+	}
+
+	float Audio_System::get_mastergroup_pitch() const {
+		float pitch;
+		mastergroup->getPitch(&pitch);
+		return pitch;
+	}
+
+	void Audio_System::set_mastergroup_pitch(float pitch) {
+		errorcheck(mastergroup->setPitch(pitch));
+	}
+
+	FMOD::ChannelGroup* Audio_System::get_bgmgroup() {
+		return bgmgroup;
+	}
+
+	FMOD::ChannelGroup* Audio_System::get_sfxgroup() {
+		return sfxgroup;
+	}
+
+	FMOD::ChannelGroup* Audio_System::get_mastergroup() {
+		return mastergroup;
+	}
 }
 
 	

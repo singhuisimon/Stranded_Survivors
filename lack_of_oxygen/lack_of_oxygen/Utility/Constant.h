@@ -92,7 +92,20 @@ namespace lof {
 
 	enum FileFormat {
 		BANK = 0,
-		WAV = 1
+		WAV = 1,
+		OGG = 2
+	};
+
+	enum AudioCommand {
+		NONE = 0,
+		PLAYSOUND,
+		STOPSOUND,
+		PAUSEDSOUND,
+		RESUMESOUND/*,
+		PLAYEVENT,
+		STOPEVENT,
+		PAUSEEVENT,
+		RESUMEEVENT*/
 	};
 
 	// ----------------------------- Movement_System.cpp -------------------------------------------

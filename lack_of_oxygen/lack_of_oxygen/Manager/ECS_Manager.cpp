@@ -89,7 +89,7 @@ namespace lof {
             add_system(std::make_unique<Collision_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
-            add_system(std::make_unique<Audio_System>(*this));
+            add_system(std::make_unique<Audio_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
 
             m_is_started = true;

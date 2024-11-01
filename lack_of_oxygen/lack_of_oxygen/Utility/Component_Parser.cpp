@@ -233,10 +233,10 @@ namespace lof {
                     LM.write_log("Component_Parser::add_components_from_json(): added loop condition %i to entity ID %u.", component_data["islooping"].GetBool(), entity);
                 }
 
-                if (component_data.HasMember("isbank") && component_data["isbank"].IsBool()) {
+                /*if (component_data.HasMember("isbank") && component_data["isbank"].IsBool()) {
                     audio_component.set_is_bank(component_data["islooping"].GetBool());
                     LM.write_log("Component_Parser::add_components_from_json(): added bank condition %i to entity ID %u.", component_data["islooping"].GetBool(), entity);
-                }
+                }*/
                 
                 // Add component to entity
                 ecs_manager.add_component<Audio_Component>(entity, audio_component);

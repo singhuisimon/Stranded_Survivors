@@ -22,7 +22,7 @@
 
 //Include other necessary header
 #include "../Manager/Log_Manager.h"
-#include "../Utility/Vector2D.h"
+#include "../Manager/Audio_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/ECS_Manager.h"
 #include "../System/system.h"
@@ -33,89 +33,86 @@ namespace lof {
 	{
 	public:
 		Audio_System();
-		Audio_System(ECS_Manager& ecs_manager);
 		~Audio_System();
 
-		int errorcheck(std::string function_name = "", std::string function_purpose = "", FMOD_RESULT result);
+		int errorcheck(FMOD_RESULT result, std::string function_name = "", std::string function_purpose = "");
 
 		bool initialize();
 		void update(float delta_time) override;
 		void shutdown();
 
-		void loadsound(const std::string filepath, FMOD::Sound*& sound);
-		void loadbank(const std::string filepath, FMOD::Studio::Bank*& bank);
-		void loadevent(const std::string& event_name, FMOD::Studio::EventInstance*& instance);
+		/**
+		 * @brief Loads a sound from the specified file_path into the FMOD system
+		 * @param file_path The path to the audio file (current format .wav)
+		 */
+		void load_sound(const std::string& file_path);
 
-		void play_sound(const std::string& sound_id, float volume = 1.0f, bool is_looping = false, FMOD::Channel*& channel, FMOD::ChannelGroup*& channelgrp);
-		void stop_sound(FMOD::Channel* channel);
-		void pause_sound(FMOD::Channel* channel);
-		void resume_sound(FMOD::Channel* channel);
-		
-		void play_event(FMOD::Studio::EventInstance* instance);
-		void stop_event(FMOD::Studio::EventInstance* instance);
-		void pause_event(FMOD::Studio::EventInstance* instance);
-		void resume_event(FMOD::Studio::EventInstance* instance);
+		/**
+		 * @brief Plays the provided FMOD::Sound object.
+		 * @param sound A pointer to the FMOD::Sound object.
+		 * @param loop If true, sound will loop indefinitely, otherwise if false sound will only play once
+		 *		  It is defaulted to be false.
+		 */
+		void play_sound(const std::string& file_path, std::string& entity_num);
+
+		void pause_resume_sound(const std::string& channel_key, bool pause);
+		void stop_sound(const std::string& channel_key);
+
+		void unload_sound(const std::string& filepath);
+
+		void set_channel_pitch(const std::string& channel_key, float pitch);
+		void set_channel_volume(const std::string& channel_key, float volume);
+		//did not add getters for pitch and volume for respective channel.
 
 		void pause_bgm_group();
 		void resume_bgm_group();
+
 		void pause_sfx_group();
 		void resume_sfx_group();
-		
+
 		float get_bgmgroup_volume() const;
 		void set_bgmgroup_volume(float volume);
+		float get_bgmgroup_pitch() const;
+		void set_bgmgroup_pitch(float pitch);
 
 		float get_sfxgroup_volume() const;
 		void set_sfxgroup_volume(float volume);
+		float get_sfxgroup_pitch() const;
+		void set_sfxgroup_pitch(float pitch);
 
-		void play_audio_component(Audio_Component& audio_component);
-		void stop_audio_component(Audio_Component& audio_component);
-		void set_audio_component_volume(Audio_Component& audio_component, float volume);
-
-		void add_event_description(const std::string& event_id, FMOD::Studio::EventDescription* event_description);
-		void remove_event_description(const std::string& event_id);
-		void clear_event_description();
-		void print_event_descriptions(); //debugging purposes.
-
-		void add_sound(const std::string& sound_id, FMOD::Sound* sound);
-		void remove_sound(const std::string& sound_id);
-		void clear_sounds();
-		void print_sounds();	//debugging purposes.
-
-		void setchannel_3D_pos(FMOD::Channel* channel, const Vec3D& pos);
-
-		FMOD::System* get_core_system() const;
-		FMOD::Studio::System* get_studio_system() const;
-
-		FMOD::Studio::EventDescription* get_event_description(const std::string& event_id);
-		FMOD::Sound* get_sound(const std::stringstream& sound_id);
+		float get_mastergroup_volume() const;
+		void set_mastergroup_volume(float volume);
+		float get_mastergroup_pitch() const;
+		void set_mastergroup_pitch(float pitch);
 
 		FMOD::ChannelGroup* get_bgmgroup();
 		FMOD::ChannelGroup* get_sfxgroup();
 		FMOD::ChannelGroup* get_mastergroup();
 
+		//3D related
+		//FMOD_VECTOR 
+		//void set_listener_position(const Vec3D& pos);
+		//void set_channel3D_pos(const std::string& channel_key, Vec3D& pos);
+
 		/**
-		* @brief Returns the type of the collision system
+		* @brief Returns the type of the audio system
 		* @return string representing the type
 		*/
 		std::string get_type() const override;
 
 	private:
-		void initializegroups();
-		bool is_sound_loaded(const std::string& sound_path) const;
-
+		//Audio_Manager& audio_manager;
 		FMOD::System* core_system;	//Core audio system
 		FMOD::Studio::System* studio_system;	//Studio audio system
-		
-		//AssetManager* asset_manager
-		std::unordered_map<std::string, FMOD::Sound*> sounds;	//loaded sound
-		std::unordered_map<std::string, FMOD::Studio::EventInstance*> event_instances;	//loaded event
-		
-		//std::vector<FMOD::Channel*> channels;
+
+		void initializegroups();
+
 		FMOD::ChannelGroup* bgmgroup;
 		FMOD::ChannelGroup* sfxgroup;
 		FMOD::ChannelGroup* mastergroup;
 
-		ECS_Manager& ecs_manager;
+		std::unordered_map<std::string, FMOD::Sound*> sound_map;
+		std::unordered_map<std::string, FMOD::Channel*> channel_map;
 	};
 
 
