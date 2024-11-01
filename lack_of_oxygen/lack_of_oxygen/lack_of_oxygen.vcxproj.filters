@@ -18,7 +18,6 @@
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
-    <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
@@ -45,7 +44,6 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
-    <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="System\Collision_System.h" />
