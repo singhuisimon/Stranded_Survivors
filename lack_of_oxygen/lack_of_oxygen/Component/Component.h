@@ -23,6 +23,7 @@
 #include "../Utility/Vector2D.h"
 #include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Path_Helper.h"
 
 // FOR TESTING 
 #include "../Glad/glad.h"
@@ -253,7 +254,7 @@ namespace lof {
             filename(filename), audio_state(PLAYING), audio_type(audio_type),
             volume(std::clamp(volume, 0.0f, 1.0f)), pitch(std::clamp(pitch_v, 0.5f, 2.0f)), islooping(islooping), is3d(is_3d), position(), mindist(1.0f), maxdist(100.0f) {}
 
-        void set_filename(const std::string filepath) { this->filename = filepath;}
+        void set_filename(const std::string filepath) { this->filename = Path_Helper::get_executable_directory() + filepath;}
         const std::string& get_filename() const { return filename; }
 
         void set_audio_state(PlayState state) { this->audio_state = state; }
@@ -272,7 +273,7 @@ namespace lof {
         float get_volume() const { return volume;  }
 
         void set_pitch(float new_pitch) { this->pitch = std::clamp(new_pitch, 0.5f, 2.0f); }
-        float get_pich() const { return pitch;  }
+        float get_pitch() const { return pitch;  }
 
         void set_is_looping(bool loop) { this->islooping = loop; }
         bool get_is_looping() const { return islooping; }

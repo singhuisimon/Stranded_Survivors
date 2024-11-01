@@ -35,7 +35,7 @@ namespace lof {
 		Audio_System();
 		~Audio_System();
 
-		int errorcheck(FMOD_RESULT result, std::string function_name = "", std::string function_purpose = "");
+		int errorcheck(FMOD_RESULT result, const std::string& function_name = "", const std::string& function_purpose = "");
 
 		bool initialize();
 		void update(float delta_time) override;
@@ -53,7 +53,7 @@ namespace lof {
 		 * @param loop If true, sound will loop indefinitely, otherwise if false sound will only play once
 		 *		  It is defaulted to be false.
 		 */
-		void play_sound(const std::string& file_path, std::string& entity_num);
+		void play_sound(const std::string& file_path, std::string& entity_num, Audio_Component& entity);
 
 		void pause_resume_sound(const std::string& channel_key, bool pause);
 		void stop_sound(const std::string& channel_key);
@@ -69,6 +69,8 @@ namespace lof {
 
 		void pause_sfx_group();
 		void resume_sfx_group();
+
+		void stop_mastergroup();
 
 		float get_bgmgroup_volume() const;
 		void set_bgmgroup_volume(float volume);

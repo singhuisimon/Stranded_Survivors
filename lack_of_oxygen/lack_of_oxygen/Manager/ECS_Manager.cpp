@@ -74,9 +74,6 @@ namespace lof {
             register_component<Graphics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
 
-            register_component<Collision_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
-
             register_component<Audio_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Audio_Component'.");
 

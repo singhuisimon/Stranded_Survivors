@@ -87,7 +87,8 @@ namespace lof {
 		//MUTED,    //Audio is to be played but not hear (essentially volume is 0.)
 		PLAYING = 0,    //Audio is to be played
 		STOPPED = 1,    //Audio is to be stopped
-		PAUSED = 2      //Audio is to be paused
+		PAUSED = 2,      //Audio is to be paused
+		RESUMED = 3		//Audio is to be resumed
 	};
 
 	enum FileFormat {
@@ -101,7 +102,8 @@ namespace lof {
 		PLAYSOUND,
 		STOPSOUND,
 		PAUSEDSOUND,
-		RESUMESOUND/*,
+		RESUMESOUND
+		/*,
 		PLAYEVENT,
 		STOPEVENT,
 		PAUSEEVENT,
