@@ -54,6 +54,7 @@ namespace lof {
     class Transform2D : public Component {
     public:
         Vec2D position;     ///< Position of the entity in world space.
+        Vec2D prev_position;
         Vec2D orientation;  ///< Orientation of the entity in degrees.
         Vec2D scale;        ///< Scale of the entity.
 
@@ -61,7 +62,7 @@ namespace lof {
          * @brief Default constructor initializing position, rotation, and scale.
          */
         Transform2D()
-            : position(0.0f, 0.0f), orientation(0.0f, 0.0f), scale(1.0f, 1.0f) {}
+            : position(0.0f, 0.0f), prev_position(0.0f,0.0f), orientation(0.0f, 0.0f), scale(1.0f, 1.0f) {}
 
         /**
          * @brief Parameterized constructor.
@@ -69,8 +70,8 @@ namespace lof {
          * @param rot Initial rotation in degrees.
          * @param scl Initial scale.
          */
-        Transform2D(const Vec2D& pos, Vec2D& ori, const Vec2D& scl)
-            : position(pos), orientation(ori), scale(scl) {}
+        Transform2D(const Vec2D& pos, Vec2D& prev_pos, Vec2D& ori, const Vec2D& scl)
+            : position(pos), prev_position(prev_pos), orientation(ori), scale(scl) {}
     };
 
 
@@ -101,14 +102,11 @@ namespace lof {
         float damping_factor;
         float max_velocity;
         Vec2D accumulated_force; //to accumulate forces applied to the entity.
+        bool is_grounded;
 
         float mass; //mass of entity
         float inv_mass;
         bool is_static; //to check if the entity is static or not
-        bool is_moveable; //to check if the entity is moveable or not
-
-        bool is_grounded; //to indicate whether the entity is on the ground
-        bool is_jumping; //to indicate whether the entity is jumping
         float jump_force; //the force applied during a jump
 
 
@@ -131,9 +129,9 @@ namespace lof {
             float damping_factor = DEFAULT_DAMPING_FACTOR,
             float max_velocity = DEFAULT_MAX_VELOCITY,
             float mass = 1.0f,
-            bool is_static = false, 
-            bool is_moveable = false,
-            float jump_force = DEFAULT_JUMP_FORCE ) //adjust later
+            bool is_static = false,
+            float jump_force = DEFAULT_JUMP_FORCE,//adjust later
+            bool is_grounded = false)
 
             : gravity(gravity),
             damping_factor(damping_factor),
@@ -142,10 +140,8 @@ namespace lof {
             mass(mass),
             inv_mass((mass > 0.0f) ? 1.0f / mass : 0.0f),
             is_static(is_static),
-            is_moveable(is_moveable),
-            is_grounded(false),
-            is_jumping(false),
-            jump_force(jump_force) {}
+            jump_force(jump_force),
+            is_grounded(is_grounded){}
 
         /**
          * @brief Applies a force to the entity.
