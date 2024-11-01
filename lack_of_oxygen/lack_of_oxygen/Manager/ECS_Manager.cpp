@@ -65,6 +65,9 @@ namespace lof {
             register_component<Velocity_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Velocity_Component'.");
 
+            register_component<Collision_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
+
             register_component<Physics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 
@@ -80,14 +83,15 @@ namespace lof {
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
+            add_system(std::make_unique<Collision_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
+
             add_system(std::make_unique<Movement_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
             add_system(std::make_unique<Render_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<Collision_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
             add_system(std::make_unique<Audio_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");

@@ -12,7 +12,7 @@
 #ifndef LOF_COLLISION_SYSTEM_H
 #define LOF_COLLISION_SYSTEM_H
 
-// Include other necessary headers
+ // Include other necessary headers
 #include "../Utility/Vector2D.h" //to get the library from vector2D.h
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
@@ -23,11 +23,35 @@
 #include <iostream>
 
 namespace lof {
+    enum class CollisionSide {
+        NONE,
+        LEFT,
+        RIGHT,
+        TOP,
+        BOTTOM
+    };
+
+    /**
+    * @struct CollisionPair
+    * @brief Represents a pair of entities that have collided, along with overlap information.
+    */
+
+        
+    struct CollisionPair {
+        EntityID entity1;
+        EntityID entity2;
+        Vec2D overlap;
+        CollisionSide side;
+        bool is_grounded;
+    };
 
     /**
      * @struct AABB
      * @brief Represents axis-aligned bounding boxes for collision detection.
      */
+
+    
+
     struct AABB {
         Vec2D min; ///< Minimum point of the bounding box
         Vec2D max; ///< Maximum point of the bounding box
@@ -48,16 +72,8 @@ namespace lof {
         static AABB from_transform(const Transform2D& transform, const Collision_Component& collision);
     };
 
-    /**
-     * @struct CollisionPair
-     * @brief Represents a pair of entities that have collided, along with overlap information.
-     */
-    struct CollisionPair {
-        EntityID entity1;
-        EntityID entity2;
-        Vec2D overlap;
-    };
 
+    
     /**
      * @class Collision_System
      * @brief Handles collision detection and resolution between entities.
@@ -76,13 +92,18 @@ namespace lof {
          */
         void update(float delta_time) override;
 
+        
+
         /**
          * @brief Returns the type of the collision system.
          * @return String representing the type.
          */
         std::string get_type() const override;
 
-    private:
+        //int Check_Instance_Collision(float pos_x, float pos_y, float scale_x, float scale_y);
+
+        CollisionSide compute_collision_side(const AABB& aabb1, const AABB& aabb2);
+
         /**
          * @brief Check for intersection between rectangles.
          * @param aabb1 First AABB.
@@ -97,6 +118,16 @@ namespace lof {
             const AABB& aabb2,
             const Vec2D& vel2,
             float& firstTimeOfCollision);
+
+        //static Collision_System& get_instance() {
+        //    static Collision_System instance; // Guaranteed to be destroyed
+        //    return instance; // Instantiated on first use
+        //}
+       // const std::vector<CollisionPair>& get_collisions() const;
+
+    private:
+        
+        //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
         /**
          * @brief Compute the overlap between AABBs.
@@ -127,7 +158,9 @@ namespace lof {
          * @param velocity1 The velocity of the dynamic object.
          * @param overlap The overlap between AABBs along the x and y axis.
          */
-        void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+        //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+
+
     };
 
 } // namespace lof

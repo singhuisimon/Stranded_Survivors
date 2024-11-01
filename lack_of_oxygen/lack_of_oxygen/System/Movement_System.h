@@ -12,6 +12,8 @@
 #define LOF_MOVEMENT_SYSTEM_H
 
 #include "System.h"
+#include "Collision_System.h"
+
 
 namespace lof {
 
@@ -38,8 +40,14 @@ namespace lof {
          * @return The string "Movement_System".
          */
         std::string get_type() const override;
-    };
 
+        //void check_grounded(EntityID entityID);
+
+        void resolve_collision(const CollisionPair& collision, Transform2D& transform, Velocity_Component& velocity, Physics_Component& physics);
+
+
+    };
+   
 } // namespace lof
 
 #endif // LOF_MOVEMENT_SYSTEM_H
