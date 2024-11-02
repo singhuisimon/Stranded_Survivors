@@ -107,7 +107,7 @@
         "Transform2D": {
           "position": [ 0, 0 ],
           "orientation": [ 0, 0 ],
-          "scale": [ 200, 20 ]
+          "scale": [ 450, 40 ]
         },
         "Graphics_Component": {
           "model_name": "square",
@@ -125,21 +125,21 @@
           "is_progress_bar": true,
           "progress": 0.0,
           "is_visible": true,
-          "relative_pos": [ 0, -50 ]
+          "relative_pos": [ 0, 0 ]
         }
       }
     },
     "gui_image": {
       "components": {
         "Transform2D": {
-          "position": [ 0, 0 ],
+          "position": [ 0, -100 ],
           "orientation": [ 0, 0 ],
           "scale": [ 64, 64 ]
         },
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "gui_placeholder",
+          "texture_name": "notex",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 1.0, 0.0, 0.0 ],
