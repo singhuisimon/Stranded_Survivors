@@ -23,6 +23,7 @@
     <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="Utility\Path_Helper.cpp" />
+    <ClCompile Include="System\GUI_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -51,13 +52,13 @@
     <ClInclude Include="Utility\Constant.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Type.h" />
+    <ClInclude Include="System\GUI_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
     <None Include="Data\square.msh" />
     <None Include="Data\scene1.scn" />
     <None Include="Data\triangle.msh" />
-    <None Include="Manager\ECS_Manager.tpp" />
     <None Include="Data\prefab.json" />
     <None Include="Data\models.msh" />
   </ItemGroup>
