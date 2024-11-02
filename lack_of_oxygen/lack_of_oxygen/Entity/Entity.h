@@ -15,17 +15,8 @@
 #include <cstdint>
 #include <bitset>
 
- /// Maximum number of components an entity can have
-const std::size_t MAX_COMPONENTS = 32;
-
-/// Alias for the entity identifier type
-using EntityID = std::uint32_t;
-
-/// Alias for the data structure that is used to store component
-using ComponentMask = std::bitset<MAX_COMPONENTS>;
-
-/// Constant representing an invalid entity ID
-constexpr EntityID INVALID_ENTITY_ID = std::numeric_limits<EntityID>::max();
+// Include other necessary headers
+#include "../Utility/Type.h" // For MAX_COMPONENTS, EntityID, and ComponentMask
 
 namespace lof {
 
@@ -39,19 +30,33 @@ namespace lof {
     private:
         EntityID id;           ///< Unique identifier for the entity
         ComponentMask mask;    ///< Bitset indicating which components the entity has
+        std::string name;      ///< Name of the entity from the scene file
 
     public:
         /**
          * @brief Constructor for Entity.
          * @param id Unique identifier for the new entity.
+         * @param name Optional name for the entity.
          */
-        Entity(EntityID id);
+        Entity(EntityID id, const std::string& name = "");
 
         /**
          * @brief Get the unique identifier of the entity.
          * @return The entity's unique identifier.
          */
         EntityID get_id() const;
+
+        /**
+         * @brief Get the name of the entity.
+         * @return The entity's name.
+         */
+        const std::string& get_name() const;
+
+        /**
+         * @brief Set the name of the entity.
+         * @param new_name The new name for the entity.
+         */
+        void set_name(const std::string& new_name);
 
         /**
          * @brief Add a component to the entity.

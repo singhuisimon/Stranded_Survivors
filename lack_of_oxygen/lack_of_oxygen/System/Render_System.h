@@ -23,43 +23,35 @@
 // Include Utility headers
 #include "../Utility/constant.h"         // To access constants 
 
- // Forward declaration
-namespace lof {
-    class ECS_Manager;
-}
-
 namespace lof {
 
     /**
-     * @class System
-     * @brief Abstract base class for all systems in the ECS.
+     * @class Render_System
+     * @brief System responsible for rendering entities.
      */
     class Render_System : public System {
-    private:
-        ECS_Manager& ecs_manager;   ///< Reference to the ECS Manager
-
     public:
         /**
-         * @brief Constructor for Movement_System.
-         * @param manager Reference to the ECS_Manager.
+         * @brief Constructor for Render_System.
+         * Initializes the system's signature.
          */
-        Render_System(ECS_Manager& ecs_manager);
+        Render_System();
 
         /**
-         * @brief Returns the system's type.
-         * @return The string "Render_System".
+         * @brief Returns the system's type as a string.
+         * @return The system's type name.
          */
         std::string get_type() const override;
 
         /**
-         * @brief Updates the graphical data of the entity and debugging features per frame.
+         * @brief Updates the graphical data of entities and handles rendering per frame.
          * @param delta_time The time elapsed since the last update, typically in seconds.
          */
         void update(float delta_time) override;
 
-
+    private:
         /**
-         * @brief Renders the entity onto the window based on the entity's components
+         * @brief Renders entities onto the window based on their components.
          */
         void draw();
     };

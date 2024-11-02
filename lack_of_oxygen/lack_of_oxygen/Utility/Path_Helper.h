@@ -48,6 +48,7 @@ namespace lof {
         static std::string get_fragment_shader_path_2();
         static std::string get_model_file_path();
         static std::string get_texture_file_path();
+        static std::string get_save_file_path(const std::string& filename);
     };
 
 } // namespace lof

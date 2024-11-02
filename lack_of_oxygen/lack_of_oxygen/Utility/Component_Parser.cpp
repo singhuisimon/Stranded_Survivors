@@ -35,6 +35,16 @@ namespace lof {
                     const rapidjson::Value& pos = component_data["position"];
                     transform.position.x = pos[0].GetFloat();
                     transform.position.y = pos[1].GetFloat();
+                    transform.prev_position = transform.position;
+                }
+                if (component_data.HasMember("prev_position") && component_data["prev_position"].IsArray()) {
+                    const rapidjson::Value& prev_pos = component_data["prev_position"];
+                    transform.prev_position.x = prev_pos[0].GetFloat();
+                    transform.prev_position.y = prev_pos[1].GetFloat();
+                }
+                else {
+                    // Optional: Set a default value for prev_position if not provided
+                    transform.prev_position = transform.position; // Or Vec2D(0.0f, 0.0f) as appropriate
                 }
                 if (component_data.HasMember("orientation") && component_data["orientation"].IsArray()) {
                     const rapidjson::Value& ori = component_data["orientation"];
@@ -98,17 +108,17 @@ namespace lof {
                     physics_component.is_static = component_data["is_static"].GetBool();
                 }
 
-                if (component_data.HasMember("is_moveable") && component_data["is_moveable"].IsBool()) {
-                    physics_component.is_moveable = component_data["is_moveable"].GetBool();
-                }
+                //if (component_data.hasmember("is_moveable") && component_data["is_moveable"].isbool()) {
+                //    physics_component.is_moveable = component_data["is_moveable"].getbool();
+                //}
 
                 if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
                     physics_component.is_grounded = component_data["is_grounded"].GetBool();
                 }
 
-                if (component_data.HasMember("is_jumping") && component_data["is_jumping"].IsBool()) {
-                    physics_component.is_jumping = component_data["is_jumping"].GetBool();
-                }
+                //if (component_data.hasmember("is_jumping") && component_data["is_jumping"].isbool()) {
+                //    physics_component.is_jumping = component_data["is_jumping"].getbool();
+                //}
 
                 if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
                     physics_component.jump_force = component_data["jump_force"].GetFloat();
