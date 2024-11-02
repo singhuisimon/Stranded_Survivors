@@ -24,7 +24,7 @@
 #include "../Manager/Log_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/ECS_Manager.h"
-#include "../System/system.h"
+#include "../System/System.h"
 
 namespace lof {
 
@@ -52,7 +52,7 @@ namespace lof {
 		 * @param loop If true, sound will loop indefinitely, otherwise if false sound will only play once
 		 *		  It is defaulted to be false.
 		 */
-		void play_sound(const std::string& file_path, std::string& entity_num, Audio_Component& entity);
+		void play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key,Audio_Component& entity);
 
 		void pause_resume_sound(const std::string& channel_key, bool pause);
 		void stop_sound(const std::string& channel_key);

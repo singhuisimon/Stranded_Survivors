@@ -218,12 +218,53 @@ namespace lof {
                 // Parse Audio_Component
                 Audio_Component audio_component;
 
-                if (component_data.HasMember("filename") && component_data["filename"].IsString()) {
-                    audio_component.set_filename(component_data["filename"].GetString());
-                    LM.write_log("Component_Parser::add_components_from_json(): added filepath %s to entity ID %i.", component_data["filename"].GetString(), entity);
+                if (component_data.HasMember("sounds") && component_data["sounds"].IsArray()) {
+                    const auto& sounds_array = component_data["sounds"];
+
+                    for (const auto& sound : sounds_array.GetArray()) {
+                        if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
+                            std::string key = sound["key"].GetString();
+                            std::string filepath = sound["filepath"].GetString();
+                            
+                            PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : STOPPED;
+                            AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
+                            float volume = sound.HasMember("volume") && sound["volume"].IsFloat() ? sound["volume"].GetFloat() : 1.0f;
+                            float pitch = sound.HasMember("pitch") && sound["pitch"].IsFloat() ? sound["pitch"].GetFloat() : 1.0f;
+                            bool islooping = sound.HasMember("islooping") && sound["islooping"].IsBool() ? sound["islooping"].GetBool() : false;
+
+                            audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
+                        }
+                    }
                 }
 
-                if (component_data.HasMember("audio_state") && component_data["audio_state"].IsInt()) {
+               /* if (component_data.HasMember("sounds") && component_data["sounds"].IsArray()) {
+                    const auto& sounds = component_data["sounds"];
+                    for (const auto& sound : sounds.GetArray()) {
+                        if (sound.HasMember("key") && sound.HasMember("filepath")) {
+                            std::string key = sound["key"].GetString();
+                            std::string filepath = sound["filepath"].GetString();
+
+                            PlayState play_state = sound.HasMember("audio_state") ? static_cast<PlayState>(sound["audio_state"].GetInt()) : STOPPED;
+                            AudioType audio_type = sound.HasMember("audio_type") ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
+                            float volume = sound.HasMember("volume") ? sound["volume"].GetFloat() : 1.0f;
+                            float pitch = sound.HasMember("pitch") ? sound["pitch"].GetFloat() : 1.0f;
+                            bool islooping = sound.HasMember("islooping") ? sound["islooping"].GetBool() : false;
+
+                            audio_component.set_filename(key, filepath);
+                            audio_component.set_audio_state(key, play_state);
+                            audio_component.set_audio_type(key, audio_type);
+                            audio_component.set_volume(key, volume);
+                            audio_component.set_pitch(key, pitch);
+                            audio_component.set_loop(key, islooping);
+
+                            LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
+                        }
+                    }
+                }*/
+
+                /*if (component_data.HasMember("audio_state") && component_data["audio_state"].IsInt()) {
                     audio_component.set_audio_state(static_cast<PlayState>(component_data["audio_state"].GetInt()));
                     LM.write_log("Component_Parser::add_components_from_json(): added audio_state %i to entity ID %u.", static_cast<PlayState>(component_data["audio_state"].GetInt()), entity);
                 }
@@ -246,7 +287,7 @@ namespace lof {
                 if (component_data.HasMember("islooping") && component_data["islooping"].IsBool()) {
                     audio_component.set_is_looping(component_data["islooping"].GetBool());
                     LM.write_log("Component_Parser::add_components_from_json(): added loop condition %i to entity ID %u.", component_data["islooping"].GetBool(), entity);
-                }
+                }*/
                 
                 // Add component to entity
                 ecs_manager.add_component<Audio_Component>(entity, audio_component);

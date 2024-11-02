@@ -228,17 +228,22 @@ namespace lof {
     */
     class Audio_Component : public Component {
     private:
-        //std::string entityid; //convert entityID into a string to be used as key
-        std::string filename;
-        //std::vector<std::string> filenames;//can be vector//need rethink abit more
-        PlayState audio_state;
-        AudioType audio_type;
+
+        struct SoundConfig {
+            std::string key;
+            std::string filepath;
+            PlayState audio_state;
+            AudioType audio_type;
+            FileFormat file_format;
+            float volume;
+            float pitch;
+            bool islooping;
+        };
+
+        std::vector<SoundConfig> sounds;
+
         //FileFormat file_format;
         //AudioCommand audio_command;
-
-        float volume;   //range of using FMOD is 0.0f to 1.0f <- has already been clamp to not exceed
-        float pitch;
-        bool islooping;
         bool is3d;
 
         Vec3D position; //position of where the sound is emitting from
@@ -247,39 +252,120 @@ namespace lof {
         
     public:
 
-        Audio_Component() : filename(""), audio_state(PLAYING), audio_type(SFX), volume(1.0f),
-            pitch(1.0f), islooping(false), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
+        Audio_Component() : sounds(), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
 
-        Audio_Component(const std::string& filename, AudioType audio_type, float volume, float pitch_v, bool is_3d = false, bool islooping = false) :
-            filename(filename), audio_state(PLAYING), audio_type(audio_type),
-            volume(std::clamp(volume, 0.0f, 1.0f)), pitch(std::clamp(pitch_v, 0.5f, 2.0f)), islooping(islooping), is3d(is_3d), position(), mindist(1.0f), maxdist(100.0f) {}
+        void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
+            float volume, float pitch, bool islooping) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    //if key already exist update properties
+                    sound.filepath = Path_Helper::get_executable_directory() + filepath;
+                    sound.audio_state = state;
+                    sound.audio_type = type;
+                    sound.volume = volume;
+                    sound.pitch = pitch;
+                    sound.islooping = islooping;
+                    return;
+                }
+            }
 
-        void set_filename(const std::string filepath) { this->filename = Path_Helper::get_executable_directory() + filepath;}
-        const std::string& get_filename() const { return filename; }
+            SoundConfig new_sound;
+            new_sound.key = key;
+            new_sound.filepath = Path_Helper::get_executable_directory() + filepath;
+            new_sound.audio_state = state;
+            new_sound.audio_type = type;
+            new_sound.volume = volume;
+            new_sound.pitch = pitch;
+            new_sound.islooping = islooping;
 
-        void set_audio_state(PlayState state) { this->audio_state = state; }
-        PlayState get_audio_state() const { return audio_state; }
+            sounds.push_back(new_sound);
+        }
 
-        void set_audio_type(AudioType type) { this->audio_type = type;}
-        AudioType get_audio_type() const { return audio_type; }
+        const std::vector<SoundConfig>& get_sounds() const { return sounds; }
 
-        //void set_file_format(FileFormat type) { this->file_format = type; }
-        //FileFormat get_file_format() const { return file_format; }
+        const SoundConfig* get_sound_by_key(const std::string& key) const{
+            for (const auto& sound : sounds) {
+                if (sound.key == key) {
+                    return &sound;
+                }
+            }
+            return nullptr;
+        }
 
-        //void set_audio_command(AudioCommand command) { this->audio_command = command; }
-        //AudioCommand get_audio_command() const { return audio_command; }
+        void set_filepath(const std::string& key, std::string& path) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.filepath = Path_Helper::get_executable_directory() + path;
+                }
+            }
+        }
 
-        void set_volume(float new_volume) { this->volume = std::clamp(new_volume, 0.0f, 1.0f); }
-        float get_volume() const { return volume;  }
+        std::string get_filepath(const std::string& key) const{
+            return get_sound_by_key(key)->filepath;
+        }
 
-        void set_pitch(float new_pitch) { this->pitch = std::clamp(new_pitch, 0.5f, 2.0f); }
-        float get_pitch() const { return pitch;  }
+        void set_audio_state(const std::string& key, PlayState state) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.audio_state = state;
+                }
+            }
+        }
 
-        void set_is_looping(bool loop) { this->islooping = loop; }
-        bool get_is_looping() const { return islooping; }
+        PlayState get_audio_state(const std::string& key) const {
+            return get_sound_by_key(key)->audio_state;
+        }
+
+        void set_audio_type(const std::string& key, AudioType type) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.audio_type = type;
+                }
+            }
+        }
+
+        AudioType get_audio_type(const std::string& key) {
+            return get_sound_by_key(key)->audio_type;
+        }
+
+        void set_volume(const std::string& key, float volume) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.volume = volume;
+                }
+            }
+        }
+
+        float get_volume(const std::string& key) {
+            return get_sound_by_key(key)->volume;
+        }
+
+        void set_pitch(const std::string& key, float pitch) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.pitch = pitch;
+                }
+            }
+        }
+
+        float get_pitch(const std::string& key) {
+            return get_sound_by_key(key)->pitch;
+        }
+
+        void set_loop(const std::string& key, bool islooping) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.islooping = islooping;
+                }
+            }
+        }
+
+        bool get_loop(const std::string& key) {
+            return get_sound_by_key(key)->islooping;
+        }
 
         void set_is3d(bool is_3d) { this->is3d = is_3d; }
-        bool get_is3d() const { return is3d; };
+        bool get_is3d() const { return is3d; }
 
         void set_position(const Vec3D& pos) { position = pos; }
         Vec3D get_position() const { return position; }

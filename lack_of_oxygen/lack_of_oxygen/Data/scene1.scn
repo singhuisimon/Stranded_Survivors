@@ -21,12 +21,26 @@
           ]
         },
         "Audio_Component": {
-          "filename": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test1.wav",
-          "audio_state": 0,
-          "audio_type": 0,
-          "volume": 0.5,
-          "pitch" : 1,
-          "islooping": false
+          "sounds": [
+            {
+              "key": "bgm1",
+              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test1.wav",
+              "audio_state": 0,
+              "audio_type": 0,
+              "volume": 0.5,
+              "pitch": 1,
+              "islooping": true
+            },
+            {
+              "key": "bgm2",
+              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test2.wav",
+              "audio_state": 1,
+              "audio_type": 0,
+              "volume": 0.5,
+              "pitch": 1,
+              "islooping": false
+            }
+          ]
         }
       }
     },
@@ -89,12 +103,28 @@
       "prefab": "player",
       "components": {
         "Audio_Component": {
-          "filename": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx16_2.wav",
-          "audio_state": 1,
-          "audio_type": 1,
-          "volume": 0.5,
-          "pitch": 1,
-          "islooping": false
+          "sounds": [
+            {
+              "key": "jumping",
+              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx16_2.wav",
+              "audio_state": 1,
+              "audio_type": 1,
+              "volume": 0.5,
+              "pitch": 1,
+              "islooping": false
+            },
+
+            {
+              "key": "moving",
+              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx28.wav",
+              "audio_state": 1,
+              "audio_type": 1,
+              "volume": 0.5,
+              "pitch": 1,
+              "islooping": false
+            }
+
+          ]          
         }
       }
     }

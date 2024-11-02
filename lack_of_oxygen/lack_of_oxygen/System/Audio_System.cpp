@@ -62,19 +62,23 @@ namespace lof {
 
 	void Audio_System::update(float delta_time) {
 		(void)delta_time;
-		const auto& entities = get_entities();
+		const auto& entityids = get_entities();
 		std::vector<std::string> stopchannel;
-		for (EntityID entityID : entities) {
+		for (EntityID entityID : entityids) {
 			if (!ECSM.has_component<Audio_Component>(entityID)) {
 				continue;	//need not process if entity has no audio
 			}
 			Audio_Component& audio = ECSM.get_component<Audio_Component>(entityID);
-			PlayState state = audio.get_audio_state();
-			std::string filepath = audio.get_filename();	//the key for sound
-			std::string key_id = filepath + std::to_string(entityID);	//the key for channel
-			switch (state) {
+			
+			const auto& sounds = audio.get_sounds();
+
+			for (const auto& sound : sounds) {
+				std::string audio_key = sound.key;
+				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID);
+				PlayState state = audio.get_audio_state(audio_key);
+				switch (state) {
 				case PLAYING:
-					play_sound(filepath, key_id, audio);
+					play_sound(audio.get_filepath(audio_key), key_id, audio_key, audio);
 					//std::cout << entity << "sound is playing" << std::endl;
 					//LM.write_log("entity %d is playing a sound", entity);
 					break;
@@ -89,30 +93,49 @@ namespace lof {
 					pause_resume_sound(key_id, false);
 					break;
 				default:
-					//nothing to be done? since play state is none
-					break;
+					continue;
+				}
+
+				if (channel_map.find(key_id) != channel_map.end()) {
+					float currvolume, currpitch;
+
+					if (channel_map[key_id]->getVolume(&currvolume) != audio.get_volume(audio_key)) {
+						set_channel_volume(key_id, audio.get_volume(audio_key));
+					}
+
+					if (channel_map[key_id]->getPitch(&currpitch) != audio.get_pitch(audio_key)) {
+						set_channel_pitch(key_id, audio.get_pitch(audio_key));
+					}
+				}
 			}
+			
+			//PlayState state = audio.get_audio_state();
+			//std::string filepath = audio.get_filename();	//the key for sound
+			//std::string key_id = filepath + std::to_string(entityID);	//the key for channel
+			//
+
 			//std::cout << "this entity is in the audio system " << entityID <<"\n";
 			//read data like volume, pitch, etc.
-			float volume;
-			float pitch;
-			
 			//check if the channel still exist to prevent accessing unaccessible channel
-			if (channel_map.find(key_id) == channel_map.end()) {
-				continue;
-			}
-			//if there is a change in volume and pitch for the entity sound, set the volume/pitch accordingly
-			if (channel_map.find(key_id)->second->getVolume(&volume) != audio.get_volume()) {
-				set_channel_volume(key_id, audio.get_volume());
-			}
-			if (channel_map.find(key_id)->second->getPitch(&pitch) != audio.get_pitch()) {
-				set_channel_pitch(key_id, audio.get_pitch());
-			}
+			//if (channel_map.find(key_id) != channel_map.end()) {
+			//	float currvolume, currpitch;
+
+			//	//if there is a change in volume and pitch for the entity sound, set the volume/pitch accordingly
+			//	if (channel_map.find(key_id)->second->getVolume(&currvolume) != audio.get_volume()) {
+			//		set_channel_volume(key_id, audio.get_volume() );
+			//	}
+			//	if (channel_map.find(key_id)->second->getPitch(&currpitch) != audio.get_pitch()) {
+			//		set_channel_pitch(key_id, audio.get_pitch());
+			//	}
+			//}
+			
 		}
 		//free up unused channel.
 		for (std::string const& key : stopchannel) {
 			channel_map.erase(key);
 		}
+
+		//update the fmod system with the core system
 		errorcheck(core_system->update());
 	}
 
@@ -175,20 +198,23 @@ namespace lof {
 		return;
 	}
 
-	void Audio_System::play_sound(const std::string& file_path, std::string& key, Audio_Component& audio) {
+	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
 		//check if sound has already been loaded.
 		if (sound_map.find(file_path) == sound_map.end()) {
 			load_sound(file_path);
+			if (sound_map.find(file_path) == sound_map.end()) {
+				LM.write_log("audiosystem play_sound fail to load sound %s.", file_path.c_str());
+			}
 		}
 
 		//check if the sound is already playing under the entity in a channel
-		if (channel_map.find(key) != channel_map.end()) {
+		if (channel_map.find(cskey) != channel_map.end()) {
 			LM.write_log("Audio_System::play_sound: channel already exists in entity");
 			//check if sound has finish playing, if so change the audio_state to stopped.
 			bool playing;
-			channel_map.find(key)->second->isPlaying(&playing);
+			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing));
 			if (!playing) {
-				audio.set_audio_state(STOPPED);
+				audio.set_audio_state(audio_key, STOPPED);
 			}
 			return;	//sound is already playing
 		}
@@ -202,19 +228,20 @@ namespace lof {
 			return;
 		}
 		else {
-			std::pair<std::string, FMOD::Channel*> pair = std::make_pair(key, channel);
-			channel_map.insert(pair);
+			//std::pair<std::string, FMOD::Channel*> pair = std::make_pair(cskey, channel);
+			//channel_map.insert(pair);
+			channel_map[cskey] = channel;
 		}
 
 		//add channel into the respective channel group
-		if (audio.get_audio_type() == BGM) {
+		if (audio.get_audio_type(audio_key) == BGM) {
 			bgmgroup->addGroup(group);
 		}
 		else {
 			sfxgroup->addGroup(group);
 		}
 
-		if (audio.get_is_looping()) {
+		if (audio.get_loop(audio_key)) {
 			channel->setMode(FMOD_LOOP_NORMAL);
 			channel->setLoopCount(-1);	//-1 for indefinite playing of sound in channel
 		}
@@ -224,10 +251,10 @@ namespace lof {
 		}
 
 		//set channel pitch and volume
-		channel->setPitch(audio.get_pitch());
-		channel->setVolume(audio.get_volume());
+		channel->setPitch(audio.get_pitch(audio_key));
+		channel->setVolume(audio.get_volume(audio_key));
 
-		LM.write_log("Audio_System::play_sound: sound %s is playing", key.c_str());
+		LM.write_log("Audio_System::play_sound: sound %s is playing", cskey.c_str());
 	}
 
 	void Audio_System::stop_mastergroup() {
@@ -274,7 +301,7 @@ namespace lof {
 
 	void Audio_System::stop_sound(const std::string& channel_key) {
 		if (channel_map.find(channel_key) == channel_map.end()) {
-			LM.write_log("Audio_System::stop_sound: failed to stop sound as sound isn't even playing in the channel.");
+			LM.write_log("Audio_System::stop_sound: failed to stop sound as %s isn't even playing in the channel.", channel_key.c_str());
 			return;
 		}
 		auto channel = channel_map.find(channel_key);
