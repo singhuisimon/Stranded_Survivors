@@ -214,22 +214,10 @@ namespace lof {
                     is_static = !is_static;
                 }
 
-                auto& is_moveable = physics.is_moveable;
-                std::string m_label = "is_moveable: " + std::string(is_moveable_on ? "On" : "Off");
-                if (button_toggle(m_label, &is_moveable_on)) {
-                    is_moveable = !is_moveable;
-                }
-
                 auto& is_grounded = physics.is_grounded;
                 std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
                 if (button_toggle(g_label, &is_grounded_on)) {
                     is_grounded = !is_grounded;
-                }
-
-                auto& is_jumping = physics.is_jumping;
-                std::string j_label = "is_jumping: " + std::string(is_jumping_on ? "On" : "Off");
-                if (button_toggle(j_label, &is_jumping_on)) {
-                    is_jumping = !is_jumping;
                 }
 
                 auto& jump = physics.jump_force;
