@@ -272,22 +272,6 @@ namespace lof {
                 }
             }
         }
-        
-        //Play Audio BGM
-        //check if key 0 is press if so play track1
-        if (IM.is_key_pressed(GLFW_KEY_0)) {
-            AM.play_bgm(TRACK1);
-        }
-        
-        //check if key 9 is press if so play track2
-        if (IM.is_key_pressed(GLFW_KEY_9)) {
-            AM.play_bgm(TRACK2);
-        }
-
-        //check if key L is press if so stop music
-        if (IM.is_key_pressed(GLFW_KEY_L)) {
-            AM.stop_bgm();
-        }
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
