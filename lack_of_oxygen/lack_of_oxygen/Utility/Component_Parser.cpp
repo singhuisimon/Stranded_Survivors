@@ -243,7 +243,7 @@ namespace lof {
                 // Add component to entity
                 ecs_manager.add_component<GUI_Component>(entity, gui_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
-                }
+            }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
                 LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);

@@ -525,7 +525,7 @@ namespace lof {
      * @return Screen width as an unsigned integer.
      */
     unsigned int Serialization_Manager::get_scr_width() const {
-        LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
+        //LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
         return m_scr_width;
     }
 
@@ -535,7 +535,7 @@ namespace lof {
      * @return Screen height as an unsigned integer.
      */
     unsigned int Serialization_Manager::get_scr_height() const {
-        LM.write_log("Serialization_Manager::get_scr_height(): Returning SCR_HEIGHT: %u", m_scr_height);
+        //LM.write_log("Serialization_Manager::get_scr_height(): Returning SCR_HEIGHT: %u", m_scr_height);
         return m_scr_height;
     }
 

@@ -21,7 +21,9 @@
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 
+// Include systems
 #include "../System/GUI_System.h"  // Add this for GUI system access
+
 
 // Include iostream for console output
 #include <iostream>
