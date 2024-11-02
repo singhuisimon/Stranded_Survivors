@@ -36,7 +36,6 @@
     <ClCompile Include="Manager\IMGUI_Manager.cpp" />
     <ClCompile Include="IMGUI\imgui_demo.cpp" />
     <ClCompile Include="Utility\Vector3D.cpp" />
-    <ClCompile Include="System\GUI_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -70,13 +69,13 @@
     <ClInclude Include="Manager\IMGUI_Manager.h" />
     <ClInclude Include="Utility\Vector3D.h" />
     <ClInclude Include="Utility\Type.h" />
-    <ClInclude Include="System\GUI_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
     <None Include="Data\square.msh" />
     <None Include="Data\scene1.scn" />
     <None Include="Data\triangle.msh" />
+    <None Include="Manager\ECS_Manager.tpp" />
     <None Include="Data\prefab.json" />
     <None Include="Data\models.msh" />
   </ItemGroup>

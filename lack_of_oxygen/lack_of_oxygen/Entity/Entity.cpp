@@ -13,19 +13,11 @@
 
 namespace lof {
 
-    Entity::Entity(EntityID id, const std::string& name)
-        : id(id), name(name) {}
+    Entity::Entity(EntityID id) : id(id) {}
 
 
     EntityID Entity::get_id() const { return id; }
 
-    const std::string& Entity::get_name() const {
-        return name;
-    }
-
-    void Entity::set_name(const std::string& new_name) {
-        name = new_name;
-    }
 
     void Entity::add_component(std::size_t component_id) { mask.set(component_id); }
 

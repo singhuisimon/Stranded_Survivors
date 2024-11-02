@@ -118,9 +118,5 @@ namespace lof {
         return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Textures\\Texture_Names.txt";
     }
 
-    // Function to get the path to the save file
-    std::string Path_Helper::get_save_file_path(const std::string& filename) {
-        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\" + filename;
-    }
 
 } // namespace lof
