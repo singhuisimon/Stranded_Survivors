@@ -234,7 +234,7 @@ namespace lof {
             std::string filepath;
             PlayState audio_state;
             AudioType audio_type;
-            FileFormat file_format;
+            //FileFormat file_format;
             float volume;
             float pitch;
             bool islooping;
