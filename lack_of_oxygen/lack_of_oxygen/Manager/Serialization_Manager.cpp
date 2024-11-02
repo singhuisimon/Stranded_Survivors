@@ -14,9 +14,6 @@
 // Include RapidJSON headers
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
-#include "rapidjson/stringbuffer.h"    // For StringBuffer
-#include "rapidjson/prettywriter.h"    // For PrettyWriter
-#include "rapidjson/writer.h"          // For Writer
 
 // Include Log_Manager
 #include "Log_Manager.h"
@@ -39,11 +36,6 @@
 #include <cassert>
 
 namespace lof {
-
-    // Forward declaration of helper functions
-    class Transform2D;
-    class Graphics_Component;
-    class Collision_Component;
 
     /**
      * @brief Private constructor for the singleton pattern.
@@ -313,36 +305,19 @@ namespace lof {
                 entity_name = obj["name"].GetString();
             }
             else {
-                LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Using default name.", i);
-                entity_name = "unnamed_entity_" + std::to_string(i);
+                LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Skipping.", i);
+                continue;
             }
 
-            EntityID eid;
-            // Handle prefab-based entities
-            if (obj.HasMember("prefab") && obj["prefab"].IsString()) {
-                std::string prefab_name = obj["prefab"].GetString();
-                eid = ECSM.clone_entity_from_prefab(prefab_name);
-                if (eid == INVALID_ENTITY_ID) {
-                    LM.write_log("Serialization_Manager::load_scene(): Failed to create entity from prefab '%s'. Skipping.", prefab_name.c_str());
-                    continue;
-                }
-            }
-            else {
-                // Create a new entity without prefab
-                eid = ECSM.create_entity();
-            }
-
-            // Set the entity's name
-            if (auto* entity = ECSM.get_entity(eid)) {
-                entity->set_name(entity_name);
-                LM.write_log("Serialization_Manager::load_scene(): Created entity '%s' with ID %u.", entity_name.c_str(), eid);
-            }
+            // Create the entity
+            EntityID eid = ECSM.create_entity();
+            LM.write_log("Serialization_Manager::load_scene(): Created entity '%s' with ID %u.", entity_name.c_str(), eid);
 
             // Initialize merged components
-            rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
+            rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator(); // Use the main document's allocator
             rapidjson::Value merged_components(rapidjson::kObjectType);
 
-            // If this is a prefab-based entity, start with the prefab's components
+            // Handle prefab
             if (obj.HasMember("prefab") && obj["prefab"].IsString()) {
                 std::string prefab_name = obj["prefab"].GetString();
                 auto prefab_it = m_prefab_map.find(prefab_name);
@@ -351,175 +326,29 @@ namespace lof {
                     if (prefab.HasMember("components") && prefab["components"].IsObject()) {
                         merged_components.CopyFrom(prefab["components"], allocator);
                     }
+                    else {
+                        LM.write_log("Serialization_Manager::load_scene(): Prefab '%s' does not have 'components' object. Skipping entity '%s'.", prefab_name.c_str(), entity_name.c_str());
+                        continue;
+                    }
+                }
+                else {
+                    LM.write_log("Serialization_Manager::load_scene(): Prefab '%s' not found. Skipping entity '%s'.", prefab_name.c_str(), entity_name.c_str());
+                    continue;
                 }
             }
 
-            // Merge components from the scene (overrides prefab components)
+            // Merge overrides from the scene
             if (obj.HasMember("components") && obj["components"].IsObject()) {
                 const rapidjson::Value& scene_components = obj["components"];
                 merge_objects(scene_components, merged_components, allocator);
             }
 
-            // Add components to the entity
+            // Add components to the entity using Component_Parser
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
         }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
-    }
-
-
-    rapidjson::Value Serialization_Manager::serialize_transform_component(const Transform2D& component, rapidjson::Document::AllocatorType& allocator) {
-        rapidjson::Value comp_obj(rapidjson::kObjectType);
-
-        // Position
-        rapidjson::Value position(rapidjson::kArrayType);
-        position.PushBack(component.position.x, allocator);
-        position.PushBack(component.position.y, allocator);
-        comp_obj.AddMember("position", position, allocator);
-
-        // Previous position (matching your scene format)
-        rapidjson::Value prev_position(rapidjson::kArrayType);
-        prev_position.PushBack(component.position.x, allocator);
-        prev_position.PushBack(component.position.y, allocator);
-        comp_obj.AddMember("prev_position", prev_position, allocator);
-
-        // Orientation
-        rapidjson::Value orientation(rapidjson::kArrayType);
-        orientation.PushBack(component.orientation.x, allocator);
-        orientation.PushBack(component.orientation.y, allocator);
-        comp_obj.AddMember("orientation", orientation, allocator);
-
-        // Scale
-        rapidjson::Value scale(rapidjson::kArrayType);
-        scale.PushBack(component.scale.x, allocator);
-        scale.PushBack(component.scale.y, allocator);
-        comp_obj.AddMember("scale", scale, allocator);
-
-        return comp_obj;
-    }
-
-
-    rapidjson::Value Serialization_Manager::serialize_graphics_component(const Graphics_Component& component, rapidjson::Document::AllocatorType& allocator) {
-        rapidjson::Value comp_obj(rapidjson::kObjectType);
-
-        comp_obj.AddMember("model_name", rapidjson::Value(component.model_name.c_str(), allocator), allocator);
-
-        rapidjson::Value color(rapidjson::kArrayType);
-        color.PushBack(component.color.x, allocator);
-        color.PushBack(component.color.y, allocator);
-        color.PushBack(component.color.z, allocator);
-        comp_obj.AddMember("color", color, allocator);
-
-        comp_obj.AddMember("texture_name", rapidjson::Value(component.texture_name.c_str(), allocator), allocator);
-        comp_obj.AddMember("shd_ref", component.shd_ref, allocator);
-
-        // Matrix in your scene file format
-        rapidjson::Value matrix(rapidjson::kArrayType);
-        for (int i = 0; i < 3; ++i) {
-            rapidjson::Value row(rapidjson::kArrayType);
-            for (int j = 0; j < 3; ++j) {
-                row.PushBack(component.mdl_to_ndc_xform[i][j], allocator);
-            }
-            matrix.PushBack(row, allocator);
-        }
-        comp_obj.AddMember("mdl_to_ndc_xform", matrix, allocator);
-
-        return comp_obj;
-    }
-
-
-    rapidjson::Value Serialization_Manager::serialize_collision_component(const Collision_Component& component, rapidjson::Document::AllocatorType& allocator) {
-        rapidjson::Value comp_obj(rapidjson::kObjectType);
-
-        comp_obj.AddMember("width", component.width, allocator);
-        comp_obj.AddMember("height", component.height, allocator);
-
-        return comp_obj;
-    }
-
-
-    bool Serialization_Manager::save_game_state(const char* filepath) {
-        LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
-
-        rapidjson::Document save_doc;
-        save_doc.SetObject();
-        rapidjson::Document::AllocatorType& allocator = save_doc.GetAllocator();
-
-        // Create array for objects (matching your scene format)
-        rapidjson::Value objects_array(rapidjson::kArrayType);
-
-        // Counter for generating unique names if needed
-        int unnamed_counter = 0;
-
-        // Iterate through all entities
-        for (const auto& entity_ptr : ECSM.get_entities()) {
-            EntityID entity_id = entity_ptr->get_id();
-
-            // Create object for this entity
-            rapidjson::Value entity_obj(rapidjson::kObjectType);
-
-            // Generate a name for the entity (you might want to store actual names somewhere)
-            std::string entity_name;
-            if (entity_id == 0) {
-                entity_name = "background";
-            }
-            else {
-                entity_name = "entity_" + std::to_string(unnamed_counter++);
-            }
-            entity_obj.AddMember("name", rapidjson::Value(entity_name.c_str(), allocator), allocator);
-
-            // Create object for components
-            rapidjson::Value components_obj(rapidjson::kObjectType);
-
-            // Add components in the same format as your scene file
-            if (ECSM.has_component<Transform2D>(entity_id)) {
-                const Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
-                components_obj.AddMember("Transform2D", serialize_transform_component(transform, allocator), allocator);
-            }
-
-            if (ECSM.has_component<Graphics_Component>(entity_id)) {
-                const Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-                components_obj.AddMember("Graphics_Component", serialize_graphics_component(graphics, allocator), allocator);
-            }
-
-            if (ECSM.has_component<Collision_Component>(entity_id)) {
-                const Collision_Component& collision = ECSM.get_component<Collision_Component>(entity_id);
-                components_obj.AddMember("Collision_Component", serialize_collision_component(collision, allocator), allocator);
-            }
-
-            // Add components object to entity object
-            entity_obj.AddMember("components", components_obj, allocator);
-
-            // Add entity object to objects array
-            objects_array.PushBack(entity_obj, allocator);
-        }
-
-        // Add objects array to root object (matching your scene format)
-        save_doc.AddMember("objects", objects_array, allocator);
-
-        // Write to file
-        try {
-            std::ofstream ofs(filepath);
-            if (!ofs.is_open()) {
-                LM.write_log("Serialization_Manager::save_game_state(): Failed to open file for writing: %s", filepath);
-                return false;
-            }
-
-            rapidjson::StringBuffer strbuf;
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
-            save_doc.Accept(writer);
-
-            ofs << strbuf.GetString();
-            ofs.close();
-
-            LM.write_log("Serialization_Manager::save_game_state(): Successfully saved game state to %s", filepath);
-            return true;
-        }
-        catch (const std::exception& e) {
-            LM.write_log("Serialization_Manager::save_game_state(): Error writing save file: %s", e.what());
-            return false;
-        }
     }
 
     /**
