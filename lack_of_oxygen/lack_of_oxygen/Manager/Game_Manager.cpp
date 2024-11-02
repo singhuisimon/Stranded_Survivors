@@ -18,6 +18,7 @@
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Path_Helper.h"
 
 // Include iostream for console output
 #include <iostream>
@@ -194,6 +195,51 @@ namespace lof {
             }
         }
         c_key_was_pressed_last_frame = c_key_pressed;
+
+        // Save game state when 'K' key is pressed
+        bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
+        if (k_key_pressed && !k_key_was_pressed_last_frame) {
+            // Generate a filename with timestamp
+            auto now = std::chrono::system_clock::now();
+            auto time = std::chrono::system_clock::to_time_t(now);
+            std::stringstream ss;
+            ss << "save_game_" << time << ".json";
+            std::string filename = ss.str();
+
+            // Replace illegal filename characters
+            std::replace(filename.begin(), filename.end(), ':', '_');
+            std::replace(filename.begin(), filename.end(), ' ', '_');
+
+            // Get save file path using Path_Helper
+            std::string save_path = Path_Helper::get_save_file_path(filename);
+
+            // Attempt to save the game
+            if (SM.save_game_state(save_path.c_str())) {
+                LM.write_log("Game_Manager::update(): Successfully saved game state to %s", save_path.c_str());
+                std::cout << "Game saved successfully to: " << filename << std::endl;
+            }
+            else {
+                LM.write_log("Game_Manager::update(): Failed to save game state to %s", save_path.c_str());
+                std::cout << "Failed to save game!" << std::endl;
+            }
+        }
+        k_key_was_pressed_last_frame = k_key_pressed;
+        
+        //Play Audio BGM
+        //check if key 0 is press if so play track1
+        if (IM.is_key_pressed(GLFW_KEY_0)) {
+            AM.play_bgm(TRACK1);
+        }
+        
+        //check if key 9 is press if so play track2
+        if (IM.is_key_pressed(GLFW_KEY_9)) {
+            AM.play_bgm(TRACK2);
+        }
+
+        //check if key L is press if so stop music
+        if (IM.is_key_pressed(GLFW_KEY_L)) {
+            AM.stop_bgm();
+        }
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

@@ -46,6 +46,7 @@
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
+    <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
@@ -77,6 +78,7 @@
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
+    <ClInclude Include="System\GUI_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
@@ -98,7 +100,6 @@
     <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
-    <None Include="Manager\ECS_Manager.tpp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\Audio\audio_test1.wav" />
