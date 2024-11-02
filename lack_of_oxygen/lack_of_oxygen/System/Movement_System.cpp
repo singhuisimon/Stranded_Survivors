@@ -67,7 +67,7 @@ namespace lof {
                 physics.apply_force(Vec2D(0.0f, physics.jump_force * physics.mass));
                 physics.is_grounded = false;
                 physics.gravity.y = DEFAULT_GRAVITY;
-
+                ECSM.get_component<Audio_Component>(entity_id).set_audio_state(PLAYING);  //jumping sound
             }
 
            
@@ -76,11 +76,13 @@ namespace lof {
                 // Apply force to move left
                 std::cout << "move left pls\n";
                 physics.apply_force(Vec2D(-5000.f, 0.0f));
+                //ECSM.get_component<Audio_Component>(entity_id).set_audio_state(PLAYING); movement sound
             }
             else if (IM.is_key_held(GLFW_KEY_D) && entity_id == 4) {
                 // Apply force to move right
                 std::cout << "move right pls\n";
                 physics.apply_force(Vec2D(5000.f, 0.0f));
+                //ECSM.get_component<Audio_Component>(entity_id).set_audio_state(PLAYING); movement sound
             }
 
             if (!physics.is_grounded) {

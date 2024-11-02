@@ -19,6 +19,14 @@
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
+        },
+        "Audio_Component": {
+          "filename": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test1.wav",
+          "audio_state": 0,
+          "audio_type": 0,
+          "volume": 0.5,
+          "pitch" : 1,
+          "islooping": false
         }
       }
     },
@@ -78,7 +86,17 @@
     },
     {
       "name": "player1",
-      "prefab": "player"
+      "prefab": "player",
+      "components": {
+        "Audio_Component": {
+          "filename": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx16_2.wav",
+          "audio_state": 1,
+          "audio_type": 1,
+          "volume": 0.5,
+          "pitch": 1,
+          "islooping": false
+        }
+      }
     }
   ]
 }
