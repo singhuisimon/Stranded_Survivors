@@ -252,6 +252,37 @@ namespace lof {
                 ecs_manager.add_component<Audio_Component>(entity, audio_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Audio_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ GUI_Component -------------------------------------------
+            else if (component_name == "GUI_Component") {
+                // Parse GUI_Component
+                GUI_Component gui_component;
+
+                if (component_data.HasMember("is_container") && component_data["is_container"].IsBool()) {
+                    gui_component.is_container = component_data["is_container"].GetBool();
+                }
+
+                if (component_data.HasMember("is_progress_bar") && component_data["is_progress_bar"].IsBool()) {
+                    gui_component.is_progress_bar = component_data["is_progress_bar"].GetBool();
+                }
+
+                if (component_data.HasMember("progress") && component_data["progress"].IsNumber()) {
+                    gui_component.progress = component_data["progress"].GetFloat();
+                }
+
+                if (component_data.HasMember("is_visible") && component_data["is_visible"].IsBool()) {
+                    gui_component.is_visible = component_data["is_visible"].GetBool();
+                }
+
+                if (component_data.HasMember("relative_pos") && component_data["relative_pos"].IsArray()) {
+                    const rapidjson::Value& pos = component_data["relative_pos"];
+                    gui_component.relative_pos.x = pos[0].GetFloat();
+                    gui_component.relative_pos.y = pos[1].GetFloat();
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<GUI_Component>(entity, gui_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
+            }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
                 LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
