@@ -26,6 +26,7 @@
 // Include Utility headers
 #include "../Utility/Type.h" // Include shared types
 #include "../Utility/Component_Parser.h" // Include Component_Parser for adding components from JSON
+#include "../Utility/globals.h" // Include shared types
 
 // Include Log_Manager for logging
 #include "Log_Manager.h"
@@ -196,12 +197,22 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
 
-
-            // Getting delta time for each system
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-            // Updating each system
-            system->update(delta_time);
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System") {
+                if (!level_editor_mode) {
+                    // Getting delta time for each system
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                    // Updating each system
+                    system->update(delta_time);
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+                }
+            }
+            else {
+                // Getting delta time for each system
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            }
             
         }
     }

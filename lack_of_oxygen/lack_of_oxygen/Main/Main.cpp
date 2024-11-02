@@ -26,6 +26,8 @@
 
 using namespace lof;
 
+bool level_editor_mode = false;
+
 int main(void) {
 
     // --------------------------- Initialization ---------------------------
@@ -104,7 +106,7 @@ int main(void) {
 
     IMGUIM.start_up(window); // Might need to integrate with game manager 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    bool level_editor_mode = false;
+    bool object_editor_mode = false;
 
     // --------------------------- Retrieve Configuration ---------------------------
 
@@ -192,13 +194,24 @@ int main(void) {
         }
 
         if (level_editor_mode) {
-            std::cout << "level editor mode is on" << std::endl;
-
+           
             // Start the Dear ImGui frame
             IMGUIM.start_frame();
-            // Example From GitHib
-            //IMGUIM.example_demo(show_demo_window, show_another_window, clear_color, io);
-            IMGUIM.imgui_game_objects_list();
+
+            if (ImGui::BeginMainMenuBar()) {
+                if (ImGui::BeginMenu("File")) {
+                    if (ImGui::MenuItem("Test")) {
+                        object_editor_mode = !object_editor_mode;
+                    }
+                    ImGui::EndMenu();
+                }
+            }
+            
+            if (object_editor_mode) {
+                IMGUIM.imgui_game_objects_list();
+            }
+            
+            ImGui::EndMainMenuBar();
             // Rendering
             IMGUIM.render();
 

@@ -36,6 +36,7 @@
     <ClCompile Include="IMGUI\imstb_textedit.h" />
     <ClCompile Include="Manager\IMGUI_Manager.cpp" />
     <ClCompile Include="IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="Manager\Level_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -69,6 +70,8 @@
     <ClInclude Include="IMGUI\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
     <ClInclude Include="Utility\Type.h" />
+    <ClInclude Include="Utility\globals.h" />
+    <ClInclude Include="Manager\Level_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

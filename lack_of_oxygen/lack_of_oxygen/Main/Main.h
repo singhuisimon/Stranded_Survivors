@@ -30,6 +30,7 @@
 #include "../Utility/Clock.h"
 #include "../Utility/Vector2D.h"
 #include "../Utility/Matrix3x3.h"
+#include "../Utility/globals.h"
 
 // Include Manager headers
 #include "../Manager/Game_Manager.h"
@@ -39,6 +40,7 @@
 #include "../Manager/Graphics_Manager.h"
 #include "../Manager/Audio_Manager.h"
 #include "../Manager/IMGUI_Manager.h"
+#include "../Manager/Level_Manager.h"
 
 #include "../IMGUI/imgui.h"
 #include "../IMGUI/imgui_impl_glfw.h"

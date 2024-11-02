@@ -5,6 +5,7 @@
 // Include other managers
 #include "Log_Manager.h"
 #include "ECS_Manager.h"
+#include "Level_Manager.h"
 
 // Include utility function
 #include "../Utility/Constant.h"
@@ -148,17 +149,23 @@ namespace lof {
         
     }
 
-    //currently has bug, needs to save in json file!!!
+    static bool is_static_on = false;
+    static bool is_moveable_on = true;
+    static bool is_grounded_on = false;
+    static bool is_jumping_on = false;
+
     void IMGUI_Manager::imgui_game_objects_edit() {
         
         ImGui::Begin("Edit Object Properties", &show_window);
 
         const auto& entities = ecs.get_entities();
 
+        //Transform2D Component
         if (entities[selected_object_index]->has_component(ecs.get_component_id<Transform2D>())) {
             Transform2D& transform = ecs.get_component<Transform2D>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Transformation")) {
 
+                //modifying values
                 auto& position = transform.position;
                 ImGui::InputFloat2("Position", &position.x);
 
@@ -168,12 +175,9 @@ namespace lof {
                 auto& scale = transform.scale;
                 ImGui::InputFloat2("Scale", &scale.x);
             }
-
-            if (ImGui::Button("Save Changes")) {
-                //save_transform_to_json(entities[selected_object_index].get()->get_id(), transform);
-            }
         }
        
+        //Velocity Component
         if (entities[selected_object_index]->has_component(ecs.get_component_id<Velocity_Component>())) {
             Velocity_Component& velocity_comp = ecs.get_component<Velocity_Component>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Velocity")) {
@@ -184,7 +188,7 @@ namespace lof {
             }
         }
 
-
+        //Physics Component
         if (entities[selected_object_index]->has_component(ecs.get_component_id<Physics_Component>())) {
             Physics_Component& physics = ecs.get_component<Physics_Component>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Physics")) {
@@ -204,29 +208,63 @@ namespace lof {
                 auto& mass = physics.mass;
                 ImGui::InputFloat("Mass", &mass);
 
-                //booleans make into buttons???
+                auto& is_static = physics.is_static;
+                std::string s_label = "is_static: " + std::string(is_static_on ? "On" : "Off");
+                if (button_toggle(s_label, &is_static_on)) {
+                    is_static = !is_static;
+                }
+
+                auto& is_moveable = physics.is_moveable;
+                std::string m_label = "is_moveable: " + std::string(is_moveable_on ? "On" : "Off");
+                if (button_toggle(m_label, &is_moveable_on)) {
+                    is_moveable = !is_moveable;
+                }
+
+                auto& is_grounded = physics.is_grounded;
+                std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
+                if (button_toggle(g_label, &is_grounded_on)) {
+                    is_grounded = !is_grounded;
+                }
+
+                auto& is_jumping = physics.is_jumping;
+                std::string j_label = "is_jumping: " + std::string(is_jumping_on ? "On" : "Off");
+                if (button_toggle(j_label, &is_jumping_on)) {
+                    is_jumping = !is_jumping;
+                }
 
                 auto& jump = physics.jump_force;
                 ImGui::InputFloat("Jump Force", &jump);
             }
         }
 
+        //Grpahics Component
         if (entities[selected_object_index]->has_component(ecs.get_component_id<Graphics_Component>())) {
             Graphics_Component& graphics = ecs.get_component<Graphics_Component>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Graphics")) {
+                
+                auto& model_name = graphics.model_name;
+                std::string condition_name_model = "model_name";
+                text_input(model_name, condition_name_model);
 
-                //strings. asset and model manager???? shd_ref, mdl_to_ndc_xform
-              
                 auto& color = graphics.color;
                 ImGui::InputFloat3("Color", &color.x);
+
+                auto& texture_name = graphics.texture_name;
+                std::string condition_name_texture = "texture_name";
+                text_input(texture_name, condition_name_texture);
+
+                //buggy!!!
+                auto& shd_ref = graphics.shd_ref;
+                ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
+                
             }
         }
 
+        //Collision Component
         if (entities[selected_object_index]->has_component(ecs.get_component_id<Collision_Component>())) {
             Collision_Component& collision = ecs.get_component<Collision_Component>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Collision")) {
 
-                // error w collision handling
                 auto& width = collision.width;
                 ImGui::InputFloat("Width", &width);
 
@@ -234,107 +272,37 @@ namespace lof {
                 ImGui::InputFloat("Width", &height);
             }
         }
-            
-        /*void IMGUI_Manager::imgui_game_objects_edit(rapidjson::Document & scene1_data) {
-        ImGui::Begin("Edit Object Properties", &show_window);
 
-        if (scene1_data.HasMember("objects") && scene1_data["objects"].IsArray()) {
-            const auto& objects = scene1_data["objects"].GetArray();
-            auto& selected_object = objects[selected_object_index];
+        if (ImGui::Button("Save Changes")) {
 
-            if (selected_object.HasMember("name") && selected_object["name"].IsString()) {
-                std::string obj_name = selected_object["name"].GetString();
-                ImGui::Text("Object Name: %s", obj_name.c_str());
-            }
-
-            ImGui::Text("\nList of components:");
-            if (selected_object.HasMember("components")) {
-                auto& component = selected_object["components"];
-
-                if (component.HasMember("Transform2D")) {
-
-                    if (ImGui::CollapsingHeader("Transformation")) {
-                        if (component["Transform2D"].HasMember("position") && component["Transform2D"]["position"].IsArray()) {
-                            auto& transform = component["Transform2D"];
-                            auto& position = transform["position"];
-
-                            float x = position[0].GetFloat();
-                            float y = position[1].GetFloat();
-
-                            if (ImGui::InputFloat2("Position", &position)) {
-                                position[0].SetFloat(x);
-                                position[1].SetFloat(y);
-                            }
-                        }
-
-                        if (component["Transform2D"].HasMember("scale") && component["Transform2D"]["scale"].IsArray()) {
-                            auto& transform = component["Transform2D"];
-                            auto& scale = transform["scale"];
-
-                            float x = scale[0].GetFloat();
-                            float y = scale[1].GetFloat();
-
-                            if (ImGui::InputFloat2("Scale", &x)) {
-                                scale[0].SetFloat(x);
-                                scale[1].SetFloat(y);
-                            }
-                        }
-
-                        if (component["Transform2D"].HasMember("orientation") && component["Transform2D"]["orientation"].IsArray()) {
-                            auto& transform = component["Transform2D"];
-                            auto& orientation = transform["orientation"];
-
-                            float x = orientation[0].GetFloat();
-                            float y = orientation[1].GetFloat();
-
-                            if (ImGui::InputFloat2("Orientation", &x)) {
-                                orientation[0].SetFloat(x);
-                                orientation[1].SetFloat(y);
-                            }
-                        }
-                    }
-                }
-                
-                if (component.HasMember("Collision_Component")) {
-                    if (ImGui::CollapsingHeader("Collision")) {
-                        if (component["Collision_Component"].HasMember("width") && component["Collision_Component"]["width"].IsFloat()) {
-                            auto& transform = component["Collision_Component"];
-                            auto& width = transform["width"];
-
-                            float x = width.GetFloat();
-
-                            if (ImGui::InputFloat("Collision Width", &x)) {
-                                width.SetFloat(x);
-                            }
-                        }
-
-                        if (component["Collision_Component"].HasMember("height") && component["Collision_Component"]["height"].IsFloat()) {
-                            auto& transform = component["Collision_Component"];
-                            auto& height = transform["height"];
-
-                            float x = height.GetFloat();
-
-                            if (ImGui::InputFloat("Collision Height", &x)) {
-                                height.SetFloat(x);
-                            }
-                        }
-                    }
-
-                }
-
-            }
+            //button to save scene goes here
+ 
         }
-
-        */
-
 
         ImGui::End();
     }
 
+    bool IMGUI_Manager::button_toggle(const std::string& boolean_name, bool* state) {
+       
 
-    /*void IMGUI_Manager::save_transform_to_json(EntityID entity, const Transform2D& transformed_data) {
-        ;
-    }*/
+        bool clicked = ImGui::Button(boolean_name.c_str());
+        if (clicked) {
+            *state = !(*state);
+        }
+    
+        return clicked;
+    }
+
+    void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
+        
+        char Buffer[128]; //add to constant.h
+        strncpy_s(Buffer, data_name.c_str(), sizeof(Buffer));//s is safer
+        Buffer[sizeof(Buffer) - 1] = '\0';
+
+        if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
+            data_name = std::string(Buffer);
+        }
+    }
 
     void IMGUI_Manager::render() {
         // Rendering

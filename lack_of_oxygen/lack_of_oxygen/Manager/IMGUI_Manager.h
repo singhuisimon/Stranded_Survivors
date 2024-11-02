@@ -48,9 +48,11 @@ namespace lof {
         void example_demo(bool& show_demo_window, bool& show_another_window, ImVec4& clear_color, ImGuiIO& io);
         void imgui_game_objects_list();
         void imgui_game_objects_edit();
-        //void save_transform_to_json(EntityID entity, const Transform2D& transformed_data);
+        bool button_toggle(const std::string& condition_name, bool* state);
+        void text_input(std::string& data_name, std::string& codition_name);
         void render();
         void shut_down() override;
+        //remember to delete update and start up
     };
 
 } // namespace lof
