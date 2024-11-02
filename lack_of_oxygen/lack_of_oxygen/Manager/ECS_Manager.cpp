@@ -19,6 +19,7 @@
 #include "../System/Movement_System.h"
 #include "../System/Render_System.h" 
 #include "../System/Collision_System.h"
+#include "../System/Audio_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -65,17 +66,23 @@ namespace lof {
             register_component<Velocity_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Velocity_Component'.");
 
+            register_component<Collision_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
+
             register_component<Physics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 
             register_component<Graphics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
 
-            register_component<Collision_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
+            register_component<Audio_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Audio_Component'.");
 
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
+
+            add_system(std::make_unique<Collision_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
             add_system(std::make_unique<Movement_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
@@ -83,8 +90,9 @@ namespace lof {
             add_system(std::make_unique<Render_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<Collision_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
+
+            add_system(std::make_unique<Audio_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");

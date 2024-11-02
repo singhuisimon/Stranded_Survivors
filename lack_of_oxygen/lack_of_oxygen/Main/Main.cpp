@@ -183,7 +183,7 @@ int main(void) {
         if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
             system_performance(GM.get_time(), IM.get_time(), IM.get_type());
             system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
-            system_performance(GM.get_time(), AM.get_time(), AM.get_type());
+            //system_performance(GM.get_time(), AM.get_time(), AM.get_type());
             system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
             std::cout << "In ECS Manager...\n";
             for (auto& system : ECSM.get_systems()) {
