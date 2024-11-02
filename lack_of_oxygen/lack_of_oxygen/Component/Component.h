@@ -241,7 +241,7 @@ namespace lof {
             , is_visible(true)
             , relative_pos(0.0f, 0.0f) {}
     };
-
+    /**
     * @class Audio_Component
     * @brief Component representing an entity's audio data
     */
