@@ -5,6 +5,7 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, -7296.0 ],
+          "prev_position": [ 0.0, -7296.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 2048.0, 16128.0 ]
         },
@@ -18,6 +19,14 @@
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
+        },
+        "Audio_Component": {
+          "filename": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test1.wav",
+          "audio_state": 0,
+          "audio_type": 0,
+          "volume": 0.5,
+          "pitch" : 1,
+          "islooping": false
         }
       }
     },
@@ -26,7 +35,8 @@
       "prefab": "dummy_object",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, -153.6 ],
+          "position": [ 0.0, 153.5 ],
+          "prev_position": [ 0.0, 153.5 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -44,6 +54,7 @@
       "components": {
         "Transform2D": {
           "position": [ 500.0, -460.8 ],
+          "prev_position": [ 500.0, -460.8 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -60,7 +71,8 @@
       "prefab": "dummy_object",
       "components": {
         "Transform2D": {
-          "position": [ -500.0, 230.4 ],
+          "position": [ -500.0, 230.6 ],
+          "prev_position": [ -500.0, 230.6 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -74,7 +86,17 @@
     },
     {
       "name": "player1",
-      "prefab": "player"
+      "prefab": "player",
+      "components": {
+        "Audio_Component": {
+          "filename": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx16_2.wav",
+          "audio_state": 1,
+          "audio_type": 1,
+          "volume": 0.5,
+          "pitch": 1,
+          "islooping": false
+        }
+      }
     }
   ]
 }

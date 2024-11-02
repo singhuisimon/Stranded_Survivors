@@ -15,10 +15,15 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <variant>
+#include <algorithm>
+#include <unordered_map>
 
 // Include Utility headers
 #include "../Utility/Vector2D.h"
+#include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Path_Helper.h"
 
 // FOR TESTING 
 #include "../Glad/glad.h"
@@ -54,6 +59,7 @@ namespace lof {
     class Transform2D : public Component {
     public:
         Vec2D position;     ///< Position of the entity in world space.
+        Vec2D prev_position;
         Vec2D orientation;  ///< Orientation of the entity in degrees.
         Vec2D scale;        ///< Scale of the entity.
 
@@ -61,7 +67,7 @@ namespace lof {
          * @brief Default constructor initializing position, rotation, and scale.
          */
         Transform2D()
-            : position(0.0f, 0.0f), orientation(0.0f, 0.0f), scale(1.0f, 1.0f) {}
+            : position(0.0f, 0.0f), prev_position(0.0f,0.0f), orientation(0.0f, 0.0f), scale(1.0f, 1.0f) {}
 
         /**
          * @brief Parameterized constructor.
@@ -69,8 +75,8 @@ namespace lof {
          * @param rot Initial rotation in degrees.
          * @param scl Initial scale.
          */
-        Transform2D(const Vec2D& pos, Vec2D& ori, const Vec2D& scl)
-            : position(pos), orientation(ori), scale(scl) {}
+        Transform2D(const Vec2D& pos, Vec2D& prev_pos, Vec2D& ori, const Vec2D& scl)
+            : position(pos), prev_position(prev_pos), orientation(ori), scale(scl) {}
     };
 
 
@@ -101,14 +107,11 @@ namespace lof {
         float damping_factor;
         float max_velocity;
         Vec2D accumulated_force; //to accumulate forces applied to the entity.
+        bool is_grounded;
 
         float mass; //mass of entity
         float inv_mass;
         bool is_static; //to check if the entity is static or not
-        bool is_moveable; //to check if the entity is moveable or not
-
-        bool is_grounded; //to indicate whether the entity is on the ground
-        bool is_jumping; //to indicate whether the entity is jumping
         float jump_force; //the force applied during a jump
 
 
@@ -131,9 +134,9 @@ namespace lof {
             float damping_factor = DEFAULT_DAMPING_FACTOR,
             float max_velocity = DEFAULT_MAX_VELOCITY,
             float mass = 1.0f,
-            bool is_static = false, 
-            bool is_moveable = false,
-            float jump_force = DEFAULT_JUMP_FORCE ) //adjust later
+            bool is_static = false,
+            float jump_force = DEFAULT_JUMP_FORCE,//adjust later
+            bool is_grounded = false)
 
             : gravity(gravity),
             damping_factor(damping_factor),
@@ -142,10 +145,8 @@ namespace lof {
             mass(mass),
             inv_mass((mass > 0.0f) ? 1.0f / mass : 0.0f),
             is_static(is_static),
-            is_moveable(is_moveable),
-            is_grounded(false),
-            is_jumping(false),
-            jump_force(jump_force) {}
+            jump_force(jump_force),
+            is_grounded(is_grounded){}
 
         /**
          * @brief Applies a force to the entity.
@@ -219,6 +220,76 @@ namespace lof {
         //constructor for collision components 
         Collision_Component(float width = 0.0f, float height = 0.0f)
             : width(width), height(height) {}
+    };
+
+    /**
+    * @class Audio_Component
+    * @brief Component representing an entity's audio data
+    */
+    class Audio_Component : public Component {
+    private:
+        //std::string entityid; //convert entityID into a string to be used as key
+        std::string filename;
+        //std::vector<std::string> filenames;//can be vector//need rethink abit more
+        PlayState audio_state;
+        AudioType audio_type;
+        //FileFormat file_format;
+        //AudioCommand audio_command;
+
+        float volume;   //range of using FMOD is 0.0f to 1.0f <- has already been clamp to not exceed
+        float pitch;
+        bool islooping;
+        bool is3d;
+
+        Vec3D position; //position of where the sound is emitting from
+        float mindist;  //the min range for listener to be in to hear the sound (closer)
+        float maxdist;  //the max range for listener to be in to hear the sound (further)
+        
+    public:
+
+        Audio_Component() : filename(""), audio_state(PLAYING), audio_type(SFX), volume(1.0f),
+            pitch(1.0f), islooping(false), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
+
+        Audio_Component(const std::string& filename, AudioType audio_type, float volume, float pitch_v, bool is_3d = false, bool islooping = false) :
+            filename(filename), audio_state(PLAYING), audio_type(audio_type),
+            volume(std::clamp(volume, 0.0f, 1.0f)), pitch(std::clamp(pitch_v, 0.5f, 2.0f)), islooping(islooping), is3d(is_3d), position(), mindist(1.0f), maxdist(100.0f) {}
+
+        void set_filename(const std::string filepath) { this->filename = Path_Helper::get_executable_directory() + filepath;}
+        const std::string& get_filename() const { return filename; }
+
+        void set_audio_state(PlayState state) { this->audio_state = state; }
+        PlayState get_audio_state() const { return audio_state; }
+
+        void set_audio_type(AudioType type) { this->audio_type = type;}
+        AudioType get_audio_type() const { return audio_type; }
+
+        //void set_file_format(FileFormat type) { this->file_format = type; }
+        //FileFormat get_file_format() const { return file_format; }
+
+        //void set_audio_command(AudioCommand command) { this->audio_command = command; }
+        //AudioCommand get_audio_command() const { return audio_command; }
+
+        void set_volume(float new_volume) { this->volume = std::clamp(new_volume, 0.0f, 1.0f); }
+        float get_volume() const { return volume;  }
+
+        void set_pitch(float new_pitch) { this->pitch = std::clamp(new_pitch, 0.5f, 2.0f); }
+        float get_pitch() const { return pitch;  }
+
+        void set_is_looping(bool loop) { this->islooping = loop; }
+        bool get_is_looping() const { return islooping; }
+
+        void set_is3d(bool is_3d) { this->is3d = is_3d; }
+        bool get_is3d() const { return is3d; };
+
+        void set_position(const Vec3D& pos) { position = pos; }
+        Vec3D get_position() const { return position; }
+
+        void set_min_distance(float dist) { mindist = dist; }
+        float get_min_distance() const { return mindist; }
+
+        void set_max_distance(float dist) { maxdist = dist; }
+        float get_max_distance() const { return maxdist; }
+
     };
 } // namespace lof
 
