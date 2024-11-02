@@ -56,6 +56,9 @@ namespace lof {
         std::unordered_map<std::size_t, const std::type_info*> id_to_component_type;
         std::size_t next_component_id = 0;
 
+        // Entity name lookup
+        std::unordered_map<std::string, EntityID> entity_names;
+
         // Helper member functions
         template<typename T>
         std::vector<std::unique_ptr<Component>>& get_component_array();
@@ -81,18 +84,45 @@ namespace lof {
         int start_up() override;
         void shut_down() override;
 
-        // Entity management
-        EntityID create_entity();
-
         // Entity destruction
         void destroy_entity(EntityID entity);
 
         /**
+         * @brief Create an entity with an optional name.
+         * @param name Optional name for the entity.
+         * @return The ID of the created entity.
+         */
+        EntityID create_entity(const std::string& name = "");
+
+        /**
+         * @brief Get a pointer to an entity by its ID.
+         * @param entity_id The ID of the entity to retrieve.
+         * @return Pointer to the entity if found, nullptr otherwise.
+         */
+        Entity* get_entity(EntityID entity_id);
+
+        /**
+         * @brief Find an entity by its name.
+         * @param name The name of the entity to find.
+         * @return The entity ID if found, INVALID_ENTITY_ID otherwise.
+         */
+        EntityID find_entity_by_name(const std::string& name) const;
+
+        /**
+         * @brief Update the name of an existing entity.
+         * @param entity_id The ID of the entity to update.
+         * @param new_name The new name for the entity.
+         * @return True if name was successfully updated, false if entity not found or name already exists.
+         */
+        bool update_entity_name(EntityID entity_id, const std::string& new_name);
+
+        /**
          * @brief Clone an entity based on a prefab.
          * @param prefab_name The name of the prefab to clone from.
+         * @param entity_name Optional name for the new entity.
          * @return The ID of the newly created entity, or INVALID_ENTITY_ID if failed.
          */
-        EntityID clone_entity_from_prefab(const std::string& prefab_name);
+        EntityID clone_entity_from_prefab(const std::string& prefab_name, const std::string& entity_name = "");
 
         /**
          * @brief Add components to an entity from JSON data.
