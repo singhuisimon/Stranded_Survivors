@@ -216,6 +216,27 @@ namespace lof {
         Collision_Component(float width = 0.0f, float height = 0.0f)
             : width(width), height(height) {}
     };
+
+    /**
+     * @class GUI_Component
+     * @brief Component representing GUI element data
+     */
+    class GUI_Component : public Component {
+    public:
+        float progress;      ///< Progress value for loading bars (0.0f to 1.0f)
+        bool is_progress_bar;///< Whether this GUI element is a progress bar
+        bool is_container;   ///< Whether this is a container element
+        bool is_visible;     ///< Visibility state of the GUI element
+        Vec2D relative_pos;  ///< Position relative to parent container
+
+        GUI_Component(bool is_progress = false, bool is_container = false)
+            : progress(0.0f)
+            , is_progress_bar(is_progress)
+            , is_container(is_container)
+            , is_visible(true)
+            , relative_pos(0.0f, 0.0f) {}
+    };
+
 } // namespace lof
 
 #endif // LOF_COMPONENT_H
