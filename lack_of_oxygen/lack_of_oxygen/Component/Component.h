@@ -24,7 +24,7 @@
 #include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
-
+#include "../Manager/Log_Manager.h"
 // FOR TESTING 
 #include "../Glad/glad.h"
 #include <GLFW/glfw3.h>
@@ -235,6 +235,7 @@ namespace lof {
             PlayState audio_state;
             AudioType audio_type;
             //FileFormat file_format;
+            //bool isbank;
             float volume;
             float pitch;
             bool islooping;
@@ -259,7 +260,7 @@ namespace lof {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
                     //if key already exist update properties
-                    sound.filepath = Path_Helper::get_executable_directory() + filepath;
+                    sound.filepath = filepath;
                     sound.audio_state = state;
                     sound.audio_type = type;
                     sound.volume = volume;
@@ -271,7 +272,7 @@ namespace lof {
 
             SoundConfig new_sound;
             new_sound.key = key;
-            new_sound.filepath = Path_Helper::get_executable_directory() + filepath;
+            new_sound.filepath = filepath;
             new_sound.audio_state = state;
             new_sound.audio_type = type;
             new_sound.volume = volume;
@@ -295,7 +296,7 @@ namespace lof {
         void set_filepath(const std::string& key, std::string& path) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
-                    sound.filepath = Path_Helper::get_executable_directory() + path;
+                    sound.filepath = path;
                 }
             }
         }
@@ -333,6 +334,7 @@ namespace lof {
                 if (sound.key == key) {
                     sound.volume = volume;
                 }
+                std::cout << sound.volume << std::endl; LM.write_log("volume change %f", sound.volume);
             }
         }
 

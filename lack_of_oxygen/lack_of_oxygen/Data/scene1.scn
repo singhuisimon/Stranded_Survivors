@@ -25,7 +25,7 @@
             {
               "key": "bgm1",
               "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test1.wav",
-              "audio_state": 0,
+              "audio_state": 4,
               "audio_type": 0,
               "volume": 0.5,
               "pitch": 1,
@@ -34,7 +34,7 @@
             {
               "key": "bgm2",
               "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test2.wav",
-              "audio_state": 1,
+              "audio_state": 0,
               "audio_type": 0,
               "volume": 0.5,
               "pitch": 1,
@@ -107,7 +107,7 @@
             {
               "key": "jumping",
               "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx16_2.wav",
-              "audio_state": 1,
+              "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
               "pitch": 1,
@@ -115,15 +115,23 @@
             },
 
             {
-              "key": "moving",
+              "key": "moving left",
               "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx28.wav",
-              "audio_state": 1,
+              "audio_state": 4,
+              "audio_type": 1,
+              "volume": 0.5,
+              "pitch": 1,
+              "islooping": false
+            },
+            {
+              "key": "moving right",
+              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx27.wav",
+              "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
               "pitch": 1,
               "islooping": false
             }
-
           ]          
         }
       }

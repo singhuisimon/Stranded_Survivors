@@ -77,7 +77,7 @@ namespace lof {
                 std::cout << "move left pls\n";
                 physics.apply_force(Vec2D(-5000.f, 0.0f));
                 if (physics.is_grounded) {
-                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("moving", PLAYING); //movement sound
+                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("moving left", PLAYING); //movement sound
                 }
             }
             else if (IM.is_key_held(GLFW_KEY_D) && entity_id == 4) {
@@ -85,7 +85,7 @@ namespace lof {
                 std::cout << "move right pls\n";
                 physics.apply_force(Vec2D(5000.f, 0.0f));
                 if (physics.is_grounded) {
-                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("moving", PLAYING); //movement sound
+                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("moving right", PLAYING); //movement sound
                 }
             }
 

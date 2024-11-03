@@ -19,6 +19,7 @@
 
 // Include other necessary headers
 #include "../Utility/Matrix3x3.h"
+#include "../Utility/Path_Helper.h"
 
 namespace lof {
 
@@ -224,9 +225,9 @@ namespace lof {
                     for (const auto& sound : sounds_array.GetArray()) {
                         if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
-                            std::string filepath = sound["filepath"].GetString();
+                            std::string filepath = Path_Helper::get_executable_directory() + sound["filepath"].GetString();
                             
-                            PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : STOPPED;
+                            PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : NONE;
                             AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
                             float volume = sound.HasMember("volume") && sound["volume"].IsFloat() ? sound["volume"].GetFloat() : 1.0f;
                             float pitch = sound.HasMember("pitch") && sound["pitch"].IsFloat() ? sound["pitch"].GetFloat() : 1.0f;
@@ -264,31 +265,6 @@ namespace lof {
                     }
                 }*/
 
-                /*if (component_data.HasMember("audio_state") && component_data["audio_state"].IsInt()) {
-                    audio_component.set_audio_state(static_cast<PlayState>(component_data["audio_state"].GetInt()));
-                    LM.write_log("Component_Parser::add_components_from_json(): added audio_state %i to entity ID %u.", static_cast<PlayState>(component_data["audio_state"].GetInt()), entity);
-                }
-
-                if (component_data.HasMember("audio_type") && component_data["audio_type"].IsInt()) {
-                    audio_component.set_audio_type(static_cast<AudioType>(component_data["audio_type"].GetInt()));
-                    LM.write_log("Component_Parser::add_components_from_json(): added audio_type %i to entity ID %u.", component_data["audio_type"].GetInt(), entity);
-                }
-
-                if (component_data.HasMember("volume") && component_data["volume"].IsFloat()) {
-                    audio_component.set_volume(component_data["volume"].GetFloat());
-                    LM.write_log("Component_Parser::add_components_from_json(): added volume %f to entity ID %u.", component_data["volume"].GetFloat(), entity);
-                }
-
-                if (component_data.HasMember("pitch") && component_data["pitch"].IsFloat()) {
-                    audio_component.set_pitch(component_data["pitch"].GetFloat());
-                    LM.write_log("Component_Parser::add_components_from_json(): added volume %f to entity ID %u.", component_data["pitch"].GetFloat(), entity);
-                }
-
-                if (component_data.HasMember("islooping") && component_data["islooping"].IsBool()) {
-                    audio_component.set_is_looping(component_data["islooping"].GetBool());
-                    LM.write_log("Component_Parser::add_components_from_json(): added loop condition %i to entity ID %u.", component_data["islooping"].GetBool(), entity);
-                }*/
-                
                 // Add component to entity
                 ecs_manager.add_component<Audio_Component>(entity, audio_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Audio_Component to entity ID %u.", entity);
