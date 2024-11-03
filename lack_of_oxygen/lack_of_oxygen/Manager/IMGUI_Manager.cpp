@@ -142,12 +142,12 @@ namespace lof {
         }
     }
 
-    void IMGUI_Manager::show_performance_viewer() {
+    /*void IMGUI_Manager::show_performance_viewer() {
         ImGui::Begin("Performance Viewer");
 
 
         ImGui::End();
-    }
+    }*/
 
     void IMGUI_Manager::imgui_game_objects_list() {
 

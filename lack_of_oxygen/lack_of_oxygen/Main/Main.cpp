@@ -230,7 +230,7 @@ int main(void) {
             }
 
             if (performance_view) {
-                IMGUIM.show_performance_viewer();
+                //IMGUIM.show_performance_viewer();
             }
 
             ImGui::EndMainMenuBar();
