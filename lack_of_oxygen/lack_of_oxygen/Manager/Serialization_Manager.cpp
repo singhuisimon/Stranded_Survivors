@@ -480,16 +480,42 @@ namespace lof {
 
     rapidjson::Value Serialization_Manager::serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator) {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
+        
+        rapidjson::Value sounds_array(rapidjson::kArrayType);
+        auto& sounds = component.get_sounds();
 
-        // Serialize filepath and state
-        comp_obj.AddMember("filename", rapidjson::Value(component.get_filename().c_str(), allocator), allocator);
-        comp_obj.AddMember("audio_state", static_cast<int>(component.get_audio_state()), allocator);
-        comp_obj.AddMember("audio_type", static_cast<int>(component.get_audio_type()), allocator);
+        for (auto& sound : sounds) {
+            rapidjson::Value sound_obj(rapidjson::kObjectType);
 
-        // Serialize properties
-        comp_obj.AddMember("volume", component.get_volume(), allocator);
-        comp_obj.AddMember("pitch", component.get_pitch(), allocator);
-        comp_obj.AddMember("is_looping", component.get_is_looping(), allocator);
+            sound_obj.AddMember("key", rapidjson::Value(sound.key.c_str(), allocator), allocator);
+
+            std::string filename = sound.filepath.c_str();
+            size_t pos = filename.find("lack_of_oxygen\\Data");
+            if (pos != std::string::npos) {
+                filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 19);
+            }
+            sound_obj.AddMember("filename", rapidjson::Value(filename.c_str(), allocator), allocator);
+            sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
+            sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
+            sound_obj.AddMember("volume", sound.volume, allocator);
+            sound_obj.AddMember("pitch", sound.pitch, allocator);
+            sound_obj.AddMember("is_looping", sound.islooping, allocator);
+
+            // Add the serialized sound object to the sounds array
+            sounds_array.PushBack(sound_obj, allocator);
+        }
+
+        comp_obj.AddMember("sounds", sounds_array, allocator);
+
+        //// Serialize filepath and state
+        //comp_obj.AddMember("filename", rapidjson::Value(component.get_filename().c_str(), allocator), allocator);
+        //comp_obj.AddMember("audio_state", static_cast<int>(component.get_audio_state()), allocator);
+        //comp_obj.AddMember("audio_type", static_cast<int>(component.get_audio_type()), allocator);
+
+        //// Serialize properties
+        //comp_obj.AddMember("volume", component.get_volume(), allocator);
+        //comp_obj.AddMember("pitch", component.get_pitch(), allocator);
+        //comp_obj.AddMember("is_looping", component.get_is_looping(), allocator);
         comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
 
         // Serialize 3D audio properties
