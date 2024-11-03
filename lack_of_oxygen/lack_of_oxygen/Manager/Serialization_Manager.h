@@ -64,28 +64,17 @@ namespace lof {
             rapidjson::Document::AllocatorType& allocator);
 
         /**
-         * @brief Helper function to serialize a Transform2D component to JSON.
-         * @param component The component to serialize.
-         * @param allocator The RapidJSON allocator.
-         * @return JSON value containing the serialized component.
+         * @brief Serializes a component into a RapidJSON Value object for saving to file.
+         * @param component The component to serialize
+         * @param allocator RapidJSON allocator for string/array allocation
+         * @return rapidjson::Value A JSON object containing the serialized component data
          */
         rapidjson::Value serialize_transform_component(const Transform2D& component, rapidjson::Document::AllocatorType& allocator);
-
-        /**
-         * @brief Helper function to serialize a Graphics component to JSON.
-         * @param component The component to serialize.
-         * @param allocator The RapidJSON allocator.
-         * @return JSON value containing the serialized component.
-         */
         rapidjson::Value serialize_graphics_component(const Graphics_Component& component, rapidjson::Document::AllocatorType& allocator);
-
-        /**
-         * @brief Helper function to serialize a Collision component to JSON.
-         * @param component The component to serialize.
-         * @param allocator The RapidJSON allocator.
-         * @return JSON value containing the serialized component.
-         */
         rapidjson::Value serialize_collision_component(const Collision_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_physics_component(const Physics_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_velocity_component(const Velocity_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator);
 
     public:
 

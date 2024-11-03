@@ -20,6 +20,10 @@
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 
+// Include systems
+#include "../System/GUI_System.h"  // Add this for GUI system access
+
+
 // Include iostream for console output
 #include <iostream>
 #include <random>
@@ -224,22 +228,50 @@ namespace lof {
             }
         }
         k_key_was_pressed_last_frame = k_key_pressed;
-        
-        //Play Audio BGM
-        //check if key 0 is press if so play track1
-        //if (IM.is_key_pressed(GLFW_KEY_0)) {
-        //    //AM.play_bgm(TRACK1);
-        //}
-        //
-        ////check if key 9 is press if so play track2
-        //if (IM.is_key_pressed(GLFW_KEY_9)) {
-        //    //AM.play_bgm(TRACK2);
-        //}
 
-        ////check if key L is press if so stop music
-        //if (IM.is_key_pressed(GLFW_KEY_L)) {
-        //    //AM.stop_bgm();
-        //}
+        // GUI System control
+        if (IM.is_key_pressed(GLFW_KEY_G)) {
+            // Find GUI System
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "GUI_System") {
+                    auto* gui_system = static_cast<GUI_System*>(system.get());
+                    if (gui_system) {
+                        // Toggle loading screen
+                        static bool loading_screen_visible = false;
+                        if (!loading_screen_visible) {
+                            loading_screen_visible = true;
+                            gui_system->show_loading_screen();
+                            LM.write_log("Game_Manager::update(): Showing loading screen");
+                        }
+                        else {
+                            loading_screen_visible = false;
+                            gui_system->hide_loading_screen();
+                            LM.write_log("Game_Manager::update(): Hiding loading screen");
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Test progress bar updates with H key
+        if (IM.is_key_pressed(GLFW_KEY_H)) {
+            static float test_progress = 0.0f;
+            test_progress += 0.1f;
+            if (test_progress > 1.0f) test_progress = 0.0f;
+
+            // Find GUI System and update progress
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "GUI_System") {
+                    auto* gui_system = static_cast<GUI_System*>(system.get());
+                    if (gui_system) {
+                        gui_system->set_progress(test_progress);
+                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
+                    }
+                    break;
+                }
+            }
+        }
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

@@ -78,10 +78,11 @@ namespace lof {
             register_component<Graphics_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
 
-            //register_component<GUI_Component>();
-            //LM.write_log("ECS_Manager::start_up(): Registered component 'GUI_Component'.");
             register_component<Audio_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Audio_Component'.");
+
+            register_component<GUI_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'GUI_Component'.");
 
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
@@ -95,9 +96,8 @@ namespace lof {
             add_system(std::make_unique<Render_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            //add_system(std::make_unique<GUI_System>(*this));
-            //LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
-
+            add_system(std::make_unique<GUI_System>(*this));
+            LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
 
             add_system(std::make_unique<Audio_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");

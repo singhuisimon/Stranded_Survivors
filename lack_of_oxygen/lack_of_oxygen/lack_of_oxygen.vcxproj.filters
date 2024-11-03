@@ -35,8 +35,8 @@
     <ClCompile Include="IMGUI\imstb_textedit.h" />
     <ClCompile Include="Manager\IMGUI_Manager.cpp" />
     <ClCompile Include="IMGUI\imgui_demo.cpp" />
-    <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="Utility\Vector3D.cpp" />
+    <ClCompile Include="System\GUI_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
