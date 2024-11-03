@@ -18,6 +18,11 @@
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Path_Helper.h"
+
+// Include systems
+#include "../System/GUI_System.h"  // Add this for GUI system access
+
 
 // Include iostream for console output
 #include <iostream>
@@ -194,6 +199,79 @@ namespace lof {
             }
         }
         c_key_was_pressed_last_frame = c_key_pressed;
+
+        // Save game state when 'K' key is pressed
+        bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
+        if (k_key_pressed && !k_key_was_pressed_last_frame) {
+            // Generate a filename with timestamp
+            auto now = std::chrono::system_clock::now();
+            auto time = std::chrono::system_clock::to_time_t(now);
+            std::stringstream ss;
+            ss << "save_game_" << time << ".json";
+            std::string filename = ss.str();
+
+            // Replace illegal filename characters
+            std::replace(filename.begin(), filename.end(), ':', '_');
+            std::replace(filename.begin(), filename.end(), ' ', '_');
+
+            // Get save file path using Path_Helper
+            std::string save_path = Path_Helper::get_save_file_path(filename);
+
+            // Attempt to save the game
+            if (SM.save_game_state(save_path.c_str())) {
+                LM.write_log("Game_Manager::update(): Successfully saved game state to %s", save_path.c_str());
+                std::cout << "Game saved successfully to: " << filename << std::endl;
+            }
+            else {
+                LM.write_log("Game_Manager::update(): Failed to save game state to %s", save_path.c_str());
+                std::cout << "Failed to save game!" << std::endl;
+            }
+        }
+        k_key_was_pressed_last_frame = k_key_pressed;
+
+        // GUI System control
+        if (IM.is_key_pressed(GLFW_KEY_G)) {
+            // Find GUI System
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "GUI_System") {
+                    auto* gui_system = static_cast<GUI_System*>(system.get());
+                    if (gui_system) {
+                        // Toggle loading screen
+                        static bool loading_screen_visible = false;
+                        if (!loading_screen_visible) {
+                            loading_screen_visible = true;
+                            gui_system->show_loading_screen();
+                            LM.write_log("Game_Manager::update(): Showing loading screen");
+                        }
+                        else {
+                            loading_screen_visible = false;
+                            gui_system->hide_loading_screen();
+                            LM.write_log("Game_Manager::update(): Hiding loading screen");
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Test progress bar updates with H key
+        if (IM.is_key_pressed(GLFW_KEY_H)) {
+            static float test_progress = 0.0f;
+            test_progress += 0.1f;
+            if (test_progress > 1.0f) test_progress = 0.0f;
+
+            // Find GUI System and update progress
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "GUI_System") {
+                    auto* gui_system = static_cast<GUI_System*>(system.get());
+                    if (gui_system) {
+                        gui_system->set_progress(test_progress);
+                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
+                    }
+                    break;
+                }
+            }
+        }
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

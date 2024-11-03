@@ -11,4 +11,6 @@ Rock
 TNT
 Vent
 Wormhole
+Oxygen_Refill_Green_circle
+Oxygen_Refill_Red_circle
 Skybox_ALL
