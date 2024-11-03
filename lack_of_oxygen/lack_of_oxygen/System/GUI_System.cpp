@@ -20,7 +20,32 @@ namespace lof {
             }
             container_gui->is_container = true;
 
-            // Create background bar
+            // Create circular images FIRST (on top)
+            left_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
+            if (left_image_id != INVALID_ENTITY_ID) {
+                if (auto* transform = get_component_safe<Transform2D>(left_image_id)) {
+                    transform->position = Vec2D(-IMAGE_OFFSET, VERTICAL_SPACING);
+                    transform->scale = Vec2D(IMAGE_SIZE, IMAGE_SIZE);
+                }
+                if (auto* graphics = get_component_safe<Graphics_Component>(left_image_id)) {
+                    graphics->texture_name = "Oxygen_Refill_Red_circle";
+                    graphics->color = glm::vec3(1.0f); // White color to show texture
+                }
+            }
+
+            right_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
+            if (right_image_id != INVALID_ENTITY_ID) {
+                if (auto* transform = get_component_safe<Transform2D>(right_image_id)) {
+                    transform->position = Vec2D(IMAGE_OFFSET, VERTICAL_SPACING);
+                    transform->scale = Vec2D(IMAGE_SIZE, IMAGE_SIZE);
+                }
+                if (auto* graphics = get_component_safe<Graphics_Component>(right_image_id)) {
+                    graphics->texture_name = "Oxygen_Refill_Green_circle";
+                    graphics->color = glm::vec3(1.0f); // White color to show texture
+                }
+            }
+
+            // Create background bar (below images)
             background_bar_id = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
             if (background_bar_id != INVALID_ENTITY_ID) {
                 if (auto* bg_gui = get_component_safe<GUI_Component>(background_bar_id)) {
@@ -28,10 +53,11 @@ namespace lof {
                     bg_gui->progress = 1.0f;
                 }
                 if (auto* bg_graphics = get_component_safe<Graphics_Component>(background_bar_id)) {
-                    bg_graphics->color = glm::vec3(0.2f, 0.2f, 0.2f);
+                    bg_graphics->color = glm::vec3(1.f); // White for background
                 }
                 if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
                     bg_transform->scale = Vec2D(PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT);
+                    bg_transform->position.y = -VERTICAL_SPACING;
                 }
             }
 
@@ -43,39 +69,13 @@ namespace lof {
                     progress_gui->progress = 0.0f;
                 }
                 if (auto* progress_graphics = get_component_safe<Graphics_Component>(progress_bar_id)) {
-                    progress_graphics->color = glm::vec3(0.2f, 0.6f, 1.0f); // Light blue color
+                    progress_graphics->color = glm::vec3(0.2f, 0.6f, 1.0f);
                 }
                 if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
-                    progress_transform->scale = Vec2D(0.0f, PROGRESS_BAR_HEIGHT); // Start with 0 width
-                    progress_transform->position.x = -PROGRESS_BAR_WIDTH / 2.0f; // Start at left edge
+                    progress_transform->scale = Vec2D(0.0f, PROGRESS_BAR_HEIGHT);
+                    progress_transform->position = Vec2D(-PROGRESS_BAR_WIDTH / 2.0f, -VERTICAL_SPACING);
                 }
             }
-
-            // Create left circular image (Red Circle)
-            left_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
-            if (left_image_id != INVALID_ENTITY_ID) {
-                if (auto* transform = get_component_safe<Transform2D>(left_image_id)) {
-                    transform->position = Vec2D(-IMAGE_OFFSET, 0.0f);
-                    transform->scale = Vec2D(IMAGE_SIZE, IMAGE_SIZE);
-                }
-                if (auto* graphics = get_component_safe<Graphics_Component>(left_image_id)) {
-                    graphics->texture_name = "Oxygen_Refill_Red_circle";
-                }
-            }
-
-            // Create right circular image (Green Circle)
-            right_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
-            if (right_image_id != INVALID_ENTITY_ID) {
-                if (auto* transform = get_component_safe<Transform2D>(right_image_id)) {
-                    transform->position = Vec2D(IMAGE_OFFSET, 0.0f);
-                    transform->scale = Vec2D(IMAGE_SIZE, IMAGE_SIZE);
-                }
-                if (auto* graphics = get_component_safe<Graphics_Component>(right_image_id)) {
-                    graphics->texture_name = "Oxygen_Refill_Green_circle";
-                }
-            }
-
-            LM.write_log("GUI_System::show_loading_screen(): Loading screen created successfully");
         }
     }
 
@@ -120,23 +120,25 @@ namespace lof {
 
         Vec2D container_pos = container_transform->position;
 
-        // Update background bar position
-        if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
-            bg_transform->position = container_pos;
-        }
-
-        // Update progress bar vertical position (horizontal handled in set_progress)
-        if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
-            progress_transform->position.y = container_pos.y;
-        }
-
-        // Update circular images positions
+        // Update circular images positions (on top)
         if (auto* left_transform = get_component_safe<Transform2D>(left_image_id)) {
-            left_transform->position = container_pos + Vec2D(-IMAGE_OFFSET, 0.0f);
+            left_transform->position = container_pos + Vec2D(-IMAGE_OFFSET, VERTICAL_SPACING);
         }
 
         if (auto* right_transform = get_component_safe<Transform2D>(right_image_id)) {
-            right_transform->position = container_pos + Vec2D(IMAGE_OFFSET, 0.0f);
+            right_transform->position = container_pos + Vec2D(IMAGE_OFFSET, VERTICAL_SPACING);
+        }
+
+        // Update background bar position (below images)
+        if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
+            bg_transform->position = container_pos + Vec2D(0.0f, -VERTICAL_SPACING);
+        }
+
+        // Update progress bar position
+        if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
+            // Keep X position for progress animation, update Y position only
+            float current_x = progress_transform->position.x;
+            progress_transform->position = Vec2D(current_x, container_pos.y - VERTICAL_SPACING);
         }
     }
 }

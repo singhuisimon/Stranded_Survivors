@@ -16,8 +16,9 @@ namespace lof {
         // Constants for layout
         const float PROGRESS_BAR_WIDTH = 450.0f;
         const float PROGRESS_BAR_HEIGHT = 40.0f;
-        const float IMAGE_OFFSET = 200.0f;
-        const float IMAGE_SIZE = 64.0f;
+        const float IMAGE_OFFSET = 150.0f;
+        const float IMAGE_SIZE = 100.0f;
+        const float VERTICAL_SPACING = 50.0f;
 
         // Helper function to clamp values
         float clamp(float value, float min, float max) const {
