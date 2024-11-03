@@ -26,6 +26,8 @@
 
 using namespace lof;
 
+bool level_editor_mode = false;
+
 int main(void) {
 
     // --------------------------- Initialization ---------------------------
@@ -104,7 +106,9 @@ int main(void) {
 
     IMGUIM.start_up(window); // Might need to integrate with game manager 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    bool level_editor_mode = false;
+    bool lvl_manager_mode = false;
+    bool object_editor_mode = false;
+    bool performance_view = false;
 
     // --------------------------- Retrieve Configuration ---------------------------
 
@@ -151,7 +155,7 @@ int main(void) {
         std::stringstream ss;
         ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
         glfwSetWindowTitle(window, ss.str().c_str());
-        
+
         // Update FPS timer
         fps_timer += delta_time;
         if (fps_timer >= FPS_DISPLAY_INTERVAL) {
@@ -162,10 +166,10 @@ int main(void) {
         }
 
         // Poll for and process events 
-        glfwPollEvents(); 
+        glfwPollEvents();
 
 
-        if (IM.is_key_held(GLFW_KEY_I)) {
+        if (IM.is_key_held(GLFW_KEY_TAB)) {
             level_editor_mode = !level_editor_mode;
         }
 
@@ -175,7 +179,7 @@ int main(void) {
         GM.update(delta_time);
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
 
-      
+
 
         // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
         if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
@@ -192,21 +196,48 @@ int main(void) {
         }
 
         if (level_editor_mode) {
-            std::cout << "level editor mode is on" << std::endl;
-
+  
             // Start the Dear ImGui frame
             IMGUIM.start_frame();
-            // Example From GitHib
-            //IMGUIM.example_demo(show_demo_window, show_another_window, clear_color, io);
-            IMGUIM.imgui_game_objects_list();
+
+            if (ImGui::BeginMainMenuBar()) {
+                if (ImGui::BeginMenu("File")) {
+                    if (ImGui::MenuItem("Load File")) {
+
+                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+                        lvl_manager_mode = !lvl_manager_mode;
+                    }
+                    if (ImGui::MenuItem("Edit File")) {
+
+                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+                        object_editor_mode = !object_editor_mode;
+                    }
+                    if (ImGui::MenuItem("Performance Viewer")) {
+
+                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+                        performance_view = !performance_view;
+                    }
+                    ImGui::EndMenu();
+                }
+            }
+
+            if (object_editor_mode) {
+                IMGUIM.imgui_game_objects_list();
+            }
+
+            if (lvl_manager_mode) {
+                IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+            }
+
+            if (performance_view) {
+                IMGUIM.show_performance_viewer();
+            }
+
+            ImGui::EndMainMenuBar();
             // Rendering
             IMGUIM.render();
 
         }
-
-    
-
-  
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {

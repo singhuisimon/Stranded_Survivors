@@ -28,6 +28,7 @@
 // Include Utility headers
 #include "../Utility/Type.h" // Include shared types
 #include "../Utility/Component_Parser.h" // Include Component_Parser for adding components from JSON
+#include "../Utility/globals.h"
 
 // Include Log_Manager for logging
 #include "Log_Manager.h"
@@ -130,7 +131,6 @@ namespace lof {
         m_is_started = false;
         LM.write_log("ECS_Manager::shut_down(): ECS_Manager shut down successfully.");
     }
-
 
     void ECS_Manager::add_components_from_json(EntityID entity, const rapidjson::Value& components) {
         LM.write_log("ECS_Manager::add_components_from_json(): Adding components to entity ID %u.", entity);
@@ -282,12 +282,25 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
 
+            if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System") {
 
-            // Getting delta time for each system
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-            // Updating each system
-            system->update(delta_time);
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+                if (!level_editor_mode) {
+                    // Getting delta time for each system
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                    // Updating each system
+                    system->update(delta_time);
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+                }
+
+            }
+            else {
+                // Getting delta time for each system
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            }
+            
             
         }
     }

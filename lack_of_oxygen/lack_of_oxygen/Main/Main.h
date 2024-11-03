@@ -12,7 +12,7 @@
 #ifndef LOF_MAIN_H
 #define LOF_MAIN_H
 
-// Include standard headers
+ // Include standard headers
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -30,6 +30,7 @@
 #include "../Utility/Clock.h"
 #include "../Utility/Vector2D.h"
 #include "../Utility/Matrix3x3.h"
+#include "../Utility/globals.h"
 
 // Include Manager headers
 #include "../Manager/Game_Manager.h"

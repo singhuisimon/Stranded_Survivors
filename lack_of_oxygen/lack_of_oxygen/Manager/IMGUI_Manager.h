@@ -42,15 +42,21 @@ namespace lof {
         static IMGUI_Manager& get_instance();
 
         //note: inherited start_up function must be dealt with
-    
+
         int start_up(GLFWwindow*& window);
         void start_frame();
         void example_demo(bool& show_demo_window, bool& show_another_window, ImVec4& clear_color, ImGuiIO& io);
+        void display_loading_options(const std::string& directory);
         void imgui_game_objects_list();
         void imgui_game_objects_edit();
-        //void save_transform_to_json(EntityID entity, const Transform2D& transformed_data);
+        void add_game_objects();
+        void remove_game_objects();
+        void clone_game_objects();
+        bool button_toggle(const std::string& condition_name, bool* state);
+        void text_input(std::string& data_name, std::string& codition_name);
         void render();
         void shut_down() override;
+        //remember to delete update and start up
     };
 
 } // namespace lof

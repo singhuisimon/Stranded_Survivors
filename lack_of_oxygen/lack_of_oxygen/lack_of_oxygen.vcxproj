@@ -84,6 +84,7 @@
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\Constant.h" />
     <ClInclude Include="Utility\FPS.h" />
+    <ClInclude Include="Utility\globals.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Type.h" />
@@ -94,6 +95,8 @@
     <None Include="Data\config.json" />
     <None Include="Data\models.msh" />
     <None Include="Data\prefab.json" />
+    <None Include="Data\save_game_1730527400.json" />
+    <None Include="Data\save_game_1730598069.json" />
     <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
