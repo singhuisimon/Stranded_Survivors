@@ -67,8 +67,8 @@
       "prefab": "dummy_object",
       "components": {
         "Transform2D": {
-          "position": [ 500.0, -460.8 ],
-          "prev_position": [ 500.0, -460.8 ],
+          "position": [ 600.0, -614.4 ],
+          "prev_position": [ 600.0, -614.4 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -90,11 +90,35 @@
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
-          "texture_name": "notex"
+          "texture_name": "NoTexture"
         },
         "Collision_Component": {
           "width": 512.0,
           "height": 76.8
+        }
+      }
+    },
+    {
+      "name": "air vent display",
+      "prefab": "dummy_object",
+      "components": {
+        "Transform2D": {
+          "position": [ 800.0, -499.2 ],
+          "scale": [ 102.4, 153.6 ]
+        },
+        "Graphics_Component": {
+          "texture_name": "Spritesheet_Animate"
+        },
+        "Collision_Component": {
+          "width": 102.4,
+          "height": 153.6
+        },
+        "Animation_Component": {
+          "animations": [
+            [ "0", "air_vent" ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0
         }
       }
     },
@@ -132,7 +156,7 @@
               "pitch": 1,
               "islooping": false
             }
-          ]          
+          ]
         }
       }
     }

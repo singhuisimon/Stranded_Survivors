@@ -75,6 +75,7 @@ namespace lof {
         rapidjson::Value serialize_physics_component(const Physics_Component& component, rapidjson::Document::AllocatorType& allocator);
         rapidjson::Value serialize_velocity_component(const Velocity_Component& component, rapidjson::Document::AllocatorType& allocator);
         rapidjson::Value serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_animation_component(const Animation_Component& component, rapidjson::Document::AllocatorType& allocator); 
 
     public:
 

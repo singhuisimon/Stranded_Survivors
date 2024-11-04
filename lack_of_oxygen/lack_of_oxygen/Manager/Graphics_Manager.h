@@ -34,6 +34,7 @@
 #include <sstream>
 #include <list>
 #include <map>
+#include <unordered_map>
 #include <mutex>
 
 namespace lof {
@@ -69,10 +70,30 @@ namespace lof {
             GLboolean link_status = GL_FALSE;
         };
 
+        // FOR ANIMATION
+        //// Struct of a frame for animation
+        struct Frame {
+            float uv_x, uv_y;   // Bottom-left of frame
+            float size;         // Dimensions of the Frame (W = H by default)
+            float time_delay;
+        };
+
+        // Struct of an animation
+        struct Animation {
+            std::vector<Frame> frames;  // Collection of frames data
+            unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
+            std::string texture_name;
+            float tex_w { DEFAULT_TEXTURE_SIZE };   // Texture width 
+            float tex_h { DEFAULT_TEXTURE_SIZE };   // Texture height
+            float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
+        };
+
         // Storages
         using MODELS = std::map<std::string, Graphics_Manager::Model>;
         using SHADERS = std::vector<ShaderProgram>;
         using TEXTURES = std::map<std::string, GLuint>; 
+        // FOR ANIMATION
+        using ANIMATIONS = std::unordered_map<std::string, Animation>;
 
         // Data members
         static std::unique_ptr<Graphics_Manager> instance;
@@ -84,6 +105,8 @@ namespace lof {
         MODELS model_storage;
         TEXTURES texture_storage; 
         SHADERS shader_program_storage;
+        // FOR ANIMATION
+        ANIMATIONS  animation_storage;
 
     public:
 
@@ -139,6 +162,14 @@ namespace lof {
          */
         GLboolean add_textures(std::string const& file_name);
 
+        /** 
+         * @brief Add animations into the animation storage.
+         *
+         * @param file_name The filepath to the animations that are being added.
+         * @return True if the animations are added successfully, false otherwise.
+         */
+        GLboolean add_animations(std::string const& file_name);
+
         /**
          * @brief Get a reference to the shader program container.
          */
@@ -153,6 +184,11 @@ namespace lof {
          * @brief Get a reference to the texture container.
          */
         TEXTURES& get_texture_storage(); 
+
+        /**
+         * @brief Get a reference to the texture container.
+         */
+        ANIMATIONS& get_animation_storage();
 
         /**
          * @brief Get a reference to the rendering mode.

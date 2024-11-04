@@ -20,11 +20,23 @@ layout (location = 0) out vec4 fFragColor;
 // Uniforms
 uniform vec3 uColor;
 uniform sampler2D uTex2d; 
-uniform bool TexFlag;
+uniform bool uTexFlag;		// Flag for texture
+uniform bool  uAnimateFlag; // Flag for animation
+uniform float uTex_W;
+uniform float uTex_H;
+uniform float uFrame_Size;	// Usually frame w and h is the same, split if needed
+uniform float uPos_X;		// Pos x in texture
+uniform float uPos_Y;		// Pos y in texture
 
 void main() {
-	if(TexFlag == true) {
-		fFragColor = texture(uTex2d, vTextCoord);
+	if(uTexFlag == true && uAnimateFlag == true) {
+		float scaling_x = uTex_W / uFrame_Size; // Scaling factor to resize TextCoord.x accordingly
+		float scaling_y = uTex_H / uFrame_Size; // Scaling factor to resize TextCoord.y accordingly	
+		float offset_x = uPos_X / uFrame_Size;  // Accounting for offset due to position in texture
+		float offset_y = uPos_Y / uFrame_Size;
+		fFragColor = texture(uTex2d, vec2(vTextCoord.x / scaling_x, vTextCoord.y / scaling_y) + vec2(offset_x / scaling_x, offset_y / scaling_y));
+	} else if (uTexFlag == true){
+		fFragColor = texture(uTex2d, vTextCoord);	
 	} else {
 		fFragColor = vec4(uColor, 1.0);
 	}

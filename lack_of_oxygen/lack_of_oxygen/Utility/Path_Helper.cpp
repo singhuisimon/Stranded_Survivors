@@ -123,4 +123,9 @@ namespace lof {
         return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\" + filename;
     }
 
+    // Function to get the path to the animation file
+    std::string Path_Helper::get_animation_file_path() {
+        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Textures\\Prisoner_Atlas.txt";
+    } 
+
 } // namespace lof

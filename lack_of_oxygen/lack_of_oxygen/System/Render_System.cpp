@@ -150,6 +150,8 @@ namespace lof {
             auto& shaders = GFXM.get_shader_program_storage();
             auto& models = GFXM.get_model_storage();
             auto& textures = GFXM.get_texture_storage();
+            // FOR ANIMATION
+            auto& animations = GFXM.get_animation_storage();
 
             // Start the shader program that the entity will use for rendering 
             GFXM.program_use(shaders[graphics.shd_ref]);
@@ -164,16 +166,16 @@ namespace lof {
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
-                GLuint tex_flag_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "TexFlag");
-                if (tex_flag_loc >= 0) {
-                    glUniform1ui(tex_flag_loc, GL_TRUE);
+                GLuint tex_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTexFlag");
+                if (tex_flag_true_loc >= 0) {
+                    glUniform1ui(tex_flag_true_loc, GL_TRUE);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
-                // Set texture unit in shader
+                // Set texture unit in fragment shader
                 GLuint tex_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex2d");
                 if (tex_uniform_loc >= 0) {
                     glUniform1i(tex_uniform_loc, 6);
@@ -182,12 +184,69 @@ namespace lof {
                     LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
+
+                // If entity has animation, pass animation data to fragment shader
+                bool has_animation = ECSM.has_component<Animation_Component>(entity_id);
+                if (has_animation == true) {
+
+                    auto& animation = ECSM.get_component<Animation_Component>(entity_id); 
+                    std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
+                    unsigned int& curr_frame_idx = animations[curr_animation_name].curr_frame_index;
+
+                    // Set animation flag to be true
+                    GLuint animate_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uAnimateFlag");
+                    if (animate_flag_true_loc >= 0) {
+                        glUniform1ui(animate_flag_true_loc, GL_TRUE);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                    // Pass texture width, height, and frame size
+                    GLuint tex_w_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex_W");
+                    GLuint tex_h_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex_H");
+                    GLuint frame_size_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uFrame_Size");
+                    if (tex_w_uniform_loc >= 0 && tex_h_uniform_loc >= 0 && frame_size_uniform_loc >= 0) {
+                        glUniform1f(tex_w_uniform_loc, animations[curr_animation_name].tex_w);
+                        glUniform1f(tex_h_uniform_loc, animations[curr_animation_name].tex_h);
+                        glUniform1f(frame_size_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].size);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Texture width, Texture height, and/or frame size uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                    // Pass frame position
+                    GLuint frame_pos_x_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uPos_X");
+                    GLuint frame_pos_y_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uPos_Y");
+                    if (frame_pos_x_uniform_loc >= 0 && frame_pos_y_uniform_loc >= 0) {
+                        glUniform1f(frame_pos_x_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_x);
+                        glUniform1f(frame_pos_y_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_y);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Frame x and y uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                }
+                else {
+                    // Set animation flag to be false
+                    GLuint animate_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uAnimateFlag");
+                    if (animate_flag_false_loc >= 0) {
+                        glUniform1ui(animate_flag_false_loc, GL_FALSE);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+                }
             }
             else {
                 // Set texture flag to false
-                GLuint tex_flag_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "TexFlag");
-                if (tex_flag_loc >= 0) {
-                    glUniform1ui(tex_flag_loc, GL_FALSE);
+                GLuint tex_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTexFlag");
+                if (tex_flag_false_loc >= 0) { 
+                    glUniform1ui(tex_flag_false_loc, GL_FALSE);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
@@ -225,7 +284,7 @@ namespace lof {
                 glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
             }
 
-            // Draw debugging features if debug mode is ON
+            // Draw debugging features if debug mode is ON 
             if (entity_id != 0) { // Background object unaffected 
                 if (GFXM.get_debug_mode() == GL_TRUE) {
                     // Check if entity has Velocity_Component and Collision_Component
@@ -233,10 +292,6 @@ namespace lof {
                     bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
 
                     if (has_velocity || has_collision) {
-
-                        // Variables for debugging
-                        auto& shaders = GFXM.get_shader_program_storage();
-                        auto& models = GFXM.get_model_storage();
 
                         // Free texture shader program to allow models shader program to bind and start  
                         GFXM.program_free();
@@ -254,7 +309,7 @@ namespace lof {
                         }
 
                         // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
-                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat");
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat"); 
                         if (debug_mat_uniform_loc < 0) {
                             LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
                             std::exit(EXIT_FAILURE);
@@ -301,15 +356,11 @@ namespace lof {
                                 // Compute model-to-world-to-NDC transformation matrix for line and store it
                                 glm::mat3 result_xform = world_scale * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
                                 box_mdl_to_ndc_xform.emplace_back(result_xform);
-                            }
 
-                            // Drawing AABB box line by line
-                            for (std::size_t i = 0; i < 4; ++i) {
-                                glLineWidth(DEFAULT_AABB_WIDTH);
-                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
-                                glBindVertexArray(models["debug_line"].vaoid);
-                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                                glBindVertexArray(0);
+                                // Drawing AABB box line by line
+                                glLineWidth(DEFAULT_AABB_WIDTH); 
+                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]); 
+                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL); 
                             }
                         }
 
@@ -322,8 +373,36 @@ namespace lof {
                                                  0, transform.scale.y * DEFAULT_VELOCITY_LINE_LENGTH, 0,
                                                  0, 0, 1 };
 
-                            // Compute direction based on velocity
-                            GLfloat direction = glm::degrees(glm::atan(velocity.velocity.y, velocity.velocity.x));
+                            // Compute current orientation of line
+                            GLfloat direction{ 0.0f };
+                            if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
+                                if (velocity.velocity.x > 0.0f) {
+                                    direction = -DEFAULT_ROTATION; // Move right 
+                                }
+                                else {
+                                    direction = DEFAULT_ROTATION; // Move left 
+                                }
+                            }
+                            else if (velocity.velocity.y && (velocity.velocity.x == 0.0f)) {
+                                if (velocity.velocity.y > 0.0f) {
+                                    direction = 0.0f; // Move up 
+                                }
+                                else {
+                                    direction = 2.0f * DEFAULT_ROTATION; // Move down 
+                                }
+                            }
+                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y > 0.0f) { // Top right
+                                direction = -DEFAULT_ROTATION / 2.0f;
+                            }
+                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y > 0.0f) { // Top left
+                                direction = DEFAULT_ROTATION / 2.0f;
+                            }
+                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                                direction = -DEFAULT_ROTATION * 1.5f;
+                            }
+                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                                direction = DEFAULT_ROTATION * 1.5f;
+                            }
 
                             // Convert direction to radians
                             GLfloat rad_disp = glm::radians(direction);
@@ -346,15 +425,13 @@ namespace lof {
                             // Compute model-to-world-to-NDC transformation matrix for the velocity line
                             glm::mat3 line_mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
 
+                            glBindVertexArray(models["debug_line"].vaoid);  
+                            glLineWidth(DEFAULT_LINE_WIDTH);  
                             glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
-                            glLineWidth(DEFAULT_LINE_WIDTH);
-                            glBindVertexArray(models["debug_line"].vaoid);
                             glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                            glBindVertexArray(0);
                         }
                     }
                 }
-
                 // Clean up by unbinding the VAO and ending the shader program
                 glBindVertexArray(0);
                 GFXM.program_free();

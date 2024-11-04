@@ -72,7 +72,7 @@ namespace lof {
 
            
             // Handle horizontal movement
-            if (IM.is_key_held(GLFW_KEY_A)&&entity_id == 4) {
+            if (IM.is_key_held(GLFW_KEY_A)&&entity_id == 5) {
                 // Apply force to move left
                 std::cout << "move left pls\n";
                 physics.apply_force(Vec2D(-5000.f, 0.0f));
@@ -80,7 +80,7 @@ namespace lof {
                     ECSM.get_component<Audio_Component>(entity_id).set_audio_state("moving left", PLAYING); //movement sound
                 }
             }
-            else if (IM.is_key_held(GLFW_KEY_D) && entity_id == 4) {
+            else if (IM.is_key_held(GLFW_KEY_D) && entity_id == 5) {
                 // Apply force to move right
                 std::cout << "move right pls\n";
                 physics.apply_force(Vec2D(5000.f, 0.0f));

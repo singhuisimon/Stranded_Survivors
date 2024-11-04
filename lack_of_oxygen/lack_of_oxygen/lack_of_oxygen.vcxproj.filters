@@ -24,6 +24,7 @@
     <ClCompile Include="Utility\Path_Helper.cpp" />
     <ClCompile Include="Utility\Vector3D.cpp" />
     <ClCompile Include="System\GUI_System.cpp" />
+    <ClCompile Include="System\Animation_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -53,6 +54,7 @@
     <ClInclude Include="Utility\Vector3D.h" />
     <ClInclude Include="Utility\Type.h" />
     <ClInclude Include="System\GUI_System.h" />
+    <ClInclude Include="System\Animation_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

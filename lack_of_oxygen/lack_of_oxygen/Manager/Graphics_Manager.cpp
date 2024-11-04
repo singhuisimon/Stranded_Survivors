@@ -83,6 +83,8 @@ namespace lof {
 
         std::string mesh_path = Path_Helper::get_model_file_path();
         std::string texture_path = Path_Helper::get_texture_file_path();
+        // FOR ANIMATION
+        std::string animation_path = Path_Helper::get_animation_file_path();
 
         // Add models
         if (!add_model(mesh_path.c_str())) {
@@ -94,6 +96,13 @@ namespace lof {
         if (!add_textures(texture_path.c_str())) {
             LM.write_log("Fail to add textures.");
             return -3;
+        }
+
+        // FOR ANIMATION
+        // Add animations
+        if (!add_animations(animation_path.c_str())) { 
+            LM.write_log("Fail to add animations.");
+            return -4;
         }
 
         m_is_started = true;
@@ -368,30 +377,86 @@ namespace lof {
         return GL_TRUE;
     }
 
-    // Return reference to shader program storage
-    Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() {
-        return shader_program_storage;
+    GLboolean Graphics_Manager::add_animations(std::string const& file_name) {
+        // Create filepath for animations from texture atlas text file
+        std::ifstream input_file{ file_name, std::ios::in };
+        if (!input_file) {
+            input_file.close();
+            LM.write_log("Unable to open %s", file_name.c_str());
+            return GL_FALSE;
+        }
+        input_file.seekg(0, std::ios::beg);
+
+        // Variables to extract data to store into an animation
+        std::string file_line, prefix;
+        std::string a_name, t_name;
+        Animation animation{};
+        Frame frame{};
+
+        while (getline(input_file, file_line)) {
+            // Reading the animation data line by line
+            std::istringstream file_line_ss{ file_line };
+            file_line_ss >> prefix;
+            if (prefix == "name") { // Get animation name
+                file_line_ss >> a_name;
+            }
+            else if (prefix == "texture") {   // Get texture name
+                file_line_ss >> animation.texture_name;
+            }
+            else if (prefix == "tex_width") {
+                file_line_ss >> animation.tex_w;
+            }
+            else if (prefix == "tex_height") {
+                file_line_ss >> animation.tex_h;
+            }
+            else if (prefix == "pos") {
+                file_line_ss >> frame.uv_x;
+
+                // Edit Y value to read from bottom left instead of top left for OpenGL texture reading
+                float temp_y;
+                file_line_ss >> temp_y;
+                frame.uv_y = animation.tex_h - temp_y - DEFAULT_Y_OFFSET;
+            }
+            else if (prefix == "size") {
+                file_line_ss >> frame.size;
+            }
+            else if (prefix == "time_delay") {
+                file_line_ss >> frame.time_delay;
+            }
+            else if (prefix == "EF") { // End of frame data
+                animation.frames.emplace_back(frame);
+            }
+            else if (prefix == "EA") { // End of animation data
+                animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED; 
+                animation_storage[a_name] = animation;
+                animation = {}; // Clear animation data
+                LM.write_log("Graphics_Manager::add_animations(): %s animation successfully created and stored.", a_name.c_str());
+            }
+        }
+
+        // Close file
+        input_file.close();
+        LM.write_log("Graphics_Manager::add_animations(): All animations successfully created and stored.");
+        return GL_TRUE;
     }
+
+    // Return reference to shader program storage
+    Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() { return shader_program_storage; }
 
     // Return reference to model storage
-    Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() {
-        return model_storage;
-    }
+    Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() { return model_storage; }
 
     // Return reference to texture storage
-    Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() {
-        return texture_storage;
-    }
+    Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() { return texture_storage; }
+
+    // Return reference to animation storage
+    Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; } 
 
     // Return state of current render mode
-    GLenum& Graphics_Manager::get_render_mode() {
-        return render_mode;
-    }
+    GLenum& Graphics_Manager::get_render_mode() { return render_mode; }
 
     // Return state of current debig mode
-    GLboolean& Graphics_Manager::get_debug_mode() {
-        return is_debug_mode;
-    }
+    GLboolean& Graphics_Manager::get_debug_mode() { return is_debug_mode; }
 
     // Compilation of vertex and fragment shaders to make a shader program
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {
@@ -487,9 +552,7 @@ namespace lof {
     }
 
     // Free shader program
-    void Graphics_Manager::program_free() {
-        glUseProgram(0);
-    }
+    void Graphics_Manager::program_free() { glUseProgram(0); }
 
     // Return the handle of the shader program
     GLuint Graphics_Manager::get_shader_program_handle(ShaderProgram shader) const {
