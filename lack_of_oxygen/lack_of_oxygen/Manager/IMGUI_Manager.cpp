@@ -23,7 +23,6 @@ namespace lof {
     bool load_selected = false;
     bool show_window = false;
     bool remove_game_obj = false;
-    bool clone_selection = false;
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -144,8 +143,6 @@ namespace lof {
 
     /*void IMGUI_Manager::show_performance_viewer() {
         ImGui::Begin("Performance Viewer");
-
-
         ImGui::End();
     }*/
 
@@ -179,10 +176,6 @@ namespace lof {
             remove_game_obj = !remove_game_obj;
         }
 
-        if (ImGui::Button("Clone Game Object")) {
-            clone_selection = !clone_selection;
-        }
-
         //if (ImGui::Button("Load Game Object")) {
         //    //clone_selection = !clone_selection;
         //}
@@ -203,12 +196,7 @@ namespace lof {
 
         //remove is buggy
         if (selected_object_index != -1 && remove_game_obj) {
-            remove_game_objects();
-        }
-
-        //clone needs to be used
-        if (selected_object_index != -1 && clone_selection) {
-            clone_game_objects();
+            remove_game_objects(selected_object_index);
         }
 
     }
@@ -377,7 +365,8 @@ namespace lof {
 
         if (ImGui::Button("Save Changes")) {
 
-            std::string saved_file = "save_game_1730598069.json";
+            std::string saved_file = "save_game_1730650698.json";
+            //std::string saved_file = "save_game_1730645173.json";
             std::string path_file = Path_Helper::get_save_file_path(saved_file);
             if (SM.save_game_state(path_file.c_str())) {
                 LM.write_log("IMGUI_Manager::update(): Successfully saved game state to %s", Path_Helper::get_scene_path().c_str());
@@ -407,6 +396,7 @@ namespace lof {
     //simon's code
     void IMGUI_Manager::add_game_objects() {
 
+        //add more options
             EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
             if (new_entity != INVALID_ENTITY_ID) {
                 // Generate random position
@@ -434,41 +424,45 @@ namespace lof {
     }
 
     //removing game object - has error
-    void IMGUI_Manager::remove_game_objects() {
+    void IMGUI_Manager::remove_game_objects(int index) {
 
-        //try{
-        //    const auto& entities = ecs.get_entities();
+        const auto& entities = ecs.get_entities();
+        EntityID eid = entities[index]->get_id();
 
-        //    if (selected_object_index >= entities.size() || !entities[selected_object_index]) {
-        //        std::cout << "\n\n\n\nError: selected_object_index is out of bounds.\n\n\n\n" << std::endl;
-        //        return;
-        //    }
+        if (eid != INVALID_ENTITY_ID) {
+            ECSM.destroy_entity(eid);
+            return;
+        }
 
-        //    auto& selectedEntity = entities[selected_object_index];
-        //    if (!selectedEntity) {
-        //        std::cout << "\n\n\n\nError: Entity at selected_object_index is already null.\n\n\n\n" << std::endl;
-        //        return;
-        //    }
-
-        //    EntityID entityId = selectedEntity->get_id();
-        //    if (entityId >= entities.size() || !entities[entityId]) {
-        //        std::cout << "\n\n\n\nError: Entity ID is invalid or entity does not exist.\n\n\n\n" << std::endl;
-        //        return;
-        //    }
-
-        //    //entities[selected_object_index]->set_name("");
-        //    ECSM.destroy_entity(entityId);
-        //    std::cout << entities.size() << std::endl;
-        //}
-        //catch (const std::exception& e) {   
-        //    std::cout << "\n\n\n\nUnexpected error: " << e.what() << "\n\n\n\n" << std::endl;
-        //}
         
     }
 
-    void IMGUI_Manager::clone_game_objects() {
-        ;
-    }
+    /*try {
+            const auto& entities = ecs.get_entities();
+
+            if (selected_object_index >= entities.size() || !entities[selected_object_index]) {
+                std::cout << "\n\n\n\nError: selected_object_index is out of bounds.\n\n\n\n" << std::endl;
+                return;
+            }
+
+            auto& selectedEntity = entities[selected_object_index];
+            if (!selectedEntity) {
+                std::cout << "\n\n\n\nError: Entity at selected_object_index is already null.\n\n\n\n" << std::endl;
+                return;
+            }
+
+            EntityID entityId = entities[selected_object_index]->get_id();
+            if (entityId >= entities.size() || !entities[entityId]) {
+                std::cout << "\n\n\n\nError: Entity ID is invalid or entity does not exist.\n\n\n\n" << std::endl;
+                return;
+            }
+
+            ECSM.destroy_entity(entityId);
+            std::cout << entities.size() << std::endl;
+        }
+        catch (const std::exception& e) {
+            std::cout << "\n\n\n\nUnexpected error: " << e.what() << "\n\n\n\n" << std::endl;
+        }*/
 
     void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
 

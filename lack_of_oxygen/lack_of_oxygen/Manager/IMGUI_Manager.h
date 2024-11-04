@@ -29,7 +29,7 @@
 
 namespace lof {
 
-    rapidjson::Document load_scn(const std::string& path);
+    
     class IMGUI_Manager : public Manager {
     private:
         IMGUI_Manager();
@@ -50,8 +50,7 @@ namespace lof {
         void imgui_game_objects_list();
         void imgui_game_objects_edit();
         void add_game_objects();
-        void remove_game_objects();
-        void clone_game_objects();
+        void remove_game_objects(int selected_object_index);
         bool button_toggle(const std::string& condition_name, bool* state);
         void text_input(std::string& data_name, std::string& codition_name);
         void render();

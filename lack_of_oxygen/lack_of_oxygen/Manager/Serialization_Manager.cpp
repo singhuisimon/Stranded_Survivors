@@ -513,11 +513,8 @@ namespace lof {
         save_doc.SetObject();
         rapidjson::Document::AllocatorType& allocator = save_doc.GetAllocator();
 
-        // Create array for objects (matching your scene format)
+        // Create array for objects
         rapidjson::Value objects_array(rapidjson::kArrayType);
-
-        // Counter for generating unique names if needed
-        int unnamed_counter = 0;
 
         // Iterate through all entities
         for (const auto& entity_ptr : ECSM.get_entities()) {
@@ -532,13 +529,24 @@ namespace lof {
             // Create object for this entity
             rapidjson::Value entity_obj(rapidjson::kObjectType);
 
-            // Generate a name for the entity
-            std::string entity_name;
-            if (entity_id == 0) {
-                entity_name = "background";
-            }
-            else {
-                entity_name = "entity_" + std::to_string(unnamed_counter++);
+            // Get entity name - use the actual entity name if it exists
+            std::string entity_name = entity_ptr->get_name();
+            if (entity_name.empty()) {
+                // Fallback to type-based names
+                if (entity_id == 0) {
+                    entity_name = "background";
+                }
+                else if (ECSM.has_component<Physics_Component>(entity_id)) {
+                    if (ECSM.get_component<Physics_Component>(entity_id).is_static) {
+                        entity_name = "platform" + std::to_string(entity_id);
+                    }
+                    else {
+                        entity_name = "player" + std::to_string(entity_id);
+                    }
+                }
+                else {
+                    entity_name = "entity_" + std::to_string(entity_id);
+                }
             }
             entity_obj.AddMember("name", rapidjson::Value(entity_name.c_str(), allocator), allocator);
 
@@ -578,13 +586,35 @@ namespace lof {
             // Add Audio_Component if present
             if (ECSM.has_component<Audio_Component>(entity_id)) {
                 const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
-                components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
+                // Convert absolute path to relative path
+                Audio_Component modified_audio = audio;
+                std::string filename = audio.get_filename();
+                size_t pos = filename.find("lack_of_oxygen\\Data");
+                if (pos != std::string::npos) {
+                    filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 14);
+                    modified_audio.set_filename(filename);
+                }
+                components_obj.AddMember("Audio_Component", serialize_audio_component(modified_audio, allocator), allocator);
             }
 
             // Only add entity to save file if it has components to save
             if (components_obj.MemberCount() > 0) {
                 // Add components object to entity object
                 entity_obj.AddMember("components", components_obj, allocator);
+
+                // Add prefab information if applicable
+                if (!entity_name.empty() && entity_name != "background") {
+                    if (ECSM.has_component<Physics_Component>(entity_id)) {
+                        const Physics_Component& physics = ECSM.get_component<Physics_Component>(entity_id);
+                        if (physics.is_static) {
+                            entity_obj.AddMember("prefab", rapidjson::Value("dummy_object", allocator), allocator);
+                        }
+                        else {
+                            entity_obj.AddMember("prefab", rapidjson::Value("player", allocator), allocator);
+                        }
+                    }
+                }
+
                 // Add entity object to objects array
                 objects_array.PushBack(entity_obj, allocator);
             }
@@ -601,8 +631,9 @@ namespace lof {
                 return false;
             }
 
-            rapidjson::StringBuffer strbuf;
+            rapidjson::StringBuffer strbuf;  // Create StringBuffer here
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
+            writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);  // Format arrays on single lines
             save_doc.Accept(writer);
             ofs << strbuf.GetString();
             ofs.close();
