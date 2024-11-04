@@ -88,27 +88,28 @@ namespace lof {
 		PLAYING = 0,    //Audio is to be played
 		STOPPED = 1,    //Audio is to be stopped
 		PAUSED = 2,      //Audio is to be paused
-		RESUMED = 3		//Audio is to be resumed
+		RESUMED = 3,		//Audio is to be resumed
+		NONE = 4
 	};
 
-	enum FileFormat {
-		BANK = 0,
-		WAV = 1,
-		OGG = 2
-	};
+	//enum FileFormat {
+	//	BANK = 0,
+	//	WAV = 1,
+	//	OGG = 2
+	//};
 
-	enum AudioCommand {
-		NONE = 0,
-		PLAYSOUND,
-		STOPSOUND,
-		PAUSEDSOUND,
-		RESUMESOUND
-		/*,
-		PLAYEVENT,
-		STOPEVENT,
-		PAUSEEVENT,
-		RESUMEEVENT*/
-	};
+	//enum AudioCommand {
+	//	NONE = 0,
+	//	PLAYSOUND,
+	//	STOPSOUND,
+	//	PAUSEDSOUND,
+	//	RESUMESOUND
+	//	/*,
+	//	PLAYEVENT,
+	//	STOPEVENT,
+	//	PAUSEEVENT,
+	//	RESUMEEVENT*/
+	//};
 
 	// ----------------------------- Movement_System.cpp -------------------------------------------
     //Movement_System constants

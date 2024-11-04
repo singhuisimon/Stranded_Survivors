@@ -87,5 +87,7 @@
     <Media Include="Data\Audio\audio_test1.wav" />
     <Media Include="Data\Audio\audio_test2.wav" />
     <Media Include="Data\Audio\Fx16_2.wav" />
+    <Media Include="Data\Audio\Fx28.wav" />
+    <Media Include="Data\Audio\Fx27.wav" />
   </ItemGroup>
 </Project>
