@@ -66,8 +66,8 @@ namespace lof {
 	//Physics component constants 
 	constexpr float DEFAULT_GRAVITY = -980.f;
 	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
-	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
-	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
+	constexpr float DEFAULT_MAX_VELOCITY = 10000.0f; //30000
+	constexpr float DEFAULT_JUMP_FORCE = 3000.f;
 	constexpr const char* DEFAULT_MODEL_NAME = "square";
 	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
@@ -76,7 +76,7 @@ namespace lof {
 	// ----------------------------- Movement_System.cpp -------------------------------------------
     //Movement_System constants
 
-	constexpr float DEFAULT_SPEED = 1000.0f;
+	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
 	// ------------------------------ Audio_Manager.cpp --------------------------------

@@ -12,6 +12,9 @@
 #define LOF_MOVEMENT_SYSTEM_H
 
 #include "System.h"
+#include "Collision_System.h"
+#include "../Manager/ECS_Manager.h"
+#include <vector>
 
 namespace lof {
 
@@ -26,7 +29,6 @@ namespace lof {
          * Initializes the system's signature.
          */
         Movement_System();
-
         /**
          * @brief Updates the system.
          * @param delta_time The time elapsed since the last update.
@@ -38,6 +40,18 @@ namespace lof {
          * @return The string "Movement_System".
          */
         std::string get_type() const override;
+
+    private:
+
+        void integrate(float deltatime);
+
+#if 0
+        void resolve_physics(const std::vector<CollisionPair>& collisions, float delta_time);
+        void apply_physics_response(EntityID entity_id, const CollisionPair& collision, float delta_time);
+        void handle_ground_contact(EntityID entity_id, const CollisionPair& collision, float delta_time);
+        void handle_wall_contact(EntityID entity_id, const CollisionPair& collision, float delta_time);
+#endif
+        
     };
 
 } // namespace lof

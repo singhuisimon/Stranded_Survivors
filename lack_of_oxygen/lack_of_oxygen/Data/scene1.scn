@@ -5,6 +5,7 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, -7296.0 ],
+          "prev_position" :  [0.0, -7296.0],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 2048.0, 16128.0 ]
         },
@@ -27,6 +28,7 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, -153.6 ],
+          "prev_position": [ 0.0, -153.6 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -44,6 +46,7 @@
       "components": {
         "Transform2D": {
           "position": [ 500.0, -460.8 ],
+          "prev_position":  [ 500.0, -460.8],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -61,6 +64,7 @@
       "components": {
         "Transform2D": {
           "position": [ -500.0, 230.4 ],
+          "prev_position" :  [ -500.0, 230.4],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {

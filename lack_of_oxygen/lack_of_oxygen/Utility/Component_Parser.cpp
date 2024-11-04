@@ -36,6 +36,12 @@ namespace lof {
                     transform.position.x = pos[0].GetFloat();
                     transform.position.y = pos[1].GetFloat();
                 }
+                if (component_data.HasMember("prev_position") && component_data["prev_position"].IsArray()) {
+                    const rapidjson::Value& pos = component_data["prev_position"];
+                    transform.prev_position.x = pos[0].GetFloat();
+                    transform.prev_position.y = pos[1].GetFloat();
+                }
+
                 if (component_data.HasMember("orientation") && component_data["orientation"].IsArray()) {
                     const rapidjson::Value& ori = component_data["orientation"];
                     transform.orientation.x = ori[0].GetFloat();
@@ -69,6 +75,8 @@ namespace lof {
             else if (component_name == "Physics_Component") {
                 // Parse Physics_Component
                 Physics_Component physics_component;
+
+#if 0
 
                 if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
                     const rapidjson::Value& grav = component_data["gravity"];
@@ -113,7 +121,61 @@ namespace lof {
                 if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
                     physics_component.jump_force = component_data["jump_force"].GetFloat();
                 }
+#endif
 
+#if 1
+
+                if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
+                    const rapidjson::Value& grav = component_data["gravity"];
+                    Vec2D gravity; 
+                    gravity.x = grav[0].GetFloat();
+                    gravity.y = grav[1].GetFloat();
+
+                    physics_component.set_gravity(gravity);
+                }
+
+                if (component_data.HasMember("damping_factor") && component_data["damping_factor"].IsNumber()) {
+                    physics_component.set_damping_factor(component_data["damping_factor"].GetFloat());
+                }
+
+                if (component_data.HasMember("max_velocity") && component_data["max_velocity"].IsNumber()) {
+                    physics_component.set_max_velocity(component_data["max_velocity"].GetFloat());
+                }
+
+                if (component_data.HasMember("accumulated_force") && component_data["accumulated_force"].IsArray()) {
+                    const rapidjson::Value& acc_force = component_data["accumulated_force"];
+                    Vec2D accumulated_force;
+                    accumulated_force.x = acc_force[0].GetFloat();
+                    accumulated_force.y = acc_force[1].GetFloat();
+
+                    physics_component.set_accumulated_force(accumulated_force);
+                }
+
+                if (component_data.HasMember("mass") && component_data["mass"].IsNumber()) {
+                    physics_component.set_mass(component_data["mass"].GetFloat());
+                }
+
+                if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
+                    physics_component.set_is_static(component_data["is_static"].GetBool());
+                }
+
+                if (component_data.HasMember("is_moveable") && component_data["is_moveable"].IsBool()) {
+                    physics_component.set_is_moveable(component_data["is_moveable"].GetBool());
+                }
+
+               /* if (component_data.hasmember("is_grounded") && component_data["is_grounded"].isbool()) {
+                    physics_component.is_grounded = component_data["is_grounded"].getbool();
+                }
+
+                if (component_data.hasmember("is_jumping") && component_data["is_jumping"].isbool()) {
+                    physics_component.is_jumping = component_data["is_jumping"].getbool();
+                }*/
+
+                if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
+                    physics_component.set_jump_force(component_data["jump_force"].GetFloat());
+                }
+
+#endif
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);

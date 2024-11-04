@@ -4,28 +4,26 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, 153.6 ],
+          "prev_position" :  [0.0, 0.0],
           "orientation": [ 0.0, 30.0 ],
-          "scale": [ 102.4, 76.8]
+          "scale": [ 102.4, 76.8 ]
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
         },
         "Physics_Component": {
-          "gravity": [ 0.0, -980.0 ],
-          "damping_factor": 0.90,
-          "max_velocity": 30000.0,
+          "gravity": [ 0.0, -700.0 ],
+          "damping_factor": 0.85,
+          "max_velocity": 10000.0,
           "accumulated_force": [ 0.0, 0.0 ],
-          "mass": 20.0,
+          "mass": 10.0,
           "is_static": false,
-          "is_moveable": true,
-          "is_grounded": false,
-          "is_jumping": false,
-          "jump_force": 5000.0
+          "jump_force": 8000.0
         },
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 0.0, 1.0, 0.0 ],
-          "texture_name" : "Prisoner",
+          "texture_name": "Prisoner",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -45,6 +43,18 @@
           "position": [ 0.0, 0.0 ],
           "orientation": [ 0.0, 30.0 ],
           "scale": [ 300.0, 100.0 ]
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.90,
+          "max_velocity": 30000.0,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "mass": 20.0,
+          "is_static": true,
+          "jump_force": 5000.0
         },
         "Graphics_Component": {
           "model_name": "square",

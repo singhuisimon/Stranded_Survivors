@@ -56,6 +56,7 @@ namespace lof {
         Vec2D position;     ///< Position of the entity in world space.
         Vec2D orientation;  ///< Orientation of the entity in degrees.
         Vec2D scale;        ///< Scale of the entity.
+        Vec2D prev_position;
 
         /**
          * @brief Default constructor initializing position, rotation, and scale.
@@ -69,8 +70,8 @@ namespace lof {
          * @param rot Initial rotation in degrees.
          * @param scl Initial scale.
          */
-        Transform2D(const Vec2D& pos, Vec2D& ori, const Vec2D& scl)
-            : position(pos), orientation(ori), scale(scl) {}
+        Transform2D(const Vec2D& pos, Vec2D& pre_position, Vec2D& ori, const Vec2D& scl)
+            : position(pos), prev_position(pre_position), orientation(ori), scale(scl) {}
     };
 
 
@@ -96,11 +97,16 @@ namespace lof {
     * @brief Component representing global physics properties
     */
     class Physics_Component : public Component {
-    public:
+
+    private:
         Vec2D gravity;
         float damping_factor;
         float max_velocity;
+        float max_velocity_sq;
         Vec2D accumulated_force; //to accumulate forces applied to the entity.
+        Vec2D acceleration;
+
+       // Force_Manager Forces;
 
         float mass; //mass of entity
         float inv_mass;
@@ -137,8 +143,9 @@ namespace lof {
 
             : gravity(gravity),
             damping_factor(damping_factor),
-            max_velocity(max_velocity),
+            max_velocity(max_velocity), max_velocity_sq(max_velocity * max_velocity),
             accumulated_force(Vec2D(0, 0)),
+            acceleration(Vec2D(0,0)),
             mass(mass),
             inv_mass((mass > 0.0f) ? 1.0f / mass : 0.0f),
             is_static(is_static),
@@ -147,7 +154,115 @@ namespace lof {
             is_jumping(false),
             jump_force(jump_force) {}
 
+        //getters and setters
+
+        Vec2D get_gravity() const {
+            return gravity; 
+        }
+
+        float get_damping_factor() const {
+            return damping_factor;
+        }
+
+        float get_max_velocity() const {
+            return max_velocity;
+        }
+
+        float get_max_velocity_sq() const {
+            return max_velocity_sq;
+        }
+       
+        Vec2D get_accumulated_force() const {
+            return accumulated_force;
+        }
+
+        Vec2D get_acceleration() const {
+            return acceleration;
+        }
+
+        float get_mass() const {
+            return mass;
+        }
+
+        float get_inv_mass() const {
+            return inv_mass;
+        }
+
+        bool get_is_static() const {
+            return is_static;
+        }
+
+        bool get_is_moveable() const {
+            return is_moveable;
+        }
+
+        bool get_is_grounded() const {
+            return is_grounded;
+        }
+
+        bool get_is_jumping() const {
+            return is_jumping;
+        }
+        //no more is grounded and is jumping
+        
+        float get_jump_force() const {
+            return jump_force;
+        }
+
+        //setters
+        void set_gravity(const Vec2D& g) {
+            gravity = g;
+        }
+
+        void set_damping_factor(float df) {
+            damping_factor = df;
+        }
+
+        void set_max_velocity(float mv) {
+            max_velocity = mv;
+        }
+
+        void set_is_grounded(bool ground) {
+            is_grounded = ground;
+        }
+
+        void set_is_jumping(bool jump) {
+            is_jumping = jump;
+        }
+
+        void set_accumulated_force(const Vec2D& af) {
+            accumulated_force = af;
+        }
+
+        void set_acceleration(const Vec2D& ac) {
+             acceleration = ac;
+        }
+
         /**
+        * @brief Sets the mass of the entity.
+        *
+        * Adjusts the mass and its inverse. If the mass is zero or negative, the inverse mass is set to zero.
+        *
+        * @param m The new mass of the entity.
+        */
+        void set_mass(float m) {
+            mass = m;
+            inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
+        }
+
+        void set_is_static(bool s) {
+            is_static = s;
+        }
+
+        void set_is_moveable(bool m) {
+            is_moveable = m;
+        }
+
+        void set_jump_force(float jf) {
+            jump_force = jf;
+        }
+
+         /**
          * @brief Applies a force to the entity.
          *
          * Adds the given force to the accumulated forces acting on the entity.
@@ -165,19 +280,15 @@ namespace lof {
          */
         void reset_forces() {
             accumulated_force = Vec2D(0, 0);
+        
         }
 
-           /**
-            * @brief Sets the mass of the entity.
-            *
-            * Adjusts the mass and its inverse. If the mass is zero or negative, the inverse mass is set to zero.
-            *
-            * @param m The new mass of the entity.
-            */        
-        void set_mass(float m) {
-            mass = m;
-            inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
-        }
+        //FORCE MANAGER 
+#if 1
+        
+#endif
+
+
     };
     /**
     * @class Graphics_Component
@@ -220,6 +331,7 @@ namespace lof {
         Collision_Component(float width = 0.0f, float height = 0.0f)
             : width(width), height(height) {}
     };
+
 } // namespace lof
 
 #endif // LOF_COMPONENT_H
