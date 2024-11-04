@@ -14,6 +14,9 @@
 // Include RapidJSON headers
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
+#include "rapidjson/stringbuffer.h"    // For StringBuffer
+#include "rapidjson/prettywriter.h"    // For PrettyWriter
+#include "rapidjson/writer.h"          // For Writer
 
 // Include Log_Manager
 #include "Log_Manager.h"
@@ -36,6 +39,11 @@
 #include <cassert>
 
 namespace lof {
+
+    // Forward declaration of helper functions
+    class Transform2D;
+    class Graphics_Component;
+    class Collision_Component;
 
     /**
      * @brief Private constructor for the singleton pattern.
@@ -113,7 +121,6 @@ namespace lof {
     void Serialization_Manager::merge_objects(const rapidjson::Value& source,
         rapidjson::Value& destination,
         rapidjson::Document::AllocatorType& allocator) {
-        LM.write_log("Serialization_Manager::merge_objects(): Updating prefab values with specifed values.");
         assert(source.IsObject());
         assert(destination.IsObject());
 
@@ -123,15 +130,18 @@ namespace lof {
             if (destination.HasMember(key)) {
                 // If both values are objects, merge them recursively
                 if (itr->value.IsObject() && destination[key].IsObject()) {
+                    LM.write_log("Serialization_Manager::merge_objects(): Merging object at key '%s'.", key);
                     merge_objects(itr->value, destination[key], allocator);
                 }
                 else {
                     // Overwrite the value in the destination
+                    LM.write_log("Serialization_Manager::merge_objects(): Overwriting key '%s'.", key);
                     destination[key].CopyFrom(itr->value, allocator);
                 }
             }
             else {
                 // Add the new key-value pair to the destination
+                LM.write_log("Serialization_Manager::merge_objects(): Adding key '%s'.", key);
                 rapidjson::Value name(key, allocator);
                 rapidjson::Value value;
                 value.CopyFrom(itr->value, allocator);
@@ -139,6 +149,7 @@ namespace lof {
             }
         }
     }
+
 
     /**
      * @brief Loads the configuration file and initializes screen settings and FPS display interval.
@@ -302,19 +313,36 @@ namespace lof {
                 entity_name = obj["name"].GetString();
             }
             else {
-                LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Skipping.", i);
-                continue;
+                LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Using default name.", i);
+                entity_name = "unnamed_entity_" + std::to_string(i);
             }
 
-            // Create the entity
-            EntityID eid = ECSM.create_entity();
-            LM.write_log("Serialization_Manager::load_scene(): Created entity '%s' with ID %u.", entity_name.c_str(), eid);
+            EntityID eid;
+            // Handle prefab-based entities
+            if (obj.HasMember("prefab") && obj["prefab"].IsString()) {
+                std::string prefab_name = obj["prefab"].GetString();
+                eid = ECSM.clone_entity_from_prefab(prefab_name);
+                if (eid == INVALID_ENTITY_ID) {
+                    LM.write_log("Serialization_Manager::load_scene(): Failed to create entity from prefab '%s'. Skipping.", prefab_name.c_str());
+                    continue;
+                }
+            }
+            else {
+                // Create a new entity without prefab
+                eid = ECSM.create_entity();
+            }
+
+            // Set the entity's name
+            if (auto* entity = ECSM.get_entity(eid)) {
+                entity->set_name(entity_name);
+                LM.write_log("Serialization_Manager::load_scene(): Created entity '%s' with ID %u.", entity_name.c_str(), eid);
+            }
 
             // Initialize merged components
-            rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator(); // Use the main document's allocator
+            rapidjson::Document::AllocatorType& allocator = m_document.GetAllocator();
             rapidjson::Value merged_components(rapidjson::kObjectType);
 
-            // Handle prefab
+            // If this is a prefab-based entity, start with the prefab's components
             if (obj.HasMember("prefab") && obj["prefab"].IsString()) {
                 std::string prefab_name = obj["prefab"].GetString();
                 auto prefab_it = m_prefab_map.find(prefab_name);
@@ -323,29 +351,295 @@ namespace lof {
                     if (prefab.HasMember("components") && prefab["components"].IsObject()) {
                         merged_components.CopyFrom(prefab["components"], allocator);
                     }
-                    else {
-                        LM.write_log("Serialization_Manager::load_scene(): Prefab '%s' does not have 'components' object. Skipping entity '%s'.", prefab_name.c_str(), entity_name.c_str());
-                        continue;
-                    }
-                }
-                else {
-                    LM.write_log("Serialization_Manager::load_scene(): Prefab '%s' not found. Skipping entity '%s'.", prefab_name.c_str(), entity_name.c_str());
-                    continue;
                 }
             }
 
-            // Merge overrides from the scene
+            // Merge components from the scene (overrides prefab components)
             if (obj.HasMember("components") && obj["components"].IsObject()) {
                 const rapidjson::Value& scene_components = obj["components"];
                 merge_objects(scene_components, merged_components, allocator);
             }
 
-            // Add components to the entity using Component_Parser
+            // Add components to the entity
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
         }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
+    }
+
+
+    rapidjson::Value Serialization_Manager::serialize_transform_component(const Transform2D& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        // Position
+        rapidjson::Value position(rapidjson::kArrayType);
+        position.PushBack(component.position.x, allocator);
+        position.PushBack(component.position.y, allocator);
+        comp_obj.AddMember("position", position, allocator);
+
+        // Previous position (matching your scene format)
+        rapidjson::Value prev_position(rapidjson::kArrayType);
+        prev_position.PushBack(component.position.x, allocator);
+        prev_position.PushBack(component.position.y, allocator);
+        comp_obj.AddMember("prev_position", prev_position, allocator);
+
+        // Orientation
+        rapidjson::Value orientation(rapidjson::kArrayType);
+        orientation.PushBack(component.orientation.x, allocator);
+        orientation.PushBack(component.orientation.y, allocator);
+        comp_obj.AddMember("orientation", orientation, allocator);
+
+        // Scale
+        rapidjson::Value scale(rapidjson::kArrayType);
+        scale.PushBack(component.scale.x, allocator);
+        scale.PushBack(component.scale.y, allocator);
+        comp_obj.AddMember("scale", scale, allocator);
+
+        return comp_obj;
+    }
+
+
+    rapidjson::Value Serialization_Manager::serialize_graphics_component(const Graphics_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        comp_obj.AddMember("model_name", rapidjson::Value(component.model_name.c_str(), allocator), allocator);
+
+        rapidjson::Value color(rapidjson::kArrayType);
+        color.PushBack(component.color.x, allocator);
+        color.PushBack(component.color.y, allocator);
+        color.PushBack(component.color.z, allocator);
+        comp_obj.AddMember("color", color, allocator);
+
+        comp_obj.AddMember("texture_name", rapidjson::Value(component.texture_name.c_str(), allocator), allocator);
+        comp_obj.AddMember("shd_ref", component.shd_ref, allocator);
+
+        // Matrix in your scene file format
+        rapidjson::Value matrix(rapidjson::kArrayType);
+        for (int i = 0; i < 3; ++i) {
+            rapidjson::Value row(rapidjson::kArrayType);
+            for (int j = 0; j < 3; ++j) {
+                row.PushBack(component.mdl_to_ndc_xform[i][j], allocator);
+            }
+            matrix.PushBack(row, allocator);
+        }
+        comp_obj.AddMember("mdl_to_ndc_xform", matrix, allocator);
+
+        return comp_obj;
+    }
+
+
+    rapidjson::Value Serialization_Manager::serialize_collision_component(const Collision_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        comp_obj.AddMember("width", component.width, allocator);
+        comp_obj.AddMember("height", component.height, allocator);
+
+        return comp_obj;
+    }
+
+    rapidjson::Value Serialization_Manager::serialize_physics_component(const Physics_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        // Serialize gravity vector
+        rapidjson::Value gravity(rapidjson::kArrayType);
+        gravity.PushBack(component.gravity.x, allocator);
+        gravity.PushBack(component.gravity.y, allocator);
+        comp_obj.AddMember("gravity", gravity, allocator);
+
+        // Serialize scalar physics properties
+        comp_obj.AddMember("damping_factor", component.damping_factor, allocator);
+        comp_obj.AddMember("max_velocity", component.max_velocity, allocator);
+        comp_obj.AddMember("mass", component.mass, allocator);
+        comp_obj.AddMember("jump_force", component.jump_force, allocator);
+
+        // Serialize boolean flags
+        comp_obj.AddMember("is_static", component.is_static, allocator);
+        comp_obj.AddMember("is_grounded", component.is_grounded, allocator);
+
+        // Serialize accumulated force
+        rapidjson::Value accumulated_force(rapidjson::kArrayType);
+        accumulated_force.PushBack(component.accumulated_force.x, allocator);
+        accumulated_force.PushBack(component.accumulated_force.y, allocator);
+        comp_obj.AddMember("accumulated_force", accumulated_force, allocator);
+
+        return comp_obj;
+    }
+
+    rapidjson::Value Serialization_Manager::serialize_velocity_component(const Velocity_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        // Serialize velocity vector
+        rapidjson::Value velocity(rapidjson::kArrayType);
+        velocity.PushBack(component.velocity.x, allocator);
+        velocity.PushBack(component.velocity.y, allocator);
+        comp_obj.AddMember("velocity", velocity, allocator);
+
+        return comp_obj;
+    }
+
+    rapidjson::Value Serialization_Manager::serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+        
+        rapidjson::Value sounds_array(rapidjson::kArrayType);
+        auto& sounds = component.get_sounds();
+
+        for (auto& sound : sounds) {
+            rapidjson::Value sound_obj(rapidjson::kObjectType);
+
+            sound_obj.AddMember("key", rapidjson::Value(sound.key.c_str(), allocator), allocator);
+
+            std::string filename = sound.filepath.c_str();
+            size_t pos = filename.find("lack_of_oxygen\\Data");
+            if (pos != std::string::npos) {
+                filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 19);
+            }
+            sound_obj.AddMember("filename", rapidjson::Value(filename.c_str(), allocator), allocator);
+            sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
+            sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
+            sound_obj.AddMember("volume", sound.volume, allocator);
+            sound_obj.AddMember("pitch", sound.pitch, allocator);
+            sound_obj.AddMember("is_looping", sound.islooping, allocator);
+
+            // Add the serialized sound object to the sounds array
+            sounds_array.PushBack(sound_obj, allocator);
+        }
+
+        comp_obj.AddMember("sounds", sounds_array, allocator);
+
+        //// Serialize filepath and state
+        //comp_obj.AddMember("filename", rapidjson::Value(component.get_filename().c_str(), allocator), allocator);
+        //comp_obj.AddMember("audio_state", static_cast<int>(component.get_audio_state()), allocator);
+        //comp_obj.AddMember("audio_type", static_cast<int>(component.get_audio_type()), allocator);
+
+        //// Serialize properties
+        //comp_obj.AddMember("volume", component.get_volume(), allocator);
+        //comp_obj.AddMember("pitch", component.get_pitch(), allocator);
+        //comp_obj.AddMember("is_looping", component.get_is_looping(), allocator);
+        comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
+
+        // Serialize 3D audio properties
+        rapidjson::Value position(rapidjson::kArrayType);
+        Vec3D pos = component.get_position();
+        position.PushBack(pos.x, allocator);
+        position.PushBack(pos.y, allocator);
+        position.PushBack(pos.z, allocator);
+        comp_obj.AddMember("position", position, allocator);
+
+        comp_obj.AddMember("min_distance", component.get_min_distance(), allocator);
+        comp_obj.AddMember("max_distance", component.get_max_distance(), allocator);
+
+        return comp_obj;
+    }
+
+
+    bool Serialization_Manager::save_game_state(const char* filepath) {
+        LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
+        rapidjson::Document save_doc;
+        save_doc.SetObject();
+        rapidjson::Document::AllocatorType& allocator = save_doc.GetAllocator();
+
+        // Create array for objects (matching your scene format)
+        rapidjson::Value objects_array(rapidjson::kArrayType);
+
+        // Counter for generating unique names if needed
+        int unnamed_counter = 0;
+
+        // Iterate through all entities
+        for (const auto& entity_ptr : ECSM.get_entities()) {
+            EntityID entity_id = entity_ptr->get_id();
+
+            // Skip if this entity only has a GUI component
+            if (entity_ptr->get_component_mask().count() == 1 &&
+                ECSM.has_component<GUI_Component>(entity_id)) {
+                continue;
+            }
+
+            // Create object for this entity
+            rapidjson::Value entity_obj(rapidjson::kObjectType);
+
+            // Generate a name for the entity
+            std::string entity_name;
+            if (entity_id == 0) {
+                entity_name = "background";
+            }
+            else {
+                entity_name = "entity_" + std::to_string(unnamed_counter++);
+            }
+            entity_obj.AddMember("name", rapidjson::Value(entity_name.c_str(), allocator), allocator);
+
+            // Create object for components
+            rapidjson::Value components_obj(rapidjson::kObjectType);
+
+            // Add Transform2D component if present
+            if (ECSM.has_component<Transform2D>(entity_id)) {
+                const Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
+                components_obj.AddMember("Transform2D", serialize_transform_component(transform, allocator), allocator);
+            }
+
+            // Add Graphics_Component if present
+            if (ECSM.has_component<Graphics_Component>(entity_id)) {
+                const Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+                components_obj.AddMember("Graphics_Component", serialize_graphics_component(graphics, allocator), allocator);
+            }
+
+            // Add Collision_Component if present
+            if (ECSM.has_component<Collision_Component>(entity_id)) {
+                const Collision_Component& collision = ECSM.get_component<Collision_Component>(entity_id);
+                components_obj.AddMember("Collision_Component", serialize_collision_component(collision, allocator), allocator);
+            }
+
+            // Add Physics_Component if present
+            if (ECSM.has_component<Physics_Component>(entity_id)) {
+                const Physics_Component& physics = ECSM.get_component<Physics_Component>(entity_id);
+                components_obj.AddMember("Physics_Component", serialize_physics_component(physics, allocator), allocator);
+            }
+
+            // Add Velocity_Component if present
+            if (ECSM.has_component<Velocity_Component>(entity_id)) {
+                const Velocity_Component& velocity = ECSM.get_component<Velocity_Component>(entity_id);
+                components_obj.AddMember("Velocity_Component", serialize_velocity_component(velocity, allocator), allocator);
+            }
+
+            // Add Audio_Component if present
+            if (ECSM.has_component<Audio_Component>(entity_id)) {
+                const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
+                components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
+            }
+
+            // Only add entity to save file if it has components to save
+            if (components_obj.MemberCount() > 0) {
+                // Add components object to entity object
+                entity_obj.AddMember("components", components_obj, allocator);
+                // Add entity object to objects array
+                objects_array.PushBack(entity_obj, allocator);
+            }
+        }
+
+        // Add objects array to root object
+        save_doc.AddMember("objects", objects_array, allocator);
+
+        // Write to file
+        try {
+            std::ofstream ofs(filepath);
+            if (!ofs.is_open()) {
+                LM.write_log("Serialization_Manager::save_game_state(): Failed to open file for writing: %s", filepath);
+                return false;
+            }
+
+            rapidjson::StringBuffer strbuf;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
+            save_doc.Accept(writer);
+            ofs << strbuf.GetString();
+            ofs.close();
+
+            LM.write_log("Serialization_Manager::save_game_state(): Successfully saved game state to %s", filepath);
+            return true;
+        }
+        catch (const std::exception& e) {
+            LM.write_log("Serialization_Manager::save_game_state(): Error writing save file: %s", e.what());
+            return false;
+        }
     }
 
     /**
@@ -354,7 +648,7 @@ namespace lof {
      * @return Screen width as an unsigned integer.
      */
     unsigned int Serialization_Manager::get_scr_width() const {
-        LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
+        //LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
         return m_scr_width;
     }
 
@@ -364,7 +658,7 @@ namespace lof {
      * @return Screen height as an unsigned integer.
      */
     unsigned int Serialization_Manager::get_scr_height() const {
-        LM.write_log("Serialization_Manager::get_scr_height(): Returning SCR_HEIGHT: %u", m_scr_height);
+        //LM.write_log("Serialization_Manager::get_scr_height(): Returning SCR_HEIGHT: %u", m_scr_height);
         return m_scr_height;
     }
 

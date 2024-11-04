@@ -18,11 +18,12 @@
     <ClCompile Include="Manager\Input_Manager.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
-    <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="Utility\Path_Helper.cpp" />
+    <ClCompile Include="Utility\Vector3D.cpp" />
+    <ClCompile Include="System\GUI_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -44,20 +45,20 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
-    <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="Utility\Constant.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
+    <ClInclude Include="Utility\Vector3D.h" />
     <ClInclude Include="Utility\Type.h" />
+    <ClInclude Include="System\GUI_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
     <None Include="Data\square.msh" />
     <None Include="Data\scene1.scn" />
     <None Include="Data\triangle.msh" />
-    <None Include="Manager\ECS_Manager.tpp" />
     <None Include="Data\prefab.json" />
     <None Include="Data\models.msh" />
   </ItemGroup>
@@ -65,5 +66,10 @@
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
+    <Media Include="Data\Audio\audio_test1.wav" />
+    <Media Include="Data\Audio\audio_test2.wav" />
+    <Media Include="Data\Audio\Fx16_2.wav" />
+    <Media Include="Data\Audio\Fx28.wav" />
+    <Media Include="Data\Audio\Fx27.wav" />
   </ItemGroup>
 </Project>

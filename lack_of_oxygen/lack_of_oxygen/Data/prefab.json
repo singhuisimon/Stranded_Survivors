@@ -32,8 +32,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 102.4,
-          "height": 76.8
+          "width": 52.4,
+          "height": 56.8
         }
       }
     },
@@ -41,6 +41,7 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
           "orientation": [ 0.0, 30.0 ],
           "scale": [ 300.0, 100.0 ]
         },
@@ -70,6 +71,87 @@
         "Collision_Component": {
           "width": 300.0,
           "height": 100.0
+        }
+      }
+    },
+    "gui_container": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0, 0 ],
+          "orientation": [ 0, 0 ],
+          "scale": [ 500, 300 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 0.2, 0.2, 0.2 ],
+          "texture_name": "notex",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 1.0, 0.0, 0.0 ],
+            [ 0.0, 1.0, 0.0 ],
+            [ 0.0, 0.0, 1.0 ]
+          ]
+        },
+        "GUI_Component": {
+          "is_container": true,
+          "is_progress_bar": false,
+          "progress": 0.0,
+          "is_visible": true,
+          "relative_pos": [ 0, 0 ]
+        }
+      }
+    },
+    "gui_progress_bar": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0, 0 ],
+          "orientation": [ 0, 0 ],
+          "scale": [ 450, 40 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 0.2, 0.6, 1.0 ],
+          "texture_name": "notex",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 1.0, 0.0, 0.0 ],
+            [ 0.0, 1.0, 0.0 ],
+            [ 0.0, 0.0, 1.0 ]
+          ]
+        },
+        "GUI_Component": {
+          "is_container": false,
+          "is_progress_bar": true,
+          "progress": 0.0,
+          "is_visible": true,
+          "relative_pos": [ 0, 0 ]
+        }
+      }
+    },
+    "gui_image": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0, -100 ],
+          "orientation": [ 0, 0 ],
+          "scale": [ 64, 64 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "notex",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 1.0, 0.0, 0.0 ],
+            [ 0.0, 1.0, 0.0 ],
+            [ 0.0, 0.0, 1.0 ]
+          ]
+        },
+        "GUI_Component": {
+          "is_container": false,
+          "is_progress_bar": false,
+          "progress": 0.0,
+          "is_visible": true,
+          "relative_pos": [ 0, 0 ]
         }
       }
     }

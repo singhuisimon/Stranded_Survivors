@@ -22,7 +22,6 @@
     <ClCompile Include="Entity\Entity.cpp" />
     <ClCompile Include="Glad\glad.c" />
     <ClCompile Include="Main\Main.cpp" />
-    <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
@@ -33,6 +32,7 @@
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
+    <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
@@ -41,13 +41,13 @@
     <ClCompile Include="Utility\Path_Helper.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
+    <ClCompile Include="Utility\Vector3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="Main\Main.h" />
-    <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
@@ -58,6 +58,7 @@
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
+    <ClInclude Include="System\GUI_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
@@ -69,6 +70,7 @@
     <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Type.h" />
     <ClInclude Include="Utility\Vector2D.h" />
+    <ClInclude Include="Utility\Vector3D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />
@@ -77,9 +79,13 @@
     <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
-    <None Include="Manager\ECS_Manager.tpp" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="Data\Audio\audio_test1.wav" />
+    <Media Include="Data\Audio\audio_test2.wav" />
+    <Media Include="Data\Audio\Fx16_2.wav" />
+    <Media Include="Data\Audio\Fx27.wav" />
+    <Media Include="Data\Audio\Fx28.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -171,7 +177,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -193,7 +199,7 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

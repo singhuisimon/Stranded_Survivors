@@ -17,8 +17,12 @@
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
-#include "Audio_Manager.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Path_Helper.h"
+
+// Include systems
+#include "../System/GUI_System.h"  // Add this for GUI system access
+
 
 // Include iostream for console output
 #include <iostream>
@@ -110,20 +114,6 @@ namespace lof {
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
         }
-        // -------------------------- Audio Manager Start Up --------------------------
-        if (AM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
-            GFXM.shut_down();
-            IM.shut_down();
-            FPSM.shut_down();
-            SM.shut_down();
-            ECSM.shut_down();
-            LM.shut_down();
-            return -7;
-        }
-        else {
-            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() successful"); 
-        }
 
         m_is_started = true;
         LM.write_log("Game_Manager::start_up(): Game_Manager started");
@@ -138,7 +128,6 @@ namespace lof {
         }
 
         // Shut down managers in reverse order of startup
-        AM.shut_down();   // Audio_Manager
         GFXM.shut_down(); // Graphics_Manager
         IM.shut_down();   // Input_Manager
         FPSM.shut_down(); // FPS_Manager
@@ -210,21 +199,78 @@ namespace lof {
             }
         }
         c_key_was_pressed_last_frame = c_key_pressed;
-        
-        //Play Audio BGM
-        //check if key 0 is press if so play track1
-        if (IM.is_key_pressed(GLFW_KEY_0)) {
-            AM.play_bgm(TRACK1);
+
+        // Save game state when 'K' key is pressed
+        bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
+        if (k_key_pressed && !k_key_was_pressed_last_frame) {
+            // Generate a filename with timestamp
+            auto now = std::chrono::system_clock::now();
+            auto time = std::chrono::system_clock::to_time_t(now);
+            std::stringstream ss;
+            ss << "save_game_" << time << ".json";
+            std::string filename = ss.str();
+
+            // Replace illegal filename characters
+            std::replace(filename.begin(), filename.end(), ':', '_');
+            std::replace(filename.begin(), filename.end(), ' ', '_');
+
+            // Get save file path using Path_Helper
+            std::string save_path = Path_Helper::get_save_file_path(filename);
+
+            // Attempt to save the game
+            if (SM.save_game_state(save_path.c_str())) {
+                LM.write_log("Game_Manager::update(): Successfully saved game state to %s", save_path.c_str());
+                std::cout << "Game saved successfully to: " << filename << std::endl;
+            }
+            else {
+                LM.write_log("Game_Manager::update(): Failed to save game state to %s", save_path.c_str());
+                std::cout << "Failed to save game!" << std::endl;
+            }
         }
-        
-        //check if key 9 is press if so play track2
-        if (IM.is_key_pressed(GLFW_KEY_9)) {
-            AM.play_bgm(TRACK2);
+        k_key_was_pressed_last_frame = k_key_pressed;
+
+        // GUI System control
+        if (IM.is_key_pressed(GLFW_KEY_G)) {
+            // Find GUI System
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "GUI_System") {
+                    auto* gui_system = static_cast<GUI_System*>(system.get());
+                    if (gui_system) {
+                        // Toggle loading screen
+                        static bool loading_screen_visible = false;
+                        if (!loading_screen_visible) {
+                            loading_screen_visible = true;
+                            gui_system->show_loading_screen();
+                            LM.write_log("Game_Manager::update(): Showing loading screen");
+                        }
+                        else {
+                            loading_screen_visible = false;
+                            gui_system->hide_loading_screen();
+                            LM.write_log("Game_Manager::update(): Hiding loading screen");
+                        }
+                    }
+                    break;
+                }
+            }
         }
 
-        //check if key L is press if so stop music
-        if (IM.is_key_pressed(GLFW_KEY_L)) {
-            AM.stop_bgm();
+        // Test progress bar updates with H key
+        if (IM.is_key_pressed(GLFW_KEY_H)) {
+            static float test_progress = 0.0f;
+            test_progress += 0.1f;
+            if (test_progress > 1.0f) test_progress = 0.0f;
+
+            // Find GUI System and update progress
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "GUI_System") {
+                    auto* gui_system = static_cast<GUI_System*>(system.get());
+                    if (gui_system) {
+                        gui_system->set_progress(test_progress);
+                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
+                    }
+                    break;
+                }
+            }
         }
 
         // Getting delta time for Input Manager
@@ -244,12 +290,6 @@ namespace lof {
         // Update game world state
         ECSM.update(delta_time);
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
-
-        // Getting delta time for Audio Manager
-        AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-        // Update Audio Manager
-        AM.update();
-        AM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - AM.get_time());
 
         m_step_count++;
     }

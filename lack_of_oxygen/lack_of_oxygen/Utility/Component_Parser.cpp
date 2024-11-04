@@ -19,6 +19,7 @@
 
 // Include other necessary headers
 #include "../Utility/Matrix3x3.h"
+#include "../Utility/Path_Helper.h"
 
 namespace lof {
 
@@ -35,6 +36,16 @@ namespace lof {
                     const rapidjson::Value& pos = component_data["position"];
                     transform.position.x = pos[0].GetFloat();
                     transform.position.y = pos[1].GetFloat();
+                    transform.prev_position = transform.position;
+                }
+                if (component_data.HasMember("prev_position") && component_data["prev_position"].IsArray()) {
+                    const rapidjson::Value& prev_pos = component_data["prev_position"];
+                    transform.prev_position.x = prev_pos[0].GetFloat();
+                    transform.prev_position.y = prev_pos[1].GetFloat();
+                }
+                else {
+                    // Optional: Set a default value for prev_position if not provided
+                    transform.prev_position = transform.position; // Or Vec2D(0.0f, 0.0f) as appropriate
                 }
                 if (component_data.HasMember("prev_position") && component_data["prev_position"].IsArray()) {
                     const rapidjson::Value& pos = component_data["prev_position"];
@@ -106,17 +117,17 @@ namespace lof {
                     physics_component.is_static = component_data["is_static"].GetBool();
                 }
 
-                if (component_data.HasMember("is_moveable") && component_data["is_moveable"].IsBool()) {
-                    physics_component.is_moveable = component_data["is_moveable"].GetBool();
-                }
+                //if (component_data.hasmember("is_moveable") && component_data["is_moveable"].isbool()) {
+                //    physics_component.is_moveable = component_data["is_moveable"].getbool();
+                //}
 
                 if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
                     physics_component.is_grounded = component_data["is_grounded"].GetBool();
                 }
 
-                if (component_data.HasMember("is_jumping") && component_data["is_jumping"].IsBool()) {
-                    physics_component.is_jumping = component_data["is_jumping"].GetBool();
-                }
+                //if (component_data.hasmember("is_jumping") && component_data["is_jumping"].isbool()) {
+                //    physics_component.is_jumping = component_data["is_jumping"].getbool();
+                //}
 
                 if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
                     physics_component.jump_force = component_data["jump_force"].GetFloat();
@@ -264,6 +275,92 @@ namespace lof {
                 // Add component to entity
                 ecs_manager.add_component<Collision_Component>(entity, collision_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
+            }
+            // ------------------------------------- Audio_Component ---------------------------------------------
+            else if (component_name == "Audio_Component") {
+                // Parse Audio_Component
+                Audio_Component audio_component;
+
+                if (component_data.HasMember("sounds") && component_data["sounds"].IsArray()) {
+                    const auto& sounds_array = component_data["sounds"];
+
+                    for (const auto& sound : sounds_array.GetArray()) {
+                        if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
+                            std::string key = sound["key"].GetString();
+                            std::string filepath = Path_Helper::get_executable_directory() + sound["filepath"].GetString();
+                            
+                            PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : NONE;
+                            AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
+                            float volume = sound.HasMember("volume") && sound["volume"].IsFloat() ? sound["volume"].GetFloat() : 1.0f;
+                            float pitch = sound.HasMember("pitch") && sound["pitch"].IsFloat() ? sound["pitch"].GetFloat() : 1.0f;
+                            bool islooping = sound.HasMember("islooping") && sound["islooping"].IsBool() ? sound["islooping"].GetBool() : false;
+
+                            audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
+                        }
+                    }
+                }
+
+               /* if (component_data.HasMember("sounds") && component_data["sounds"].IsArray()) {
+                    const auto& sounds = component_data["sounds"];
+                    for (const auto& sound : sounds.GetArray()) {
+                        if (sound.HasMember("key") && sound.HasMember("filepath")) {
+                            std::string key = sound["key"].GetString();
+                            std::string filepath = sound["filepath"].GetString();
+
+                            PlayState play_state = sound.HasMember("audio_state") ? static_cast<PlayState>(sound["audio_state"].GetInt()) : STOPPED;
+                            AudioType audio_type = sound.HasMember("audio_type") ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
+                            float volume = sound.HasMember("volume") ? sound["volume"].GetFloat() : 1.0f;
+                            float pitch = sound.HasMember("pitch") ? sound["pitch"].GetFloat() : 1.0f;
+                            bool islooping = sound.HasMember("islooping") ? sound["islooping"].GetBool() : false;
+
+                            audio_component.set_filename(key, filepath);
+                            audio_component.set_audio_state(key, play_state);
+                            audio_component.set_audio_type(key, audio_type);
+                            audio_component.set_volume(key, volume);
+                            audio_component.set_pitch(key, pitch);
+                            audio_component.set_loop(key, islooping);
+
+                            LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
+                        }
+                    }
+                }*/
+
+                // Add component to entity
+                ecs_manager.add_component<Audio_Component>(entity, audio_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Audio_Component to entity ID %u.", entity);
+            }
+            // ------------------------------------ GUI_Component -------------------------------------------
+            else if (component_name == "GUI_Component") {
+                // Parse GUI_Component
+                GUI_Component gui_component;
+
+                if (component_data.HasMember("is_container") && component_data["is_container"].IsBool()) {
+                    gui_component.is_container = component_data["is_container"].GetBool();
+                }
+
+                if (component_data.HasMember("is_progress_bar") && component_data["is_progress_bar"].IsBool()) {
+                    gui_component.is_progress_bar = component_data["is_progress_bar"].GetBool();
+                }
+
+                if (component_data.HasMember("progress") && component_data["progress"].IsNumber()) {
+                    gui_component.progress = component_data["progress"].GetFloat();
+                }
+
+                if (component_data.HasMember("is_visible") && component_data["is_visible"].IsBool()) {
+                    gui_component.is_visible = component_data["is_visible"].GetBool();
+                }
+
+                if (component_data.HasMember("relative_pos") && component_data["relative_pos"].IsArray()) {
+                    const rapidjson::Value& pos = component_data["relative_pos"];
+                    gui_component.relative_pos.x = pos[0].GetFloat();
+                    gui_component.relative_pos.y = pos[1].GetFloat();
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<GUI_Component>(entity, gui_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
             }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {

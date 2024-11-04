@@ -17,6 +17,9 @@
 // Include base headers
 #include "Manager.h"
 
+// Include component headers
+#include "../Component/Component.h"
+
 // Include RapidJSON headers
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
@@ -60,7 +63,21 @@ namespace lof {
             rapidjson::Value& destination,
             rapidjson::Document::AllocatorType& allocator);
 
+        /**
+         * @brief Serializes a component into a RapidJSON Value object for saving to file.
+         * @param component The component to serialize
+         * @param allocator RapidJSON allocator for string/array allocation
+         * @return rapidjson::Value A JSON object containing the serialized component data
+         */
+        rapidjson::Value serialize_transform_component(const Transform2D& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_graphics_component(const Graphics_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_collision_component(const Collision_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_physics_component(const Physics_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_velocity_component(const Velocity_Component& component, rapidjson::Document::AllocatorType& allocator);
+        rapidjson::Value serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator);
+
     public:
+
         /**
          * @brief Get the singleton instance of Serialization_Manager.
          * @return Reference to the singleton instance.
@@ -71,15 +88,7 @@ namespace lof {
         Serialization_Manager(const Serialization_Manager&) = delete;
         Serialization_Manager& operator=(const Serialization_Manager&) = delete;
 
-        /**
-         * @brief Start up the Serialization_Manager by loading configuration files.
-         * @return 0 on success, negative value on failure.
-         */
         int start_up() override;
-
-        /**
-         * @brief Shut down the Serialization_Manager.
-         */
         void shut_down() override;
 
         /**
@@ -89,24 +98,10 @@ namespace lof {
          */
         bool load_scene(const char* filename);
 
-        /**
-         * @brief Get the screen width from the configuration.
-         * @return Screen width.
-         */
+        // Getters for configuration data
         unsigned int get_scr_width() const;
-
-        /**
-         * @brief Get the screen height from the configuration.
-         * @return Screen height.
-         */
         unsigned int get_scr_height() const;
-
-        /**
-         * @brief Get the FPS display interval from the configuration.
-         * @return FPS display interval.
-         */
         float get_fps_display_interval() const;
-
 
         /**
          * @brief Retrieve a prefab configuration by its name.
@@ -114,6 +109,13 @@ namespace lof {
          * @return A constant pointer to the prefab's JSON value if found; otherwise, nullptr.
          */
         const rapidjson::Value* get_prefab(const std::string& prefab_name) const;
+
+        /**
+         * @brief Saves the current game state to a JSON file in scene format.
+         * @param filepath The path where the save file should be created.
+         * @return True if saving was successful, false otherwise.
+         */
+        bool save_game_state(const char* filepath);
     };
 
 } // namespace lof

@@ -36,7 +36,6 @@ namespace lof {
     * @brief Represents a pair of entities that have collided, along with overlap information.
     */
 
-
     struct CollisionPair {
         EntityID entity1;
         EntityID entity2;
@@ -49,7 +48,6 @@ namespace lof {
      * @struct AABB
      * @brief Represents axis-aligned bounding boxes for collision detection.
      */
-
 
 
     struct AABB {
@@ -73,7 +71,7 @@ namespace lof {
     };
 
 
-
+    
     /**
      * @class Collision_System
      * @brief Handles collision detection and resolution between entities.
@@ -91,7 +89,6 @@ namespace lof {
          * @param delta_time Delta time since the last update.
          */
         void update(float delta_time) override;
-
 
 
         /**
@@ -117,7 +114,18 @@ namespace lof {
             const Vec2D& vel1,
             const AABB& aabb2,
             const Vec2D& vel2,
-            float& firstTimeOfCollision);
+            float& firstTimeOfCollision, 
+            float delta_time);
+
+        //static Collision_System& get_instance() {
+        //    static Collision_System instance; // Guaranteed to be destroyed
+        //    return instance; // Instantiated on first use
+        //}
+       // const std::vector<CollisionPair>& get_collisions() const;
+
+    private:
+        
+        //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
         //static Collision_System& get_instance() {
         //    static Collision_System instance; // Guaranteed to be destroyed

@@ -20,6 +20,10 @@
 #include <glm-0.9.9.8/glm/glm.hpp>
 #include <glm-0.9.9.8/glm/gtc/type_ptr.hpp>
 
+// Include FMOD headers
+#include "fmod.hpp"
+#include "fmod_studio.hpp"
+
 namespace lof {
 
 	// ------------------------------ Serialization_Manager.cpp --------------------------------
@@ -73,6 +77,40 @@ namespace lof {
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
 	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
 
+	//Audio component constants
+	enum AudioType {
+		BGM = 0,    //background music
+		SFX = 1    //Sound Effect
+	};
+
+	enum PlayState {
+		//MUTED,    //Audio is to be played but not hear (essentially volume is 0.)
+		PLAYING = 0,    //Audio is to be played
+		STOPPED = 1,    //Audio is to be stopped
+		PAUSED = 2,      //Audio is to be paused
+		RESUMED = 3,		//Audio is to be resumed
+		NONE = 4
+	};
+
+	//enum FileFormat {
+	//	BANK = 0,
+	//	WAV = 1,
+	//	OGG = 2
+	//};
+
+	//enum AudioCommand {
+	//	NONE = 0,
+	//	PLAYSOUND,
+	//	STOPSOUND,
+	//	PAUSEDSOUND,
+	//	RESUMESOUND
+	//	/*,
+	//	PLAYEVENT,
+	//	STOPEVENT,
+	//	PAUSEEVENT,
+	//	RESUMEEVENT*/
+	//};
+
 	// ----------------------------- Movement_System.cpp -------------------------------------------
     //Movement_System constants
 
@@ -80,7 +118,6 @@ namespace lof {
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
 	// ------------------------------ Audio_Manager.cpp --------------------------------
-
 
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
@@ -100,6 +137,13 @@ namespace lof {
 
 	// ------------------------------ Graphics_System.cpp --------------------------------
 
+
+	// ------------------------------ Collision_System.cpp --------------------------------
+	constexpr const float         BOUNDING_RECT_SIZE = 1.0f;
+	constexpr const unsigned int	COLLISION_LEFT = 0x00000001;	//0001
+	constexpr unsigned int	COLLISION_RIGHT = 0x00000002;	//0010
+	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
+	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
 
 } // namespace lof
 

@@ -73,6 +73,7 @@ namespace lof {
             //std::cout << *it1 << "\n";
 
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
+          
 
 
             // Skip if entity is static
@@ -87,7 +88,6 @@ namespace lof {
             // Create AABB for object 1
             AABB aabb1 = AABB::from_transform(transform1, collision1);
             //std::cout << "Entity " << entity_ID1 << " is_static: " << physic1.is_static << "\n";
-
 
             bool is_grounded = false; // Track if entity is grounded
             // Check for collisions with other entities
@@ -178,6 +178,8 @@ namespace lof {
 
                 // Create AABB for object 2
                 AABB aabb2 = AABB::from_transform(transform2, collision2);
+                
+
 
                 // Check for collision
                 float collision_time = delta_time;
@@ -201,24 +203,170 @@ namespace lof {
                     std::cout << "Overlap: x=" << overlap.x << ", y=" << overlap.y << "\n";
                 }
             }
+            physic1.is_grounded = is_grounded;
+            if (!is_grounded) {
+                physic1.gravity.y = DEFAULT_GRAVITY; // Reset gravity if not grounded
+            }
         }
     }
 #endif
+
+ 
 
     bool Collision_System::collision_intersection_rect_rect(const AABB& aabb1,
         const Vec2D& vel1,
         const AABB& aabb2,
         const Vec2D& vel2,
-        float& firstTimeOfCollision) {
+        float& firstTimeOfCollision,
+        float delta_time) {
         // Check for AABB intersection
+        // Check for AABB intersection
+        //check for A.max < B.min or A.min > B.min for x axis & y axis
         if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x ||
-            aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y) {
-            return false; // No intersection
+            aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y)
+        {
+            return false; //no intersection
         }
 
-        // Additional collision detection logic can be implemented here if needed
+        float Vb_x = vel2.x - vel1.x;; //initialize Vb for x axis 
+        float Vb_y = vel2.y - vel1.y;; //initialize Vb for y axis
 
-        return true; // The rectangles intersect
+        float dFirst_x = aabb1.max.x - aabb2.min.x;  //initialize for dFirst for x-axis
+        float dFirst_y = aabb1.max.y - aabb2.min.y;; // initialize for dFrist for y axis
+        float dLast_x = aabb1.min.x - aabb2.max.x;; //initialize for dLast for x axis
+        float dLast_y = aabb1.min.y - aabb2.max.y;; //initialize for dLast for y axis
+
+
+        float tFirst = firstTimeOfCollision = 0.0f; //Initialise t first
+        float tLast = delta_time; //initialize tLast and assume 1 as the time step (g_dt)
+
+        //for x-axis
+        if (Vb_x < 0)
+        {
+            //case 1 for x-axis
+            if (aabb1.min.x > aabb2.max.x)
+            {
+                return false;
+            }
+            //case 4 for x-axis
+            if (aabb1.max.x < aabb2.min.x)
+            {
+                if (tFirst < dFirst_x / Vb_x)
+                {
+                    tFirst = dFirst_x / Vb_x;
+                }
+            }
+
+            if (aabb1.min.x < aabb2.max.x)
+            {
+                if (tLast > dLast_x / Vb_x)
+                {
+                    tLast = dLast_x / Vb_x;
+                }
+            }
+        }
+        else if (Vb_x > 0)
+        {
+            //case 2 for x_axis
+            if (aabb1.min.x > aabb2.max.x)
+            {
+                if (tFirst < dLast_x / Vb_x)
+                {
+                    tFirst = dLast_x / Vb_x;
+                }
+            }
+            if (aabb1.max.x > aabb2.min.x)
+            {
+                if (tLast > dFirst_x / Vb_x)
+                {
+                    tLast = dFirst_x / Vb_x;
+                }
+            }
+
+            //case 3
+            if (aabb1.max.x < aabb2.min.x)
+            {
+                return false;
+            }
+
+        }
+        else if (Vb_x == 0) {
+            //case 5;
+            if (aabb1.max.x < aabb2.min.x)
+            {
+                return false;
+            }
+            else if (aabb1.min.x > aabb2.max.x)
+            {
+                return false;
+            }
+        }
+
+        //for y-axis
+        if (Vb_y < 0)
+        {
+            //case 1 for x-axis
+            if (aabb1.min.y > aabb2.max.y)
+            {
+                return 0;
+            }
+            //case 4 for x-axis
+            if (aabb1.max.y < aabb2.min.y)
+            {
+                if (tFirst < dFirst_y / Vb_y)
+                {
+                    tFirst = dFirst_y / Vb_y;
+                }
+            }
+            if (aabb1.min.y < aabb2.max.y)
+            {
+                if (tLast > dLast_y / Vb_y)
+                {
+                    tLast = dLast_y / Vb_y;
+                }
+            }
+        }
+        else if (Vb_y > 0)
+        {
+            //case 2 for x_axis
+            if (aabb1.min.y > aabb2.max.y)
+            {
+                if (tFirst < dLast_y / Vb_y)
+                {
+                    tFirst = dLast_y / Vb_y;
+                }
+            }
+            if (aabb1.max.y > aabb2.min.y)
+            {
+                if (tLast > dFirst_y / Vb_y)
+                {
+                    tLast = dFirst_y / Vb_y;
+                }
+            }
+            //case 3
+            if (aabb1.max.y < aabb2.min.y)
+            {
+                return false;
+            }
+        }
+        else if (Vb_y == 0) {
+            //case 5;
+            if (aabb1.max.y < aabb2.min.y)
+            {
+                return false;
+            }
+            else if (aabb1.min.y > aabb2.max.y)
+            {
+                return false;
+            }
+        }
+        //case 6; 
+        if (tFirst > tLast)
+        {
+            return false;
+        }
+
+        return true; //the rectangle intersect
 
     }
 
