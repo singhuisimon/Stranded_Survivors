@@ -182,18 +182,18 @@ int main(void) {
 
 
         // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
-        if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
+        //if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
             system_performance(GM.get_time(), IM.get_time(), IM.get_type());
             system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
             //system_performance(GM.get_time(), AM.get_time(), AM.get_type());
             system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
-            std::cout << "In ECS Manager...\n";
+            //std::cout << "In ECS Manager...\n";
             for (auto& system : ECSM.get_systems()) {
                 system_performance(GM.get_time(), system->get_time(), system->get_type());
             }
 
-            std::cout << std::endl;
-        }
+            //std::cout << std::endl;
+        //}
 
         if (level_editor_mode) {
   

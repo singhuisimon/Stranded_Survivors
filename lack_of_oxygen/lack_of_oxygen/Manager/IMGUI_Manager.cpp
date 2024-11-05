@@ -352,45 +352,53 @@ namespace lof {
             }
         }
 
-        //Audio Component
-        if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
-            Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
-            if (ImGui::CollapsingHeader("Audio")) {
+        //Animation Component
+        if (entities[selected_object_index]->has_component(ecs.get_component_id<Animation_Component>())) {
+            Animation_Component& animation = ecs.get_component<Animation_Component>(entities[selected_object_index].get()->get_id());
+            if (ImGui::CollapsingHeader("Animation")) {
 
-                //iterate sounds
-                //auto& file = audio.get_sounds();
+                //need to fix! - first still buggy!!!!
+                auto& animation_list = animation.animations;
+                for (auto it = animation_list.begin(); it != animation_list.end(); ++it) {
+                    
+                    char Buffer[128];
+                    strncpy_s(Buffer, it->second.c_str(), sizeof(Buffer));//s is safer
+                    Buffer[sizeof(Buffer) - 1] = '\0';
+                    
+                    //needs to be consistent
+                    if (ImGui::InputText(it->first.c_str(), Buffer, sizeof(Buffer))) {
+                        it->second = Buffer;
+                    }
+          
+                }
 
-                //auto& file = audio.get_filename();
+                //find a way for this not to be less than 1
+                auto& current_animation_index = animation.curr_animation_idx;
 
-                //auto const & state = audio.get_audio_state();
-
-                //auto const & state = audio.get_audio_type();
-
-                //auto const& volume = audio.get_volume();
-
-                //auto const& pitch = audio.get_pitch();
-
-                //auto const& is_looping = audio.get_is_looping();
-                //std::string a_label = "is_audio: " + std::string(is_audio_on ? "On" : "Off");
-                //if (button_toggle(a_label, &is_audio_on)) {
-                //    //audio.set_is_looping()  = !audio.get_is_looping(); //= !is_looping;
+                /*if (current_animation_index <= 0) {
+                    current_animation_index = 0;
+                    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                }*/
+                
+                if (ImGui::InputInt("start animation index", reinterpret_cast<int*>(&current_animation_index))) {
+                    if (current_animation_index < 0) {
+                        current_animation_index = 0;
+                    }
+                }
+                //if (current_animation_index == 0) {
+                //    ImGui::PopItemFlag(); // Re-enable the widget
                 //}
 
-                /*ImGui::InputFloat("Width", &width);
+                //somehow ok w less than 1
+                auto& start_animation_index = animation.start_animation_idx;
+                ImGui::InputInt("start animation index", reinterpret_cast<int*>(&start_animation_index));
 
-                auto& height = collision.height;
-                ImGui::InputFloat("Height", &height);*/
             }
         }
 
         if (ImGui::Button("Save Changes")) {
 
-            //std::string saved_file = "save_game_1730650698.json";
-            //std::string saved_file = "save_game_1730645173.json";
-
             std::string scene_path = Path_Helper::get_scene_path();
-            //std::string scene_path = Path_Helper::get_scene_path();
-            //std::string path_file = Path_Helper::get_save_file_path(saved_file);
             if (SM.save_game_state(scene_path.c_str())) {
                 LM.write_log("IMGUI_Manager::update(): Successfully saved game state to %s", Path_Helper::get_scene_path().c_str());
                 std::cout << "\n\n\n\nGame saved successfully to: " << Path_Helper::get_scene_path() << "\n\n\n" << std::endl;
