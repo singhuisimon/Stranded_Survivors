@@ -17,6 +17,7 @@
 #include <memory>
 #include <variant>
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 
 // Include Utility headers
@@ -180,6 +181,7 @@ namespace lof {
             inv_mass = (m > 0.0f) ? 1.0f / m : 0.0f;
         }
     };
+
     /**
     * @class Graphics_Component
     * @brief Component representing an entity's graphical data.
@@ -188,25 +190,57 @@ namespace lof {
     public:
         std::string model_name;
         glm::vec3 color;
-        std::string texture_name; 
+        std::string texture_name;
         GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
 
         // Default constructor
         Graphics_Component()
-            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), texture_name(DEFAULT_TEXTURE_NAME), shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
+            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), texture_name(DEFAULT_TEXTURE_NAME), 
+              shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
 
         /**
          * @brief Constructor for Graphics_Component.
+         * @param model_name Name of model.
+         * @param color Color of model.
+         * @param texture_name Name of texture.
+         * @param shd_ref Reference to shader.
          * @param mdl_to_ndc_xform Model-to-world-to-NDC transformation.
-         * @param mdl_ref Reference to model
-         * @param shd_ref Reference to shader
          */
 
-        Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader,glm::mat3 xform) : 
-                           model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
+        Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader, glm::mat3 xform) :
+            model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
 
-    }; 
+    };
+
+    /**
+    * @class Animation_Component
+    * @brief Component representing an entity's graphical data.
+    */
+    class Animation_Component : public Component {
+    public:
+        std::map<std::string, std::string> animations; 
+        unsigned int curr_animation_idx;
+        unsigned int start_animation_idx;
+
+        // Default constructor
+        Animation_Component()
+            : curr_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)), start_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)) {
+            animations.insert(std::make_pair(DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME));
+        }
+
+        /**
+         * @brief Constructor for Graphics_Component.
+         * @param animations Collection of animations usable by entity.
+         * @param curr_animation_idx Index of the current animation.
+         * @param start_animation_idx Index of the starting animation.
+         */
+
+        Animation_Component(std::pair<std::string, std::string> animation, int curr_animation, int start_animation) :
+            curr_animation_idx(curr_animation), start_animation_idx(start_animation) {
+            animations.insert(animation);
+        }
+    };
 
     /**
     * @class Collision_Component

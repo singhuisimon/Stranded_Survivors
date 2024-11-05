@@ -554,6 +554,34 @@ namespace lof {
         return comp_obj;
     }
 
+    rapidjson::Value Serialization_Manager::serialize_animation_component(const Animation_Component& component, rapidjson::Document::AllocatorType& allocator) { 
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        // Map in scene file format
+        rapidjson::Value map(rapidjson::kArrayType);    
+        auto begin = component.animations.begin();
+        int cnt{ 0 };
+        while(begin != component.animations.end()) {
+            std::string animation_index = begin->first; 
+            std::string animation_name = begin->second;
+            const char* index = (animation_index.c_str());
+            
+            rapidjson::Value index_str;
+            index_str = rapidjson::StringRef(index);
+            rapidjson::Value animation(rapidjson::kArrayType);
+            animation.AddMember(index_str, rapidjson::Value(animation_name.c_str(), allocator), allocator); 
+            map.PushBack(animation, allocator);
+            begin++;
+            cnt++;
+        }
+        comp_obj.AddMember("animations", map, allocator); 
+
+        comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator); 
+        comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator); 
+
+        return comp_obj;
+    }
+
     bool Serialization_Manager::save_game_state(const char* filepath) {
         LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
         rapidjson::Document save_doc;
@@ -626,6 +654,12 @@ namespace lof {
             if (ECSM.has_component<Audio_Component>(entity_id)) {
                 const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
                 components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
+            }
+
+            // Add Animation_Component if present
+            if (ECSM.has_component<Animation_Component>(entity_id)) {
+                const Animation_Component& animation = ECSM.get_component<Animation_Component>(entity_id);
+                components_obj.AddMember("Animation_Component", serialize_animation_component(animation, allocator), allocator);
             }
 
             // Only add entity to save file if it has components to save

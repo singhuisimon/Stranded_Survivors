@@ -300,6 +300,53 @@ namespace lof {
                 ecs_manager.add_component<GUI_Component>(entity, gui_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Animation_Component -------------------------------------------
+            else if (component_name == "Animation_Component") {
+                // Parse Animation_Component
+                Animation_Component animation_component;
+
+                if (component_data.HasMember("animations") && component_data["animations"].IsArray()) {
+                    const rapidjson::Value& map = component_data["animations"];
+
+                    if (map.Size() > 0) {
+                        std::map<std::string, std::string> animation_map;
+                        for (rapidjson::SizeType i = 0; i < map.Size(); ++i) {
+                            const rapidjson::Value& row = map[i];
+                            if (row.IsArray() && row.Size() == 2) {
+                                if (row[0].IsString() && row[1].IsString()) {
+                                    animation_map.insert({ row[0].GetString(), row[1].GetString() });
+                                }
+                            }
+                        }
+
+                        animation_component.animations = animation_map;
+                    }
+                    else {
+                        animation_component.animations = std::map<std::string, std::string>{ {DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME} }; // Default value 
+                    }
+                }
+                else {
+                    animation_component.animations = std::map<std::string, std::string>{ {DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME} }; // Default value
+                }
+
+                if (component_data.HasMember("curr_animation_idx") && component_data["curr_animation_idx"].IsUint()) {
+                    animation_component.curr_animation_idx = component_data["curr_animation_idx"].GetUint();
+                }
+                else {
+                    animation_component.curr_animation_idx = std::stoi(DEFAULT_ANIMATION_IDX); // Default value
+                }
+
+                if (component_data.HasMember("start_animation_idx") && component_data["start_animation_idx"].IsUint()) {
+                    animation_component.start_animation_idx = component_data["start_animation_idx"].GetUint();
+                }
+                else {
+                    animation_component.start_animation_idx = std::stoi(DEFAULT_ANIMATION_IDX); // Default value
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<Animation_Component>(entity, animation_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Animation_Component to entity ID %u.", entity);
+                }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
                 LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);

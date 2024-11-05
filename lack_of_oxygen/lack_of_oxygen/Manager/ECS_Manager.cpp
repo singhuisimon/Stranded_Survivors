@@ -21,6 +21,7 @@
 #include "../System/Collision_System.h"
 #include "../System/GUI_System.h"
 #include "../System/Audio_System.h"
+#include "../System/Animation_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -84,6 +85,9 @@ namespace lof {
             register_component<GUI_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'GUI_Component'.");
 
+            register_component<Animation_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Animation_Component'.");
+
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
@@ -101,6 +105,9 @@ namespace lof {
 
             add_system(std::make_unique<Audio_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
+
+            add_system(std::make_unique<Animation_System>()); 
+            LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");

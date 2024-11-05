@@ -72,10 +72,16 @@ namespace lof {
 	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
 	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
 	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
+
+	// Graphics component constants
 	constexpr const char* DEFAULT_MODEL_NAME = "square";
 	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
-	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
+	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) }; 
+
+	// Animation component constants
+	constexpr const char* DEFAULT_ANIMATION_IDX = "0";
+	constexpr const char* DEFAULT_ANIMATION_NAME = "NoAnimation";
 
 	//Audio component constants
 	enum AudioType {
@@ -122,21 +128,25 @@ namespace lof {
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
 
+	// ------------------------------ Graphics_Manager.cpp -----------------------------
+	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;
+	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
+
 	// ------------------------------ Render_System.cpp --------------------------------
-	// Graphics Component constants
-	//constexpr GLfloat DEFAULT_WORLD_RANGE = 3000.0f;
+	// Drawing constants
 	constexpr GLfloat DEFAULT_ROTATION = 90.0f;
 	constexpr GLfloat DEFAULT_LINE_WIDTH = 5.0f;
 	constexpr GLfloat DEFAULT_POINT_SIZE = 5.0f;
-	constexpr const char* DEFAULT_TEXTURE_NAME = "notex";
+	constexpr const char* DEFAULT_TEXTURE_NAME = "NoTexture";
 	
 	// Debugging constants
 	constexpr float DEFAULT_SCALE_CHANGE = 100.0f;
 	constexpr GLfloat DEFAULT_AABB_WIDTH = 2.0f;
 	constexpr GLfloat DEFAULT_VELOCITY_LINE_LENGTH = 1.5f;
 
-	// ------------------------------ Graphics_System.cpp --------------------------------
-
+	// ------------------------------ Animation_System.cpp --------------------------------
+	constexpr float DEFAULT_FRAME_TIME_ELAPSED = 0.0f;
+	constexpr float DEFAULT_Y_OFFSET = 1.0f;
 
 	// ------------------------------ Collision_System.cpp --------------------------------
 	constexpr const float         BOUNDING_RECT_SIZE = 1.0f;
@@ -144,6 +154,7 @@ namespace lof {
 	constexpr unsigned int	COLLISION_RIGHT = 0x00000002;	//0010
 	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
 	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
+
 
 } // namespace lof
 
