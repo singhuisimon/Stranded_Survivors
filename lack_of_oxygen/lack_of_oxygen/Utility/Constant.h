@@ -132,6 +132,11 @@ namespace lof {
 	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;
 	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
 
+	// Camera
+	constexpr float DEFAULT_CAMERA_SPEED = 1000.0f;
+	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
+	constexpr float DEFAULT_ORIENTATION = 0.0f;
+
 	// ------------------------------ Render_System.cpp --------------------------------
 	// Drawing constants
 	constexpr GLfloat DEFAULT_ROTATION = 90.0f;

@@ -29,88 +29,146 @@ namespace lof {
     // Updates the model-to-world-to-NDC transformation matrix of the entity per frame.
     void Render_System::update(float delta_time) {
 
+        // Get screen width and height
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width()); 
+        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height()); 
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
+            // Access player's ID
+            EntityID player_id = ECSM.find_entity_by_name("player_5");
+
             if (entity_id != 0) { // Background object unaffected
+
 
                 // Scaling update when up or down arrow key pressed
                 GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
 
                 // Check if the entity has Collision_Component
                 if (ECSM.has_component<Collision_Component>(entity_id)) {
-                    auto& collision = ECSM.get_component<Collision_Component>(entity_id);
 
-                    if (IM.is_key_held(GLFW_KEY_UP)) {
-                        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
-                        transform.scale.x += scale_change;
-                        transform.scale.y += scale_change;
-                        collision.width += scale_change;
-                        collision.height += scale_change;
-                    }
-                    else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
-                        if (transform.scale.x > 0.0f) {
-                            transform.scale.x -= scale_change;
-                            collision.width -= scale_change;
+
+                    if (entity_id == player_id) { // Uncomment to allow all objects to scale and rotate
+
+                        auto& collision = ECSM.get_component<Collision_Component>(entity_id);
+
+                        if (IM.is_key_held(GLFW_KEY_UP)) {
+                            LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
+                            transform.scale.x += scale_change;
+                            transform.scale.y += scale_change;
+                            collision.width += scale_change;
+                            collision.height += scale_change;
                         }
-                        else {
-                            transform.scale.x = 0.0f;
-                            collision.width = 0.0f;
+                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                            LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
+                            if (transform.scale.x > 0.0f) {
+                                transform.scale.x -= scale_change;
+                                collision.width -= scale_change;
+                            }
+                            else {
+                                transform.scale.x = 0.0f;
+                                collision.width = 0.0f;
+                            }
+
+                            if (transform.scale.y > 0.0f) {
+                                transform.scale.y -= scale_change;
+                                collision.height -= scale_change;
+                            }
+                            else {
+                                transform.scale.y = 0.0f;
+                                collision.height = 0.0f;
+                            }
                         }
 
-                        if (transform.scale.y > 0.0f) {
-                            transform.scale.y -= scale_change;
-                            collision.height -= scale_change;
+                        // Rotation update when left or right arrow key pressed
+                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                            transform.orientation.x += rot_change;
+                            LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
                         }
-                        else {
-                            transform.scale.y = 0.0f;
-                            collision.height = 0.0f;
+                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                            transform.orientation.x -= rot_change;
+                            LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
                         }
-                    }
+
+                    } // Uncomment to allow all objects to scale and rotate
                 }
 
-                // Rotation update when left or right arrow key pressed
-                if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                    transform.orientation.x += rot_change;
-                    LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
+            }
+
+            // Update camera bounded to player
+            auto& camera = GFXM.get_camera();
+
+            if (entity_id == player_id && camera.is_free_cam == GL_FALSE) {
+
+                // Update world-to-camera view transformation matrix
+                camera.pos_y = transform.position.y; 
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               -1, -transform.position.y, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
+                                                       0, 1.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+            } else if (entity_id == player_id && camera.is_free_cam == GL_TRUE) {
+
+                // Movement update when keypad 8 or 2 pressed
+                if (IM.is_key_held(GLFW_KEY_KP_8)) {
+                    camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                    LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
                 }
-                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                    transform.orientation.x -= rot_change;
-                    LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                else if (IM.is_key_held(GLFW_KEY_KP_2)) {
+                    camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                    LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
                 }
+
+                // Update world-to-camera view transformation matrix
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               1, -camera.pos_y, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
+                                                       0, 1.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform; 
             }
 
             // Compute object scale matrix
             glm::mat3 scale_mat{ transform.scale.x, 0, 0,
-                                 0, transform.scale.y, 0,
-                                 0, 0, 1 };
+                                    0, transform.scale.y, 0,
+                                    0, 0, 1 };
 
             // Compute current orientation of object
             GLfloat rad_disp = glm::radians(transform.orientation.x);
 
             // Compute object rotational matrix 
             glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
-                               -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
+                                -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
                                 0,                   0,                  1 };
 
             // Compute object translation matrix
             glm::mat3 trans_mat{ 1, 0, 0,
-                                 0, 1, 0,
-                                 transform.position.x, transform.position.y, 1 };
+                                    0, 1, 0,
+                                    transform.position.x, transform.position.y, 1 };
 
             // Compute world scale matrix
-            glm::mat3 world_scale{ 1.0f / SM.get_scr_width(), 0, 0,
-                                   0, 1.0f / SM.get_scr_height(), 0,
-                                   0, 0, 1 };
+            glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
+                                    0, 1.0f / screen_height, 0,
+                                    0, 0, 1 };
 
-            // Compute model-to-world-to-NDC transformation matrix and store it in the graphics component
-            graphics.mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
+            graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
         }
 
         // Set up for the drawing of objects
@@ -140,18 +198,23 @@ namespace lof {
     // Renders the entity onto the window based on the graphics components
     void Render_System::draw() {
 
+        // Get screen width and height
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width()); 
+        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height()); 
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
-            // Get shaders, models, and textures from the Graphics Manager
+
+            // Get shaders, models, textures, animation, and camera from the Graphics Manager
             auto& shaders = GFXM.get_shader_program_storage();
             auto& models = GFXM.get_model_storage();
             auto& textures = GFXM.get_texture_storage();
-            // FOR ANIMATION
             auto& animations = GFXM.get_animation_storage();
+            auto& camera = GFXM.get_camera(); 
 
             // Start the shader program that the entity will use for rendering 
             GFXM.program_use(shaders[graphics.shd_ref]);
@@ -349,12 +412,12 @@ namespace lof {
                                                           transform.position.x, transform.position.y, 1 };
 
                                 // Compute world scale matrix
-                                glm::mat3 world_scale{ 1.0f / SM.get_scr_width(), 0, 0,
-                                                       0, 1.0f / SM.get_scr_height(), 0,
+                                glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
+                                                       0, 1.0f / screen_height, 0,
                                                        0, 0, 1 };
 
                                 // Compute model-to-world-to-NDC transformation matrix for line and store it
-                                glm::mat3 result_xform = world_scale * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
+                                glm::mat3 result_xform = camera.world_to_ndc_xform * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
                                 box_mdl_to_ndc_xform.emplace_back(result_xform);
 
                                 // Drawing AABB box line by line
@@ -418,13 +481,12 @@ namespace lof {
                                                  transform.position.x, transform.position.y, 1 };
 
                             // Compute world scale matrix
-                            glm::mat3 world_scale{ 1.0f / SM.get_scr_width(), 0, 0,
-                                                   0, 1.0f / SM.get_scr_height(), 0,
+                            glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
+                                                   0, 1.0f / screen_height, 0,
                                                    0, 0, 1 };
 
                             // Compute model-to-world-to-NDC transformation matrix for the velocity line
-                            glm::mat3 line_mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
-
+                            glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                             glBindVertexArray(models["debug_line"].vaoid);  
                             glLineWidth(DEFAULT_LINE_WIDTH);  
                             glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);

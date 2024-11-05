@@ -4,7 +4,7 @@
       "components": {
         "Transform2D": {
           "position": [ 0.0, 153.6 ],
-          "prev_position": [ 0.0, 156.0 ],
+          "prev_position": [ 0.0, 153.6 ],
           "orientation": [ 0.0, 30.0 ],
           "scale": [ 102.4, 153.6 ]
         },
