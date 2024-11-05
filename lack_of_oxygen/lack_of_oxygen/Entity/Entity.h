@@ -87,6 +87,10 @@ namespace lof {
          * @return The entity's component mask.
          */
         ComponentMask get_component_mask() const;
+
+        // Add this to the public section of the Entity class in Entity.h:
+        void set_id(EntityID new_id) { id = new_id; }
+
     };
 
 } // namespace lof

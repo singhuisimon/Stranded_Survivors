@@ -235,12 +235,13 @@ namespace lof {
 
 
     void ECS_Manager::destroy_entity(EntityID entity) {
+
         if (entity >= entities.size() || !entities[entity]) {
             LM.write_log("ECS_Manager::destroy_entity(): Invalid entity ID or already destroyed: %u", entity);
             return;
         }
 
-        // Remove from systems
+        // Remove from systems first
         for (auto& system : systems) {
             system->remove_entity(entity);
         }
@@ -260,10 +261,43 @@ namespace lof {
             }
         }
 
-        // Clear the entity itself
-        entities[entity].reset();
+        // Before removing the entity, we need to update all entities that come after it
+        for (size_t i = entity + 1; i < entities.size(); i++) {
+            if (entities[i]) {
+                // Update the entity's ID
+                EntityID old_id = entities[i]->get_id();
+                entities[i]->set_id(old_id - 1);
 
+                // Update name mapping if it exists
+                const std::string& entity_name = entities[i]->get_name();
+                if (!entity_name.empty()) {
+                    entity_names[entity_name] = old_id - 1;
+                }
+
+                // Update system mappings
+                for (auto& system : systems) {
+                    if (system->has_entity(old_id)) {
+                        system->remove_entity(old_id);
+                        system->add_entity(old_id - 1);
+                    }
+                }
+            }
+        }
+
+        // Remove the entity
+        entities.erase(entities.begin() + entity);
+
+        // Resize all component arrays
+        for (auto& component_pair : component_arrays) {
+            auto& componentArray = component_pair.second;
+            if (!componentArray.empty()) {
+                componentArray.erase(componentArray.begin() + entity);
+            }
+        }
+
+        LM.write_log("ECS_Manager::destroy_entity(): Destroyed entity ID %u and reindexed remaining entities.", entity);
         LM.write_log("ECS_Manager::destroy_entity(): Destroyed entity ID %u.", entity);
+
     }
 
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{

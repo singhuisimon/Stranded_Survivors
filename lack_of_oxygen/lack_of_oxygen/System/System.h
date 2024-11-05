@@ -30,14 +30,6 @@ namespace lof {
         Signature signature;                      ///< Components required by the system
         std::unordered_set<EntityID> entities;    ///< Entities matching the system's signature
 
-        /**
-         * @brief Get the list of entities the system processes.
-         * @return A constant reference to the set of entity IDs.
-         */
-        const std::unordered_set<EntityID>& get_entities() const {
-            return entities;
-        }
-
     private:
 
         int64_t system_time = DEFAULT_START_TIME; // Private data member to store system's consumption time in game loop.
@@ -98,6 +90,19 @@ namespace lof {
          */
         const Signature& get_signature() const {
             return signature;
+        }
+
+        /**
+         * @brief Get the list of entities the system processes.
+         * @return A constant reference to the set of entity IDs.
+         */
+        const std::unordered_set<EntityID>& get_entities() const {
+            return entities;
+        }
+
+        // Add this to System.h in the System class:
+        bool has_entity(EntityID entity) const {
+            return entities.find(entity) != entities.end();
         }
     };
 } // namespace lof

@@ -95,9 +95,6 @@
     <None Include="Data\config.json" />
     <None Include="Data\models.msh" />
     <None Include="Data\prefab.json" />
-    <None Include="Data\save_game_1730527400.json" />
-    <None Include="Data\save_game_1730598069.json" />
-    <None Include="Data\save_game_1730650698.json" />
     <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />

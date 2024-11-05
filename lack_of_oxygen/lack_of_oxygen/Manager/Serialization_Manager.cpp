@@ -273,8 +273,31 @@ namespace lof {
      * @param filename The complete path to the scene file.
      * @return True if loading and parsing are successful, false otherwise.
      */
+    
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
+
+        // Clear all existing entities first
+        const auto& entities = ECSM.get_entities();
+        std::vector<EntityID> entities_to_remove;
+
+        // Collect all existing entity IDs
+        for (size_t i = 0; i < entities.size(); ++i) {
+            if (entities[i]) {  // Check if entity exists
+                std::cout << entities[i]->get_name() << ": " << entities[i]->get_id() << std::endl;
+                entities_to_remove.push_back(static_cast<EntityID>(i));
+            }
+        }
+
+        // Remove all existing entities
+        for (EntityID eid : entities_to_remove) {
+            std::cout << "removing eid: " << eid << std::endl;
+            ECSM.destroy_entity(0);
+        }
+
+        std::cout << "entities removed: " << entities_to_remove.size() << std::endl;
+
+        LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
 
         // Read and parse the scene file
         std::ifstream ifs(filename);
@@ -367,7 +390,6 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
     }
-
 
     rapidjson::Value Serialization_Manager::serialize_transform_component(const Transform2D& component, rapidjson::Document::AllocatorType& allocator) {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
@@ -494,7 +516,7 @@ namespace lof {
             if (pos != std::string::npos) {
                 filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 19);
             }
-            sound_obj.AddMember("filename", rapidjson::Value(filename.c_str(), allocator), allocator);
+            sound_obj.AddMember("filepath", rapidjson::Value(filename.c_str(), allocator), allocator);
             sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
             sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
             sound_obj.AddMember("volume", sound.volume, allocator);
@@ -532,15 +554,17 @@ namespace lof {
         return comp_obj;
     }
 
-
     bool Serialization_Manager::save_game_state(const char* filepath) {
         LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
         rapidjson::Document save_doc;
         save_doc.SetObject();
         rapidjson::Document::AllocatorType& allocator = save_doc.GetAllocator();
 
-        // Create array for objects
+        // Create array for objects (matching your scene format)
         rapidjson::Value objects_array(rapidjson::kArrayType);
+
+        // Counter for generating unique names if needed
+        int unnamed_counter = 0;
 
         // Iterate through all entities
         for (const auto& entity_ptr : ECSM.get_entities()) {
@@ -555,24 +579,13 @@ namespace lof {
             // Create object for this entity
             rapidjson::Value entity_obj(rapidjson::kObjectType);
 
-            // Get entity name - use the actual entity name if it exists
-            std::string entity_name = entity_ptr->get_name();
-            if (entity_name.empty()) {
-                // Fallback to type-based names
-                if (entity_id == 0) {
-                    entity_name = "background";
-                }
-                else if (ECSM.has_component<Physics_Component>(entity_id)) {
-                    if (ECSM.get_component<Physics_Component>(entity_id).is_static) {
-                        entity_name = "platform" + std::to_string(entity_id);
-                    }
-                    else {
-                        entity_name = "player" + std::to_string(entity_id);
-                    }
-                }
-                else {
-                    entity_name = "entity_" + std::to_string(entity_id);
-                }
+            // Generate a name for the entity
+            std::string entity_name;
+            if (entity_id == 0) {
+                entity_name = "background";
+            }
+            else {
+                entity_name = "entity_" + std::to_string(unnamed_counter++);
             }
             entity_obj.AddMember("name", rapidjson::Value(entity_name.c_str(), allocator), allocator);
 
@@ -612,35 +625,13 @@ namespace lof {
             // Add Audio_Component if present
             if (ECSM.has_component<Audio_Component>(entity_id)) {
                 const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
-                // Convert absolute path to relative path
-                Audio_Component modified_audio = audio;
-                std::string filename = audio.get_filename();
-                size_t pos = filename.find("lack_of_oxygen\\Data");
-                if (pos != std::string::npos) {
-                    filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 14);
-                    modified_audio.set_filename(filename);
-                }
-                components_obj.AddMember("Audio_Component", serialize_audio_component(modified_audio, allocator), allocator);
+                components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
             }
 
             // Only add entity to save file if it has components to save
             if (components_obj.MemberCount() > 0) {
                 // Add components object to entity object
                 entity_obj.AddMember("components", components_obj, allocator);
-
-                // Add prefab information if applicable
-                if (!entity_name.empty() && entity_name != "background") {
-                    if (ECSM.has_component<Physics_Component>(entity_id)) {
-                        const Physics_Component& physics = ECSM.get_component<Physics_Component>(entity_id);
-                        if (physics.is_static) {
-                            entity_obj.AddMember("prefab", rapidjson::Value("dummy_object", allocator), allocator);
-                        }
-                        else {
-                            entity_obj.AddMember("prefab", rapidjson::Value("player", allocator), allocator);
-                        }
-                    }
-                }
-
                 // Add entity object to objects array
                 objects_array.PushBack(entity_obj, allocator);
             }
@@ -657,9 +648,8 @@ namespace lof {
                 return false;
             }
 
-            rapidjson::StringBuffer strbuf;  // Create StringBuffer here
+            rapidjson::StringBuffer strbuf;
             rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
-            writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);  // Format arrays on single lines
             save_doc.Accept(writer);
             ofs << strbuf.GetString();
             ofs.close();

@@ -23,6 +23,7 @@ namespace lof {
     bool load_selected = false;
     bool show_window = false;
     bool remove_game_obj = false;
+    bool create_game_obj = false;
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -52,39 +53,35 @@ namespace lof {
     }
 
     void IMGUI_Manager::display_loading_options(const std::string& directory) {
-        std::vector<std::string> files;
-
-        try {
-            for (const auto& file : std::filesystem::directory_iterator(directory)) {
-                if (file.is_regular_file()) {
-                    files.push_back(file.path().filename().string()); // Store filename
-                }
-            }
-        }
-        catch (const std::filesystem::filesystem_error& e) {
-            std::cout << "Error: " << e.what() << std::endl; // Print error message
-        }
-
+        //std::vector<std::string> files;
+        //try {
+        //    for (const auto& file : std::filesystem::directory_iterator(directory)) {
+        //        if (file.is_regular_file()) {
+        //            files.push_back(file.path().filename().string()); // Store filename
+        //        }
+        //    }
+        //}
+        //catch (const std::filesystem::filesystem_error& e) {
+        //    std::cout << "Error: " << e.what() << std::endl; // Print error message
+        //}
         int current_object_index = 0;
 
         if (ImGui::Begin("File List")) {
+
             // Display the ListBox without allowing selection
-            for (const auto& filename : files) {
+            //for (const auto& filename : files) {
+            //    //selectable for clicking; second param for highlighting
+            //    if (ImGui::Selectable(filename.c_str(), selected_file_index == current_object_index)) {
+            //        //selected; casuing seceond param state to change
+            //        selected_file_index = current_object_index;
+            //    }
+            //    ++current_object_index;
+            //    
+            //    // Create a non-selectable item in the ListBox
+            //    //ImGui::Text("%s", filename.c_str());
+            //}
 
-                //selectable for clicking; second param for highlighting
-                if (ImGui::Selectable(filename.c_str(), selected_file_index == current_object_index)) {
-
-                    //selected; casuing seceond param state to change
-                    selected_file_index = current_object_index;
-                }
-
-                ++current_object_index;
-                
-                // Create a non-selectable item in the ListBox
-                //ImGui::Text("%s", filename.c_str());
-            }
-
-            //editing name is buggy
+            selected_file_index = current_object_index;
             if (ImGui::Button("Load Scene")) {
                 load_selected = !load_selected;
             }
@@ -92,14 +89,23 @@ namespace lof {
         }
 
        
+        //Pressing the button
         if (load_selected && (selected_file_index != -1)) {
 
-            //buggy
-            if (SM.load_scene(files[selected_file_index].c_str())) {
-                std::cout << "works! " << files[selected_file_index] << std::endl;
+            //std::cout << Path_Helper::get_save_file_path(files[selected_file_index].c_str()) << std::endl;
+            //load new file, entirety of ecs cleared
+            //load ecs again and load up new file 
+            //ECSM.shut_down();
+            //ECSM.start_up();
+            //if (SM.load_scene((Path_Helper::get_save_file_path(files[selected_file_index].c_str())).c_str())){
+            if (SM.load_scene((Path_Helper::get_scene_path().c_str()))) {
+                std::cout << "\n\n\nworks! \n\n\n" << Path_Helper::get_scene_path() << std::endl;
+                //std::cout << "\n\n\nworks! \n\n\n" << files[selected_file_index] << std::endl;
+                load_selected = !load_selected;
             }
             else {
-                std::cout << "failed to load " << files[selected_file_index] << std::endl;
+                std::cout << "\n\n\nfailed to load \n\n\n" << Path_Helper::get_scene_path() << std::endl;
+                load_selected = !load_selected;
             }
         }
     }
@@ -152,40 +158,47 @@ namespace lof {
 
         int current_object_index = 0;
         const auto& entities = ecs.get_entities();
-        for (auto& entity : entities) {
+
+        //std::cout << entities.size() << std::endl;
+
+        if (selected_object_index >= entities.size()) {
+            selected_object_index = -1;
+        }
+
+        for (int i = 0; i < entities.size(); ++i) { //Still getting deleted entity ??
             
-            std::string obj_name = entity->get_name();
+            //std::cout << "num: " << i+1 << "  ";
+            if (entities[i] != nullptr) {
+                std::string obj_name = entities[i]->get_name();
+                //std::cout << obj_name << std::endl;
+                
+                //selectable for clicking; second param for highlighting
+                if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index)) {
 
-            //selectable for clicking; second param for highlighting
-            if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index)) {
-
-                //selected; casuing seceond param state to change
-                 selected_object_index = current_object_index;
+                    //selected; casuing seceond param state to change
+                    selected_object_index = current_object_index;
+                }
+                
+                
             }
 
             ++current_object_index;
         }
 
-        //editing name is buggy
+        // discuss editing name
         if (ImGui::Button("Edit Game Object")) {
             show_window = !show_window;
         }
 
-        //remove is buggy
         if (ImGui::Button("Remove Game Object")) {
             remove_game_obj = !remove_game_obj;
         }
 
-        //if (ImGui::Button("Load Game Object")) {
-        //    //clone_selection = !clone_selection;
-        //}
-        //if (ImGui::Button("Clone Game Object")) {
-        //    //clone_selection = !clone_selection;
-        //}
-
+        //add other options
         ImGui::Text("\n\n%s", "Create Game Object From Prefab");
         if (ImGui::Button("Create Game Object From Prefab")) {
-            add_game_objects();
+
+            create_game_obj = !create_game_obj;
         }
 
         ImGui::End();
@@ -194,9 +207,12 @@ namespace lof {
             imgui_game_objects_edit();
         }
 
-        //remove is buggy
         if (selected_object_index != -1 && remove_game_obj) {
             remove_game_objects(selected_object_index);
+        }
+
+        if (create_game_obj) {
+            add_game_objects();
         }
 
     }
@@ -206,6 +222,7 @@ namespace lof {
     static bool is_grounded_on = false;
     static bool is_jumping_on = false;
     static bool is_audio_on = false;
+
 
     void IMGUI_Manager::imgui_game_objects_edit() {
 
@@ -340,6 +357,9 @@ namespace lof {
             Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Audio")) {
 
+                //iterate sounds
+                //auto& file = audio.get_sounds();
+
                 //auto& file = audio.get_filename();
 
                 //auto const & state = audio.get_audio_state();
@@ -365,10 +385,13 @@ namespace lof {
 
         if (ImGui::Button("Save Changes")) {
 
-            std::string saved_file = "save_game_1730650698.json";
+            //std::string saved_file = "save_game_1730650698.json";
             //std::string saved_file = "save_game_1730645173.json";
-            std::string path_file = Path_Helper::get_save_file_path(saved_file);
-            if (SM.save_game_state(path_file.c_str())) {
+
+            std::string scene_path = Path_Helper::get_scene_path();
+            //std::string scene_path = Path_Helper::get_scene_path();
+            //std::string path_file = Path_Helper::get_save_file_path(saved_file);
+            if (SM.save_game_state(scene_path.c_str())) {
                 LM.write_log("IMGUI_Manager::update(): Successfully saved game state to %s", Path_Helper::get_scene_path().c_str());
                 std::cout << "\n\n\n\nGame saved successfully to: " << Path_Helper::get_scene_path() << "\n\n\n" << std::endl;
             }
@@ -396,8 +419,16 @@ namespace lof {
     //simon's code
     void IMGUI_Manager::add_game_objects() {
 
+        ImGui::Begin("Edit Object Properties", &create_game_obj);
         //add more options
-            EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
+
+        static const char* prefab_options[]{ "player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image" };
+
+        static int selected_item = -1;
+
+        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, IM_ARRAYSIZE(prefab_options))){
+            
+            EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
             if (new_entity != INVALID_ENTITY_ID) {
                 // Generate random position
                 static std::default_random_engine generator;
@@ -421,6 +452,10 @@ namespace lof {
             else {
                 LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
+        }
+            
+
+        ImGui::End();
     }
 
     //removing game object - has error
@@ -431,6 +466,9 @@ namespace lof {
 
         if (eid != INVALID_ENTITY_ID) {
             ECSM.destroy_entity(eid);
+
+            std::cout << "end of calling remove\n";
+            remove_game_obj = !remove_game_obj;
             return;
         }
 
