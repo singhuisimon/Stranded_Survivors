@@ -70,8 +70,7 @@ namespace lof {
             GLboolean link_status = GL_FALSE;
         };
 
-        // FOR ANIMATION
-        //// Struct of a frame for animation
+        // Struct of a frame for animation
         struct Frame {
             float uv_x, uv_y;   // Bottom-left of frame
             float size;         // Dimensions of the Frame (W = H by default)
@@ -88,25 +87,31 @@ namespace lof {
             float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
         };
 
-        // Storages
+        // Struct of a camera
+        struct Camera2D {
+            GLfloat pos_y{ DEFAULT_CAMERA_POS_Y };
+            glm::mat3 view_xform, camwin_to_ndc_xform, world_to_ndc_xform; 
+
+            // Toggle for free camera mode
+            GLboolean is_free_cam{ GL_FALSE }; 
+        };
+
+        // Storage for models and shader programs 
         using MODELS = std::map<std::string, Graphics_Manager::Model>;
         using SHADERS = std::vector<ShaderProgram>;
         using TEXTURES = std::map<std::string, GLuint>; 
-        // FOR ANIMATION
         using ANIMATIONS = std::unordered_map<std::string, Animation>;
+        MODELS model_storage;
+        TEXTURES texture_storage;  
+        SHADERS shader_program_storage; 
+        ANIMATIONS  animation_storage; 
 
         // Data members
         static std::unique_ptr<Graphics_Manager> instance;
         static std::once_flag once_flag;
         GLenum render_mode;
         GLboolean is_debug_mode = GL_FALSE;
-
-        // Storage for models and shader programs 
-        MODELS model_storage;
-        TEXTURES texture_storage; 
-        SHADERS shader_program_storage;
-        // FOR ANIMATION
-        ANIMATIONS  animation_storage;
+        Camera2D camera {};
 
     public:
 
@@ -125,7 +130,7 @@ namespace lof {
          * @brief Startup the Graphics_Manager and initialize data (serialization).
          * @return 0 if successful, else a negative number.
          */
-        int start_up() override;
+        int start_up() override; 
 
         /**
          * @brief Shuts down the Graphics_Manager.
@@ -135,7 +140,7 @@ namespace lof {
         /**
          * @brief Update the Graphics_Manager and its storage to prepare for rendering.
          */
-        void update();
+        void update(); 
 
         //////////////////////Shaders & Models-Related functions///////////////////////
         /**
@@ -199,6 +204,11 @@ namespace lof {
          * @brief Get flag of the debug mode.
          */
         GLboolean& get_debug_mode();
+
+        /**
+         * @brief Get a reference to the camera object.
+         */
+        Camera2D& get_camera();
 
         /**
         * @brief Compile the shaders, link the shader objects to create an executable,

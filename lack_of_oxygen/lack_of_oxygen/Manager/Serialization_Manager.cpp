@@ -344,7 +344,7 @@ namespace lof {
             // Handle prefab-based entities
             if (obj.HasMember("prefab") && obj["prefab"].IsString()) {
                 std::string prefab_name = obj["prefab"].GetString();
-                eid = ECSM.clone_entity_from_prefab(prefab_name);
+                eid = ECSM.clone_entity_from_prefab(prefab_name, entity_name);
                 if (eid == INVALID_ENTITY_ID) {
                     LM.write_log("Serialization_Manager::load_scene(): Failed to create entity from prefab '%s'. Skipping.", prefab_name.c_str());
                     continue;
@@ -352,7 +352,7 @@ namespace lof {
             }
             else {
                 // Create a new entity without prefab
-                eid = ECSM.create_entity();
+                eid = ECSM.create_entity(entity_name);
             }
 
             // Set the entity's name

@@ -61,12 +61,12 @@ namespace lof {
         // Set up default render mode 
         render_mode = GL_FILL;
 
+        // Read file to initialize shaders 
         std::string vertex_path_1 = Path_Helper::get_vertex_shader_path_1();
         std::string fragment_path_1 = Path_Helper::get_fragment_shader_path_1();
         std::string vertex_path_2 = Path_Helper::get_vertex_shader_path_2();
         std::string fragment_path_2 = Path_Helper::get_fragment_shader_path_2();
 
-        // Read file to initialize shaders 
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
         std::make_pair<std::string, std::string>(vertex_path_1.c_str(), fragment_path_1.c_str()),
         std::make_pair<std::string, std::string>(vertex_path_2.c_str(), fragment_path_2.c_str()) 
@@ -83,7 +83,6 @@ namespace lof {
 
         std::string mesh_path = Path_Helper::get_model_file_path();
         std::string texture_path = Path_Helper::get_texture_file_path();
-        // FOR ANIMATION
         std::string animation_path = Path_Helper::get_animation_file_path();
 
         // Add models
@@ -98,7 +97,6 @@ namespace lof {
             return -3;
         }
 
-        // FOR ANIMATION
         // Add animations
         if (!add_animations(animation_path.c_str())) { 
             LM.write_log("Fail to add animations.");
@@ -141,6 +139,17 @@ namespace lof {
             LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
             is_debug_mode = GL_FALSE;
         }
+
+        // Toggle free camera mode using 'Z' and 'X'
+        if (IM.is_key_held(GLFW_KEY_Z)) {
+            LM.write_log("Graphics_Manager::update(): 'Z' key pressed, Free Camera enabled.");
+            camera.is_free_cam = GL_TRUE;
+        }
+        else if (IM.is_key_held(GLFW_KEY_X)) {
+            LM.write_log("Graphics_Manager::update(): 'X' key pressed, Free Camera disabled.");
+            camera.is_free_cam = GL_FALSE;
+        }
+
     }
 
     // Add a shader program into the shader program storage.
@@ -457,6 +466,9 @@ namespace lof {
 
     // Return state of current debig mode
     GLboolean& Graphics_Manager::get_debug_mode() { return is_debug_mode; }
+
+    // Return reference to camera
+    Graphics_Manager::Camera2D& Graphics_Manager::get_camera() { return camera; }
 
     // Compilation of vertex and fragment shaders to make a shader program
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {
