@@ -49,8 +49,8 @@
       "prefab": "dummy_object",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 153.5 ],
-          "prev_position": [ 0.0, 153.5 ],
+          "position": [ 0.0, 38.4 ],
+          "prev_position": [ 0.0, 38.4 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {
@@ -85,8 +85,8 @@
       "prefab": "dummy_object",
       "components": {
         "Transform2D": {
-          "position": [ -500.0, 230.6 ],
-          "prev_position": [ -500.0, 230.6 ],
+          "position": [ -512.0, 100.0 ],
+          "prev_position": [ -512.0, 100.0 ],
           "scale": [ 512.0, 76.8 ]
         },
         "Graphics_Component": {

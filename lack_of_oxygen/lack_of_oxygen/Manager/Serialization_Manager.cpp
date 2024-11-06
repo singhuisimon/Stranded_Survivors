@@ -344,7 +344,7 @@ namespace lof {
             // Handle prefab-based entities
             if (obj.HasMember("prefab") && obj["prefab"].IsString()) {
                 std::string prefab_name = obj["prefab"].GetString();
-                eid = ECSM.clone_entity_from_prefab(prefab_name);
+                eid = ECSM.clone_entity_from_prefab(prefab_name, entity_name);
                 if (eid == INVALID_ENTITY_ID) {
                     LM.write_log("Serialization_Manager::load_scene(): Failed to create entity from prefab '%s'. Skipping.", prefab_name.c_str());
                     continue;
@@ -352,7 +352,7 @@ namespace lof {
             }
             else {
                 // Create a new entity without prefab
-                eid = ECSM.create_entity();
+                eid = ECSM.create_entity(entity_name);
             }
 
             // Set the entity's name
@@ -554,30 +554,31 @@ namespace lof {
         return comp_obj;
     }
 
-    rapidjson::Value Serialization_Manager::serialize_animation_component(const Animation_Component& component, rapidjson::Document::AllocatorType& allocator) { 
+    rapidjson::Value Serialization_Manager::serialize_animation_component(const Animation_Component& component, rapidjson::Document::AllocatorType& allocator) {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
 
-        // Map in scene file format
-        rapidjson::Value map(rapidjson::kArrayType);    
-        auto begin = component.animations.begin();
-        int cnt{ 0 };
-        while(begin != component.animations.end()) {
-            std::string animation_index = begin->first; 
-            std::string animation_name = begin->second;
-            const char* index = (animation_index.c_str());
-            
-            rapidjson::Value index_str;
-            index_str = rapidjson::StringRef(index);
-            rapidjson::Value animation(rapidjson::kArrayType);
-            animation.AddMember(index_str, rapidjson::Value(animation_name.c_str(), allocator), allocator); 
-            map.PushBack(animation, allocator);
-            begin++;
-            cnt++;
-        }
-        comp_obj.AddMember("animations", map, allocator); 
+        // Create animations array
+        rapidjson::Value animations_array(rapidjson::kArrayType);
 
-        comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator); 
-        comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator); 
+        // Iterate through the animations map
+        for (const auto& [index, name] : component.animations) {
+            // Create array for each animation entry
+            rapidjson::Value animation_entry(rapidjson::kArrayType);
+
+            // Add index and name as separate array elements
+            animation_entry.PushBack(rapidjson::Value(index.c_str(), allocator), allocator);
+            animation_entry.PushBack(rapidjson::Value(name.c_str(), allocator), allocator);
+
+            // Add the entry to animations array
+            animations_array.PushBack(animation_entry, allocator);
+        }
+
+        // Add animations array to component object
+        comp_obj.AddMember("animations", animations_array, allocator);
+
+        // Add other animation component properties
+        comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator);
+        comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator);
 
         return comp_obj;
     }

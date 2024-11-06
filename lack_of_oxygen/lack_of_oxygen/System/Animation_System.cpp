@@ -35,9 +35,11 @@ namespace lof {
             auto& animation_comp = ECSM.get_component<Animation_Component>(entity_id);  
             auto& animations_storage = GFXM.get_animation_storage();   
 
+            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
             // Determine which frame of which animation to play
-            // Hardcode the logic for player animation first (This should be done before coming into animation system)
-            if (entity_id == 5) { // playerID
+            // Set logic for player animation here first (This should be done before coming into animation system)
+            if (entity_id == player_id) { 
 
                 // Determine player animation index
                 // (When changing animation index, reset previous animation curr_frame_idx and frame_time_elapsed to 0)
