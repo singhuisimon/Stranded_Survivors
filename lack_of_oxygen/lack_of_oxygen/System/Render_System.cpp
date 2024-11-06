@@ -40,17 +40,15 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Access player's ID
-            EntityID player_id = ECSM.find_entity_by_name("player_5");
+            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);  
 
             if (entity_id != 0) { // Background object unaffected
-
 
                 // Scaling update when up or down arrow key pressed
                 GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
 
                 // Check if the entity has Collision_Component
                 if (ECSM.has_component<Collision_Component>(entity_id)) {
-
 
                     if (entity_id == player_id) { // Uncomment to allow all objects to scale and rotate
 
@@ -119,7 +117,7 @@ namespace lof {
 
                 // Update world-to-NDC transformation matrix
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
-            } else if (entity_id == player_id && camera.is_free_cam == GL_TRUE) {
+            } else if (camera.is_free_cam == GL_TRUE) {
 
                 // Movement update when keypad 8 or 2 pressed
                 if (IM.is_key_held(GLFW_KEY_KP_8)) {

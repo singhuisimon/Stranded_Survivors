@@ -160,6 +160,8 @@ namespace lof {
 	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
 	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
 
+	// -------------------------- Common variables used in Systems -----------------------------------
+	constexpr char const* DEFAULT_PLAYER_NAME = "player1";
 
 } // namespace lof
 
