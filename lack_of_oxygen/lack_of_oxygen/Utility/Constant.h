@@ -36,7 +36,7 @@ namespace lof {
 
 	// ----------------------------- FPS_Manager.cpp -------------------------------------------
 	// FPS_Manager Constants
-	constexpr int DEFAULT_TARGET_FPS = 60;
+	constexpr int DEFAULT_TARGET_FPS = 120;
 	constexpr int64_t DEFAULT_MICROSECONDS_PER_SECOND = 1000000;
 	constexpr int64_t DEFAULT_TARGET_TIME = DEFAULT_MICROSECONDS_PER_SECOND / DEFAULT_TARGET_FPS;
 
