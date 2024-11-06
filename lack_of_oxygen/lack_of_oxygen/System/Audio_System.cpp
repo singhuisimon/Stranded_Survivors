@@ -21,7 +21,7 @@ namespace lof {
 		mastergroup->addGroup(sfxgroup);
 	}
 
-	Audio_System::Audio_System() : core_system(nullptr), studio_system(nullptr) {
+	Audio_System::Audio_System() : core_system(nullptr) {// studio_system(nullptr) {
 		signature.set(ECSM.get_component_id<Audio_Component>());
 		initializegroups();
 		if (initialize()) {
@@ -45,7 +45,17 @@ namespace lof {
 	bool Audio_System::initialize() {
 		FMOD_RESULT result;
 
-		result = FMOD::Studio::System::create(&studio_system);
+		result = FMOD::System_Create(&core_system);
+		if (errorcheck(result, "Audio_System::initialize", "create core system") != 0) {
+			return false;
+		}
+
+		result = core_system->init(512, FMOD_INIT_NORMAL, 0);
+		if (errorcheck(result, "Audio_System::initialize", "initialize studio system") != 0) {
+			return false;
+		}
+
+		/*result = FMOD::Studio::System::create(&studio_system);
 		if (errorcheck(result, "Audio_System::initialize", "create studio system") != 0) {
 			return false;
 		}
@@ -56,7 +66,7 @@ namespace lof {
 		result = studio_system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_3D_RIGHTHANDED, nullptr);
 		if (errorcheck(result, "Audio_System::initialize", "initialize studio system") != 0) {
 			return false;
-		}
+		}*/
 		return true;
 	}
 
@@ -113,9 +123,9 @@ namespace lof {
 			
 		}
 		//free up unused channel.
-		for (std::string const& key : stopchannel) {
+		/*for (std::string const& key : stopchannel) {
 			channel_map.erase(key);
-		}
+		}*/
 
 		//update the fmod system with the core system
 		errorcheck(core_system->update(), "Audio_System::update", "update core system");
@@ -145,14 +155,14 @@ namespace lof {
 		channel_map.clear();
 		
 		if (core_system) {
-			errorcheck(core_system->close(), "Audio_System::shutdown", "close core system");
+			//errorcheck(core_system->close(), "Audio_System::shutdown", "close core system");
 			errorcheck(core_system->release(), "Audio_System::shutdown", "release core system");
 			core_system = nullptr;
 		}
-		if (studio_system) {
+		/*if (studio_system) {
 			errorcheck(studio_system->release(), "Audio_System::shutdown", "release studio system");
 			studio_system = nullptr;
-		}
+		}*/
 
 		LM.write_log("Audio System shutdown successfully");
 	}
@@ -192,12 +202,13 @@ namespace lof {
 
 		//check if the sound is already playing under the entity in a channel
 		if ((channel_map.find(cskey) != channel_map.end()) && channel_map.find(cskey)->second != nullptr) {
-			LM.write_log("Audio_System::play_sound: channel already exists in entity");
+			//LM.write_log("Audio_System::play_sound: channel already exists in entity");
 			//check if sound has finish playing, if so change the audio_state to stopped.
 			bool playing = false;
 			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
 			if (!playing) {
 				audio.set_audio_state(audio_key, NONE);
+				channel_map.erase(cskey);
 			}
 			return;	//sound is already playing
 		}

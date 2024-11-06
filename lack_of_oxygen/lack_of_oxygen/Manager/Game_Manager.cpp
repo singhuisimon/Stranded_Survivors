@@ -17,6 +17,8 @@
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
+
+// Include utility
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 
@@ -109,7 +111,7 @@ namespace lof {
             SM.shut_down();
             ECSM.shut_down();
             LM.shut_down();
-            return -6;
+            return -7;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
@@ -169,109 +171,119 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
+        
+
         // Clone a game object from a prefab when 'C' key is pressed
         bool c_key_pressed = IM.is_key_pressed(GLFW_KEY_C);
-        if (IM.is_key_pressed(GLFW_KEY_C) && !c_key_was_pressed_last_frame) {
-            // Clone the entity from the prefab
-            EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
-            if (new_entity != INVALID_ENTITY_ID) {
-                // Generate random position
-                static std::default_random_engine generator;
-                static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
+        //if (IM.is_key_pressed(GLFW_KEY_C) && !c_key_was_pressed_last_frame) {
+        //    // Clone the entity from the prefab
+        //    EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
+        //    if (new_entity != INVALID_ENTITY_ID) {
+        //        // Generate random position
+        //        static std::default_random_engine generator;
+        //        static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
 
-                float random_x = distribution(generator);
-                float random_y = distribution(generator);
+        //        float random_x = distribution(generator);
+        //        float random_y = distribution(generator);
 
-                // Get the Transform2D component and set its position
-                if (ECSM.has_component<Transform2D>(new_entity)) {
-                    Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
-                    transform.position.x = random_x;
-                    transform.position.y = random_y;
+        //        // Get the Transform2D component and set its position
+        //        if (ECSM.has_component<Transform2D>(new_entity)) {
+        //            Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
+        //            transform.position.x = random_x;
+        //            transform.position.y = random_y;
 
-                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
-                }
-                else {
-                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
-                }
-            }
-            else {
-                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
-            }
-        }
+        //            LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
+        //        }
+        //        else {
+        //            LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
+        //        }
+        //    }
+        //    else {
+        //        LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
+        //    }
+        //}
+        
+        LM.write_log("GAME Checking key %i: is pressed = %i, previous state = %i", GLFW_KEY_C, IM.is_key_pressed(GLFW_KEY_C), c_key_was_pressed_last_frame);
         c_key_was_pressed_last_frame = c_key_pressed;
-
         // Save game state when 'K' key is pressed
-        bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
-        if (k_key_pressed && !k_key_was_pressed_last_frame) {
-            // Generate a filename with timestamp
-            auto now = std::chrono::system_clock::now();
-            auto time = std::chrono::system_clock::to_time_t(now);
-            std::stringstream ss;
-            ss << "save_game_" << time << ".json";
-            std::string filename = ss.str();
+        //bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
+        //if (k_key_pressed && !k_key_was_pressed_last_frame) {
+        //    // Generate a filename with timestamp
+        //    auto now = std::chrono::system_clock::now();
+        //    auto time = std::chrono::system_clock::to_time_t(now);
+        //    std::stringstream ss;
+        //    ss << "save_game_" << time << ".json";
+        //    std::string filename = ss.str();
 
-            // Replace illegal filename characters
-            std::replace(filename.begin(), filename.end(), ':', '_');
-            std::replace(filename.begin(), filename.end(), ' ', '_');
+        //    // Replace illegal filename characters
+        //    std::replace(filename.begin(), filename.end(), ':', '_');
+        //    std::replace(filename.begin(), filename.end(), ' ', '_');
 
-            // Get save file path using Path_Helper
-            std::string save_path = Path_Helper::get_save_file_path(filename);
+        //    // Get save file path using Path_Helper
+        //    std::string save_path = Path_Helper::get_save_file_path(filename);
 
-            // Attempt to save the game
-            if (SM.save_game_state(save_path.c_str())) {
-                LM.write_log("Game_Manager::update(): Successfully saved game state to %s", save_path.c_str());
-                std::cout << "Game saved successfully to: " << filename << std::endl;
-            }
-            else {
-                LM.write_log("Game_Manager::update(): Failed to save game state to %s", save_path.c_str());
-                std::cout << "Failed to save game!" << std::endl;
-            }
-        }
-        k_key_was_pressed_last_frame = k_key_pressed;
+        //    // Attempt to save the game
+        //    if (SM.save_game_state(save_path.c_str())) {
+        //        LM.write_log("Game_Manager::update(): Successfully saved game state to %s", save_path.c_str());
+        //        std::cout << "Game saved successfully to: " << filename << std::endl;
+        //    }
+        //    else {
+        //        LM.write_log("Game_Manager::update(): Failed to save game state to %s", save_path.c_str());
+        //        std::cout << "Failed to save game!" << std::endl;
+        //    }
+        //}
+        //k_key_was_pressed_last_frame = k_key_pressed;
 
         // GUI System control
-        if (IM.is_key_pressed(GLFW_KEY_G)) {
-            // Find GUI System
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        // Toggle loading screen
-                        static bool loading_screen_visible = false;
-                        if (!loading_screen_visible) {
-                            loading_screen_visible = true;
-                            gui_system->show_loading_screen();
-                            LM.write_log("Game_Manager::update(): Showing loading screen");
-                        }
-                        else {
-                            loading_screen_visible = false;
-                            gui_system->hide_loading_screen();
-                            LM.write_log("Game_Manager::update(): Hiding loading screen");
-                        }
-                    }
-                    break;
-                }
-            }
-        }
+        //if (IM.is_key_pressed(GLFW_KEY_G)) {
+        //    // Find GUI System
+        //    for (auto& system : ECSM.get_systems()) {
+        //        if (system->get_type() == "GUI_System") {
+        //            auto* gui_system = static_cast<GUI_System*>(system.get());
+        //            if (gui_system) {
+        //                // Toggle loading screen
+        //                static bool loading_screen_visible = false;
+        //                if (!loading_screen_visible) {
+        //                    loading_screen_visible = true;
+        //                    gui_system->show_loading_screen();
+        //                    LM.write_log("Game_Manager::update(): Showing loading screen");
+        //                }
+        //                else {
+        //                    loading_screen_visible = false;
+        //                    gui_system->hide_loading_screen();
+        //                    LM.write_log("Game_Manager::update(): Hiding loading screen");
+        //                }
+        //            }
+        //            break;
+        //        }
+        //    }
+        //}
 
         // Test progress bar updates with H key
-        if (IM.is_key_pressed(GLFW_KEY_H)) {
-            static float test_progress = 0.0f;
-            test_progress += 0.1f;
-            if (test_progress > 1.0f) test_progress = 0.0f;
+        //if (IM.is_key_pressed(GLFW_KEY_H)) {
+        //    static float test_progress = 0.0f;
+        //    test_progress += 0.1f;
+        //    if (test_progress > 1.0f) test_progress = 0.0f;
 
-            // Find GUI System and update progress
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        gui_system->set_progress(test_progress);
-                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
-                    }
-                    break;
-                }
-            }
-        }
+        //    // Find GUI System and update progress
+        //    for (auto& system : ECSM.get_systems()) {
+        //        if (system->get_type() == "GUI_System") {
+        //            auto* gui_system = static_cast<GUI_System*>(system.get());
+        //            if (gui_system) {
+        //                gui_system->set_progress(test_progress);
+        //                LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
+        //            }
+        //            break;
+        //        }
+        //    }
+        //}
+
+        //if (IM.is_key_pressed(GLFW_KEY_G)) {
+        //    LGM.handle_general_input(GLFW_KEY_G);
+        //}
+        //if (IM.is_key_pressed(GLFW_KEY_H)) {
+        //    LGM.handle_general_input(GLFW_KEY_H);
+        //}
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

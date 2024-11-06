@@ -234,7 +234,7 @@ namespace lof {
                             bool islooping = sound.HasMember("islooping") && sound["islooping"].IsBool() ? sound["islooping"].GetBool() : false;
 
                             audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
-                            LM.write_log("key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("add component from json<audiocom>: key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
                             LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
                         }
                     }

@@ -13,7 +13,7 @@
 
 // Include FMOD headers
 #include <fmod.hpp>
-#include <fmod_studio.hpp>
+//#include <fmod_studio.hpp>
 #include "fmod_errors.h"
 
 // Include standard headers
@@ -105,7 +105,7 @@ namespace lof {
 	private:
 		//Audio_Manager& audio_manager;
 		FMOD::System* core_system;	//Core audio system
-		FMOD::Studio::System* studio_system;	//Studio audio system
+		//FMOD::Studio::System* studio_system;	//Studio audio system
 
 		void initializegroups();
 

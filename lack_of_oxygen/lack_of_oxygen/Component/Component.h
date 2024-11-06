@@ -434,6 +434,47 @@ namespace lof {
             , relative_pos(0.0f, 0.0f) {}
     };
 
+    class BehaviourComponent : public Component {
+    protected:
+        //protected to prevent any other class to access except this and derived classes
+        unsigned int m_behaviorIndex;
+
+        //chat gpt recommendatoin i havent got to understanding
+        //but from what ik its just to have string to direct to
+        //the behaviour when as the name says on update (still)
+        //or on collide (play sound) smth like that
+        std::string on_update_behaviour;
+        std::string on_collision_behaviour;
+    public:
+        //allows us to change behavior at run time 
+        //helps to switch entity behavior e.g. from idle to attack
+        void set_behaviour_index(const unsigned int& behaviour) {
+            m_behaviorIndex = behaviour;
+        }
+
+        //returning a & allows caller to update the m_behavior directly
+        inline unsigned int& get_behaviour_index() noexcept {
+            return m_behaviorIndex;
+        }
+
+        void set_on_update_behaviour(const std::string& behaviour) {
+            on_update_behaviour = behaviour;
+        }
+
+        void set_on_collision_behaviour(const std::string& behaviour) {
+            on_collision_behaviour = behaviour;
+        }
+
+        std::string get_on_update_behaviour() const {
+            return on_update_behaviour;
+        }
+
+        std::string get_on_collision_behaviour() const {
+            return on_collision_behaviour;
+        }
+
+    };
+
 } // namespace lof
 
 #endif // LOF_COMPONENT_H
