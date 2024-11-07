@@ -87,55 +87,6 @@ namespace lof {
                 // Parse Physics_Component
                 Physics_Component physics_component;
 
-#if 0
-
-                if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
-                    const rapidjson::Value& grav = component_data["gravity"];
-                    physics_component.gravity.x = grav[0].GetFloat();
-                    physics_component.gravity.y = grav[1].GetFloat();
-                }
-
-                if (component_data.HasMember("damping_factor") && component_data["damping_factor"].IsNumber()) {
-                    physics_component.damping_factor = component_data["damping_factor"].GetFloat();
-                }
-
-                if (component_data.HasMember("max_velocity") && component_data["max_velocity"].IsNumber()) {
-                    physics_component.max_velocity = component_data["max_velocity"].GetFloat();
-                }
-
-                if (component_data.HasMember("accumulated_force") && component_data["accumulated_force"].IsArray()) {
-                    const rapidjson::Value& acc_force = component_data["accumulated_force"];
-                    physics_component.accumulated_force.x = acc_force[0].GetFloat();
-                    physics_component.accumulated_force.y = acc_force[1].GetFloat();
-                }
-
-                if (component_data.HasMember("mass") && component_data["mass"].IsNumber()) {
-                    physics_component.set_mass(component_data["mass"].GetFloat());
-                }
-
-                if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
-                    physics_component.is_static = component_data["is_static"].GetBool();
-                }
-
-                //if (component_data.hasmember("is_moveable") && component_data["is_moveable"].isbool()) {
-                //    physics_component.is_moveable = component_data["is_moveable"].getbool();
-                //}
-
-                if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
-                    physics_component.is_grounded = component_data["is_grounded"].GetBool();
-                }
-
-                //if (component_data.hasmember("is_jumping") && component_data["is_jumping"].isbool()) {
-                //    physics_component.is_jumping = component_data["is_jumping"].getbool();
-                //}
-
-                if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
-                    physics_component.jump_force = component_data["jump_force"].GetFloat();
-                }
-#endif
-
-#if 1
-
                 if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
                     const rapidjson::Value& grav = component_data["gravity"];
                     Vec2D gravity; 
@@ -240,7 +191,6 @@ namespace lof {
 
                 }
 
-#endif
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);
