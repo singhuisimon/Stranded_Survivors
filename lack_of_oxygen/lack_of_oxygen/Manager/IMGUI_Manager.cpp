@@ -183,6 +183,7 @@ namespace lof {
             filled = false; // Reset filled to allow repopulating `assigned_names` for the new object
         }
 
+
         std::string Name = entities[selected_object_index]->get_name();
         std::string condition_name_model = "Name of Entity";
     
@@ -190,10 +191,12 @@ namespace lof {
         strncpy_s(Buffer, Name.c_str(), sizeof(Buffer));//s is safer
         Buffer[sizeof(Buffer) - 1] = '\0';
 
+        ImGui::BeginDisabled();
         if (ImGui::InputText(condition_name_model.c_str(), Buffer, sizeof(Buffer))) {
              std::string name= std::string(Buffer);
              entities[selected_object_index]->set_name(name);
         }
+        ImGui::EndDisabled();
         
 
         //Transform2D Component
@@ -353,7 +356,7 @@ namespace lof {
                 ImGui::Text("Note: The animation index depends on movement.\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\nIn the Level Editor, objects are stationary by default, so only animations 0 and 1 are available.\nIf an out - of - range index is entered, it snaps to 0 for even values and 1 for odd values.");
                 int temp_value = static_cast<int>(curr);
                 if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, animation_list.size() - 1)) {
-                    // Clamp `temp_value` to stay within the valid range
+                    
                     if (temp_value < 0) {
                         temp_value = 0;
                     }
@@ -386,14 +389,22 @@ namespace lof {
 
     void IMGUI_Manager::add_game_objects() {
 
-        ImGui::Begin("Edit Object Properties", &create_game_obj);
+        ImGui::Begin("Add Game Object", &create_game_obj);
 
-        static const char* prefab_options[]{ "player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image" };
+        std::vector <const char*> prefab_names_c_str{};
+
+        for (const std::string& name : prefab_names) {
+            prefab_names_c_str.push_back(name.c_str());
+        }
+
+        //static const char* prefab_options[]{ "player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image" };
+
+        const char** prefab_options = prefab_names_c_str.data();
 
         static int selected_item = -1;
 
-        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, IM_ARRAYSIZE(prefab_options))){
-            
+        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, prefab_names_c_str.size())) {
+
             //Simon's code
             EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
             if (new_entity != INVALID_ENTITY_ID) {
@@ -420,6 +431,36 @@ namespace lof {
                 LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
         }
+
+        /*static const char* prefab_options[]{"player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image"};
+        static int selected_item = -1;
+        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, IM_ARRAYSIZE(prefab_options))){
+            //Simon's code
+            EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
+            if (new_entity != INVALID_ENTITY_ID) {
+                // Generate random position
+                static std::default_random_engine generator;
+                static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
+
+                float random_x = distribution(generator);
+                float random_y = distribution(generator);
+
+                // Get the Transform2D component and set its position
+                if (ECSM.has_component<Transform2D>(new_entity)) {
+                    Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
+                    transform.position.x = random_x;
+                    transform.position.y = random_y;
+
+                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
+                }
+                else {
+                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
+                }
+            }
+            else {
+                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
+            }
+        }*/
             
 
         ImGui::End();
@@ -432,8 +473,6 @@ namespace lof {
 
         if (eid != INVALID_ENTITY_ID) {
             ECSM.destroy_entity(eid);
-
-            std::cout << "end of calling remove\n";
             remove_game_obj = !remove_game_obj;
             return;
         }
@@ -450,6 +489,10 @@ namespace lof {
         if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
             data_name = std::string(Buffer);
         }
+    }
+
+    void IMGUI_Manager::fill_prefab_names(const char* prefab_name) {
+        prefab_names.push_back(prefab_name);
     }
 
     void IMGUI_Manager::render() {

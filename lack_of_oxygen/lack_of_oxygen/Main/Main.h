@@ -30,7 +30,7 @@
 #include "../Utility/Clock.h"
 #include "../Utility/Vector2D.h"
 #include "../Utility/Matrix3x3.h"
-#include "../Utility/globals.h"
+#include "../Utility/Globals.h"
 
 // Include Manager headers
 #include "../Manager/Game_Manager.h"

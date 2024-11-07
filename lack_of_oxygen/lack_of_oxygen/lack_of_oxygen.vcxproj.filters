@@ -72,7 +72,7 @@
     <ClInclude Include="Utility\Vector3D.h" />
     <ClInclude Include="Utility\Type.h" />
     <ClInclude Include="System\GUI_System.h" />
-    <ClInclude Include="Utility\globals.h" />
+    <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="System\Animation_System.h" />
   </ItemGroup>
   <ItemGroup>

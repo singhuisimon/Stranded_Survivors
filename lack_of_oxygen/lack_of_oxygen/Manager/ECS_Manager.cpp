@@ -29,7 +29,7 @@
 // Include Utility headers
 #include "../Utility/Type.h" // Include shared types
 #include "../Utility/Component_Parser.h" // Include Component_Parser for adding components from JSON
-#include "../Utility/globals.h"
+#include "../Utility/Globals.h"
 
 // Include Log_Manager for logging
 #include "Log_Manager.h"
