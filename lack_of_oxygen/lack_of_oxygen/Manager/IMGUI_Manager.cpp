@@ -1,4 +1,3 @@
-
 // Include header file
 #include "IMGUI_Manager.h"
 
@@ -176,7 +175,8 @@ namespace lof {
 
         const auto& entities = ecs.get_entities();
 
-        // If the selected object index has changed, reset `filled` and clear `assigned_names`
+        //for animation dropdown
+        // if the selected object has changed, reset filled and clear assigned names for new object
         if (selected_object_index != last_selected_object_index) {
             last_selected_object_index = selected_object_index;
             assigned_names.clear();
@@ -338,10 +338,10 @@ namespace lof {
                         selected_items.resize(animation_list.size(), -1);
                     }
 
-                    ImGui::Text("%s", it->second.c_str());
-                    // Display an individual combo box for each animation entry
-                    std::string combo_label = "Choose Animation " + std::to_string(index);
-                    if (ImGui::Combo(combo_label.c_str(), &selected_items[index], animation_names_c_str.data(), assigned_names.size())) {
+                    ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
+                    std::string label = "Choose Animation for " + std::to_string(index);
+                    if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), assigned_names.size())) {
+
                         // Update the specific animation in the list
                         if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
                             it->second = assigned_names[selected_items[index]];
@@ -353,7 +353,7 @@ namespace lof {
                 auto& curr = animation.curr_animation_idx;
 
                 ImGui::Text("Current Animation Index: %i", curr);
-                ImGui::Text("Note: The animation index depends on movement.\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\nIn the Level Editor, objects are stationary by default, so only animations 0 and 1 are available.\nIf an out - of - range index is entered, it snaps to 0 for even values and 1 for odd values.");
+                ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
                 int temp_value = static_cast<int>(curr);
                 if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, animation_list.size() - 1)) {
                     
