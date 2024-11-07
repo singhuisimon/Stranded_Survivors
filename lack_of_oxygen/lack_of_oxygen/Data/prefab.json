@@ -165,6 +165,52 @@
           "relative_pos": [ 0, 0 ]
         }
       }
+    },
+    "moving_platform": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 512.0, 76.8 ]
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "mass": 0.0,
+          "is_static": true,
+          "jump_force": 0.0
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 0.0, 0.8, 0.2 ],
+          "texture_name": "Rock",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 512.0,
+          "height": 76.8
+        },
+        "Logic_Component": {
+          "logic_type": 0,
+          "movement_pattern": 0,
+          "is_active": true,
+          "movement_speed": 1.0,
+          "movement_range": 200.0,
+          "reverse_direction": false,
+          "rotate_with_motion": false
+        }
+      }
     }
   }
 }

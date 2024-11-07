@@ -137,7 +137,6 @@
               "pitch": 1,
               "islooping": false
             },
-
             {
               "key": "moving left",
               "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx28.wav",
@@ -157,6 +156,54 @@
               "islooping": false
             }
           ]
+        }
+      }
+    },
+    {
+      "name": "moving_sun_horizontal",
+      "prefab": "moving_platform",
+      "components": {
+        "Transform2D": {
+          "position": [ -500.0, 600.0 ],
+          "prev_position": [ -500.0, 600.0 ],
+          "scale": [ 100.0, 100.8 ]
+        },
+        "Graphics_Component": {
+          "texture_name": "sun",
+          "color": [ 0.0, 0.8, 0.2 ]
+        },
+        "Logic_Component": {
+          "logic_type": 0,
+          "movement_pattern": 0,
+          "is_active": true,
+          "movement_speed": 1.1,
+          "movement_range": 300.0,
+          "reverse_direction": false
+        }
+      }
+    },
+    {
+      "name": "moving_sun_circular",
+      "prefab": "moving_platform",
+      "components": {
+        "Transform2D": {
+          "position": [ -500.0, 550.0 ],
+          "prev_position": [ -500.0, 550.0 ],
+          "scale": [ 50.0, 50.0 ]
+        },
+        "Graphics_Component": {
+          "texture_name": "Snowflake",
+          "color": [ 0.8, 0.2, 0.0 ]
+        },
+        "Logic_Component": {
+          "logic_type": 0,
+          "movement_pattern": 1,
+          "is_active": true,
+          "movement_speed": 1.0,
+          "movement_range": 200.0,
+          "rotate_with_motion": true,
+          "reverse_direction": false,
+          "origin_pos": [ -500.0, 550.0 ]
         }
       }
     }
