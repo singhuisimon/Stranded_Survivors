@@ -24,6 +24,7 @@
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
 #include "IMGUI_Manager.h"
+#include "Assets_Manager.h"  // Access the file
 
 // Include all component headers
 #include "../Component/Component.h"
@@ -76,21 +77,24 @@ namespace lof {
         m_is_started = true;
 
         // Load general configuration using Path_Helper
-        std::string config_path = Path_Helper::get_config_path();
+        const std::string CONFIG = "Config\\";
+        std::string config_path = ASM.get_full_path(CONFIG, "config.json");
         if (!load_config(config_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
             return -1;
         }
 
         // Load prefabs using Path_Helper
-        std::string prefabs_path = Path_Helper::get_prefabs_path();
+        const std::string PREFABS = "Prefab\\";
+        std::string prefabs_path = ASM.get_full_path(PREFABS, "prefab.json");
         if (!load_prefabs(prefabs_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
             return -2;
         }
 
         // Load scene file using Path_Helper
-        std::string scene_path = Path_Helper::get_scene_path();
+        const std::string SCENES = "Scenes\\";
+        std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
@@ -162,15 +166,13 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
 
         // Read the JSON file into a string
-        std::ifstream ifs(filepath);
-        if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_config(): Failed to open configuration file: %s", filepath);
+        std::string json_content;  // This will receive the file content
+
+        // Read JSON file through Assets_Manager
+        if (!ASM.read_json_file(filepath, json_content)) {  // json_content is passed by reference
+            LM.write_log("Serialization_Manager::load_config(): Failed to read configuration file");
             return false;
         }
-
-        std::stringstream buffer;
-        buffer << ifs.rdbuf();
-        std::string json_content = buffer.str();
 
         // Parse the JSON content
         m_document.Parse(json_content.c_str());
@@ -226,15 +228,13 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
 
         // Read and parse the prefab file
-        std::ifstream ifs(filepath);
-        if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_prefabs(): Failed to open prefab file: %s", filepath);
+        std::string json_content;  // This will receive the file content
+
+        // Read JSON file through Assets_Manager
+        if (!ASM.read_json_file(filepath, json_content)) {  // json_content is passed by reference
+            LM.write_log("Serialization_Manager::load_config(): Failed to read prefabs file");
             return false;
         }
-
-        std::stringstream buffer;
-        buffer << ifs.rdbuf();
-        std::string json_content = buffer.str();
 
         rapidjson::Document prefab_document;
         prefab_document.Parse(json_content.c_str());
@@ -299,15 +299,13 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
 
         // Read and parse the scene file
-        std::ifstream ifs(filename);
-        if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_scene(): Failed to open scene file: %s", filename);
+        std::string json_content;  // This will receive the file content
+
+        // Read JSON file through Assets_Manager
+        if (!ASM.read_json_file(filename, json_content)) {  // json_content is passed by reference
+            LM.write_log("Serialization_Manager::load_config(): Failed to read configuration file");
             return false;
         }
-
-        std::stringstream buffer;
-        buffer << ifs.rdbuf();
-        std::string json_content = buffer.str();
 
         rapidjson::Document scene_document;
         scene_document.Parse(json_content.c_str());
