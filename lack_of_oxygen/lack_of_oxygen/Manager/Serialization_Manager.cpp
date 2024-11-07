@@ -30,6 +30,7 @@
 // Include Utility headers
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Component_Parser.h" // Adding components from JSON
+#include "../Utility/Force_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 
@@ -255,6 +256,9 @@ namespace lof {
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
 
+            //DEBUG
+            LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());
+
             // Deep copy the prefab definition into the map
             rapidjson::Value prefab_value(rapidjson::kObjectType);
             prefab_value.CopyFrom(it->value, m_document.GetAllocator());
@@ -442,26 +446,57 @@ namespace lof {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
 
         // Serialize gravity vector
-        rapidjson::Value gravity(rapidjson::kArrayType);
-        gravity.PushBack(component.gravity.x, allocator);
-        gravity.PushBack(component.gravity.y, allocator);
-        comp_obj.AddMember("gravity", gravity, allocator);
+        Vec2D gravity = component.get_gravity();
+        rapidjson::Value gravity_arr(rapidjson::kArrayType);
+        gravity_arr.PushBack(gravity.x, allocator);
+        gravity_arr.PushBack(gravity.y, allocator);
+        comp_obj.AddMember("gravity", gravity_arr, allocator);
 
         // Serialize scalar physics properties
-        comp_obj.AddMember("damping_factor", component.damping_factor, allocator);
-        comp_obj.AddMember("max_velocity", component.max_velocity, allocator);
-        comp_obj.AddMember("mass", component.mass, allocator);
-        comp_obj.AddMember("jump_force", component.jump_force, allocator);
+        comp_obj.AddMember("damping_factor", component.get_damping_factor(), allocator);
+        comp_obj.AddMember("max_velocity", component.get_max_velocity(), allocator);
+        comp_obj.AddMember("mass", component.get_mass(), allocator);
+        comp_obj.AddMember("jump_force", component.get_jump_force(), allocator);
 
         // Serialize boolean flags
-        comp_obj.AddMember("is_static", component.is_static, allocator);
-        comp_obj.AddMember("is_grounded", component.is_grounded, allocator);
+        comp_obj.AddMember("is_static", component.get_is_static(), allocator);
+        comp_obj.AddMember("is_grounded", component.get_is_grounded(), allocator);
+        comp_obj.AddMember("has_jumped", component.get_has_jumped(), allocator);
 
         // Serialize accumulated force
+        Vec2D acc_force = component.get_accumulated_force();
         rapidjson::Value accumulated_force(rapidjson::kArrayType);
-        accumulated_force.PushBack(component.accumulated_force.x, allocator);
-        accumulated_force.PushBack(component.accumulated_force.y, allocator);
+        accumulated_force.PushBack(acc_force.x, allocator);
+        accumulated_force.PushBack(acc_force.y, allocator);
         comp_obj.AddMember("accumulated_force", accumulated_force, allocator);
+
+        //serialize force_manager 
+        rapidjson::Value force_manager_obj(rapidjson::kObjectType);
+        rapidjson::Value forces_array(rapidjson::kArrayType);
+
+        //get all forces from force manager
+        const auto& forces = component.force_manager.get_forces();
+
+        for (const auto& force : forces) {
+            rapidjson::Value force_obj(rapidjson::kObjectType);
+
+            // Serialize direction
+            rapidjson::Value direction(rapidjson::kArrayType);
+            direction.PushBack(force.direction.x, allocator);
+            direction.PushBack(force.direction.y, allocator);
+            force_obj.AddMember("direction", direction, allocator);
+
+            std::string type_str = Force::ftype_to_string(force.type);
+            force_obj.AddMember("type", rapidjson::Value(type_str.c_str(), allocator), allocator);
+            // Serialize other force properties
+            force_obj.AddMember("magnitude", force.magnitude, allocator);
+            force_obj.AddMember("lifetime", force.lifetime, allocator);
+            force_obj.AddMember("is_active", force.is_active, allocator);
+
+            forces_array.PushBack(force_obj, allocator);
+        }
+        force_manager_obj.AddMember("forces", forces_array, allocator);
+        comp_obj.AddMember("force_manager", force_manager_obj, allocator);
 
         return comp_obj;
     }

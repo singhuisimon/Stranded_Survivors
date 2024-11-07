@@ -69,7 +69,7 @@ namespace lof {
 
         for (auto it1 = entities.begin(); it1 != entities.end(); ++it1) {
             EntityID entity_ID1 = *it1;
-            std::cout << "entity 1 is :" << entity_ID1 << "\n";
+            //std::cout << "entity 1 is :" << entity_ID1 << "\n";
             //std::cout << *it1 << "\n";
 
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
@@ -97,7 +97,7 @@ namespace lof {
             // Check for collisions with other entities
             for (auto it2 = entities.begin(); it2 != entities.end(); ++it2) {
                 EntityID entity_ID2 = *it2;
-                std::cout << "entity 2 is :" << entity_ID2 << "\n";
+                //std::cout << "entity 2 is :" << entity_ID2 << "\n";
 
                 if (entity_ID1 == entity_ID2)
                 {
@@ -126,8 +126,8 @@ namespace lof {
                     if (side == CollisionSide::BOTTOM)
                     {
                         is_grounded = true;
-                        LM.write_log("is on a platform now ");
-                        std::cout << "this is collide top\n";
+                        //LM.write_log("is on a platform now ");
+                        //std::cout << "this is collide top\n";
                         physic1.set_gravity(Vec2D(0.0f, 0.0f));
                     }
 
@@ -136,8 +136,8 @@ namespace lof {
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
                     std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
 
-                    std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
-                    std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
+                    //std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
                     std::cout << "State of is grouded for player: " << physic1.get_is_grounded() << "\n";
 
 
@@ -152,224 +152,24 @@ namespace lof {
 
 #endif
 
-#if 0
-    void Collision_System::collision_check_collide(float delta_time) {
-        const auto& entities = get_entities();
-
-        for (auto it1 = entities.begin(); it1 != entities.end(); ++it1) {
-            EntityID entity_ID1 = *it1;
-            auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
-            auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
-            auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
-            auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
-
-            // Create AABB for object 1
-            AABB aabb1 = AABB::from_transform(transform1, collision1);
-
-            for (auto it2 = entities.begin(); it2 != entities.end(); ++it2) {
-                EntityID entity_ID2 = *it2;
-
-                if (entity_ID1 == entity_ID2)
-                    continue;
-
-                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
-                auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
-                auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
-
-                // Create AABB for object 2
-                AABB aabb2 = AABB::from_transform(transform2, collision2);
-                
-
-
-                // Check for collision
-                float collision_time = delta_time;
-                if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time)) {
-                    CollisionSide side = compute_collision_side(aabb1, aabb2);
-                    Vec2D overlap = compute_overlap(aabb1, aabb2);
-
-                    // Just store collision info, no resolution here
-                    current_collisions.push_back({
-                        entity_ID1,
-                        entity_ID2,
-                        overlap,
-                        side,
-                        false  // is_grounded will be handled by Movement_System
-                        });
-
-                    // Debug output
-                    LM.write_log("Collision detected!");
-                    std::cout << "Collision between Entity " << entity_ID1 << " and Entity " << entity_ID2 << "\n";
-                    std::cout << "Collision Side: " << collisionSideToString(side) << "\n";
-                    std::cout << "Overlap: x=" << overlap.x << ", y=" << overlap.y << "\n";
-                }
-            }
-            physic1.is_grounded = is_grounded;
-            if (!is_grounded) {
-                physic1.gravity.y = DEFAULT_GRAVITY; // Reset gravity if not grounded
-            }
-        }
-    }
-#endif
-
  
 
     bool Collision_System::collision_intersection_rect_rect(const AABB& aabb1,
         const Vec2D& vel1,
         const AABB& aabb2,
         const Vec2D& vel2,
-        float& firstTimeOfCollision,
-        float delta_time) {
+        float& firstTimeOfCollision) {
         // Check for AABB intersection
-        // Check for AABB intersection
-        //check for A.max < B.min or A.min > B.min for x axis & y axis
         if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x ||
-            aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y)
-        {
-            return false; //no intersection
+            aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y) {
+            return false; // No intersection
         }
 
-        float Vb_x = vel2.x - vel1.x;; //initialize Vb for x axis 
-        float Vb_y = vel2.y - vel1.y;; //initialize Vb for y axis
+        // Additional collision detection logic can be implemented here if needed
 
-        float dFirst_x = aabb1.max.x - aabb2.min.x;  //initialize for dFirst for x-axis
-        float dFirst_y = aabb1.max.y - aabb2.min.y;; // initialize for dFrist for y axis
-        float dLast_x = aabb1.min.x - aabb2.max.x;; //initialize for dLast for x axis
-        float dLast_y = aabb1.min.y - aabb2.max.y;; //initialize for dLast for y axis
-
-
-        float tFirst = firstTimeOfCollision = 0.0f; //Initialise t first
-        float tLast = delta_time; //initialize tLast and assume 1 as the time step (g_dt)
-
-        //for x-axis
-        if (Vb_x < 0)
-        {
-            //case 1 for x-axis
-            if (aabb1.min.x > aabb2.max.x)
-            {
-                return false;
-            }
-            //case 4 for x-axis
-            if (aabb1.max.x < aabb2.min.x)
-            {
-                if (tFirst < dFirst_x / Vb_x)
-                {
-                    tFirst = dFirst_x / Vb_x;
-                }
-            }
-
-            if (aabb1.min.x < aabb2.max.x)
-            {
-                if (tLast > dLast_x / Vb_x)
-                {
-                    tLast = dLast_x / Vb_x;
-                }
-            }
-        }
-        else if (Vb_x > 0)
-        {
-            //case 2 for x_axis
-            if (aabb1.min.x > aabb2.max.x)
-            {
-                if (tFirst < dLast_x / Vb_x)
-                {
-                    tFirst = dLast_x / Vb_x;
-                }
-            }
-            if (aabb1.max.x > aabb2.min.x)
-            {
-                if (tLast > dFirst_x / Vb_x)
-                {
-                    tLast = dFirst_x / Vb_x;
-                }
-            }
-
-            //case 3
-            if (aabb1.max.x < aabb2.min.x)
-            {
-                return false;
-            }
-
-        }
-        else if (Vb_x == 0) {
-            //case 5;
-            if (aabb1.max.x < aabb2.min.x)
-            {
-                return false;
-            }
-            else if (aabb1.min.x > aabb2.max.x)
-            {
-                return false;
-            }
-        }
-
-        //for y-axis
-        if (Vb_y < 0)
-        {
-            //case 1 for x-axis
-            if (aabb1.min.y > aabb2.max.y)
-            {
-                return 0;
-            }
-            //case 4 for x-axis
-            if (aabb1.max.y < aabb2.min.y)
-            {
-                if (tFirst < dFirst_y / Vb_y)
-                {
-                    tFirst = dFirst_y / Vb_y;
-                }
-            }
-            if (aabb1.min.y < aabb2.max.y)
-            {
-                if (tLast > dLast_y / Vb_y)
-                {
-                    tLast = dLast_y / Vb_y;
-                }
-            }
-        }
-        else if (Vb_y > 0)
-        {
-            //case 2 for x_axis
-            if (aabb1.min.y > aabb2.max.y)
-            {
-                if (tFirst < dLast_y / Vb_y)
-                {
-                    tFirst = dLast_y / Vb_y;
-                }
-            }
-            if (aabb1.max.y > aabb2.min.y)
-            {
-                if (tLast > dFirst_y / Vb_y)
-                {
-                    tLast = dFirst_y / Vb_y;
-                }
-            }
-            //case 3
-            if (aabb1.max.y < aabb2.min.y)
-            {
-                return false;
-            }
-        }
-        else if (Vb_y == 0) {
-            //case 5;
-            if (aabb1.max.y < aabb2.min.y)
-            {
-                return false;
-            }
-            else if (aabb1.min.y > aabb2.max.y)
-            {
-                return false;
-            }
-        }
-        //case 6; 
-        if (tFirst > tLast)
-        {
-            return false;
-        }
-
-        return true; //the rectangle intersect
+        return true; // The rectangles intersect
 
     }
-
     Vec2D Collision_System::compute_overlap(const AABB& aabb1, const AABB& aabb2) {
         float overlap_x = std::min(aabb1.max.x, aabb2.max.x) - std::max(aabb1.min.x, aabb2.min.x);
         float overlap_y = std::min(aabb1.max.y, aabb2.max.y) - std::max(aabb1.min.y, aabb2.min.y);
@@ -434,8 +234,9 @@ namespace lof {
         //return CollisionSide::NONE; // No collision
         return side;
     }
-
-#if 1
+   
+    //HS'S ORGINAL CODE
+#if 0
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         for (const auto& collision : collisions) {
             EntityID entityA = collision.entity1;
@@ -463,14 +264,14 @@ namespace lof {
                     //velocityA.velocity.x = std::max(0.0f, velocityA.velocity.x);
                     velocityA.velocity.x = 0.0f;
                     transformA.position.x += overlap.x;
-                    std::cout << "This is the position in resolve function for left side " << transformA.position.x << "\n";
+                  //  std::cout << "This is the position in resolve function for left side " << transformA.position.x << "\n";
                     break;
 
                 case CollisionSide::RIGHT:
                     //velocityA.velocity.x = std::min(0.0f, velocityA.velocity.x);
                     velocityA.velocity.x = 0.0f;
                     transformA.position.x -= overlap.x;
-                    std::cout << "This is the position in resolve function for right side " << transformA.position.x << "\n";
+                //    std::cout << "This is the position in resolve function for right side " << transformA.position.x << "\n";
                     break;
 
                 case CollisionSide::TOP:
@@ -478,16 +279,19 @@ namespace lof {
                     velocityA.velocity.y = 0.0f;
                     //transformA.position.y = transformB.position.y + transformB.scale.y * 0.5 + transformA.scale.y * 0.5;
                     transformA.position.y -= overlap.y;
-                    std::cout << "this is the scale for platformB in resolve solution" << transformB.scale.y << "\n";
-                    std::cout << "This is the position in resolve function for top side " << transformA.position.y << "\n";
+                    //std::cout << "this is the scale for platformB in resolve solution" << transformB.scale.y << "\n";
+                    //std::cout << "This is the position in resolve function for top side " << transformA.position.y << "\n";
                     break;
 
                 case CollisionSide::BOTTOM:
                     //velocityA.velocity.y = std::min(0.0f, velocityA.velocity.y);
                     velocityA.velocity.y = 0.0f;
                     transformA.position.y += overlap.y;
+                    physicsA.set_is_grounded(true); //setting is grounded here 
+                    physicsA.set_has_jumped(false); //reset jump state when landing
+                    physicsA.set_gravity(Vec2D(0.0f, 0.0f)); //reset gravity when grounded.
 
-                    std::cout << "This is the position in resolve function for bottom side " << transformA.position.y << "\n";
+                   // std::cout << "This is the position in resolve function for bottom side " << transformA.position.y << "\n";
                     break;
 
                 case CollisionSide::NONE:
@@ -500,30 +304,77 @@ namespace lof {
                 }
             }
         }
+    }
+#endif
+
+#if 1
+    void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
+        for (const auto& collision : collisions) {
+            EntityID entityA = collision.entity1;
+            EntityID entityB = collision.entity2;
+
+            auto& physicsA = ECSM.get_component<Physics_Component>(entityA);
+            auto& transformA = ECSM.get_component<Transform2D>(entityA);
+            auto& velocityA = ECSM.get_component<Velocity_Component>(entityA);
+
+            // Only process dynamic entities colliding with static entities
+            if (!physicsA.get_is_static()) {
+                Vec2D normal(0.0f, 0.0f);
+                if (collision.side == CollisionSide::LEFT) normal = Vec2D(1.0f, 0.0f);
+                else if (collision.side == CollisionSide::RIGHT) normal = Vec2D(-1.0f, 0.0f);
+                else if (collision.side == CollisionSide::TOP) normal = Vec2D(0.0f, -1.0f);
+                else if (collision.side == CollisionSide::BOTTOM) normal = Vec2D(0.0f, 1.0f);
+
+                Vec2D relative_velocity = velocityA.velocity;
+
+                // Apply minimal restitution for bottom collisions to prevent bouncing
+                float restitution = (collision.side == CollisionSide::BOTTOM) ? 0.0f : 0.1f;
+
+                // Compute impulse scalar
+                float impulse_scalar = -(1.0f + restitution) * dot_product_vec2d(relative_velocity, normal);
+                impulse_scalar /= physicsA.get_inv_mass();
+
+                // Apply impulse
+                Vec2D impulse = normal * impulse_scalar;
+                velocityA.velocity += impulse * physicsA.get_inv_mass();
+
+                // Position correction to avoid sinking
+                float percent = 0.2f;  // Adjust as needed
+                float slop = 0.01f;    // Allowable penetration
+                Vec2D correction = normal * std::max((collision.overlap.y - slop) * percent, 0.0f);
+
+                // Only apply correction on the y-axis for bottom collisions
+                if (collision.side == CollisionSide::BOTTOM) {
+                    correction.x = 0.0f;  // Prevent horizontal corrections
+                }
+
+                transformA.position += correction;
+
+                // Additional handling for grounded state and velocity stabilization
+                if (collision.side == CollisionSide::BOTTOM) {
+                    physicsA.set_is_grounded(true);
+                    physicsA.set_has_jumped(false);
+                    physicsA.set_gravity(Vec2D(0.0f, 0.0f));
+
+                    // Dampen velocity if close to zero to prevent jitter
+                    if (std::abs(velocityA.velocity.y) < 0.1f) {
+                        velocityA.velocity.y = 0.0f;
+                    }
+                }
+            }
+        }
+    }
 #endif
 
 
-    }
-
     void Collision_System::update(float delta_time) {
 
-#if 1
         std::vector<CollisionPair> collisions;
         std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
         std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
-#endif
-   
-#if 0
-        current_collisions.clear(); //clear the previous ones before storing another
-        collision_check_collide(delta_time);
-#endif
-    }
 
-
-    const std::vector<CollisionPair>& Collision_System::get_collisions() const {
-        return current_collisions;
     }
 
 } // namespace lof

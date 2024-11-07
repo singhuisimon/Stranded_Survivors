@@ -114,30 +114,21 @@ namespace lof {
             const Vec2D& vel1,
             const AABB& aabb2,
             const Vec2D& vel2,
-            float& firstTimeOfCollision, 
-            float delta_time);
+            float& firstTimeOfCollision);
 
-        //static Collision_System& get_instance() {
-        //    static Collision_System instance; // Guaranteed to be destroyed
-        //    return instance; // Instantiated on first use
+        //static const std::vector<CollisionPair>& get_collisions() {
+        //    return current_collisions;
         //}
-       // const std::vector<CollisionPair>& get_collisions() const;
 
-    private:
+
+    public:
         
-        //sstd::vector<CollisionPair> collision_pairs; // Store collisions
-
-        //static Collision_System& get_instance() {
-        //    static Collision_System instance; // Guaranteed to be destroyed
-        //    return instance; // Instantiated on first use
-        //}
-        const std::vector<CollisionPair>& get_collisions() const;
         std::string collisionSideToString(CollisionSide side);
 
     private:
 
         //to store current frame's collisions
-        std::vector<CollisionPair> current_collisions; 
+        //static std::vector<CollisionPair> current_collisions; 
 
         /**
          * @brief Compute the overlap between AABBs.

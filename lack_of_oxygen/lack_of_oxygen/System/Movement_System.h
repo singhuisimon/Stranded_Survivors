@@ -51,12 +51,8 @@ namespace lof {
         void handle_ground_contact(EntityID entity_id, const CollisionPair& collision, float delta_time);
         void handle_wall_contact(EntityID entity_id, const CollisionPair& collision, float delta_time);
 #endif
-        
-    };
 
-        //void check_grounded(EntityID entityID);
-
-        void resolve_collision(const CollisionPair& collision, Transform2D& transform, Velocity_Component& velocity, Physics_Component& physics);
+       // void resolve_collision(const CollisionPair& collision, Transform2D& transform, Velocity_Component& velocity, Physics_Component& physics);
 
 
     };
