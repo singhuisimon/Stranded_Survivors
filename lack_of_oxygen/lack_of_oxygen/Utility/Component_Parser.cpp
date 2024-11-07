@@ -291,45 +291,23 @@ namespace lof {
                     for (const auto& sound : sounds_array.GetArray()) {
                         if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
+                            //includes the path and filetype. For now its only .wav in the future there will be a filetype constant to aid in adding the file type at the end.
                             std::string filepath = Path_Helper::get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Audio\\" + sound["filepath"].GetString() + ".wav";
                             
+                            //checks if it has any missing component if so default it.
                             PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : NONE;
                             AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
                             float volume = sound.HasMember("volume") && sound["volume"].IsFloat() ? sound["volume"].GetFloat() : 1.0f;
                             float pitch = sound.HasMember("pitch") && sound["pitch"].IsFloat() ? sound["pitch"].GetFloat() : 1.0f;
                             bool islooping = sound.HasMember("islooping") && sound["islooping"].IsBool() ? sound["islooping"].GetBool() : false;
 
+                            //adds the sound into the soundconfig located in the component.h
                             audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
                             LM.write_log("add component from json<audiocom>: key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
                             LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
                         }
                     }
                 }
-
-               /* if (component_data.HasMember("sounds") && component_data["sounds"].IsArray()) {
-                    const auto& sounds = component_data["sounds"];
-                    for (const auto& sound : sounds.GetArray()) {
-                        if (sound.HasMember("key") && sound.HasMember("filepath")) {
-                            std::string key = sound["key"].GetString();
-                            std::string filepath = sound["filepath"].GetString();
-
-                            PlayState play_state = sound.HasMember("audio_state") ? static_cast<PlayState>(sound["audio_state"].GetInt()) : STOPPED;
-                            AudioType audio_type = sound.HasMember("audio_type") ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
-                            float volume = sound.HasMember("volume") ? sound["volume"].GetFloat() : 1.0f;
-                            float pitch = sound.HasMember("pitch") ? sound["pitch"].GetFloat() : 1.0f;
-                            bool islooping = sound.HasMember("islooping") ? sound["islooping"].GetBool() : false;
-
-                            audio_component.set_filename(key, filepath);
-                            audio_component.set_audio_state(key, play_state);
-                            audio_component.set_audio_type(key, audio_type);
-                            audio_component.set_volume(key, volume);
-                            audio_component.set_pitch(key, pitch);
-                            audio_component.set_loop(key, islooping);
-
-                            LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
-                        }
-                    }
-                }*/
 
                 // Add component to entity
                 ecs_manager.add_component<Audio_Component>(entity, audio_component);
