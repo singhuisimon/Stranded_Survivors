@@ -74,6 +74,9 @@ int main(void) {
     // Make the window's context current
     glfwMakeContextCurrent(window);
 
+    // Disable VSync, so that the fps can increase beyond the monitor's refresh rate
+    glfwSwapInterval(0);
+
     // Load OpenGL function pointers with GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         LM.write_log("Failed to initialize OpenGL function pointers!");

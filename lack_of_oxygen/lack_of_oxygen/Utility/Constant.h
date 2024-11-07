@@ -36,7 +36,7 @@ namespace lof {
 
 	// ----------------------------- FPS_Manager.cpp -------------------------------------------
 	// FPS_Manager Constants
-	constexpr int DEFAULT_TARGET_FPS = 60;
+	constexpr int DEFAULT_TARGET_FPS = 120;
 	constexpr int64_t DEFAULT_MICROSECONDS_PER_SECOND = 1000000;
 	constexpr int64_t DEFAULT_TARGET_TIME = DEFAULT_MICROSECONDS_PER_SECOND / DEFAULT_TARGET_FPS;
 
@@ -132,6 +132,11 @@ namespace lof {
 	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;
 	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
 
+	// Camera
+	constexpr float DEFAULT_CAMERA_SPEED = 1000.0f;
+	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
+	constexpr float DEFAULT_ORIENTATION = 0.0f;
+
 	// ------------------------------ Render_System.cpp --------------------------------
 	// Drawing constants
 	constexpr GLfloat DEFAULT_ROTATION = 90.0f;
@@ -155,6 +160,8 @@ namespace lof {
 	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
 	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
 
+	// -------------------------- Common variables used in Systems -----------------------------------
+	constexpr char const* DEFAULT_PLAYER_NAME = "player1";
 
 } // namespace lof
 
