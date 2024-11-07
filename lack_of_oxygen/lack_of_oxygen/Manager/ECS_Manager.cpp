@@ -21,6 +21,8 @@
 #include "../System/Collision_System.h"
 #include "../System/GUI_System.h"
 #include "../System/Audio_System.h"
+#include "../System/Animation_System.h"
+#include "../System/Logic_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -28,6 +30,7 @@
 // Include Utility headers
 #include "../Utility/Type.h" // Include shared types
 #include "../Utility/Component_Parser.h" // Include Component_Parser for adding components from JSON
+#include "../Utility/Globals.h"
 
 // Include Log_Manager for logging
 #include "Log_Manager.h"
@@ -83,6 +86,15 @@ namespace lof {
             register_component<GUI_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'GUI_Component'.");
 
+            register_component<Animation_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Animation_Component'.");
+
+            register_component<Logic_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Logic_Component'.");
+
+            register_component<Text_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Text_Component'.");
+
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
@@ -100,6 +112,12 @@ namespace lof {
 
             add_system(std::make_unique<Audio_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
+
+            add_system(std::make_unique<Animation_System>()); 
+            LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
+
+            add_system(std::make_unique<Logic_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");
@@ -130,7 +148,6 @@ namespace lof {
         m_is_started = false;
         LM.write_log("ECS_Manager::shut_down(): ECS_Manager shut down successfully.");
     }
-
 
     void ECS_Manager::add_components_from_json(EntityID entity, const rapidjson::Value& components) {
         LM.write_log("ECS_Manager::add_components_from_json(): Adding components to entity ID %u.", entity);
@@ -240,30 +257,75 @@ namespace lof {
             return;
         }
 
-        // Remove from systems
-        for (auto& system : systems) {
-            system->remove_entity(entity);
-        }
-
-        // Remove from name lookup if it has a name
+        // Log the entity being destroyed
         const std::string& name = entities[entity]->get_name();
-        if (!name.empty()) {
-            entity_names.erase(name);
-            LM.write_log("ECS_Manager::destroy_entity(): Removed name mapping for '%s'", name.c_str());
-        }
+        LM.write_log("ECS_Manager::destroy_entity(): Starting destruction of entity %u (name: %s)", entity, name.c_str());
 
-        // Remove components
-        for (auto& component_pair : component_arrays) {
-            auto& componentArray = component_pair.second;
-            if (entity < componentArray.size()) {
-                componentArray[entity].reset();
+        // First remove from all systems
+        for (auto& system : systems) {
+            if (system->has_entity(entity)) {
+                system->remove_entity(entity);
+                LM.write_log("Removed entity %u from system %s", entity, system->get_type().c_str());
             }
         }
 
-        // Clear the entity itself
-        entities[entity].reset();
+        // Remove from name lookup if it has a name
+        if (!name.empty()) {
+            entity_names.erase(name);
+            LM.write_log("Removed name mapping for '%s'", name.c_str());
+        }
 
-        LM.write_log("ECS_Manager::destroy_entity(): Destroyed entity ID %u.", entity);
+        // Remove all components
+        for (auto& component_pair : component_arrays) {
+            auto& componentArray = component_pair.second;
+            if (entity < componentArray.size()) {
+                if (componentArray[entity]) {  // Check if component exists
+                    componentArray[entity].reset();
+                    LM.write_log("Reset component for entity %u", entity);
+                }
+            }
+        }
+
+        // Remove the entity from the entities vector
+        entities.erase(entities.begin() + entity);
+        LM.write_log("Removed entity from entities vector");
+
+        // Update the IDs of all entities that come after the removed one
+        for (size_t i = entity; i < entities.size(); i++) {
+            if (entities[i]) {
+                EntityID new_id = static_cast<EntityID>(i);
+                EntityID old_id = entities[i]->get_id();
+
+                // Update the entity's ID
+                entities[i]->set_id(new_id);
+
+                // Update name mapping
+                const std::string& entity_name = entities[i]->get_name();
+                if (!entity_name.empty()) {
+                    entity_names[entity_name] = new_id;
+                }
+
+                // Update system mappings
+                for (auto& system : systems) {
+                    if (system->has_entity(old_id)) {
+                        system->remove_entity(old_id);
+                        system->add_entity(new_id);
+                    }
+                }
+
+                LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
+            }
+        }
+
+        // Compact component arrays
+        for (auto& component_pair : component_arrays) {
+            auto& componentArray = component_pair.second;
+            if (entity < componentArray.size()) {
+                componentArray.erase(componentArray.begin() + entity);
+            }
+        }
+
+        LM.write_log("ECS_Manager::destroy_entity(): Completed destruction of entity %u", entity);
     }
 
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{
@@ -282,11 +344,25 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
 
-            // Getting delta time for each system
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-            // Updating each system
-            system->update(delta_time);
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System") {
+
+                if (!level_editor_mode) {
+                    // Getting delta time for each system
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                    // Updating each system
+                    system->update(delta_time);
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+                }
+
+            }
+            else {
+                // Getting delta time for each system
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            }
+            
             
         }
     }

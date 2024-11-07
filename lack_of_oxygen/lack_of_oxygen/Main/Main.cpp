@@ -26,7 +26,7 @@
 
 using namespace lof;
 
-
+bool level_editor_mode = false;
 
 int main(void) {
 
@@ -74,6 +74,9 @@ int main(void) {
     // Make the window's context current
     glfwMakeContextCurrent(window);
 
+    // Disable VSync, so that the fps can increase beyond the monitor's refresh rate
+    glfwSwapInterval(0);
+
     // Load OpenGL function pointers with GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         LM.write_log("Failed to initialize OpenGL function pointers!");
@@ -101,6 +104,13 @@ int main(void) {
         LM.write_log("Game_Manager started up successfully.");
         std::cout << "Game_Manager started up successfully." << std::endl;
     }
+
+    // --------------------------- Start IMGUI_Manager ---------------------------
+
+    IMGUIM.start_up(window); // Might need to integrate with game manager 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    bool lvl_manager_mode = false;
+    bool object_editor_mode = false;
 
     // --------------------------- Retrieve Configuration ---------------------------
 
@@ -147,7 +157,7 @@ int main(void) {
         std::stringstream ss;
         ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
         glfwSetWindowTitle(window, ss.str().c_str());
-        
+
         // Update FPS timer
         fps_timer += delta_time;
         if (fps_timer >= FPS_DISPLAY_INTERVAL) {
@@ -158,7 +168,12 @@ int main(void) {
         }
 
         // Poll for and process events 
-        glfwPollEvents(); 
+        glfwPollEvents();
+
+
+        if (IM.is_key_held(GLFW_KEY_TAB)) {
+            level_editor_mode = !level_editor_mode;
+        }
 
         // Getting delta time for Game Manager/game loop
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -166,21 +181,64 @@ int main(void) {
         GM.update(delta_time);
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
 
-       
-        // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
-        if (IM.is_key_held(GLFW_KEY_T)) {
-            system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-            system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
-            //system_performance(GM.get_time(), AM.get_time(), AM.get_type());
-            system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
-            std::cout << "In ECS Manager...\n";
-            for (auto& system : ECSM.get_systems()) {
-                system_performance(GM.get_time(), system->get_time(), system->get_type());
-            }
 
-            std::cout << std::endl;
+        // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
+        //if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
+
+        // Start the Dear ImGui frame
+        IMGUIM.start_frame();
+        ImGui::Begin("Performance Viewer");
+        
+        
+        system_performance(GM.get_time(), IM.get_time(), IM.get_type());
+        system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+        //system_performance(GM.get_time(), IMGUIM.get_time(), IMGUIM.get_type());
+        system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
+        ImGui::Text("In ECS Manager: \n");
+        for (auto& system : ECSM.get_systems()) {
+        system_performance(GM.get_time(), system->get_time(), system->get_type());
         }
 
+        ImGui::End();
+            
+
+        if (level_editor_mode) {
+  
+            
+
+            if (ImGui::BeginMainMenuBar()) {
+                if (ImGui::BeginMenu("File")) {
+                    if (ImGui::MenuItem("Load File")) {
+
+                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+                        lvl_manager_mode = !lvl_manager_mode;
+                    }
+                    if (ImGui::MenuItem("Edit File")) {
+
+                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+                        object_editor_mode = !object_editor_mode;
+                    }
+                    
+                    ImGui::EndMenu();
+                }
+            }
+
+            if (object_editor_mode) {
+                IMGUIM.imgui_game_objects_list();
+            }
+
+            if (lvl_manager_mode) {
+                IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+            }
+
+
+            ImGui::EndMainMenuBar();
+            // Rendering
+            
+
+        }
+        // Rendering
+        IMGUIM.render();
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {
@@ -195,6 +253,11 @@ int main(void) {
         // End of frame timing and FPS control
         FPSM.frame_end();
     }
+
+    IMGUIM.shut_down();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
     LM.write_log("Exiting main game loop.");
     std::cout << "Exiting main game loop." << std::endl;

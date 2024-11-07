@@ -341,7 +341,7 @@ namespace lof {
                     for (const auto& sound : sounds_array.GetArray()) {
                         if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
-                            std::string filepath = Path_Helper::get_executable_directory() + sound["filepath"].GetString();
+                            std::string filepath = Path_Helper::get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Audio\\" + sound["filepath"].GetString() + ".wav";
                             
                             PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : NONE;
                             AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
@@ -350,7 +350,7 @@ namespace lof {
                             bool islooping = sound.HasMember("islooping") && sound["islooping"].IsBool() ? sound["islooping"].GetBool() : false;
 
                             audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
-                            LM.write_log("key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("add component from json<audiocom>: key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
                             LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
                         }
                     }
@@ -416,6 +416,119 @@ namespace lof {
                 ecs_manager.add_component<GUI_Component>(entity, gui_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
             }
+            // ------------------------------------ Animation_Component -------------------------------------------
+            else if (component_name == "Animation_Component") {
+                // Parse Animation_Component
+                Animation_Component animation_component;
+
+                if (component_data.HasMember("animations") && component_data["animations"].IsArray()) {
+                    const rapidjson::Value& map = component_data["animations"];
+
+                    if (map.Size() > 0) {
+                        std::map<std::string, std::string> animation_map;
+                        for (rapidjson::SizeType i = 0; i < map.Size(); ++i) {
+                            const rapidjson::Value& row = map[i];
+                            if (row.IsArray() && row.Size() == 2) {
+                                if (row[0].IsString() && row[1].IsString()) {
+                                    animation_map.insert({ row[0].GetString(), row[1].GetString() });
+                                }
+                            }
+                        }
+
+                        animation_component.animations = animation_map;
+                    }
+                    else {
+                        animation_component.animations = std::map<std::string, std::string>{ {DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME} }; // Default value 
+                    }
+                }
+                else {
+                    animation_component.animations = std::map<std::string, std::string>{ {DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME} }; // Default value
+                }
+
+                if (component_data.HasMember("curr_animation_idx") && component_data["curr_animation_idx"].IsUint()) {
+                    animation_component.curr_animation_idx = component_data["curr_animation_idx"].GetUint();
+                }
+                else {
+                    animation_component.curr_animation_idx = std::stoi(DEFAULT_ANIMATION_IDX); // Default value
+                }
+
+                if (component_data.HasMember("start_animation_idx") && component_data["start_animation_idx"].IsUint()) {
+                    animation_component.start_animation_idx = component_data["start_animation_idx"].GetUint();
+                }
+                else {
+                    animation_component.start_animation_idx = std::stoi(DEFAULT_ANIMATION_IDX); // Default value
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<Animation_Component>(entity, animation_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Animation_Component to entity ID %u.", entity);
+                }
+            // ------------------------------------ Logic_Component -------------------------------------------
+            else if (component_name == "Logic_Component") {
+                // Log the raw value from JSON
+                int pattern_value = component_data["movement_pattern"].GetInt();
+                LM.write_log("Parsing Logic Component - Raw movement pattern value: %d", pattern_value);
+
+                Logic_Component logic(
+                    static_cast<Logic_Component::LogicType>(component_data["logic_type"].GetInt()),
+                    static_cast<Logic_Component::MovementPattern>(pattern_value)
+                );
+
+                // Set other properties
+                if (component_data.HasMember("is_active")) {
+                    logic.is_active = component_data["is_active"].GetBool();
+                }
+                if (component_data.HasMember("movement_speed")) {
+                    logic.movement_speed = component_data["movement_speed"].GetFloat();
+                }
+                if (component_data.HasMember("movement_range")) {
+                    logic.movement_range = component_data["movement_range"].GetFloat();
+                }
+                if (component_data.HasMember("reverse_direction")) {
+                    logic.reverse_direction = component_data["reverse_direction"].GetBool();
+                }
+                if (component_data.HasMember("rotate_with_motion")) {
+                    logic.rotate_with_motion = component_data["rotate_with_motion"].GetBool();
+                }
+                if (component_data.HasMember("origin_pos") && component_data["origin_pos"].IsArray()) {
+                    logic.origin_pos.x = component_data["origin_pos"][0].GetFloat();
+                    logic.origin_pos.y = component_data["origin_pos"][1].GetFloat();
+                }
+
+                // Log the final state
+                LM.write_log("Created Logic Component with movement pattern: %d, speed: %.2f, range: %.2f",
+                    static_cast<int>(logic.movement_pattern),
+                    logic.movement_speed,
+                    logic.movement_range);
+
+                // Add component to entity
+                ecs_manager.add_component<Logic_Component>(entity, logic);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+                }
+            // ------------------------------------ Text_Component -------------------------------------------
+            else if (component_name == "Text_Component") {
+                // Parse Text_Component
+                Text_Component text_component;
+
+                if (component_data.HasMember("font_name") && component_data["font_name"].IsString()) {
+                    text_component.font_name = component_data["font_name"].GetString();
+                }
+
+                if (component_data.HasMember("text") && component_data["text"].IsString()) {
+                    text_component.text = component_data["text"].GetString();
+                }
+
+                if (component_data.HasMember("color") && component_data["color"].IsArray()) {
+                    const rapidjson::Value& clr = component_data["color"];
+                    text_component.color.x = clr[0].GetFloat();
+                    text_component.color.y = clr[1].GetFloat();
+                    text_component.color.z = clr[2].GetFloat();
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<Text_Component>(entity, text_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Text_Component to entity ID %u.", entity);
+                }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
                 LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);

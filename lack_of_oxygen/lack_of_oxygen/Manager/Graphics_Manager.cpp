@@ -61,15 +61,18 @@ namespace lof {
         // Set up default render mode 
         render_mode = GL_FILL;
 
-        std::string vertex_path_1 = Path_Helper::get_vertex_shader_path_1();
-        std::string fragment_path_1 = Path_Helper::get_fragment_shader_path_1();
-        std::string vertex_path_2 = Path_Helper::get_vertex_shader_path_2();
-        std::string fragment_path_2 = Path_Helper::get_fragment_shader_path_2();
-
         // Read file to initialize shaders 
+        std::string vertex_obj_path = Path_Helper::get_vertex_shader_obj_path();
+        std::string fragment_obj_path = Path_Helper::get_fragment_shader_obj_path();
+        std::string vertex_debug_path = Path_Helper::get_vertex_shader_debug_path();
+        std::string fragment_debug_path = Path_Helper::get_fragment_shader_debug_path(); 
+        std::string vertex_font_path = Path_Helper::get_vertex_shader_font_path();
+        std::string fragment_font_path = Path_Helper::get_fragment_shader_font_path(); 
+
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
-        std::make_pair<std::string, std::string>(vertex_path_1.c_str(), fragment_path_1.c_str()),
-        std::make_pair<std::string, std::string>(vertex_path_2.c_str(), fragment_path_2.c_str()) 
+        std::make_pair<std::string, std::string>(vertex_obj_path.c_str(), fragment_obj_path.c_str()),
+        std::make_pair<std::string, std::string>(vertex_debug_path.c_str(), fragment_debug_path.c_str()),
+        std::make_pair<std::string, std::string>(vertex_font_path.c_str(), fragment_font_path.c_str())
         };
 
         // Create shader program from shader files and insert 
@@ -83,6 +86,8 @@ namespace lof {
 
         std::string mesh_path = Path_Helper::get_model_file_path();
         std::string texture_path = Path_Helper::get_texture_file_path();
+        std::string animation_path = Path_Helper::get_animation_file_path();
+        std::string font_path = Path_Helper::get_font_file_path();
 
         // Add models
         if (!add_model(mesh_path.c_str())) {
@@ -96,6 +101,18 @@ namespace lof {
             return -3;
         }
 
+        // Add animations
+        if (!add_animations(animation_path.c_str())) { 
+            LM.write_log("Fail to add animations.");
+            return -4;
+        }
+
+        // Add fonts
+        if (!add_fonts(font_path.c_str())) {
+            LM.write_log("Fail to add fonts.");
+            return -5;
+        }
+
         m_is_started = true;
         return 0;
     }
@@ -105,6 +122,12 @@ namespace lof {
         if (!is_started()) {
             return; // Not started
         }
+
+        // Free the data storages
+        shader_program_storage.clear();
+        model_storage.clear();
+        texture_storage.clear();
+        animation_storage.clear();
 
         m_is_started = false;
     }
@@ -132,9 +155,20 @@ namespace lof {
             LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
             is_debug_mode = GL_FALSE;
         }
+
+        // Toggle free camera mode using 'Z' and 'X'
+        if (IM.is_key_held(GLFW_KEY_Z)) {
+            LM.write_log("Graphics_Manager::update(): 'Z' key pressed, Free Camera enabled.");
+            camera.is_free_cam = GL_TRUE;
+        }
+        else if (IM.is_key_held(GLFW_KEY_X)) {
+            LM.write_log("Graphics_Manager::update(): 'X' key pressed, Free Camera disabled.");
+            camera.is_free_cam = GL_FALSE;
+        }
+
     }
 
-    // Add a shader program into the shader program storage.
+    // Add a shader program into the shader program storage
     GLboolean Graphics_Manager::add_shader_program(std::vector<std::pair<std::string, std::string>> shaders) {
         for (auto const& file : shaders) {
             std::vector<std::pair<GLenum, std::string>> shader_files;
@@ -156,7 +190,7 @@ namespace lof {
         return GL_TRUE;
     }
 
-    // Add models into the model storage.
+    // Add models into the model storage
     GLboolean Graphics_Manager::add_model(std::string const& file_name) {
 
         // Read file containing model data
@@ -307,6 +341,7 @@ namespace lof {
         return GL_TRUE;
     }
 
+    // Add textures into the texture storage
     GLboolean Graphics_Manager::add_textures(std::string const& file_name) {
         // Create filepath for textures from texture name text file
         std::ifstream input_file{ file_name, std::ios::in }; 
@@ -339,6 +374,7 @@ namespace lof {
                 glGenTextures(1, &tex_id);
                 glBindTexture(GL_TEXTURE_2D, tex_id);
 
+                // Set texture options
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -368,30 +404,203 @@ namespace lof {
         return GL_TRUE;
     }
 
-    // Return reference to shader program storage
-    Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() {
-        return shader_program_storage;
+    // Add animations into the animation storage
+    GLboolean Graphics_Manager::add_animations(std::string const& file_name) {
+        // Create filepath for animations from texture atlas text file
+        std::ifstream input_file{ file_name, std::ios::in };
+        if (!input_file) {
+            input_file.close();
+            LM.write_log("Unable to open %s", file_name.c_str());
+            return GL_FALSE;
+        }
+        input_file.seekg(0, std::ios::beg);
+
+        // Variables to extract data to store into an animation
+        std::string file_line, prefix;
+        std::string a_name, t_name;
+        Animation animation{};
+        Frame frame{};
+
+        while (getline(input_file, file_line)) {
+            // Reading the animation data line by line
+            std::istringstream file_line_ss{ file_line };
+            file_line_ss >> prefix;
+            if (prefix == "name") { // Get animation name
+                file_line_ss >> a_name;
+            }
+            else if (prefix == "texture") {   // Get texture name
+                file_line_ss >> animation.texture_name;
+            }
+            else if (prefix == "tex_width") {
+                file_line_ss >> animation.tex_w;
+            }
+            else if (prefix == "tex_height") {
+                file_line_ss >> animation.tex_h;
+            }
+            else if (prefix == "pos") {
+                file_line_ss >> frame.uv_x;
+
+                // Edit Y value to read from bottom left instead of top left for OpenGL texture reading
+                float temp_y;
+                file_line_ss >> temp_y;
+                frame.uv_y = animation.tex_h - temp_y - DEFAULT_Y_OFFSET;
+            }
+            else if (prefix == "size") {
+                file_line_ss >> frame.size;
+            }
+            else if (prefix == "time_delay") {
+                file_line_ss >> frame.time_delay;
+            }
+            else if (prefix == "EF") { // End of frame data
+                animation.frames.emplace_back(frame);
+            }
+            else if (prefix == "EA") { // End of animation data
+                animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED; 
+                animation_storage[a_name] = animation;
+                animation = {}; // Clear animation data
+                LM.write_log("Graphics_Manager::add_animations(): %s animation successfully created and stored.", a_name.c_str());
+            }
+        }
+
+        // Close file
+        input_file.close();
+        LM.write_log("Graphics_Manager::add_animations(): All animations successfully created and stored.");
+        return GL_TRUE;
     }
+
+    // Add fonts into the font storage
+    GLboolean Graphics_Manager::add_fonts(std::string const& file_name) {
+        // Create filepath to access the fonts in fonts.txt file
+        std::ifstream input_file{ file_name, std::ios::in }; 
+        if (!input_file) { 
+            input_file.close(); 
+            LM.write_log("Unable to open %s", file_name.c_str()); 
+            return GL_FALSE; 
+        }
+        input_file.seekg(0, std::ios::beg); 
+
+        // Variables to extract data to store into an animation 
+        std::string font_name; 
+    
+        while (getline(input_file, font_name)) {
+            FT_Library font_type {};
+            if (FT_Init_FreeType(&font_type)) {
+                LM.write_log("Graphics_Manager::add_fonts(): Could not initialize FreeType Library");
+                return GL_FALSE; 
+            }
+            
+            // Checking if file exists
+            std::string font_filepath = "../lack_of_oxygen/Data/Fonts/" + font_name + ".ttf";
+            std::ifstream ifs{ font_filepath, std::ios::binary };
+            if (!ifs) {
+                LM.write_log("Graphics_Manager::add_fonts(): %s does not exist!!!!!", font_filepath.c_str());
+                return GL_FALSE; 
+            }
+            ifs.seekg(0, std::ios::beg); 
+
+            // Load font as face
+            FT_Face face;
+            if (FT_New_Face(font_type, font_filepath.c_str(), 0, &face)) {
+                LM.write_log("Graphics_Manager::add_fonts(): Failed to load font %s", font_name.c_str()); 
+                return GL_FALSE; 
+            } else {
+                // Set glyph size to load
+                FT_Set_Pixel_Sizes(face, DEFAULT_GLYPH_WIDTH, DEFAULT_GLYPH_HEIGHT); 
+
+                // Disable byte-alignment restriction
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+                // Load first 128 characters of ASCII set
+                std::map<GLchar, Character> characters_set; 
+                Font new_font {}; 
+                for (unsigned char ch = 0; ch < 128; ++ch) { 
+                    // Load character glyph 
+                    if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
+                        LM.write_log("Graphics_Manager::add_fonts(): Failed to load Glyph");
+                        return GL_FALSE; 
+                    }
+                    // Generate texture
+                    unsigned int texture; 
+                    glGenTextures(1, &texture);
+                    glBindTexture(GL_TEXTURE_2D, texture);
+
+                    // Set texture options
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+                    // Allocate memory for texture data and upload it
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 
+                                 face->glyph->bitmap.width, face->glyph->bitmap.rows,
+                                 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+
+                    // Store characters into the characters container
+                    Character character = {
+                        texture,
+                        glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                        glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                        static_cast<unsigned int>(face->glyph->advance.x)
+                    };
+                    characters_set.insert(std::pair<char, Character>(ch, character));
+                }
+
+                // Encapsulate information about contents of VBO and VBO handle to VAO
+                // to create a texture quad
+                GLuint vbo_hdl, vaoid;
+                glGenVertexArrays(1, &vaoid);           // Generate vao
+                glGenBuffers(1, &vbo_hdl);              // Generate vbo
+                glBindVertexArray(vaoid);               // Bind vao
+                glBindBuffer(GL_ARRAY_BUFFER, vbo_hdl); // Bind vbo
+                glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW); // Allocate memory in vbo
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);       // Unbind vbo
+                glBindVertexArray(0);                   // Unbind vao
+
+                // Store data such as handle to vao and characters
+                new_font.vaoid = vaoid; 
+                new_font.vboid = vbo_hdl;
+                new_font.characters = characters_set;
+
+                // Store the new font into font storage
+                font_storage[font_name] = new_font;
+                LM.write_log("Graphics_Manager::add_fonts(): Font %s successfully added.", font_name.c_str());
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+            // Free FreeType
+            FT_Done_Face(face);
+            FT_Done_FreeType(font_type); 
+        }
+        // Close file
+        input_file.close(); 
+        LM.write_log("Graphics_Manager::add_fonts(): All fonts successfully created and stored."); 
+        return GL_TRUE;
+    }
+
+    // Return reference to shader program storage
+    Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() { return shader_program_storage; }
 
     // Return reference to model storage
-    Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() {
-        return model_storage;
-    }
+    Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() { return model_storage; }
 
     // Return reference to texture storage
-    Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() {
-        return texture_storage;
-    }
+    Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() { return texture_storage; }
+
+    // Return reference to animation storage
+    Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; } 
+
+    // Return reference to font storage
+    Graphics_Manager::FONTS& Graphics_Manager::get_font_storage() { return font_storage; }
 
     // Return state of current render mode
-    GLenum& Graphics_Manager::get_render_mode() {
-        return render_mode;
-    }
+    GLenum& Graphics_Manager::get_render_mode() { return render_mode; }
 
     // Return state of current debig mode
-    GLboolean& Graphics_Manager::get_debug_mode() {
-        return is_debug_mode;
-    }
+    GLboolean& Graphics_Manager::get_debug_mode() { return is_debug_mode; }
+
+    // Return reference to camera
+    Graphics_Manager::Camera2D& Graphics_Manager::get_camera() { return camera; }
 
     // Compilation of vertex and fragment shaders to make a shader program
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {
@@ -487,9 +696,7 @@ namespace lof {
     }
 
     // Free shader program
-    void Graphics_Manager::program_free() {
-        glUseProgram(0);
-    }
+    void Graphics_Manager::program_free() { glUseProgram(0); }
 
     // Return the handle of the shader program
     GLuint Graphics_Manager::get_shader_program_handle(ShaderProgram shader) const {

@@ -17,6 +17,7 @@
 #include <memory>
 #include <variant>
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 
 // Include Utility headers
@@ -246,25 +247,57 @@ namespace lof {
     public:
         std::string model_name;
         glm::vec3 color;
-        std::string texture_name; 
+        std::string texture_name;
         GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
 
         // Default constructor
         Graphics_Component()
-            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), texture_name(DEFAULT_TEXTURE_NAME), shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
+            : model_name(DEFAULT_MODEL_NAME), color(DEFAULT_COLOR), texture_name(DEFAULT_TEXTURE_NAME), 
+              shd_ref(DEFAULT_SHADER_REF), mdl_to_ndc_xform(DEFAULT_MDL_TO_NDC_MAT) {}
 
         /**
          * @brief Constructor for Graphics_Component.
+         * @param model_name Name of model.
+         * @param color Color of model.
+         * @param texture_name Name of texture.
+         * @param shd_ref Reference to shader.
          * @param mdl_to_ndc_xform Model-to-world-to-NDC transformation.
-         * @param mdl_ref Reference to model
-         * @param shd_ref Reference to shader
          */
 
-        Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader,glm::mat3 xform) : 
-                           model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
+        Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader, glm::mat3 xform) :
+            model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
 
-    }; 
+    };
+
+    /**
+    * @class Animation_Component
+    * @brief Component representing an entity's graphical data.
+    */
+    class Animation_Component : public Component {
+    public:
+        std::map<std::string, std::string> animations; 
+        unsigned int curr_animation_idx;
+        unsigned int start_animation_idx;
+
+        // Default constructor
+        Animation_Component()
+            : curr_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)), start_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)) {
+            animations.insert(std::make_pair(DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME));
+        }
+
+        /**
+         * @brief Constructor for Animation_Component.
+         * @param animations Collection of animations usable by entity.
+         * @param curr_animation_idx Index of the current animation.
+         * @param start_animation_idx Index of the starting animation.
+         */
+
+        Animation_Component(std::pair<std::string, std::string> animation, int curr_animation, int start_animation) :
+            curr_animation_idx(curr_animation), start_animation_idx(start_animation) {
+            animations.insert(animation);
+        }
+    };
 
     /**
     * @class Collision_Component
@@ -287,32 +320,48 @@ namespace lof {
     class Audio_Component : public Component {
     private:
 
+        /**
+        * @struct SoundConfig
+        * @brief Holds all the details in each sound component currently it has.
+        */
         struct SoundConfig {
-            std::string key;
-            std::string filepath;
-            PlayState audio_state;
-            AudioType audio_type;
-            //FileFormat file_format;
-            //bool isbank;
-            float volume;
-            float pitch;
-            bool islooping;
+            std::string key = "";
+            std::string filepath = "";
+            PlayState audio_state = NONE;
+            AudioType audio_type = NIL;
+            float volume = 0.0f;
+            float pitch = 1.0f;
+            bool islooping = false;
         };
 
-        std::vector<SoundConfig> sounds;
+        std::vector<SoundConfig> sounds; ///< vectors of sound details
 
-        //FileFormat file_format;
-        //AudioCommand audio_command;
-        bool is3d;
 
-        Vec3D position; //position of where the sound is emitting from
-        float mindist;  //the min range for listener to be in to hear the sound (closer)
-        float maxdist;  //the max range for listener to be in to hear the sound (further)
+        //for future implementation
+        bool is3d;      ///<check if the sound is 3D or 2D.
+
+        Vec3D position; ///<position of where the sound is emitting from
+        float mindist;  ///<the min range for listener to be in to hear the sound (closer)
+        float maxdist;  ///<the max range for listener to be in to hear the sound (further)
         
     public:
 
+        /**
+         * @brief Constructor for Audio_Component.
+         *        initializes the member values of Audio_Component
+         */
         Audio_Component() : sounds(), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
 
+        /**
+         * @brief Constructor for SoundConfig.
+         * @param key The purpose of the sound which doubles as a key function.
+         * @param filepath Contains the filepath to the audio
+         * @param state Contains the state of the sound path
+         * @param type Contains details regarding is it a BGM or SFX
+         * @param volume Contains the volume level for the sound.
+         * @param pitch Contains the pitch level for the sound.
+         * @param islooping Contains the loop state of the sound
+         */
         void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
             float volume, float pitch, bool islooping) {
             for (auto& sound : sounds) {
@@ -321,8 +370,8 @@ namespace lof {
                     sound.filepath = filepath;
                     sound.audio_state = state;
                     sound.audio_type = type;
-                    sound.volume = volume;
-                    sound.pitch = pitch;
+                    sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
+                    sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
                     sound.islooping = islooping;
                     return;
                 }
@@ -333,15 +382,22 @@ namespace lof {
             new_sound.filepath = filepath;
             new_sound.audio_state = state;
             new_sound.audio_type = type;
-            new_sound.volume = volume;
-            new_sound.pitch = pitch;
+            new_sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
+            new_sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
             new_sound.islooping = islooping;
 
             sounds.push_back(new_sound);
         }
 
+        /**
+        * @brief Getters for the vector of soundconfig
+        */
         const std::vector<SoundConfig>& get_sounds() const { return sounds; }
 
+        /**
+        * @brief Getter for the soundconfig using param key
+        * @param key The unique identifier of soundconfig
+        */
         const SoundConfig* get_sound_by_key(const std::string& key) const{
             for (const auto& sound : sounds) {
                 if (sound.key == key) {
@@ -351,6 +407,11 @@ namespace lof {
             return nullptr;
         }
 
+        /**
+        * @brief Setter for the filepath in soundconfig
+        * @param key The unique identifier of soundconfig
+        * @param path The new path.
+        */
         void set_filepath(const std::string& key, std::string& path) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -359,10 +420,19 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for the filepath in soundconfig using param key
+        * @param key The unique identifier of soundconfig
+        */
         std::string get_filepath(const std::string& key) const{
             return get_sound_by_key(key)->filepath;
         }
 
+        /**
+        * @brief Setter for audio state in soundconfig
+        * @param key The unique idenitifier for soundconfig
+        * @param state The new state
+        */
         void set_audio_state(const std::string& key, PlayState state) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -371,10 +441,18 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for audio state in soundconfig using param key
+        * @param key The unique identifier for soundconfig
+        */
         PlayState get_audio_state(const std::string& key) const {
             return get_sound_by_key(key)->audio_state;
         }
 
+        /**
+        * @brief Setter for audio type
+        * @param key The unique identifier of soundconfig
+        */
         void set_audio_type(const std::string& key, AudioType type) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -383,32 +461,32 @@ namespace lof {
             }
         }
 
-        AudioType get_audio_type(const std::string& key) {
+        AudioType get_audio_type(const std::string& key) const{
             return get_sound_by_key(key)->audio_type;
         }
 
         void set_volume(const std::string& key, float volume) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
-                    sound.volume = volume;
+                    sound.volume = std::clamp(volume, 0.0f, 1.0f);
                 }
                 std::cout << sound.volume << std::endl; LM.write_log("volume change %f", sound.volume);
             }
         }
 
-        float get_volume(const std::string& key) {
+        float get_volume(const std::string& key) const {
             return get_sound_by_key(key)->volume;
         }
 
         void set_pitch(const std::string& key, float pitch) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
-                    sound.pitch = pitch;
+                    sound.pitch = std::clamp(pitch, 0.5f, 2.0f);
                 }
             }
         }
 
-        float get_pitch(const std::string& key) {
+        float get_pitch(const std::string& key) const {
             return get_sound_by_key(key)->pitch;
         }
 
@@ -420,7 +498,7 @@ namespace lof {
             }
         }
 
-        bool get_loop(const std::string& key) {
+        bool get_loop(const std::string& key) const {
             return get_sound_by_key(key)->islooping;
         }
 
@@ -456,6 +534,65 @@ namespace lof {
             , is_container(is_container)
             , is_visible(true)
             , relative_pos(0.0f, 0.0f) {}
+    };
+
+    class Logic_Component : public Component {
+    public:
+        enum class LogicType {
+            MOVING_PLATFORM    // Platform that moves between points
+        };
+
+        enum class MovementPattern {
+            LINEAR = 0,            // Move back and forth in a line
+            CIRCULAR = 1           // Move in a circular path
+        };
+
+        LogicType logic_type;
+        MovementPattern movement_pattern;
+        bool is_active{ true };           // Whether object is currently active/visible
+        float timer{ 0.0f };              // For movement timing
+        float movement_speed{ 100.0f };   // Speed of movement
+        float movement_range{ 200.0f };   // Range of movement
+        Vec2D origin_pos;                 // Starting/center position
+        bool reverse_direction{ false };   // For changing direction (horizontal/vertical)
+        bool rotate_with_motion{ false }; // Whether object rotates to face movement direction
+
+        Logic_Component(LogicType type = LogicType::MOVING_PLATFORM,
+            MovementPattern pattern = MovementPattern::LINEAR)
+            : logic_type(type)
+            , movement_pattern(pattern) {}
+
+        // Add helper method to set movement pattern
+        void set_movement_pattern(MovementPattern pattern) {
+            movement_pattern = pattern;
+            // Reset timer when changing patterns
+            timer = 0.0f;
+        }
+    };
+
+    /**
+    * @class Text_Component
+    * @brief Component representing a text data.
+    */
+    class Text_Component : public Component {
+    public:
+        std::string font_name;
+        std::string text;
+        glm::vec3 color;
+
+        // Default constructor
+        Text_Component() : font_name(DEFAULT_FONT_NAME), text(DEFAULT_FONT_NAME), color(DEFAULT_COLOR) {}
+
+        /**
+         * @brief Constructor for Text_Component.
+         * @param font_name Font type.
+         * @param text Text that will be rendered.
+         * @param color Color of the text.
+         */
+
+        Text_Component(std::string name, std::string text, glm::vec3 color) :
+            font_name(name), text(text), color(color) {}
+
     };
 
 } // namespace lof

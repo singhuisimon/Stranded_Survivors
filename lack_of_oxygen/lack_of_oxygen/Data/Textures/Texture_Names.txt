@@ -11,6 +11,9 @@ Rock
 TNT
 Vent
 Wormhole
+sun
+Snowflake
 Oxygen_Refill_Green_circle
 Oxygen_Refill_Red_circle
 Skybox_ALL
+Spritesheet_Animate

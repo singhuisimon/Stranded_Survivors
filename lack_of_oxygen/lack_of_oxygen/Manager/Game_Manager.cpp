@@ -7,7 +7,8 @@
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
- // Include header file
+
+// Include header file
 #include "Game_Manager.h"
 
 // Include other managers
@@ -17,6 +18,8 @@
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
+
+// Include utility
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 
@@ -109,7 +112,7 @@ namespace lof {
             SM.shut_down();
             ECSM.shut_down();
             LM.shut_down();
-            return -6;
+            return -7;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
@@ -169,6 +172,8 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
+        
+
         // Clone a game object from a prefab when 'C' key is pressed
         bool c_key_pressed = IM.is_key_pressed(GLFW_KEY_C);
         if (IM.is_key_pressed(GLFW_KEY_C) && !c_key_was_pressed_last_frame) {
@@ -198,8 +203,9 @@ namespace lof {
                 LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
         }
+        
+        LM.write_log("GAME Checking key %i: is pressed = %i, previous state = %i", GLFW_KEY_C, IM.is_key_pressed(GLFW_KEY_C), c_key_was_pressed_last_frame);
         c_key_was_pressed_last_frame = c_key_pressed;
-
         // Save game state when 'K' key is pressed
         bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
         if (k_key_pressed && !k_key_was_pressed_last_frame) {

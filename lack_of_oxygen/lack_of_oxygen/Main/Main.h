@@ -12,7 +12,7 @@
 #ifndef LOF_MAIN_H
 #define LOF_MAIN_H
 
-// Include standard headers
+ // Include standard headers
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -30,6 +30,7 @@
 #include "../Utility/Clock.h"
 #include "../Utility/Vector2D.h"
 #include "../Utility/Matrix3x3.h"
+#include "../Utility/Globals.h"
 
 // Include Manager headers
 #include "../Manager/Game_Manager.h"
@@ -37,5 +38,10 @@
 #include "../Manager/FPS_Manager.h"
 #include "../Manager/Serialization_Manager.h"
 #include "../Manager/Graphics_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
+
+#include "../IMGUI/imgui.h"
+#include "../IMGUI/imgui_impl_glfw.h"
+#include "../IMGUI/imgui_impl_opengl3.h"
 
 #endif // LOF_MAIN_H

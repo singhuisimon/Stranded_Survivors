@@ -10,6 +10,7 @@
 // Include header file
 #include "FPS.h"
 #include "../Utility/Constant.h"
+#include "../Manager/IMGUI_Manager.h"
 
 namespace lof {
 
@@ -55,7 +56,10 @@ namespace lof {
         float percent = static_cast<float>(system_time) / static_cast<float>(gm_time) * UPON_PERCENTAGE;
 
         // Prints calculated value for system in console
-        std::cout << std::left << std::setw(DEBUG_LEFT_WIDTH) << name << ": "  << std::right << std::setprecision(DEBUG_RIGHT_WIDTH) << percent << "%"  << " of total game loop" << std::endl;
+        //std::cout << std::left << std::setw(DEBUG_LEFT_WIDTH) << name << ": "  << std::right << std::setprecision(DEBUG_RIGHT_WIDTH) << percent << "%"  << " of total game loop" << std::endl;
+
+        ImGui::Text("%s : %.3f%%\n", name.c_str(), percent);
+
     }
 
 } // namespace lof

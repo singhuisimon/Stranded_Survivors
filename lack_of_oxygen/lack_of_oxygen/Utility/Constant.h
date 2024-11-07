@@ -36,7 +36,7 @@ namespace lof {
 
 	// ----------------------------- FPS_Manager.cpp -------------------------------------------
 	// FPS_Manager Constants
-	constexpr int DEFAULT_TARGET_FPS = 60;
+	constexpr int DEFAULT_TARGET_FPS = 120;
 	constexpr int64_t DEFAULT_MICROSECONDS_PER_SECOND = 1000000;
 	constexpr int64_t DEFAULT_TARGET_TIME = DEFAULT_MICROSECONDS_PER_SECOND / DEFAULT_TARGET_FPS;
 
@@ -75,41 +75,26 @@ namespace lof {
 	constexpr const char* DEFAULT_MODEL_NAME = "square";
 	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
-	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
+	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) }; 
+
+	// Animation component constants
+	constexpr const char* DEFAULT_ANIMATION_IDX = "0";
+	constexpr const char* DEFAULT_ANIMATION_NAME = "NoAnimation";
 
 	//Audio component constants
 	enum AudioType {
-		BGM = 0,    //background music
-		SFX = 1    //Sound Effect
+		BGM = 0,    ///<background music
+		SFX = 1,		///<Sound Effect
+		NIL = 2
 	};
 
 	enum PlayState {
-		//MUTED,    //Audio is to be played but not hear (essentially volume is 0.)
-		PLAYING = 0,    //Audio is to be played
-		STOPPED = 1,    //Audio is to be stopped
-		PAUSED = 2,      //Audio is to be paused
-		RESUMED = 3,		//Audio is to be resumed
-		NONE = 4
+		PLAYING = 0,    ///<Audio is to be played
+		STOPPED = 1,    ///<Audio is to be stopped
+		PAUSED = 2,     ///<Audio is to be paused
+		RESUMED = 3,	///<Audio is to be resumed
+		NONE = 4		///<Audio is not played at all nor need to stop
 	};
-
-	//enum FileFormat {
-	//	BANK = 0,
-	//	WAV = 1,
-	//	OGG = 2
-	//};
-
-	//enum AudioCommand {
-	//	NONE = 0,
-	//	PLAYSOUND,
-	//	STOPSOUND,
-	//	PAUSEDSOUND,
-	//	RESUMESOUND
-	//	/*,
-	//	PLAYEVENT,
-	//	STOPEVENT,
-	//	PAUSEEVENT,
-	//	RESUMEEVENT*/
-	//};
 
 	// ----------------------------- Movement_System.cpp -------------------------------------------
     //Movement_System constants
@@ -122,21 +107,36 @@ namespace lof {
 	constexpr int TRACK1 = 1;
 	constexpr int TRACK2 = 2;
 
+	// ------------------------------ Graphics_Manager.cpp -----------------------------
+	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;
+	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
+
+	// Camera
+	constexpr float DEFAULT_CAMERA_SPEED = 500.0f;
+	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
+	constexpr float DEFAULT_ORIENTATION = 0.0f;
+
+	// Fonts
+	constexpr int DEFAULT_GLYPH_HEIGHT = 48;
+	constexpr int DEFAULT_GLYPH_WIDTH = 0;
+	constexpr const char* DEFAULT_FONT_NAME = "PressStart2P";
+	constexpr float DEFAULT_TEXT_POSITION = 0.0f;
+
 	// ------------------------------ Render_System.cpp --------------------------------
-	// Graphics Component constants
-	//constexpr GLfloat DEFAULT_WORLD_RANGE = 3000.0f;
+	// Drawing constants
 	constexpr GLfloat DEFAULT_ROTATION = 90.0f;
 	constexpr GLfloat DEFAULT_LINE_WIDTH = 5.0f;
 	constexpr GLfloat DEFAULT_POINT_SIZE = 5.0f;
-	constexpr const char* DEFAULT_TEXTURE_NAME = "notex";
+	constexpr const char* DEFAULT_TEXTURE_NAME = "NoTexture";
 	
 	// Debugging constants
 	constexpr float DEFAULT_SCALE_CHANGE = 100.0f;
 	constexpr GLfloat DEFAULT_AABB_WIDTH = 2.0f;
 	constexpr GLfloat DEFAULT_VELOCITY_LINE_LENGTH = 1.5f;
 
-	// ------------------------------ Graphics_System.cpp --------------------------------
-
+	// ------------------------------ Animation_System.cpp --------------------------------
+	constexpr float DEFAULT_FRAME_TIME_ELAPSED = 0.0f;
+	constexpr float DEFAULT_Y_OFFSET = 1.0f;
 
 	// ------------------------------ Collision_System.cpp --------------------------------
 	constexpr const float         BOUNDING_RECT_SIZE = 1.0f;
@@ -144,6 +144,17 @@ namespace lof {
 	constexpr unsigned int	COLLISION_RIGHT = 0x00000002;	//0010
 	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
 	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
+
+	// -------------------------- Common variables used in Systems -----------------------------------
+	constexpr char const* DEFAULT_PLAYER_NAME = "player1";
+
+	// ------------------------------ GUI_System.cpp --------------------------------
+	// GUI Layout Constants
+	constexpr float DEFAULT_GUI_PROGRESS_BAR_WIDTH = 450.0f;
+	constexpr float DEFAULT_GUI_PROGRESS_BAR_HEIGHT = 40.0f;
+	constexpr float DEFAULT_GUI_IMAGE_OFFSET = 150.0f;
+	constexpr float DEFAULT_GUI_IMAGE_SIZE = 100.0f;
+	constexpr float DEFAULT_GUI_VERTICAL_SPACING = 50.0f;
 
 } // namespace lof
 

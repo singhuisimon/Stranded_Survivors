@@ -29,11 +29,18 @@ namespace lof {
     // Updates the model-to-world-to-NDC transformation matrix of the entity per frame.
     void Render_System::update(float delta_time) {
 
+        // Get screen width and height
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width()); 
+        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height()); 
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
+
+            // Access player's ID
+            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);  
 
             if (entity_id != 0) { // Background object unaffected
 
@@ -42,75 +49,124 @@ namespace lof {
 
                 // Check if the entity has Collision_Component
                 if (ECSM.has_component<Collision_Component>(entity_id)) {
-                    auto& collision = ECSM.get_component<Collision_Component>(entity_id);
 
-                    if (IM.is_key_held(GLFW_KEY_UP)) {
-                        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
-                        transform.scale.x += scale_change;
-                        transform.scale.y += scale_change;
-                        collision.width += scale_change;
-                        collision.height += scale_change;
-                    }
-                    else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
-                        if (transform.scale.x > 0.0f) {
-                            transform.scale.x -= scale_change;
-                            collision.width -= scale_change;
+                    if (entity_id == player_id) { // Uncomment to allow all objects to scale and rotate
+
+                        auto& collision = ECSM.get_component<Collision_Component>(entity_id);
+
+                        if (IM.is_key_held(GLFW_KEY_UP)) {
+                            LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
+                            transform.scale.x += scale_change;
+                            transform.scale.y += scale_change;
+                            collision.width += scale_change;
+                            collision.height += scale_change;
                         }
-                        else {
-                            transform.scale.x = 0.0f;
-                            collision.width = 0.0f;
+                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                            LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
+                            if (transform.scale.x > 0.0f) {
+                                transform.scale.x -= scale_change;
+                                collision.width -= scale_change;
+                            }
+                            else {
+                                transform.scale.x = 0.0f;
+                                collision.width = 0.0f;
+                            }
+
+                            if (transform.scale.y > 0.0f) {
+                                transform.scale.y -= scale_change;
+                                collision.height -= scale_change;
+                            }
+                            else {
+                                transform.scale.y = 0.0f;
+                                collision.height = 0.0f;
+                            }
                         }
 
-                        if (transform.scale.y > 0.0f) {
-                            transform.scale.y -= scale_change;
-                            collision.height -= scale_change;
+                        // Rotation update when left or right arrow key pressed
+                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                            transform.orientation.x += rot_change;
+                            LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
                         }
-                        else {
-                            transform.scale.y = 0.0f;
-                            collision.height = 0.0f;
+                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                            transform.orientation.x -= rot_change;
+                            LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
                         }
-                    }
+
+                    } // Uncomment to allow all objects to scale and rotate
                 }
 
-                // Rotation update when left or right arrow key pressed
-                if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                    transform.orientation.x += rot_change;
-                    LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
+            }
+
+            // Update camera bounded to player
+            auto& camera = GFXM.get_camera();
+
+            if (entity_id == player_id && camera.is_free_cam == GL_FALSE) {
+
+                // Update world-to-camera view transformation matrix
+                camera.pos_y = transform.position.y; 
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               -1, -transform.position.y, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
+                                                       0, 1.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+            } else if (camera.is_free_cam == GL_TRUE) {
+
+                // Movement update when keypad 8 or 2 pressed
+                if (IM.is_key_held(GLFW_KEY_KP_8)) {
+                    camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                    LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
                 }
-                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                    transform.orientation.x -= rot_change;
-                    LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                else if (IM.is_key_held(GLFW_KEY_KP_2)) {
+                    camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                    LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
                 }
+
+                // Update world-to-camera view transformation matrix
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               1, -camera.pos_y, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
+                                                       0, 1.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform; 
             }
 
             // Compute object scale matrix
             glm::mat3 scale_mat{ transform.scale.x, 0, 0,
-                                 0, transform.scale.y, 0,
-                                 0, 0, 1 };
+                                    0, transform.scale.y, 0,
+                                    0, 0, 1 };
 
             // Compute current orientation of object
             GLfloat rad_disp = glm::radians(transform.orientation.x);
 
             // Compute object rotational matrix 
             glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
-                               -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
+                                -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
                                 0,                   0,                  1 };
 
             // Compute object translation matrix
             glm::mat3 trans_mat{ 1, 0, 0,
-                                 0, 1, 0,
-                                 transform.position.x, transform.position.y, 1 };
+                                    0, 1, 0,
+                                    transform.position.x, transform.position.y, 1 };
 
             // Compute world scale matrix
-            glm::mat3 world_scale{ 1.0f / SM.get_scr_width(), 0, 0,
-                                   0, 1.0f / SM.get_scr_height(), 0,
-                                   0, 0, 1 };
+            glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
+                                    0, 1.0f / screen_height, 0,
+                                    0, 0, 1 };
 
-            // Compute model-to-world-to-NDC transformation matrix and store it in the graphics component
-            graphics.mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
+            graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
         }
 
         // Set up for the drawing of objects
@@ -140,16 +196,107 @@ namespace lof {
     // Renders the entity onto the window based on the graphics components
     void Render_System::draw() {
 
+        // Get screen width and height
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width()); 
+        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height()); 
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
-            // Get shaders, models, and textures from the Graphics Manager
+
+            // Get shaders, models, textures, animation, and camera from the Graphics Manager
             auto& shaders = GFXM.get_shader_program_storage();
             auto& models = GFXM.get_model_storage();
             auto& textures = GFXM.get_texture_storage();
+            auto& animations = GFXM.get_animation_storage();
+            auto& camera = GFXM.get_camera(); 
+
+            // Check for text objects to render 
+            bool is_text = ECSM.has_component<Text_Component>(entity_id);
+            if (is_text == true) {
+
+                auto& text_comp = ECSM.get_component<Text_Component>(entity_id);
+                auto& fonts = GFXM.get_font_storage();
+
+                // Start the shader program used for text rendering
+                GFXM.program_use(shaders[graphics.shd_ref]); 
+
+                // Set text color in fragment shader
+                GLuint text_color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTextColor");
+                if (text_color_uniform_loc >= 0) {
+                    glUniform3fv(text_color_uniform_loc, 1, &text_comp.color[0]);
+                } else {
+                    LM.write_log("Render_System::draw(): Text colour uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Pass object's mdl_to_ndc_xform to vertex shader to compute object's final position
+                GLint text_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC_Mat");
+                if (text_mat_uniform_loc >= 0) {
+                    glUniformMatrix3fv(text_mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
+                } else {
+                    LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Set texture unit and bind text object's VAO handle 
+                glActiveTexture(GL_TEXTURE0);  
+                glBindVertexArray(fonts[text_comp.font_name].vaoid);
+
+                // Iterate through all characters
+                std::string::const_iterator c;
+                float base_x = transform.position.x;
+                for (c = text_comp.text.begin(); c != text_comp.text.end(); c++)
+                {
+                    // Get read-only values from character
+                    auto const& bearing = fonts[text_comp.font_name].characters[*c].Bearing; 
+                    auto const& size = fonts[text_comp.font_name].characters[*c].Size;
+                    auto const& texture_id = fonts[text_comp.font_name].characters[*c].TextureID; 
+                    auto const& advance = fonts[text_comp.font_name].characters[*c].Advance; 
+                    
+                    // Calculate the position and size of character in world 
+                    float xpos = base_x + bearing.x * transform.scale.x;
+                    float ypos = transform.position.y - (size.y - bearing.y) * transform.scale.y;
+                    float w = size.x * transform.scale.x;
+                    float h = size.y * transform.scale.y;
+
+                    // Update VBO for each character
+                    float vertices[6][4] = {
+                        { xpos,     ypos + h,   0.0f, 0.0f },
+                        { xpos,     ypos,       0.0f, 1.0f },
+                        { xpos + w, ypos,       1.0f, 1.0f },
+                        { xpos,     ypos + h,   0.0f, 0.0f },
+                        { xpos + w, ypos,       1.0f, 1.0f },
+                        { xpos + w, ypos + h,   1.0f, 0.0f }
+                    };
+
+                    LM.write_log("Render_System::draw(): Width: %f", w);
+
+                    // Set texture id to render
+                    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+                    // Update content of VBO memory and unbind once completed
+                    glBindBuffer(GL_ARRAY_BUFFER, fonts[text_comp.font_name].vboid); 
+                    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+                    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                    // Render quad
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                    
+                    // Advance cursors for next glyph 
+                    base_x += (advance >> 6) * transform.scale.x;
+                }
+                // Free VAO, texture id, and program once rendering completed
+                glBindVertexArray(0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                GFXM.program_free(); 
+
+                // Skip other rendering operations
+                continue;
+            }
 
             // Start the shader program that the entity will use for rendering 
             GFXM.program_use(shaders[graphics.shd_ref]);
@@ -159,35 +306,92 @@ namespace lof {
 
             // Check if entity has a texture
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
-                // Assign texture object to use texture image unit 6 
-                glBindTextureUnit(6, textures[graphics.texture_name]);
+                // Assign texture object to use texture image unit 5 
+                glBindTextureUnit(5, textures[graphics.texture_name]);
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
-                GLuint tex_flag_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "TexFlag");
-                if (tex_flag_loc >= 0) {
-                    glUniform1ui(tex_flag_loc, GL_TRUE);
+                GLuint tex_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTexFlag");
+                if (tex_flag_true_loc >= 0) {
+                    glUniform1ui(tex_flag_true_loc, GL_TRUE);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
-                // Set texture unit in shader
+                // Set texture unit in fragment shader
                 GLuint tex_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex2d");
                 if (tex_uniform_loc >= 0) {
-                    glUniform1i(tex_uniform_loc, 6);
+                    glUniform1i(tex_uniform_loc, 5);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
+
+                // If entity has animation, pass animation data to fragment shader
+                bool has_animation = ECSM.has_component<Animation_Component>(entity_id);
+                if (has_animation == true) {
+
+                    auto& animation = ECSM.get_component<Animation_Component>(entity_id); 
+                    std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
+                    unsigned int& curr_frame_idx = animations[curr_animation_name].curr_frame_index;
+
+                    // Set animation flag to be true
+                    GLuint animate_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uAnimateFlag");
+                    if (animate_flag_true_loc >= 0) {
+                        glUniform1ui(animate_flag_true_loc, GL_TRUE);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                    // Pass texture width, height, and frame size
+                    GLuint tex_w_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex_W");
+                    GLuint tex_h_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex_H");
+                    GLuint frame_size_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uFrame_Size");
+                    if (tex_w_uniform_loc >= 0 && tex_h_uniform_loc >= 0 && frame_size_uniform_loc >= 0) {
+                        glUniform1f(tex_w_uniform_loc, animations[curr_animation_name].tex_w);
+                        glUniform1f(tex_h_uniform_loc, animations[curr_animation_name].tex_h);
+                        glUniform1f(frame_size_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].size);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Texture width, Texture height, and/or frame size uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                    // Pass frame position
+                    GLuint frame_pos_x_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uPos_X");
+                    GLuint frame_pos_y_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uPos_Y");
+                    if (frame_pos_x_uniform_loc >= 0 && frame_pos_y_uniform_loc >= 0) {
+                        glUniform1f(frame_pos_x_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_x);
+                        glUniform1f(frame_pos_y_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_y);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Frame x and y uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                }
+                else {
+                    // Set animation flag to be false
+                    GLuint animate_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uAnimateFlag");
+                    if (animate_flag_false_loc >= 0) {
+                        glUniform1ui(animate_flag_false_loc, GL_FALSE);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+                }
             }
             else {
                 // Set texture flag to false
-                GLuint tex_flag_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "TexFlag");
-                if (tex_flag_loc >= 0) {
-                    glUniform1ui(tex_flag_loc, GL_FALSE);
+                GLuint tex_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTexFlag");
+                if (tex_flag_false_loc >= 0) { 
+                    glUniform1ui(tex_flag_false_loc, GL_FALSE);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
@@ -225,7 +429,7 @@ namespace lof {
                 glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
             }
 
-            // Draw debugging features if debug mode is ON
+            // Draw debugging features if debug mode is ON 
             if (entity_id != 0) { // Background object unaffected 
                 if (GFXM.get_debug_mode() == GL_TRUE) {
                     // Check if entity has Velocity_Component and Collision_Component
@@ -233,10 +437,6 @@ namespace lof {
                     bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
 
                     if (has_velocity || has_collision) {
-
-                        // Variables for debugging
-                        auto& shaders = GFXM.get_shader_program_storage();
-                        auto& models = GFXM.get_model_storage();
 
                         // Free texture shader program to allow models shader program to bind and start  
                         GFXM.program_free();
@@ -254,7 +454,7 @@ namespace lof {
                         }
 
                         // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
-                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat");
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat"); 
                         if (debug_mat_uniform_loc < 0) {
                             LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
                             std::exit(EXIT_FAILURE);
@@ -294,22 +494,18 @@ namespace lof {
                                                           transform.position.x, transform.position.y, 1 };
 
                                 // Compute world scale matrix
-                                glm::mat3 world_scale{ 1.0f / SM.get_scr_width(), 0, 0,
-                                                       0, 1.0f / SM.get_scr_height(), 0,
+                                glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
+                                                       0, 1.0f / screen_height, 0,
                                                        0, 0, 1 };
 
                                 // Compute model-to-world-to-NDC transformation matrix for line and store it
-                                glm::mat3 result_xform = world_scale * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
+                                glm::mat3 result_xform = camera.world_to_ndc_xform * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
                                 box_mdl_to_ndc_xform.emplace_back(result_xform);
-                            }
 
-                            // Drawing AABB box line by line
-                            for (std::size_t i = 0; i < 4; ++i) {
-                                glLineWidth(DEFAULT_AABB_WIDTH);
-                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
-                                glBindVertexArray(models["debug_line"].vaoid);
-                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                                glBindVertexArray(0);
+                                // Drawing AABB box line by line
+                                glLineWidth(DEFAULT_AABB_WIDTH); 
+                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]); 
+                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL); 
                             }
                         }
 
@@ -322,8 +518,36 @@ namespace lof {
                                                  0, transform.scale.y * DEFAULT_VELOCITY_LINE_LENGTH, 0,
                                                  0, 0, 1 };
 
-                            // Compute direction based on velocity
-                            GLfloat direction = glm::degrees(glm::atan(velocity.velocity.y, velocity.velocity.x));
+                            // Compute current orientation of line
+                            GLfloat direction{ 0.0f };
+                            if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
+                                if (velocity.velocity.x > 0.0f) {
+                                    direction = -DEFAULT_ROTATION; // Move right 
+                                }
+                                else {
+                                    direction = DEFAULT_ROTATION; // Move left 
+                                }
+                            }
+                            else if (velocity.velocity.y && (velocity.velocity.x == 0.0f)) {
+                                if (velocity.velocity.y > 0.0f) {
+                                    direction = 0.0f; // Move up 
+                                }
+                                else {
+                                    direction = 2.0f * DEFAULT_ROTATION; // Move down 
+                                }
+                            }
+                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y > 0.0f) { // Top right
+                                direction = -DEFAULT_ROTATION / 2.0f;
+                            }
+                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y > 0.0f) { // Top left
+                                direction = DEFAULT_ROTATION / 2.0f;
+                            }
+                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                                direction = -DEFAULT_ROTATION * 1.5f;
+                            }
+                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                                direction = DEFAULT_ROTATION * 1.5f;
+                            }
 
                             // Convert direction to radians
                             GLfloat rad_disp = glm::radians(direction);
@@ -339,26 +563,24 @@ namespace lof {
                                                  transform.position.x, transform.position.y, 1 };
 
                             // Compute world scale matrix
-                            glm::mat3 world_scale{ 1.0f / SM.get_scr_width(), 0, 0,
-                                                   0, 1.0f / SM.get_scr_height(), 0,
+                            glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
+                                                   0, 1.0f / screen_height, 0,
                                                    0, 0, 1 };
 
                             // Compute model-to-world-to-NDC transformation matrix for the velocity line
-                            glm::mat3 line_mdl_to_ndc_xform = world_scale * trans_mat * rot_mat * scale_mat;
-
+                            glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
+                            glBindVertexArray(models["debug_line"].vaoid);  
+                            glLineWidth(DEFAULT_LINE_WIDTH);  
                             glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
-                            glLineWidth(DEFAULT_LINE_WIDTH);
-                            glBindVertexArray(models["debug_line"].vaoid);
                             glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                            glBindVertexArray(0);
                         }
                     }
                 }
-
-                // Clean up by unbinding the VAO and ending the shader program
-                glBindVertexArray(0);
-                GFXM.program_free();
             }
+            // Clean up by unbinding the VAO and ending the shader program
+            glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            GFXM.program_free();
         }
     }
 
