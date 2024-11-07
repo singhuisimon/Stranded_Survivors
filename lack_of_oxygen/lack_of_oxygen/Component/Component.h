@@ -263,32 +263,48 @@ namespace lof {
     class Audio_Component : public Component {
     private:
 
+        /**
+        * @struct SoundConfig
+        * @brief Holds all the details in each sound component currently it has.
+        */
         struct SoundConfig {
             std::string key;
             std::string filepath;
             PlayState audio_state;
             AudioType audio_type;
-            //FileFormat file_format;
-            //bool isbank;
             float volume;
             float pitch;
             bool islooping;
         };
 
-        std::vector<SoundConfig> sounds;
+        std::vector<SoundConfig> sounds; ///< vectors of sound details
 
-        //FileFormat file_format;
-        //AudioCommand audio_command;
-        bool is3d;
 
-        Vec3D position; //position of where the sound is emitting from
-        float mindist;  //the min range for listener to be in to hear the sound (closer)
-        float maxdist;  //the max range for listener to be in to hear the sound (further)
+        //for future implementation
+        bool is3d;      ///<check if the sound is 3D or 2D.
+
+        Vec3D position; ///<position of where the sound is emitting from
+        float mindist;  ///<the min range for listener to be in to hear the sound (closer)
+        float maxdist;  ///<the max range for listener to be in to hear the sound (further)
         
     public:
 
+        /**
+         * @brief Constructor for Audio_Component.
+         *        initializes the member values of Audio_Component
+         */
         Audio_Component() : sounds(), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
 
+        /**
+         * @brief Constructor for SoundConfig.
+         * @param key The purpose of the sound which doubles as a key function.
+         * @param filepath Contains the filepath to the audio
+         * @param state Contains the state of the sound path
+         * @param type Contains details regarding is it a BGM or SFX
+         * @param volume Contains the volume level for the sound.
+         * @param pitch Contains the pitch level for the sound.
+         * @param islooping Contains the loop state of the sound
+         */
         void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
             float volume, float pitch, bool islooping) {
             for (auto& sound : sounds) {
@@ -297,8 +313,8 @@ namespace lof {
                     sound.filepath = filepath;
                     sound.audio_state = state;
                     sound.audio_type = type;
-                    sound.volume = volume;
-                    sound.pitch = pitch;
+                    sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
+                    sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
                     sound.islooping = islooping;
                     return;
                 }
@@ -309,8 +325,8 @@ namespace lof {
             new_sound.filepath = filepath;
             new_sound.audio_state = state;
             new_sound.audio_type = type;
-            new_sound.volume = volume;
-            new_sound.pitch = pitch;
+            new_sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
+            new_sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
             new_sound.islooping = islooping;
 
             sounds.push_back(new_sound);
@@ -366,7 +382,7 @@ namespace lof {
         void set_volume(const std::string& key, float volume) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
-                    sound.volume = volume;
+                    sound.volume = std::clamp(volume, 0.0f, 1.0f);
                 }
                 std::cout << sound.volume << std::endl; LM.write_log("volume change %f", sound.volume);
             }
@@ -379,7 +395,7 @@ namespace lof {
         void set_pitch(const std::string& key, float pitch) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
-                    sound.pitch = pitch;
+                    sound.pitch = std::clamp(pitch, 0.5f, 2.0f);
                 }
             }
         }
@@ -432,47 +448,6 @@ namespace lof {
             , is_container(is_container)
             , is_visible(true)
             , relative_pos(0.0f, 0.0f) {}
-    };
-
-    class BehaviourComponent : public Component {
-    protected:
-        //protected to prevent any other class to access except this and derived classes
-        unsigned int m_behaviorIndex;
-
-        //chat gpt recommendatoin i havent got to understanding
-        //but from what ik its just to have string to direct to
-        //the behaviour when as the name says on update (still)
-        //or on collide (play sound) smth like that
-        std::string on_update_behaviour;
-        std::string on_collision_behaviour;
-    public:
-        //allows us to change behavior at run time 
-        //helps to switch entity behavior e.g. from idle to attack
-        void set_behaviour_index(const unsigned int& behaviour) {
-            m_behaviorIndex = behaviour;
-        }
-
-        //returning a & allows caller to update the m_behavior directly
-        inline unsigned int& get_behaviour_index() noexcept {
-            return m_behaviorIndex;
-        }
-
-        void set_on_update_behaviour(const std::string& behaviour) {
-            on_update_behaviour = behaviour;
-        }
-
-        void set_on_collision_behaviour(const std::string& behaviour) {
-            on_collision_behaviour = behaviour;
-        }
-
-        std::string get_on_update_behaviour() const {
-            return on_update_behaviour;
-        }
-
-        std::string get_on_collision_behaviour() const {
-            return on_collision_behaviour;
-        }
-
     };
 
 } // namespace lof

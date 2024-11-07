@@ -38,8 +38,6 @@
     <ClCompile Include="Utility\Vector3D.cpp" />
     <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
-    <ClCompile Include="System\Logic_System.cpp" />
-    <ClCompile Include="Utility\BehaviourFCT.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -76,8 +74,6 @@
     <ClInclude Include="System\GUI_System.h" />
     <ClInclude Include="Utility\globals.h" />
     <ClInclude Include="System\Animation_System.h" />
-    <ClInclude Include="System\Logic_System.h" />
-    <ClInclude Include="Utility\BehaviourFCT.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

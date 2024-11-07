@@ -85,37 +85,17 @@ namespace lof {
 
 	//Audio component constants
 	enum AudioType {
-		BGM = 0,    //background music
-		SFX = 1    //Sound Effect
+		BGM = 0,    ///<background music
+		SFX = 1		///<Sound Effect
 	};
 
 	enum PlayState {
-		//MUTED,    //Audio is to be played but not hear (essentially volume is 0.)
-		PLAYING = 0,    //Audio is to be played
-		STOPPED = 1,    //Audio is to be stopped
-		PAUSED = 2,      //Audio is to be paused
-		RESUMED = 3,		//Audio is to be resumed
-		NONE = 4
+		PLAYING = 0,    ///<Audio is to be played
+		STOPPED = 1,    ///<Audio is to be stopped
+		PAUSED = 2,     ///<Audio is to be paused
+		RESUMED = 3,	///<Audio is to be resumed
+		NONE = 4		///<Audio is not played at all nor need to stop
 	};
-
-	//enum FileFormat {
-	//	BANK = 0,
-	//	WAV = 1,
-	//	OGG = 2
-	//};
-
-	//enum AudioCommand {
-	//	NONE = 0,
-	//	PLAYSOUND,
-	//	STOPSOUND,
-	//	PAUSEDSOUND,
-	//	RESUMESOUND
-	//	/*,
-	//	PLAYEVENT,
-	//	STOPEVENT,
-	//	PAUSEEVENT,
-	//	RESUMEEVENT*/
-	//};
 
 	// ----------------------------- Movement_System.cpp -------------------------------------------
     //Movement_System constants

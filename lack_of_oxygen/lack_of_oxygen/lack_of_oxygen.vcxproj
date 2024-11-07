@@ -47,10 +47,8 @@
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="System\GUI_System.cpp" />
-    <ClCompile Include="System\Logic_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
-    <ClCompile Include="Utility\BehaviourFCT.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
@@ -81,11 +79,9 @@
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="System\GUI_System.h" />
-    <ClInclude Include="System\Logic_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
     <ClInclude Include="System\System.h" />
-    <ClInclude Include="Utility\BehaviourFCT.h" />
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\Constant.h" />
