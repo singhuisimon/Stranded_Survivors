@@ -510,11 +510,22 @@ namespace lof {
 
             sound_obj.AddMember("key", rapidjson::Value(sound.key.c_str(), allocator), allocator);
 
-            std::string filename = sound.filepath.c_str();
+            /*std::string filename = sound.filepath.c_str();
             size_t pos = filename.find("lack_of_oxygen\\Data");
             if (pos != std::string::npos) {
                 filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 19);
+            }*/
+
+            std::string filename = sound.filepath.c_str();
+            size_t pos = filename.find("lack_of_oxygen\\Data\\Audio\\");
+            if (pos != std::string::npos) {
+                filename = filename.substr(pos + 26);
+                size_t dot_pos = filename.find_last_of('.');
+                if (dot_pos != std::string::npos) {
+                    filename = filename.substr(0, dot_pos);
+                }
             }
+
             sound_obj.AddMember("filepath", rapidjson::Value(filename.c_str(), allocator), allocator);
             sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
             sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
