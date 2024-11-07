@@ -22,6 +22,7 @@
 #include "../System/GUI_System.h"
 #include "../System/Audio_System.h"
 #include "../System/Animation_System.h"
+#include "../System/Logic_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -88,6 +89,9 @@ namespace lof {
             register_component<Animation_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Animation_Component'.");
 
+            register_component<Logic_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Logic_Component'.");
+
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
@@ -108,6 +112,9 @@ namespace lof {
 
             add_system(std::make_unique<Animation_System>()); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
+
+            add_system(std::make_unique<Logic_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");
@@ -242,69 +249,80 @@ namespace lof {
 
 
     void ECS_Manager::destroy_entity(EntityID entity) {
-
         if (entity >= entities.size() || !entities[entity]) {
             LM.write_log("ECS_Manager::destroy_entity(): Invalid entity ID or already destroyed: %u", entity);
             return;
         }
 
-        // Remove from systems first
-        for (auto& system : systems) {
-            system->remove_entity(entity);
-        }
-
-        // Remove from name lookup if it has a name
+        // Log the entity being destroyed
         const std::string& name = entities[entity]->get_name();
-        if (!name.empty()) {
-            entity_names.erase(name);
-            LM.write_log("ECS_Manager::destroy_entity(): Removed name mapping for '%s'", name.c_str());
-        }
+        LM.write_log("ECS_Manager::destroy_entity(): Starting destruction of entity %u (name: %s)", entity, name.c_str());
 
-        // Remove components
-        for (auto& component_pair : component_arrays) {
-            auto& componentArray = component_pair.second;
-            if (entity < componentArray.size()) {
-                componentArray[entity].reset();
+        // First remove from all systems
+        for (auto& system : systems) {
+            if (system->has_entity(entity)) {
+                system->remove_entity(entity);
+                LM.write_log("Removed entity %u from system %s", entity, system->get_type().c_str());
             }
         }
 
-        // Before removing the entity, we need to update all entities that come after it
-        for (size_t i = entity + 1; i < entities.size(); i++) {
-            if (entities[i]) {
-                // Update the entity's ID
-                EntityID old_id = entities[i]->get_id();
-                entities[i]->set_id(old_id - 1);
+        // Remove from name lookup if it has a name
+        if (!name.empty()) {
+            entity_names.erase(name);
+            LM.write_log("Removed name mapping for '%s'", name.c_str());
+        }
 
-                // Update name mapping if it exists
+        // Remove all components
+        for (auto& component_pair : component_arrays) {
+            auto& componentArray = component_pair.second;
+            if (entity < componentArray.size()) {
+                if (componentArray[entity]) {  // Check if component exists
+                    componentArray[entity].reset();
+                    LM.write_log("Reset component for entity %u", entity);
+                }
+            }
+        }
+
+        // Remove the entity from the entities vector
+        entities.erase(entities.begin() + entity);
+        LM.write_log("Removed entity from entities vector");
+
+        // Update the IDs of all entities that come after the removed one
+        for (size_t i = entity; i < entities.size(); i++) {
+            if (entities[i]) {
+                EntityID new_id = static_cast<EntityID>(i);
+                EntityID old_id = entities[i]->get_id();
+
+                // Update the entity's ID
+                entities[i]->set_id(new_id);
+
+                // Update name mapping
                 const std::string& entity_name = entities[i]->get_name();
                 if (!entity_name.empty()) {
-                    entity_names[entity_name] = old_id - 1;
+                    entity_names[entity_name] = new_id;
                 }
 
                 // Update system mappings
                 for (auto& system : systems) {
                     if (system->has_entity(old_id)) {
                         system->remove_entity(old_id);
-                        system->add_entity(old_id - 1);
+                        system->add_entity(new_id);
                     }
                 }
+
+                LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
             }
         }
 
-        // Remove the entity
-        entities.erase(entities.begin() + entity);
-
-        // Resize all component arrays
+        // Compact component arrays
         for (auto& component_pair : component_arrays) {
             auto& componentArray = component_pair.second;
-            if (!componentArray.empty()) {
+            if (entity < componentArray.size()) {
                 componentArray.erase(componentArray.begin() + entity);
             }
         }
 
-        LM.write_log("ECS_Manager::destroy_entity(): Destroyed entity ID %u and reindexed remaining entities.", entity);
-        LM.write_log("ECS_Manager::destroy_entity(): Destroyed entity ID %u.", entity);
-
+        LM.write_log("ECS_Manager::destroy_entity(): Completed destruction of entity %u", entity);
     }
 
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{

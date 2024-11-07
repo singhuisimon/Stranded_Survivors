@@ -3,6 +3,8 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Type.h"
 
+#define LOGIC_SYSTEM lof::Logic_System::get_instance()
+
 namespace lof {
     class GUI_System : public System {
     private:
@@ -42,37 +44,23 @@ namespace lof {
             return &ecs_manager.get_component<T>(entity_id);
         }
 
+        void debug_entity(const char* prefix, EntityID id);
+        void validate_gui_state();
+
     public:
-        GUI_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {
-            container_id = INVALID_ENTITY_ID;
-            background_bar_id = INVALID_ENTITY_ID;
-            progress_bar_id = INVALID_ENTITY_ID;
-            left_image_id = INVALID_ENTITY_ID;
-            right_image_id = INVALID_ENTITY_ID;
-
-            // Set up the required components
-            signature.set(ecs_manager.get_component_id<Transform2D>());
-            signature.set(ecs_manager.get_component_id<Graphics_Component>());
-            signature.set(ecs_manager.get_component_id<GUI_Component>());
-        }
-
+        GUI_System(ECS_Manager& ecs_manager);
         void show_loading_screen();
         void hide_loading_screen();
         void set_progress(float progress);
         void update(float delta_time) override;
-        std::string get_type() const override {
-            return "GUI_System";
-        }
+        std::string get_type() const override { return "GUI_System"; }
 
-        // Add getters for current state
         float get_progress() const {
             if (progress_bar_id == INVALID_ENTITY_ID) return 0.0f;
             const auto* gui = get_component_safe<GUI_Component>(progress_bar_id);
             return gui ? gui->progress : 0.0f;
         }
 
-        bool is_visible() const {
-            return container_id != INVALID_ENTITY_ID;
-        }
+        bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
     };
 }

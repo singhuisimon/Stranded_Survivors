@@ -347,6 +347,48 @@ namespace lof {
                 ecs_manager.add_component<Animation_Component>(entity, animation_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Animation_Component to entity ID %u.", entity);
                 }
+            // ------------------------------------ Logic_Component -------------------------------------------
+            else if (component_name == "Logic_Component") {
+                // Log the raw value from JSON
+                int pattern_value = component_data["movement_pattern"].GetInt();
+                LM.write_log("Parsing Logic Component - Raw movement pattern value: %d", pattern_value);
+
+                Logic_Component logic(
+                    static_cast<Logic_Component::LogicType>(component_data["logic_type"].GetInt()),
+                    static_cast<Logic_Component::MovementPattern>(pattern_value)
+                );
+
+                // Set other properties
+                if (component_data.HasMember("is_active")) {
+                    logic.is_active = component_data["is_active"].GetBool();
+                }
+                if (component_data.HasMember("movement_speed")) {
+                    logic.movement_speed = component_data["movement_speed"].GetFloat();
+                }
+                if (component_data.HasMember("movement_range")) {
+                    logic.movement_range = component_data["movement_range"].GetFloat();
+                }
+                if (component_data.HasMember("reverse_direction")) {
+                    logic.reverse_direction = component_data["reverse_direction"].GetBool();
+                }
+                if (component_data.HasMember("rotate_with_motion")) {
+                    logic.rotate_with_motion = component_data["rotate_with_motion"].GetBool();
+                }
+                if (component_data.HasMember("origin_pos") && component_data["origin_pos"].IsArray()) {
+                    logic.origin_pos.x = component_data["origin_pos"][0].GetFloat();
+                    logic.origin_pos.y = component_data["origin_pos"][1].GetFloat();
+                }
+
+                // Log the final state
+                LM.write_log("Created Logic Component with movement pattern: %d, speed: %.2f, range: %.2f",
+                    static_cast<int>(logic.movement_pattern),
+                    logic.movement_speed,
+                    logic.movement_range);
+
+                // Add component to entity
+                ecs_manager.add_component<Logic_Component>(entity, logic);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+                }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
                 LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
