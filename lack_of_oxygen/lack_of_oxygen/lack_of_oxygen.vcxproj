@@ -88,7 +88,7 @@
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\Constant.h" />
     <ClInclude Include="Utility\FPS.h" />
-    <ClInclude Include="Utility\globals.h" />
+    <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
     <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Type.h" />

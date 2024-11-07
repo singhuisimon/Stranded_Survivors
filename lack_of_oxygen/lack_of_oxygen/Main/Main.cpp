@@ -111,7 +111,6 @@ int main(void) {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     bool lvl_manager_mode = false;
     bool object_editor_mode = false;
-    bool performance_view = false;
 
     // --------------------------- Retrieve Configuration ---------------------------
 
@@ -183,25 +182,29 @@ int main(void) {
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
 
 
-
         // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
         //if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
-            system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-            system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
-            //system_performance(GM.get_time(), LGM.get_time(), LGM.get_type());
-            system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
-            //std::cout << "In ECS Manager...\n";
-            for (auto& system : ECSM.get_systems()) {
-                system_performance(GM.get_time(), system->get_time(), system->get_type());
-            }
 
-            //std::cout << std::endl;
-        //}
+        // Start the Dear ImGui frame
+        IMGUIM.start_frame();
+        ImGui::Begin("Performance Viewer");
+        
+        
+        system_performance(GM.get_time(), IM.get_time(), IM.get_type());
+        system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+        //system_performance(GM.get_time(), IMGUIM.get_time(), IMGUIM.get_type());
+        system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
+        ImGui::Text("In ECS Manager: \n");
+        for (auto& system : ECSM.get_systems()) {
+        system_performance(GM.get_time(), system->get_time(), system->get_type());
+        }
+
+        ImGui::End();
+            
 
         if (level_editor_mode) {
   
-            // Start the Dear ImGui frame
-            IMGUIM.start_frame();
+            
 
             if (ImGui::BeginMainMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
@@ -215,11 +218,7 @@ int main(void) {
                         //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
                         object_editor_mode = !object_editor_mode;
                     }
-                    if (ImGui::MenuItem("Performance Viewer")) {
-
-                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
-                        performance_view = !performance_view;
-                    }
+                    
                     ImGui::EndMenu();
                 }
             }
@@ -232,15 +231,14 @@ int main(void) {
                 IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
             }
 
-            if (performance_view) {
-                //IMGUIM.show_performance_viewer();
-            }
 
             ImGui::EndMainMenuBar();
             // Rendering
-            IMGUIM.render();
+            
 
         }
+        // Rendering
+        IMGUIM.render();
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {

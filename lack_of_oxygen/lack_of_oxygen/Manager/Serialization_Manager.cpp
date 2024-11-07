@@ -23,6 +23,7 @@
 
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
+#include "IMGUI_Manager.h"
 
 // Include all component headers
 #include "../Component/Component.h"
@@ -254,6 +255,8 @@ namespace lof {
         const rapidjson::Value& prefabs = prefab_document["prefabs"];
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
+            
+            IMGUIM.fill_prefab_names(prefab_name.c_str());
 
             // Deep copy the prefab definition into the map
             rapidjson::Value prefab_value(rapidjson::kObjectType);
@@ -284,18 +287,14 @@ namespace lof {
         // Collect all existing entity IDs
         for (size_t i = 0; i < entities.size(); ++i) {
             if (entities[i]) {  // Check if entity exists
-                std::cout << entities[i]->get_name() << ": " << entities[i]->get_id() << std::endl;
                 entities_to_remove.push_back(static_cast<EntityID>(i));
             }
         }
 
         // Remove all existing entities
         for (EntityID eid : entities_to_remove) {
-            std::cout << "removing eid: " << eid << std::endl;
             ECSM.destroy_entity(0);
         }
-
-        std::cout << "entities removed: " << entities_to_remove.size() << std::endl;
 
         LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
 

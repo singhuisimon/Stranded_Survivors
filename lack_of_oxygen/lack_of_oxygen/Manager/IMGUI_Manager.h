@@ -29,11 +29,11 @@
 
 namespace lof {
 
-    
     class IMGUI_Manager : public Manager {
     private:
         IMGUI_Manager();
         class ECS_Manager& ecs;
+        std::vector<std::string> prefab_names{};
     public:
 
         IMGUI_Manager(ECS_Manager& ecs_manager);
@@ -44,8 +44,8 @@ namespace lof {
         //note: inherited start_up function must be dealt with
 
         int start_up(GLFWwindow*& window);
-        void start_frame();
-        void example_demo(bool& show_demo_window, bool& show_another_window, ImVec4& clear_color, ImGuiIO& io);
+        void start_frame();/*
+        void example_demo(bool& show_demo_window, bool& show_another_window, ImVec4& clear_color, ImGuiIO& io);*/
         void display_loading_options(const std::string& directory);
         void imgui_game_objects_list();
         void imgui_game_objects_edit();
@@ -53,6 +53,7 @@ namespace lof {
         void remove_game_objects(int selected_object_index);
         bool button_toggle(const std::string& condition_name, bool* state);
         void text_input(std::string& data_name, std::string& codition_name);
+        void fill_prefab_names(const char* prefab_name);
         void render();
         void shut_down() override;
         //remember to delete update and start up
