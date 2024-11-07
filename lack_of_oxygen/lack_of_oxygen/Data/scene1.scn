@@ -206,6 +206,83 @@
           "origin_pos": [ -500.0, 550.0 ]
         }
       }
+    },
+    {
+      "name": "game_title",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -200.0, 180.0 ],
+          "prev_position": [ -200.0, 180.0 ],
+          "scale": [ 1.2, 1.2 ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Lack of Oxygen",
+          "color": [ 0.0, 0.0, 0.0 ]
+        }
+      }
+    },
+    {
+      "name": "team_name",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -240.0, 260.0 ],
+          "prev_position": [ -240.0, 260.0 ],
+          "scale": [ 2.0, 2.0 ]
+        },
+        "Text_Component": {
+          "font_name": "arial_narrow_7",
+          "text": "Stranded Survivors",
+          "color": [ 0.0, 0.0, 0.0 ]
+        }
+      }
+    },
+    {
+      "name": "guiding_text1",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -260.0, -1000.0 ],
+          "prev_position": [ -260.0, -1000.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Text_Component": {
+          "text": "I guess you found me :)",
+          "color": [ 1.0, 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "guiding_text2",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -375.0, -3000.0 ],
+          "prev_position": [ -375.0, -3000.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Text_Component": {
+          "text": "Keep going, you're almost there!",
+          "color": [ 1.0, 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "guiding_text3",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -475.0, -8000.0 ],
+          "prev_position": [ -475.0, -8000.0 ],
+          "scale": [ 0.9, 0.9 ]
+        },
+        "Text_Component": {
+          "text": "You've reached the end, have a great day ahead!",
+          "color": [ 1.0, 1.0, 1.0 ]
+        }
+      }
     }
   ]
 }

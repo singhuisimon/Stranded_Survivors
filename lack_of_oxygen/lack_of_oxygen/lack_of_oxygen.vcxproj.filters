@@ -84,6 +84,12 @@
     <None Include="Data\triangle.msh" />
     <None Include="Data\prefab.json" />
     <None Include="Data\models.msh" />
+    <None Include="Shaders\lack_of_oxygen_debug.frag" />
+    <None Include="Shaders\lack_of_oxygen_debug.vert" />
+    <None Include="Shaders\lack_of_oxygen_font.frag" />
+    <None Include="Shaders\lack_of_oxygen_font.vert" />
+    <None Include="Shaders\lack_of_oxygen_obj.frag" />
+    <None Include="Shaders\lack_of_oxygen_obj.vert" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -94,5 +100,12 @@
     <Media Include="Data\Audio\Fx16_2.wav" />
     <Media Include="Data\Audio\Fx28.wav" />
     <Media Include="Data\Audio\Fx27.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Data\Fonts\arial_narrow_7.ttf" />
+    <Font Include="Data\Fonts\PressStart2P.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Data\Fonts\Fonts.txt" />
   </ItemGroup>
 </Project>

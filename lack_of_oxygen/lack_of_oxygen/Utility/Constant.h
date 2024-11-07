@@ -114,9 +114,15 @@ namespace lof {
 	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
 
 	// Camera
-	constexpr float DEFAULT_CAMERA_SPEED = 1000.0f;
+	constexpr float DEFAULT_CAMERA_SPEED = 500.0f;
 	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
 	constexpr float DEFAULT_ORIENTATION = 0.0f;
+
+	// Fonts
+	constexpr int DEFAULT_GLYPH_HEIGHT = 48;
+	constexpr int DEFAULT_GLYPH_WIDTH = 0;
+	constexpr const char* DEFAULT_FONT_NAME = "PressStart2P";
+	constexpr float DEFAULT_TEXT_POSITION = 0.0f;
 
 	// ------------------------------ Render_System.cpp --------------------------------
 	// Drawing constants
