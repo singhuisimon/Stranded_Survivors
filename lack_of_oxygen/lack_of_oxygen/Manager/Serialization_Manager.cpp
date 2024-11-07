@@ -617,6 +617,11 @@ namespace lof {
 
         // Iterate through all entities
         for (const auto& entity_ptr : ECSM.get_entities()) {
+            if (!entity_ptr) {
+                LM.write_log("Serialization_Manager::save_game_state(): Skipping null entity");
+                continue;
+            }
+
             EntityID entity_id = entity_ptr->get_id();
 
             // Skip if this entity only has a GUI component
@@ -628,67 +633,90 @@ namespace lof {
             // Create object for this entity
             rapidjson::Value entity_obj(rapidjson::kObjectType);
 
-            // Generate a name for the entity
+            // Get the entity's name while maintaining the working logic
             std::string entity_name;
             if (entity_id == 0) {
                 entity_name = "background";
             }
             else {
-                entity_name = "entity_" + std::to_string(unnamed_counter++);
+                // Try to get the existing name first
+                entity_name = entity_ptr->get_name();
+                if (entity_name.empty()) {
+                    entity_name = "entity_" + std::to_string(unnamed_counter++);
+                }
             }
+
+            // Add the name using the same method as the working version
             entity_obj.AddMember("name", rapidjson::Value(entity_name.c_str(), allocator), allocator);
 
             // Create object for components
             rapidjson::Value components_obj(rapidjson::kObjectType);
 
-            // Add Transform2D component if present
-            if (ECSM.has_component<Transform2D>(entity_id)) {
-                const Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
-                components_obj.AddMember("Transform2D", serialize_transform_component(transform, allocator), allocator);
-            }
+            try {
+                // Add Transform2D component if present
+                if (ECSM.has_component<Transform2D>(entity_id)) {
+                    const Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
+                    components_obj.AddMember("Transform2D", serialize_transform_component(transform, allocator), allocator);
+                }
 
-            // Add Graphics_Component if present
-            if (ECSM.has_component<Graphics_Component>(entity_id)) {
-                const Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-                components_obj.AddMember("Graphics_Component", serialize_graphics_component(graphics, allocator), allocator);
-            }
+                // Add Graphics_Component if present
+                if (ECSM.has_component<Graphics_Component>(entity_id)) {
+                    const Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+                    components_obj.AddMember("Graphics_Component", serialize_graphics_component(graphics, allocator), allocator);
+                }
 
-            // Add Collision_Component if present
-            if (ECSM.has_component<Collision_Component>(entity_id)) {
-                const Collision_Component& collision = ECSM.get_component<Collision_Component>(entity_id);
-                components_obj.AddMember("Collision_Component", serialize_collision_component(collision, allocator), allocator);
-            }
+                // Add Collision_Component if present
+                if (ECSM.has_component<Collision_Component>(entity_id)) {
+                    const Collision_Component& collision = ECSM.get_component<Collision_Component>(entity_id);
+                    components_obj.AddMember("Collision_Component", serialize_collision_component(collision, allocator), allocator);
+                }
 
-            // Add Physics_Component if present
-            if (ECSM.has_component<Physics_Component>(entity_id)) {
-                const Physics_Component& physics = ECSM.get_component<Physics_Component>(entity_id);
-                components_obj.AddMember("Physics_Component", serialize_physics_component(physics, allocator), allocator);
-            }
+                // Add Physics_Component if present
+                if (ECSM.has_component<Physics_Component>(entity_id)) {
+                    const Physics_Component& physics = ECSM.get_component<Physics_Component>(entity_id);
+                    components_obj.AddMember("Physics_Component", serialize_physics_component(physics, allocator), allocator);
+                }
 
-            // Add Velocity_Component if present
-            if (ECSM.has_component<Velocity_Component>(entity_id)) {
-                const Velocity_Component& velocity = ECSM.get_component<Velocity_Component>(entity_id);
-                components_obj.AddMember("Velocity_Component", serialize_velocity_component(velocity, allocator), allocator);
-            }
+                // Add Velocity_Component if present
+                if (ECSM.has_component<Velocity_Component>(entity_id)) {
+                    const Velocity_Component& velocity = ECSM.get_component<Velocity_Component>(entity_id);
+                    components_obj.AddMember("Velocity_Component", serialize_velocity_component(velocity, allocator), allocator);
+                }
 
-            // Add Audio_Component if present
-            if (ECSM.has_component<Audio_Component>(entity_id)) {
-                const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
-                components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
-            }
+                // Add Audio_Component if present
+                if (ECSM.has_component<Audio_Component>(entity_id)) {
+                    const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
+                    components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
+                }
 
-            // Add Animation_Component if present
-            if (ECSM.has_component<Animation_Component>(entity_id)) {
-                const Animation_Component& animation = ECSM.get_component<Animation_Component>(entity_id);
-                components_obj.AddMember("Animation_Component", serialize_animation_component(animation, allocator), allocator);
-            }
+                // Add Animation_Component if present
+                if (ECSM.has_component<Animation_Component>(entity_id)) {
+                    const Animation_Component& animation = ECSM.get_component<Animation_Component>(entity_id);
+                    components_obj.AddMember("Animation_Component", serialize_animation_component(animation, allocator), allocator);
+                }
 
-            // Only add entity to save file if it has components to save
-            if (components_obj.MemberCount() > 0) {
-                // Add components object to entity object
-                entity_obj.AddMember("components", components_obj, allocator);
-                // Add entity object to objects array
-                objects_array.PushBack(entity_obj, allocator);
+                // Add Logic_Component if present
+                if (ECSM.has_component<Logic_Component>(entity_id)) {
+                    const Logic_Component& logic = ECSM.get_component<Logic_Component>(entity_id);
+                    components_obj.AddMember("Logic_Component", serialize_logic_component(logic, allocator), allocator);
+                }
+
+                std::cout << "printing\n";
+                // Only add entity to save file if it has components to save
+                if (components_obj.MemberCount() > 0) {
+                    // Add components object to entity object
+                    entity_obj.AddMember("components", components_obj, allocator);
+                    // Add entity object to objects array
+                    objects_array.PushBack(entity_obj, allocator);
+                    std::cout << "printing2\n";
+                    LM.write_log("Serialization_Manager::save_game_state(): Saved entity '%s' with %u components", entity_name, components_obj.MemberCount());
+                    std::cout << "printing3\n";
+                    ;
+                }
+            }
+            catch (const std::exception& e) {
+                LM.write_log("Error processing components for entity %s: %s", entity_name.c_str(), e.what());
+                continue;  // Skip this entity if there's an error
             }
         }
 
