@@ -719,42 +719,25 @@ namespace lof {
         }
     }
 
-    /**
-     * @brief Retrieves the screen width from the configuration.
-     *
-     * @return Screen width as an unsigned integer.
-     */
+
     unsigned int Serialization_Manager::get_scr_width() const {
         //LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
         return m_scr_width;
     }
 
-    /**
-     * @brief Retrieves the screen height from the configuration.
-     *
-     * @return Screen height as an unsigned integer.
-     */
+
     unsigned int Serialization_Manager::get_scr_height() const {
         //LM.write_log("Serialization_Manager::get_scr_height(): Returning SCR_HEIGHT: %u", m_scr_height);
         return m_scr_height;
     }
 
-    /**
-     * @brief Retrieves the FPS display interval from the configuration.
-     *
-     * @return FPS display interval as a float.
-     */
+
     float Serialization_Manager::get_fps_display_interval() const {
         LM.write_log("Serialization_Manager::get_fps_display_interval(): Returning FPS_DISPLAY_INTERVAL: %.2f", m_fps_display_interval);
         return m_fps_display_interval;
     }
 
-    /**
-     * @brief Retrieves a prefab's JSON configuration by its name.
-     *
-     * @param prefab_name The name of the prefab to retrieve.
-     * @return A constant pointer to the prefab's JSON value if found; otherwise, nullptr.
-     */
+
     const rapidjson::Value* Serialization_Manager::get_prefab(const std::string& prefab_name) const {
         auto it = m_prefab_map.find(prefab_name);
         if (it != m_prefab_map.end()) {
