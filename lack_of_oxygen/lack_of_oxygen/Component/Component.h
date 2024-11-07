@@ -268,13 +268,13 @@ namespace lof {
         * @brief Holds all the details in each sound component currently it has.
         */
         struct SoundConfig {
-            std::string key;
-            std::string filepath;
-            PlayState audio_state;
-            AudioType audio_type;
-            float volume;
-            float pitch;
-            bool islooping;
+            std::string key = "";
+            std::string filepath = "";
+            PlayState audio_state = NONE;
+            AudioType audio_type = NIL;
+            float volume = 0.0f;
+            float pitch = 1.0f;
+            bool islooping = false;
         };
 
         std::vector<SoundConfig> sounds; ///< vectors of sound details
@@ -404,7 +404,7 @@ namespace lof {
             }
         }
 
-        AudioType get_audio_type(const std::string& key) {
+        AudioType get_audio_type(const std::string& key) const{
             return get_sound_by_key(key)->audio_type;
         }
 
@@ -417,7 +417,7 @@ namespace lof {
             }
         }
 
-        float get_volume(const std::string& key) {
+        float get_volume(const std::string& key) const {
             return get_sound_by_key(key)->volume;
         }
 
@@ -429,7 +429,7 @@ namespace lof {
             }
         }
 
-        float get_pitch(const std::string& key) {
+        float get_pitch(const std::string& key) const {
             return get_sound_by_key(key)->pitch;
         }
 
@@ -441,7 +441,7 @@ namespace lof {
             }
         }
 
-        bool get_loop(const std::string& key) {
+        bool get_loop(const std::string& key) const {
             return get_sound_by_key(key)->islooping;
         }
 

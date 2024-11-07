@@ -105,7 +105,6 @@ namespace lof {
 	private:
 		
 		FMOD::System* core_system;	//Core audio system
-		FMOD::Studio::System* studio_system;	//Studio audio system
 
 		void initializegroups();
 

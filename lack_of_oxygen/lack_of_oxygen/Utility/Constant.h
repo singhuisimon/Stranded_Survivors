@@ -86,7 +86,8 @@ namespace lof {
 	//Audio component constants
 	enum AudioType {
 		BGM = 0,    ///<background music
-		SFX = 1		///<Sound Effect
+		SFX = 1,		///<Sound Effect
+		NIL = 2
 	};
 
 	enum PlayState {
