@@ -766,6 +766,18 @@ namespace lof {
                         }
                     }
 
+                    // Text Component
+                    if (ECSM.has_component<Text_Component>(entity_id)) {
+                        try {
+                            const auto& text = ECSM.get_component<Text_Component>(entity_id);
+                            rapidjson::Value comp_value = serialize_text_component(text, allocator);
+                            components_obj.AddMember("Text_Component", comp_value, allocator);
+                        }
+                        catch (const std::exception& e) {
+                            LM.write_log("Error serializing Text_Component for entity %s: %s", entity_name.c_str(), e.what());
+                        }
+                    }
+
                     // Only add if we have components
                     if (components_obj.MemberCount() > 0) {
                         try {
