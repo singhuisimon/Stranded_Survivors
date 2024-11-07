@@ -39,7 +39,6 @@
     <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Logic_System.cpp" />
-    <ClCompile Include="Manager\Assets_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -77,7 +76,6 @@
     <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Logic_System.h" />
-    <ClInclude Include="Manager\Assets_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\config.json" />

@@ -34,7 +34,6 @@
     <ClCompile Include="IMGUI\imstb_textedit.h" />
     <ClCompile Include="IMGUI\imstb_truetype.h" />
     <ClCompile Include="Main\Main.cpp" />
-    <ClCompile Include="Manager\Assets_Manager.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
@@ -69,7 +68,6 @@
     <ClInclude Include="IMGUI\imgui_impl_opengl3.h" />
     <ClInclude Include="IMGUI\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Main\Main.h" />
-    <ClInclude Include="Manager\Assets_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
@@ -247,7 +245,7 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\*.dll" "$(OutDir)"
