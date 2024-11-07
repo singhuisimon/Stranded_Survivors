@@ -21,6 +21,10 @@ namespace lof {
     /**
      * @class Movement_System
      * @brief System responsible for updating entities' positions based on their velocities and physics.
+     *
+     * This system processes entities with Transform2D, Velocity_Component, and Physics_Component,
+     * applying physics-based calculations to update their positions, velocities, and other related
+     * properties. It manages forces like gravity and jumping.
      */
     class Movement_System : public System {
     public:
@@ -42,18 +46,11 @@ namespace lof {
         std::string get_type() const override;
 
     private:
-
+        /**
+         * @brief Integrates physics calculations for movement, applying forces and updating positions.
+         * @param delta_time The time increment for updating entity positions and velocities.
+         */
         void integrate(float deltatime);
-
-#if 0
-        void resolve_physics(const std::vector<CollisionPair>& collisions, float delta_time);
-        void apply_physics_response(EntityID entity_id, const CollisionPair& collision, float delta_time);
-        void handle_ground_contact(EntityID entity_id, const CollisionPair& collision, float delta_time);
-        void handle_wall_contact(EntityID entity_id, const CollisionPair& collision, float delta_time);
-#endif
-
-       // void resolve_collision(const CollisionPair& collision, Transform2D& transform, Velocity_Component& velocity, Physics_Component& physics);
-
 
     };
    

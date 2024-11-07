@@ -1,5 +1,25 @@
-#include "Force_Manager.h"
+/**
+ * @file Force_Manager.cpp
+ * @brief Implements the Force and Force_Manager classes used for managing forces in a physics simulation.
+ *
+ * This file contains the definitions of the functions declared in `Force_Manager.h`:
+ *
+ * - **Force Class Methods**: Implements functions to update the age of a force, manage its
+ *   activation state, set its lifetime, and check for expiration.
+ *
+ * - **Force_Manager Class Methods**: Implements functions to add forces, activate and deactivate
+ *   forces by type, update forces over time, compute the resultant force, and clear the stored
+ *   forces.
+ *
+ * @author Wai Lwin Thit (100%)
+ * @date November 8, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
+
+#include "Force_Manager.h"
 
 namespace lof {
 
@@ -15,6 +35,7 @@ namespace lof {
 			age += delta_time;
 			if (age >= lifetime) {
 				is_active = false;
+				age = 0.0f; //reset age
 			}
 		}
 	}

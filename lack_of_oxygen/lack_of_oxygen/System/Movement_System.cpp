@@ -30,7 +30,7 @@ namespace lof {
     }
 
     void Movement_System::integrate(float delta_time) {
-#if 1
+
         // Iterate through entities matching the system's signature
 
         LM.write_log("Movement system start update");
@@ -48,41 +48,21 @@ namespace lof {
 
             // Store the current position before updating
             transform.prev_position = transform.position;
- 
+
+
             // Handle jumping mechanics
-            if (IM.is_key_held(GLFW_KEY_SPACE) && physics.get_is_grounded() && !physics.get_has_jumped()) {
+            if (physics.get_jump_requested() && physics.get_is_grounded() && !physics.get_has_jumped()) {
               
-                std::cout << "DEBUG: player has pressed space\n";
                 physics.force_manager.activate_force(JUMP_UP);
                 physics.set_is_grounded(false);
                 physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 physics.set_has_jumped(true);
                
                 velocity.velocity.y = physics.get_jump_force();
-            }
-        
-            else if (!IM.is_key_held(GLFW_KEY_SPACE)) {
-                std::cout << "DEBUG: player has NOT pressed space\n";
+                //reset the jump request
+                physics.reset_jump_request();
                 physics.force_manager.deactivate_force(JUMP_UP);  // Deactivate the jump force
-            }
 
-
-            // Handle horizontal movement
-            if (IM.is_key_held(GLFW_KEY_A)) {
-                // Apply force to move left
-                physics.force_manager.activate_force(MOVE_LEFT);
-            }
-            else {
-                physics.force_manager.deactivate_force(MOVE_LEFT);
-            }
-
-            if (IM.is_key_held(GLFW_KEY_D)) {
-                // Apply force to move right
-                physics.force_manager.activate_force(MOVE_RIGHT);
-
-            }
-            else {
-                physics.force_manager.deactivate_force(MOVE_RIGHT);
             }
 
 
@@ -93,9 +73,8 @@ namespace lof {
             Vec2D sum_force = physics.force_manager.get_resultant_Force();
 
             //add gravity 
-                sum_force += physics.get_gravity() * physics.get_mass();
+            sum_force += physics.get_gravity() * physics.get_mass();
 
-            std::cout << "Force_Manager: Sum_Forces: " << sum_force.x << ", " << sum_force.y << std::endl;
 
             //save the accumulated forces
             physics.apply_force(sum_force);
@@ -103,11 +82,9 @@ namespace lof {
             // Calculate the acceleration
             Vec2D resulting_acceleration = physics.get_accumulated_force() * physics.get_inv_mass();
 
-            std::cout << "Inverse mass: " << physics.get_inv_mass();
 
             physics.set_acceleration(resulting_acceleration);
 
-            std::cout << "Acceleration: " << physics.get_acceleration().x << ", " << physics.get_acceleration().y << '\n';
 
             // Update velocity according to the acceleration
             velocity.velocity += physics.get_acceleration() * delta_time;
@@ -129,40 +106,16 @@ namespace lof {
 
             }
 
-            std::cout << "Physic System side: \n";
-            std::cout << "Entity ID " << entity_id << "\n";
-#if 0
-            std::cout << "Accumulated Force in movement system before reset: " << physics.get_accumulated_force().x << ", " << physics.get_accumulated_force().y << "\n";
-            std::cout << "Force Applied: " << physics.get_accumulated_force().x << ", " << physics.get_accumulated_force().y << "\n";
-            std::cout << "Acceleration: " << physics.get_acceleration().x << ", " << physics.get_acceleration().y << "\n";
-            std::cout << "New Velocity: " << velocity.velocity.x << ", " << velocity.velocity.y << "\n";
-            std::cout << "Position: " << transform.position.x << ", " << transform.position.y << "\n";
-            std::cout << "Prev Position: " << transform.prev_position.x << ", " << transform.prev_position.y << "\n\n";
-#endif
-            std::cout << "State of player on ground: " << physics.get_is_grounded() << "\n";
-            std::cout << "State of player jump state: " << physics.get_has_jumped() << "\n";
-
             // Reset the accumulated force
            physics.reset_forces();
-            std::cout << "Accumulated Forces after reset: " << physics.get_accumulated_force().x << ", " << physics.get_accumulated_force().y << '\n';
-
-            // Do not reset is_grounded or is_jumping here
-            // Let the collision system update is_grounded
         }
 
 
-        LM.write_log("Movement system end update");
 
-
-#endif
     }
     void Movement_System::update(float delta_time) {
 
-        std::cout << "---------------------------------------START Movement_System-------------------------------------\n";
-
         Movement_System::integrate(delta_time);
-
-        std::cout << "---------------------------------------END Movement_System-------------------------------------\n";
 
     }
 

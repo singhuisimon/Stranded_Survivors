@@ -1,4 +1,24 @@
 #pragma once
+/**
+ * @file Force_Manager.h
+ * @brief Defines the Force and Force_Manager classes used to manage forces in a physics simulation.
+ *
+ * This file provides the declarations for the Force and Force_Manager classes within the `lof` namespace.
+ *
+ * - **Force Class**: Represents an individual force, characterized by a direction, type, magnitude,
+ *   and optional lifetime. The class provides methods for managing the force’s activity status,
+ *   lifetime, and expiration.
+ *
+ * - **Force_Manager Class**: Manages a collection of Force objects, allowing for the addition,
+ *   activation, deactivation, and updating of forces. It also provides a method for computing the
+ *   resultant force vector from all active forces.
+ *
+ * @author Wai Lwin Thit (100%)
+ * @date November 8, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
 
 #ifndef LOF_FORCE_MANAGER_H
@@ -19,6 +39,13 @@ namespace lof {
 		IMPULSE //for future purposes
 	};
 
+	/**
+	 * @class Force
+	 * @brief Represents a force with specific characteristics like direction, type, magnitude, and lifetime.
+	 *
+	 * This class models a force that can be applied to objects within a physics simulation. Each force has
+	 * a direction, a type (e.g., MOVE_LEFT, JUMP_UP), a magnitude, and an optional lifetime.
+	 */
 	class Force {
 
 	public:
@@ -31,24 +58,45 @@ namespace lof {
 		bool is_active = false;
 
 	public:
-		//constructor
+		/**
+		 * @brief Constructs a Force object with specified direction, type, magnitude, and lifetime.
+		 * @param direction The direction vector of the force.
+		 * @param type The type of the force.
+		 * @param magnitude The magnitude of the force.
+		 * @param lifetime The active duration of the force (0.0 for infinite lifetime).
+		 */
 		Force(Vec2D direction, ForceType type, float magnitude,
 			float lifetime);
 
-		//update the force's age according to time
+		/**
+		 * @brief Updates the age of the force over time and deactivates it if it expires.
+		 * @param delta_time The time step by which to increment the age.
+		 */
 		void update_Age(float delta_time);
 
-		//seting the force to activate or deactivate
+		/**
+		 * @brief Activates or deactivates the force.
+		 * @param active Boolean indicating if the force should be active.
+		 */
 		void set_active(bool active);
 
-		//set the life time for the force
+		/**
+		 * @brief Sets a new lifetime for the force.
+		 * @param life The new lifetime in seconds.
+		 */
 		void set_lifetime(float life);
 
-
-		//checking if the force is expired or not
+		/**
+		 * @brief Checks if the force has expired (i.e., exceeded its lifetime).
+		 * @return True if the force has expired, false otherwise.
+		 */
 		bool isExpired() const;
 
-		//utility function to help convert the string to ForceType
+		/**
+		 * @brief Converts a string to its corresponding ForceType enumeration.
+		 * @param type_str The string representing the force type.
+		 * @return The matching ForceType enum.
+		 */
 		static ForceType string_to_ftype(const std::string& type_str) {
 			if (type_str == "MOVE_LEFT") return MOVE_LEFT;
 			if (type_str == "MOVE_RIGHT") return MOVE_RIGHT;
@@ -56,6 +104,12 @@ namespace lof {
 			if (type_str == "DRAG") return DRAG;
 			if (type_str == "IMPULSE") return IMPULSE;
 		}
+
+		/**
+		 * @brief Converts a ForceType enumeration to its string representation.
+		 * @param type The ForceType enum to convert.
+		 * @return The string representation of the force type.
+		 */
 		static std::string ftype_to_string(const ForceType type) {
 			std::string type_str;
 
@@ -86,26 +140,61 @@ namespace lof {
 
 	};
 
-
+	/**
+	 * @class Force_Manager
+	 * @brief Manages a collection of forces applied to objects in a physics simulation.
+	 *
+	 * The Force_Manager class is responsible for handling a set of Force objects, including
+	 * adding new forces, updating their state, activating/deactivating specific force types,
+	 * and calculating the resultant force vector.
+	 */
 	class Force_Manager
 	{
 
 	public:
-
-	
+		/**
+		 * @brief Destructor that clears all managed forces.
+		 */
 		~Force_Manager();
+
+		/**
+		 * @brief Adds a new Force to the manager.
+		 * @param force The Force object to add.
+		 */
 		void add_force(const Force& force);
+
+		/**
+		 * @brief Updates all forces, incrementing their age if active.
+		 * @param delta_time The time increment for updating force ages.
+		 */
 		void update_force(float delta_time);
+
+		/**
+		 * @brief Activates all forces of a specified type.
+		 * @param type The type of force to activate.
+		 */
 		void activate_force(ForceType type);
+
+		/**
+		 * @brief Deactivates all forces of a specified type.
+		 * @param type The type of force to deactivate.
+		 */
 		void deactivate_force(ForceType type);
+
+		/**
+		 * @brief Clears all forces from the manager.
+		 */
 		void clear();
 
-		Vec2D get_resultant_Force() const;
+		/**
+		 * @brief Computes the resultant force from all active forces.
+		 * @return The resultant force as a Vec2D vector.
+		 */		Vec2D get_resultant_Force() const;
 
 		const std::vector<Force>& get_forces() const { return forces; }
 
 	private:
-		std::vector<Force> forces;
+		std::vector<Force> forces; /**< A vector storing all the forces managed by this class. */
 	};
 
 } //endof Namespace lof

@@ -234,80 +234,18 @@ namespace lof {
         //return CollisionSide::NONE; // No collision
         return side;
     }
-   
-    //HS'S ORGINAL CODE
-#if 0
-    void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
-        for (const auto& collision : collisions) {
-            EntityID entityA = collision.entity1;
-            EntityID entityB = collision.entity2;
 
-            auto& physicsA = ECSM.get_component<Physics_Component>(entityA);
-            auto& transformA = ECSM.get_component<Transform2D>(entityA);
-            auto& velocityA = ECSM.get_component<Velocity_Component>(entityA);
-
-            auto& physicsB = ECSM.get_component<Physics_Component>(entityB);
-            auto& transformB = ECSM.get_component<Transform2D>(entityB);
-            auto& velocityB = ECSM.get_component<Velocity_Component>(entityB);
-
-
-            // Only stop the player (entityA) if it is a dynamic object colliding with a static object (entityB)
-            if (!physicsA.get_is_static() && physicsB.get_is_static()) {
-                // Determine the side of collision for response
-                CollisionSide collisionSide = collision.side;
-                Vec2D overlap = collision.overlap;
-
-
-                // Adjust position and velocity based on the collision side and overlap
-                switch (collisionSide) {
-                case CollisionSide::LEFT:
-                    //velocityA.velocity.x = std::max(0.0f, velocityA.velocity.x);
-                    velocityA.velocity.x = 0.0f;
-                    transformA.position.x += overlap.x;
-                  //  std::cout << "This is the position in resolve function for left side " << transformA.position.x << "\n";
-                    break;
-
-                case CollisionSide::RIGHT:
-                    //velocityA.velocity.x = std::min(0.0f, velocityA.velocity.x);
-                    velocityA.velocity.x = 0.0f;
-                    transformA.position.x -= overlap.x;
-                //    std::cout << "This is the position in resolve function for right side " << transformA.position.x << "\n";
-                    break;
-
-                case CollisionSide::TOP:
-                    //velocityA.velocity.y = std::max(0.0f, velocityA.velocity.y);
-                    velocityA.velocity.y = 0.0f;
-                    //transformA.position.y = transformB.position.y + transformB.scale.y * 0.5 + transformA.scale.y * 0.5;
-                    transformA.position.y -= overlap.y;
-                    //std::cout << "this is the scale for platformB in resolve solution" << transformB.scale.y << "\n";
-                    //std::cout << "This is the position in resolve function for top side " << transformA.position.y << "\n";
-                    break;
-
-                case CollisionSide::BOTTOM:
-                    //velocityA.velocity.y = std::min(0.0f, velocityA.velocity.y);
-                    velocityA.velocity.y = 0.0f;
-                    transformA.position.y += overlap.y;
-                    physicsA.set_is_grounded(true); //setting is grounded here 
-                    physicsA.set_has_jumped(false); //reset jump state when landing
-                    physicsA.set_gravity(Vec2D(0.0f, 0.0f)); //reset gravity when grounded.
-
-                   // std::cout << "This is the position in resolve function for bottom side " << transformA.position.y << "\n";
-                    break;
-
-                case CollisionSide::NONE:
-                    velocityA.velocity.x = 0.0f;
-                    velocityA.velocity.y = 0.0f;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        }
-    }
-#endif
-
-#if 1
+    /**
+     * @brief Resolves collisions between entities based on the provided collision pairs.
+     *
+     * This function processes each collision in the list of `CollisionPair` objects, applying
+     * appropriate collision response for dynamic entities colliding with static entities. It
+     * calculates the impulse to prevent overlapping and corrects positions to avoid "sinking"
+     * into static objects. For bottom collisions, it manages the grounded state and
+     * stabilizes velocity to prevent jitter.
+     *
+     * @param collisions A vector of `CollisionPair` objects representing collisions between entities.
+     */
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         for (const auto& collision : collisions) {
             EntityID entityA = collision.entity1;
@@ -364,7 +302,6 @@ namespace lof {
             }
         }
     }
-#endif
 
 
     void Collision_System::update(float delta_time) {

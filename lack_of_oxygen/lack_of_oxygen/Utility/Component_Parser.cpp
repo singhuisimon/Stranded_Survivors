@@ -170,16 +170,16 @@ namespace lof {
                     physics_component.set_is_static(component_data["is_static"].GetBool());
                 }
 
-                /* if (component_data.HasMember("is_moveable") && component_data["is_moveable"].IsBool()) {
-                    physics_component.set_is_moveable(component_data["is_moveable"].GetBool());
-                }
-                */
                if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
                    physics_component.set_is_grounded(component_data["is_grounded"].GetBool());
                 }
 
                if (component_data.HasMember("has_jumped") && component_data["has_jumped"].IsBool()) {
                    physics_component.set_is_grounded(component_data["has_jumped"].GetBool());
+               }
+
+               if (component_data.HasMember("jump_requested") && component_data["jump_requested"].IsBool()) {
+                   physics_component.set_jump_requested(component_data["jump_requested"].GetBool());
                }
 
                 if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {

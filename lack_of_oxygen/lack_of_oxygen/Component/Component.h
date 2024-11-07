@@ -119,6 +119,8 @@ namespace lof {
         bool is_grounded;
         bool has_jumped;
 
+        bool jump_requested; 
+
         float mass; //mass of entity
         float inv_mass;
         bool is_static; //to check if the entity is static or not
@@ -130,17 +132,28 @@ namespace lof {
 
     public:
         /**
-     * @brief Constructor for Physics_Component.
-     *
-     * Initializes the physics properties of the entity, including gravity, damping factor, max velocity,
-     * mass, static state, movability, and jump force.
-     */
+         * @brief Constructor for Physics_Component.
+         *
+         * Initializes the physics properties of the entity, including gravity, damping factor,
+         * max velocity, mass, static state, and jump properties.
+         *
+         * @param gravity The gravity vector applied to the entity.
+         * @param damping_factor The factor for velocity reduction to simulate friction.
+         * @param max_velocity The maximum velocity allowed for the entity.
+         * @param mass The mass of the entity.
+         * @param is_static Determines if the entity is static.
+         * @param has_jumped Indicates if the entity has jumped.
+         * @param jump_requested Indicates if a jump was requested.
+         * @param jump_force The force applied to initiate a jump.
+         * @param is_grounded Indicates if the entity is grounded.
+         */
         Physics_Component(Vec2D gravity = Vec2D(0, DEFAULT_GRAVITY),
             float damping_factor = DEFAULT_DAMPING_FACTOR,
             float max_velocity = DEFAULT_MAX_VELOCITY,
             float mass = 1.0f,
             bool is_static = false,
             bool has_jumped = false,
+            bool jump_requested = false,
             float jump_force = DEFAULT_JUMP_FORCE,//adjust later
             bool is_grounded = false)
 
@@ -154,47 +167,49 @@ namespace lof {
             is_static(is_static),
             jump_force(jump_force),
             is_grounded(is_grounded),
-            has_jumped(has_jumped) {}
+            has_jumped(has_jumped),
+            jump_requested(jump_requested) {}
 
         //getters and setters
         //getters
-        Vec2D get_gravity() const { return gravity; }
+        //non-const references 
+        Vec2D& get_gravity() { return gravity; }
+        float& get_damping_factor() { return damping_factor; }
+        float& get_max_velocity() { return max_velocity; }
+        float& get_max_velocity_sq()  { return max_velocity_sq; }
+        Vec2D& get_accumulated_force()  { return accumulated_force; }
+        Vec2D& get_acceleration()  { return acceleration; }
+        float& get_mass()  { return mass; }
+        float& get_inv_mass()  { return inv_mass; }
+        bool& get_is_static()  { return is_static; }
+        bool& get_is_grounded()  { return is_grounded; }
+        bool& get_has_jumped()  { return has_jumped; }
+        bool& get_jump_requested() { return jump_requested; }
+        float& get_jump_force()  { return jump_force; }
 
-        float get_damping_factor() const { return damping_factor; }
+        const Vec2D& get_gravity() const { return gravity; }
+        const float& get_damping_factor() const { return damping_factor; }
+        const float& get_max_velocity() const { return max_velocity; }
+        const float& get_max_velocity_sq() const { return max_velocity_sq; }
+        const Vec2D& get_accumulated_force() const { return accumulated_force; }
+        const Vec2D& get_acceleration()const { return acceleration; }
+        const float& get_mass() const { return mass; }
+        const float& get_inv_mass()const { return inv_mass; }
+        const bool& get_is_static()const { return is_static; }
+        const bool& get_is_grounded() const { return is_grounded; }
+        const bool& get_has_jumped()const { return has_jumped; }
+        const bool& get_jump_requested() const { return jump_requested; }
+        const float& get_jump_force()const { return jump_force; }
 
-        float get_max_velocity() const { return max_velocity; }
-
-        float get_max_velocity_sq() const { return max_velocity_sq; }
-       
-        Vec2D get_accumulated_force() const { return accumulated_force; }
-
-        Vec2D get_acceleration() const { return acceleration; }
-
-        float get_mass() const { return mass; }
-
-        float get_inv_mass() const { return inv_mass; }
-
-        bool get_is_static() const { return is_static; }
-
-        bool get_is_grounded() const { return is_grounded; }
-
-        bool get_has_jumped() const { return has_jumped; }
-        
-        float get_jump_force() const { return jump_force; }
 
         //setters
         void set_damping_factor(float df) { damping_factor = df; }
-
         void set_max_velocity(float mv) { max_velocity = mv; }
-
         void set_is_grounded(bool ground) { is_grounded = ground; }
-
         void set_gravity(Vec2D g) { gravity = g; }
-
         void set_has_jumped(bool jump)  { has_jumped = jump; }
-
+        void set_jump_requested(bool request) { jump_requested = request; }
         void set_accumulated_force(const Vec2D& af) { accumulated_force = af; }
-
         void set_acceleration(const Vec2D& ac) { acceleration = ac; }
 
         /**
@@ -210,10 +225,8 @@ namespace lof {
         }
 
         void set_is_static(bool s) { is_static = s; }
-
         void set_jump_force(float jf) { jump_force = jf;}
 
-#if 1
          /**
          * @brief Applies a force to the entity.
          *
@@ -234,7 +247,8 @@ namespace lof {
             accumulated_force = Vec2D(0, 0);
         
         }
-#endif
+
+        void reset_jump_request() { jump_requested = false; }
 
     }; //END_PHYSICS_COMPONENT
 

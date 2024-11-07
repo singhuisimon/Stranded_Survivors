@@ -483,6 +483,8 @@ namespace lof {
         comp_obj.AddMember("is_static", component.get_is_static(), allocator);
         comp_obj.AddMember("is_grounded", component.get_is_grounded(), allocator);
         comp_obj.AddMember("has_jumped", component.get_has_jumped(), allocator);
+        comp_obj.AddMember("jump_requested", component.get_jump_requested(), allocator);
+
 
         // Serialize accumulated force
         Vec2D acc_force = component.get_accumulated_force();
