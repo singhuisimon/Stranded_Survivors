@@ -12,6 +12,7 @@
 
 namespace lof {
 
+	//initialize all the group
 	void Audio_System::initializegroups() {
 		core_system->getMasterChannelGroup(&mastergroup);
 		core_system->createChannelGroup("BGM Group", &bgmgroup);
@@ -21,18 +22,21 @@ namespace lof {
 		mastergroup->addGroup(sfxgroup);
 	}
 
+	//initialize the core system
 	Audio_System::Audio_System() : core_system(nullptr) {
-		signature.set(ECSM.get_component_id<Audio_Component>());
+		signature.set(ECSM.get_component_id<Audio_Component>());	//initialize the signature set for the audio component
 		initializegroups();
 		if (initialize()) {
 			LM.write_log("successfully initialize audio system.");
 		}
 	}
 
+	//destructor for the audio system
 	Audio_System::~Audio_System() {
 		shutdown();
 	}
 
+	//function to check for error
 	int Audio_System::errorcheck(FMOD_RESULT result, const std::string& function_name, const std::string& function_purpose) {
 		if (result != FMOD_OK) {
 			LM.write_log("%s failed to %s. FMOD Error: %s.", function_name.c_str(), function_purpose.c_str(), FMOD_ErrorString(result));
@@ -42,6 +46,7 @@ namespace lof {
 		return 0;
 	}
 
+	//initializes the audio system
 	bool Audio_System::initialize() {
 		FMOD_RESULT result;
 

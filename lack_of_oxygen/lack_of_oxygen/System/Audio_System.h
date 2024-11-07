@@ -32,13 +32,38 @@ namespace lof {
 	class Audio_System : public System 
 	{
 	public:
+		/**
+		* @brief Default constructor
+		*/
 		Audio_System();
+
+		/**
+		* @brief Destructor
+		*/
 		~Audio_System();
 
+		/**
+		* @brief Prints out error or successful message depending on result.
+		* @param result FMOD will detect if action is successful.
+		* @function_name Function name where errrorcheck is being called from
+		* @function_purpose The purpose of the function / The purpose of checking if there is any error
+		*/
 		int errorcheck(FMOD_RESULT result, const std::string& function_name = "", const std::string& function_purpose = "");
 
+		/**
+		* @brief Initializer for the Audio System
+		*/
 		bool initialize();
+
+		/**
+		* @brief Update for Audio System
+		* @param delta_time 
+		*/
 		void update(float delta_time) override;
+
+		/**
+		* @brief Shutdown for Audio System, releases all the resources etc.
+		*/
 		void shutdown();
 
 		/**
