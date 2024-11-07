@@ -332,8 +332,15 @@ namespace lof {
             sounds.push_back(new_sound);
         }
 
+        /**
+        * @brief Getters for the vector of soundconfig
+        */
         const std::vector<SoundConfig>& get_sounds() const { return sounds; }
 
+        /**
+        * @brief Getter for the soundconfig using param key
+        * @param key The unique identifier of soundconfig
+        */
         const SoundConfig* get_sound_by_key(const std::string& key) const{
             for (const auto& sound : sounds) {
                 if (sound.key == key) {
@@ -343,6 +350,11 @@ namespace lof {
             return nullptr;
         }
 
+        /**
+        * @brief Setter for the filepath in soundconfig
+        * @param key The unique identifier of soundconfig
+        * @param path The new path.
+        */
         void set_filepath(const std::string& key, std::string& path) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -351,10 +363,19 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for the filepath in soundconfig using param key
+        * @param key The unique identifier of soundconfig
+        */
         std::string get_filepath(const std::string& key) const{
             return get_sound_by_key(key)->filepath;
         }
 
+        /**
+        * @brief Setter for audio state in soundconfig
+        * @param key The unique idenitifier for soundconfig
+        * @param state The new state
+        */
         void set_audio_state(const std::string& key, PlayState state) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -363,10 +384,18 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for audio state in soundconfig using param key
+        * @param key The unique identifier for soundconfig
+        */
         PlayState get_audio_state(const std::string& key) const {
             return get_sound_by_key(key)->audio_state;
         }
 
+        /**
+        * @brief Setter for audio type
+        * @param key The unique identifier of soundconfig
+        */
         void set_audio_type(const std::string& key, AudioType type) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
