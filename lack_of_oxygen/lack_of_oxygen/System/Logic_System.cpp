@@ -1,4 +1,17 @@
+/**
+ * @file Logic_System.cpp
+ * @brief Defines the definition for Logic systems.
+ * @author Simon Chan (100%)
+ * @date November 07, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+// Include the header file
 #include "Logic_System.h"
+
+// Include the manager headers
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Input_Manager.h"

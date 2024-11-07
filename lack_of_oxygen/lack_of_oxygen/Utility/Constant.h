@@ -163,6 +163,14 @@ namespace lof {
 	// -------------------------- Common variables used in Systems -----------------------------------
 	constexpr char const* DEFAULT_PLAYER_NAME = "player1";
 
+	// ------------------------------ GUI_System.cpp --------------------------------
+	// GUI Layout Constants
+	constexpr float DEFAULT_GUI_PROGRESS_BAR_WIDTH = 450.0f;
+	constexpr float DEFAULT_GUI_PROGRESS_BAR_HEIGHT = 40.0f;
+	constexpr float DEFAULT_GUI_IMAGE_OFFSET = 150.0f;
+	constexpr float DEFAULT_GUI_IMAGE_SIZE = 100.0f;
+	constexpr float DEFAULT_GUI_VERTICAL_SPACING = 50.0f;
+
 } // namespace lof
 
 #endif // CONSTANTS_H

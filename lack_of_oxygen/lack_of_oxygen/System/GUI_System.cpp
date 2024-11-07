@@ -1,8 +1,23 @@
+/**
+ * @file GUI_System.cpp
+ * @brief Defines the definition for GUI systems.
+ * @author Simon Chan (100%)
+ * @date November 07, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+// Include header file
 #include "GUI_System.h"
+
+// Include necessary headers
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Log_Manager.h"
-#include "Logic_System.h"
+
+// Include Utility headers
+#include "../Utility/Constant.h"
 
 namespace lof {
     GUI_System::GUI_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {
@@ -38,8 +53,8 @@ namespace lof {
             left_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
             if (left_image_id != INVALID_ENTITY_ID) {
                 if (auto* transform = get_component_safe<Transform2D>(left_image_id)) {
-                    transform->position = Vec2D(-IMAGE_OFFSET, VERTICAL_SPACING);
-                    transform->scale = Vec2D(IMAGE_SIZE, IMAGE_SIZE);
+                    transform->position = Vec2D(-DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
+                    transform->scale = Vec2D(DEFAULT_GUI_IMAGE_SIZE, DEFAULT_GUI_IMAGE_SIZE);
                 }
                 if (auto* graphics = get_component_safe<Graphics_Component>(left_image_id)) {
                     graphics->texture_name = "Oxygen_Refill_Red_circle";
@@ -50,8 +65,8 @@ namespace lof {
             right_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
             if (right_image_id != INVALID_ENTITY_ID) {
                 if (auto* transform = get_component_safe<Transform2D>(right_image_id)) {
-                    transform->position = Vec2D(IMAGE_OFFSET, VERTICAL_SPACING);
-                    transform->scale = Vec2D(IMAGE_SIZE, IMAGE_SIZE);
+                    transform->position = Vec2D(DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
+                    transform->scale = Vec2D(DEFAULT_GUI_IMAGE_SIZE, DEFAULT_GUI_IMAGE_SIZE);
                 }
                 if (auto* graphics = get_component_safe<Graphics_Component>(right_image_id)) {
                     graphics->texture_name = "Oxygen_Refill_Green_circle";
@@ -70,25 +85,26 @@ namespace lof {
                     bg_graphics->color = glm::vec3(1.f); // White for background
                 }
                 if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
-                    bg_transform->scale = Vec2D(PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT);
-                    bg_transform->position.y = -VERTICAL_SPACING;
+                    bg_transform->scale = Vec2D(DEFAULT_GUI_PROGRESS_BAR_WIDTH, DEFAULT_GUI_PROGRESS_BAR_HEIGHT);
+                    bg_transform->position.y = -DEFAULT_GUI_VERTICAL_SPACING;
                 }
             }
 
-            // Create main progress bar
+            // Create progress bar with stored value
             progress_bar_id = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
             if (progress_bar_id != INVALID_ENTITY_ID) {
                 if (auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id)) {
                     progress_gui->is_progress_bar = true;
-                    progress_gui->progress = 0.0f;
+                    progress_gui->progress = last_progress_value;  // Use stored value
                 }
                 if (auto* progress_graphics = get_component_safe<Graphics_Component>(progress_bar_id)) {
                     progress_graphics->color = glm::vec3(0.2f, 0.6f, 1.0f);
                 }
                 if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
-                    progress_transform->scale = Vec2D(0.0f, PROGRESS_BAR_HEIGHT);
-                    progress_transform->position = Vec2D(-PROGRESS_BAR_WIDTH / 2.0f, -VERTICAL_SPACING);
+                    progress_transform->scale = Vec2D(DEFAULT_GUI_PROGRESS_BAR_WIDTH * last_progress_value, DEFAULT_GUI_PROGRESS_BAR_HEIGHT);
+                    progress_transform->position = Vec2D(-DEFAULT_GUI_PROGRESS_BAR_WIDTH / 2.0f + (progress_transform->scale.x / 2.0f), -DEFAULT_GUI_VERTICAL_SPACING);
                 }
+                LM.write_log("Progress bar created with stored value: %.2f", last_progress_value);
             }
         }
     }
@@ -96,6 +112,26 @@ namespace lof {
     void GUI_System::hide_loading_screen() {
         LM.write_log("=== Starting GUI cleanup ===");
         validate_gui_state();
+
+        // Store current progress value before cleanup if progress bar exists
+        if (progress_bar_id != INVALID_ENTITY_ID) {
+            if (auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id)) {
+                last_progress_value = progress_gui->progress;
+                LM.write_log("Stored progress value before cleanup: %.2f", last_progress_value);
+            }
+        }
+
+        // First reset progress bar state if it exists
+        if (progress_bar_id != INVALID_ENTITY_ID) {
+            if (auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id)) {
+                progress_gui->progress = 0.0f;
+            }
+            if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
+                progress_transform->scale = Vec2D(0.0f, DEFAULT_GUI_PROGRESS_BAR_HEIGHT);
+                progress_transform->position = Vec2D(-DEFAULT_GUI_PROGRESS_BAR_WIDTH / 2.0f, -DEFAULT_GUI_VERTICAL_SPACING);
+                LM.write_log("Reset progress bar scale and position");
+            }
+        }
 
         // Log current state of background bar specifically
         if (background_bar_id != INVALID_ENTITY_ID) {
@@ -112,18 +148,14 @@ namespace lof {
             }
         }
 
-        // Store current valid IDs, but handle background bar first
+        // Store current valid IDs in destruction order
         std::vector<std::pair<EntityID, const char*>> entities_to_destroy;
 
-        // Add background bar first if it exists
-        if (background_bar_id != INVALID_ENTITY_ID) {
-            entities_to_destroy.push_back({ background_bar_id, "Background Bar" });
-        }
-
-        // Then add the rest
+        // Add entities in specific order: progress first, then others
+        if (progress_bar_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ progress_bar_id, "Progress Bar" });
+        if (background_bar_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ background_bar_id, "Background Bar" });
         if (right_image_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ right_image_id, "Right Image" });
         if (left_image_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ left_image_id, "Left Image" });
-        if (progress_bar_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ progress_bar_id, "Progress Bar" });
         if (container_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ container_id, "Container" });
 
         // Destroy each entity with extra validation
@@ -142,6 +174,17 @@ namespace lof {
             if (auto* entity = ecs_manager.get_entity(id)) {
                 was_in_ecs = true;
                 LM.write_log("%s found in ECS", name);
+
+                // First reset any accumulated state for progress bar
+                if (id == progress_bar_id &&
+                    ecs_manager.has_component<GUI_Component>(id) &&
+                    ecs_manager.has_component<Transform2D>(id)) {
+                    auto& gui = ecs_manager.get_component<GUI_Component>(id);
+                    auto& transform = ecs_manager.get_component<Transform2D>(id);
+                    gui.progress = 0.0f;
+                    transform.scale.x = 0.0f;
+                    LM.write_log("Reset progress bar state before destruction");
+                }
 
                 // MUST Remove from this system first 
                 if (was_in_system) {
@@ -173,7 +216,7 @@ namespace lof {
                 LM.write_log("Warning: %s (ID: %u) not found in ECS", name, id);
             }
 
-            // Final validation
+            // Final validation for this entity
             if (was_in_system && entities.find(id) != entities.end()) {
                 LM.write_log("ERROR: Failed to remove %s from GUI system", name);
             }
@@ -183,10 +226,10 @@ namespace lof {
         }
 
         // Reset IDs
+        progress_bar_id = INVALID_ENTITY_ID;  // Reset progress bar ID first
+        background_bar_id = INVALID_ENTITY_ID;
         right_image_id = INVALID_ENTITY_ID;
         left_image_id = INVALID_ENTITY_ID;
-        progress_bar_id = INVALID_ENTITY_ID;
-        background_bar_id = INVALID_ENTITY_ID;
         container_id = INVALID_ENTITY_ID;
 
         // Final validation
@@ -211,19 +254,22 @@ namespace lof {
     }
 
     void GUI_System::set_progress(float progress) {
+        // Store the new progress value first
+        last_progress_value = clamp(progress, 0.0f, 1.0f);
+
         auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id);
         auto* transform = get_component_safe<Transform2D>(progress_bar_id);
 
         if (!progress_gui || !transform) return;
 
         // Update progress value and bar width
-        progress_gui->progress = clamp(progress, 0.0f, 1.0f);
-        transform->scale.x = PROGRESS_BAR_WIDTH * progress_gui->progress;
+        progress_gui->progress = last_progress_value;
+        transform->scale.x = DEFAULT_GUI_PROGRESS_BAR_WIDTH * last_progress_value;
 
         // Keep the progress bar anchored to the left side and grow rightward
-        transform->position.x = -PROGRESS_BAR_WIDTH / 2.0f + (transform->scale.x / 2.0f);
+        transform->position.x = -DEFAULT_GUI_PROGRESS_BAR_WIDTH / 2.0f + (transform->scale.x / 2.0f);
 
-        LM.write_log("GUI_System::set_progress(): Progress updated to %.2f", progress_gui->progress);
+        LM.write_log("GUI_System::set_progress(): Progress updated to %.2f", last_progress_value);
     }
 
     void GUI_System::update(float delta_time) {
@@ -234,23 +280,23 @@ namespace lof {
 
         // Update circular images positions (on top)
         if (auto* left_transform = get_component_safe<Transform2D>(left_image_id)) {
-            left_transform->position = container_pos + Vec2D(-IMAGE_OFFSET, VERTICAL_SPACING);
+            left_transform->position = container_pos + Vec2D(-DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
         }
 
         if (auto* right_transform = get_component_safe<Transform2D>(right_image_id)) {
-            right_transform->position = container_pos + Vec2D(IMAGE_OFFSET, VERTICAL_SPACING);
+            right_transform->position = container_pos + Vec2D(DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
         }
 
         // Update background bar position (below images)
         if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
-            bg_transform->position = container_pos + Vec2D(0.0f, -VERTICAL_SPACING);
+            bg_transform->position = container_pos + Vec2D(0.0f, -DEFAULT_GUI_VERTICAL_SPACING);
         }
 
         // Update progress bar position
         if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
             // Keep X position for progress animation, update Y position only
             float current_x = progress_transform->position.x;
-            progress_transform->position = Vec2D(current_x, container_pos.y - VERTICAL_SPACING);
+            progress_transform->position = Vec2D(current_x, container_pos.y - DEFAULT_GUI_VERTICAL_SPACING);
         }
     }
 
