@@ -1,3 +1,5 @@
+
+#if 1
 /**
  * @file Render_System.cpp
  * @brief Implements the Render_System class for the ECS that
@@ -30,8 +32,8 @@ namespace lof {
     void Render_System::update(float delta_time) {
 
         // Get screen width and height
-        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width()); 
-        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height()); 
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
@@ -40,7 +42,7 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Access player's ID
-            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);  
+            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
             if (entity_id != 0) { // Background object unaffected
 
@@ -105,7 +107,7 @@ namespace lof {
             if (entity_id == player_id && camera.is_free_cam == GL_FALSE) {
 
                 // Update world-to-camera view transformation matrix
-                camera.pos_y = transform.position.y; 
+                camera.pos_y = transform.position.y;
                 camera.view_xform = glm::mat3{ 1, 0, 0,
                                                0, 1, 0,
                                                -1, -transform.position.y, 1 };
@@ -117,7 +119,8 @@ namespace lof {
 
                 // Update world-to-NDC transformation matrix
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
-            } else if (camera.is_free_cam == GL_TRUE) {
+            }
+            else if (camera.is_free_cam == GL_TRUE) {
 
                 // Movement update when keypad 8 or 2 pressed
                 if (IM.is_key_held(GLFW_KEY_KP_8)) {
@@ -140,7 +143,7 @@ namespace lof {
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix
-                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform; 
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
             // Compute object scale matrix
@@ -197,8 +200,8 @@ namespace lof {
     void Render_System::draw() {
 
         // Get screen width and height
-        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width()); 
-        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height()); 
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
@@ -208,11 +211,11 @@ namespace lof {
 
 
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
-            auto& shaders = GFXM.get_shader_program_storage();
+            Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
             auto& models = GFXM.get_model_storage();
             auto& textures = GFXM.get_texture_storage();
             auto& animations = GFXM.get_animation_storage();
-            auto& camera = GFXM.get_camera(); 
+            auto& camera = GFXM.get_camera();
 
             // Check for text objects to render 
             bool is_text = ECSM.has_component<Text_Component>(entity_id);
@@ -222,28 +225,30 @@ namespace lof {
                 auto& fonts = GFXM.get_font_storage();
 
                 // Start the shader program used for text rendering
-                GFXM.program_use(shaders[graphics.shd_ref]); 
+                GFXM.program_use(shader->program_handle);
 
                 // Set text color in fragment shader
-                GLuint text_color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTextColor");
+                GLuint text_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uTextColor");
                 if (text_color_uniform_loc >= 0) {
                     glUniform3fv(text_color_uniform_loc, 1, &text_comp.color[0]);
-                } else {
+                }
+                else {
                     LM.write_log("Render_System::draw(): Text colour uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
                 // Pass object's mdl_to_ndc_xform to vertex shader to compute object's final position
-                GLint text_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC_Mat");
+                GLint text_mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
                 if (text_mat_uniform_loc >= 0) {
                     glUniformMatrix3fv(text_mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
-                } else {
+                }
+                else {
                     LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
                 // Set texture unit and bind text object's VAO handle 
-                glActiveTexture(GL_TEXTURE0);  
+                glActiveTexture(GL_TEXTURE0);
                 glBindVertexArray(fonts[text_comp.font_name].vaoid);
 
                 // Iterate through all characters
@@ -252,11 +257,11 @@ namespace lof {
                 for (c = text_comp.text.begin(); c != text_comp.text.end(); c++)
                 {
                     // Get read-only values from character
-                    auto const& bearing = fonts[text_comp.font_name].characters[*c].Bearing; 
+                    auto const& bearing = fonts[text_comp.font_name].characters[*c].Bearing;
                     auto const& size = fonts[text_comp.font_name].characters[*c].Size;
-                    auto const& texture_id = fonts[text_comp.font_name].characters[*c].TextureID; 
-                    auto const& advance = fonts[text_comp.font_name].characters[*c].Advance; 
-                    
+                    auto const& texture_id = fonts[text_comp.font_name].characters[*c].TextureID;
+                    auto const& advance = fonts[text_comp.font_name].characters[*c].Advance;
+
                     // Calculate the position and size of character in world 
                     float xpos = base_x + bearing.x * transform.scale.x;
                     float ypos = transform.position.y - (size.y - bearing.y) * transform.scale.y;
@@ -279,27 +284,27 @@ namespace lof {
                     glBindTexture(GL_TEXTURE_2D, texture_id);
 
                     // Update content of VBO memory and unbind once completed
-                    glBindBuffer(GL_ARRAY_BUFFER, fonts[text_comp.font_name].vboid); 
+                    glBindBuffer(GL_ARRAY_BUFFER, fonts[text_comp.font_name].vboid);
                     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                     // Render quad
                     glDrawArrays(GL_TRIANGLES, 0, 6);
-                    
+
                     // Advance cursors for next glyph 
                     base_x += (advance >> 6) * transform.scale.x;
                 }
                 // Free VAO, texture id, and program once rendering completed
                 glBindVertexArray(0);
                 glBindTexture(GL_TEXTURE_2D, 0);
-                GFXM.program_free(); 
+                GFXM.program_free();
 
                 // Skip other rendering operations
                 continue;
             }
 
             // Start the shader program that the entity will use for rendering 
-            GFXM.program_use(shaders[graphics.shd_ref]);
+            GFXM.program_use(shader->program_handle);
 
             // Bind object's VAO handle
             glBindVertexArray(models[graphics.model_name].vaoid);
@@ -311,7 +316,7 @@ namespace lof {
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
-                GLuint tex_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTexFlag");
+                GLuint tex_flag_true_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
                 if (tex_flag_true_loc >= 0) {
                     glUniform1ui(tex_flag_true_loc, GL_TRUE);
                 }
@@ -321,7 +326,7 @@ namespace lof {
                 }
 
                 // Set texture unit in fragment shader
-                GLuint tex_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex2d");
+                GLuint tex_uniform_loc = glGetUniformLocation(shader->program_handle, "uTex2d");
                 if (tex_uniform_loc >= 0) {
                     glUniform1i(tex_uniform_loc, 5);
                 }
@@ -334,12 +339,12 @@ namespace lof {
                 bool has_animation = ECSM.has_component<Animation_Component>(entity_id);
                 if (has_animation == true) {
 
-                    auto& animation = ECSM.get_component<Animation_Component>(entity_id); 
+                    auto& animation = ECSM.get_component<Animation_Component>(entity_id);
                     std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
                     unsigned int& curr_frame_idx = animations[curr_animation_name].curr_frame_index;
 
                     // Set animation flag to be true
-                    GLuint animate_flag_true_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uAnimateFlag");
+                    GLuint animate_flag_true_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
                     if (animate_flag_true_loc >= 0) {
                         glUniform1ui(animate_flag_true_loc, GL_TRUE);
                     }
@@ -349,9 +354,9 @@ namespace lof {
                     }
 
                     // Pass texture width, height, and frame size
-                    GLuint tex_w_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex_W");
-                    GLuint tex_h_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex_H");
-                    GLuint frame_size_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uFrame_Size");
+                    GLuint tex_w_uniform_loc = glGetUniformLocation(shader->program_handle, "uTex_W");
+                    GLuint tex_h_uniform_loc = glGetUniformLocation(shader->program_handle, "uTex_H");
+                    GLuint frame_size_uniform_loc = glGetUniformLocation(shader->program_handle, "uFrame_Size");
                     if (tex_w_uniform_loc >= 0 && tex_h_uniform_loc >= 0 && frame_size_uniform_loc >= 0) {
                         glUniform1f(tex_w_uniform_loc, animations[curr_animation_name].tex_w);
                         glUniform1f(tex_h_uniform_loc, animations[curr_animation_name].tex_h);
@@ -363,8 +368,8 @@ namespace lof {
                     }
 
                     // Pass frame position
-                    GLuint frame_pos_x_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uPos_X");
-                    GLuint frame_pos_y_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uPos_Y");
+                    GLuint frame_pos_x_uniform_loc = glGetUniformLocation(shader->program_handle, "uPos_X");
+                    GLuint frame_pos_y_uniform_loc = glGetUniformLocation(shader->program_handle, "uPos_Y");
                     if (frame_pos_x_uniform_loc >= 0 && frame_pos_y_uniform_loc >= 0) {
                         glUniform1f(frame_pos_x_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_x);
                         glUniform1f(frame_pos_y_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_y);
@@ -377,7 +382,7 @@ namespace lof {
                 }
                 else {
                     // Set animation flag to be false
-                    GLuint animate_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uAnimateFlag");
+                    GLuint animate_flag_false_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
                     if (animate_flag_false_loc >= 0) {
                         glUniform1ui(animate_flag_false_loc, GL_FALSE);
                     }
@@ -389,8 +394,8 @@ namespace lof {
             }
             else {
                 // Set texture flag to false
-                GLuint tex_flag_false_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTexFlag");
-                if (tex_flag_false_loc >= 0) { 
+                GLuint tex_flag_false_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
+                if (tex_flag_false_loc >= 0) {
                     glUniform1ui(tex_flag_false_loc, GL_FALSE);
                 }
                 else {
@@ -400,7 +405,7 @@ namespace lof {
             }
 
             // Pass object's color to fragment shader uniform variable uColor
-            GLint color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uColor");
+            GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
             if (color_uniform_loc >= 0) {
                 glUniform3fv(color_uniform_loc, 1, &graphics.color[0]);
             }
@@ -410,7 +415,7 @@ namespace lof {
             }
 
             // Pass object's mdl_to_ndc_xform to vertex shader to compute object's final position
-            GLint mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC_Mat");
+            GLint mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
             if (mat_uniform_loc >= 0) {
                 glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
             }
@@ -440,10 +445,11 @@ namespace lof {
 
                         // Free texture shader program to allow models shader program to bind and start  
                         GFXM.program_free();
-                        GFXM.program_use(shaders[graphics.shd_ref + 1]);
+                        Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref + 1);
+                        GFXM.program_use(shader->program_handle);
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
-                        GLint debug_color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uColor");
+                        GLint debug_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
                         glm::vec3 debug_color{ 0.0f, 0.0f, 0.0f };
                         if (debug_color_uniform_loc >= 0) {
                             glUniform3fv(debug_color_uniform_loc, 1, &debug_color[0]);
@@ -454,7 +460,7 @@ namespace lof {
                         }
 
                         // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
-                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat"); 
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
                         if (debug_mat_uniform_loc < 0) {
                             LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
                             std::exit(EXIT_FAILURE);
@@ -503,9 +509,9 @@ namespace lof {
                                 box_mdl_to_ndc_xform.emplace_back(result_xform);
 
                                 // Drawing AABB box line by line
-                                glLineWidth(DEFAULT_AABB_WIDTH); 
-                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]); 
-                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL); 
+                                glLineWidth(DEFAULT_AABB_WIDTH);
+                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
+                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
                             }
                         }
 
@@ -569,8 +575,8 @@ namespace lof {
 
                             // Compute model-to-world-to-NDC transformation matrix for the velocity line
                             glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
-                            glBindVertexArray(models["debug_line"].vaoid);  
-                            glLineWidth(DEFAULT_LINE_WIDTH);  
+                            glBindVertexArray(models["debug_line"].vaoid);
+                            glLineWidth(DEFAULT_LINE_WIDTH);
                             glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
                             glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
                         }
@@ -585,3 +591,5 @@ namespace lof {
     }
 
 } // namespace lof
+
+#endif

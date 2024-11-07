@@ -163,8 +163,10 @@ namespace lof {
     static bool is_static_on = false;
     static bool is_moveable_on = true;
     static bool is_grounded_on = false;
-    static bool is_jumping_on = false;
-    static bool is_audio_on = false;
+ 
+    static bool is_active_on = true;
+    static bool is_reverse_on = false;
+    static bool is_rotate_on = true;;
 
     
     void IMGUI_Manager::imgui_game_objects_edit() {
@@ -372,6 +374,41 @@ namespace lof {
 
             }
         }
+
+        //Logic Component
+        if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+            Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+            if (ImGui::CollapsingHeader("Logic")) {
+
+                auto& is_active = logic.is_active;
+                std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                if (button_toggle(s_label, &is_active_on)) {
+                    is_active = !is_active;
+                }
+
+                auto& movement_speed = logic.movement_speed;
+                ImGui::InputFloat("Movement Speed", &movement_speed);
+
+                auto& movement_range = logic.movement_range;
+                ImGui::InputFloat("Movement Range", &movement_range);
+
+                auto& reverse_direction = logic.reverse_direction;
+                std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                if (button_toggle(reverse_dir, &is_reverse_on)) {
+                    reverse_direction = !reverse_direction;
+                }
+
+                auto& is_rotate = logic.rotate_with_motion;
+                std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                    is_rotate = !is_rotate;
+                }
+
+                auto& original_position = logic.origin_pos;
+                ImGui::InputFloat2("Original Position", &original_position.x);
+            }
+        }
+
 
         ImGui::End();
     }
