@@ -18,12 +18,16 @@
 
 namespace lof {
 
+    //constants to replace
     int selected_file_index = -1;
     int selected_object_index = -1;
     bool load_selected = false;
     bool show_window = false;
     bool remove_game_obj = false;
     bool create_game_obj = false;
+    bool filled = false;
+
+    std::vector<std::string> assigned_names;
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -36,13 +40,12 @@ namespace lof {
         return instance;
     }
 
-    //need to
     int IMGUI_Manager::start_up(GLFWwindow*& window) {
         if (is_started()) {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
             return 0; // Already started
         }
-
+        
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -53,104 +56,38 @@ namespace lof {
     }
 
     void IMGUI_Manager::display_loading_options(const std::string& directory) {
-        //std::vector<std::string> files;
-        //try {
-        //    for (const auto& file : std::filesystem::directory_iterator(directory)) {
-        //        if (file.is_regular_file()) {
-        //            files.push_back(file.path().filename().string()); // Store filename
-        //        }
-        //    }
-        //}
-        //catch (const std::filesystem::filesystem_error& e) {
-        //    std::cout << "Error: " << e.what() << std::endl; // Print error message
-        //}
+ 
         int current_object_index = 0;
 
-        if (ImGui::Begin("File List")) {
-
-            // Display the ListBox without allowing selection
-            //for (const auto& filename : files) {
-            //    //selectable for clicking; second param for highlighting
-            //    if (ImGui::Selectable(filename.c_str(), selected_file_index == current_object_index)) {
-            //        //selected; casuing seceond param state to change
-            //        selected_file_index = current_object_index;
-            //    }
-            //    ++current_object_index;
-            //    
-            //    // Create a non-selectable item in the ListBox
-            //    //ImGui::Text("%s", filename.c_str());
-            //}
-
-            selected_file_index = current_object_index;
-            if (ImGui::Button("Load Scene")) {
-                load_selected = !load_selected;
-            }
-            ImGui::End(); // End the ImGui window
+        ImGui::Begin("File List");
+        selected_file_index = current_object_index;
+        if (ImGui::Button("Load Scene")) {
+            load_selected = !load_selected;
         }
+        ImGui::End(); 
 
-       
-        //Pressing the button
         if (load_selected && (selected_file_index != -1)) {
 
-            //std::cout << Path_Helper::get_save_file_path(files[selected_file_index].c_str()) << std::endl;
-            //load new file, entirety of ecs cleared
-            //load ecs again and load up new file 
-            //ECSM.shut_down();
-            //ECSM.start_up();
-            //if (SM.load_scene((Path_Helper::get_save_file_path(files[selected_file_index].c_str())).c_str())){
             if (SM.load_scene((Path_Helper::get_scene_path().c_str()))) {
-                std::cout << "\n\n\nworks! \n\n\n" << Path_Helper::get_scene_path() << std::endl;
-                //std::cout << "\n\n\nworks! \n\n\n" << files[selected_file_index] << std::endl;
+
+                LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
+
                 load_selected = !load_selected;
             }
             else {
-                std::cout << "\n\n\nfailed to load \n\n\n" << Path_Helper::get_scene_path() << std::endl;
+
+                LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
+                
                 load_selected = !load_selected;
             }
         }
     }
-
-    
 
     void IMGUI_Manager::start_frame() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
-
-
-    //function with code taken from IMGUI's GITHUB. To test out IMGUI and their demo.cpp; TO BE DELETED LATER
-    void IMGUI_Manager::example_demo(bool& show_demo_window, bool& show_another_window, ImVec4& clear_color, ImGuiIO& io) {
-
-        static float f = 0.0f;
-        static int counter = 0;
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
-        // Render windows if the corresponding checkbox is checked
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);  // This renders the ImGui demo window
-        if (show_another_window) {
-            ImGui::Begin("Another Window", &show_another_window);  // Open another window
-            ImGui::Text("Hello from another window!");  // Add content to the window
-            ImGui::End();  // Close the window
-        }
-    }
-
-    /*void IMGUI_Manager::show_performance_viewer() {
-        ImGui::Begin("Performance Viewer");
-        ImGui::End();
-    }*/
 
     void IMGUI_Manager::imgui_game_objects_list() {
 
@@ -159,18 +96,15 @@ namespace lof {
         int current_object_index = 0;
         const auto& entities = ecs.get_entities();
 
-        //std::cout << entities.size() << std::endl;
 
         if (selected_object_index >= entities.size()) {
             selected_object_index = -1;
         }
 
-        for (int i = 0; i < entities.size(); ++i) { //Still getting deleted entity ??
+        for (int i = 0; i < entities.size(); ++i) { 
             
-            //std::cout << "num: " << i+1 << "  ";
             if (entities[i] != nullptr) {
                 std::string obj_name = entities[i]->get_name();
-                //std::cout << obj_name << std::endl;
                 
                 //selectable for clicking; second param for highlighting
                 if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index)) {
@@ -185,7 +119,6 @@ namespace lof {
             ++current_object_index;
         }
 
-        // discuss editing name
         if (ImGui::Button("Edit Game Object")) {
             show_window = !show_window;
         }
@@ -194,11 +127,22 @@ namespace lof {
             remove_game_obj = !remove_game_obj;
         }
 
-        //add other options
         ImGui::Text("\n\n%s", "Create Game Object From Prefab");
         if (ImGui::Button("Create Game Object From Prefab")) {
 
             create_game_obj = !create_game_obj;
+        }
+
+        if (ImGui::Button("Save Changes")) {
+
+            std::string scene_path = Path_Helper::get_scene_path();
+            if (SM.save_game_state(scene_path.c_str())) {
+                LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
+            }
+            else {
+                LM.write_log("IMGUI_Manager::update(): Failed to initate save game state to %s", Path_Helper::get_scene_path().c_str());
+            }
+
         }
 
         ImGui::End();
@@ -223,12 +167,21 @@ namespace lof {
     static bool is_jumping_on = false;
     static bool is_audio_on = false;
 
-
+    
     void IMGUI_Manager::imgui_game_objects_edit() {
+
+        static int last_selected_object_index = -1; // Track the previous selected object index
 
         ImGui::Begin("Edit Object Properties", &show_window);
 
         const auto& entities = ecs.get_entities();
+
+        // If the selected object index has changed, reset `filled` and clear `assigned_names`
+        if (selected_object_index != last_selected_object_index) {
+            last_selected_object_index = selected_object_index;
+            assigned_names.clear();
+            filled = false; // Reset filled to allow repopulating `assigned_names` for the new object
+        }
 
         std::string Name = entities[selected_object_index]->get_name();
         std::string condition_name_model = "Name of Entity";
@@ -355,59 +308,66 @@ namespace lof {
         //Animation Component
         if (entities[selected_object_index]->has_component(ecs.get_component_id<Animation_Component>())) {
             Animation_Component& animation = ecs.get_component<Animation_Component>(entities[selected_object_index].get()->get_id());
-            if (ImGui::CollapsingHeader("Animation")) {
 
-                //need to fix! - first still buggy!!!!
+            if (!filled) {
+
                 auto& animation_list = animation.animations;
-                for (auto it = animation_list.begin(); it != animation_list.end(); ++it) {
-                    
-                    char Buffer[128];
-                    strncpy_s(Buffer, it->second.c_str(), sizeof(Buffer));//s is safer
-                    Buffer[sizeof(Buffer) - 1] = '\0';
-                    
-                    //needs to be consistent
-                    if (ImGui::InputText(it->first.c_str(), Buffer, sizeof(Buffer))) {
-                        it->second = Buffer;
-                    }
-          
+                for (const auto& it : animation_list) {
+                    assigned_names.push_back(it.second);
                 }
 
-                //find a way for this not to be less than 1
-                auto& current_animation_index = animation.curr_animation_idx;
+                filled = true;
 
-                /*if (current_animation_index <= 0) {
-                    current_animation_index = 0;
-                    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-                }*/
-                
-                if (ImGui::InputInt("start animation index", reinterpret_cast<int*>(&current_animation_index))) {
-                    if (current_animation_index < 0) {
-                        current_animation_index = 0;
+            }
+
+            if (ImGui::CollapsingHeader("Animation") && filled) {
+
+                std::vector<const char*> animation_names_c_str;
+                for (const auto& name : assigned_names) {
+                    animation_names_c_str.push_back(name.c_str());
+                }
+
+                auto& animation_list = animation.animations;
+                static std::vector<int> selected_items(animation_list.size(), -1);
+                int index = 0;
+                for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
+                    if (selected_items.size() != animation_list.size()) {
+                        selected_items.resize(animation_list.size(), -1);
+                    }
+
+                    ImGui::Text("%s", it->second.c_str());
+                    // Display an individual combo box for each animation entry
+                    std::string combo_label = "Choose Animation " + std::to_string(index);
+                    if (ImGui::Combo(combo_label.c_str(), &selected_items[index], animation_names_c_str.data(), assigned_names.size())) {
+                        // Update the specific animation in the list
+                        if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
+                            it->second = assigned_names[selected_items[index]];
+                        }
                     }
                 }
-                //if (current_animation_index == 0) {
-                //    ImGui::PopItemFlag(); // Re-enable the widget
-                //}
 
-                //somehow ok w less than 1
-                auto& start_animation_index = animation.start_animation_idx;
-                ImGui::InputInt("start animation index", reinterpret_cast<int*>(&start_animation_index));
+
+                auto& curr = animation.curr_animation_idx;
+
+                ImGui::Text("Current Animation Index: %i", curr);
+                ImGui::Text("Note: The animation index depends on movement.\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\nIn the Level Editor, objects are stationary by default, so only animations 0 and 1 are available.\nIf an out - of - range index is entered, it snaps to 0 for even values and 1 for odd values.");
+                int temp_value = static_cast<int>(curr);
+                if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, animation_list.size() - 1)) {
+                    // Clamp `temp_value` to stay within the valid range
+                    if (temp_value < 0) {
+                        temp_value = 0;
+                    }
+                    else if (temp_value >= static_cast<int>(animation_list.size())) {
+                        temp_value = animation_list.size() - 1;
+                    }
+
+                    // Only update `curr_animation_idx` if temp_value is within valid bounds
+                    if (temp_value >= 0 && temp_value < static_cast<int>(animation_list.size())) {
+                        curr = static_cast<unsigned int>(temp_value);
+                    }
+                }
 
             }
-        }
-
-        if (ImGui::Button("Save Changes")) {
-
-            std::string scene_path = Path_Helper::get_scene_path();
-            if (SM.save_game_state(scene_path.c_str())) {
-                LM.write_log("IMGUI_Manager::update(): Successfully saved game state to %s", Path_Helper::get_scene_path().c_str());
-                std::cout << "\n\n\n\nGame saved successfully to: " << Path_Helper::get_scene_path() << "\n\n\n" << std::endl;
-            }
-            else {
-                LM.write_log("IMGUI_Manager::update(): Failed to save game state to %s", Path_Helper::get_scene_path().c_str());
-                std::cout << "\n\n\n\nFailed to save game!\n\n\n" << std::endl;
-            }
-
         }
 
         ImGui::End();
@@ -424,11 +384,9 @@ namespace lof {
         return clicked;
     }
 
-    //simon's code
     void IMGUI_Manager::add_game_objects() {
 
         ImGui::Begin("Edit Object Properties", &create_game_obj);
-        //add more options
 
         static const char* prefab_options[]{ "player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image" };
 
@@ -436,6 +394,7 @@ namespace lof {
 
         if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, IM_ARRAYSIZE(prefab_options))){
             
+            //Simon's code
             EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
             if (new_entity != INVALID_ENTITY_ID) {
                 // Generate random position
@@ -466,7 +425,6 @@ namespace lof {
         ImGui::End();
     }
 
-    //removing game object - has error
     void IMGUI_Manager::remove_game_objects(int index) {
 
         const auto& entities = ecs.get_entities();
@@ -482,33 +440,6 @@ namespace lof {
 
         
     }
-
-    /*try {
-            const auto& entities = ecs.get_entities();
-
-            if (selected_object_index >= entities.size() || !entities[selected_object_index]) {
-                std::cout << "\n\n\n\nError: selected_object_index is out of bounds.\n\n\n\n" << std::endl;
-                return;
-            }
-
-            auto& selectedEntity = entities[selected_object_index];
-            if (!selectedEntity) {
-                std::cout << "\n\n\n\nError: Entity at selected_object_index is already null.\n\n\n\n" << std::endl;
-                return;
-            }
-
-            EntityID entityId = entities[selected_object_index]->get_id();
-            if (entityId >= entities.size() || !entities[entityId]) {
-                std::cout << "\n\n\n\nError: Entity ID is invalid or entity does not exist.\n\n\n\n" << std::endl;
-                return;
-            }
-
-            ECSM.destroy_entity(entityId);
-            std::cout << entities.size() << std::endl;
-        }
-        catch (const std::exception& e) {
-            std::cout << "\n\n\n\nUnexpected error: " << e.what() << "\n\n\n\n" << std::endl;
-        }*/
 
     void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
 
