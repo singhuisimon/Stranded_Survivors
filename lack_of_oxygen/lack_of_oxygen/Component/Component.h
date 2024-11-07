@@ -450,6 +450,40 @@ namespace lof {
             , relative_pos(0.0f, 0.0f) {}
     };
 
+    class Logic_Component : public Component {
+    public:
+        enum class LogicType {
+            MOVING_PLATFORM    // Platform that moves between points
+        };
+
+        enum class MovementPattern {
+            LINEAR = 0,            // Move back and forth in a line
+            CIRCULAR = 1           // Move in a circular path
+        };
+
+        LogicType logic_type;
+        MovementPattern movement_pattern;
+        bool is_active{ true };           // Whether object is currently active/visible
+        float timer{ 0.0f };              // For movement timing
+        float movement_speed{ 100.0f };   // Speed of movement
+        float movement_range{ 200.0f };   // Range of movement
+        Vec2D origin_pos;                 // Starting/center position
+        bool reverse_direction{ false };   // For changing direction (horizontal/vertical)
+        bool rotate_with_motion{ false }; // Whether object rotates to face movement direction
+
+        Logic_Component(LogicType type = LogicType::MOVING_PLATFORM,
+            MovementPattern pattern = MovementPattern::LINEAR)
+            : logic_type(type)
+            , movement_pattern(pattern) {}
+
+        // Add helper method to set movement pattern
+        void set_movement_pattern(MovementPattern pattern) {
+            movement_pattern = pattern;
+            // Reset timer when changing patterns
+            timer = 0.0f;
+        }
+    };
+
 } // namespace lof
 
 #endif // LOF_COMPONENT_H

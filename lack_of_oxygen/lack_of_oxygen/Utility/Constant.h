@@ -36,7 +36,7 @@ namespace lof {
 
 	// ----------------------------- FPS_Manager.cpp -------------------------------------------
 	// FPS_Manager Constants
-	constexpr int DEFAULT_TARGET_FPS = 60;
+	constexpr int DEFAULT_TARGET_FPS = 120;
 	constexpr int64_t DEFAULT_MICROSECONDS_PER_SECOND = 1000000;
 	constexpr int64_t DEFAULT_TARGET_TIME = DEFAULT_MICROSECONDS_PER_SECOND / DEFAULT_TARGET_FPS;
 
@@ -142,6 +142,14 @@ namespace lof {
 
 	// -------------------------- Common variables used in Systems -----------------------------------
 	constexpr char const* DEFAULT_PLAYER_NAME = "player1";
+
+	// ------------------------------ GUI_System.cpp --------------------------------
+	// GUI Layout Constants
+	constexpr float DEFAULT_GUI_PROGRESS_BAR_WIDTH = 450.0f;
+	constexpr float DEFAULT_GUI_PROGRESS_BAR_HEIGHT = 40.0f;
+	constexpr float DEFAULT_GUI_IMAGE_OFFSET = 150.0f;
+	constexpr float DEFAULT_GUI_IMAGE_SIZE = 100.0f;
+	constexpr float DEFAULT_GUI_VERTICAL_SPACING = 50.0f;
 
 } // namespace lof
 
