@@ -13,7 +13,7 @@
 
 #define GLFW_INCLUDE_NONE
 
-// Macros for accessing manager singleton instances
+ // Macros for accessing manager singleton instances
 #define GFXM lof::Graphics_Manager::get_instance() 
 
 // Include base Manager class
@@ -36,10 +36,13 @@
 #include <map>
 #include <unordered_map>
 #include <mutex>
+#include <../ft2build.h>
+#include FT_FREETYPE_H 
 
 namespace lof {
 
     class Graphics_Manager : public Manager {
+    public:
     private:
 
         /**
@@ -82,36 +85,53 @@ namespace lof {
             std::vector<Frame> frames;  // Collection of frames data
             unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
             std::string texture_name;
-            float tex_w { DEFAULT_TEXTURE_SIZE };   // Texture width 
-            float tex_h { DEFAULT_TEXTURE_SIZE };   // Texture height
+            float tex_w{ DEFAULT_TEXTURE_SIZE };   // Texture width 
+            float tex_h{ DEFAULT_TEXTURE_SIZE };   // Texture height
             float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
         };
 
         // Struct of a camera
         struct Camera2D {
             GLfloat pos_y{ DEFAULT_CAMERA_POS_Y };
-            glm::mat3 view_xform, camwin_to_ndc_xform, world_to_ndc_xform; 
+            glm::mat3 view_xform, camwin_to_ndc_xform, world_to_ndc_xform;
 
             // Toggle for free camera mode
-            GLboolean is_free_cam{ GL_FALSE }; 
+            GLboolean is_free_cam{ GL_FALSE };
         };
 
-        // Storage for models and shader programs 
+        // Struct of a character
+        struct Character {
+            unsigned int TextureID; // ID handle of the glyph texture
+            glm::ivec2   Size;      // Size of glyph
+            glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
+            unsigned int Advance;   // Horizontal offset to advance to next glyph
+        };
+
+        // Struct of a font
+        struct Font {
+            GLuint vaoid{ 0 };
+            GLuint vboid{ 0 };
+            std::map<GLchar, Character> characters; // Store the full range of characters
+        };
+
+        // Storages
         using MODELS = std::map<std::string, Graphics_Manager::Model>;
         using SHADERS = std::vector<ShaderProgram>;
-        using TEXTURES = std::map<std::string, GLuint>; 
+        using TEXTURES = std::map<std::string, GLuint>;
         using ANIMATIONS = std::unordered_map<std::string, Animation>;
+        using FONTS = std::map<std::string, Font>;
         MODELS model_storage;
-        TEXTURES texture_storage;  
-        SHADERS shader_program_storage; 
-        ANIMATIONS  animation_storage; 
+        TEXTURES texture_storage;
+        SHADERS shader_program_storage;
+        ANIMATIONS  animation_storage;
+        FONTS font_storage;
 
         // Data members
         static std::unique_ptr<Graphics_Manager> instance;
         static std::once_flag once_flag;
         GLenum render_mode;
         GLboolean is_debug_mode = GL_FALSE;
-        Camera2D camera {};
+        Camera2D camera{};
 
     public:
 
@@ -130,7 +150,7 @@ namespace lof {
          * @brief Startup the Graphics_Manager and initialize data (serialization).
          * @return 0 if successful, else a negative number.
          */
-        int start_up() override; 
+        int start_up() override;
 
         /**
          * @brief Shuts down the Graphics_Manager.
@@ -140,12 +160,12 @@ namespace lof {
         /**
          * @brief Update the Graphics_Manager and its storage to prepare for rendering.
          */
-        void update(); 
+        void update();
 
         //////////////////////Shaders & Models-Related functions///////////////////////
         /**
          * @brief Add a shader program into the shader program storage.
-         * 
+         *
          * @param shaders The filepath to the shaders that are being added.
          * @return True if shader program is added successfully, false otherwise.
          */
@@ -153,27 +173,35 @@ namespace lof {
 
         /**
          * @brief Add a model into the model storage.
-         * 
+         *
          * @param file_name The filepath to the models that are being added.
          * @return True if the models are added successfully, false otherwise.
          */
         GLboolean add_model(std::string const& file_name);
 
-        /** 
+        /**
          * @brief Add a texture into the texture storage.
-         * 
+         *
          * @param file_name The filepath to the textures that are being added.
          * @return True if the textures are added successfully, false otherwise.
          */
         GLboolean add_textures(std::string const& file_name);
 
-        /** 
+        /**
          * @brief Add animations into the animation storage.
          *
          * @param file_name The filepath to the animations that are being added.
          * @return True if the animations are added successfully, false otherwise.
          */
         GLboolean add_animations(std::string const& file_name);
+
+        /**
+         * @brief Add fonts into the fonts storage.
+         *
+         * @param file_name The filepath to the fonts that are being added.
+         * @return True if the fonts are added successfully, false otherwise.
+         */
+        GLboolean add_fonts(std::string const& file_name);
 
         /**
          * @brief Get a reference to the shader program container.
@@ -185,15 +213,20 @@ namespace lof {
          */
         MODELS& get_model_storage();
 
-        /** 
+        /**
          * @brief Get a reference to the texture container.
          */
-        TEXTURES& get_texture_storage(); 
+        TEXTURES& get_texture_storage();
 
         /**
          * @brief Get a reference to the texture container.
          */
         ANIMATIONS& get_animation_storage();
+
+        /**
+         * @brief Get a reference to the texture container.
+         */
+        FONTS& get_font_storage();
 
         /**
          * @brief Get a reference to the rendering mode.
@@ -233,7 +266,7 @@ namespace lof {
 
         /**
          * @brief Return the shader program handle
-         * 
+         *
          * @param shader The shader program that is to return its program handle
          * @return The program handle
          */

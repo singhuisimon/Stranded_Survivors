@@ -92,6 +92,9 @@ namespace lof {
             register_component<Logic_Component>();
             LM.write_log("ECS_Manager::start_up(): Registered component 'Logic_Component'.");
 
+            register_component<Text_Component>();
+            LM.write_log("ECS_Manager::start_up(): Registered component 'Text_Component'.");
+
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 

@@ -603,6 +603,23 @@ namespace lof {
         return comp_obj;
     }
 
+    rapidjson::Value Serialization_Manager::serialize_text_component(const Text_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        // Add font name and text 
+        comp_obj.AddMember("font_name", rapidjson::Value(component.font_name.c_str(), allocator), allocator);
+        comp_obj.AddMember("text", rapidjson::Value(component.text.c_str(), allocator), allocator);
+
+        // Add color
+        rapidjson::Value color(rapidjson::kArrayType);
+        color.PushBack(component.color.x, allocator);
+        color.PushBack(component.color.y, allocator);
+        color.PushBack(component.color.z, allocator);
+        comp_obj.AddMember("color", color, allocator);
+
+        return comp_obj;
+    }
+
     bool Serialization_Manager::save_game_state(const char* filepath) {
         LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
         rapidjson::Document save_doc;
@@ -682,6 +699,12 @@ namespace lof {
                 const Animation_Component& animation = ECSM.get_component<Animation_Component>(entity_id);
                 components_obj.AddMember("Animation_Component", serialize_animation_component(animation, allocator), allocator);
             }
+
+            //// Add Text_Component if present
+            //if (ECSM.has_component<Text_Component>(entity_id)) {
+            //    const Text_Component& text = ECSM.get_component<Text_Component>(entity_id);
+            //    components_obj.AddMember("Text_Component", serialize_text_component(text, allocator), allocator);
+            //}
 
             // Only add entity to save file if it has components to save
             if (components_obj.MemberCount() > 0) {

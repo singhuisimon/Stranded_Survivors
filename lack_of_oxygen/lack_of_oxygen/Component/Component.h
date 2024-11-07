@@ -230,7 +230,7 @@ namespace lof {
         }
 
         /**
-         * @brief Constructor for Graphics_Component.
+         * @brief Constructor for Animation_Component.
          * @param animations Collection of animations usable by entity.
          * @param curr_animation_idx Index of the current animation.
          * @param start_animation_idx Index of the starting animation.
@@ -575,6 +575,31 @@ namespace lof {
             // Reset timer when changing patterns
             timer = 0.0f;
         }
+    };
+
+    /**
+    * @class Text_Component
+    * @brief Component representing a text data.
+    */
+    class Text_Component : public Component {
+    public:
+        std::string font_name;
+        std::string text;
+        glm::vec3 color;
+
+        // Default constructor
+        Text_Component() : font_name(DEFAULT_FONT_NAME), text(DEFAULT_FONT_NAME), color(DEFAULT_COLOR) {}
+
+        /**
+         * @brief Constructor for Text_Component.
+         * @param font_name Font type.
+         * @param text Text that will be rendered.
+         * @param color Color of the text.
+         */
+
+        Text_Component(std::string name, std::string text, glm::vec3 color) :
+            font_name(name), text(text), color(color) {}
+
     };
 
 } // namespace lof

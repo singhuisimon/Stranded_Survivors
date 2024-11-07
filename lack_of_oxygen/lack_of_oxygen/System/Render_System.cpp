@@ -214,6 +214,90 @@ namespace lof {
             auto& animations = GFXM.get_animation_storage();
             auto& camera = GFXM.get_camera(); 
 
+            // Check for text objects to render 
+            bool is_text = ECSM.has_component<Text_Component>(entity_id);
+            if (is_text == true) {
+
+                auto& text_comp = ECSM.get_component<Text_Component>(entity_id);
+                auto& fonts = GFXM.get_font_storage();
+
+                // Start the shader program used for text rendering
+                GFXM.program_use(shaders[graphics.shd_ref]); 
+
+                // Set text color in fragment shader
+                GLuint text_color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTextColor");
+                if (text_color_uniform_loc >= 0) {
+                    glUniform3fv(text_color_uniform_loc, 1, &text_comp.color[0]);
+                } else {
+                    LM.write_log("Render_System::draw(): Text colour uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Pass object's mdl_to_ndc_xform to vertex shader to compute object's final position
+                GLint text_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uModel_to_NDC_Mat");
+                if (text_mat_uniform_loc >= 0) {
+                    glUniformMatrix3fv(text_mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
+                } else {
+                    LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Set texture unit and bind text object's VAO handle 
+                glActiveTexture(GL_TEXTURE0);  
+                glBindVertexArray(fonts[text_comp.font_name].vaoid);
+
+                // Iterate through all characters
+                std::string::const_iterator c;
+                float base_x = transform.position.x;
+                for (c = text_comp.text.begin(); c != text_comp.text.end(); c++)
+                {
+                    // Get read-only values from character
+                    auto const& bearing = fonts[text_comp.font_name].characters[*c].Bearing; 
+                    auto const& size = fonts[text_comp.font_name].characters[*c].Size;
+                    auto const& texture_id = fonts[text_comp.font_name].characters[*c].TextureID; 
+                    auto const& advance = fonts[text_comp.font_name].characters[*c].Advance; 
+                    
+                    // Calculate the position and size of character in world 
+                    float xpos = base_x + bearing.x * transform.scale.x;
+                    float ypos = transform.position.y - (size.y - bearing.y) * transform.scale.y;
+                    float w = size.x * transform.scale.x;
+                    float h = size.y * transform.scale.y;
+
+                    // Update VBO for each character
+                    float vertices[6][4] = {
+                        { xpos,     ypos + h,   0.0f, 0.0f },
+                        { xpos,     ypos,       0.0f, 1.0f },
+                        { xpos + w, ypos,       1.0f, 1.0f },
+                        { xpos,     ypos + h,   0.0f, 0.0f },
+                        { xpos + w, ypos,       1.0f, 1.0f },
+                        { xpos + w, ypos + h,   1.0f, 0.0f }
+                    };
+
+                    LM.write_log("Render_System::draw(): Width: %f", w);
+
+                    // Set texture id to render
+                    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+                    // Update content of VBO memory and unbind once completed
+                    glBindBuffer(GL_ARRAY_BUFFER, fonts[text_comp.font_name].vboid); 
+                    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+                    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                    // Render quad
+                    glDrawArrays(GL_TRIANGLES, 0, 6);
+                    
+                    // Advance cursors for next glyph 
+                    base_x += (advance >> 6) * transform.scale.x;
+                }
+                // Free VAO, texture id, and program once rendering completed
+                glBindVertexArray(0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                GFXM.program_free(); 
+
+                // Skip other rendering operations
+                continue;
+            }
+
             // Start the shader program that the entity will use for rendering 
             GFXM.program_use(shaders[graphics.shd_ref]);
 
@@ -222,8 +306,8 @@ namespace lof {
 
             // Check if entity has a texture
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
-                // Assign texture object to use texture image unit 6 
-                glBindTextureUnit(6, textures[graphics.texture_name]);
+                // Assign texture object to use texture image unit 5 
+                glBindTextureUnit(5, textures[graphics.texture_name]);
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
@@ -239,7 +323,7 @@ namespace lof {
                 // Set texture unit in fragment shader
                 GLuint tex_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref]), "uTex2d");
                 if (tex_uniform_loc >= 0) {
-                    glUniform1i(tex_uniform_loc, 6);
+                    glUniform1i(tex_uniform_loc, 5);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist.");
@@ -492,10 +576,11 @@ namespace lof {
                         }
                     }
                 }
-                // Clean up by unbinding the VAO and ending the shader program
-                glBindVertexArray(0);
-                GFXM.program_free();
             }
+            // Clean up by unbinding the VAO and ending the shader program
+            glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            GFXM.program_free();
         }
     }
 
