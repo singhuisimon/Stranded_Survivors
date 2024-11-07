@@ -603,6 +603,23 @@ namespace lof {
         return comp_obj;
     }
 
+    rapidjson::Value Serialization_Manager::serialize_text_component(const Text_Component& component, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+        // Add font name and text 
+        comp_obj.AddMember("font_name", rapidjson::Value(component.font_name.c_str(), allocator), allocator);
+        comp_obj.AddMember("text", rapidjson::Value(component.text.c_str(), allocator), allocator);
+
+        // Add color
+        rapidjson::Value color(rapidjson::kArrayType);
+        color.PushBack(component.color.x, allocator);
+        color.PushBack(component.color.y, allocator);
+        color.PushBack(component.color.z, allocator);
+        comp_obj.AddMember("color", color, allocator);
+
+        return comp_obj;
+    }
+
     bool Serialization_Manager::save_game_state(const char* filepath) {
         try {
             LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);

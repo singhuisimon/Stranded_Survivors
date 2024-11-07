@@ -18,6 +18,8 @@
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
+
+// Include utility
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 #include "../Utility/Globals.h"
@@ -111,7 +113,7 @@ namespace lof {
             SM.shut_down();
             ECSM.shut_down();
             LM.shut_down();
-            return -6;
+            return -7;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");

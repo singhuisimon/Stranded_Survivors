@@ -17,7 +17,6 @@
 #include "../System/Render_System.h"
 #include "Collision_System.h"
 
-
 namespace lof {
 
     Movement_System::Movement_System() {

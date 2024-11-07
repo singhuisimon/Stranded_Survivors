@@ -21,7 +21,7 @@ namespace lof {
 		mastergroup->addGroup(sfxgroup);
 	}
 
-	Audio_System::Audio_System() : core_system(nullptr), studio_system(nullptr) {
+	Audio_System::Audio_System() : core_system(nullptr) {
 		signature.set(ECSM.get_component_id<Audio_Component>());
 		initializegroups();
 		if (initialize()) {
@@ -45,18 +45,16 @@ namespace lof {
 	bool Audio_System::initialize() {
 		FMOD_RESULT result;
 
-		result = FMOD::Studio::System::create(&studio_system);
-		if (errorcheck(result, "Audio_System::initialize", "create studio system") != 0) {
-			return false;
-		}
-		result = studio_system->getCoreSystem(&core_system);
+		result = FMOD::System_Create(&core_system);
 		if (errorcheck(result, "Audio_System::initialize", "create core system") != 0) {
 			return false;
 		}
-		result = studio_system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_3D_RIGHTHANDED, nullptr);
+
+		result = core_system->init(512, FMOD_INIT_NORMAL, 0);
 		if (errorcheck(result, "Audio_System::initialize", "initialize studio system") != 0) {
 			return false;
 		}
+
 		return true;
 	}
 
@@ -80,8 +78,6 @@ namespace lof {
 				switch (state) {
 				case PLAYING:
 					play_sound(audio.get_filepath(audio_key), key_id, audio_key, audio);
-					//std::cout << entity << "sound is playing" << std::endl;
-					//LM.write_log("entity %d is playing a sound", entity);
 					break;
 				case STOPPED:
 					stop_sound(key_id);
@@ -125,11 +121,6 @@ namespace lof {
 
 		stop_mastergroup();
 
-		//keeping it here incase stop_mastergroup() doesn't work again
-		//for (auto [key, channel] : channel_map) {
-		//	stop_sound(key);
-		//}
-
 		std::vector<std::string> to_unload;
 
 		for (const auto& sound : sound_map) {
@@ -145,13 +136,9 @@ namespace lof {
 		channel_map.clear();
 		
 		if (core_system) {
-			errorcheck(core_system->close(), "Audio_System::shutdown", "close core system");
+			//errorcheck(core_system->close(), "Audio_System::shutdown", "close core system");
 			errorcheck(core_system->release(), "Audio_System::shutdown", "release core system");
 			core_system = nullptr;
-		}
-		if (studio_system) {
-			errorcheck(studio_system->release(), "Audio_System::shutdown", "release studio system");
-			studio_system = nullptr;
 		}
 
 		LM.write_log("Audio System shutdown successfully");
@@ -167,6 +154,7 @@ namespace lof {
 			//sound is already loaded in the map.
 			return;
 		}
+		LM.write_log("The file path for load_sound is: %s", file_path.c_str());
 		FMOD::Sound* sound = nullptr;
 		FMOD_MODE mode = FMOD_DEFAULT;
 		FMOD_RESULT result = core_system->createSound(file_path.c_str(), mode, 0, &sound);
@@ -192,12 +180,12 @@ namespace lof {
 
 		//check if the sound is already playing under the entity in a channel
 		if ((channel_map.find(cskey) != channel_map.end()) && channel_map.find(cskey)->second != nullptr) {
-			LM.write_log("Audio_System::play_sound: channel already exists in entity");
 			//check if sound has finish playing, if so change the audio_state to stopped.
 			bool playing = false;
 			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
 			if (!playing) {
 				audio.set_audio_state(audio_key, NONE);
+				channel_map.erase(cskey);
 			}
 			return;	//sound is already playing
 		}
@@ -219,21 +207,18 @@ namespace lof {
 		//add channel into the respective channel group
 		if (audio.get_audio_type(audio_key) == BGM) {
 			LM.write_log("audio added into BGM GROUP");
-			//bgmgroup->addGroup(group);
 			channel->setChannelGroup(bgmgroup);
 		}
 		else {
 			channel->setChannelGroup(sfxgroup);
-			//sfxgroup->addGroup(group);
 			LM.write_log("audio added into SFX Group");
 		}
 
 		if (audio.get_loop(audio_key)) {
 			channel->setMode(FMOD_LOOP_NORMAL);
-			channel->setLoopCount(-1);	//-1 for indefinite playing of sound in channel
+			channel->setLoopCount(-1);	//<-1 for indefinite playing of sound in channel
 		}
 		else {
-			//FMOD_MODE mode;
 			channel->setLoopCount(0);	//set it to 0 to play sound once.
 		}
 
@@ -310,7 +295,6 @@ namespace lof {
 		}
 		auto sound = sound_map.find(filepath);
 		FMOD::Sound* sounds = sound->second;
-		//FMOD_RESULT result = sound->second->release();	//release the sound
 		FMOD_RESULT result = sounds->release();
 		if (errorcheck(result, "Audio_System::unload_sound", "release sound" + filepath) != 0) {
 			return;

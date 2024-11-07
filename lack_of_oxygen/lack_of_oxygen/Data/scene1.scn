@@ -24,8 +24,8 @@
           "sounds": [
             {
               "key": "bgm1",
-              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test1.wav",
-              "audio_state": 4,
+              "filepath": "audio_test1",
+              "audio_state": 0,
               "audio_type": 0,
               "volume": 0.5,
               "pitch": 1,
@@ -33,8 +33,8 @@
             },
             {
               "key": "bgm2",
-              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\audio_test2.wav",
-              "audio_state": 0,
+              "filepath": "audio_test2",
+              "audio_state": 4,
               "audio_type": 0,
               "volume": 0.5,
               "pitch": 1,
@@ -130,7 +130,7 @@
           "sounds": [
             {
               "key": "jumping",
-              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx16_2.wav",
+              "filepath": "Fx16_2",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
@@ -139,7 +139,7 @@
             },
             {
               "key": "moving left",
-              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx28.wav",
+              "filepath": "Fx28",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
@@ -148,7 +148,7 @@
             },
             {
               "key": "moving right",
-              "filepath": "\\..\\..\\lack_of_oxygen\\Data\\Audio\\Fx27.wav",
+              "filepath": "Fx27",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
@@ -204,6 +204,83 @@
           "rotate_with_motion": true,
           "reverse_direction": false,
           "origin_pos": [ -500.0, 550.0 ]
+        }
+      }
+    },
+    {
+      "name": "game_title",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -200.0, 180.0 ],
+          "prev_position": [ -200.0, 180.0 ],
+          "scale": [ 1.2, 1.2 ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Lack of Oxygen",
+          "color": [ 0.0, 0.0, 0.0 ]
+        }
+      }
+    },
+    {
+      "name": "team_name",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -240.0, 260.0 ],
+          "prev_position": [ -240.0, 260.0 ],
+          "scale": [ 2.0, 2.0 ]
+        },
+        "Text_Component": {
+          "font_name": "arial_narrow_7",
+          "text": "Stranded Survivors",
+          "color": [ 0.0, 0.0, 0.0 ]
+        }
+      }
+    },
+    {
+      "name": "guiding_text1",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -260.0, -1000.0 ],
+          "prev_position": [ -260.0, -1000.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Text_Component": {
+          "text": "I guess you found me :)",
+          "color": [ 1.0, 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "guiding_text2",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -375.0, -3000.0 ],
+          "prev_position": [ -375.0, -3000.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Text_Component": {
+          "text": "Keep going, you're almost there!",
+          "color": [ 1.0, 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "guiding_text3",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [ -475.0, -8000.0 ],
+          "prev_position": [ -475.0, -8000.0 ],
+          "scale": [ 0.9, 0.9 ]
+        },
+        "Text_Component": {
+          "text": "You've reached the end, have a great day ahead!",
+          "color": [ 1.0, 1.0, 1.0 ]
         }
       }
     }

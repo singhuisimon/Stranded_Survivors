@@ -225,7 +225,7 @@ namespace lof {
                     for (const auto& sound : sounds_array.GetArray()) {
                         if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
-                            std::string filepath = Path_Helper::get_executable_directory() + sound["filepath"].GetString();
+                            std::string filepath = Path_Helper::get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Audio\\" + sound["filepath"].GetString() + ".wav";
                             
                             PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : NONE;
                             AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;
@@ -234,7 +234,7 @@ namespace lof {
                             bool islooping = sound.HasMember("islooping") && sound["islooping"].IsBool() ? sound["islooping"].GetBool() : false;
 
                             audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
-                            LM.write_log("key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("add component from json<audiocom>: key %s, path %s, state %i, type %i, volume %f, pitch %f, loop %i", key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
                             LM.write_log("Added sound %s with filepath %s to entityID %i", key.c_str(), filepath.c_str(), entity);
                         }
                     }
@@ -388,6 +388,30 @@ namespace lof {
                 // Add component to entity
                 ecs_manager.add_component<Logic_Component>(entity, logic);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+                }
+            // ------------------------------------ Text_Component -------------------------------------------
+            else if (component_name == "Text_Component") {
+                // Parse Text_Component
+                Text_Component text_component;
+
+                if (component_data.HasMember("font_name") && component_data["font_name"].IsString()) {
+                    text_component.font_name = component_data["font_name"].GetString();
+                }
+
+                if (component_data.HasMember("text") && component_data["text"].IsString()) {
+                    text_component.text = component_data["text"].GetString();
+                }
+
+                if (component_data.HasMember("color") && component_data["color"].IsArray()) {
+                    const rapidjson::Value& clr = component_data["color"];
+                    text_component.color.x = clr[0].GetFloat();
+                    text_component.color.y = clr[1].GetFloat();
+                    text_component.color.z = clr[2].GetFloat();
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<Text_Component>(entity, text_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Text_Component to entity ID %u.", entity);
                 }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
