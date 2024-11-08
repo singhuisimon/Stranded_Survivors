@@ -118,6 +118,7 @@ namespace lof {
         // Add fonts
         if (!add_fonts(font_path.c_str())) {
             LM.write_log("Fail to add fonts.");
+            std::cout << "AAAAA" << std::endl;
             return -5;
         }
 

@@ -84,22 +84,28 @@ namespace lof {
 
                 if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
                     const rapidjson::Value& grav = component_data["gravity"];
-                    physics_component.gravity.x = grav[0].GetFloat();
-                    physics_component.gravity.y = grav[1].GetFloat();
+                    Vec2D gravity;
+                    gravity.x = grav[0].GetFloat();
+                    gravity.y = grav[1].GetFloat();
+
+                    physics_component.set_gravity(gravity);
                 }
 
                 if (component_data.HasMember("damping_factor") && component_data["damping_factor"].IsNumber()) {
-                    physics_component.damping_factor = component_data["damping_factor"].GetFloat();
+                    physics_component.set_damping_factor(component_data["damping_factor"].GetFloat());
                 }
 
                 if (component_data.HasMember("max_velocity") && component_data["max_velocity"].IsNumber()) {
-                    physics_component.max_velocity = component_data["max_velocity"].GetFloat();
+                    physics_component.set_max_velocity(component_data["max_velocity"].GetFloat());
                 }
 
                 if (component_data.HasMember("accumulated_force") && component_data["accumulated_force"].IsArray()) {
                     const rapidjson::Value& acc_force = component_data["accumulated_force"];
-                    physics_component.accumulated_force.x = acc_force[0].GetFloat();
-                    physics_component.accumulated_force.y = acc_force[1].GetFloat();
+                    Vec2D accumulated_force;
+                    accumulated_force.x = acc_force[0].GetFloat();
+                    accumulated_force.y = acc_force[1].GetFloat();
+
+                    physics_component.set_accumulated_force(accumulated_force);
                 }
 
                 if (component_data.HasMember("mass") && component_data["mass"].IsNumber()) {
@@ -107,24 +113,79 @@ namespace lof {
                 }
 
                 if (component_data.HasMember("is_static") && component_data["is_static"].IsBool()) {
-                    physics_component.is_static = component_data["is_static"].GetBool();
+                    physics_component.set_is_static(component_data["is_static"].GetBool());
                 }
-
-                //if (component_data.hasmember("is_moveable") && component_data["is_moveable"].isbool()) {
-                //    physics_component.is_moveable = component_data["is_moveable"].getbool();
-                //}
 
                 if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
-                    physics_component.is_grounded = component_data["is_grounded"].GetBool();
+                    physics_component.set_is_grounded(component_data["is_grounded"].GetBool());
                 }
 
-                //if (component_data.hasmember("is_jumping") && component_data["is_jumping"].isbool()) {
-                //    physics_component.is_jumping = component_data["is_jumping"].getbool();
-                //}
+                if (component_data.HasMember("has_jumped") && component_data["has_jumped"].IsBool()) {
+                    physics_component.set_is_grounded(component_data["has_jumped"].GetBool());
+                }
+
+                if (component_data.HasMember("jump_requested") && component_data["jump_requested"].IsBool()) {
+                    physics_component.set_jump_requested(component_data["jump_requested"].GetBool());
+                }
 
                 if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
-                    physics_component.jump_force = component_data["jump_force"].GetFloat();
+                    physics_component.set_jump_force(component_data["jump_force"].GetFloat());
                 }
+
+                if (component_data.HasMember("force_helper") && component_data["force_helper"].IsObject()) {
+                    const rapidjson::Value& force_helper = component_data["force_helper"];
+
+
+                    if (force_helper.HasMember("forces") && force_helper["forces"].IsArray()) {
+
+                        physics_component.force_helper = Force_Helper();
+
+                        const rapidjson::Value& forces_array = force_helper["forces"];
+
+                        for (const auto& force : forces_array.GetArray()) {
+                            //parse direction
+                            Vec2D direction(0.0f, 0.0f);
+                            if (force.HasMember("direction") && force["direction"].IsArray()) {
+                                const rapidjson::Value& dir = force["direction"];
+                                direction.x = dir[0].GetFloat();
+                                direction.y = dir[1].GetFloat();
+                            }
+
+                            // Parse force type 
+                            ForceType type;
+                            if (force.HasMember("type") && force["type"].IsString()) {
+                                std::string type_str = force["type"].GetString();
+                                type = Force::string_to_ftype(type_str);
+                            }
+                            //magnitude
+                            float magnitude = 0.0f;
+                            if (force.HasMember("magnitude") && force["magnitude"].IsNumber()) {
+                                magnitude = force["magnitude"].GetFloat();
+                            }
+                            //lifetime
+                            float lifetime = 0.0f;
+                            if (force.HasMember("lifetime") && force["lifetime"].IsNumber()) {
+                                lifetime = force["lifetime"].GetFloat();
+                            }
+
+                            //create and add the force type 
+                            Force force_obj(direction, type, magnitude, lifetime);
+
+                            //active state 
+                            if (force.HasMember("is_active") && force["is_active"].IsBool()) {
+                                force_obj.set_active(force["is_active"].GetBool());
+                            }
+
+                            physics_component.force_helper.add_force(force_obj);
+
+                            LM.write_log("Component_Parser::add_components_from_json(): Added force of type %d to entity ID %u",
+                                type, entity);
+
+                        }
+                    }
+
+                }
+
 
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);

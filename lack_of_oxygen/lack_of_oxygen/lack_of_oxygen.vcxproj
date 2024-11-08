@@ -53,6 +53,7 @@
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
+    <ClCompile Include="Utility\Force_Helper.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\Constant.h" />
+    <ClInclude Include="Utility\Force_Helper.h" />
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />

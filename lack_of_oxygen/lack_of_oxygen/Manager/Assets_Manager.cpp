@@ -17,6 +17,8 @@
 #include "../Utility/constant.h" 
 #include <windows.h>
 
+#include <filesystem>
+
 namespace lof {
 
     // Hui Shan
@@ -347,7 +349,13 @@ namespace lof {
             return false;
         }
 
-        std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
+        //std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
+
+        std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+        if (!std::filesystem::exists(font_filepath))
+        {
+            font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+        }
         std::ifstream ifs{ font_filepath, std::ios::binary };
         if (!ifs) {
             LM.write_log("Assets_Manager: Font file does not exist: %s", font_filepath.c_str());

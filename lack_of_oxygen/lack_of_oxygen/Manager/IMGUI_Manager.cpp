@@ -244,34 +244,34 @@ namespace lof {
             Physics_Component& physics = ecs.get_component<Physics_Component>(entities[selected_object_index].get()->get_id());
             if (ImGui::CollapsingHeader("Physics")) {
 
-                auto& gravity = physics.gravity;
+                auto& gravity = physics.get_gravity();
                 ImGui::InputFloat2("Gravity", &gravity.x);
 
-                auto& damping_factor = physics.damping_factor;
+                auto& damping_factor = physics.get_damping_factor();
                 ImGui::InputFloat("Damping Factor", &damping_factor);
 
-                auto& max_velocity = physics.max_velocity;
+                auto& max_velocity = physics.get_max_velocity();
                 ImGui::InputFloat("Maximun Velocity", &max_velocity);
 
-                auto& accumulated_force = physics.accumulated_force;
+                auto& accumulated_force = physics.get_accumulated_force();
                 ImGui::InputFloat2("Accumulated Force", &accumulated_force.x);
 
-                auto& mass = physics.mass;
+                auto& mass = physics.get_mass();
                 ImGui::InputFloat("Mass", &mass);
 
-                auto& is_static = physics.is_static;
+                auto& is_static = physics.get_is_static();
                 std::string s_label = "is_static: " + std::string(is_static_on ? "On" : "Off");
                 if (button_toggle(s_label, &is_static_on)) {
                     is_static = !is_static;
                 }
 
-                auto& is_grounded = physics.is_grounded;
+                auto& is_grounded = physics.get_is_grounded();
                 std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
                 if (button_toggle(g_label, &is_grounded_on)) {
                     is_grounded = !is_grounded;
                 }
 
-                auto& jump = physics.jump_force;
+                auto& jump = physics.get_jump_force();
                 ImGui::InputFloat("Jump Force", &jump);
             }
         }

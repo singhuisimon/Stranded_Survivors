@@ -81,6 +81,87 @@
             }
         },
         {
+            "name": "platform1",
+            "components": {
+                "Transform2D": {
+                    "position": [
+                        0.0,
+                        -52.0
+                    ],
+                    "prev_position": [
+                        0.0,
+                        -52.0
+                    ],
+                    "orientation": [
+                        0.0,
+                        30.0
+                    ],
+                    "scale": [
+                        512.0,
+                        50.0
+                    ]
+                },
+                "Graphics_Component": {
+                    "model_name": "square",
+                    "color": [
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "texture_name": "Dirt",
+                    "shd_ref": 0,
+                    "mdl_to_ndc_xform": [
+                        [
+                            0.5,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0651041716337204,
+                            0.0
+                        ],
+                        [
+                            -0.0009765625,
+                            -0.21119794249534607,
+                            1.0
+                        ]
+                    ]
+                },
+                "Collision_Component": {
+                    "width": 512.0,
+                    "height": 76.80000305175781
+                },
+                "Physics_Component": {
+                    "gravity": [
+                        0.0,
+                        -0.0
+                    ],
+                    "damping_factor": 0.0,
+                    "max_velocity": 0.0,
+                    "mass": 0.0,
+                    "jump_force": 0.0,
+                    "is_static": true,
+                    "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
+                    "accumulated_force": [
+                        0.0,
+                        0.0
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
+                },
+                "Velocity_Component": {
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                }
+            }
+        },
+        {
             "name": "platform2",
             "components": {
                 "Transform2D": {
@@ -143,10 +224,15 @@
                     "jump_force": 0.0,
                     "is_static": true,
                     "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
                     "accumulated_force": [
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
                 },
                 "Velocity_Component": {
                     "velocity": [
@@ -219,10 +305,15 @@
                     "jump_force": 0.0,
                     "is_static": true,
                     "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
                     "accumulated_force": [
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
                 },
                 "Velocity_Component": {
                     "velocity": [
@@ -295,10 +386,15 @@
                     "jump_force": 0.0,
                     "is_static": true,
                     "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
                     "accumulated_force": [
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
                 },
                 "Velocity_Component": {
                     "velocity": [
@@ -381,10 +477,15 @@
                     "jump_force": 150000.0,
                     "is_static": false,
                     "is_grounded": true,
+                    "has_jumped": false,
+                    "jump_requested": false,
                     "accumulated_force": [
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
                 },
                 "Velocity_Component": {
                     "velocity": [
@@ -518,10 +619,15 @@
                     "jump_force": 0.0,
                     "is_static": true,
                     "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
                     "accumulated_force": [
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
                 },
                 "Velocity_Component": {
                     "velocity": [
@@ -607,10 +713,15 @@
                     "jump_force": 0.0,
                     "is_static": true,
                     "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
                     "accumulated_force": [
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
                 },
                 "Velocity_Component": {
                     "velocity": [
