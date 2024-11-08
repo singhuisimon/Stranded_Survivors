@@ -140,7 +140,7 @@ namespace lof {
 
     // Function to get the path to the font file
     std::string Path_Helper::get_font_file_path() {
-        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Fonts\\Fonts.txt";
+        return get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Data\\Fonts\\Fonts.txt";
     }
 
 } // namespace lof
