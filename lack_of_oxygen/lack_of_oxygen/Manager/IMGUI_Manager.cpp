@@ -68,7 +68,7 @@ namespace lof {
 
         if (load_selected && (selected_file_index != -1)) {
             const std::string SCENES = "Scenes";;
-            if (SM.load_scene(ASM.get_full_path(SCENES, "scene1.txt").c_str())) {
+            if (SM.load_scene(ASM.get_full_path(SCENES, "scene1.scn").c_str())) {
 
                 //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
 
@@ -135,7 +135,7 @@ namespace lof {
 
         if (ImGui::Button("Save Changes")) {
             const std::string SCENES = "Scenes";
-            std::string scene_path = ASM.get_full_path(SCENES, "scene1.txt");
+            std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
             if (SM.save_game_state(scene_path.c_str())) {
                 //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
