@@ -353,7 +353,7 @@ namespace lof {
         Vec3D position; ///<position of where the sound is emitting from
         float mindist;  ///<the min range for listener to be in to hear the sound (closer)
         float maxdist;  ///<the max range for listener to be in to hear the sound (further)
-        
+
     public:
 
         /**
@@ -408,7 +408,7 @@ namespace lof {
         * @brief Getter for the soundconfig using param key
         * @param key The unique identifier of soundconfig
         */
-        const SoundConfig* get_sound_by_key(const std::string& key) const{
+        const SoundConfig* get_sound_by_key(const std::string& key) const {
             for (const auto& sound : sounds) {
                 if (sound.key == key) {
                     return &sound;
@@ -434,7 +434,7 @@ namespace lof {
         * @brief Getter for the filepath in soundconfig using param key
         * @param key The unique identifier of soundconfig
         */
-        std::string get_filepath(const std::string& key) const{
+        std::string get_filepath(const std::string& key) const {
             return get_sound_by_key(key)->filepath;
         }
 
@@ -460,8 +460,9 @@ namespace lof {
         }
 
         /**
-        * @brief Setter for audio type
+        * @brief Setter for audio type in soundconfig
         * @param key The unique identifier of soundconfig
+        * @param type The new type
         */
         void set_audio_type(const std::string& key, AudioType type) {
             for (auto& sound : sounds) {
@@ -471,10 +472,19 @@ namespace lof {
             }
         }
 
-        AudioType get_audio_type(const std::string& key) const{
+        /**
+        * @brief Getter for audio type in soundconfig
+        * @param key The unique identifier for soundconfig
+        */
+        AudioType get_audio_type(const std::string& key) const {
             return get_sound_by_key(key)->audio_type;
         }
 
+        /**
+        * @brief Setter for volume in soundconfig
+        * @param key The unique identifier for soundconfig
+        * @param volume The new volume
+        */
         void set_volume(const std::string& key, float volume) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -484,10 +494,19 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for volume in soundconfig
+        * @param key The unique identifier for soundconfig
+        */
         float get_volume(const std::string& key) const {
             return get_sound_by_key(key)->volume;
         }
 
+        /**
+        * @brief Setter for pitch in soundconfig
+        * @param key The unique identifier for soundconfig
+        * @param pitch The new pitch
+        */
         void set_pitch(const std::string& key, float pitch) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -496,10 +515,19 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for pitch in soundconfig
+        * @param key The unique identifier for soundconfig
+        */
         float get_pitch(const std::string& key) const {
             return get_sound_by_key(key)->pitch;
         }
 
+        /**
+        * @brief Setter for loop in soundconfig
+        * @param key The unique identifier for soundconfig
+        * @param islooping The new boolean value for loop
+        */
         void set_loop(const std::string& key, bool islooping) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
@@ -508,20 +536,56 @@ namespace lof {
             }
         }
 
+        /**
+        * @brief Getter for loop in soundconfig
+        * @param key The unique identifier for soundconfig
+        */
         bool get_loop(const std::string& key) const {
             return get_sound_by_key(key)->islooping;
         }
 
+        /**
+        * @brief Setter for is 3D
+        * @param is_3d The new boolean value for 3D
+        */
         void set_is3d(bool is_3d) { this->is3d = is_3d; }
+
+        /**
+        * @brief Getter for is 3D
+        */
         bool get_is3d() const { return is3d; }
 
+        /**
+        * @brief Setter for position
+        * @param pos The new vec3d position
+        */
         void set_position(const Vec3D& pos) { position = pos; }
+
+        /**
+        * @brief Getter for position
+        */
         Vec3D get_position() const { return position; }
 
+        /**
+        * @brief Setter for min distance
+        * @param dist The new distance
+        */
         void set_min_distance(float dist) { mindist = dist; }
+
+        /**
+        * @brief Getter for min distance
+        */
         float get_min_distance() const { return mindist; }
 
+        /**
+        * @brief Setter for max distance
+        * @param dist The new distance
+        */
         void set_max_distance(float dist) { maxdist = dist; }
+
+        /**
+        * @brief Getter for max distance
+        */
         float get_max_distance() const { return maxdist; }
 
     };

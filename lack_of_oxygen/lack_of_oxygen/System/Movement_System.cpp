@@ -70,6 +70,8 @@ namespace lof {
                 //reset the jump request
                 physics.reset_jump_request();
                 physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
+
+                ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping", PLAYING);
             }
 
             //update forces based on time

@@ -542,12 +542,6 @@ namespace lof {
 
             sound_obj.AddMember("key", rapidjson::Value(sound.key.c_str(), allocator), allocator);
 
-            /*std::string filename = sound.filepath.c_str();
-            size_t pos = filename.find("lack_of_oxygen\\Data");
-            if (pos != std::string::npos) {
-                filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 19);
-            }*/
-
             std::string filename = sound.filepath.c_str();
             size_t pos = filename.find("lack_of_oxygen\\Data\\Audio\\");
             if (pos != std::string::npos) {
@@ -571,15 +565,6 @@ namespace lof {
 
         comp_obj.AddMember("sounds", sounds_array, allocator);
 
-        //// Serialize filepath and state
-        //comp_obj.AddMember("filename", rapidjson::Value(component.get_filename().c_str(), allocator), allocator);
-        //comp_obj.AddMember("audio_state", static_cast<int>(component.get_audio_state()), allocator);
-        //comp_obj.AddMember("audio_type", static_cast<int>(component.get_audio_type()), allocator);
-
-        //// Serialize properties
-        //comp_obj.AddMember("volume", component.get_volume(), allocator);
-        //comp_obj.AddMember("pitch", component.get_pitch(), allocator);
-        //comp_obj.AddMember("is_looping", component.get_is_looping(), allocator);
         comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
 
         // Serialize 3D audio properties
