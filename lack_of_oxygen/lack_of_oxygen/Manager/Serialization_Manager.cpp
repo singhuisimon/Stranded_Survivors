@@ -33,7 +33,7 @@
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Component_Parser.h" // Adding components from JSON
 #include "../Utility/Constant.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
 
 // Include standard headers
 #include <fstream>
@@ -77,7 +77,7 @@ namespace lof {
         m_is_started = true;
 
         // Load general configuration using Path_Helper
-        const std::string CONFIG = "Config\\";
+        const std::string CONFIG = "Config";
         std::string config_path = ASM.get_full_path(CONFIG, "config.json");
         if (!load_config(config_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
@@ -85,7 +85,7 @@ namespace lof {
         }
 
         // Load prefabs using Path_Helper
-        const std::string PREFABS = "Prefab\\";
+        const std::string PREFABS = "Prefab";
         std::string prefabs_path = ASM.get_full_path(PREFABS, "prefab.json");
         if (!load_prefabs(prefabs_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
@@ -93,7 +93,7 @@ namespace lof {
         }
 
         // Load scene file using Path_Helper
-        const std::string SCENES = "Scenes\\";
+        const std::string SCENES = "Scenes";
         std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());

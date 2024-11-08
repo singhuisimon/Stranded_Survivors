@@ -29,7 +29,13 @@ namespace lof {
         initialize_paths();
     }
 
-    
+     std::string Assets_Manager::get_executable_directory() {
+        char buffer[MAX_PATH];
+        GetModuleFileNameA(NULL, buffer, MAX_PATH);
+        std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+        return std::string(buffer).substr(0, pos);
+        }
+
     void Assets_Manager::initialize_paths() { // (Simon file path)
         
         char buffer[MAX_PATH];
@@ -341,7 +347,7 @@ namespace lof {
             return false;
         }
 
-        std::string font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+        std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
         std::ifstream ifs{ font_filepath, std::ios::binary };
         if (!ifs) {
             LM.write_log("Assets_Manager: Font file does not exist: %s", font_filepath.c_str());

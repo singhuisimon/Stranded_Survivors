@@ -178,7 +178,7 @@ namespace lof {
        */
         bool read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names);
 
-
+        std::string get_executable_directory();
     private:
         // A unique_ptr to the single instance of Assets_Manager
         static std::unique_ptr<Assets_Manager> instance;
@@ -208,6 +208,8 @@ namespace lof {
        * @return True if load successfully, else false
        */
         bool validate_file(const std::string& file_path, std::ifstream& file);
+        
+           
 
        /**
        * @brief Read the file content
@@ -244,6 +246,7 @@ namespace lof {
         const std::string SHADER_PATH = "Shaders";
         const std::string FONT_PATH = "Fonts";
         const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
+
     };
 
 } // namespace lof

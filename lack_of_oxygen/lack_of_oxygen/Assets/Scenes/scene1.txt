@@ -52,7 +52,7 @@
                     "sounds": [
                         {
                             "key": "bgm1",
-                            "filepath": "audio_test1",
+                            "filepath": "C:\\Users\\huish\\Downloads\\SIT Y2 T1\\CSD 2401 SEP\\Stranded_Survivors\\lack_of_oxygen\\x64\\Debug\\..\\..\\lack_of_oxygen\\Assets\\Audio\\audio_test1.wav",
                             "audio_state": 0,
                             "audio_type": 0,
                             "volume": 0.5,
@@ -61,7 +61,7 @@
                         },
                         {
                             "key": "bgm2",
-                            "filepath": "audio_test2",
+                            "filepath": "C:\\Users\\huish\\Downloads\\SIT Y2 T1\\CSD 2401 SEP\\Stranded_Survivors\\lack_of_oxygen\\x64\\Debug\\..\\..\\lack_of_oxygen\\Assets\\Audio\\audio_test2.wav",
                             "audio_state": 4,
                             "audio_type": 0,
                             "volume": 0.5,
@@ -77,6 +77,82 @@
                     ],
                     "min_distance": 1.0,
                     "max_distance": 100.0
+                }
+            }
+        },
+        {
+            "name": "platform1",
+            "components": {
+                "Transform2D": {
+                    "position": [
+                        0.0,
+                        38.400001525878906
+                    ],
+                    "prev_position": [
+                        0.0,
+                        38.400001525878906
+                    ],
+                    "orientation": [
+                        0.0,
+                        30.0
+                    ],
+                    "scale": [
+                        512.0,
+                        76.80000305175781
+                    ]
+                },
+                "Graphics_Component": {
+                    "model_name": "square",
+                    "color": [
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "texture_name": "Dirt",
+                    "shd_ref": 0,
+                    "mdl_to_ndc_xform": [
+                        [
+                            0.5,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.10000000894069672,
+                            0.0
+                        ],
+                        [
+                            -0.0009765625,
+                            -0.15000000596046448,
+                            1.0
+                        ]
+                    ]
+                },
+                "Collision_Component": {
+                    "width": 512.0,
+                    "height": 76.80000305175781
+                },
+                "Physics_Component": {
+                    "gravity": [
+                        0.0,
+                        -0.0
+                    ],
+                    "damping_factor": 0.0,
+                    "max_velocity": 0.0,
+                    "mass": 0.0,
+                    "jump_force": 0.0,
+                    "is_static": true,
+                    "is_grounded": false,
+                    "accumulated_force": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                "Velocity_Component": {
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
                 }
             }
         },
@@ -396,7 +472,7 @@
                     "sounds": [
                         {
                             "key": "jumping",
-                            "filepath": "Fx16_2",
+                            "filepath": "C:\\Users\\huish\\Downloads\\SIT Y2 T1\\CSD 2401 SEP\\Stranded_Survivors\\lack_of_oxygen\\x64\\Debug\\..\\..\\lack_of_oxygen\\Assets\\Audio\\Fx16_2.wav",
                             "audio_state": 4,
                             "audio_type": 1,
                             "volume": 0.5,
@@ -405,7 +481,7 @@
                         },
                         {
                             "key": "moving left",
-                            "filepath": "Fx28",
+                            "filepath": "C:\\Users\\huish\\Downloads\\SIT Y2 T1\\CSD 2401 SEP\\Stranded_Survivors\\lack_of_oxygen\\x64\\Debug\\..\\..\\lack_of_oxygen\\Assets\\Audio\\Fx28.wav",
                             "audio_state": 4,
                             "audio_type": 1,
                             "volume": 0.5,
@@ -414,7 +490,7 @@
                         },
                         {
                             "key": "moving right",
-                            "filepath": "Fx27",
+                            "filepath": "C:\\Users\\huish\\Downloads\\SIT Y2 T1\\CSD 2401 SEP\\Stranded_Survivors\\lack_of_oxygen\\x64\\Debug\\..\\..\\lack_of_oxygen\\Assets\\Audio\\Fx27.wav",
                             "audio_state": 4,
                             "audio_type": 1,
                             "volume": 0.5,
@@ -460,11 +536,11 @@
             "components": {
                 "Transform2D": {
                     "position": [
-                        -283.4276428222656,
+                        -235.75900268554688,
                         600.0
                     ],
                     "prev_position": [
-                        -283.4276428222656,
+                        -235.75900268554688,
                         600.0
                     ],
                     "orientation": [
@@ -497,7 +573,7 @@
                             0.0
                         ],
                         [
-                            -0.2777613699436188,
+                            -0.23120996356010437,
                             0.5812499523162842,
                             1.0
                         ]
@@ -549,12 +625,12 @@
             "components": {
                 "Transform2D": {
                     "position": [
-                        -604.8721923828125,
-                        720.2991943359375
+                        -560.1732177734375,
+                        740.7332763671875
                     ],
                     "prev_position": [
-                        -604.8721923828125,
-                        720.2991943359375
+                        -560.1732177734375,
+                        740.7332763671875
                     ],
                     "orientation": [
                         0.0,
@@ -586,8 +662,8 @@
                             0.0
                         ],
                         [
-                            -0.5916720628738403,
-                            0.7378895282745361,
+                            -0.5480207204818726,
+                            0.7644964456558228,
                             1.0
                         ]
                     ]

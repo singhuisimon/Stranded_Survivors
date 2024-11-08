@@ -19,7 +19,8 @@
 
 // Include other necessary headers
 #include "../Utility/Matrix3x3.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
+#include "../Manager/Assets_Manager.h"
 
 namespace lof {
 
@@ -225,7 +226,7 @@ namespace lof {
                     for (const auto& sound : sounds_array.GetArray()) {
                         if ((sound.HasMember("key") && sound["key"].IsString()) && (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
-                            std::string filepath = Path_Helper::get_executable_directory() + "\\..\\..\\lack_of_oxygen\\Data\\Audio\\" + sound["filepath"].GetString() + ".wav";
+                            std::string filepath = ASM.get_executable_directory()  + "\\..\\..\\lack_of_oxygen\\Assets\\Audio\\" + sound["filepath"].GetString() + ".wav";
                             
                             PlayState play_state = sound.HasMember("audio_state") && sound["audio_state"].IsInt() ? static_cast<PlayState>(sound["audio_state"].GetInt()) : NONE;
                             AudioType audio_type = sound.HasMember("audio_type") && sound["audio_type"].IsInt() ? static_cast<AudioType>(sound["audio_type"].GetInt()) : SFX;

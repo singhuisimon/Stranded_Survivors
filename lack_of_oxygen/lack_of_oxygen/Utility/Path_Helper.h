@@ -21,7 +21,8 @@ namespace lof {
      * @class PathHelper
      * @brief Utility class for generating file paths relative to the executable directory.
      */
-    class Path_Helper {
+    class 
+    {
     public:
         /**
          * @brief Get the directory of the currently running executable.

@@ -24,7 +24,7 @@
 #include "../Utility/Vector2D.h"
 #include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
 #include "../Manager/Log_Manager.h"
 // FOR TESTING 
 #include "../Glad/glad.h"

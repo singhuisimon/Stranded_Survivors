@@ -54,7 +54,6 @@
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
-    <ClCompile Include="Utility\Path_Helper.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
     <ClCompile Include="Utility\Vector3D.cpp" />
@@ -92,7 +91,6 @@
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="Utility\Matrix3x3.h" />
-    <ClInclude Include="Utility\Path_Helper.h" />
     <ClInclude Include="Utility\Type.h" />
     <ClInclude Include="Utility\Vector2D.h" />
     <ClInclude Include="Utility\Vector3D.h" />
