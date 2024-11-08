@@ -13,7 +13,8 @@
 
 // Include utility function
 #include "../Utility/Constant.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
+#include "Assets_Manager.h"
 
 namespace lof {
 
@@ -66,16 +67,16 @@ namespace lof {
         ImGui::End(); 
 
         if (load_selected && (selected_file_index != -1)) {
+            const std::string SCENES = "Scenes";;
+            if (SM.load_scene(ASM.get_full_path(SCENES, "scene1.txt").c_str())) {
 
-            if (SM.load_scene((Path_Helper::get_scene_path().c_str()))) {
-
-                LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
+                //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
 
                 load_selected = !load_selected;
             }
             else {
 
-                LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
+                //LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
                 
                 load_selected = !load_selected;
             }
@@ -133,13 +134,15 @@ namespace lof {
         }
 
         if (ImGui::Button("Save Changes")) {
-
-            std::string scene_path = Path_Helper::get_scene_path();
+            const std::string SCENES = "Scenes";
+            std::string scene_path = ASM.get_full_path(SCENES, "scene1.txt");
             if (SM.save_game_state(scene_path.c_str())) {
-                LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
+                //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
+                LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
             }
             else {
-                LM.write_log("IMGUI_Manager::update(): Failed to initate save game state to %s", Path_Helper::get_scene_path().c_str());
+                //LM.write_log("IMGUI_Manager::update(): Failed to initate save game state to %s", Path_Helper::get_scene_path().c_str());
+                LM.write_log("IMGUI_Manager::update(): Failed initated game state to %s");
             }
 
         }

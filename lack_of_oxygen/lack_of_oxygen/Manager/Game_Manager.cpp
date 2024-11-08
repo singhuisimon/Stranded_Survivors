@@ -21,7 +21,7 @@
 
 // Include utility
 #include "../Utility/Constant.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
 #include "../Utility/Globals.h"
 
 // Include systems

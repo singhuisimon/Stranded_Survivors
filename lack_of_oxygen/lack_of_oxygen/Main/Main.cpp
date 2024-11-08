@@ -228,7 +228,7 @@ int main(void) {
             }
 
             if (lvl_manager_mode) {
-                IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
+                IMGUIM.display_loading_options(ASM.get_full_path("Assets",""));
             }
 
 
