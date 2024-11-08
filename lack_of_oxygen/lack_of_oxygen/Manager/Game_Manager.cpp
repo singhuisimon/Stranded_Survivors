@@ -1,4 +1,4 @@
-/**
+/*
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class helper functions.
  * @author Simon Chan (82.901%), Amanda Leow (11.91%), Liliana Hanawardani (5.181%)
@@ -283,11 +283,9 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
         if (player_id != 0) {  // If player entity exists
-            if (ECSM.has_component<Physics_Component>(player_id) &&
-                ECSM.has_component<Velocity_Component>(player_id)) {
+            if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
-                auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
             
                 if (IM.is_key_held(GLFW_KEY_SPACE) && !physics.get_jump_requested()) {
                     physics.set_jump_requested(true);
