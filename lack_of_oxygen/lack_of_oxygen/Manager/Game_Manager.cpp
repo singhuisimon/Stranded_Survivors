@@ -287,21 +287,21 @@ namespace lof {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
             
-                if (IM.is_key_held(GLFW_KEY_SPACE) && !physics.get_jump_requested()) {
+                if (IM.is_key_held(GLFW_KEY_SPACE)) {
                     physics.set_jump_requested(true);
                 }
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_A)) {
-                    physics.force_manager.activate_force(MOVE_LEFT);
+                    physics.force_helper.activate_force(MOVE_LEFT);
                 }
                 else {
-                    physics.force_manager.deactivate_force(MOVE_LEFT);
+                    physics.force_helper.deactivate_force(MOVE_LEFT);
                 }
                 if (IM.is_key_held(GLFW_KEY_D)) {
-                    physics.force_manager.activate_force(MOVE_RIGHT);
+                    physics.force_helper.activate_force(MOVE_RIGHT);
                 }
                 else {
-                    physics.force_manager.deactivate_force(MOVE_RIGHT);
+                    physics.force_helper.deactivate_force(MOVE_RIGHT);
                 }
             }
         }

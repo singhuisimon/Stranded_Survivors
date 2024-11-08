@@ -137,15 +137,15 @@ namespace lof {
                     physics_component.set_jump_force(component_data["jump_force"].GetFloat());
                 }
 
-                if (component_data.HasMember("force_manager") && component_data["force_manager"].IsObject()) {
-                    const rapidjson::Value& force_manager = component_data["force_manager"]; 
+                if (component_data.HasMember("force_helper") && component_data["force_helper"].IsObject()) {
+                    const rapidjson::Value& force_helper = component_data["force_helper"];
 
 
-                    if (force_manager.HasMember("forces") && force_manager["forces"].IsArray()) {
+                    if (force_helper.HasMember("forces") && force_helper["forces"].IsArray()) {
 
-                        physics_component.force_manager = Force_Manager();
+                        physics_component.force_helper = Force_Helper();
 
-                        const rapidjson::Value& forces_array = force_manager["forces"];
+                        const rapidjson::Value& forces_array = force_helper["forces"];
 
                         for (const auto& force : forces_array.GetArray()) {
                             //parse direction
@@ -181,7 +181,7 @@ namespace lof {
                                 force_obj.set_active(force["is_active"].GetBool());
                             }
 
-                            physics_component.force_manager.add_force(force_obj);
+                            physics_component.force_helper.add_force(force_obj);
 
                             LM.write_log("Component_Parser::add_components_from_json(): Added force of type %d to entity ID %u",
                                 type, entity);

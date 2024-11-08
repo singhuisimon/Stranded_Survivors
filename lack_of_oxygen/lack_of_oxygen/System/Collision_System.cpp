@@ -307,9 +307,9 @@ namespace lof {
     void Collision_System::update(float delta_time) {
 
         std::vector<CollisionPair> collisions;
-        std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
+      //  std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
-        std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
+       // std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
 
     }

@@ -12,7 +12,6 @@
 #define LOF_MOVEMENT_SYSTEM_H
 
 #include "System.h"
-#include "Collision_System.h"
 #include "../Manager/ECS_Manager.h"
 #include <vector>
 

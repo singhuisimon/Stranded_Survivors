@@ -1,13 +1,13 @@
 /**
- * @file Force_Manager.cpp
- * @brief Implements the Force and Force_Manager classes used for managing forces in a physics simulation.
+ * @file Force_Helper.cpp
+ * @brief Implements the Force and Force_Helper classes used for managing forces in a physics simulation.
  *
- * This file contains the definitions of the functions declared in `Force_Manager.h`:
+ * This file contains the definitions of the functions declared in `Force_Helper.h`:
  *
  * - **Force Class Methods**: Implements functions to update the age of a force, manage its
  *   activation state, set its lifetime, and check for expiration.
  *
- * - **Force_Manager Class Methods**: Implements functions to add forces, activate and deactivate
+ * - **Force_Helper Class Methods**: Implements functions to add forces, activate and deactivate
  *   forces by type, update forces over time, compute the resultant force, and clear the stored
  *   forces.
  *
@@ -19,7 +19,7 @@
  */
 
 
-#include "Force_Manager.h"
+#include "Force_Helper.h"
 
 namespace lof {
 
@@ -55,13 +55,13 @@ namespace lof {
 
 	//Force Manager 
 
-	void Force_Manager::add_force(const Force& force) {
+	void Force_Helper::add_force(const Force& force) {
 		forces.push_back(force);
 	}
 
 
 
-	void Force_Manager::activate_force(ForceType type) {
+	void Force_Helper::activate_force(ForceType type) {
 		for (auto& force : forces) {
 			if (force.type == type) {
 				force.set_active(true);
@@ -70,7 +70,7 @@ namespace lof {
 		}
 	}
 
-	void Force_Manager::deactivate_force(ForceType type) {
+	void Force_Helper::deactivate_force(ForceType type) {
 		for (auto& force : forces) {
 			if (force.type == type) {
 				force.set_active(false);
@@ -80,7 +80,7 @@ namespace lof {
 	}
 
 
-	void Force_Manager::update_force(float delta_time) {
+	void Force_Helper::update_force(float delta_time) {
 
 		for (auto& force : forces) {
 			force.update_Age(delta_time);
@@ -88,7 +88,7 @@ namespace lof {
 
 	}
 
-	Vec2D Force_Manager::get_resultant_Force() const {
+	Vec2D Force_Helper::get_resultant_Force() const {
 
 		Vec2D resultant(0.0, 0.0);
 		for (const auto& force : forces) {
@@ -103,11 +103,11 @@ namespace lof {
 		return resultant;
 
 	}
-	Force_Manager::~Force_Manager() {
+	Force_Helper::~Force_Helper() {
 		forces.clear();
 	}
 
-	void Force_Manager::clear() {
+	void Force_Helper::clear() {
 		forces.clear();
 	}
 

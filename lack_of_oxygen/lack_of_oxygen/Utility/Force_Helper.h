@@ -1,15 +1,15 @@
 #pragma once
 /**
- * @file Force_Manager.h
- * @brief Defines the Force and Force_Manager classes used to manage forces in a physics simulation.
+ * @file Force_Helper.h
+ * @brief Defines the Force and Force_Helper classes used to manage forces in a physics simulation.
  *
- * This file provides the declarations for the Force and Force_Manager classes within the `lof` namespace.
+ * This file provides the declarations for the Force and Force_Helper classes within the `lof` namespace.
  *
  * - **Force Class**: Represents an individual force, characterized by a direction, type, magnitude,
  *   and optional lifetime. The class provides methods for managing the force’s activity status,
  *   lifetime, and expiration.
  *
- * - **Force_Manager Class**: Manages a collection of Force objects, allowing for the addition,
+ * - **Force_Helper Class**: Manages a collection of Force objects, allowing for the addition,
  *   activation, deactivation, and updating of forces. It also provides a method for computing the
  *   resultant force vector from all active forces.
  *
@@ -21,8 +21,8 @@
  */
 
 
-#ifndef LOF_FORCE_MANAGER_H
-#define LOF_FORCE_MANAGER_H
+#ifndef LOF_FORCE_HELPER_H
+#define LOF_FORCE_HELPER_H
 
 #include "Vector2D.h"
 #include <map>
@@ -141,21 +141,21 @@ namespace lof {
 	};
 
 	/**
-	 * @class Force_Manager
+	 * @class Force_Helper
 	 * @brief Manages a collection of forces applied to objects in a physics simulation.
 	 *
-	 * The Force_Manager class is responsible for handling a set of Force objects, including
+	 * The Force_Helper class is responsible for handling a set of Force objects, including
 	 * adding new forces, updating their state, activating/deactivating specific force types,
 	 * and calculating the resultant force vector.
 	 */
-	class Force_Manager
+	class Force_Helper
 	{
 
 	public:
 		/**
 		 * @brief Destructor that clears all managed forces.
 		 */
-		~Force_Manager();
+		~Force_Helper();
 
 		/**
 		 * @brief Adds a new Force to the manager.
@@ -199,5 +199,5 @@ namespace lof {
 
 } //endof Namespace lof
 
-#endif // !FORCE_MANAGER_H
+#endif // !Force_Helper_H
 

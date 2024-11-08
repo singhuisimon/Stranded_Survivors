@@ -10,7 +10,7 @@
 
 #if 1
 #include "Movement_System.h"
-//#include "../Utility/Force_Manager.h"
+#include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
@@ -53,7 +53,8 @@ namespace lof {
             // Handle jumping mechanics
             if (physics.get_jump_requested() && physics.get_is_grounded() && !physics.get_has_jumped()) {
               
-                physics.force_manager.activate_force(JUMP_UP);
+              
+                physics.force_helper.activate_force(JUMP_UP);
                 physics.set_is_grounded(false);
                 physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 physics.set_has_jumped(true);
@@ -61,16 +62,17 @@ namespace lof {
                 velocity.velocity.y = physics.get_jump_force();
                 //reset the jump request
                 physics.reset_jump_request();
-                physics.force_manager.deactivate_force(JUMP_UP);  // Deactivate the jump force
+                physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
+               
 
             }
 
 
             //update forces based on time
-            physics.force_manager.update_force(delta_time);
+            physics.force_helper.update_force(delta_time);
 
             //get resultant force 
-            Vec2D sum_force = physics.force_manager.get_resultant_Force();
+            Vec2D sum_force = physics.force_helper.get_resultant_Force();
 
             //add gravity 
             sum_force += physics.get_gravity() * physics.get_mass();

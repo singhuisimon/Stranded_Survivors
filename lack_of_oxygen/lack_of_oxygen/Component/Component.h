@@ -25,7 +25,7 @@
 #include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
-#include "../Utility/Force_Manager.h"
+#include "../Utility/Force_Helper.h"
 #include "../Manager/Log_Manager.h"
 // FOR TESTING 
 #include "../Glad/glad.h"
@@ -41,7 +41,7 @@ namespace lof {
      */
     using ComponentID = std::uint8_t;
     //forward declaration
-    class Force_Manager;
+    class Force_Helper;
     /**
      * @class Component
      * @brief Base class for all components in the ECS.
@@ -127,7 +127,7 @@ namespace lof {
         float jump_force; //the force applied during a jump
 
     public: 
-        Force_Manager force_manager;
+        Force_Helper force_helper;
 
 
     public:

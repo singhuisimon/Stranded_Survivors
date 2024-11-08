@@ -31,7 +31,7 @@
 // Include Utility headers
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Component_Parser.h" // Adding components from JSON
-#include "../Utility/Force_Manager.h"
+#include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Path_Helper.h"
 
@@ -493,12 +493,12 @@ namespace lof {
         accumulated_force.PushBack(acc_force.y, allocator);
         comp_obj.AddMember("accumulated_force", accumulated_force, allocator);
 
-        //serialize force_manager 
-        rapidjson::Value force_manager_obj(rapidjson::kObjectType);
+        //serialize force_helper
+        rapidjson::Value force_helper_obj(rapidjson::kObjectType);
         rapidjson::Value forces_array(rapidjson::kArrayType);
 
         //get all forces from force manager
-        const auto& forces = component.force_manager.get_forces();
+        const auto& forces = component.force_helper.get_forces();
 
         for (const auto& force : forces) {
             rapidjson::Value force_obj(rapidjson::kObjectType);
@@ -518,8 +518,8 @@ namespace lof {
 
             forces_array.PushBack(force_obj, allocator);
         }
-        force_manager_obj.AddMember("forces", forces_array, allocator);
-        comp_obj.AddMember("force_manager", force_manager_obj, allocator);
+        force_helper_obj.AddMember("forces", forces_array, allocator);
+        comp_obj.AddMember("force_helper", force_helper_obj, allocator);
 
         return comp_obj;
     }
