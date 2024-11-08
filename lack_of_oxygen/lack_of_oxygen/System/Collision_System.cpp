@@ -82,7 +82,7 @@ namespace lof {
            
             bool is_grounded = false; // Track if entity is grounded
             
-            auto it2 = std::next(it_1); // Start from the next entity
+            auto it_2 = std::next(it_1); // Start from the next entity
 
             // Check for collisions with other entities
             for (auto it_2 = collision_entities.begin(); it_2 != collision_entities.end(); ++it_2) {
