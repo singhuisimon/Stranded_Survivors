@@ -534,31 +534,37 @@ namespace lof {
 
     rapidjson::Value Serialization_Manager::serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator) {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
-        
-        rapidjson::Value sounds_array(rapidjson::kArrayType);
-        auto& sounds = component.get_sounds();
 
-        for (auto& sound : sounds) {
+        // Create the sounds array
+        rapidjson::Value sounds_array(rapidjson::kArrayType);
+        auto& all_sounds = component.get_sounds();
+
+        for (auto& sound : all_sounds) {
             rapidjson::Value sound_obj(rapidjson::kObjectType);
 
+            // Add key
             sound_obj.AddMember("key", rapidjson::Value(sound.key.c_str(), allocator), allocator);
 
-            std::string filename = sound.filepath.c_str();
-            size_t pos = filename.find("lack_of_oxygen\\Data\\Audio\\");
-            if (pos != std::string::npos) {
-                filename = filename.substr(pos + 26);
-                size_t dot_pos = filename.find_last_of('.');
-                if (dot_pos != std::string::npos) {
-                    filename = filename.substr(0, dot_pos);
-                }
+            // Handle filepath - extract just the basic filename without path
+            std::string filename = sound.filepath;
+            size_t last_slash = filename.find_last_of("/\\");
+            if (last_slash != std::string::npos) {
+                filename = filename.substr(last_slash + 1);
             }
-
+            // Remove the .wav extension if present
+            size_t extension = filename.find(".wav");
+            if (extension != std::string::npos) {
+                filename = filename.substr(0, extension);
+            }
             sound_obj.AddMember("filepath", rapidjson::Value(filename.c_str(), allocator), allocator);
+
+            // Add other sound properties
             sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
             sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
             sound_obj.AddMember("volume", sound.volume, allocator);
             sound_obj.AddMember("pitch", sound.pitch, allocator);
-            sound_obj.AddMember("is_looping", sound.islooping, allocator);
+            // Use "islooping" to match original format
+            sound_obj.AddMember("islooping", sound.islooping, allocator);
 
             // Add the serialized sound object to the sounds array
             sounds_array.PushBack(sound_obj, allocator);
@@ -566,9 +572,9 @@ namespace lof {
 
         comp_obj.AddMember("sounds", sounds_array, allocator);
 
+        // Add other audio component properties
         comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
 
-        // Serialize 3D audio properties
         rapidjson::Value position(rapidjson::kArrayType);
         Vec3D pos = component.get_position();
         position.PushBack(pos.x, allocator);
