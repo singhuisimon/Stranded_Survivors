@@ -234,12 +234,18 @@ namespace lof {
                 //activate and deactivate the forces.
                 if (IM.is_key_held(GLFW_KEY_A)) {
                     physics.force_helper.activate_force(MOVE_LEFT);
+                    if (physics.get_is_grounded()) {
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                    }
                 }
                 else {
                     physics.force_helper.deactivate_force(MOVE_LEFT);
                 }
                 if (IM.is_key_held(GLFW_KEY_D)) {
                     physics.force_helper.activate_force(MOVE_RIGHT);
+                    if (physics.get_is_grounded()) {
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                    }
                 }
                 else {
                     physics.force_helper.deactivate_force(MOVE_RIGHT);

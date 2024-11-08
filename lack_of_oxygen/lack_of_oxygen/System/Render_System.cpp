@@ -290,7 +290,7 @@ namespace lof {
 
                     // Render quad
                     glDrawArrays(GL_TRIANGLES, 0, 6);
-                    std::cout << "hell" << std::endl;
+                    //std::cout << "hell" << std::endl;
                     std::cout << *c << std::endl;
 
                     // Advance cursors for next glyph 
