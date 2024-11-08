@@ -290,9 +290,8 @@ namespace lof {
 
                     // Render quad
                     glDrawArrays(GL_TRIANGLES, 0, 6);
-                    //std::cout << "hell" << std::endl;
-                    std::cout << *c << std::endl;
-
+                    
+                 
                     // Advance cursors for next glyph 
                     base_x += (advance >> 6) * transform.scale.x;
                 }
@@ -447,8 +446,9 @@ namespace lof {
 
                         // Free texture shader program to allow models shader program to bind and start  
                         GFXM.program_free();
-                        Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref + 1);
-                        GFXM.program_use(shader->program_handle);
+                        int safe_shd_ref = static_cast<int>(graphics.shd_ref) + 1; // prevent overflow
+                        Assets_Manager::ShaderProgram* debug_shader = ASM.get_shader_program(safe_shd_ref);
+                        GFXM.program_use(debug_shader->program_handle);
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
                         GLint debug_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
@@ -462,7 +462,7 @@ namespace lof {
                         }
 
                         // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
-                        GLint debug_mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uModel_to_NDC_Mat");
                         if (debug_mat_uniform_loc < 0) {
                             LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
                             std::exit(EXIT_FAILURE);
