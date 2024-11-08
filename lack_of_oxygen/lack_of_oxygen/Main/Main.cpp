@@ -109,6 +109,8 @@ int main(void) {
 
     IMGUIM.start_up(window); // Might need to integrate with game manager 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    // Flag to prevent multiple key presses for cloning
+    bool tab_key_was_pressed_last_frame = false;
     bool lvl_manager_mode = false;
     bool object_editor_mode = false;
 
@@ -171,9 +173,11 @@ int main(void) {
         glfwPollEvents();
 
 
-        if (IM.is_key_held(GLFW_KEY_TAB)) {
+        bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
+        if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
             level_editor_mode = !level_editor_mode;
         }
+        tab_key_was_pressed_last_frame = is_TAB_pressed;
 
         // Getting delta time for Game Manager/game loop
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -228,7 +232,8 @@ int main(void) {
             }
 
             if (lvl_manager_mode) {
-                IMGUIM.display_loading_options(ASM.get_full_path("Assets",""));
+                //IMGUIM.display_loading_options(ASM.get_full_path("Assets",""));
+                IMGUIM.display_loading_options();
             }
 
 

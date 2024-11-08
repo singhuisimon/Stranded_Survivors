@@ -1,4 +1,14 @@
-// Include header file
+/**
+ * @file IMGUI_Manager.cpp
+ * @brief Declaration of the IMGUI_Manager class for running the IMGUI level editor.
+ * @author Liliana Hanawardani (100%)
+ * @date November 8, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+ 
+ // Include header file
 #include "IMGUI_Manager.h"
 
 // Include other managers
@@ -40,6 +50,11 @@ namespace lof {
         return instance;
     }
 
+    //Inherited start_up, not using
+    int IMGUI_Manager::start_up() {
+        throw std::runtime_error("No-parameter start_up() is disabled in IMGUI_Manager. start_up() now has a parameter GLFWwindow*& window");
+    }
+
     int IMGUI_Manager::start_up(GLFWwindow*& window) {
         if (is_started()) {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
@@ -55,7 +70,7 @@ namespace lof {
         return 0;
     }
 
-    void IMGUI_Manager::display_loading_options(const std::string& directory) {
+    void IMGUI_Manager::display_loading_options() {
  
         int current_object_index = 0;
 
@@ -282,8 +297,8 @@ namespace lof {
             if (ImGui::CollapsingHeader("Graphics")) {
 
                 auto& model_name = graphics.model_name;
-                std::string condition_name_model = "model_name";
-                text_input(model_name, condition_name_model);
+                std::string condition_name_m = "model_name";
+                text_input(model_name, condition_name_m);
 
                 auto& color = graphics.color;
                 ImGui::InputFloat3("Color", &color.x);
@@ -345,7 +360,7 @@ namespace lof {
 
                     ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
                     std::string label = "Choose Animation for " + std::to_string(index);
-                    if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), assigned_names.size())) {
+                    if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
 
                         // Update the specific animation in the list
                         if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
@@ -360,13 +375,13 @@ namespace lof {
                 ImGui::Text("Current Animation Index: %i", curr);
                 ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
                 int temp_value = static_cast<int>(curr);
-                if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, animation_list.size() - 1)) {
+                if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, static_cast<int>(animation_list.size()) - 1)) {
                     
                     if (temp_value < 0) {
                         temp_value = 0;
                     }
                     else if (temp_value >= static_cast<int>(animation_list.size())) {
-                        temp_value = animation_list.size() - 1;
+                        temp_value = static_cast<int>(animation_list.size()) - 1;
                     }
 
                     // Only update `curr_animation_idx` if temp_value is within valid bounds
@@ -437,13 +452,11 @@ namespace lof {
             prefab_names_c_str.push_back(name.c_str());
         }
 
-        //static const char* prefab_options[]{ "player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image" };
-
         const char** prefab_options = prefab_names_c_str.data();
 
         static int selected_item = -1;
 
-        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, prefab_names_c_str.size())) {
+        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, static_cast<int>(prefab_names_c_str.size()))) {
 
             //Simon's code
             EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
