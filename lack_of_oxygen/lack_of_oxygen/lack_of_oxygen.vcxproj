@@ -98,10 +98,6 @@
     <ClInclude Include="Utility\Vector3D.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\config.json" />
-    <None Include="Data\models.msh" />
-    <None Include="Data\prefab.json" />
-    <None Include="Data\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
     <None Include="Shaders\lack_of_oxygen_debug.frag" />
@@ -112,21 +108,9 @@
     <None Include="Shaders\lack_of_oxygen_obj.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="Data\Audio\audio_test1.wav" />
-    <Media Include="Data\Audio\audio_test2.wav" />
-    <Media Include="Data\Audio\Fx16_2.wav" />
-    <Media Include="Data\Audio\Fx27.wav" />
-    <Media Include="Data\Audio\Fx28.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="Data\Fonts\arial_narrow_7.ttf" />
-    <Font Include="Data\Fonts\PressStart2P.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Data\Fonts\Fonts.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

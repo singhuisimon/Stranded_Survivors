@@ -39,6 +39,7 @@
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Logic_System.cpp" />
     <ClCompile Include="Manager\Assets_Manager.cpp" />
+    <ClCompile Include="Utility\Force_Helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -76,14 +77,11 @@
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Logic_System.h" />
     <ClInclude Include="Manager\Assets_Manager.h" />
+    <ClInclude Include="Utility\Force_Helper.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\config.json" />
     <None Include="Data\square.msh" />
-    <None Include="Data\scene1.scn" />
     <None Include="Data\triangle.msh" />
-    <None Include="Data\prefab.json" />
-    <None Include="Data\models.msh" />
     <None Include="Shaders\lack_of_oxygen_debug.frag" />
     <None Include="Shaders\lack_of_oxygen_debug.vert" />
     <None Include="Shaders\lack_of_oxygen_font.frag" />
@@ -95,17 +93,5 @@
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
-    <Media Include="Data\Audio\audio_test1.wav" />
-    <Media Include="Data\Audio\audio_test2.wav" />
-    <Media Include="Data\Audio\Fx16_2.wav" />
-    <Media Include="Data\Audio\Fx28.wav" />
-    <Media Include="Data\Audio\Fx27.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="Data\Fonts\arial_narrow_7.ttf" />
-    <Font Include="Data\Fonts\PressStart2P.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Data\Fonts\Fonts.txt" />
   </ItemGroup>
 </Project>
