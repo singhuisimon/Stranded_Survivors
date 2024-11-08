@@ -12,14 +12,38 @@
           "velocity": [ 0.0, 0.0 ]
         },
         "Physics_Component": {
-          "gravity": [ 0.0, -850.0 ],
-          "damping_factor": 0.85,
-          "max_velocity": 80000.0,
+          "gravity": [ 0.0, -1000.0 ],
+          "damping_factor": 0.95,
+          "max_velocity": 20000.0,
           "accumulated_force": [ 0.0, 0.0 ],
-          "mass": 1.0,
+          "mass": 10.0,
           "is_static": false,
-          "is_grounded": true,
-          "jump_force": 150000.0
+          "jump_force": 2000.0,
+          "force_helper": {
+            "forces": [
+              {
+                "direction": [ -1.0, 0.0 ],
+                "type": "MOVE_LEFT",
+                "magnitude": 10000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [ 1.0, 0.0 ],
+                "type": "MOVE_RIGHT",
+                "magnitude": 10000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [ 0.0, 1.0 ],
+                "type": "JUMP_UP",
+                "magnitude": 20000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              }
+            ]
+          }
         },
         "Graphics_Component": {
           "model_name": "square",
@@ -66,7 +90,10 @@
           "accumulated_force": [ 0.0, 0.0 ],
           "mass": 0.0,
           "is_static": true,
-          "jump_force": 0.0
+          "jump_force": 0.0,
+          "force_helper": {
+            "forces": []
+          }
         },
         "Graphics_Component": {
           "model_name": "square",

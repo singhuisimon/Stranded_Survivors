@@ -217,6 +217,38 @@ namespace lof {
             }
         }
 
+        // Handle player movement and physics input
+        EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
+        if (player_id != 0) {  // If player entity exists
+            if (ECSM.has_component<Physics_Component>(player_id)) {
+
+                auto& physics = ECSM.get_component<Physics_Component>(player_id);
+
+
+                if (IM.is_key_held(GLFW_KEY_SPACE)) {
+                    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component
+                }
+                // Handle horizontal movement
+
+                //activate and deactivate the forces.
+                if (IM.is_key_held(GLFW_KEY_A)) {
+                    physics.force_helper.activate_force(MOVE_LEFT);
+                }
+                else {
+                    physics.force_helper.deactivate_force(MOVE_LEFT);
+                }
+                if (IM.is_key_held(GLFW_KEY_D)) {
+                    physics.force_helper.activate_force(MOVE_RIGHT);
+                }
+                else {
+                    physics.force_helper.deactivate_force(MOVE_RIGHT);
+                }
+
+            }
+        }
+
+
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Input_Manager
