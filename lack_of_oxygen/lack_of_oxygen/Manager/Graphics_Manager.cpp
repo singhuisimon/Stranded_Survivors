@@ -61,9 +61,6 @@ namespace lof {
 
         // Set up default render mode 
         render_mode = GL_FILL;
-
-
-
         std::string vertex_obj_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_obj.vert");
         std::string fragment_obj_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_obj.frag");
         std::string vertex_debug_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_debug.vert");
@@ -77,8 +74,6 @@ namespace lof {
             std::make_pair(vertex_font_path, fragment_font_path)
         };
 
-
-
         if (!ASM.load_shader_programs(shader_files)) {
             LM.write_log("Graphics_Manager::start_up(): Failed to load shader programs");
             return -1;
@@ -86,7 +81,6 @@ namespace lof {
         else {
             LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
-
 
         std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, "models.msh");
         std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
@@ -132,54 +126,13 @@ namespace lof {
         }
 
         // Free the data storages
-        //shader_program_storage.clear();
         ASM.unload_shader_programs();
         model_storage.clear();
         texture_storage.clear();
         animation_storage.clear();
 
-       
-
         m_is_started = false;
     }
-
-    // Update rendering details according to inputs
-    void Graphics_Manager::update() { 
-        // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_held(GLFW_KEY_1)) {
-            LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
-            render_mode = GL_FILL;
-        } else if (IM.is_key_held(GLFW_KEY_2)) {
-            LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
-            render_mode = GL_LINE;
-        } else if (IM.is_key_held(GLFW_KEY_3)) {
-            LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
-            render_mode = GL_POINT; 
-        }
-
-        // Toggle debug mode using 'B" or 'N'
-        if (IM.is_key_held(GLFW_KEY_B)) {
-            LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
-            is_debug_mode = GL_TRUE;
-        }
-        else if (IM.is_key_held(GLFW_KEY_N)) {
-            LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
-            is_debug_mode = GL_FALSE;
-        }
-
-        // Toggle free camera mode using 'Z' and 'X'
-        if (IM.is_key_held(GLFW_KEY_Z)) {
-            LM.write_log("Graphics_Manager::update(): 'Z' key pressed, Free Camera enabled.");
-            camera.is_free_cam = GL_TRUE;
-        }
-        else if (IM.is_key_held(GLFW_KEY_X)) {
-            LM.write_log("Graphics_Manager::update(): 'X' key pressed, Free Camera disabled.");
-            camera.is_free_cam = GL_FALSE;
-        }
-
-    }
-
-
 
     GLboolean Graphics_Manager::add_model(const std::string& file_name) {
         if (!ASM.load_model_data(file_name)) {
@@ -257,8 +210,6 @@ namespace lof {
         return GL_TRUE;
     }
 
-
-
     GLboolean Graphics_Manager::add_textures(const std::vector<std::string>& texture_names) {
         for (const auto& tex_name : texture_names) {
             // Construct the full path
@@ -308,8 +259,6 @@ namespace lof {
         LM.write_log("Graphics_Manager: Added %d textures to storage", texture_storage.size());
         return GL_TRUE;
     }
-
-
 
     // Add fonts into the font storage
     GLboolean Graphics_Manager::add_fonts(std::string const& file_name) {
@@ -426,6 +375,12 @@ namespace lof {
     // Return reference to camera
     Graphics_Manager::Camera2D& Graphics_Manager::get_camera() { return camera; }
 
+    // Return reference to scale flag
+    int& Graphics_Manager::get_scale_flag() { return scale_flag; }
+
+    // Return reference to rotation flag
+    int& Graphics_Manager::get_rotation_flag() { return rotation_flag; }
+
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, Assets_Manager::ShaderProgram& shader) {
         // Read each shader file details such as shader type and file path
         for (auto& file : shader_files) {
@@ -503,7 +458,7 @@ namespace lof {
 
     }
 
-
+    // Use shader program
     void Graphics_Manager::program_use(GLuint program_handle)
     {
         if (program_handle > 0) {

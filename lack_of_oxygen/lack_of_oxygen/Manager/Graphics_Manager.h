@@ -90,6 +90,7 @@ namespace lof {
 
         // Struct of a camera
         struct Camera2D {
+            GLfloat pos_x{ DEFAULT_CAMERA_POS_X };
             GLfloat pos_y{ DEFAULT_CAMERA_POS_Y };
             glm::mat3 view_xform, camwin_to_ndc_xform, world_to_ndc_xform;
 
@@ -136,6 +137,10 @@ namespace lof {
         GLboolean is_debug_mode = GL_FALSE;
         Camera2D camera{};
 
+        // Flags to prevent scaling and rotation buttons from conflicting
+        int scale_flag = 0;
+        int rotation_flag = 0;
+
     public:
 
         /**
@@ -159,20 +164,6 @@ namespace lof {
          * @brief Shuts down the Graphics_Manager.
          */
         void shut_down() override;
-
-        /**
-         * @brief Update the Graphics_Manager and its storage to prepare for rendering.
-         */
-        void update();
-
-        //////////////////////Shaders & Models-Related functions///////////////////////
-        /**
-         * @brief Add a shader program into the shader program storage.
-         *
-         * @param shaders The filepath to the shaders that are being added.
-         * @return True if shader program is added successfully, false otherwise.
-         */
-        //GLboolean add_shader_program(std::vector<std::pair<std::string, std::string>> shaders);
 
         /**
          * @brief Add a model into the model storage.
@@ -209,13 +200,8 @@ namespace lof {
         GLboolean add_fonts(std::string const& file_name);
 
         /**
-         * @brief Get a reference to the shader program container.
+         * @brief Get a reference to the model container.
          */
-         //SHADERS& get_shader_program_storage();
-
-         /**
-          * @brief Get a reference to the model container.
-          */
         MODELS& get_model_storage();
 
         /**
@@ -249,6 +235,16 @@ namespace lof {
         Camera2D& get_camera();
 
         /**
+         * @brief Get a reference to the scale flag.
+         */
+        int& get_scale_flag();
+
+        /**
+         * @brief Get a reference to the rotation flag.
+         */
+        int& get_rotation_flag();
+
+        /**
         * @brief Compile the shaders, link the shader objects to create an executable,
                  and ensure the program can work in the current OpenGL state.
         * @param shader_files The data which contains the shader type and its filepath.
@@ -278,8 +274,8 @@ namespace lof {
          */
          //GLuint get_shader_program_handle(ShaderProgram shader) const;
         GLuint get_shader_program_handle(Assets_Manager::ShaderProgram shader) const;
-    
-    
+
+
     };
 
 } // namespace lof
