@@ -7,6 +7,8 @@
 #include "../Utility/constant.h" 
 #include <windows.h>
 
+#include <filesystem>
+
 namespace lof {
 
     std::unique_ptr<Assets_Manager> Assets_Manager::instance;
@@ -339,7 +341,12 @@ namespace lof {
             return false;
         }
 
-        std::string font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+
+        std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+        if (!std::filesystem::exists(font_filepath))
+        {
+            font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+        }
         std::ifstream ifs{ font_filepath, std::ios::binary };
         if (!ifs) {
             LM.write_log("Font file does not exist: %s", font_filepath.c_str());

@@ -133,8 +133,12 @@ namespace lof {
 
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
-                    std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
+                    //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
 
+                    //std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
+                    //std::cout << "State of is grouded for player: " << physic1.is_grounded << "\n";
+                    
 #if 0
                     std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
                     std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
@@ -381,7 +385,7 @@ namespace lof {
                 side = (dy > 0) ? CollisionSide::BOTTOM : CollisionSide::TOP;
             }
         }
-        std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
+        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
 
         //return CollisionSide::NONE; // No collision
         return side;
