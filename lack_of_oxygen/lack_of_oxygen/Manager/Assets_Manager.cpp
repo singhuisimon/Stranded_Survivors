@@ -1,3 +1,13 @@
+/**
+ * @file Assets_Manager.cpp
+ * @brief Implements the Assets_Manager.
+ * @author Saw Hui Shan (%), Chua Wen Bin Kenny (%) 
+ * @date September 21, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+
+ */
 
 
 #include "Assets_Manager.h"
@@ -11,21 +21,32 @@
 
 namespace lof {
 
+    // Hui Shan
     std::unique_ptr<Assets_Manager> Assets_Manager::instance;
     std::once_flag Assets_Manager::once_flag;
 
+    // Hui Shan
     Assets_Manager::Assets_Manager() {
         set_type("Assets_Manager");
         initialize_paths();
     }
 
-    void Assets_Manager::initialize_paths() {
+     std::string Assets_Manager::get_executable_directory() {
+        char buffer[MAX_PATH];
+        GetModuleFileNameA(NULL, buffer, MAX_PATH);
+        std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+        return std::string(buffer).substr(0, pos);
+        }
+
+    void Assets_Manager::initialize_paths() { // (Simon file path)
+        
         char buffer[MAX_PATH];
         GetModuleFileNameA(NULL, buffer, MAX_PATH);
         std::string::size_type pos = std::string(buffer).find_last_of("\\/");
         executable_path = std::string(buffer).substr(0, pos);
     }
 
+    // Hui Shan
     Assets_Manager& Assets_Manager::get_instance() {
         std::call_once(once_flag, []() {
             instance.reset(new Assets_Manager);
@@ -33,18 +54,27 @@ namespace lof {
         return *instance;
     }
 
+    // Hui Shan
     Assets_Manager::~Assets_Manager() {}
 
-    bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) {
+
+    bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) { // (Hui Shan)
         file.open(filepath, std::ios::in);
         if (!file.good()) {
             LM.write_log("Assets_Manager: Unable to open file: %s", filepath.c_str());
             return false;
         }
+        else
+        {
+            LM.write_log("Assets_Manager: Successfully open file: %s", filepath.c_str());
+        }
+            
         file.seekg(0, std::ios::beg);
         return true;
     }
 
+
+    // (Hui Shan)
     bool Assets_Manager::read_file_content(const std::string& filepath, std::string& content) {
         std::ifstream file;
         if (!validate_file(filepath, file)) {
@@ -60,7 +90,7 @@ namespace lof {
     }
 
 
-
+    // (Hui Shan)
     bool Assets_Manager::read_json_file(const std::string& filepath, std::string& json_content) {
         std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
@@ -74,19 +104,21 @@ namespace lof {
         return true;
     }
 
+
+    // (Hui Shan)
     std::string Assets_Manager::get_full_path(const std::string& base_path, const std::string& name) {
         std::string clean_name = name;
         while (!clean_name.empty() && (clean_name[0] == '/' || clean_name[0] == '\\')) {
             clean_name = clean_name.substr(1);
         }
 
-        std::string full_path = executable_path + "\\" + BASE_PATH + base_path + clean_name;
+        std::string full_path = executable_path + "\\" + BASE_PATH + base_path + "\\" + clean_name;
         LM.write_log("Assets_Manager: Full path: %s", full_path.c_str());
         return full_path;
     }
 
 
-
+    // (kenny for contents, HS for function) 
     bool Assets_Manager::load_all_textures(const std::string& filepath, std::vector<std::string>& texture_names) {
         std::ifstream input_file{ filepath, std::ios::in };
         if (!input_file) {
@@ -106,23 +138,7 @@ namespace lof {
         return true;
     }
 
-    void Assets_Manager::unload_texture(const std::string& name) {
-        auto& tex_storage = GFXM.get_texture_storage();
-
-        // Loop through and delete all textures
-        for (const auto& [name, tex_id] : texture_cache) {
-            auto tex_it = tex_storage.find(name);
-            if (tex_it != tex_storage.end()) {
-                glDeleteTextures(1, &tex_it->second);
-                tex_storage.erase(tex_it);
-                LM.write_log("Assets_Manager: Unloaded texture %s", name.c_str());
-            }
-        }
-
-        texture_cache.clear();
-        LM.write_log("Assets_Manager: Unloaded all textures");
-    }
-
+    // Kenny code 
     bool Assets_Manager::read_shader_file(const std::string& file_path, std::string& shader_source) {
         // Check if file's state is good for reading
         std::ifstream input_file(file_path);
@@ -141,7 +157,7 @@ namespace lof {
         return true;
     }
 
-
+    // kenny code 
     bool Assets_Manager::load_shader_programs(std::vector<std::pair<std::string, std::string>> shaders) {
         for (auto const& file : shaders) {
             // Create the shader files vector with types
@@ -171,7 +187,7 @@ namespace lof {
     }
 
 
-    // Add a getter for shader programs
+    // Get the shader program (Hui Shan)
     Assets_Manager::ShaderProgram* Assets_Manager::get_shader_program(size_t index) {
         if (index < shader_programs.size()) {
             return &shader_programs[index];
@@ -179,7 +195,7 @@ namespace lof {
         return nullptr;
     }
 
-
+    // Unload the shader as shader handle in assets manager now (Hui Shan)
     void Assets_Manager::unload_shader_programs() {
         // Delete all shader programs
         for (auto& shader : shader_programs) {
@@ -194,6 +210,7 @@ namespace lof {
         LM.write_log("Assets_Manager: Unloaded all shader programs");
     }
 
+    // kenny code 
     bool Assets_Manager::load_model_data(const std::string& file_name) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
@@ -269,17 +286,7 @@ namespace lof {
     }
 
    
-    
-
-    Assets_Manager::ModelData* Assets_Manager::get_model_data(const std::string& model_name) {
-        auto it = model_storage.find(model_name);
-        if (it != model_storage.end()) {
-            return &(it->second);
-        }
-        LM.write_log("Asset_Manager: Model %s not found", model_name.c_str());
-        return nullptr;
-    }
-
+   // kenny code 
     bool Assets_Manager::load_animations(const std::string& file_name) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
@@ -335,12 +342,14 @@ namespace lof {
         return true;
     }
 
+    // kenny 
     bool Assets_Manager::load_fonts(const std::string& font_name, FT_Library& out_ft, FT_Face& out_face) {
         if (FT_Init_FreeType(&out_ft)) {
-            LM.write_log("Could not initialize FreeType Library");
+            LM.write_log("Assets_Manager: Could not initialize FreeType Library");
             return false;
         }
 
+        //std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
 
         std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
         if (!std::filesystem::exists(font_filepath))
@@ -349,23 +358,24 @@ namespace lof {
         }
         std::ifstream ifs{ font_filepath, std::ios::binary };
         if (!ifs) {
-            LM.write_log("Font file does not exist: %s", font_filepath.c_str());
+            LM.write_log("Assets_Manager: Font file does not exist: %s", font_filepath.c_str());
             return false;
         }
         ifs.close();
 
         if (FT_New_Face(out_ft, font_filepath.c_str(), 0, &out_face)) {
-            LM.write_log("Failed to load font %s", font_name.c_str());
+            LM.write_log("Assets_Manager:: Failed to load font %s", font_name.c_str());
             return false;
         }
 
         return true;
     }
 
+    // kenny 
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
-            LM.write_log("Unable to open %s", file_name.c_str());
+            LM.write_log("Assets_Manager:: Unable to open %s", file_name.c_str());
             return false;
         }
 

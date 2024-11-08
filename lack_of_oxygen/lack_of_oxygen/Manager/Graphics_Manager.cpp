@@ -10,7 +10,7 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
-#include "../Utility/Path_Helper.h" // For file path resolution
+//#include "../Utility/Path_Helper.h" // For file path resolution
 #include "Assets_Manager.h"
 
 // FOR TESTING (texture loading)
