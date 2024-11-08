@@ -20,7 +20,11 @@
 
 namespace lof {
 
-    
+     /**
+     * @brief Constructor for Movement_System.
+     * Initializes the system's signature.
+     */
+
 
     Movement_System::Movement_System() {
         // Set the required components for this system
@@ -28,7 +32,10 @@ namespace lof {
         signature.set(ECSM.get_component_id<Velocity_Component>());
         signature.set(ECSM.get_component_id<Physics_Component>());
     }
-
+    /**
+     * @brief Integrates physics calculations for movement, applying forces and updating positions.
+     * @param delta_time The time increment for updating entity positions and velocities.
+     */
     void Movement_System::integrate(float delta_time) {
 
         // Iterate through entities matching the system's signature
@@ -52,21 +59,17 @@ namespace lof {
 
             // Handle jumping mechanics
             if (physics.get_jump_requested() && physics.get_is_grounded() && !physics.get_has_jumped()) {
-              
-              
+
+                                
                 physics.force_helper.activate_force(JUMP_UP);
                 physics.set_is_grounded(false);
                 physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 physics.set_has_jumped(true);
-               
                 velocity.velocity.y = physics.get_jump_force();
                 //reset the jump request
                 physics.reset_jump_request();
                 physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
-               
-
             }
-
 
             //update forces based on time
             physics.force_helper.update_force(delta_time);
@@ -109,12 +112,15 @@ namespace lof {
             }
 
             // Reset the accumulated force
-           physics.reset_forces();
+            physics.reset_forces();
         }
 
-
-
     }
+
+    /**
+     * @brief Updates the system.
+     * @param delta_time The time elapsed since the last update.
+     */
     void Movement_System::update(float delta_time) {
 
         Movement_System::integrate(delta_time);

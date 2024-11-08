@@ -89,7 +89,7 @@ namespace lof {
 
                 if (component_data.HasMember("gravity") && component_data["gravity"].IsArray()) {
                     const rapidjson::Value& grav = component_data["gravity"];
-                    Vec2D gravity; 
+                    Vec2D gravity;
                     gravity.x = grav[0].GetFloat();
                     gravity.y = grav[1].GetFloat();
 
@@ -121,17 +121,17 @@ namespace lof {
                     physics_component.set_is_static(component_data["is_static"].GetBool());
                 }
 
-               if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
-                   physics_component.set_is_grounded(component_data["is_grounded"].GetBool());
+                if (component_data.HasMember("is_grounded") && component_data["is_grounded"].IsBool()) {
+                    physics_component.set_is_grounded(component_data["is_grounded"].GetBool());
                 }
 
-               if (component_data.HasMember("has_jumped") && component_data["has_jumped"].IsBool()) {
-                   physics_component.set_is_grounded(component_data["has_jumped"].GetBool());
-               }
+                if (component_data.HasMember("has_jumped") && component_data["has_jumped"].IsBool()) {
+                    physics_component.set_is_grounded(component_data["has_jumped"].GetBool());
+                }
 
-               if (component_data.HasMember("jump_requested") && component_data["jump_requested"].IsBool()) {
-                   physics_component.set_jump_requested(component_data["jump_requested"].GetBool());
-               }
+                if (component_data.HasMember("jump_requested") && component_data["jump_requested"].IsBool()) {
+                    physics_component.set_jump_requested(component_data["jump_requested"].GetBool());
+                }
 
                 if (component_data.HasMember("jump_force") && component_data["jump_force"].IsNumber()) {
                     physics_component.set_jump_force(component_data["jump_force"].GetFloat());
@@ -157,9 +157,9 @@ namespace lof {
                             }
 
                             // Parse force type 
-                            ForceType type; 
+                            ForceType type;
                             if (force.HasMember("type") && force["type"].IsString()) {
-                                std::string type_str = force["type"].GetString(); 
+                                std::string type_str = force["type"].GetString();
                                 type = Force::string_to_ftype(type_str);
                             }
                             //magnitude
@@ -174,7 +174,7 @@ namespace lof {
                             }
 
                             //create and add the force type 
-                            Force force_obj(direction, type, magnitude, lifetime); 
+                            Force force_obj(direction, type, magnitude, lifetime);
 
                             //active state 
                             if (force.HasMember("is_active") && force["is_active"].IsBool()) {
@@ -186,10 +186,11 @@ namespace lof {
                             LM.write_log("Component_Parser::add_components_from_json(): Added force of type %d to entity ID %u",
                                 type, entity);
 
-                        } 
+                        }
                     }
 
                 }
+
 
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);

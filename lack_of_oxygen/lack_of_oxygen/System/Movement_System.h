@@ -52,7 +52,7 @@ namespace lof {
         void integrate(float deltatime);
 
     };
-   
+
 } // namespace lof
 
 #endif // LOF_MOVEMENT_SYSTEM_H
