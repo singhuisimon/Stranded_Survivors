@@ -217,11 +217,9 @@ namespace lof {
             }
         }
 
-        std::cout << "DEBUG: -------------------------------GAME MANAGER START PHYSICS INPUT -------------------------------------\n";
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        std::cout << "player_id: " << player_id << '\n';
         if (player_id != 0) {  // If player entity exists
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
@@ -229,45 +227,26 @@ namespace lof {
 
 
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
-                    std::cout << "space_key pressed\n";
-                    physics.set_jump_requested(true);
+                    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component
                 }
                 // Handle horizontal movement
+
+                //activate and deactivate the forces.
                 if (IM.is_key_held(GLFW_KEY_A)) {
-                    std::cout << "A pressed\n";
                     physics.force_helper.activate_force(MOVE_LEFT);
                 }
                 else {
                     physics.force_helper.deactivate_force(MOVE_LEFT);
                 }
                 if (IM.is_key_held(GLFW_KEY_D)) {
-                    std::cout << "D pressed\n";
                     physics.force_helper.activate_force(MOVE_RIGHT);
                 }
                 else {
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                 }
 
-                const auto& forces = physics.force_helper.get_forces();
-                if (forces.empty()) {
-                    std::cout << "No forces present in the force_helper!!!!\n";
-                }
-                else {
-
-
-                // Debug print to display all forces inside force_helper.forces
-                std::cout << "Forces currently applied to the player:" << std::endl;
-                for ( auto& force : physics.force_helper.get_forces()) {
-                    std::cout << "Force Type: " << Force::ftype_to_string(force.type)
-                        << ", Direction: (" << force.direction.x << ", " << force.direction.y << ")"
-                        << ", Magnitude: " << force.magnitude
-                        << ", Is Active: " << (force.is_active ? "Yes" : "No") << std::endl;
-                }
-                }
-
             }
         }
-        std::cout << "DEBUG: -------------------------------GAME MANAGER END PHYSICS INPUT -------------------------------------\n";
 
 
         // Getting delta time for Input Manager

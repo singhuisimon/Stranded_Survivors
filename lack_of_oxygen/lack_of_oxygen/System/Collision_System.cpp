@@ -135,10 +135,11 @@ namespace lof {
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
                     std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
 
+#if 0
                     std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
                     std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
                     std::cout << "State of is grouded for player: " << physic1.get_is_grounded() << "\n";
-                    
+#endif                
                     
                 }
             }
@@ -544,26 +545,4 @@ namespace lof {
 
 } // namespace lof
 
-#if 0
 
-   /* std::cout << "entity 2 is :" << entity_ID2 << "\n";
-                std::cout << "Velocity for Entity " << entity_ID1 << ": (" << velocity1.velocity.x << ", " << velocity1.velocity.y << ")\n";
-                std::cout << "Velocity for Entity " << entity_ID2 << ": (" << velocity2.velocity.x << ", " << velocity2.velocity.y << ")\n";*/
-
-
-//std::cout << "Checking collision between Entity " << entity_ID1 << " and Entity " << entity_ID2 << "\n";
-                ////std::cout << "AABB1: Min(" << aabb1.min.x << ", " << aabb1.min.y << "), Max(" << aabb1.max.x << ", " << aabb1.max.y << ")\n";
-                ////std::cout << "AABB2: Min(" << aabb2.min.x << ", " << aabb2.min.y << "), Max(" << aabb2.max.x << ", " << aabb2.max.y << ")\n";
-                //std::cout << "Before Collision Check: Entity 4 Position: (" << transform1.prev_position.x << ", " << transform1.prev_position.y << ")\n";
-                //std::cout << "Current Collision Check: Entity 4 Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
-                //std::cout << "Entity: " << entity_ID2 << " Before Collision Check: other entity Position: (" << " " << transform2.prev_position.x << ", " << transform2.prev_position.y << ")\n";
-                //std::cout << "Entity: " << entity_ID2 << " current Collision Check: other entity Position: (" << " " << transform2.position.x << ", " << transform2.position.y << ")\n";
-
-          /*  if (!physicsA.is_static)
-            {
-                velocityA.velocity.x = 0.0f;
-                velocityA.velocity.y = 0.0f;
-                std::cout << entityA << "is static\n";
-
-            }*/
-#endif

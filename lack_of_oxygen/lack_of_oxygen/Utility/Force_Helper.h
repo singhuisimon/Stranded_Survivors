@@ -1,6 +1,19 @@
 #pragma once
 
-
+/**
+ * @file Force_Helper.h
+ * @brief Declaration of the `Force` and `Force_Helper` classes for managing forces in a physics simulation.
+ *
+ * This file provides the structure and functions to handle various forces, allowing
+ * the activation, deactivation, addition, and computation of resultant forces for game entities.
+ *  *
+ * @author Wai Lwin Thit (100%)
+ * @date November 8, 2024
+ * 
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #ifndef LOF_FORCE_HELPER_H
 #define LOF_FORCE_HELPER_H
 
