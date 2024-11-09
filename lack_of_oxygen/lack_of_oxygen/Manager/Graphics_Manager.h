@@ -141,6 +141,9 @@ namespace lof {
         int scale_flag = 0;
         int rotation_flag = 0;
 
+        // Flag for player direction animation
+        int player_direction = -1;
+
     public:
 
         /**
@@ -243,6 +246,11 @@ namespace lof {
          * @brief Get a reference to the rotation flag.
          */
         int& get_rotation_flag();
+
+        /**
+         * @brief Get a reference to the player direction.
+         */
+        int& get_player_direction(); 
 
         /**
         * @brief Compile the shaders, link the shader objects to create an executable,

@@ -381,6 +381,9 @@ namespace lof {
     // Return reference to rotation flag
     int& Graphics_Manager::get_rotation_flag() { return rotation_flag; }
 
+    // Return reference to player direction
+    int& Graphics_Manager::get_player_direction() { return player_direction; }
+
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, Assets_Manager::ShaderProgram& shader) {
         // Read each shader file details such as shader type and file path
         for (auto& file : shader_files) {
