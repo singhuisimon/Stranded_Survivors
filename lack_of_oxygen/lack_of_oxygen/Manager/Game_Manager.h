@@ -41,6 +41,16 @@ namespace lof {
         bool c_key_was_pressed_last_frame = false; 
         bool k_key_was_pressed_last_frame = false;    // Track K key state for saving
 
+        // Flags to prevent camera scrolling buttons from conflicting
+        int camera_up_down_scroll_flag = 0;
+        int camera_left_right_scroll_flag = 0;
+
+        // Flag for editor camera
+        int editor_camera_flag = false;
+
+        // Flag for forces applied
+        int forces_flag = -1;
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
@@ -94,6 +104,8 @@ namespace lof {
          * @return The number of game loop iterations executed.
          */
         int get_step_count() const;
+
+        
     };
 
 } // namespace lof

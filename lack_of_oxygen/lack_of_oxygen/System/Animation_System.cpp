@@ -41,15 +41,17 @@ namespace lof {
             // Set logic for player animation here first (This should be done before coming into animation system)
             if (entity_id == player_id) { 
 
+                int& player_direction = GFXM.get_player_direction(); 
+
                 // Determine player animation index
                 // (When changing animation index, reset previous animation curr_frame_idx and frame_time_elapsed to 0)
-                if (IM.is_key_held(GLFW_KEY_A)) { // Set running_left animation if not playing currently
+                if (player_direction == MOVE_LEFT) { // Set running_left animation if not playing currently
                     if (animation_comp.curr_animation_idx != 2) {
                         animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].curr_frame_index = 0; // Reset previous animation curr_frame_idx
                         animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
                         animation_comp.curr_animation_idx = 2;
                     }
-                } else if (IM.is_key_held(GLFW_KEY_D)) { // set running_right animation if not playing currently
+                } else if (player_direction == MOVE_RIGHT) { // set running_right animation if not playing currently
                     if (animation_comp.curr_animation_idx != 3) {
                         animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].curr_frame_index = 0; // Reset previous animation curr_frame_idx
                         animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 

@@ -50,51 +50,49 @@ namespace lof {
                 // Check if the entity has Collision_Component
                 if (ECSM.has_component<Collision_Component>(entity_id)) {
 
-                    if (entity_id == player_id) { // Uncomment to allow all objects to scale and rotate
+                    auto& collision = ECSM.get_component<Collision_Component>(entity_id);
 
-                        auto& collision = ECSM.get_component<Collision_Component>(entity_id);
-
-                        if (IM.is_key_held(GLFW_KEY_UP)) {
-                            LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
-                            transform.scale.x += scale_change;
-                            transform.scale.y += scale_change;
-                            collision.width += scale_change;
-                            collision.height += scale_change;
+                    int scale_flag = GFXM.get_scale_flag();
+                    if (scale_flag == GLFW_KEY_UP) {
+                        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
+                        transform.scale.x += scale_change;
+                        transform.scale.y += scale_change;
+                        collision.width += scale_change;
+                        collision.height += scale_change;
+                    }
+                    else if (scale_flag == GLFW_KEY_DOWN) {
+                        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
+                        if (transform.scale.x > 0.0f) {
+                            transform.scale.x -= scale_change;
+                            collision.width -= scale_change;
                         }
-                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                            LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
-                            if (transform.scale.x > 0.0f) {
-                                transform.scale.x -= scale_change;
-                                collision.width -= scale_change;
-                            }
-                            else {
-                                transform.scale.x = 0.0f;
-                                collision.width = 0.0f;
-                            }
-
-                            if (transform.scale.y > 0.0f) {
-                                transform.scale.y -= scale_change;
-                                collision.height -= scale_change;
-                            }
-                            else {
-                                transform.scale.y = 0.0f;
-                                collision.height = 0.0f;
-                            }
+                        else {
+                            transform.scale.x = 0.0f;
+                            collision.width = 0.0f;
                         }
 
-                        // Rotation update when left or right arrow key pressed
-                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                            transform.orientation.x += rot_change;
-                            LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                        if (transform.scale.y > 0.0f) {
+                            transform.scale.y -= scale_change;
+                            collision.height -= scale_change;
                         }
-                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                            transform.orientation.x -= rot_change;
-                            LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                        else {
+                            transform.scale.y = 0.0f;
+                            collision.height = 0.0f;
                         }
+                    }
 
-                    } // Uncomment to allow all objects to scale and rotate
+                    // Rotation update when left or right arrow key pressed
+                    int rotation_flag = GFXM.get_rotation_flag();
+                    if (rotation_flag == GLFW_KEY_LEFT) {
+                        GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                        transform.orientation.x += rot_change;
+                        LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                    }
+                    else if (rotation_flag == GLFW_KEY_RIGHT) {
+                        GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                        transform.orientation.x -= rot_change;
+                        LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                    }
                 }
 
             }
@@ -119,20 +117,20 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             } else if (camera.is_free_cam == GL_TRUE) {
 
-                // Movement update when keypad 8 or 2 pressed
-                if (IM.is_key_held(GLFW_KEY_KP_8)) {
-                    camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                    LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
-                }
-                else if (IM.is_key_held(GLFW_KEY_KP_2)) {
-                    camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                    LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
-                }
+                //// Movement update when keypad 8 or 2 pressed
+                //if (IM.is_key_held(GLFW_KEY_KP_8)) {
+                //    camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                //    LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+                //}
+                //else if (IM.is_key_held(GLFW_KEY_KP_2)) {
+                //    camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                //    LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+                //}
 
                 // Update world-to-camera view transformation matrix
                 camera.view_xform = glm::mat3{ 1, 0, 0,
                                                0, 1, 0,
-                                               1, -camera.pos_y, 1 };
+                                               -camera.pos_x, -camera.pos_y, 1 };
 
                 // Update window-to-NDC transformation matrix
                 camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
@@ -272,8 +270,6 @@ namespace lof {
                         { xpos + w, ypos,       1.0f, 1.0f },
                         { xpos + w, ypos + h,   1.0f, 0.0f }
                     };
-
-                    LM.write_log("Render_System::draw(): Width: %f", w);
 
                     // Set texture id to render
                     glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -440,7 +436,9 @@ namespace lof {
 
                         // Free texture shader program to allow models shader program to bind and start  
                         GFXM.program_free();
-                        GFXM.program_use(shaders[graphics.shd_ref + 1]);
+                        int safe_shd_ref = static_cast<int>(graphics.shd_ref) + 1; // prevent overflow
+                        Assets_Manager::ShaderProgram* debug_shader = ASM.get_shader_program(safe_shd_ref);
+                        GFXM.program_use(debug_shader->program_handle);
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
                         GLint debug_color_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uColor");
@@ -454,7 +452,7 @@ namespace lof {
                         }
 
                         // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
-                        GLint debug_mat_uniform_loc = glGetUniformLocation(GFXM.get_shader_program_handle(shaders[graphics.shd_ref + 1]), "uModel_to_NDC_Mat"); 
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uModel_to_NDC_Mat");
                         if (debug_mat_uniform_loc < 0) {
                             LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
                             std::exit(EXIT_FAILURE);

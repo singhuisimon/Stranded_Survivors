@@ -16,7 +16,7 @@
 namespace lof {
 
 	/**
-	* @struct	Coord_3D 
+	* @struct	Coord_3D
 	* @brief	Inherits Coord location in Vec2D file that contains x and y. Adds in a z
 	*			coordinate to allow it be Vec3D.
 	*/

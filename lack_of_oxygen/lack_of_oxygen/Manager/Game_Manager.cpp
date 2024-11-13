@@ -21,10 +21,12 @@
 
 // Include utility
 #include "../Utility/Constant.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
+#include "../Utility/Globals.h"
 
 // Include systems
 #include "../System/GUI_System.h"  // Add this for GUI system access
+#include "../System/Animation_System.h"  // For player_direction
 
 
 // Include iostream for console output
@@ -288,26 +290,255 @@ namespace lof {
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
 
-                if (IM.is_key_held(GLFW_KEY_SPACE)) {
-                    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component
-                }
-                // Handle horizontal movement
+                //if (IM.is_key_held(GLFW_KEY_SPACE)) {
+                //    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component
+                //}
+                //// Handle horizontal movement
 
-                //activate and deactivate the forces.
-                if (IM.is_key_held(GLFW_KEY_A)) {
+                ////activate and deactivate the forces.
+                //if (IM.is_key_held(GLFW_KEY_A)) {
+                //    physics.force_helper.activate_force(MOVE_LEFT);
+                //    if (physics.get_is_grounded()) {
+                //        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                //    }
+                //}
+                //else {
+                //    physics.force_helper.deactivate_force(MOVE_LEFT);
+                //}
+                //if (IM.is_key_held(GLFW_KEY_D)) {
+                //    physics.force_helper.activate_force(MOVE_RIGHT);
+                //    if (physics.get_is_grounded()) {
+                //        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                //    }
+                //}
+                //else {
+                //    physics.force_helper.deactivate_force(MOVE_RIGHT);
+                //}
+
+
+                // Handle horizontal movement
+                if (IM.is_key_held(GLFW_KEY_SPACE)) { 
+                    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
+                } 
+
+                //activate and deactivate the forces. 
+                if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
+                    // Updates forces
+                    physics.force_helper.deactivate_force(MOVE_RIGHT); 
                     physics.force_helper.activate_force(MOVE_LEFT);
-                }
-                else {
-                    physics.force_helper.deactivate_force(MOVE_LEFT);
-                }
-                if (IM.is_key_held(GLFW_KEY_D)) {
-                    physics.force_helper.activate_force(MOVE_RIGHT);
-                }
-                else {
+                    forces_flag = MOVE_LEFT;  
+
+                    // Update player animation flag
+                    int& direction = GFXM.get_player_direction();
+                    direction = MOVE_LEFT;
+
+                    // Update sound effect for player moving left
+                    if (physics.get_is_grounded()) { 
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING); 
+                    }
+                } else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) { 
+                    // Update forces
+                    physics.force_helper.deactivate_force(MOVE_LEFT); 
+                    physics.force_helper.activate_force(MOVE_RIGHT); 
+                    forces_flag = MOVE_RIGHT;
+
+                    // Update player animation flag
+                    int& direction = GFXM.get_player_direction();
+                    direction = MOVE_RIGHT; 
+
+                    // Update sound effect for player moving right
+                    if (physics.get_is_grounded()) { 
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING); 
+                    }
+                } else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
+                    if (forces_flag == MOVE_LEFT) {
+                        // Update forces
+                        physics.force_helper.activate_force(MOVE_LEFT); 
+                        forces_flag = MOVE_LEFT; 
+
+                        // Update player animation flag
+                        int& direction = GFXM.get_player_direction();
+                        direction = MOVE_LEFT; 
+
+                        // Update sound effect for player moving left
+                        if (physics.get_is_grounded()) {
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                        }
+                    } else {
+                        // Update forces
+                        physics.force_helper.deactivate_force(MOVE_LEFT);
+                        physics.force_helper.activate_force(MOVE_RIGHT);
+                        forces_flag = MOVE_RIGHT;
+
+                        // Update player animation flag
+                        int& direction = GFXM.get_player_direction();
+                        direction = MOVE_RIGHT;
+
+                        // Update sound effect for player moving right
+                        if (physics.get_is_grounded()) {
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                        }
+                    }
+                } else {
+                    // Reset forces and player animation
+                    physics.force_helper.deactivate_force(MOVE_LEFT);  
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
+                    forces_flag = -1;
+
+                    int& direction = GFXM.get_player_direction(); 
+                    direction = -1;
                 }
 
             }
+        }
+
+        // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
+        if (IM.is_key_pressed(GLFW_KEY_1)) {
+            LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
+            GLenum& mode = GFXM.get_render_mode();
+            mode = GL_FILL;
+        }
+        else if (IM.is_key_pressed(GLFW_KEY_2)) {
+            LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
+            GLenum& mode = GFXM.get_render_mode();
+            mode = GL_LINE;
+        }
+        else if (IM.is_key_pressed(GLFW_KEY_3)) {
+            LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
+            GLenum& mode = GFXM.get_render_mode();
+            mode = GL_POINT;
+        }
+
+        // Toggle debug mode using 'B" or 'N'
+        if (IM.is_key_pressed(GLFW_KEY_B)) {
+            LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
+            GLboolean& mode = GFXM.get_debug_mode();
+            mode = GL_TRUE;
+        }
+        else if (IM.is_key_pressed(GLFW_KEY_N)) {
+            LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
+            GLboolean& mode = GFXM.get_debug_mode();
+            mode = GL_FALSE;
+        }
+
+        // Object scaling when up and down arrow keys pressed
+        if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
+            int& flag = GFXM.get_scale_flag();
+            flag = GLFW_KEY_UP;
+        }
+        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
+            int& flag = GFXM.get_scale_flag();
+            flag = GLFW_KEY_DOWN;
+        }
+        else if (IM.is_key_held(GLFW_KEY_UP) && IM.is_key_held(GLFW_KEY_DOWN)) {
+            int& flag = GFXM.get_scale_flag();
+            if (flag == GLFW_KEY_UP) {
+                flag = GLFW_KEY_UP;
+            }
+            else {
+                flag = GLFW_KEY_DOWN;
+            }
+        }
+        else {
+            int& flag = GFXM.get_scale_flag();
+            flag = 0;
+        }
+
+        // Object rotation when left and right arrow keys pressed
+        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
+            int& flag = GFXM.get_rotation_flag();
+            flag = GLFW_KEY_LEFT;
+        }
+        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))) {
+            int& flag = GFXM.get_rotation_flag();
+            flag = GLFW_KEY_RIGHT;
+        }
+        else if (IM.is_key_held(GLFW_KEY_LEFT) && IM.is_key_held(GLFW_KEY_RIGHT)) {
+            int& flag = GFXM.get_rotation_flag();
+            if (flag == GLFW_KEY_LEFT) {
+                flag = GLFW_KEY_LEFT;
+            }
+            else {
+                flag = GLFW_KEY_RIGHT;
+            }
+        }
+        else {
+            int& flag = GFXM.get_rotation_flag();
+            flag = 0;
+        }
+
+        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+            auto& camera = GFXM.get_camera();
+            if (camera.is_free_cam == GL_FALSE) {
+                camera.is_free_cam = GL_TRUE;
+            }
+            else {
+                camera.is_free_cam = GL_FALSE;
+            }
+        }
+
+        // Camera up-down scrolling when Number Pad 8 or 2 pressed
+        if (IM.is_key_held(GLFW_KEY_KP_8) && !(IM.is_key_held(GLFW_KEY_KP_2))) {
+            camera_up_down_scroll_flag = GLFW_KEY_KP_8;
+            auto& camera = GFXM.get_camera();
+            if (camera.is_free_cam == true) {
+                camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+            }
+        }
+        else if (IM.is_key_held(GLFW_KEY_KP_2) && !(IM.is_key_held(GLFW_KEY_KP_8))) {
+            camera_up_down_scroll_flag = GLFW_KEY_KP_2;
+            auto& camera = GFXM.get_camera();
+            if (camera.is_free_cam == true) {
+                camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+            }
+        }
+        else if (IM.is_key_held(GLFW_KEY_KP_8) && IM.is_key_held(GLFW_KEY_KP_2)) {
+            auto& camera = GFXM.get_camera();
+            if (camera_up_down_scroll_flag == GLFW_KEY_KP_8) {
+                camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+            }
+            else {
+                camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+            }
+        }
+        else {
+            camera_up_down_scroll_flag = 0;
+        }
+
+        // Camera left-right scrolling when Number Pad 4 or 6 pressed
+        if (IM.is_key_held(GLFW_KEY_KP_4) && !(IM.is_key_held(GLFW_KEY_KP_6))) {
+            camera_left_right_scroll_flag = GLFW_KEY_KP_4;
+            auto& camera = GFXM.get_camera();
+            if (camera.is_free_cam == true) {
+                camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+            }
+        }
+        else if (IM.is_key_held(GLFW_KEY_KP_6) && !(IM.is_key_held(GLFW_KEY_KP_4))) {
+            camera_left_right_scroll_flag = GLFW_KEY_KP_6;
+            auto& camera = GFXM.get_camera();
+            if (camera.is_free_cam == true) {
+                camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+            }
+        }
+        else if (IM.is_key_held(GLFW_KEY_KP_4) && IM.is_key_held(GLFW_KEY_KP_6)) {
+            auto& camera = GFXM.get_camera();
+            if (camera_left_right_scroll_flag == GLFW_KEY_KP_4) {
+                camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+            }
+            else {
+                camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+            }
+        }
+        else {
+            camera_left_right_scroll_flag = 0;
         }
 
 
@@ -319,8 +550,6 @@ namespace lof {
 
         // Getting delta time for Graphics Manager
         GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-        // Update Graphics Manager
-        GFXM.update();
         GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
         // Getting delta time for ECS Manager

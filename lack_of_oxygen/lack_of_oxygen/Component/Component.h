@@ -24,7 +24,8 @@
 #include "../Utility/Vector2D.h"
 #include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
-#include "../Utility/Path_Helper.h"
+//#include "../Utility/Path_Helper.h"
+// #include "../Utility/Path_Helper.h"
 #include "../Utility/Force_Helper.h"
 #include "../Manager/Log_Manager.h"
 // FOR TESTING 
@@ -355,7 +356,7 @@ namespace lof {
         Vec3D position; ///<position of where the sound is emitting from
         float mindist;  ///<the min range for listener to be in to hear the sound (closer)
         float maxdist;  ///<the max range for listener to be in to hear the sound (further)
-        
+
     public:
 
         /**
@@ -410,7 +411,7 @@ namespace lof {
         * @brief Getter for the soundconfig using param key
         * @param key The unique identifier of soundconfig
         */
-        const SoundConfig* get_sound_by_key(const std::string& key) const{
+        const SoundConfig* get_sound_by_key(const std::string& key) const {
             for (const auto& sound : sounds) {
                 if (sound.key == key) {
                     return &sound;
@@ -436,7 +437,7 @@ namespace lof {
         * @brief Getter for the filepath in soundconfig using param key
         * @param key The unique identifier of soundconfig
         */
-        std::string get_filepath(const std::string& key) const{
+        std::string get_filepath(const std::string& key) const {
             return get_sound_by_key(key)->filepath;
         }
 
@@ -478,7 +479,7 @@ namespace lof {
         * @brief Getter for audio type in soundconfig
         * @param key The unique identifier for soundconfig
         */
-        AudioType get_audio_type(const std::string& key) const{
+        AudioType get_audio_type(const std::string& key) const {
             return get_sound_by_key(key)->audio_type;
         }
 

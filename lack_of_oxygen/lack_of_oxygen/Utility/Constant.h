@@ -57,8 +57,8 @@ namespace lof {
 	// ------------------------------ Matrix3x3.cpp --------------------------------------------
 	constexpr float PI_VALUE = 3.1415926f;
 	constexpr float PI_VALUE_DEGREES = 180.0f;
-	
-	
+
+
 	// -------------------------- Time Conversion Constants-----------------------------------
 	constexpr int MILLISECONDS_PER_SECOND = 1000;
 	constexpr int SECONDS_PER_MINUTE = 60;
@@ -70,14 +70,14 @@ namespace lof {
 	//Physics component constants 
 	constexpr float DEFAULT_GRAVITY = -980.f;
 	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
-	constexpr float DEFAULT_MAX_VELOCITY = 20000.0f;
+	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
 	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
 
 	// Graphics component constants
 	constexpr const char* DEFAULT_MODEL_NAME = "square";
 	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
-	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) }; 
+	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
 
 	// Animation component constants
 	constexpr const char* DEFAULT_ANIMATION_IDX = "0";
@@ -99,7 +99,7 @@ namespace lof {
 	};
 
 	// ----------------------------- Movement_System.cpp -------------------------------------------
-    //Movement_System constants
+	//Movement_System constants
 
 	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
@@ -115,6 +115,7 @@ namespace lof {
 
 	// Camera
 	constexpr float DEFAULT_CAMERA_SPEED = 500.0f;
+	constexpr float DEFAULT_CAMERA_POS_X = 0.0f;
 	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
 	constexpr float DEFAULT_ORIENTATION = 0.0f;
 
@@ -130,7 +131,7 @@ namespace lof {
 	constexpr GLfloat DEFAULT_LINE_WIDTH = 5.0f;
 	constexpr GLfloat DEFAULT_POINT_SIZE = 5.0f;
 	constexpr const char* DEFAULT_TEXTURE_NAME = "NoTexture";
-	
+
 	// Debugging constants
 	constexpr float DEFAULT_SCALE_CHANGE = 100.0f;
 	constexpr GLfloat DEFAULT_AABB_WIDTH = 2.0f;

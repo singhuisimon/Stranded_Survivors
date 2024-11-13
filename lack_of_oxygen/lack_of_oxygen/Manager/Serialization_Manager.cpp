@@ -33,8 +33,9 @@
 #include "../Utility/Component_Parser.h" // Adding components from JSON
 #include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
+//#include "../Utility/Path_Helper.h"
 #include "../Utility/Force_Helper.h"
-#include "../Utility/Path_Helper.h"
+// #include "../Utility/Path_Helper.h"
 
 // Include standard headers
 #include <fstream>
@@ -78,21 +79,24 @@ namespace lof {
         m_is_started = true;
 
         // Load general configuration using Path_Helper
-        std::string config_path = Path_Helper::get_config_path();
+        const std::string CONFIG = "Config";
+        std::string config_path = ASM.get_full_path(CONFIG, "config.json");
         if (!load_config(config_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
             return -1;
         }
 
         // Load prefabs using Path_Helper
-        std::string prefabs_path = Path_Helper::get_prefabs_path();
+        const std::string PREFABS = "Prefab";
+        std::string prefabs_path = ASM.get_full_path(PREFABS, "prefab.json");
         if (!load_prefabs(prefabs_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
             return -2;
         }
 
         // Load scene file using Path_Helper
-        std::string scene_path = Path_Helper::get_scene_path();
+        const std::string SCENES = "Scenes";
+        std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
@@ -539,26 +543,37 @@ namespace lof {
 
     rapidjson::Value Serialization_Manager::serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator) {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
-        
-        rapidjson::Value sounds_array(rapidjson::kArrayType);
-        auto& sounds = component.get_sounds();
 
-        for (auto& sound : sounds) {
+        // Create the sounds array
+        rapidjson::Value sounds_array(rapidjson::kArrayType);
+        auto& all_sounds = component.get_sounds();
+
+        for (auto& sound : all_sounds) {
             rapidjson::Value sound_obj(rapidjson::kObjectType);
 
+            // Add key
             sound_obj.AddMember("key", rapidjson::Value(sound.key.c_str(), allocator), allocator);
 
-            std::string filename = sound.filepath.c_str();
-            size_t pos = filename.find("lack_of_oxygen\\Data");
-            if (pos != std::string::npos) {
-                filename = "\\..\\..\\lack_of_oxygen\\Data" + filename.substr(pos + 19);
+            // Handle filepath - extract just the basic filename without path
+            std::string filename = sound.filepath;
+            size_t last_slash = filename.find_last_of("/\\");
+            if (last_slash != std::string::npos) {
+                filename = filename.substr(last_slash + 1);
+            }
+            // Remove the .wav extension if present
+            size_t extension = filename.find(".wav");
+            if (extension != std::string::npos) {
+                filename = filename.substr(0, extension);
             }
             sound_obj.AddMember("filepath", rapidjson::Value(filename.c_str(), allocator), allocator);
+
+            // Add other sound properties
             sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
             sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
             sound_obj.AddMember("volume", sound.volume, allocator);
             sound_obj.AddMember("pitch", sound.pitch, allocator);
-            sound_obj.AddMember("is_looping", sound.islooping, allocator);
+            // Use "islooping" to match original format
+            sound_obj.AddMember("islooping", sound.islooping, allocator);
 
             // Add the serialized sound object to the sounds array
             sounds_array.PushBack(sound_obj, allocator);
@@ -566,18 +581,9 @@ namespace lof {
 
         comp_obj.AddMember("sounds", sounds_array, allocator);
 
-        //// Serialize filepath and state
-        //comp_obj.AddMember("filename", rapidjson::Value(component.get_filename().c_str(), allocator), allocator);
-        //comp_obj.AddMember("audio_state", static_cast<int>(component.get_audio_state()), allocator);
-        //comp_obj.AddMember("audio_type", static_cast<int>(component.get_audio_type()), allocator);
-
-        //// Serialize properties
-        //comp_obj.AddMember("volume", component.get_volume(), allocator);
-        //comp_obj.AddMember("pitch", component.get_pitch(), allocator);
-        //comp_obj.AddMember("is_looping", component.get_is_looping(), allocator);
+        // Add other audio component properties
         comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
 
-        // Serialize 3D audio properties
         rapidjson::Value position(rapidjson::kArrayType);
         Vec3D pos = component.get_position();
         position.PushBack(pos.x, allocator);

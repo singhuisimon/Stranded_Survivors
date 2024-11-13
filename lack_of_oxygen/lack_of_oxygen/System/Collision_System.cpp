@@ -40,38 +40,31 @@ namespace lof {
         max.x = transform.prev_position.x + (collision.width / 2.0f);
         max.y = transform.prev_position.y + (collision.height / 2.0f);
 
-        // Debug print to verify min and max values
-        //std::cout << "AABB Min in from_transform function in collision system: (" << min.x << ", " << min.y << "), Max: (" << max.x << ", " << max.y << ")\n";
-
         return AABB(min, max);
     }
 
     Collision_System::Collision_System() {
         // Set the required components for this system
-        signature.set(ECSM.get_component_id<Transform2D>());
-        signature.set(ECSM.get_component_id<Collision_Component>());
-        signature.set(ECSM.get_component_id<Physics_Component>());
-        signature.set(ECSM.get_component_id<Velocity_Component>());
+        signature.set(ECSM.get_component_id<Transform2D>()); // simon
+        signature.set(ECSM.get_component_id<Collision_Component>()); // simon
+        signature.set(ECSM.get_component_id<Physics_Component>()); // simon
+        signature.set(ECSM.get_component_id<Velocity_Component>()); // simon
 
-
-        LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component.");
+        LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
     }
 
     std::string Collision_System::get_type() const {
         return "Collision_System";
     }
-
-#if 1
+ 
     void Collision_System::collision_check_collide(std::vector<CollisionPair>& collisions, float delta_time) {
         // Iterate over entities matching the system's signature
-        const auto& entities = get_entities();
+        const auto& collision_entities = get_entities();
         //std::cout << "Total entities: " << entities.size() << "\n";
 
-        for (auto it1 = entities.begin(); it1 != entities.end(); ++it1) {
-            EntityID entity_ID1 = *it1;
-            //std::cout << "entity 1 is :" << entity_ID1 << "\n";
-            //std::cout << *it1 << "\n";
-
+        for (auto it_1 = collision_entities.begin(); it_1 != collision_entities.end(); ++it_1) {
+            EntityID entity_ID1 = *it_1;
+           
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
           
 
@@ -87,24 +80,22 @@ namespace lof {
 
             // Create AABB for object 1
             AABB aabb1 = AABB::from_transform(transform1, collision1);
-            //std::cout << "Entity " << entity_ID1 << " is_static: " << physic1.is_static << "\n";
-
+           
             bool is_grounded = false; // Track if entity is grounded
-            // Check for collisions with other entities
-            auto it2 = std::next(it1); // Start from the next entity
-            //std::cout << "Starting inner loop for Entity " << entity_ID1 << "\n";
+            
+            auto it_2 = std::next(it_1); // Start from the next entity
 
             // Check for collisions with other entities
-            for (auto it2 = entities.begin(); it2 != entities.end(); ++it2) {
-                EntityID entity_ID2 = *it2;
-                //std::cout << "entity 2 is :" << entity_ID2 << "\n";
-
+            for (auto it_2 = collision_entities.begin(); it_2 != collision_entities.end(); ++it_2) {
+                EntityID entity_ID2 = *it_2;
+                //std::cout << "entity 1 is :" << entity_ID1 << "\n";
                 if (entity_ID1 == entity_ID2)
                 {
                     continue;
                 }
 
-                auto& physic2 = ECSM.get_component<Physics_Component>(entity_ID2);
+
+                //auto& physic2 = ECSM.get_component<Physics_Component>(entity_ID2);
 
                 auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
                 auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
@@ -135,7 +126,12 @@ namespace lof {
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
                     std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
+                    //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
 
+                    //std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
+                    //std::cout << "State of is grouded for player: " << physic1.is_grounded << "\n";
+                    
 #if 0
                     std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
                     std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
@@ -150,10 +146,6 @@ namespace lof {
             }
         }
     }
-
-#endif
-
- 
 
     bool Collision_System::collision_intersection_rect_rect(const AABB& aabb1,
         const Vec2D& vel1,
@@ -366,7 +358,7 @@ namespace lof {
                 side = (dy > 0) ? CollisionSide::BOTTOM : CollisionSide::TOP;
             }
         }
-        std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
+        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
 
         //return CollisionSide::NONE; // No collision
         return side;
@@ -377,19 +369,12 @@ namespace lof {
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         for (const auto& collision : collisions) {
             EntityID entityA = collision.entity1;
-            EntityID entityB = collision.entity2;
+            //EntityID entityB = collision.entity2;
 
-            auto& physicsA = ECSM.get_component<Physics_Component>(entityA);
             auto& transformA = ECSM.get_component<Transform2D>(entityA);
             auto& velocityA = ECSM.get_component<Velocity_Component>(entityA);
 
-            // Only process dynamic entities colliding with static entities
-            if (!physicsA.get_is_static()) {
-                Vec2D normal(0.0f, 0.0f);
-                if (collision.side == CollisionSide::LEFT) normal = Vec2D(1.0f, 0.0f);
-                else if (collision.side == CollisionSide::RIGHT) normal = Vec2D(-1.0f, 0.0f);
-                else if (collision.side == CollisionSide::TOP) normal = Vec2D(0.0f, -1.0f);
-                else if (collision.side == CollisionSide::BOTTOM) normal = Vec2D(0.0f, 1.0f);
+            //auto& velocityB = ECSM.get_component<Velocity_Component>(entityB);
 
                 Vec2D relative_velocity = velocityA.velocity;
 
@@ -404,10 +389,12 @@ namespace lof {
                 Vec2D impulse = normal * impulse_scalar;
                 velocityA.velocity += impulse * physicsA.get_inv_mass();
 
-                // Position correction to avoid sinking
-                float percent = 0.2f;  // Adjust as needed
-                float slop = 0.01f;    // Allowable penetration
-                Vec2D correction = normal * std::max((collision.overlap.y - slop) * percent, 0.0f);
+                case CollisionSide::RIGHT:
+                    //velocityA.velocity.x = std::min(0.0f, velocityA.velocity.x);
+                    velocityA.velocity.x = 0.0f;
+                    transformA.position.x -= overlap.x;
+                    // std::cout << "This is the position in resolve function for right side " << transformA.position.x << "\n";
+                    break;
 
                 // Only apply correction on the y-axis for bottom collisions
                 if (collision.side == CollisionSide::BOTTOM) {

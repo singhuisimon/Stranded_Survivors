@@ -23,6 +23,8 @@
 #include <iostream>
 
 namespace lof {
+
+    // A enum class for the possible collide side 
     enum class CollisionSide {
         NONE,
         LEFT,
@@ -35,7 +37,6 @@ namespace lof {
     * @struct CollisionPair
     * @brief Represents a pair of entities that have collided, along with overlap information.
     */
-
     struct CollisionPair {
         EntityID entity1;
         EntityID entity2;
@@ -48,8 +49,6 @@ namespace lof {
      * @struct AABB
      * @brief Represents axis-aligned bounding boxes for collision detection.
      */
-
-
     struct AABB {
         Vec2D min; ///< Minimum point of the bounding box
         Vec2D max; ///< Maximum point of the bounding box
@@ -116,14 +115,7 @@ namespace lof {
             const Vec2D& vel2,
             float& firstTimeOfCollision);
 
-        //static const std::vector<CollisionPair>& get_collisions() {
-        //    return current_collisions;
-        //}
-
-
-    public:
         
-        std::string collisionSideToString(CollisionSide side);
 
     private:
 
@@ -160,7 +152,16 @@ namespace lof {
          * @param velocity1 The velocity of the dynamic object.
          * @param overlap The overlap between AABBs along the x and y axis.
          */
-         //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+        //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+
+
+        /**
+         * @brief Get the string of which side to collide 
+         * @param side The side of the collide side 
+         * @return Return the string side that is collide
+         */
+        std::string collisionSideToString(CollisionSide side);
+
     };
 
 } // namespace lof

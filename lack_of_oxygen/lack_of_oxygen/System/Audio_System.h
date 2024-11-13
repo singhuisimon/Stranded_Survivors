@@ -11,7 +11,7 @@
 #ifndef _AUDIO_SYSTEM_H_
 #define _AUDIO_SYSTEM_H_
 
-// Include FMOD headers
+ // Include FMOD headers
 #include <fmod.hpp>
 //#include <fmod_studio.hpp>
 #include "fmod_errors.h"
@@ -28,8 +28,8 @@
 #include "../System/System.h"
 
 namespace lof {
-	
-	class Audio_System : public System 
+
+	class Audio_System : public System
 	{
 	public:
 		/**
@@ -57,7 +57,7 @@ namespace lof {
 
 		/**
 		* @brief Update for Audio System
-		* @param delta_time 
+		* @param delta_time
 		*/
 		void update(float delta_time) override;
 
@@ -79,7 +79,7 @@ namespace lof {
 		 * @param audio_key The unique identifier of the soundconfig
 		 * @param entity A reference to a Audio Component.
 		 */
-		void play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key,Audio_Component& entity);
+		void play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& entity);
 
 		/**
 		* @brief Pause and Resume sound
@@ -113,7 +113,6 @@ namespace lof {
 		* @param volume The new volume value
 		*/
 		void set_channel_volume(const std::string& channel_key, float volume);
-		
 		/**
 		* @brief Pause the channels under the bgm channelgroup
 		*/
@@ -232,7 +231,7 @@ namespace lof {
 		std::string get_type() const override;
 
 	private:
-		
+
 		FMOD::System* core_system;	///<Core audio system
 
 		/**

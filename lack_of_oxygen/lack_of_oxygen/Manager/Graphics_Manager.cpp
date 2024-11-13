@@ -10,7 +10,8 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
-#include "../Utility/Path_Helper.h" // For file path resolution
+//#include "../Utility/Path_Helper.h" // For file path resolution
+#include "Assets_Manager.h"
 
 // FOR TESTING (texture loading)
 #define STB_IMAGE_IMPLEMENTATION 
@@ -60,14 +61,12 @@ namespace lof {
 
         // Set up default render mode 
         render_mode = GL_FILL;
-
-        // Read file to initialize shaders 
-        std::string vertex_obj_path = Path_Helper::get_vertex_shader_obj_path();
-        std::string fragment_obj_path = Path_Helper::get_fragment_shader_obj_path();
-        std::string vertex_debug_path = Path_Helper::get_vertex_shader_debug_path();
-        std::string fragment_debug_path = Path_Helper::get_fragment_shader_debug_path(); 
-        std::string vertex_font_path = Path_Helper::get_vertex_shader_font_path();
-        std::string fragment_font_path = Path_Helper::get_fragment_shader_font_path(); 
+        std::string vertex_obj_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_obj.vert");
+        std::string fragment_obj_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_obj.frag");
+        std::string vertex_debug_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_debug.vert");
+        std::string fragment_debug_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_debug.frag");
+        std::string vertex_font_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_font.vert");
+        std::string fragment_font_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_font.frag");
 
         std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
         std::make_pair<std::string, std::string>(vertex_obj_path.c_str(), fragment_obj_path.c_str()),
@@ -75,23 +74,20 @@ namespace lof {
         std::make_pair<std::string, std::string>(vertex_font_path.c_str(), fragment_font_path.c_str())
         };
 
-        // Create shader program from shader files and insert 
-        // shader program into shader container 
-        if (!add_shader_program(shader_files)) {
-            LM.write_log("Graphics_Manager::start_up(): Fail to add shader program.");
+        if (!ASM.load_shader_programs(shader_files)) {
+            LM.write_log("Graphics_Manager::start_up(): Failed to load shader programs");
             return -1;
         } else {
             LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
 
-        std::string mesh_path = Path_Helper::get_model_file_path();
-        std::string texture_path = Path_Helper::get_texture_file_path();
-        std::string animation_path = Path_Helper::get_animation_file_path();
-        std::string font_path = Path_Helper::get_font_file_path();
+        std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, "models.msh");
+        std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
+        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Prisoner_Atlas.txt");
+        std::string font_path = ASM.get_full_path(ASM.FONT_PATH, "Fonts.txt");
 
-        // Add models
-        if (!add_model(mesh_path.c_str())) {
-            LM.write_log("Fail to add models.");
+        if (!add_model(mesh_path)) {
+            LM.write_log("Graphics_Manager::start_up(): Failed to add models");
             return -2;
         }
 
@@ -124,7 +120,7 @@ namespace lof {
         }
 
         // Free the data storages
-        shader_program_storage.clear();
+        ASM.unload_shader_programs();
         model_storage.clear();
         texture_storage.clear();
         animation_storage.clear();
@@ -132,85 +128,18 @@ namespace lof {
         m_is_started = false;
     }
 
-    // Update rendering details according to inputs
-    void Graphics_Manager::update() { 
-        // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_held(GLFW_KEY_1)) {
-            LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
-            render_mode = GL_FILL;
-        } else if (IM.is_key_held(GLFW_KEY_2)) {
-            LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
-            render_mode = GL_LINE;
-        } else if (IM.is_key_held(GLFW_KEY_3)) {
-            LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
-            render_mode = GL_POINT; 
-        }
-
-        // Toggle debug mode using 'B" or 'N'
-        if (IM.is_key_held(GLFW_KEY_B)) {
-            LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
-            is_debug_mode = GL_TRUE;
-        }
-        else if (IM.is_key_held(GLFW_KEY_N)) {
-            LM.write_log("Graphics_Manager::update(): 'N' key pressed, Debug Mode is now OFF.");
-            is_debug_mode = GL_FALSE;
-        }
-
-        // Toggle free camera mode using 'Z' and 'X'
-        if (IM.is_key_held(GLFW_KEY_Z)) {
-            LM.write_log("Graphics_Manager::update(): 'Z' key pressed, Free Camera enabled.");
-            camera.is_free_cam = GL_TRUE;
-        }
-        else if (IM.is_key_held(GLFW_KEY_X)) {
-            LM.write_log("Graphics_Manager::update(): 'X' key pressed, Free Camera disabled.");
-            camera.is_free_cam = GL_FALSE;
-        }
-
-    }
-
-    // Add a shader program into the shader program storage
-    GLboolean Graphics_Manager::add_shader_program(std::vector<std::pair<std::string, std::string>> shaders) {
-        for (auto const& file : shaders) {
-            std::vector<std::pair<GLenum, std::string>> shader_files;
-            shader_files.emplace_back(std::make_pair(GL_VERTEX_SHADER, file.first));
-            shader_files.emplace_back(std::make_pair(GL_FRAGMENT_SHADER, file.second));
-
-            // Compile the shaders to make a shader program
-            ShaderProgram shader_program;
-            if (!(Graphics_Manager::compile_shader(shader_files, shader_program))) {
-                LM.write_log("Graphics_Manager::add_shader_program(): Shader program failed to compile.");
-                return GL_FALSE;
-            }
-            // Insert shader program into container
-            shader_program_storage.emplace_back(shader_program);
-            std::size_t shader_idx = shader_program_storage.size() - 1;
-            LM.write_log("Graphics_Manager::add_shader_program(): Shader program handle is %u.", shader_program.program_handle);
-            LM.write_log("Graphics_Manager::add_shader_program(): Shader program %u created, compiled and added successfully.", shader_idx);
+    GLboolean Graphics_Manager::add_model(const std::string& file_name) {
+        if (!ASM.load_model_data(file_name)) {
+            LM.write_log("Graphics_Manager: Failed to load model data");
+            return GL_FALSE;
         }
         return GL_TRUE;
     }
 
-    // Add models into the model storage
-    GLboolean Graphics_Manager::add_model(std::string const& file_name) {
-
-        // Read file containing model data
-        std::ifstream input_file{ file_name, std::ios::in };
-        if (!input_file) {
-            input_file.close();
-            LM.write_log("Unable to open %s", file_name.c_str());
-            return GL_FALSE;
-        }
-        input_file.seekg(0, std::ios::beg);
-
-        // Model data
-        struct TexVtxData { 
-            glm::vec2 pos{}; 
-            glm::vec2 tex{}; 
-        };
-        std::vector<TexVtxData> TexVtxArr;
-        std::vector<glm::vec2> pos_vtx;
-        std::vector<GLushort> vtx_idx;
-        Graphics_Manager::Model mdl{};
+    GLboolean Graphics_Manager::add_textures(const std::vector<std::string>& texture_names) {
+        for (const auto& tex_name : texture_names) {
+            // Construct the full path
+            std::string tex_filepath = ASM.get_full_path(ASM.TEXTURE_PATH, tex_name + ".png");
 
         // For reading file to store model data
         std::string model_name, prefix, file_line;
@@ -404,70 +333,6 @@ namespace lof {
         return GL_TRUE;
     }
 
-    // Add animations into the animation storage
-    GLboolean Graphics_Manager::add_animations(std::string const& file_name) {
-        // Create filepath for animations from texture atlas text file
-        std::ifstream input_file{ file_name, std::ios::in };
-        if (!input_file) {
-            input_file.close();
-            LM.write_log("Unable to open %s", file_name.c_str());
-            return GL_FALSE;
-        }
-        input_file.seekg(0, std::ios::beg);
-
-        // Variables to extract data to store into an animation
-        std::string file_line, prefix;
-        std::string a_name, t_name;
-        Animation animation{};
-        Frame frame{};
-
-        while (getline(input_file, file_line)) {
-            // Reading the animation data line by line
-            std::istringstream file_line_ss{ file_line };
-            file_line_ss >> prefix;
-            if (prefix == "name") { // Get animation name
-                file_line_ss >> a_name;
-            }
-            else if (prefix == "texture") {   // Get texture name
-                file_line_ss >> animation.texture_name;
-            }
-            else if (prefix == "tex_width") {
-                file_line_ss >> animation.tex_w;
-            }
-            else if (prefix == "tex_height") {
-                file_line_ss >> animation.tex_h;
-            }
-            else if (prefix == "pos") {
-                file_line_ss >> frame.uv_x;
-
-                // Edit Y value to read from bottom left instead of top left for OpenGL texture reading
-                float temp_y;
-                file_line_ss >> temp_y;
-                frame.uv_y = animation.tex_h - temp_y - DEFAULT_Y_OFFSET;
-            }
-            else if (prefix == "size") {
-                file_line_ss >> frame.size;
-            }
-            else if (prefix == "time_delay") {
-                file_line_ss >> frame.time_delay;
-            }
-            else if (prefix == "EF") { // End of frame data
-                animation.frames.emplace_back(frame);
-            }
-            else if (prefix == "EA") { // End of animation data
-                animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED; 
-                animation_storage[a_name] = animation;
-                animation = {}; // Clear animation data
-                LM.write_log("Graphics_Manager::add_animations(): %s animation successfully created and stored.", a_name.c_str());
-            }
-        }
-
-        // Close file
-        input_file.close();
-        LM.write_log("Graphics_Manager::add_animations(): All animations successfully created and stored.");
-        return GL_TRUE;
-    }
-
     // Add fonts into the font storage
     GLboolean Graphics_Manager::add_fonts(std::string const& file_name) {
         // Create filepath to access the fonts in fonts.txt file
@@ -602,8 +467,16 @@ namespace lof {
     // Return reference to camera
     Graphics_Manager::Camera2D& Graphics_Manager::get_camera() { return camera; }
 
-    // Compilation of vertex and fragment shaders to make a shader program
-    GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader) {
+    // Return reference to scale flag
+    int& Graphics_Manager::get_scale_flag() { return scale_flag; }
+
+    // Return reference to rotation flag
+    int& Graphics_Manager::get_rotation_flag() { return rotation_flag; }
+
+    // Return reference to player direction
+    int& Graphics_Manager::get_player_direction() { return player_direction; }
+
+    GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, Assets_Manager::ShaderProgram& shader) {
         // Read each shader file details such as shader type and file path
         for (auto& file : shader_files) {
             // Check if file's state is good for reading
@@ -688,10 +561,11 @@ namespace lof {
         return GL_TRUE;
     }
 
-    // Get a shader program ready to use
-    void Graphics_Manager::program_use(ShaderProgram shader) {
-        if (shader.program_handle > 0 && shader.link_status == GL_TRUE) {
-            glUseProgram(shader.program_handle);
+    // Use shader program
+    void Graphics_Manager::program_use(GLuint program_handle)
+    {
+        if (program_handle > 0) {
+            glUseProgram(program_handle);
         }
     }
 
