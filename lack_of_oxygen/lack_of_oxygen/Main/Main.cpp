@@ -109,6 +109,15 @@ int main(void) {
 
     IMGUIM.start_up(window); // Might need to integrate with game manager 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    //ImGui::StyleColorsDark();
+
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
     bool lvl_manager_mode = false;
@@ -178,70 +187,34 @@ int main(void) {
             level_editor_mode = !level_editor_mode;
         }
         tab_key_was_pressed_last_frame = is_TAB_pressed;
-
+     
+        // render IMGUI
         // Getting delta time for Game Manager/game loop
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update game world state
         GM.update(delta_time);
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
 
-
-        // Logic for performance viewer, calls function to calculate and print the % of delta time of each system and manager
-        //if (IM.is_key_held(GLFW_KEY_T)) { //to add imgui later
-
         // Start the Dear ImGui frame
         IMGUIM.start_frame();
+
+        
         ImGui::Begin("Performance Viewer");
-        
-        
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
         system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
-        //system_performance(GM.get_time(), IMGUIM.get_time(), IMGUIM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
         ImGui::Text("In ECS Manager: \n");
         for (auto& system : ECSM.get_systems()) {
-        system_performance(GM.get_time(), system->get_time(), system->get_type());
+            system_performance(GM.get_time(), system->get_time(), system->get_type());
         }
-
         ImGui::End();
+        
             
 
         if (level_editor_mode) {
-  
-            
-
-            if (ImGui::BeginMainMenuBar()) {
-                if (ImGui::BeginMenu("File")) {
-                    if (ImGui::MenuItem("Load File")) {
-
-                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
-                        lvl_manager_mode = !lvl_manager_mode;
-                    }
-                    if (ImGui::MenuItem("Edit File")) {
-
-                        //IMGUIM.display_loading_options(Path_Helper::get_save_file_path(""));
-                        object_editor_mode = !object_editor_mode;
-                    }
-                    
-                    ImGui::EndMenu();
-                }
-            }
-
-            if (object_editor_mode) {
-                IMGUIM.imgui_game_objects_list();
-            }
-
-            if (lvl_manager_mode) {
-                //IMGUIM.display_loading_options(ASM.get_full_path("Assets",""));
-                IMGUIM.display_loading_options();
-            }
-
-
-            ImGui::EndMainMenuBar();
-            // Rendering
-            
-
+            IMGUIM.render_ui(SCR_WIDTH, SCR_HEIGHT);
         }
+
         // Rendering
         IMGUIM.render();
 
@@ -257,6 +230,15 @@ int main(void) {
 
         // End of frame timing and FPS control
         FPSM.frame_end();
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
+
     }
 
     IMGUIM.shut_down();

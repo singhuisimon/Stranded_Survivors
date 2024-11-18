@@ -412,6 +412,14 @@ namespace lof {
             else {
                 camera.is_free_cam = GL_FALSE;
             }
+
+            int& editor_mode = GFXM.get_editor_mode();
+            if (editor_mode == 1) {
+                editor_mode = 0;
+            }
+            else {
+                editor_mode = 1;
+            }
         }
 
         // Camera up-down scrolling when Number Pad 8 or 2 pressed

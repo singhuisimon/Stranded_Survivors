@@ -57,7 +57,7 @@ namespace lof {
         // Set viewport position and dimensions
         GLuint scr_width = SM.get_scr_width();
         GLuint scr_height = SM.get_scr_height();
-        glViewport(0, 0, scr_width, scr_height); 
+        glViewport(0, 0, scr_width, scr_height);
 
         // Set up default render mode 
         render_mode = GL_FILL;
@@ -104,7 +104,7 @@ namespace lof {
         }
 
         // Add animations
-        if (!add_animations(animation_path.c_str())) { 
+        if (!add_animations(animation_path.c_str())) {
             LM.write_log("Fail to add animations.");
             return -4;
         }
@@ -114,6 +114,29 @@ namespace lof {
             LM.write_log("Fail to add fonts.");
             return -5;
         }
+
+
+
+        // FOR TESTING (SET UP FRAMEBUFFER AND GAME SCENE TEXTURE FOR IMGUI)
+        glGenFramebuffers(1, &imgui_fbo);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+            LM.write_log("Graphics_Manager::start_up(): FRAME BUFFER CREATION SUCCESSFUL.");
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, imgui_fbo);
+
+        // Creating texture object for imgui
+        glGenTextures(1, &imgui_tex);
+        glBindTexture(GL_TEXTURE_2D, imgui_tex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Attaching texture object for imgui to framebuffer 
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, imgui_tex, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         m_is_started = true;
         return 0;
@@ -130,6 +153,10 @@ namespace lof {
         model_storage.clear();
         texture_storage.clear();
         animation_storage.clear();
+
+        // Free imgui framebuffer and tex object
+        glDeleteFramebuffers(1, &imgui_fbo);
+        glDeleteTextures(1, &imgui_tex);
 
         m_is_started = false;
     }
@@ -204,7 +231,7 @@ namespace lof {
             model_storage[model_name] = mdl;
 
             LM.write_log("Graphics_Manager: Created GPU resources for model %s", model_name.c_str());
-    }
+        }
 
         LM.write_log("Graphics_Manager: All models successfully created and stored.");
         return GL_TRUE;
@@ -351,9 +378,6 @@ namespace lof {
         return ASM.load_animations(file_name);
     }
 
-    // Return reference to shader program storage
-   // Graphics_Manager::SHADERS& Graphics_Manager::get_shader_program_storage() { return shader_program_storage; }
-
     // Return reference to model storage
     Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() { return model_storage; }
 
@@ -361,7 +385,7 @@ namespace lof {
     Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() { return texture_storage; }
 
     // Return reference to animation storage
-    Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; } 
+    Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; }
 
     // Return reference to font storage
     Graphics_Manager::FONTS& Graphics_Manager::get_font_storage() { return font_storage; }
@@ -476,4 +500,26 @@ namespace lof {
         return shader.program_handle;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+    // FOR TESTING
+
+    GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }
+
+    GLuint& Graphics_Manager::get_framebuffer_texture() { return imgui_tex; }
+
+    int& Graphics_Manager::get_editor_mode() { return editor_mode; }
+
 } // namespace lof
+
+

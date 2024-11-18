@@ -98,6 +98,7 @@
     <ClInclude Include="Utility\Vector3D.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Config\config.json" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
