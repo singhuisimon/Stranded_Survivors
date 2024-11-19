@@ -160,10 +160,14 @@ namespace lof {
 
             if (selectedEntityInfo.isSelected) {
                 std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
                 LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
             }
             else {
                 std::cout << "No entity is selected.\n";
+                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
             }
         }
 
