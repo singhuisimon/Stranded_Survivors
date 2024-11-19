@@ -88,6 +88,8 @@ namespace lof {
          */
         void start_frame();
 
+        void render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
+
         /**
          * @brief Displays the file list in the menu. Handles the logic for calling the load scene function for the "Load File" option.
          */
