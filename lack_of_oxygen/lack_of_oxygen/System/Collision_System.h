@@ -23,6 +23,7 @@
 #include <iostream>
 
 namespace lof {
+    #define CS lof::Collision_System::get_instance()
 
     // A enum class for the possible collide side 
     enum class CollisionSide {
@@ -117,9 +118,21 @@ namespace lof {
             float& firstTimeOfCollision, 
             float delta_time);
 
-        
+        //bool isEntitySelected();
+        EntityID isEntitySelected();
+        bool isInterseptBox(float box_x, float box_y, float width, float height, int X, int mouseY);
+
+        Vec2D MousePos();
+        void MousePos_test();
+
+        static Collision_System& get_instance();
+
 
     private:
+        static std::unique_ptr<Collision_System> instance;
+
+        static std::once_flag once_flag;
+
         
         //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
@@ -162,7 +175,12 @@ namespace lof {
          */
         std::string collisionSideToString(CollisionSide side);
 
+
+
+    
     };
+    
+   
 
 } // namespace lof
 

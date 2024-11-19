@@ -25,6 +25,7 @@
 #include "../Utility/Globals.h"
 
 // Include systems
+#include "../System/Audio_System.h" // Add this for Audio System access
 #include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../System/Animation_System.h"  // For player_direction
 
@@ -214,6 +215,18 @@ namespace lof {
                         LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
                     }
                     break;
+                }
+            }
+        }
+
+        //to pause all the sound that is playing
+        if (IM.is_key_pressed(GLFW_KEY_KP_5)) {
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->pause_resume_mastergroup();
+                    }
                 }
             }
         }

@@ -22,10 +22,25 @@
 #include "../System/Render_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
+#include "../Main/Main.h" // for extern
+#include "../Manager/Input_Manager.h"
+
+
 
 
 
 namespace lof {
+    std::unique_ptr<Collision_System> Collision_System::instance;
+    std::once_flag Collision_System::once_flag;
+
+    Collision_System& Collision_System::get_instance() {
+        std::call_once(once_flag, []() {
+            instance.reset(new Collision_System);
+            });
+        return *instance;
+    }
+
+ 
 
     AABB::AABB(const Vec2D& min, const Vec2D& max)
         : min(min), max(max) {}
@@ -67,7 +82,7 @@ namespace lof {
            
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
           
-
+            
             // Skip if entity is static
             if (physic1.get_is_static())
                 continue;
@@ -76,18 +91,19 @@ namespace lof {
             auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
             auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
             auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
-
+            std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
             // Create AABB for object 1
             AABB aabb1 = AABB::from_transform(transform1, collision1);
            
             bool is_grounded = false; // Track if entity is grounded
             
             auto it_2 = std::next(it_1); // Start from the next entity
-
+           
             // Check for collisions with other entities
             for (auto it_2 = collision_entities.begin(); it_2 != collision_entities.end(); ++it_2) {
                 EntityID entity_ID2 = *it_2;
                 //std::cout << "entity 1 is :" << entity_ID1 << "\n";
+               
                 if (entity_ID1 == entity_ID2)
                 {
                     continue;
@@ -124,17 +140,17 @@ namespace lof {
 
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
-                    std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
+                    //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
                     //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
 
                     //std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
                     //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
                     //std::cout << "State of is grouded for player: " << physic1.is_grounded << "\n";
                     
-#if 0
-                    std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
-                    std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
-                    std::cout << "State of is grouded for player: " << physic1.get_is_grounded() << "\n";
+#if 1
+                   // std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
+                    //std::cout << "State of is grouded for player: " << physic1.get_is_grounded() << "\n";
 #endif                
                     
                 }
@@ -351,19 +367,6 @@ namespace lof {
         float overlapX = halfWidth1 + halfWidth2 - std::abs(dx);
         float overlapY = halfHeight1 + halfHeight2 - std::abs(dy);
 
-        //// Determine the side of the collision
-        //if (overlapX >= 0 && overlapY >= 0) {
-        //    if (overlapX < overlapY) {
-        //        return (dx > 0) ? CollisionSide::LEFT : CollisionSide::RIGHT;
-        //       
-        //    }
-        //    else {
-        //        return (dy > 0) ? CollisionSide::TOP : CollisionSide::BOTTOM;
-
-        //       
-        //    }
-        //}
-
       // Determine the side of the collision
         CollisionSide side = CollisionSide::NONE;
 
@@ -527,11 +530,150 @@ namespace lof {
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
-       // std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
+        // std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
         //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
+
+  //      Vec2D mouse_world_pos = MousePos();
+  //      float world_x = mouse_world_pos.x;
+  //      float  world_y = mouse_world_pos.y;
+  //     // std::cout << "World cursor position x: " << world_x << " y: " << world_y << "\n";
+
+		//EntityID SelectedEntity = isEntitySelected();
+		////if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
+		////{
+		//	//std::cout << "key is pressed!!!!!\n";
+		//	if (SelectedEntity == -1) {
+		//		//std::cout << "NO entity is selected!\n";
+		//	}
+		//	else {
+		//		std::cout << "Entity " << SelectedEntity << " is selected!\n";
+		//	}
+		//}
+
+		////if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
+		////{
+		////    std::cout << "Mouse button clickkkkk\n";
+		////    LM.write_log("Mouse button clickkkkk"); //simon
+		////}
+		//if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
+		//{
+		//	std::cout << "Mouse button clickkkkk in movement system\n";
+		//	LM.write_log("Mouse button clickkkkk in movement system"); //simon
+		//}
+        EntityID SelectedEntity = isEntitySelected();
+        if (SelectedEntity != -1) {
+            std::cout << "Entity " << SelectedEntity << " is selected!\n";
+        }
+        
+
+
+        
     }
+
+    bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
+    {
+
+        
+        return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
+            mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
+        
+    }
+
+    Vec2D Collision_System::MousePos()
+    {
+        /*double mouse_x;
+        double mouse_y;*/
+
+        if (!window)
+        {
+            return Vec2D(0.0f, 0.0f);
+        }
+ 
+    
+        double screen_width = SM.get_scr_width();
+        double screen_height = SM.get_scr_height(); //1020 /2
+        //std::cout << "scene width: " << SM.get_scr_width() << " scene height: " << SM.get_scr_height() << "\n";
+        // 1980 x 1020
+        double mouse_x, mouse_y;
+        glfwGetCursorPos(window, &mouse_x, &mouse_y);
+        mouse_x -= (screen_width / 2);
+        mouse_y -= (screen_height /2);
+        mouse_x = mouse_x;
+        mouse_y = mouse_y;
+        mouse_y = -mouse_y;
+
+        // Get camera position
+        auto& camera = GFXM.get_camera();
+
+        // Convert screen coordinates to world coordinates by adding camera position
+        double world_x = mouse_x + camera.pos_x;
+        double world_y = mouse_y + camera.pos_y;
+        std::cout << "cursor position x: " << world_x << " " << "cursor position y: " << world_y << "\n";
+        return Vec2D(static_cast<float>(world_x), static_cast<float>(world_y));
+     
+      
+
+    }
+
+
+#if 0
+    void Collision_System::MousePos_test()
+    {
+        /*double mouse_x;
+        double mouse_y;*/
+
+        if (!window)
+        {
+            return;
+        }
+
+
+        double screen_width = SM.get_scr_width();
+        double screen_height = SM.get_scr_height(); //1020 /2
+        //std::cout << "scene width: " << SM.get_scr_width() << " scene height: " << SM.get_scr_height() << "\n";
+        // 1980 x 1020
+
+        auto& camera = GFXM.get_camera();
+        double world_x =  camera.pos_x;
+        double world_y =  camera.pos_y;
+        std::cout << "camera x: " << world_x << " " << "camera y: " << world_y << "\n";
+        double mouse_x, mouse_y;
+        glfwGetCursorPos(window, &mouse_x, &world_y);
+        mouse_x -= (screen_width / 2);
+        //mouse_y -= (screen_height / 2);
+        mouse_x = mouse_x;
+       
+    }
+#endif
+
+    EntityID Collision_System::isEntitySelected() {
+        // Get the mouse position in world coordinates
+        Vec2D mouseWorldPos = MousePos();
+        for (EntityID entityID : get_entities())
+        {
+
+            auto& transform = ECSM.get_component<Transform2D>(entityID);
+            auto& collision = ECSM.get_component<Collision_Component>(entityID);
+
+            // Calculate the entity's bounding box
+            float entityX = transform.position.x; // Center position of the entity
+            float entityY = transform.position.y; // Center position of the entity
+            float entityWidth = collision.width;   // Width of the entity
+            float entityHeight = collision.height; // Height of the entity
+
+            // Use isInterseptBox to check if the mouse is within the entity's bounding box
+            if (isInterseptBox(entityX, entityY, entityWidth, entityHeight, mouseWorldPos.x, mouseWorldPos.y)) {
+                return entityID; // Entity is selected
+                std::cout << "Seleted entity is: " << entityID << "\n";
+            }
+            
+        }
+        return -1;
+        // Retrieve the entity's transform and collision components
+    }
+
 
 
 } // namespace lof

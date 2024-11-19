@@ -27,6 +27,8 @@
 using namespace lof;
 
 bool level_editor_mode = false;
+GLFWwindow* window = nullptr;
+
 
 int main(void) {
 
@@ -59,7 +61,7 @@ int main(void) {
     // --------------------------- Create GLFW Window ---------------------------
 
     // Create a windowed mode window and its OpenGL context using default values
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+     window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
     if (!window) {
         LM.write_log("Failed to create GLFW window!");
         std::cerr << "Failed to create GLFW window!" << std::endl;
