@@ -28,7 +28,7 @@
 #include "../System/Audio_System.h" // Add this for Audio System access
 #include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../System/Animation_System.h"  // For player_direction
-
+#include "../System/Collision_System.h" // for click entity object
 
 // Include iostream for console output
 #include <iostream>
@@ -155,6 +155,16 @@ namespace lof {
         if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
             // Handle left mouse button press
             std::cout << "Left mouse button pressed." << std::endl;
+
+            SelectedEntityInfo& selectedEntityInfo = CS.get_selected_entity_info();
+
+            if (selectedEntityInfo.isSelected) {
+                std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
+            }
+            else {
+                std::cout << "No entity is selected.\n";
+            }
         }
 
         try {
