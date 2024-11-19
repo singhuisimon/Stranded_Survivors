@@ -44,4 +44,5 @@
 #include "../IMGUI/imgui_impl_glfw.h"
 #include "../IMGUI/imgui_impl_opengl3.h"
 
+extern GLFWwindow* window;
 #endif // LOF_MAIN_H

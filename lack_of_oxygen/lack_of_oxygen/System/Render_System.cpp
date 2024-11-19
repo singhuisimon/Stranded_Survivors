@@ -111,8 +111,8 @@ namespace lof {
                                                -1, -transform.position.y, 1 };
 
                 // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
-                                                       0, 1.f / screen_height, 0,
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / (screen_width/2), 0, 0,
+                                                       0, 1.f / (screen_height/2), 0,
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix
@@ -121,7 +121,8 @@ namespace lof {
             else if (camera.is_free_cam == GL_TRUE) {
 
                 //// Movement update when keypad 8 or 2 pressed
-                //if (IM.is_key_held(GLFW_KEY_KP_8)) {
+                //if (
+                // is_key_held(GLFW_KEY_KP_8)) {
                 //    camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 //    LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
                 //}
@@ -136,8 +137,8 @@ namespace lof {
                                                -camera.pos_x, -camera.pos_y, 1 };
 
                 // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
-                                                       0, 1.f / screen_height, 0,
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / (screen_width/2), 0, 0,
+                                                       0, 1.f / (screen_height/2), 0,
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix

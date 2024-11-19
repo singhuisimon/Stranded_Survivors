@@ -46,7 +46,6 @@ namespace lof {
         executable_path = std::string(buffer).substr(0, pos);
     }
 
-    // Hui Shan
     Assets_Manager& Assets_Manager::get_instance() {
         std::call_once(once_flag, []() {
             instance.reset(new Assets_Manager);
@@ -54,7 +53,6 @@ namespace lof {
         return *instance;
     }
 
-    // Hui Shan
     Assets_Manager::~Assets_Manager() {}
 
 
@@ -73,8 +71,6 @@ namespace lof {
         return true;
     }
 
-
-    // (Hui Shan)
     bool Assets_Manager::read_file_content(const std::string& filepath, std::string& content) {
         std::ifstream file;
         if (!validate_file(filepath, file)) {
@@ -89,8 +85,6 @@ namespace lof {
         return true;
     }
 
-
-    // (Hui Shan)
     bool Assets_Manager::read_json_file(const std::string& filepath, std::string& json_content) {
         std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
@@ -104,8 +98,6 @@ namespace lof {
         return true;
     }
 
-
-    // (Hui Shan)
     std::string Assets_Manager::get_full_path(const std::string& base_path, const std::string& name) {
         std::string clean_name = name;
         while (!clean_name.empty() && (clean_name[0] == '/' || clean_name[0] == '\\')) {
@@ -118,7 +110,6 @@ namespace lof {
     }
 
 
-    // (kenny for contents, HS for function) 
     bool Assets_Manager::load_all_textures(const std::string& filepath, std::vector<std::string>& texture_names) {
         std::ifstream input_file{ filepath, std::ios::in };
         if (!input_file) {
@@ -138,7 +129,7 @@ namespace lof {
         return true;
     }
 
-    // Kenny code 
+
     bool Assets_Manager::read_shader_file(const std::string& file_path, std::string& shader_source) {
         // Check if file's state is good for reading
         std::ifstream input_file(file_path);
@@ -157,7 +148,6 @@ namespace lof {
         return true;
     }
 
-    // kenny code 
     bool Assets_Manager::load_shader_programs(std::vector<std::pair<std::string, std::string>> shaders) {
         for (auto const& file : shaders) {
             // Create the shader files vector with types
@@ -210,7 +200,7 @@ namespace lof {
         LM.write_log("Assets_Manager: Unloaded all shader programs");
     }
 
-    // kenny code 
+ 
     bool Assets_Manager::load_model_data(const std::string& file_name) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
