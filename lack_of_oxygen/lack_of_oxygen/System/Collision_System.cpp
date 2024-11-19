@@ -536,7 +536,32 @@ namespace lof {
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
         //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
+        Check_Selected_Entity();
+    
+#if 0
+    if (entitySelected) {
+        std::cout << "Selected Entity ID: " << selectedEntityID << "\n";
+        // Optionally, print other information about the selected entity, such as mouse position
+        SelectedEntityInfo selectedInfo = Get_Selected_Entity_Info();
+        std::cout << "Mouse Position: (" << selectedInfo.mousePos.x << ", " << selectedInfo.mousePos.y << ")\n";
+    }
+    else {
+        std::cout << "No entity is selected.\n";
+    }
+#endif
 
+    }
+
+    bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
+    {
+
+        
+        return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
+            mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
+        
+    }
+    void Collision_System::Check_Selected_Entity()
+    {
         bool entitySelected = false;
         EntityID selectedEntityID = -1;
 
@@ -559,30 +584,9 @@ namespace lof {
                 break;  // Exit the loop early if an entity is selected (optional)
             }
 
-
         }
-#if 0
-        if (entitySelected) {
-            std::cout << "Selected Entity ID: " << selectedEntityID << "\n";
-            // Optionally, print other information about the selected entity, such as mouse position
-            SelectedEntityInfo selectedInfo = Get_Selected_Entity_Info();
-            std::cout << "Mouse Position: (" << selectedInfo.mousePos.x << ", " << selectedInfo.mousePos.y << ")\n";
-        }
-        else {
-            std::cout << "No entity is selected.\n";
-        }
-#endif
-     
     }
 
-    bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
-    {
-
-        
-        return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
-            mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
-        
-    }
 
     Vec2D Collision_System::Get_World_MousePos()
     {

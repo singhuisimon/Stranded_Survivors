@@ -87,7 +87,7 @@ namespace lof {
 
         static SelectedEntityInfo& get_selected_entity_info();
        
-      
+        void Check_Selected_Entity();
         /**
          * @brief Constructor for Collision_System.
          * Initializes the system's signature.
