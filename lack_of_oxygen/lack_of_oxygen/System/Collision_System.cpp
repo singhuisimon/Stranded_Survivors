@@ -33,6 +33,8 @@ namespace lof {
     std::unique_ptr<Collision_System> Collision_System::instance;
     std::once_flag Collision_System::once_flag;
 
+    SelectedEntityInfo Collision_System::g_selected_Entity_Info;
+
     Collision_System& Collision_System::get_instance() {
         std::call_once(once_flag, []() {
             instance.reset(new Collision_System);
@@ -535,41 +537,42 @@ namespace lof {
         //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
 
-  //      Vec2D mouse_world_pos = MousePos();
-  //      float world_x = mouse_world_pos.x;
-  //      float  world_y = mouse_world_pos.y;
-  //     // std::cout << "World cursor position x: " << world_x << " y: " << world_y << "\n";
+        bool entitySelected = false;
+        EntityID selectedEntityID = -1;
 
-		//EntityID SelectedEntity = isEntitySelected();
-		////if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
-		////{
-		//	//std::cout << "key is pressed!!!!!\n";
-		//	if (SelectedEntity == -1) {
-		//		//std::cout << "NO entity is selected!\n";
-		//	}
-		//	else {
-		//		std::cout << "Entity " << SelectedEntity << " is selected!\n";
-		//	}
-		//}
+        for (EntityID entityID : get_entities())
+        {
+            auto& transform = ECSM.get_component<Transform2D>(entityID);
+            auto& collision = ECSM.get_component<Collision_Component>(entityID);
 
-		////if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
-		////{
-		////    std::cout << "Mouse button clickkkkk\n";
-		////    LM.write_log("Mouse button clickkkkk"); //simon
-		////}
-		//if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT))
-		//{
-		//	std::cout << "Mouse button clickkkkk in movement system\n";
-		//	LM.write_log("Mouse button clickkkkk in movement system"); //simon
-		//}
-        EntityID SelectedEntity = isEntitySelected();
-        if (SelectedEntity != -1) {
-            std::cout << "Entity " << SelectedEntity << " is selected!\n";
+            float entityX = transform.position.x;
+            float entityY = transform.position.y;
+            float entityWidth = collision.width;
+            float entityHeight = collision.height;
+
+            Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
+            SelectedEntityInfo selectedInfo = g_selected_Entity_Info;
+
+            if (selectedInfo.isSelected) {
+                entitySelected = true;
+                selectedEntityID = selectedInfo.selectedEntity;  // Store the selected entity ID
+                break;  // Exit the loop early if an entity is selected (optional)
+            }
+
+
         }
-        
-
-
-        
+#if 0
+        if (entitySelected) {
+            std::cout << "Selected Entity ID: " << selectedEntityID << "\n";
+            // Optionally, print other information about the selected entity, such as mouse position
+            SelectedEntityInfo selectedInfo = Get_Selected_Entity_Info();
+            std::cout << "Mouse Position: (" << selectedInfo.mousePos.x << ", " << selectedInfo.mousePos.y << ")\n";
+        }
+        else {
+            std::cout << "No entity is selected.\n";
+        }
+#endif
+     
     }
 
     bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
@@ -581,7 +584,7 @@ namespace lof {
         
     }
 
-    Vec2D Collision_System::MousePos()
+    Vec2D Collision_System::Get_World_MousePos()
     {
         /*double mouse_x;
         double mouse_y;*/
@@ -610,11 +613,61 @@ namespace lof {
         // Convert screen coordinates to world coordinates by adding camera position
         double world_x = mouse_x + camera.pos_x;
         double world_y = mouse_y + camera.pos_y;
-        std::cout << "cursor position x: " << world_x << " " << "cursor position y: " << world_y << "\n";
+        //std::cout << "cursor position x: " << world_x << " " << "cursor position y: " << world_y << "\n";
         return Vec2D(static_cast<float>(world_x), static_cast<float>(world_y));
      
       
 
+    }
+
+#if 0
+    void Collision_System::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
+    {
+       
+        Vec2D mousePos = Get_World_MousePos();
+        entitySelectionInfo.mousePos = mousePos;
+
+        bool isSelected = isInterseptBox(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        entitySelectionInfo.isSelected = isSelected;
+
+        if (entitySelectionInfo.isSelected) {
+            //std::cout << "Entity " << entityID << " is selected!\n";
+            entitySelectionInfo.selectedEntity = entityID;  // Store the selected entity's ID
+        }
+        else {
+            entitySelectionInfo.selectedEntity = static_cast<EntityID>(-1);  // no entity is being selected
+        }
+
+        
+    }
+
+#endif
+
+#if 1
+    void Collision_System::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
+    {
+
+        Vec2D mousePos = Get_World_MousePos();
+        g_selected_Entity_Info.mousePos = mousePos;
+
+        bool isSelected = isInterseptBox(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        g_selected_Entity_Info.isSelected = isSelected;
+
+        if (g_selected_Entity_Info.isSelected) {
+            //std::cout << "Entity " << entityID << " is selected!\n";
+            g_selected_Entity_Info.selectedEntity = entityID;  // Store the selected entity's ID
+        }
+        else {
+            g_selected_Entity_Info.selectedEntity = static_cast<EntityID>(-1);  // no entity is being selected
+        }
+
+
+    }
+
+#endif
+
+    SelectedEntityInfo& Collision_System::get_selected_entity_info() {
+        return g_selected_Entity_Info;
     }
 
 
@@ -648,32 +701,7 @@ namespace lof {
     }
 #endif
 
-    EntityID Collision_System::isEntitySelected() {
-        // Get the mouse position in world coordinates
-        Vec2D mouseWorldPos = MousePos();
-        for (EntityID entityID : get_entities())
-        {
-
-            auto& transform = ECSM.get_component<Transform2D>(entityID);
-            auto& collision = ECSM.get_component<Collision_Component>(entityID);
-
-            // Calculate the entity's bounding box
-            float entityX = transform.position.x; // Center position of the entity
-            float entityY = transform.position.y; // Center position of the entity
-            float entityWidth = collision.width;   // Width of the entity
-            float entityHeight = collision.height; // Height of the entity
-
-            // Use isInterseptBox to check if the mouse is within the entity's bounding box
-            if (isInterseptBox(entityX, entityY, entityWidth, entityHeight, mouseWorldPos.x, mouseWorldPos.y)) {
-                return entityID; // Entity is selected
-                std::cout << "Seleted entity is: " << entityID << "\n";
-            }
-            
-        }
-        return -1;
-        // Retrieve the entity's transform and collision components
-    }
-
+  
 
 
 } // namespace lof

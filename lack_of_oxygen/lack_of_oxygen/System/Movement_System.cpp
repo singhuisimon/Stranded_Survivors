@@ -128,6 +128,53 @@ namespace lof {
 
         Movement_System::integrate(delta_time);
 
+        SelectedEntityInfo& selectedEntityInfo = CS.get_selected_entity_info();
+
+        if (selectedEntityInfo.isSelected) {
+            std::cout << "Selected Entity ID in movement system: " << selectedEntityInfo.selectedEntity << "\n";
+        }
+        else {
+            std::cout << "No entity is selected.\n";
+    }
+
+
+#if 0
+        if (g_selected_Entity_Info.isSelected) {
+            std::cout << "Selected Entity ID in movement system: " << g_selected_Entity_Info.selectedEntity << "\n";
+        }
+        else {
+            std::cout << "No entity is selected.\n";
+        }
+
+#endif
+#if 0
+        Vec2D mousePos = CS.Get_World_MousePos();
+        for (EntityID entityID : get_entities())
+        {
+            auto& transform = ECSM.get_component<Transform2D>(entityID);
+            auto& collision = ECSM.get_component<Collision_Component>(entityID);
+
+            float entityX = transform.position.x;
+            float entityY = transform.position.y;
+            float entityWidth = collision.width;
+            float entityHeight = collision.height;
+
+            CS.Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight, mousePos);
+            std::cout << CS.selectedEntityInfo.selectedEntity << " in movement system\n" << "The bool is: " << CS.selectedEntityInfo.isSelected << "\n";
+        }
+#endif
+       /* SelectedEntityInfo selectedInfo = CS.Get_Selected_Entity_Info();
+        if (selectedInfo.isSelected) {
+            std::cout << "Selected Entity ID: " << selectedInfo.selectedEntity << "\n";
+            std::cout << "Mouse Position: (" << selectedInfo.mousePos.x << ", " << selectedInfo.mousePos.y << ")\n";
+        }
+        else {
+            std::cout << "No entity is selected.\n";
+        }*/
+       
+
+
+      
     }
 
     std::string Movement_System::get_type() const {
