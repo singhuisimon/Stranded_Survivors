@@ -34,6 +34,7 @@
     <ClCompile Include="IMGUI\imstb_textedit.h" />
     <ClCompile Include="IMGUI\imstb_truetype.h" />
     <ClCompile Include="Main\Main.cpp" />
+    <ClCompile Include="Manager\Assets_Manager.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
     <ClCompile Include="System\GUI_System.cpp" />
+    <ClCompile Include="System\Interruption_System.cpp" />
     <ClCompile Include="System\Logic_System.cpp" />
     <ClCompile Include="System\Movement_System.cpp" />
     <ClCompile Include="System\Render_System.cpp" />
@@ -67,6 +69,7 @@
     <ClInclude Include="IMGUI\imgui_impl_opengl3.h" />
     <ClInclude Include="IMGUI\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Main\Main.h" />
+    <ClInclude Include="Manager\Assets_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
@@ -80,6 +83,7 @@
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="System\GUI_System.h" />
+    <ClInclude Include="System\Interruption_System.h" />
     <ClInclude Include="System\Logic_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />

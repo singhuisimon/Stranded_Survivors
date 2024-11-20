@@ -24,6 +24,7 @@
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
 #include "IMGUI_Manager.h"
+#include "Assets_Manager.h"
 
 // Include all component headers
 #include "../Component/Component.h"

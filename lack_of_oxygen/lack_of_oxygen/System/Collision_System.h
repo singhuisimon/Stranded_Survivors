@@ -70,7 +70,7 @@ namespace lof {
     };
 
 
-    
+
     /**
      * @class Collision_System
      * @brief Handles collision detection and resolution between entities.
@@ -88,6 +88,7 @@ namespace lof {
          * @param delta_time Delta time since the last update.
          */
         void update(float delta_time) override;
+
 
 
         /**
@@ -113,14 +114,14 @@ namespace lof {
             const Vec2D& vel1,
             const AABB& aabb2,
             const Vec2D& vel2,
-            float& firstTimeOfCollision);
+            float& firstTimeOfCollision,
+            float delta_time);
 
-        
+
 
     private:
 
-        //to store current frame's collisions
-        //static std::vector<CollisionPair> current_collisions; 
+        //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
         /**
          * @brief Compute the overlap between AABBs.
@@ -136,7 +137,6 @@ namespace lof {
          * @param delta_time The time since the last update.
          */
         void collision_check_collide(std::vector<CollisionPair>& collisions, float delta_time);
-        //void collision_check_collide(float delta_time);
 
         /**
          * @brief Resolve collisions and update the positions and velocities of involved entities.
@@ -152,14 +152,14 @@ namespace lof {
          * @param velocity1 The velocity of the dynamic object.
          * @param overlap The overlap between AABBs along the x and y axis.
          */
-        //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+         //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
 
 
-        /**
-         * @brief Get the string of which side to collide 
-         * @param side The side of the collide side 
-         * @return Return the string side that is collide
-         */
+         /**
+          * @brief Get the string of which side to collide
+          * @param side The side of the collide side
+          * @return Return the string side that is collide
+          */
         std::string collisionSideToString(CollisionSide side);
 
     };

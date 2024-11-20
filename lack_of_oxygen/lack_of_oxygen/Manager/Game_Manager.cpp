@@ -1,4 +1,4 @@
-/*
+/**
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class helper functions.
  * @author Simon Chan (82.901%), Amanda Leow (11.91%), Liliana Hanawardani (5.181%)
@@ -8,7 +8,7 @@
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
-// Include header file
+ // Include header file
 #include "Game_Manager.h"
 
 // Include other managers
@@ -174,71 +174,8 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
-        
-
-        // Clone a game object from a prefab when 'C' key is pressed
-        bool c_key_pressed = IM.is_key_pressed(GLFW_KEY_C);
-        if (IM.is_key_pressed(GLFW_KEY_C) && !c_key_was_pressed_last_frame) {
-            // Clone the entity from the prefab
-            EntityID new_entity = ECSM.clone_entity_from_prefab("dummy_object");
-            if (new_entity != INVALID_ENTITY_ID) {
-                // Generate random position
-                static std::default_random_engine generator;
-                static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
-
-                float random_x = distribution(generator);
-                float random_y = distribution(generator);
-
-                // Get the Transform2D component and set its position
-                if (ECSM.has_component<Transform2D>(new_entity)) {
-                    Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
-                    transform.position.x = random_x;
-                    transform.position.y = random_y;
-
-                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
-                }
-                else {
-                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
-                }
-            }
-            else {
-                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
-            }
-        }
-        
-        LM.write_log("GAME Checking key %i: is pressed = %i, previous state = %i", GLFW_KEY_C, IM.is_key_pressed(GLFW_KEY_C), c_key_was_pressed_last_frame);
-        c_key_was_pressed_last_frame = c_key_pressed;
-        // Save game state when 'K' key is pressed
-        bool k_key_pressed = IM.is_key_pressed(GLFW_KEY_K);
-        if (k_key_pressed && !k_key_was_pressed_last_frame) {
-            // Generate a filename with timestamp
-            auto now = std::chrono::system_clock::now();
-            auto time = std::chrono::system_clock::to_time_t(now);
-            std::stringstream ss;
-            ss << "save_game_" << time << ".json";
-            std::string filename = ss.str();
-
-            // Replace illegal filename characters
-            std::replace(filename.begin(), filename.end(), ':', '_');
-            std::replace(filename.begin(), filename.end(), ' ', '_');
-
-            // Get save file path using Path_Helper
-            std::string save_path = Path_Helper::get_save_file_path(filename);
-
-            // Attempt to save the game
-            if (SM.save_game_state(save_path.c_str())) {
-                LM.write_log("Game_Manager::update(): Successfully saved game state to %s", save_path.c_str());
-                std::cout << "Game saved successfully to: " << filename << std::endl;
-            }
-            else {
-                LM.write_log("Game_Manager::update(): Failed to save game state to %s", save_path.c_str());
-                std::cout << "Failed to save game!" << std::endl;
-            }
-        }
-        k_key_was_pressed_last_frame = k_key_pressed;
-
         // GUI System control
-        if (IM.is_key_pressed(GLFW_KEY_G)) {
+        if (IM.is_key_pressed(GLFW_KEY_G) && !level_editor_mode) {
             // Find GUI System
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "GUI_System") {
@@ -263,7 +200,7 @@ namespace lof {
         }
 
         // Test progress bar updates with H key
-        if (IM.is_key_pressed(GLFW_KEY_H)) {
+        if (IM.is_key_pressed(GLFW_KEY_H) && !level_editor_mode) {
             static float test_progress = 0.0f;
             test_progress += 0.1f;
             if (test_progress > 1.0f) test_progress = 0.0f;
@@ -317,54 +254,57 @@ namespace lof {
 
 
                 // Handle horizontal movement
-                if (IM.is_key_held(GLFW_KEY_SPACE)) { 
+                if (IM.is_key_held(GLFW_KEY_SPACE)) {
                     physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
-                } 
+                }
 
                 //activate and deactivate the forces. 
                 if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
                     // Updates forces
-                    physics.force_helper.deactivate_force(MOVE_RIGHT); 
+                    physics.force_helper.deactivate_force(MOVE_RIGHT);
                     physics.force_helper.activate_force(MOVE_LEFT);
-                    forces_flag = MOVE_LEFT;  
+                    forces_flag = MOVE_LEFT;
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
                     direction = MOVE_LEFT;
 
                     // Update sound effect for player moving left
-                    if (physics.get_is_grounded()) { 
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING); 
+                    if (physics.get_is_grounded()) {
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
                     }
-                } else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) { 
+                }
+                else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
                     // Update forces
-                    physics.force_helper.deactivate_force(MOVE_LEFT); 
-                    physics.force_helper.activate_force(MOVE_RIGHT); 
+                    physics.force_helper.deactivate_force(MOVE_LEFT);
+                    physics.force_helper.activate_force(MOVE_RIGHT);
                     forces_flag = MOVE_RIGHT;
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_RIGHT; 
+                    direction = MOVE_RIGHT;
 
                     // Update sound effect for player moving right
-                    if (physics.get_is_grounded()) { 
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING); 
+                    if (physics.get_is_grounded()) {
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
                     }
-                } else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
+                }
+                else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
                     if (forces_flag == MOVE_LEFT) {
                         // Update forces
-                        physics.force_helper.activate_force(MOVE_LEFT); 
-                        forces_flag = MOVE_LEFT; 
+                        physics.force_helper.activate_force(MOVE_LEFT);
+                        forces_flag = MOVE_LEFT;
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_LEFT; 
+                        direction = MOVE_LEFT;
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
                             ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
                         }
-                    } else {
+                    }
+                    else {
                         // Update forces
                         physics.force_helper.deactivate_force(MOVE_LEFT);
                         physics.force_helper.activate_force(MOVE_RIGHT);
@@ -379,13 +319,14 @@ namespace lof {
                             ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
                         }
                     }
-                } else {
+                }
+                else {
                     // Reset forces and player animation
-                    physics.force_helper.deactivate_force(MOVE_LEFT);  
+                    physics.force_helper.deactivate_force(MOVE_LEFT);
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                     forces_flag = -1;
 
-                    int& direction = GFXM.get_player_direction(); 
+                    int& direction = GFXM.get_player_direction();
                     direction = -1;
                 }
 

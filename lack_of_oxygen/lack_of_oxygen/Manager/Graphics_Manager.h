@@ -37,12 +37,15 @@
 #include <unordered_map>
 #include <mutex>
 #include <../ft2build.h>
+
+#include "Assets_Manager.h"
 #include FT_FREETYPE_H 
 
 namespace lof {
 
     class Graphics_Manager : public Manager {
-    public:
+        friend class Assets_Manager;
+
     private:
 
         /**
@@ -61,16 +64,11 @@ namespace lof {
         Graphics_Manager& operator=(const Graphics_Manager&) = delete;
 
         // Struct of data to create a model
+
         struct Model {
             GLenum primitive_type;
             GLuint vaoid;
             GLuint draw_cnt;
-        };
-
-        // Struct of data to create a shader
-        struct ShaderProgram {
-            GLuint program_handle = 0;
-            GLboolean link_status = GL_FALSE;
         };
 
         // Struct of a frame for animation
@@ -117,13 +115,18 @@ namespace lof {
 
         // Storages
         using MODELS = std::map<std::string, Graphics_Manager::Model>;
-        using SHADERS = std::vector<ShaderProgram>;
+
+        //using SHADERS = std::vector<ShaderProgram>;
+
         using TEXTURES = std::map<std::string, GLuint>;
+
         using ANIMATIONS = std::unordered_map<std::string, Animation>;
         using FONTS = std::map<std::string, Font>;
+
         MODELS model_storage;
         TEXTURES texture_storage;
-        SHADERS shader_program_storage;
+
+        //SHADERS shader_program_storage;
         ANIMATIONS  animation_storage;
         FONTS font_storage;
 
@@ -173,13 +176,15 @@ namespace lof {
          */
         GLboolean add_model(std::string const& file_name);
 
+
         /**
          * @brief Add a texture into the texture storage.
          *
          * @param file_name The filepath to the textures that are being added.
          * @return True if the textures are added successfully, false otherwise.
          */
-        GLboolean add_textures(std::string const& file_name);
+        GLboolean add_textures(const std::vector<std::string>& texture_names);
+
 
         /**
          * @brief Add animations into the animation storage.
@@ -245,7 +250,7 @@ namespace lof {
         /**
          * @brief Get a reference to the player direction.
          */
-        int& get_player_direction(); 
+        int& get_player_direction();
 
         /**
         * @brief Compile the shaders, link the shader objects to create an executable,
@@ -254,14 +259,15 @@ namespace lof {
         * @param shader The shader program that will be created, compiled, and link.
         * @return True if shader program compile and link successfully, false otherwise.
         */
-        GLboolean compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, ShaderProgram& shader);
+        GLboolean compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, Assets_Manager::ShaderProgram& shader);
 
         /**
          * @brief Start the shader program
          *
          *.@param shader The shader program that is to be started
          */
-        void program_use(ShaderProgram shader);
+         //void program_use(ShaderProgram shader);
+        void program_use(GLuint program_handle);
 
         /**
          * @brief Free the shader program
