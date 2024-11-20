@@ -16,6 +16,10 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 
+
+// FOR TESTING
+#include "../System/GUI_System.h"  // Add this for GUI system access
+
 namespace lof {
 
     Render_System::Render_System() {
@@ -111,8 +115,8 @@ namespace lof {
                                                -1, -transform.position.y, 1 };
 
                 // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
-                                                       0, 1.f / screen_height, 0,
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / (screen_width / 2), 0, 0,
+                                                       0, 1.f / (screen_height / 2), 0,
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix
@@ -120,24 +124,14 @@ namespace lof {
             }
             else if (camera.is_free_cam == GL_TRUE) {
 
-                //// Movement update when keypad 8 or 2 pressed
-                //if (IM.is_key_held(GLFW_KEY_KP_8)) {
-                //    camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                //    LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
-                //}
-                //else if (IM.is_key_held(GLFW_KEY_KP_2)) {
-                //    camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                //    LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
-                //}
-
                 // Update world-to-camera view transformation matrix
                 camera.view_xform = glm::mat3{ 1, 0, 0,
                                                0, 1, 0,
                                                -camera.pos_x, -camera.pos_y, 1 };
 
                 // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / screen_width, 0, 0,
-                                                       0, 1.f / screen_height, 0,
+                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / (screen_width / 2), 0, 0,
+                                                       0, 1.f / (screen_height / 2), 0,
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix
@@ -162,16 +156,8 @@ namespace lof {
                                     0, 1, 0,
                                     transform.position.x, transform.position.y, 1 };
 
-            // Compute world scale matrix
-            glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
-                                    0, 1.0f / screen_height, 0,
-                                    0, 0, 1 };
-
             graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
         }
-
-        // Set up for the drawing of objects
-        glClear(GL_COLOR_BUFFER_BIT);
 
         // Render polygon according to rendering mode 
         glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode());
@@ -190,6 +176,14 @@ namespace lof {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // Set up the imgui framebuffer when entering editor mode
+        if (GFXM.get_editor_mode() == 1) {
+            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
+        }
+
+        // Set up for the drawing of objects
+        glClear(GL_COLOR_BUFFER_BIT);
+
         // Draw all objects
         draw();
     }
@@ -206,7 +200,6 @@ namespace lof {
 
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
-
 
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
@@ -309,6 +302,7 @@ namespace lof {
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
                 // Assign texture object to use texture image unit 5 
                 glBindTextureUnit(5, textures[graphics.texture_name]);
+
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
@@ -496,11 +490,6 @@ namespace lof {
                                                           0, 1, 0,
                                                           transform.position.x, transform.position.y, 1 };
 
-                                // Compute world scale matrix
-                                glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
-                                                       0, 1.0f / screen_height, 0,
-                                                       0, 0, 1 };
-
                                 // Compute model-to-world-to-NDC transformation matrix for line and store it
                                 glm::mat3 result_xform = camera.world_to_ndc_xform * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
                                 box_mdl_to_ndc_xform.emplace_back(result_xform);
@@ -565,11 +554,6 @@ namespace lof {
                                                  0, 1, 0,
                                                  transform.position.x, transform.position.y, 1 };
 
-                            // Compute world scale matrix
-                            glm::mat3 world_scale{ 1.0f / screen_width, 0, 0,
-                                                   0, 1.0f / screen_height, 0,
-                                                   0, 0, 1 };
-
                             // Compute model-to-world-to-NDC transformation matrix for the velocity line
                             glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                             glBindVertexArray(models["debug_line"].vaoid);
@@ -585,8 +569,13 @@ namespace lof {
             glBindTexture(GL_TEXTURE_2D, 0);
             GFXM.program_free();
         }
+        if (GFXM.get_editor_mode() == 1) {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
+        }
+
     }
 
 } // namespace lof
 
 #endif
+

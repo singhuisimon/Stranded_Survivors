@@ -14,7 +14,7 @@ namespace lof {
 
 	//initialize all the group
 	void Audio_System::initializegroups() {
-		core_system->getMasterChannelGroup(&mastergroup);
+		errorcheck(core_system->getMasterChannelGroup(&mastergroup), "Audio_System::initializegroups()", "initializing mastergroup");
 		core_system->createChannelGroup("BGM Group", &bgmgroup);
 		core_system->createChannelGroup("SFX Group", &sfxgroup);
 
@@ -23,9 +23,9 @@ namespace lof {
 	}
 
 	//initialize the core system
-	Audio_System::Audio_System() : core_system(nullptr) {
+	Audio_System::Audio_System() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr) {
 		signature.set(ECSM.get_component_id<Audio_Component>());	//initialize the signature set for the audio component
-		initializegroups();
+		//initializegroups();
 		if (initialize()) {
 			LM.write_log("successfully initialize audio system.");
 		}
@@ -59,6 +59,8 @@ namespace lof {
 		if (errorcheck(result, "Audio_System::initialize", "initialize studio system") != 0) {
 			return false;
 		}
+
+		initializegroups();
 
 		return true;
 	}
@@ -367,6 +369,19 @@ namespace lof {
 		else {
 			return;
 		}
+	}
+
+	void Audio_System::pause_resume_mastergroup() {
+		//get_mastergroup;
+		bool pause;
+		mastergroup->getPaused(&pause);
+		if (pause) {
+			errorcheck(mastergroup->setPaused(false), "Audio_System::pause_resume_group", "resume mastergroup");
+		}
+		else {
+			errorcheck(mastergroup->setPaused(true), "Audio_System::pause_resume_group", "pause mastergroup");
+		}
+		
 	}
 
 	float Audio_System::get_bgmgroup_volume() const {

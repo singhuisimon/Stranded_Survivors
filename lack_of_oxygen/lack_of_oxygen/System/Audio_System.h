@@ -138,6 +138,8 @@ namespace lof {
 		*/
 		void stop_mastergroup();
 
+		void pause_resume_mastergroup();
+
 		/**
 		* @brief Getter for the bgm channelgroup volume
 		*/

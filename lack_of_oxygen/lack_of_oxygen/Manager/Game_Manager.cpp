@@ -25,9 +25,10 @@
 #include "../Utility/Globals.h"
 
 // Include systems
+#include "../System/Audio_System.h" // Add this for Audio System access
 #include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../System/Animation_System.h"  // For player_direction
-
+#include "../System/Collision_System.h" // for click entity object
 
 // Include iostream for console output
 #include <iostream>
@@ -154,6 +155,20 @@ namespace lof {
         if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
             // Handle left mouse button press
             std::cout << "Left mouse button pressed." << std::endl;
+
+            SelectedEntityInfo& selectedEntityInfo = CS.get_selected_entity_info();
+
+            if (selectedEntityInfo.isSelected) {
+                std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
+            }
+            else {
+                std::cout << "No entity is selected.\n";
+                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+            }
         }
 
         try {
@@ -214,6 +229,18 @@ namespace lof {
                         LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
                     }
                     break;
+                }
+            }
+        }
+
+        //to pause all the sound that is playing
+        if (IM.is_key_pressed(GLFW_KEY_KP_5)) {
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->pause_resume_mastergroup();
+                    }
                 }
             }
         }
@@ -415,6 +442,14 @@ namespace lof {
             }
             else {
                 camera.is_free_cam = GL_FALSE;
+            }
+
+            int& editor_mode = GFXM.get_editor_mode();
+            if (editor_mode == 1) {
+                editor_mode = 0;
+            }
+            else {
+                editor_mode = 1;
             }
         }
 

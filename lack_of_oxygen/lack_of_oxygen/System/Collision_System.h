@@ -23,6 +23,7 @@
 #include <iostream>
 
 namespace lof {
+    #define CS lof::Collision_System::get_instance()
 
     // A enum class for the possible collide side 
     enum class CollisionSide {
@@ -31,6 +32,12 @@ namespace lof {
         RIGHT,
         TOP,
         BOTTOM
+    };
+
+    struct SelectedEntityInfo {
+        EntityID selectedEntity;
+        bool isSelected; // Flag to indicate if an entity is selected
+        Vec2D mousePos;  // Store the mouse position 
     };
 
     /**
@@ -70,13 +77,17 @@ namespace lof {
     };
 
 
-
+   // extern SelectedEntityInfo g_selected_Entity_Info;
     /**
      * @class Collision_System
      * @brief Handles collision detection and resolution between entities.
      */
     class Collision_System : public System {
     public:
+
+        static SelectedEntityInfo& get_selected_entity_info();
+       
+        void Check_Selected_Entity();
         /**
          * @brief Constructor for Collision_System.
          * Initializes the system's signature.
@@ -116,11 +127,20 @@ namespace lof {
             const Vec2D& vel2,
             float& firstTimeOfCollision,
             float delta_time);
+   
+        bool isInterseptBox(float box_x, float box_y, float width, float height, int X, int mouseY);
 
+        Vec2D Get_World_MousePos();
+
+        static Collision_System& get_instance();
 
 
     private:
+        static std::unique_ptr<Collision_System> instance;
 
+        static std::once_flag once_flag;
+
+        
         //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
         /**
@@ -162,7 +182,16 @@ namespace lof {
           */
         std::string collisionSideToString(CollisionSide side);
 
+        void Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight);
+
+
+        static SelectedEntityInfo g_selected_Entity_Info;
+       
+
+    
     };
+    
+   
 
 } // namespace lof
 

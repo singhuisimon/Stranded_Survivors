@@ -91,6 +91,7 @@
     <None Include="Shaders\lack_of_oxygen_obj.frag" />
     <None Include="Shaders\lack_of_oxygen_obj.vert" />
     <None Include="Assets\Scenes\scene1.scn" />
+    <None Include="Assets\Config\config.json" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />

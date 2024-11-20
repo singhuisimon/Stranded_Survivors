@@ -115,18 +115,12 @@ namespace lof {
 
         // Storages
         using MODELS = std::map<std::string, Graphics_Manager::Model>;
-
-        //using SHADERS = std::vector<ShaderProgram>;
-
         using TEXTURES = std::map<std::string, GLuint>;
-
         using ANIMATIONS = std::unordered_map<std::string, Animation>;
         using FONTS = std::map<std::string, Font>;
 
         MODELS model_storage;
         TEXTURES texture_storage;
-
-        //SHADERS shader_program_storage;
         ANIMATIONS  animation_storage;
         FONTS font_storage;
 
@@ -143,6 +137,10 @@ namespace lof {
 
         // Flag for player direction animation
         int player_direction = -1;
+
+        // FOR TESTING
+        GLuint imgui_fbo, imgui_tex;
+        int editor_mode = 0;
 
     public:
 
@@ -252,6 +250,25 @@ namespace lof {
          */
         int& get_player_direction();
 
+
+        // FOR TESTING
+
+        /**
+         * @brief Get a reference to the framebuffer object.
+         */
+        GLuint& get_framebuffer();
+
+        /**
+         * @brief Get a reference to the framebuffer texture object.
+         */
+        GLuint& get_framebuffer_texture();
+
+        int& get_editor_mode();
+
+
+        // FOR TESTING
+
+
         /**
         * @brief Compile the shaders, link the shader objects to create an executable,
                  and ensure the program can work in the current OpenGL state.
@@ -289,3 +306,5 @@ namespace lof {
 } // namespace lof
 
 #endif // LOF_GRAPHICS_MANAGER_H
+
+
