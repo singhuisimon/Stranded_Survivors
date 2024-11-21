@@ -28,7 +28,9 @@ using namespace lof;
 
 bool level_editor_mode = false;
 GLFWwindow* window = nullptr;
-
+bool is_full_screen = true;
+GLFWmonitor* monitor = nullptr;
+const GLFWvidmode* mode = nullptr;
 
 int main(void) {
 
@@ -58,10 +60,19 @@ int main(void) {
     glfwWindowHint(GLFW_RED_BITS, 8); glfwWindowHint(GLFW_GREEN_BITS, 8);
     glfwWindowHint(GLFW_BLUE_BITS, 8); glfwWindowHint(GLFW_ALPHA_BITS, 8);
 
+    //Get primary window
+    monitor = glfwGetPrimaryMonitor();
+    mode = glfwGetVideoMode(monitor);
+
     // --------------------------- Create GLFW Window ---------------------------
 
     // Create a windowed mode window and its OpenGL context using default values
-     window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+    // window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+    
+    // Create a fullscreen window
+    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
+    glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
+
     if (!window) {
         LM.write_log("Failed to create GLFW window!");
         std::cerr << "Failed to create GLFW window!" << std::endl;
@@ -69,7 +80,7 @@ int main(void) {
         return -1;
     }
     else {
-        LM.write_log("GLFW window created successfully with size %ux%u.", 800, 600);
+        LM.write_log("GLFW window created successfully with size %ux%u.", mode->width, mode->height);
         std::cout << "GLFW window created successfully with size 800x600." << std::endl;
     }
 
@@ -140,11 +151,18 @@ int main(void) {
         << ", FPS_DISPLAY_INTERVAL: " << FPS_DISPLAY_INTERVAL << std::endl;
 
     // If the window size from Config_Manager differs from the created window, adjust it
-    if (SCR_WIDTH != 800 || SCR_HEIGHT != 600) {
-        glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
-        LM.write_log("GLFW window size adjusted to %ux%u based on configuration.", SCR_WIDTH, SCR_HEIGHT);
-        std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
-    }
+    //if (SCR_WIDTH != 800 || SCR_HEIGHT != 600) {
+    //    glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
+    //    LM.write_log("GLFW window size adjusted to %ux%u based on configuration.", SCR_WIDTH, SCR_HEIGHT);
+    //    std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
+    //}
+    
+    // ----------------------------- Set Window Variables ---------------------------
+
+    unsigned int win_height = mode->height;
+    unsigned int win_width = mode->width;
+
+    bool enter_key_was_pressed_last_frame = false;
 
     // -------------------------- Game Loop Setup --------------------------
 
@@ -183,13 +201,29 @@ int main(void) {
         // Poll for and process events 
         glfwPollEvents();
 
-
         bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
         if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
             level_editor_mode = !level_editor_mode;
         }
         tab_key_was_pressed_last_frame = is_TAB_pressed;
-     
+    
+        bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
+        if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
+            if (is_full_screen) {
+                win_height = SCR_HEIGHT;
+                win_width = SCR_WIDTH;
+                glfwSetWindowMonitor(window, nullptr, 200, 200, win_width, win_height, GLFW_DONT_CARE);
+                is_full_screen = false;
+            }
+            else {
+                win_height = mode->height;
+                win_width = mode->width;
+                glfwSetWindowMonitor(window, monitor, 0, 0, win_width, win_height, GLFW_DONT_CARE);
+                is_full_screen = true;
+            }
+        }
+        enter_key_was_pressed_last_frame = is_ENTER_pressed;
+
         // render IMGUI
         // Getting delta time for Game Manager/game loop
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -214,7 +248,7 @@ int main(void) {
             
 
         if (level_editor_mode) {
-            IMGUIM.render_ui(SCR_WIDTH, SCR_HEIGHT);
+            IMGUIM.render_ui(win_width, win_height);
         }
 
         // Rendering
