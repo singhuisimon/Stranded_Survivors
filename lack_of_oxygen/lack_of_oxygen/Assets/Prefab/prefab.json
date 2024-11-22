@@ -293,8 +293,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -326,8 +337,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -359,8 +381,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -392,8 +425,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -425,8 +469,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -458,8 +513,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -491,8 +557,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -524,8 +601,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -557,8 +645,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -590,8 +689,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -623,8 +733,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -656,8 +777,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
@@ -689,8 +821,19 @@
           "height": 102.0
         },
         "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
           "is_static": true,
-          "mass": 0.0
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
