@@ -8,7 +8,7 @@
 ; !!NOTE!!: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click "Tools" | "Create GUID" inside the Visual Studio IDE.)
-AppId={{FB4536C8-1C2F-49A4-8B7F-0D8A33A68FC9}
+AppId={{D0B30F57-1010-46FC-A803-6D518F1B1A2D}
 
 ; Standard app data stuff
 ; !!NOTE!!: Replace all instances of "GameTest" with your game name.
@@ -20,8 +20,9 @@ AppSupportURL=http://www.digipen.edu/
 
 ; Default path to the file storage directory.
 ; {pf} is the default program files directory set by Windows
-;DefaultDirName={commonpf}\DigiPen\Lack of Oxygen prof one
-DefaultDirName={userdocs}\Digipen\Lack of Oxygen
+DefaultDirName={commonpf}\DigiPen\Lack of Oxygen 
+;prof one
+;DefaultDirName={userdocs}\Digipen\Lack of Oxygen
 
 ; Start menu directory
 DefaultGroupName=DigiPen\Lack of Oxygen
