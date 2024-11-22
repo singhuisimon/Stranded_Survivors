@@ -295,6 +295,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -325,6 +328,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -355,6 +361,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -385,6 +394,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -415,6 +427,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -445,6 +460,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -475,6 +493,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -505,6 +526,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -535,6 +559,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -565,6 +592,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -595,6 +625,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -625,6 +658,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -655,6 +691,9 @@
         "Physics_Component": {
           "is_static": true,
           "mass": 0.0
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     }
