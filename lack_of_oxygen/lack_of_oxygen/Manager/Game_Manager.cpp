@@ -30,6 +30,8 @@
 #include "../System/Animation_System.h"  // For player_direction
 #include "../System/Collision_System.h" // for click entity object
 
+#include "../System/Entity_Selector_System.h"
+
 // Include iostream for console output
 #include <iostream>
 #include <random>
@@ -37,6 +39,8 @@
 
 namespace lof {
 
+    float imgui_camara_pos_x = 0.0f;
+    float imgui_camera_pos_y = 0.0f;
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
@@ -144,33 +148,47 @@ namespace lof {
         m_is_started = false;
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
+    
+    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+
+    EntityID selectedID = -1;
 
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
         }
-
+#if 0
+        ESS.Check_Selected_Entity();
+        
         // Check if the left mouse button was pressed
+        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
         if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
             // Handle left mouse button press
             std::cout << "Left mouse button pressed." << std::endl;
 
-            SelectedEntityInfo& selectedEntityInfo = CS.get_selected_entity_info();
 
             if (selectedEntityInfo.isSelected) {
+                select_entity = true;
+                selectedEntityID = selectedEntityInfo.selectedEntity;
+            
                 std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
                 std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
                 std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
                 LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
+
             }
             else {
+                select_entity = false;
+                selectedEntityID = selectedEntityInfo.selectedEntity;
+       
                 std::cout << "No entity is selected.\n";
                 std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
                 std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
             }
         }
-
+#endif
+        //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
         try {
             // Simulate a crash when the 'P' key is pressed
             if (IM.is_key_pressed(GLFW_KEY_P)) {
@@ -356,6 +374,7 @@ namespace lof {
             }
         }
 
+
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
         if (IM.is_key_pressed(GLFW_KEY_1)) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
@@ -385,6 +404,7 @@ namespace lof {
             mode = GL_FALSE;
         }
 
+#if 0
         // Object scaling when up and down arrow keys pressed
         if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             int& flag = GFXM.get_scale_flag();
@@ -407,7 +427,66 @@ namespace lof {
             int& flag = GFXM.get_scale_flag();
             flag = 0;
         }
+#endif
+        if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (select_entity)
+            {
+                selectedID = selectedEntityInfo.selectedEntity;
+            }
+        }
 
+        //std::cout << selectedID << "in game manager\n";
+        
+
+#if 1
+        //std::cout << "bool if is selected (1 is selected, 0 is not): " << select_entity << "\n";
+       // std::cout << select_entity << " this is select entity\n";
+        if (select_entity && selectedID != -1 && level_editor_mode) {
+            auto& transform = ECSM.get_component<Transform2D>(selectedID);
+            auto& collision = ECSM.get_component<Collision_Component>(selectedID);
+
+            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+            GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+            // Example: Scaling the selected entity
+            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
+                // Increase the size of the selected entity
+                transform.scale.x += scale_change;
+                transform.scale.y += scale_change;
+                collision.width += scale_change;
+                collision.height += scale_change;
+            }
+            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
+                // Increase the size of the selected entity
+                if (transform.scale.x > 0.0f) {
+                    transform.scale.x -= scale_change;
+                    collision.width -= scale_change;
+                }
+                else {
+                    transform.scale.x = 0.0f;
+                    collision.width = 0.0f;
+                }
+
+                if (transform.scale.y > 0.0f) {
+                    transform.scale.y -= scale_change;
+                    collision.height -= scale_change;
+                }
+                else {
+                    transform.scale.y = 0.0f;
+                    collision.height = 0.0f;
+                }
+            }
+            else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
+            {
+                transform.orientation.x += rot_change;
+            }
+            else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
+            {
+                transform.orientation.x -= rot_change;
+            }
+        }
+#endif 
+       
+#if 0
         // Object rotation when left and right arrow keys pressed
         if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
             int& flag = GFXM.get_rotation_flag();
@@ -430,6 +509,8 @@ namespace lof {
             int& flag = GFXM.get_rotation_flag();
             flag = 0;
         }
+#endif
+        
 
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
@@ -455,6 +536,7 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == true) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
@@ -463,6 +545,7 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == true) {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
@@ -470,10 +553,12 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             if (camera_up_down_scroll_flag == GLFW_KEY_KP_8) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
             else {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
@@ -487,6 +572,7 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == true) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
@@ -495,6 +581,7 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == true) {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
@@ -502,10 +589,12 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             if (camera_left_right_scroll_flag == GLFW_KEY_KP_4) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
             else {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+                imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }

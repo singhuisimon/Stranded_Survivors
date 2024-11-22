@@ -7,13 +7,14 @@
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
- 
+
  // Include header file
 #include "IMGUI_Manager.h"
 
 // Include other managers
 #include "Log_Manager.h"
 #include "ECS_Manager.h"
+#include "Game_Manager.h"
 #include "Graphics_Manager.h"
 
 #include <iostream>
@@ -22,10 +23,15 @@
 #include <filesystem>
 #include <vector>
 
+//#include <glm/glm.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/type_ptr.hpp>
+
 // Include utility function
 #include "../Utility/Constant.h"
 //#include "../Utility/Path_Helper.h"
 #include "Assets_Manager.h"
+#include "../System/Entity_Selector_System.h"
 
 namespace lof {
 
@@ -61,7 +67,7 @@ namespace lof {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
             return 0; // Already started
         }
-        
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -72,7 +78,7 @@ namespace lof {
     }
 
     void IMGUI_Manager::display_loading_options() {
- 
+
         int current_object_index = 0;
 
         ImGui::Begin("File List");
@@ -80,7 +86,7 @@ namespace lof {
         if (ImGui::Button("Load Scene")) {
             load_selected = !load_selected;
         }
-        ImGui::End(); 
+        ImGui::End();
 
         if (load_selected && (selected_file_index != -1)) {
             const std::string SCENES = "Scenes";;
@@ -93,7 +99,7 @@ namespace lof {
             else {
 
                 //LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
-                
+
                 load_selected = !load_selected;
             }
         }
@@ -105,12 +111,92 @@ namespace lof {
         ImGui::NewFrame();
     }
 
+    ImVec2 IMGUI_Manager::get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
+
+        ImVec2 mouse_texture_coord_world{};
+
+        // Check if the mouse is within the texture
+        if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
+            mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
+
+            ImVec2 mouse_texture_coord_screen{};
+            mouse_texture_coord_screen.x = (mouse_pos.x - texture_pos.x);
+            mouse_texture_coord_screen.y = (mouse_pos.y - texture_pos.y);
+
+            ImGui::Text("Texture Starts at: (%.2f, %.2f)", texture_pos.x, texture_pos.y);
+            ImGui::Text("Texture Dimensions: (%i, %i) \n", (SCR_WIDTH / 2), (SCR_HEIGHT / 2));
+
+            ImGui::Separator();
+
+            ImGui::Text("0,0 starts at texture ");
+            ImGui::Text("Mouse in texture at: (%.2f, %.2f)", mouse_texture_coord_screen.x, mouse_texture_coord_screen.y);
+            ImGui::Text("Mouse at: (%.2f, %.2f)\n", mouse_pos.x, mouse_pos.y);
+
+            ImGui::Separator();
+
+            auto& camera = GFXM.get_camera();
+
+            //conversion
+
+
+
+            mouse_texture_coord_world.x = mouse_texture_coord_screen.x;
+            if (mouse_texture_coord_screen.x < (SCR_WIDTH / 4)) {
+                //mouse_texture_coord_x_world = -((SCR_WIDTH / 4) - mouse_texture_coord_x_screen) + camera.pos_x;
+                //mouse_texture_coord_x_world = -((SCR_WIDTH / 4) - mouse_texture_coord_x_screen) + camera.pos_x;
+
+                mouse_texture_coord_world.x = -((SCR_WIDTH / 4) - mouse_texture_coord_screen.x);
+                mouse_texture_coord_world.x *= 2;
+
+            }
+            else {
+                //mouse_texture_coord_x_world = mouse_texture_coord_x_screen - (SCR_WIDTH / 4) + camera.pos_x;
+                //mouse_texture_coord_x_world = mouse_texture_coord_x_screen - (SCR_WIDTH / 4) + camera.pos_x;
+
+                mouse_texture_coord_world.x = mouse_texture_coord_screen.x - (SCR_WIDTH / 4);
+                mouse_texture_coord_world.x *= 2;
+            }
+
+
+            mouse_texture_coord_world.y = mouse_texture_coord_screen.y;
+            if (mouse_texture_coord_screen.y <= (SCR_HEIGHT / 4)) {
+
+                //mouse_texture_coord_y_world = -((SCR_HEIGHT / 4) - mouse_texture_coord_y_screen) + camera.pos_y;
+                mouse_texture_coord_world.y = (SCR_HEIGHT / 4) - mouse_texture_coord_screen.y;
+                mouse_texture_coord_world.y *= 2;
+            }
+            else {
+                //mouse_texture_coord_y_world = mouse_texture_coord_y_screen - (SCR_HEIGHT / 4) + camera.pos_y;
+                mouse_texture_coord_world.y = -(mouse_texture_coord_screen.y - (SCR_HEIGHT / 4));
+                mouse_texture_coord_world.y *= 2;
+            }
+
+            ImGui::Text("0,0 starts at center");
+            ImGui::Text("Mouse in texture at: (%.2f, %.2f)", mouse_texture_coord_world.x, mouse_texture_coord_world.y);
+            ImGui::Separator();
+            ImGui::Text("");
+            ImGui::Text("Camera: (%.2f, %.2f)", camera.pos_x, camera.pos_y);
+
+        }
+        else {
+            ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", imgui_camara_pos_x, imgui_camera_pos_y);
+        }
+
+        return mouse_texture_coord_world;
+
+    }
+
+    ImVec2 IMGUI_Manager::imgui_mouse_pos() {
+        return Mouse_Pos;
+    }
+    bool select_entity = false; // to ensure mouse click selected
+    EntityID selectedEntityID = -1;
 
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
         static ImGuiDockNodeFlags docking_flags = ImGuiDockNodeFlags_None;
-        static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking 
-            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize 
+        static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
+            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
             | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -121,7 +207,7 @@ namespace lof {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-        
+
         ImGui::Begin("Level Editor Mode", nullptr, window_flags);
 
         ImGuiIO& io = ImGui::GetIO();
@@ -135,7 +221,7 @@ namespace lof {
         {
             if (ImGui::BeginMenu("Options"))
             {
-               
+
                 if (ImGui::MenuItem("Flag: NoSplit", "", (docking_flags & ImGuiDockNodeFlags_NoSplit) != 0)) {
                     docking_flags ^= ImGuiDockNodeFlags_NoSplit;
                 }
@@ -149,20 +235,83 @@ namespace lof {
             }
             ImGui::EndMenuBar();
         }
-
+        //std::cout << "x in game manangar "  << imgui_camara_pos_x << " y in game manager: " << imgui_camera_pos_y << "\n";
+       // std::cout << "x: 5" << Mouse_Pos.x << " y: " << Mouse_Pos.y << "\n";
         ImGui::PopStyleVar(2);
-        ImGui::End(); 
+        ImGui::End();
 
         //Windows -------------------------------------------------------------------------------
         if (GFXM.get_editor_mode() == 1) {
 
             ImGui::Begin("Game Viewport", nullptr);
 
+
             // Ensure the texture is updated before displaying
             auto texture = GFXM.get_framebuffer_texture();
+
+            // Get the position where the texture will be rendered
+            ImVec2 texture_pos = ImGui::GetCursorScreenPos();
+
             if (texture) {
                 ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
+
+            // Get the mouse position
+            ImVec2 mouse_pos = ImGui::GetIO().MousePos;
+
+            Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
+
+            ESS.Check_Selected_Entity();
+            
+            // Check if the left mouse button was pressed
+            EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                // Handle left mouse button press
+                std::cout << "Left mouse button pressed yessssssssssssssssssssssssss." << std::endl;
+
+
+                if (selectedEntityInfo.isSelected) {
+                    select_entity = true;
+                    selectedEntityID = selectedEntityInfo.selectedEntity;
+
+                   // std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                    //std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                    //std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n\n";
+                    LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
+                    
+                    
+                }
+                else {
+                    select_entity = false;
+                    selectedEntityID = selectedEntityInfo.selectedEntity;
+
+                    //std::cout << "No entity is selected.\n";
+                    std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n\n";
+                    //std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n\n";
+                }
+
+                
+            }
+            ImGui::Separator();
+            if (selectedEntityID == -1)
+            {
+                ImGui::Text("Selected Entity: None");
+            }
+            else
+            {
+                ImGui::Text("Selected Entity: %d", selectedEntityID);
+            }
+            
+            //if (ImGui::IsMouseHoveringRect(texture_pos, ImVec2(texture_pos.x + texture_size.x, texture_pos.y + texture_size.y)) &&
+            //    ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+            //    // Mouse is clicking within the texture
+            //    ImGui::Text("Clicked inside the texture!");
+            //}
+            
+            //std::cout << selectedEntityID << "in imgui\n";
+         
+
             ImGui::End();
         }
 
@@ -176,8 +325,41 @@ namespace lof {
         IMGUIM.imgui_game_objects_edit();
 
 
+        //// View matrix (identity for 2D)
+        //glm::mat4 view = glm::mat4(1.0f);
+
+        //// Projection matrix (orthographic for 2D)
+        //glm::mat4 projection = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);
+
+        //// Model matrix (initial position of the object)
+        //glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object_position.x, object_position.y, 0.0f));
+
+        //ImGuizmo::SetOrthographic(true);  // Set to orthographic for 2D
+        //ImGuizmo::SetDrawlist();          // Use ImGui's current draw list
+
+        //// Define the rectangle where the gizmo will be drawn
+        //ImGuizmo::SetRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
+
+        //ImGuizmo::Manipulate(
+        //    glm::value_ptr(view),
+        //    glm::value_ptr(projection),
+        //    ImGuizmo::TRANSLATE,     // Transformation mode
+        //    ImGuizmo::LOCAL,         // Local or world space
+        //    glm::value_ptr(model)    // Pass the model matrix for manipulation
+        //);
+
+        //glm::vec3 position, rotation, scale;
+        //ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale));
+
+        //// Update your object's properties based on the manipulated matrix
+        //object_position = glm::vec2(position.x, position.y);
+        //object_rotation = rotation.z;  // For 2D, only Z-axis rotation is relevant
+        //object_scale = glm::vec2(scale.x, scale.y);
+
+
+
     }
-    
+
 
     void IMGUI_Manager::imgui_game_objects_list() {
 
@@ -191,19 +373,19 @@ namespace lof {
             selected_object_index = -1;
         }
 
-        for (int i = 0; i < entities.size(); ++i) { 
-            
+        for (int i = 0; i < entities.size(); ++i) {
+
             if (entities[i] != nullptr) {
                 std::string obj_name = entities[i]->get_name();
-                
+
                 //selectable for clicking; second param for highlighting
                 if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index)) {
 
                     //selected; casuing seceond param state to change
                     selected_object_index = current_object_index;
                 }
-                
-                
+
+
             }
 
             ++current_object_index;
@@ -256,12 +438,12 @@ namespace lof {
     static bool is_static_on = false;
     static bool is_moveable_on = true;
     static bool is_grounded_on = false;
- 
+
     static bool is_active_on = true;
     static bool is_reverse_on = false;
     static bool is_rotate_on = true;;
 
-    
+
     void IMGUI_Manager::imgui_game_objects_edit() {
 
         static int last_selected_object_index = -1; // Track the previous selected object index
@@ -594,7 +776,7 @@ namespace lof {
                 LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
         }*/
-            
+
 
         ImGui::End();
     }
@@ -610,7 +792,7 @@ namespace lof {
             return;
         }
 
-        
+
     }
 
     void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
