@@ -96,7 +96,7 @@ namespace lof {
 
         // Load scene file 
         const std::string scene_folder = "Scenes";
-        std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
+        std::string scene_path = ASM.get_full_path(scene_folder, "scene2.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
@@ -406,13 +406,13 @@ namespace lof {
         }
 
         //// Create level entities only for scene2
-        if (is_scene2_file(filename)) {
+       /* if (is_scene2_file(filename)) {
             LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
             if (!create_level_entities()) {
                 LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
                 return false;
             }
-        }
+        }*/
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
@@ -1027,7 +1027,8 @@ namespace lof {
         for (size_t row = 0; row < current_level.rows; ++row) {
             for (size_t col = 0; col < current_level.cols; ++col) {
                 const TileData& tile = get_tile(static_cast<int>(row), static_cast<int>(col));
-
+                //std::cout << "tile row: " << tile.row << "tile col: " << tile.row << "\n";
+                LM.write_log("tile row: (%zu), tile col: (%zu)", tile.row, tile.col);
                 // Skip empty tiles early
                 if (tile.type == 'e') {
                     continue;
@@ -1089,7 +1090,7 @@ namespace lof {
                 }
             }
         }
-
+        
         return true;
     }
 

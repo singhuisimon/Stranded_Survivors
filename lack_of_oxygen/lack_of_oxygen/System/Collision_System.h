@@ -134,6 +134,8 @@ namespace lof {
 
         static Collision_System& get_instance();
 
+        void Grid_Check_Collide(std::vector<CollisionPair>& collisions, float delta_time);
+
 
     private:
         static std::unique_ptr<Collision_System> instance;
