@@ -72,6 +72,7 @@
         }
       }
     },
+
     "dummy_object": {
       "components": {
         "Transform2D": {
@@ -109,6 +110,7 @@
         }
       }
     },
+
     "gui_container": {
       "components": {
         "Transform2D": {
@@ -136,6 +138,7 @@
         }
       }
     },
+
     "gui_progress_bar": {
       "components": {
         "Transform2D": {
@@ -163,6 +166,7 @@
         }
       }
     },
+
     "gui_image": {
       "components": {
         "Transform2D": {
@@ -190,6 +194,7 @@
         }
       }
     },
+
     "moving_platform": {
       "components": {
         "Transform2D": {
@@ -236,6 +241,7 @@
         }
       }
     },
+
     "text_object": {
       "components": {
         "Transform2D": {
@@ -259,6 +265,396 @@
           "font_name": "PressStart2P",
           "text": "Lack Of Oxygen",
           "color": [ 0.0, 0.0, 0.0 ]
+        }
+      }
+    },
+
+    "dirt_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Dirt_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "rock_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Rock_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "tnt_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "TNT_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "quartz_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Quartz_001_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "sapphire_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Sapphire_001_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "lava_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Lava_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "emerald_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Emerald_001_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "amethyst_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Amethyst_001_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "citrine_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Citrine_001_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "alexandrite_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Alexandrite_001_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "tunnel_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Wormhole",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "vent_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Vent",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
+        }
+      }
+    },
+
+    "ventStrip_prefab": {
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 100.0, 100.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "texture_name": "Air_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0
+        },
+        "Physics_Component": {
+          "is_static": true,
+          "mass": 0.0
         }
       }
     }

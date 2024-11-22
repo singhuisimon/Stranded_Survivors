@@ -78,28 +78,45 @@ namespace lof {
     int Serialization_Manager::start_up() {
         m_is_started = true;
 
-        // Load general configuration using Path_Helper
-        const std::string CONFIG = "Config";
-        std::string config_path = ASM.get_full_path(CONFIG, "config.json");
+        // Load general configuration
+        const std::string confid_folder = "Config";
+        std::string config_path = ASM.get_full_path(confid_folder, "config.json");
         if (!load_config(config_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
             return -1;
         }
 
-        // Load prefabs using Path_Helper
-        const std::string PREFABS = "Prefab";
-        std::string prefabs_path = ASM.get_full_path(PREFABS, "prefab.json");
+        // Load prefabs 
+        const std::string prefabs_folder = "Prefab";
+        std::string prefabs_path = ASM.get_full_path(prefabs_folder, "prefab.json");
         if (!load_prefabs(prefabs_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
             return -2;
         }
 
-        // Load scene file using Path_Helper
-        const std::string SCENES = "Scenes";
-        std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
+        // Load scene file 
+        const std::string scene_folder = "Scenes";
+        std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
+        }
+
+        // Load level data
+        const std::string level_folder = "Level_Design";
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        if (!load_level_data(level_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
+            return -4;
+        }
+
+        // Debug print level data if loaded successfully
+        debug_print_level();
+
+        // Create entities for the level
+        if (!create_level_entities()) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
+            return -5;
         }
 
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
@@ -871,6 +888,198 @@ namespace lof {
             LM.write_log("Unknown fatal error in save_game_state");
             return false;
         }
+    }
+
+
+    bool Serialization_Manager::load_level_data(const char* filepath) {
+        LM.write_log("Serialization_Manager::load_level_data(): Loading level from %s", filepath);
+
+        std::ifstream file(filepath);
+        if (!file.is_open()) {
+            LM.write_log("Failed to open level file: %s", filepath);
+            return false;
+        }
+
+        try {
+            // Clear existing level data
+            current_level.tiles.clear();
+            std::string line;
+            size_t row = 0;
+
+            while (std::getline(file, line)) {
+                std::vector<Serialization_Manager::TileData> row_data;
+                std::stringstream line_stream(line);
+                std::string cell;
+                size_t col = 0;
+
+                while (std::getline(line_stream, cell, ',')) {
+                    // Remove any whitespace
+                    cell.erase(std::remove_if(cell.begin(), cell.end(), ::isspace), cell.end());
+                    if (!cell.empty()) {
+                        Serialization_Manager::TileData tile;
+                        tile.type = cell[0];
+                        tile.row = static_cast<int>(row);
+                        tile.col = static_cast<int>(col);
+                        row_data.push_back(tile);
+
+                        // Debug logging to verify tile data
+                        // LM.write_log("Added tile: type='%c' at position (%d,%d)", tile.type, tile.row, tile.col);
+                    }
+                    col++;
+                }
+                if (!row_data.empty()) {
+                    current_level.tiles.push_back(row_data);
+                }
+                row++;
+            }
+
+            current_level.rows = current_level.tiles.size();
+            current_level.cols = current_level.tiles.empty() ? 0 : current_level.tiles[0].size();
+
+            LM.write_log("Successfully loaded level data: %zu rows x %zu columns",
+                current_level.rows, current_level.cols);
+
+            // Additional verification logging
+            LM.write_log("First tile type: %c, Last tile type: %c",
+                current_level.tiles[0][0].type,
+                current_level.tiles[current_level.rows - 1][current_level.cols - 1].type);
+
+            return true;
+        }
+        catch (const std::exception& e) {
+            LM.write_log("Error parsing level data: %s", e.what());
+            return false;
+        }
+    }
+
+
+    Serialization_Manager::TileData Serialization_Manager::get_tile(int row, int col) const {
+        if (row >= 0 && static_cast<size_t>(row) < current_level.rows &&
+            col >= 0 && static_cast<size_t>(col) < current_level.cols) {
+            return current_level.tiles[row][col];
+        }
+
+        // Return empty tile as default
+        Serialization_Manager::TileData empty_tile;
+        empty_tile.type = 'e';
+        empty_tile.row = row;
+        empty_tile.col = col;
+        return empty_tile;
+    }
+
+
+    void Serialization_Manager::debug_print_level() const {
+        LM.write_log("Level Data Debug Print:");
+        LM.write_log("Level dimensions: %zu x %zu", current_level.rows, current_level.cols);
+
+        // Print all rows
+        for (size_t i = 0; i < current_level.rows; ++i) {
+            std::string row_str;
+            for (size_t j = 0; j < current_level.cols; ++j) {
+                TileData tile = get_tile(static_cast<int>(i), static_cast<int>(j));
+                row_str += tile.type;
+                row_str += " ";  // Add space for readability
+            }
+            LM.write_log("Row %zu: %s", i, row_str.c_str());
+        }
+
+        // Print tile type statistics
+        std::map<char, int> tile_counts;
+        for (const auto& row : current_level.tiles) {
+            for (const auto& tile : row) {
+                tile_counts[tile.type]++;
+            }
+        }
+    }
+
+
+    bool Serialization_Manager::create_level_entities() {
+        if (current_level.tiles.empty()) {
+            LM.write_log("Serialization_Manager::create_level_entities(): No level data loaded");
+            return false;
+        }
+
+        // Define bounds
+        const float LEFT_BOUND = -1020.0f;
+        const float RIGHT_BOUND = 1020.0f;
+        const float START_Y = -150.0f;
+
+        // Calculate tile size based on the bounds and number of columns
+        float total_width = RIGHT_BOUND - LEFT_BOUND;
+        float tile_width = total_width / current_level.cols;
+        float tile_height = tile_width; // Keep tiles square
+
+        //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
+        //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
+
+        // Create entities for each tile
+        for (size_t row = 0; row < current_level.rows; ++row) {
+            for (size_t col = 0; col < current_level.cols; ++col) {
+                const TileData& tile = get_tile(static_cast<int>(row), static_cast<int>(col));
+
+                // Skip empty tiles early
+                if (tile.type == 'e') {
+                    continue;
+                }
+
+                std::string prefab_name;
+                // Map tile types to prefab names
+                switch (tile.type) {
+                case 'd': prefab_name = "dirt_prefab"; break;
+                case 'r': prefab_name = "rock_prefab"; break;
+                case '!': prefab_name = "tnt_prefab"; break;
+                case '1': prefab_name = "quartz_prefab"; break;
+                case '2': prefab_name = "emerald_prefab"; break;
+                case '3': prefab_name = "sapphire_prefab"; break;
+                case '4': prefab_name = "amethyst_prefab"; break;
+                case '5': prefab_name = "citrine_prefab"; break;
+                case '*': prefab_name = "alexandrite_prefab"; break;
+                case 't': prefab_name = "tunnel_prefab"; break;
+                case 'v': prefab_name = "vent_prefab"; break;
+                case 'l': prefab_name = "lava_prefab"; break;
+                case 'o': prefab_name = "obsidian_prefab"; break;
+                case 's': prefab_name = "ventStrip_prefab"; break;
+                default:
+                    LM.write_log("Unknown tile type '%c' at position (%zu, %zu)",
+                        tile.type, row, col);
+                    continue;
+                }
+
+                // Calculate world position for the tile
+                float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
+                float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
+
+                // Create unique name for the tile entity
+                std::string entity_name = prefab_name + "_" + std::to_string(row) + "_" + std::to_string(col);
+
+                // Create entity from prefab
+                EntityID entity = ECSM.clone_entity_from_prefab(prefab_name, entity_name);
+                if (entity != INVALID_ENTITY_ID) {
+                    // Update position and scale
+                    if (ECSM.has_component<Transform2D>(entity)) {
+                        auto& transform = ECSM.get_component<Transform2D>(entity);
+                        transform.position = Vec2D(x_pos, y_pos);
+                        transform.scale = Vec2D(tile_width, tile_height);
+
+                        // Log the position for debugging
+                        LM.write_log("Created tile '%c' at (%.2f, %.2f) with size %.2f x %.2f",
+                            tile.type, x_pos, y_pos, tile_width, tile_height);
+                    }
+
+                    // Update collision component if present
+                    if (ECSM.has_component<Collision_Component>(entity)) {
+                        auto& collision = ECSM.get_component<Collision_Component>(entity);
+                        collision.width = tile_width;
+                        collision.height = tile_height;
+                    }
+                }
+                else {
+                    LM.write_log("Failed to create entity from prefab '%s'", prefab_name.c_str());
+                }
+            }
+        }
+
+        return true;
     }
 
 
