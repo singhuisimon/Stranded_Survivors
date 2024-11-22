@@ -406,13 +406,13 @@ namespace lof {
         }
 
         //// Create level entities only for scene2
-        //if (is_scene2_file(filename)) {
-        //    LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
-        //    if (!create_level_entities()) {
-        //        LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
-        //        return false;
-        //    }
-        //}
+        if (is_scene2_file(filename)) {
+            LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
+            if (!create_level_entities()) {
+                LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
+                return false;
+            }
+        }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
