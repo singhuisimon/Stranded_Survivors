@@ -289,8 +289,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -319,8 +319,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -349,8 +349,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -379,8 +379,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -409,8 +409,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -439,8 +439,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -469,8 +469,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -499,8 +499,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -529,8 +529,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -559,8 +559,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -589,8 +589,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -619,8 +619,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
@@ -649,8 +649,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 100.0,
-          "height": 100.0
+          "width": 102.0,
+          "height": 102.0
         },
         "Physics_Component": {
           "is_static": true,
