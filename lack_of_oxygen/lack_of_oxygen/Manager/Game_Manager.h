@@ -18,7 +18,9 @@
 #include "Manager.h"
 
 namespace lof {
-
+    extern float imgui_camara_pos_x;
+    extern float imgui_camera_pos_y;
+   
     /**
      * @class Game_Manager
      * @brief Manages the overall game state and logic.
