@@ -113,10 +113,12 @@ namespace lof {
         // Debug print level data if loaded successfully
         debug_print_level();
 
-        // Create entities for the level
-        if (!create_level_entities()) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
-            return -5;
+        // Only create level entities if startup on scene file is scene2.scn
+        if (is_scene2_file(scene_path.c_str())) {
+            if (!create_level_entities()) {
+                LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
+                return -5;
+            }
         }
 
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
@@ -402,6 +404,15 @@ namespace lof {
             // Add components to the entity
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
         }
+
+        //// Create level entities only for scene2
+        //if (is_scene2_file(filename)) {
+        //    LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
+        //    if (!create_level_entities()) {
+        //        LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
+        //        return false;
+        //    }
+        //}
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
@@ -1082,6 +1093,10 @@ namespace lof {
         return true;
     }
 
+    bool Serialization_Manager::is_scene2_file(const char* filepath) const {
+        std::string path(filepath);
+        return path.find("scene2.scn") != std::string::npos;
+    }
 
     unsigned int Serialization_Manager::get_scr_width() const {
         //LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);

@@ -141,6 +141,7 @@ namespace lof {
         TileData get_tile(int row, int col) const;
         void debug_print_level() const;
         bool create_level_entities();  // Function to create entities from the loaded tile data
+        bool is_scene2_file(const char* filepath) const;
     };
 
 } // namespace lof

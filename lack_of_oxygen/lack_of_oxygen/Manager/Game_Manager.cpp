@@ -513,6 +513,45 @@ namespace lof {
             camera_left_right_scroll_flag = 0;
         }
 
+        if (IM.is_key_pressed(GLFW_KEY_0)) {
+            LM.write_log("Game_Manager::update(): Toggling between scenes");
+
+            // Toggle between scenes
+            current_scene = (current_scene == 1) ? 2 : 1;
+
+            // Create full path to the scene file
+            const std::string SCENES = "Scenes";
+            std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
+
+            // Try to load the new scene
+            if (SM.load_scene(scene_path.c_str())) {
+                LM.write_log("Game_Manager::update(): Successfully loaded scene%d: %s", current_scene, scene_path.c_str());
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Reset player position if exists
+                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (player_id != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Transform2D>(player_id)) {
+                        auto& transform = ECSM.get_component<Transform2D>(player_id);
+                        transform.position = Vec2D(0.0f, 0.0f);
+                        transform.prev_position = transform.position;
+                    }
+                    if (ECSM.has_component<Velocity_Component>(player_id)) {
+                        auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
+                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                    }
+                }
+            }
+            else {
+                LM.write_log("Game_Manager::update(): Failed to load scene%d: %s", current_scene, scene_path.c_str());
+                // Revert the scene number since load failed
+                current_scene = (current_scene == 1) ? 2 : 1;
+            }
+        }
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
