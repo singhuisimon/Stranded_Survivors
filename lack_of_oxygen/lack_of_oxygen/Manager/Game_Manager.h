@@ -53,6 +53,9 @@ namespace lof {
         // Flag for forces applied
         int forces_flag = -1;
 
+        // Flag for scn file
+        int current_scene = 1;
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.

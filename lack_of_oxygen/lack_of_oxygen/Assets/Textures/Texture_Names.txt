@@ -17,3 +17,14 @@ Oxygen_Refill_Green_circle
 Oxygen_Refill_Red_circle
 Skybox_ALL
 Spritesheet_Animate
+Dirt_Batch_4
+Rock_Batch_4
+TNT_Batch_4
+Quartz_001_Batch_4
+Sapphire_001_Batch_4
+Lava_Batch_4
+Emerald_001_Batch_4
+Amethyst_001_Batch_4
+Citrine_001_Batch_4
+Alexandrite_001_Batch_4
+Air_Batch_4

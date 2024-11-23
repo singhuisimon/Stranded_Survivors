@@ -376,9 +376,6 @@ namespace lof {
         input_file.close();
         return true;
     }
-  
-
-
 } // namespace lof
 
 

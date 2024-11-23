@@ -79,6 +79,21 @@ namespace lof {
         rapidjson::Value serialize_logic_component(const Logic_Component& component, rapidjson::Document::AllocatorType& allocator);
         rapidjson::Value serialize_text_component(const Text_Component& component, rapidjson::Document::AllocatorType& allocator);
 
+        // ---------------------------- LEVEL CONFIG LOGIC ---------------------------- //
+        struct TileData {
+            char type;
+            int row;
+            int col;
+        };
+
+        struct LevelData {
+            std::vector<std::vector<TileData>> tiles;
+            size_t rows;
+            size_t cols;
+        };
+
+        LevelData current_level;
+
     public:
 
         /**
@@ -119,6 +134,14 @@ namespace lof {
          * @return True if saving was successful, false otherwise.
          */
         bool save_game_state(const char* filepath);
+
+        // ---------------------------- LEVEL CONFIG LOGIC ---------------------------- //
+        bool load_level_data(const char* filepath);
+        const LevelData& get_current_level() const { return current_level; }
+        TileData get_tile(int row, int col) const;
+        void debug_print_level() const;
+        bool create_level_entities();  // Function to create entities from the loaded tile data
+        bool is_scene2_file(const char* filepath) const;
     };
 
 } // namespace lof
