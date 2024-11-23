@@ -24,6 +24,7 @@
 #include "../Utility/Constant.h"
 #include "../Main/Main.h" // for extern
 #include "../Manager/Input_Manager.h"
+#include "Entity_Selector_System.h"
 
 
 
@@ -93,7 +94,7 @@ namespace lof {
             auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
             auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
             auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
-            std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+           // std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
             // Create AABB for object 1
             AABB aabb1 = AABB::from_transform(transform1, collision1);
            
@@ -536,7 +537,9 @@ namespace lof {
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
         //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
-        Check_Selected_Entity();
+        //Check_Selected_Entity();
+
+       
     
 #if 0
     if (entitySelected) {
@@ -560,6 +563,8 @@ namespace lof {
             mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
         
     }
+
+#if 0
     void Collision_System::Check_Selected_Entity()
     {
         bool entitySelected = false;
@@ -581,7 +586,7 @@ namespace lof {
             if (selectedInfo.isSelected) {
                 entitySelected = true;
                 selectedEntityID = selectedInfo.selectedEntity;  // Store the selected entity ID
-                break;  // Exit the loop early if an entity is selected (optional)
+                break;  // Exit the loop early if an entity is selected 
             }
 
         }
@@ -617,14 +622,14 @@ namespace lof {
         // Convert screen coordinates to world coordinates by adding camera position
         double world_x = mouse_x + camera.pos_x;
         double world_y = mouse_y + camera.pos_y;
-        //std::cout << "cursor position x: " << world_x << " " << "cursor position y: " << world_y << "\n";
+       // std::cout << "cursor position x: " << world_x << " " << "cursor position y: " << world_y << "\n";
         return Vec2D(static_cast<float>(world_x), static_cast<float>(world_y));
      
       
 
     }
 
-#if 0
+
     void Collision_System::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
     {
        
@@ -645,9 +650,7 @@ namespace lof {
         
     }
 
-#endif
 
-#if 1
     void Collision_System::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
     {
 
@@ -668,14 +671,13 @@ namespace lof {
 
     }
 
-#endif
+
 
     SelectedEntityInfo& Collision_System::get_selected_entity_info() {
         return g_selected_Entity_Info;
     }
 
 
-#if 0
     void Collision_System::MousePos_test()
     {
         /*double mouse_x;
