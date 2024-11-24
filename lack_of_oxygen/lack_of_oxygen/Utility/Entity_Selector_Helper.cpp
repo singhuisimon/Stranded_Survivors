@@ -63,8 +63,8 @@ namespace lof
                 entitySelected = true;
                 selectedEntityID = selectedInfo.selectedEntity;  // Store the selected entity ID
                 //std::cout << "x pos of the entity " << entityX << " y pos " << entityY << "\n";
-                std::cout << " yees !!! is selected in entitty selector system  " << selectedEntityID << "\n";
-                std::cout << "mouse x: " << selectedInfo.mousePos.x << " mouse y: " << selectedInfo.mousePos.y << "\n\n";
+                //std::cout << " yees !!! is selected in entitty selector system  " << selectedEntityID << "\n";
+                //std::cout << "mouse x: " << selectedInfo.mousePos.x << " mouse y: " << selectedInfo.mousePos.y << "\n\n";
                 break;  // Exit the loop early if an entity is selected 
             }
 

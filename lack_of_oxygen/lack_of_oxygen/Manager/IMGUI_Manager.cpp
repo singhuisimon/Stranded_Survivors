@@ -23,13 +23,8 @@
 #include <filesystem>
 #include <vector>
 
-//#include <glm/glm.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtc/type_ptr.hpp>
-
 // Include utility function
 #include "../Utility/Constant.h"
-//#include "../Utility/Path_Helper.h"
 #include "Assets_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 
@@ -44,7 +39,14 @@ namespace lof {
     bool create_game_obj = false;
     bool filled = false;
 
+    static bool mouse_clicked_or_dragged = false;
+
+    //mouse position in terms of game world
+    ImVec2 mouse_texture_coord_world{};
+
+    //Vector of assigned names
     std::vector<std::string> assigned_names;
+
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -111,77 +113,61 @@ namespace lof {
         ImGui::NewFrame();
     }
 
+
+    //Gets mouse position in terms of game world
     ImVec2 IMGUI_Manager::get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
-        ImVec2 mouse_texture_coord_world{};
-
-        // Check if the mouse is within the texture
+        // If Mouse within texture
         if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
             mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
 
+            //Gets position of mouse in terms of viewports
             ImVec2 mouse_texture_coord_screen{};
             mouse_texture_coord_screen.x = (mouse_pos.x - texture_pos.x);
             mouse_texture_coord_screen.y = (mouse_pos.y - texture_pos.y);
 
-            ImGui::Text("Texture Starts at: (%.2f, %.2f)", texture_pos.x, texture_pos.y);
-            ImGui::Text("Texture Dimensions: (%i, %i) \n", (SCR_WIDTH / 2), (SCR_HEIGHT / 2));
-
-            ImGui::Separator();
-
-            ImGui::Text("0,0 starts at texture ");
-            ImGui::Text("Mouse in texture at: (%.2f, %.2f)", mouse_texture_coord_screen.x, mouse_texture_coord_screen.y);
-            ImGui::Text("Mouse at: (%.2f, %.2f)\n", mouse_pos.x, mouse_pos.y);
-
-            ImGui::Separator();
-
+            //Get camera position and changes
             auto& camera = GFXM.get_camera();
 
-            //conversion
-
-
-
+            //Gets position of mouse in terms of game world
             mouse_texture_coord_world.x = mouse_texture_coord_screen.x;
             if (mouse_texture_coord_screen.x < (SCR_WIDTH / 4)) {
-                //mouse_texture_coord_x_world = -((SCR_WIDTH / 4) - mouse_texture_coord_x_screen) + camera.pos_x;
-                //mouse_texture_coord_x_world = -((SCR_WIDTH / 4) - mouse_texture_coord_x_screen) + camera.pos_x;
-
                 mouse_texture_coord_world.x = -((SCR_WIDTH / 4) - mouse_texture_coord_screen.x);
                 mouse_texture_coord_world.x *= 2;
-
+                mouse_texture_coord_world.x += camera.pos_x;
             }
             else {
-                //mouse_texture_coord_x_world = mouse_texture_coord_x_screen - (SCR_WIDTH / 4) + camera.pos_x;
-                //mouse_texture_coord_x_world = mouse_texture_coord_x_screen - (SCR_WIDTH / 4) + camera.pos_x;
-
                 mouse_texture_coord_world.x = mouse_texture_coord_screen.x - (SCR_WIDTH / 4);
                 mouse_texture_coord_world.x *= 2;
+                mouse_texture_coord_world.x += camera.pos_x;
             }
-
-
             mouse_texture_coord_world.y = mouse_texture_coord_screen.y;
             if (mouse_texture_coord_screen.y <= (SCR_HEIGHT / 4)) {
-
-                //mouse_texture_coord_y_world = -((SCR_HEIGHT / 4) - mouse_texture_coord_y_screen) + camera.pos_y;
                 mouse_texture_coord_world.y = (SCR_HEIGHT / 4) - mouse_texture_coord_screen.y;
                 mouse_texture_coord_world.y *= 2;
+                mouse_texture_coord_world.y += camera.pos_y;
             }
             else {
-                //mouse_texture_coord_y_world = mouse_texture_coord_y_screen - (SCR_HEIGHT / 4) + camera.pos_y;
                 mouse_texture_coord_world.y = -(mouse_texture_coord_screen.y - (SCR_HEIGHT / 4));
                 mouse_texture_coord_world.y *= 2;
+                mouse_texture_coord_world.y += camera.pos_y;
             }
 
-            ImGui::Text("0,0 starts at center");
+            //Display debug information
+            /*ImGui::Text("0,0 starts at center");
             ImGui::Text("Mouse in texture at: (%.2f, %.2f)", mouse_texture_coord_world.x, mouse_texture_coord_world.y);
             ImGui::Separator();
             ImGui::Text("");
-            ImGui::Text("Camera: (%.2f, %.2f)", camera.pos_x, camera.pos_y);
+            ImGui::Text("Camera: (%.2f, %.2f)", camera.pos_x, camera.pos_y);*/
 
         }
         else {
-            ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", imgui_camara_pos_x, imgui_camera_pos_y);
+
+            //Display debug information
+            /*ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", mouse_pos.x, mouse_pos);*/
         }
 
+        //Return mouse in terms of game world
         return mouse_texture_coord_world;
 
     }
@@ -189,27 +175,31 @@ namespace lof {
     ImVec2 IMGUI_Manager::imgui_mouse_pos() {
         return Mouse_Pos;
     }
+
+
     bool select_entity = false; // to ensure mouse click selected
     EntityID selectedEntityID = -1;
 
+    //Rendering UI
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
+        //Docking and window flags
         static ImGuiDockNodeFlags docking_flags = ImGuiDockNodeFlags_None;
         static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
-            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
-            | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
+        //Set up Viewport
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
         ImGui::SetNextWindowViewport(viewport->ID);
-
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-
         ImGui::Begin("Level Editor Mode", nullptr, window_flags);
 
+        //Set up Dockspace
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
         {
@@ -217,11 +207,11 @@ namespace lof {
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), docking_flags);
         }
 
+        //Set up Menu
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Options"))
             {
-
                 if (ImGui::MenuItem("Flag: NoSplit", "", (docking_flags & ImGuiDockNodeFlags_NoSplit) != 0)) {
                     docking_flags ^= ImGuiDockNodeFlags_NoSplit;
                 }
@@ -229,22 +219,23 @@ namespace lof {
                     docking_flags ^= ImGuiDockNodeFlags_NoResize;
                 }
 
-
                 ImGui::Separator();
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
-        //std::cout << "x in game manangar "  << imgui_camara_pos_x << " y in game manager: " << imgui_camera_pos_y << "\n";
-       // std::cout << "x: 5" << Mouse_Pos.x << " y: " << Mouse_Pos.y << "\n";
+        
         ImGui::PopStyleVar(2);
         ImGui::End();
 
-        //Windows -------------------------------------------------------------------------------
+
+
+
+
+        //Game Viewport
         if (GFXM.get_editor_mode() == 1) {
 
             ImGui::Begin("Game Viewport", nullptr);
-
 
             // Ensure the texture is updated before displaying
             auto texture = GFXM.get_framebuffer_texture();
@@ -256,107 +247,169 @@ namespace lof {
                 ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
 
-            // Get the mouse position
+            // Get the mouse position in terms of IMGUI screen
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
 
+            //Gets mouse position in terms of game world
             Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
 
+            //Check if entity is hovered on
             ESS.Check_Selected_Entity();
-            
+
             // Check if the left mouse button was pressed
             EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
 
-            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                // Handle left mouse button press
-                std::cout << "Left mouse button pressed yessssssssssssssssssssssssss." << std::endl;
 
 
-                if (selectedEntityInfo.isSelected) {
-                    select_entity = true;
-                    selectedEntityID = selectedEntityInfo.selectedEntity;
 
-                   // std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
-                    //std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                    //std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n\n";
-                    LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
-                    
-                    
+            // If Mouse within texture
+            if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
+                mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
+
+                //Click with  mouse
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+
+                    mouse_clicked_or_dragged = true;
+                    if (selectedEntityInfo.isSelected) {
+                        select_entity = true;
+                        selectedEntityID = selectedEntityInfo.selectedEntity;
+
+                        std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                        LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
+
+                    }
+                    else {
+
+                        select_entity = false;
+
+                        selectedEntityID = selectedEntityInfo.selectedEntity;
+                        std::cout << "No entity is selected.\n";
+                        std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n\n";
+
+                  
+                    }
                 }
                 else {
-                    select_entity = false;
-                    selectedEntityID = selectedEntityInfo.selectedEntity;
 
-                    //std::cout << "No entity is selected.\n";
-                    std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n\n";
-                    //std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n\n";
+                    mouse_clicked_or_dragged = false;
+                    select_entity = false;
                 }
 
+                if (select_entity) {
+                    selected_object_index = selectedEntityID;
+                }
+
+                static ImVec2 previousMousePos;    // Previous mouse position
+                static bool mouse_was_down = false;
+
                 
+                bool isDragging = false;
+                Vec2D Drag_Offset;
+                auto& entities = ecs.get_entities();
+                ImVec2 currentMousePos = ImGui::GetMousePos();
+
+                //calculate
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+
+                    mouse_clicked_or_dragged = true;
+
+                    if (!mouse_was_down) {
+
+                        mouse_was_down = true;
+                        previousMousePos = currentMousePos;
+
+                    }
+                    else {
+
+                        // Get the mouse position in terms of IMGUI screen
+                        ImVec2 mouse_pos = ImGui::GetIO().MousePos;
+                        ImVec2 texture_pos = ImGui::GetCursorScreenPos();
+
+                        //Gets mouse position in terms of game world
+                        Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
+
+                        
+                        auto& entities_change = ecs.get_entities();
+
+                        if (selectedEntityInfo.isSelected) {
+
+                            if (entities_change[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities_change[selectedEntityID].get()->get_id());
+
+                                auto& position = transform.position;
+
+                                position.x = Mouse_Pos.x;
+                                position.y = Mouse_Pos.y;
+
+                                auto& prev_position = transform.prev_position;
+                                prev_position = position;
+
+                            }
+                            
+
+                            selected_object_index = selectedEntityID;
+                        }
+
+                        /*if (selectedEntityInfo.isSelected) {
+                            if (entities_change[selectedEntityID]) {
+
+                                std::cout << "entity dragged;" << std::endl;
+
+                                if (entities_change[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                    std::cout << "entity has transformation component;" << std::endl;
+
+                                    Transform2D& transform = ecs.get_component<Transform2D>(entities_change[selectedEntityID].get()->get_id());
+
+                                    auto& position = transform.position;
+
+                                    position.x = Mouse_Pos.x;
+                                    position.y = Mouse_Pos.y;
+
+                                    auto& prev_position = transform.prev_position;
+                                    prev_position = position;
+
+                                }
+                            }
+
+                            selected_object_index = selectedEntityID;
+                        }*/
+
+                    }
+
+                    //selected_object_index = selectedEntityID;
+
+                }
+                else {
+
+                    mouse_clicked_or_dragged = false;
+                    mouse_was_down = false;
+                }
+            
             }
+
+
             ImGui::Separator();
             if (selectedEntityID == -1)
             {
                 ImGui::Text("Selected Entity: None");
-            }
-            else
+            }else
             {
                 ImGui::Text("Selected Entity: %d", selectedEntityID);
             }
-            
-            //if (ImGui::IsMouseHoveringRect(texture_pos, ImVec2(texture_pos.x + texture_size.x, texture_pos.y + texture_size.y)) &&
-            //    ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-            //    // Mouse is clicking within the texture
-            //    ImGui::Text("Clicked inside the texture!");
-            //}
-            
-            //std::cout << selectedEntityID << "in imgui\n";
          
-
             ImGui::End();
         }
 
         //asset manager to be added later
         ImGui::Begin("Console");
-        ImGui::Text("Console stuff");
+        ImGui::Text("Console stuff:\nSelected Object Index: %.f\n", selected_object_index);
+        ImGui::Text("selectedEntityID: %.f", selectedEntityID);
         ImGui::End();
 
         IMGUIM.imgui_game_objects_list();
         IMGUIM.display_loading_options();
         IMGUIM.imgui_game_objects_edit();
-
-
-        //// View matrix (identity for 2D)
-        //glm::mat4 view = glm::mat4(1.0f);
-
-        //// Projection matrix (orthographic for 2D)
-        //glm::mat4 projection = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);
-
-        //// Model matrix (initial position of the object)
-        //glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(object_position.x, object_position.y, 0.0f));
-
-        //ImGuizmo::SetOrthographic(true);  // Set to orthographic for 2D
-        //ImGuizmo::SetDrawlist();          // Use ImGui's current draw list
-
-        //// Define the rectangle where the gizmo will be drawn
-        //ImGuizmo::SetRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
-
-        //ImGuizmo::Manipulate(
-        //    glm::value_ptr(view),
-        //    glm::value_ptr(projection),
-        //    ImGuizmo::TRANSLATE,     // Transformation mode
-        //    ImGuizmo::LOCAL,         // Local or world space
-        //    glm::value_ptr(model)    // Pass the model matrix for manipulation
-        //);
-
-        //glm::vec3 position, rotation, scale;
-        //ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(model), glm::value_ptr(position), glm::value_ptr(rotation), glm::value_ptr(scale));
-
-        //// Update your object's properties based on the manipulated matrix
-        //object_position = glm::vec2(position.x, position.y);
-        //object_rotation = rotation.z;  // For 2D, only Z-axis rotation is relevant
-        //object_scale = glm::vec2(scale.x, scale.y);
-
-
 
     }
 
@@ -379,11 +432,13 @@ namespace lof {
                 std::string obj_name = entities[i]->get_name();
 
                 //selectable for clicking; second param for highlighting
-                if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index)) {
+                if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index) && !mouse_clicked_or_dragged) {
 
                     //selected; casuing seceond param state to change
                     selected_object_index = current_object_index;
                 }
+
+          
 
 
             }
@@ -421,12 +476,9 @@ namespace lof {
 
         ImGui::End();
 
-        /*if (selected_object_index != -1 && show_window) {
-            imgui_game_objects_edit();
-        }*/
-
-        if (selected_object_index != -1 && remove_game_obj) {
+        if (selected_object_index != -1 && remove_game_obj && selected_object_index < entities.size()) {
             remove_game_objects(selected_object_index);
+            selected_object_index = -1;
         }
 
         if (create_game_obj) {
@@ -465,227 +517,232 @@ namespace lof {
                 filled = false; // Reset filled to allow repopulating `assigned_names` for the new object
             }
 
-
-            std::string Name = entities[selected_object_index]->get_name();
-            std::string condition_name_model = "Name of Entity";
-
-            char Buffer[128]; //add to constant.h
-            strncpy_s(Buffer, Name.c_str(), sizeof(Buffer));//s is safer
-            Buffer[sizeof(Buffer) - 1] = '\0';
-
-            ImGui::BeginDisabled();
-            if (ImGui::InputText(condition_name_model.c_str(), Buffer, sizeof(Buffer))) {
-                std::string name = std::string(Buffer);
-                entities[selected_object_index]->set_name(name);
+            if (selected_object_index == -1) {
+                ImGui::Text("Select a game object to edit it.");
             }
-            ImGui::EndDisabled();
+            else {
 
+                std::string Name = entities[selected_object_index]->get_name();
+                std::string condition_name_model = "Name of Entity";
 
-            //Transform2D Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Transform2D>())) {
-                Transform2D& transform = ecs.get_component<Transform2D>(entities[selected_object_index].get()->get_id());
-                if (ImGui::CollapsingHeader("Transformation")) {
+                char Buffer[128]; //add to constant.h
+                strncpy_s(Buffer, Name.c_str(), sizeof(Buffer));//s is safer
+                Buffer[sizeof(Buffer) - 1] = '\0';
 
-                    //modifying values
-                    auto& position = transform.position;
-                    ImGui::InputFloat2("Position", &position.x);
-
-                    auto& prev_position = transform.prev_position;
-                    prev_position = position;
-                    ImGui::BeginDisabled();
-                    ImGui::InputFloat2("Previous Position", &prev_position.x); // Disabled input box (no editing)
-                    ImGui::EndDisabled();
-
-
-                    auto& orientation = transform.orientation;
-                    ImGui::InputFloat2("Orientation", &orientation.x);
-
-                    auto& scale = transform.scale;
-                    ImGui::InputFloat2("Scale", &scale.x);
+                ImGui::BeginDisabled();
+                if (ImGui::InputText(condition_name_model.c_str(), Buffer, sizeof(Buffer))) {
+                    std::string name = std::string(Buffer);
+                    entities[selected_object_index]->set_name(name);
                 }
-            }
+                ImGui::EndDisabled();
 
-            //Velocity Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Velocity_Component>())) {
-                Velocity_Component& velocity_comp = ecs.get_component<Velocity_Component>(entities[selected_object_index].get()->get_id());
-                if (ImGui::CollapsingHeader("Velocity")) {
 
-                    auto& velocity = velocity_comp.velocity;
-                    ImGui::InputFloat2("Velocity", &velocity.x);
+                //Transform2D Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Transform2D>())) {
+                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Transformation")) {
 
-                }
-            }
+                        //modifying values
+                        auto& position = transform.position;
+                        ImGui::InputFloat2("Position", &position.x);
 
-            //Physics Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Physics_Component>())) {
-                Physics_Component& physics = ecs.get_component<Physics_Component>(entities[selected_object_index].get()->get_id());
-                if (ImGui::CollapsingHeader("Physics")) {
+                        auto& prev_position = transform.prev_position;
+                        prev_position = position;
+                        ImGui::BeginDisabled();
+                        ImGui::InputFloat2("Previous Position", &prev_position.x); // Disabled input box (no editing)
+                        ImGui::EndDisabled();
 
-                    auto& gravity = physics.get_gravity();
-                    ImGui::InputFloat2("Gravity", &gravity.x);
 
-                    auto& damping_factor = physics.get_damping_factor();
-                    ImGui::InputFloat("Damping Factor", &damping_factor);
+                        auto& orientation = transform.orientation;
+                        ImGui::InputFloat2("Orientation", &orientation.x);
 
-                    auto& max_velocity = physics.get_max_velocity();
-                    ImGui::InputFloat("Maximun Velocity", &max_velocity);
-
-                    auto& accumulated_force = physics.get_accumulated_force();
-                    ImGui::InputFloat2("Accumulated Force", &accumulated_force.x);
-
-                    auto& mass = physics.get_mass();
-                    ImGui::InputFloat("Mass", &mass);
-
-                    auto& is_static = physics.get_is_static();
-                    std::string s_label = "is_static: " + std::string(is_static_on ? "On" : "Off");
-                    if (button_toggle(s_label, &is_static_on)) {
-                        is_static = !is_static;
+                        auto& scale = transform.scale;
+                        ImGui::InputFloat2("Scale", &scale.x);
                     }
+                }
 
-                    auto& is_grounded = physics.get_is_grounded();
-                    std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
-                    if (button_toggle(g_label, &is_grounded_on)) {
-                        is_grounded = !is_grounded;
+                //Velocity Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Velocity_Component>())) {
+                    Velocity_Component& velocity_comp = ecs.get_component<Velocity_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Velocity")) {
+
+                        auto& velocity = velocity_comp.velocity;
+                        ImGui::InputFloat2("Velocity", &velocity.x);
+
                     }
-
-                    auto& jump = physics.get_jump_force();
-                    ImGui::InputFloat("Jump Force", &jump);
-                }
-            }
-
-            //Grpahics Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Graphics_Component>())) {
-                Graphics_Component& graphics = ecs.get_component<Graphics_Component>(entities[selected_object_index].get()->get_id());
-                if (ImGui::CollapsingHeader("Graphics")) {
-
-                    auto& model_name = graphics.model_name;
-                    std::string condition_name_m = "model_name";
-                    text_input(model_name, condition_name_m);
-
-                    auto& color = graphics.color;
-                    ImGui::InputFloat3("Color", &color.x);
-
-                    auto& texture_name = graphics.texture_name;
-                    std::string condition_name_texture = "texture_name";
-                    text_input(texture_name, condition_name_texture);
-
-                    auto& shd_ref = graphics.shd_ref;
-                    ImGui::BeginDisabled();
-                    ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
-                    ImGui::EndDisabled();
-
-                }
-            }
-
-            //Collision Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Collision_Component>())) {
-                Collision_Component& collision = ecs.get_component<Collision_Component>(entities[selected_object_index].get()->get_id());
-                if (ImGui::CollapsingHeader("Collision")) {
-
-                    auto& width = collision.width;
-                    ImGui::InputFloat("Width", &width);
-
-                    auto& height = collision.height;
-                    ImGui::InputFloat("Height", &height);
-                }
-            }
-
-            //Animation Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Animation_Component>())) {
-                Animation_Component& animation = ecs.get_component<Animation_Component>(entities[selected_object_index].get()->get_id());
-
-                if (!filled) {
-
-                    auto& animation_list = animation.animations;
-                    for (const auto& it : animation_list) {
-                        assigned_names.push_back(it.second);
-                    }
-
-                    filled = true;
-
                 }
 
-                if (ImGui::CollapsingHeader("Animation") && filled) {
+                //Physics Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Physics_Component>())) {
+                    Physics_Component& physics = ecs.get_component<Physics_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Physics")) {
 
-                    std::vector<const char*> animation_names_c_str;
-                    for (const auto& name : assigned_names) {
-                        animation_names_c_str.push_back(name.c_str());
-                    }
+                        auto& gravity = physics.get_gravity();
+                        ImGui::InputFloat2("Gravity", &gravity.x);
 
-                    auto& animation_list = animation.animations;
-                    static std::vector<int> selected_items(animation_list.size(), -1);
-                    int index = 0;
-                    for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
-                        if (selected_items.size() != animation_list.size()) {
-                            selected_items.resize(animation_list.size(), -1);
+                        auto& damping_factor = physics.get_damping_factor();
+                        ImGui::InputFloat("Damping Factor", &damping_factor);
+
+                        auto& max_velocity = physics.get_max_velocity();
+                        ImGui::InputFloat("Maximun Velocity", &max_velocity);
+
+                        auto& accumulated_force = physics.get_accumulated_force();
+                        ImGui::InputFloat2("Accumulated Force", &accumulated_force.x);
+
+                        auto& mass = physics.get_mass();
+                        ImGui::InputFloat("Mass", &mass);
+
+                        auto& is_static = physics.get_is_static();
+                        std::string s_label = "is_static: " + std::string(is_static_on ? "On" : "Off");
+                        if (button_toggle(s_label, &is_static_on)) {
+                            is_static = !is_static;
                         }
 
-                        ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
-                        std::string label = "Choose Animation for " + std::to_string(index);
-                        if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
+                        auto& is_grounded = physics.get_is_grounded();
+                        std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
+                        if (button_toggle(g_label, &is_grounded_on)) {
+                            is_grounded = !is_grounded;
+                        }
 
-                            // Update the specific animation in the list
-                            if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
-                                it->second = assigned_names[selected_items[index]];
+                        auto& jump = physics.get_jump_force();
+                        ImGui::InputFloat("Jump Force", &jump);
+                    }
+                }
+
+                //Grpahics Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Graphics_Component>())) {
+                    Graphics_Component& graphics = ecs.get_component<Graphics_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Graphics")) {
+
+                        auto& model_name = graphics.model_name;
+                        std::string condition_name_m = "model_name";
+                        text_input(model_name, condition_name_m);
+
+                        auto& color = graphics.color;
+                        ImGui::InputFloat3("Color", &color.x);
+
+                        auto& texture_name = graphics.texture_name;
+                        std::string condition_name_texture = "texture_name";
+                        text_input(texture_name, condition_name_texture);
+
+                        auto& shd_ref = graphics.shd_ref;
+                        ImGui::BeginDisabled();
+                        ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
+                        ImGui::EndDisabled();
+
+                    }
+                }
+
+                //Collision Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Collision_Component>())) {
+                    Collision_Component& collision = ecs.get_component<Collision_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Collision")) {
+
+                        auto& width = collision.width;
+                        ImGui::InputFloat("Width", &width);
+
+                        auto& height = collision.height;
+                        ImGui::InputFloat("Height", &height);
+                    }
+                }
+
+                //Animation Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Animation_Component>())) {
+                    Animation_Component& animation = ecs.get_component<Animation_Component>(entities[selected_object_index].get()->get_id());
+
+                    if (!filled) {
+
+                        auto& animation_list = animation.animations;
+                        for (const auto& it : animation_list) {
+                            assigned_names.push_back(it.second);
+                        }
+
+                        filled = true;
+
+                    }
+
+                    if (ImGui::CollapsingHeader("Animation") && filled) {
+
+                        std::vector<const char*> animation_names_c_str;
+                        for (const auto& name : assigned_names) {
+                            animation_names_c_str.push_back(name.c_str());
+                        }
+
+                        auto& animation_list = animation.animations;
+                        static std::vector<int> selected_items(animation_list.size(), -1);
+                        int index = 0;
+                        for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
+                            if (selected_items.size() != animation_list.size()) {
+                                selected_items.resize(animation_list.size(), -1);
+                            }
+
+                            ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
+                            std::string label = "Choose Animation for " + std::to_string(index);
+                            if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
+
+                                // Update the specific animation in the list
+                                if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
+                                    it->second = assigned_names[selected_items[index]];
+                                }
                             }
                         }
+
+
+                        auto& curr = animation.curr_animation_idx;
+
+                        ImGui::Text("Current Animation Index: %i", curr);
+                        ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
+                        int temp_value = static_cast<int>(curr);
+                        if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, static_cast<int>(animation_list.size()) - 1)) {
+
+                            if (temp_value < 0) {
+                                temp_value = 0;
+                            }
+                            else if (temp_value >= static_cast<int>(animation_list.size())) {
+                                temp_value = static_cast<int>(animation_list.size()) - 1;
+                            }
+
+                            // Only update `curr_animation_idx` if temp_value is within valid bounds
+                            if (temp_value >= 0 && temp_value < static_cast<int>(animation_list.size())) {
+                                curr = static_cast<unsigned int>(temp_value);
+                            }
+                        }
+
                     }
-
-
-                    auto& curr = animation.curr_animation_idx;
-
-                    ImGui::Text("Current Animation Index: %i", curr);
-                    ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
-                    int temp_value = static_cast<int>(curr);
-                    if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, static_cast<int>(animation_list.size()) - 1)) {
-
-                        if (temp_value < 0) {
-                            temp_value = 0;
-                        }
-                        else if (temp_value >= static_cast<int>(animation_list.size())) {
-                            temp_value = static_cast<int>(animation_list.size()) - 1;
-                        }
-
-                        // Only update `curr_animation_idx` if temp_value is within valid bounds
-                        if (temp_value >= 0 && temp_value < static_cast<int>(animation_list.size())) {
-                            curr = static_cast<unsigned int>(temp_value);
-                        }
-                    }
-
                 }
-            }
 
-            //Logic Component
-            if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
-                Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
-                if (ImGui::CollapsingHeader("Logic")) {
+                //Logic Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Logic")) {
 
-                    auto& is_active = logic.is_active;
-                    std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                    if (button_toggle(s_label, &is_active_on)) {
-                        is_active = !is_active;
+                        auto& is_active = logic.is_active;
+                        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                        if (button_toggle(s_label, &is_active_on)) {
+                            is_active = !is_active;
+                        }
+
+                        auto& movement_speed = logic.movement_speed;
+                        ImGui::InputFloat("Movement Speed", &movement_speed);
+
+                        auto& movement_range = logic.movement_range;
+                        ImGui::InputFloat("Movement Range", &movement_range);
+
+                        auto& reverse_direction = logic.reverse_direction;
+                        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                        if (button_toggle(reverse_dir, &is_reverse_on)) {
+                            reverse_direction = !reverse_direction;
+                        }
+
+                        auto& is_rotate = logic.rotate_with_motion;
+                        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                            is_rotate = !is_rotate;
+                        }
+
+                        auto& original_position = logic.origin_pos;
+                        ImGui::InputFloat2("Original Position", &original_position.x);
                     }
-
-                    auto& movement_speed = logic.movement_speed;
-                    ImGui::InputFloat("Movement Speed", &movement_speed);
-
-                    auto& movement_range = logic.movement_range;
-                    ImGui::InputFloat("Movement Range", &movement_range);
-
-                    auto& reverse_direction = logic.reverse_direction;
-                    std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
-                    if (button_toggle(reverse_dir, &is_reverse_on)) {
-                        reverse_direction = !reverse_direction;
-                    }
-
-                    auto& is_rotate = logic.rotate_with_motion;
-                    std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
-                    if (button_toggle(rotate_w_motion, &is_rotate_on)) {
-                        is_rotate = !is_rotate;
-                    }
-
-                    auto& original_position = logic.origin_pos;
-                    ImGui::InputFloat2("Original Position", &original_position.x);
                 }
             }
         }

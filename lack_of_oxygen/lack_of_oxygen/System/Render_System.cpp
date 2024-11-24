@@ -303,8 +303,19 @@ namespace lof {
 
             // Check if entity has a texture
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
-                // Assign texture object to use texture image unit 5 
-                glBindTextureUnit(5, textures[graphics.texture_name]);
+
+                // Look for texture in texture storage. If not found, load texture 
+                if (textures.find(graphics.texture_name) == textures.end()) {
+                    GFXM.load_texture(graphics.texture_name);
+                }
+
+                // Assign texture object to use texture image unit 5. If texture
+                // is not loaded, render with default black texture
+                if (textures.find(graphics.texture_name) == textures.end()) {
+                    glBindTextureUnit(5, 0);
+                } else {
+                    glBindTextureUnit(5, textures[graphics.texture_name]);
+                }
 
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
