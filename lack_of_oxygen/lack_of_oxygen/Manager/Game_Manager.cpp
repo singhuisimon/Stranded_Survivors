@@ -30,7 +30,7 @@
 #include "../System/Animation_System.h"  // For player_direction
 #include "../System/Collision_System.h" // for click entity object
 
-#include "../System/Entity_Selector_System.h"
+#include "../Utility/Entity_Selector_Helper.h"
 
 // Include iostream for console output
 #include <iostream>
@@ -152,25 +152,40 @@ namespace lof {
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
 
     EntityID selectedID = -1;
+    
 
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
         }
+
+        //printf("-----------------in game manager--------------------------------\n");
+        bool has_collision = CS.has_bottom_collide_detect();
+        EntityID collision_entity = CS.get_bottom_collide_entity();
+    
+
+        if (IM.is_key_pressed(GLFW_KEY_S) && !level_editor_mode) {
+        
+            printf("Has bottom collision: %s\n", has_collision ? "true" : "false");
+            printf("Bottom collision entity: %d\n", collision_entity);
+
+        }
+        //printf("-----------------in game manager--------------------------------\n\n");
+        
 #if 0
         ESS.Check_Selected_Entity();
         
         // Check if the left mouse button was pressed
         EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-        if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        if (IM.is_key_held(GLFW_KEY_W) && !level_editor_mode) {
             // Handle left mouse button press
             std::cout << "Left mouse button pressed." << std::endl;
 
 
             if (selectedEntityInfo.isSelected) {
                 select_entity = true;
-                selectedEntityID = selectedEntityInfo.selectedEntity;
+                selectedID = selectedEntityInfo.selectedEntity;
             
                 std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
                 std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
@@ -180,7 +195,7 @@ namespace lof {
             }
             else {
                 select_entity = false;
-                selectedEntityID = selectedEntityInfo.selectedEntity;
+                selectedID = selectedEntityInfo.selectedEntity;
        
                 std::cout << "No entity is selected.\n";
                 std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
@@ -302,6 +317,9 @@ namespace lof {
                 if (IM.is_key_held(GLFW_KEY_SPACE)) { 
                     physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
                 } 
+                else {
+                    physics.set_jump_requested(false);
+                }
 
                 //activate and deactivate the forces. 
                 if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
@@ -433,6 +451,8 @@ namespace lof {
             {
                 selectedID = selectedEntityInfo.selectedEntity;
             }
+
+
         }
 
         //std::cout << selectedID << "in game manager\n";

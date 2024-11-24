@@ -49,7 +49,7 @@ namespace lof {
         EntityID entity2;
         Vec2D overlap;
         CollisionSide side;
-        bool is_grounded;
+        float collide_time; // to store when it collide
     };
 
     /**
@@ -85,9 +85,7 @@ namespace lof {
     class Collision_System : public System {
     public:
 
-        static SelectedEntityInfo& get_selected_entity_info();
-       
-        void Check_Selected_Entity();
+        
         /**
          * @brief Constructor for Collision_System.
          * Initializes the system's signature.
@@ -130,11 +128,12 @@ namespace lof {
    
         bool isInterseptBox(float box_x, float box_y, float width, float height, int X, int mouseY);
 
-        Vec2D Get_World_MousePos();
-
         static Collision_System& get_instance();
 
-        void Grid_Check_Collide(std::vector<CollisionPair>& collisions, float delta_time);
+        bool has_bottom_collide_detect() const { return has_bottom_collision; }
+        
+
+        EntityID get_bottom_collide_entity() const { return static_cast<int>(bottom_collision_entity); }
 
 
     private:
@@ -142,6 +141,13 @@ namespace lof {
 
         static std::once_flag once_flag;
 
+        int frame_counter = 0;
+        static bool has_bottom_collision;
+
+        static EntityID bottom_collision_entity;
+
+        //static bool collision_handled;
+        //float accumulated_time = 0.0f;
         
         //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
@@ -159,6 +165,8 @@ namespace lof {
          * @param delta_time The time since the last update.
          */
         void collision_check_collide(std::vector<CollisionPair>& collisions, float delta_time);
+        void collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time);
+        void collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time);
 
         /**
          * @brief Resolve collisions and update the positions and velocities of involved entities.
@@ -183,13 +191,6 @@ namespace lof {
          * @return Return the string side that is collide
          */
         std::string collisionSideToString(CollisionSide side);
-
-        void Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight);
-
-
-        static SelectedEntityInfo g_selected_Entity_Info;
-       
-
     
     };
     

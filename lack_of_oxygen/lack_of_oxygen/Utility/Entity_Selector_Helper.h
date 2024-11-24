@@ -1,6 +1,6 @@
 #pragma once
-#ifndef ENTITY_SELECTOR_SYSTEM_H
-#define ENTITY_SELECTOR_SYSTEM_H
+#ifndef ENTITY_SELECTOR_HELPER_H
+#define ENTITY_SELECTOR_HELPER_H
 
 #include "../Main/Main.h" // for extern window
 #include <iostream>
@@ -8,7 +8,7 @@
 
 namespace lof {
 
-#define ESS lof::Entity_Selector_System::get_instance()
+#define ESS lof::Entity_Selector_Helper::get_instance()
 #if 1
 	struct EntityInfo {
 		EntityID selectedEntity;
@@ -17,17 +17,17 @@ namespace lof {
 		Vec2D entitypos;
 	};
 #endif
-	class Entity_Selector_System
+	class Entity_Selector_Helper
 	{
 	public:
 
-		static Entity_Selector_System& get_instance();
+		static Entity_Selector_Helper& get_instance();
 
 		static EntityInfo& get_selected_entity_info();
 
 		void Check_Selected_Entity();
 		
-		Entity_Selector_System() = default;
+		Entity_Selector_Helper() = default;
 		
 		void Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight);
 
@@ -45,7 +45,7 @@ namespace lof {
 
 
 
-		static std::unique_ptr<Entity_Selector_System> instance;
+		static std::unique_ptr<Entity_Selector_Helper> instance;
 
 		static std::once_flag once_flag;
 

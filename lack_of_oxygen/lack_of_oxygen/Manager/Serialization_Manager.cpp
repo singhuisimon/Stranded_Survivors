@@ -70,7 +70,7 @@ namespace lof {
         static Serialization_Manager instance;
         return instance;
     }
-
+    int Serialization_Manager::scene_no = 1;
     /**
      * @brief Starts up the Serialization_Manager by loading configuration, prefabs, and scene files.
      * @return 0 on success, negative value on failure.
@@ -96,7 +96,7 @@ namespace lof {
 
         // Load scene file 
         const std::string scene_folder = "Scenes";
-        std::string scene_path = ASM.get_full_path(scene_folder, "scene2.scn");
+        std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
@@ -300,7 +300,15 @@ namespace lof {
     
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
-
+        std::string path(filename);
+        if (path.find("scene1.scn") != std::string::npos) {
+            scene_no = 1;
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");
+        }
+        else if (path.find("scene2.scn") != std::string::npos) {
+            scene_no = 2;
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 2");
+        }
         // Clear all existing entities first
         const auto& entities = ECSM.get_entities();
         std::vector<EntityID> entities_to_remove;
@@ -405,14 +413,14 @@ namespace lof {
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
         }
 
-        //// Create level entities only for scene2
-       /* if (is_scene2_file(filename)) {
+        // Create level entities only for scene2
+        if (is_scene2_file(filename)) {
             LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
             if (!create_level_entities()) {
                 LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
                 return false;
             }
-        }*/
+        }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
@@ -1019,10 +1027,15 @@ namespace lof {
         float total_width = RIGHT_BOUND - LEFT_BOUND;
         float tile_width = total_width / current_level.cols;
         float tile_height = tile_width; // Keep tiles square
+ 
 
         //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
         //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
-
+        //float first_tile_x = LEFT_BOUND + (0 * tile_width) + (tile_width / 2.0f);
+        //float last_tile_x = LEFT_BOUND + ((current_level.cols - 1) * tile_width) + (tile_width / 2.0f);
+        //LM.write_log("First tile X position: %.2f", first_tile_x);
+        //LM.write_log("Last tile X position: %.2f", last_tile_x);
+  
         // Create entities for each tile
         for (size_t row = 0; row < current_level.rows; ++row) {
             for (size_t col = 0; col < current_level.cols; ++col) {
@@ -1060,7 +1073,9 @@ namespace lof {
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
                 float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
-
+                LM.write_log("First tile X position: %.2f", x_pos);
+                LM.write_log("Last tile X position: %.2f", y_pos);
+                
                 // Create unique name for the tile entity
                 std::string entity_name = prefab_name + "_" + std::to_string(row) + "_" + std::to_string(col);
 
@@ -1071,19 +1086,27 @@ namespace lof {
                     if (ECSM.has_component<Transform2D>(entity)) {
                         auto& transform = ECSM.get_component<Transform2D>(entity);
                         transform.position = Vec2D(x_pos, y_pos);
+                        transform.prev_position = Vec2D(transform.position);
                         transform.scale = Vec2D(tile_width, tile_height);
 
                         // Log the position for debugging
                         LM.write_log("Created tile '%c' at (%.2f, %.2f) with size %.2f x %.2f",
                             tile.type, x_pos, y_pos, tile_width, tile_height);
+                       
                     }
+                    
 
                     // Update collision component if present
                     if (ECSM.has_component<Collision_Component>(entity)) {
                         auto& collision = ECSM.get_component<Collision_Component>(entity);
                         collision.width = tile_width;
                         collision.height = tile_height;
+
+                        // Debug print collision component
+                        LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
+                            x_pos, y_pos, collision.width, collision.height);
                     }
+                   
                 }
                 else {
                     LM.write_log("Failed to create entity from prefab '%s'", prefab_name.c_str());

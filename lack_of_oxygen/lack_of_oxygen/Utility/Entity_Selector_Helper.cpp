@@ -1,4 +1,4 @@
-#include "Entity_Selector_System.h"
+#include "Entity_Selector_Helper.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Main/Main.h" // for extern window
 #include <iostream>
@@ -8,24 +8,24 @@
 
 namespace lof 
 {
-    std::unique_ptr<Entity_Selector_System> Entity_Selector_System::instance;
-    std::once_flag Entity_Selector_System::once_flag;
+    std::unique_ptr<Entity_Selector_Helper> Entity_Selector_Helper::instance;
+    std::once_flag Entity_Selector_Helper::once_flag;
 
-    EntityInfo Entity_Selector_System::g_selected_entity_info;
+    EntityInfo Entity_Selector_Helper::g_selected_entity_info;
 
-    Entity_Selector_System& Entity_Selector_System::get_instance() {
+    Entity_Selector_Helper& Entity_Selector_Helper::get_instance() {
         std::call_once(once_flag, []() {
-            instance.reset(new Entity_Selector_System);
+            instance.reset(new Entity_Selector_Helper);
             });
         return *instance;
     }
 
-    EntityInfo& Entity_Selector_System::get_selected_entity_info() {
+    EntityInfo& Entity_Selector_Helper::get_selected_entity_info() {
         return g_selected_entity_info;
     }
 
 #if 1
-    void Entity_Selector_System::Check_Selected_Entity()
+    void Entity_Selector_Helper::Check_Selected_Entity()
     {
         bool entitySelected = false;
         EntityID selectedEntityID = -1;
@@ -56,9 +56,6 @@ namespace lof
             float entityWidth = collision.width;
             float entityHeight = collision.height;
 
-           
-           
-
             Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
             EntityInfo selectedInfo = g_selected_entity_info;
 
@@ -77,14 +74,24 @@ namespace lof
 
     
 #if 1
-    void Entity_Selector_System::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
+    void Entity_Selector_Helper::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
     {
+        bool isSelected = false;
+        if (level_editor_mode)
+        {
 
-        ImVec2 mousePos = IMGUIM.imgui_mouse_pos();
+            ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
+            g_selected_entity_info.mousePos = mousePos;
+            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        }
+        else
+        {
+            Vec2D mousePos = Get_World_MousePos();
+            g_selected_entity_info.entitypos = mousePos;
+            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        }
         
-        g_selected_entity_info.mousePos = mousePos;
 
-        bool isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
         g_selected_entity_info.isSelected = isSelected;
 
         if (g_selected_entity_info.isSelected) {
@@ -119,7 +126,7 @@ namespace lof
     }
 #endif
 
-    Vec2D Entity_Selector_System::Get_World_MousePos()
+    Vec2D Entity_Selector_Helper::Get_World_MousePos()
     {
 
         if (!window)
@@ -176,7 +183,7 @@ namespace lof
     }
 
   
-    bool Entity_Selector_System::Mouse_Over_AABB(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
+    bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
     {
         return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
             mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));

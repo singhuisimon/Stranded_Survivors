@@ -40,7 +40,7 @@
     <ClCompile Include="System\Logic_System.cpp" />
     <ClCompile Include="Manager\Assets_Manager.cpp" />
     <ClCompile Include="Utility\Force_Helper.cpp" />
-    <ClCompile Include="System\Entity_Selector_System.cpp" />
+    <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -80,7 +80,7 @@
     <ClInclude Include="Manager\Assets_Manager.h" />
     <ClInclude Include="Utility\Force_Helper.h" />
     <ClInclude Include="System\Header.h" />
-    <ClInclude Include="System\Entity_Selector_System.h" />
+    <ClInclude Include="Utility\Entity_Selector_Helper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />

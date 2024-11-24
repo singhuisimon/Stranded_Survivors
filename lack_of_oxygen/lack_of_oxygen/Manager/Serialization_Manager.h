@@ -93,7 +93,7 @@ namespace lof {
         };
 
         LevelData current_level;
-
+        static int scene_no;
     public:
 
         /**
@@ -146,6 +146,7 @@ namespace lof {
         // ----------------- use for collision---------------------------------//
         size_t get_level_rows() const { return current_level.rows; }
         size_t get_level_cols() const { return current_level.cols; }
+        int scene_switch() const { return scene_no; }
     };
 
 } // namespace lof
