@@ -442,11 +442,11 @@ namespace lof {
 
             if (matches) {
                 system->add_entity(entity);
-                LM.write_log("Entity %u added to system %s.", entity, system->get_type().c_str());
+                // LM.write_log("Entity %u added to system %s.", entity, system->get_type().c_str());
             }
             else {
                 system->remove_entity(entity);
-                LM.write_log("Entity %u removed from system %s.", entity, system->get_type().c_str());
+                // LM.write_log("Entity %u removed from system %s.", entity, system->get_type().c_str());
             }
         }
     }
