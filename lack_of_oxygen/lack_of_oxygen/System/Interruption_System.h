@@ -79,6 +79,9 @@ namespace lof {
 		void restore_window();
 		bool is_game_paused() const;
 
+		void check_key_combinations();
+		void handle_audio();
+
 		// Callbacks
 		static void iconify_callback(GLFWwindow* window, int iconified);
 		static void focus_callback(GLFWwindow* window, int focused);
@@ -105,6 +108,11 @@ namespace lof {
 		int prev_width;
 		int prev_x; 
 		int prev_y;
+
+		bool alt_tab; 
+		bool ctrl_alt_del;
+		bool prev_alt_tab = false;
+		bool prev_ctrl_alt_del = false;
 
 	};
 }

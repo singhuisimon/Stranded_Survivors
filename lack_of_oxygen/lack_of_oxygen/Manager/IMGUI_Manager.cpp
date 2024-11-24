@@ -7,7 +7,7 @@
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
- 
+
  // Include header file
 #include "IMGUI_Manager.h"
 
@@ -61,7 +61,7 @@ namespace lof {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
             return 0; // Already started
         }
-        
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -72,7 +72,7 @@ namespace lof {
     }
 
     void IMGUI_Manager::display_loading_options() {
- 
+
         int current_object_index = 0;
 
         ImGui::Begin("File List");
@@ -80,7 +80,7 @@ namespace lof {
         if (ImGui::Button("Load Scene")) {
             load_selected = !load_selected;
         }
-        ImGui::End(); 
+        ImGui::End();
 
         if (load_selected && (selected_file_index != -1)) {
             const std::string SCENES = "Scenes";;
@@ -93,7 +93,7 @@ namespace lof {
             else {
 
                 //LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
-                
+
                 load_selected = !load_selected;
             }
         }
@@ -109,8 +109,8 @@ namespace lof {
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
         static ImGuiDockNodeFlags docking_flags = ImGuiDockNodeFlags_None;
-        static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking 
-            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize 
+        static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
+            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
             | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -121,7 +121,7 @@ namespace lof {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
-        
+
         ImGui::Begin("Level Editor Mode", nullptr, window_flags);
 
         ImGuiIO& io = ImGui::GetIO();
@@ -135,7 +135,7 @@ namespace lof {
         {
             if (ImGui::BeginMenu("Options"))
             {
-               
+
                 if (ImGui::MenuItem("Flag: NoSplit", "", (docking_flags & ImGuiDockNodeFlags_NoSplit) != 0)) {
                     docking_flags ^= ImGuiDockNodeFlags_NoSplit;
                 }
@@ -151,7 +151,7 @@ namespace lof {
         }
 
         ImGui::PopStyleVar(2);
-        ImGui::End(); 
+        ImGui::End();
 
         //Windows -------------------------------------------------------------------------------
         if (GFXM.get_editor_mode() == 1) {
@@ -177,7 +177,7 @@ namespace lof {
 
 
     }
-    
+
 
     void IMGUI_Manager::imgui_game_objects_list() {
 
@@ -191,19 +191,19 @@ namespace lof {
             selected_object_index = -1;
         }
 
-        for (int i = 0; i < entities.size(); ++i) { 
-            
+        for (int i = 0; i < entities.size(); ++i) {
+
             if (entities[i] != nullptr) {
                 std::string obj_name = entities[i]->get_name();
-                
+
                 //selectable for clicking; second param for highlighting
                 if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index)) {
 
                     //selected; casuing seceond param state to change
                     selected_object_index = current_object_index;
                 }
-                
-                
+
+
             }
 
             ++current_object_index;
@@ -256,10 +256,12 @@ namespace lof {
     static bool is_static_on = false;
     static bool is_moveable_on = true;
     static bool is_grounded_on = false;
-    static bool is_jumping_on = false;
-    static bool is_audio_on = false;
 
-    
+    static bool is_active_on = true;
+    static bool is_reverse_on = false;
+    static bool is_rotate_on = true;;
+
+
     void IMGUI_Manager::imgui_game_objects_edit() {
 
         static int last_selected_object_index = -1; // Track the previous selected object index
@@ -592,7 +594,7 @@ namespace lof {
                 LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
             }
         }*/
-            
+
 
         ImGui::End();
     }
@@ -608,7 +610,7 @@ namespace lof {
             return;
         }
 
-        
+
     }
 
     void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
