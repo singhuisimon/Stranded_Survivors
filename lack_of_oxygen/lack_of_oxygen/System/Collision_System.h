@@ -131,9 +131,14 @@ namespace lof {
         static Collision_System& get_instance();
 
         bool has_bottom_collide_detect() const { return has_bottom_collision; }
+        bool has_left_collide_detect() const { return has_left_collision; }
+        bool has_right_collide_detect() const { return has_right_collision; }
         
 
         EntityID get_bottom_collide_entity() const { return static_cast<int>(bottom_collision_entity); }
+        EntityID get_left_collide_entity() const { return static_cast<int>(left_collision_entity); }
+        EntityID get_right_collide_entity() const { return static_cast<int>(right_collision_entity); }
+
 
 
     private:
@@ -143,8 +148,12 @@ namespace lof {
 
         int frame_counter = 0;
         static bool has_bottom_collision;
+        static bool has_left_collision;
+        static bool has_right_collision;
 
         static EntityID bottom_collision_entity;
+        static EntityID left_collision_entity;
+        static EntityID right_collision_entity;
 
         //static bool collision_handled;
         //float accumulated_time = 0.0f;

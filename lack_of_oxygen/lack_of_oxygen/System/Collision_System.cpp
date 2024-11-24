@@ -430,14 +430,24 @@ namespace lof {
     EntityID Collision_System::bottom_collision_entity = -1;
     bool Collision_System::has_bottom_collision = false;
 
+    EntityID Collision_System::left_collision_entity = -1;
+    bool Collision_System::has_left_collision = false;
+
+    EntityID Collision_System::right_collision_entity = -1;
+    bool Collision_System::has_right_collision = false;
+
     void Collision_System::collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time) {
  
         bool found_bottom_collision = false;
+        bool found_left_collision = false;
+        bool found_right_collision = false;
         const auto& collision_entities = get_entities();
         bool is_grounded = false;
         frame_counter++;
     
         EntityID current_bottom_entity = -1;
+        EntityID current_left_entity = -1;
+        EntityID current_right_entity = -1;
 
         // Level grid constants
         const float LEFT_BOUND = -1020.0f;
@@ -525,12 +535,15 @@ namespace lof {
                     if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
                         CollisionSide side = compute_collision_side(aabb1, aabb2);
 
+#if 0
                         if (side == CollisionSide::BOTTOM && !is_grounded) {
                             //printf("this logic is occur \n");
                             is_grounded = true;
                             physic1.set_gravity(Vec2D(0.0f, 0.0f));
                             found_bottom_collision = true;
                             current_bottom_entity = entity_ID2;
+                            found_left_collision = false;
+                            found_right_collision = false;
                            
                         }
                         else {
@@ -538,6 +551,28 @@ namespace lof {
                             is_grounded = false;
                             bottom_collision_entity = -1;
                         }
+#endif
+                        switch (side) {
+                        case CollisionSide::BOTTOM:
+                            if (!is_grounded) {
+                                is_grounded = true;
+                                physic1.set_gravity(Vec2D(0.0f, 0.0f));
+                                found_bottom_collision = true;
+                                current_bottom_entity = entity_ID2;
+                            }
+                            break;
+
+                        case CollisionSide::LEFT:
+                            found_left_collision = true;
+                            current_left_entity = entity_ID2;
+                            break;
+
+                        case CollisionSide::RIGHT:
+                            found_right_collision = true;
+                            current_right_entity = entity_ID2;
+                            break;
+                        }
+                        
                         //printf("Collision detected: Entity %d with Entity %d at side %d\n", entity_ID1, entity_ID2, side);
                         //printf("this is frame counter: %f\n" , static_cast<float>(frame_counter));
                         //printf("this is bool of is_grounded %d\n", is_grounded);
@@ -558,12 +593,30 @@ namespace lof {
         if (found_bottom_collision) {
             bottom_collision_entity = current_bottom_entity;
             has_bottom_collision = true;
-           
         }
         else {
             bottom_collision_entity = -1;
             has_bottom_collision = false;
-            
+        }
+
+        // Left collision
+        if (found_left_collision) {
+            left_collision_entity = current_left_entity;
+            has_left_collision = true;
+        }
+        else {
+            left_collision_entity = -1;
+            has_left_collision = false;
+        }
+
+        // Right collision
+        if (found_right_collision) {
+            right_collision_entity = current_right_entity;
+            has_right_collision = true;
+        }
+        else {
+            right_collision_entity = -1;
+            has_right_collision = false;
         }
     }
    
@@ -923,13 +976,23 @@ namespace lof {
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
-        // std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
+        //std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
         //printf("this is bool of is_collide_bottom %d\n", is_collide_bottom);
         // printf("this is the entity that get %d\n", get_bottom_collide_entity());
+        //printf("entity bottom: %d\n", has_bottom_collide_detect());
+
+        //printf("this is the entity that get %d\n", get_bottom_collide_entity());
         // printf("entity bottom: %d\n", has_bottom_collide_detect());
-        
-        // yea std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
+
+        //printf("this is the entity left %d\n", get_left_collide_entity());
+        //printf("entity left: %d\n", has_left_collide_detect());
+        //
+
+        //printf("this is the entity right %d\n", get_right_collide_entity());
+        //printf("entity right: %d\n", has_right_collide_detect());
+
+        //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
         resolve_collision_event(collisions);
         //Check_Selected_Entity();
      
