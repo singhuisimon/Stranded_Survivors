@@ -547,7 +547,7 @@
             {
               "key": "moving right",
               "filepath": "Fx27",
-              "audio_state": 0,
+              "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
               "pitch": 1.0,
