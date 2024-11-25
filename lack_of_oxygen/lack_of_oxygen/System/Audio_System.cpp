@@ -204,17 +204,16 @@ namespace lof {
 
 	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
 		//check if sound has already been loaded.
-		auto sound = sound_map.find(file_path);
-		if (sound == sound_map.end()) {
+		if (sound_map.find(file_path) == sound_map.end()) {
 			load_sound(file_path);
-			if (sound == sound_map.end()) {
+			if (sound_map.find(file_path) == sound_map.end()) {
 				LM.write_log("audiosystem play_sound fail to load sound %s.", file_path.c_str());
 				return;
 			}
 		}
 
 		//check if the sound is already playing under the entity in a channel
-		if ((channel_map.find(cskey) != channel_map.end())){//}&& channel_map.find(cskey)->second != nullptr) {
+		if ((channel_map.find(cskey) != channel_map.end()) && channel_map.find(cskey)->second != nullptr) {
 			//check if sound has finish playing, if so change the audio_state to stopped.
 			bool playing = false;
 			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
@@ -225,6 +224,8 @@ namespace lof {
 			return;	//sound is already playing
 		}
 
+		auto sound = sound_map.find(file_path);
+
 		//find the loaded sound file
 		FMOD::Channel* channel = nullptr;
 		//FMOD::ChannelGroup* group = nullptr;
@@ -234,9 +235,7 @@ namespace lof {
 			LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 			return;
 		}
-		/*else {
-			channel_map[cskey] = channel;
-		}*/
+
 		channel_map[cskey] = channel;
 
 		//add channel into the respective channel group
