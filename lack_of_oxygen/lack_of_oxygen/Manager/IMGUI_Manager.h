@@ -22,6 +22,7 @@
 #include "../IMGUI/imgui_impl_glfw.h"
 #include "../IMGUI/imgui_impl_opengl3.h"
 
+
 // Include standard headers
 #include <string>
 #include <fstream>
@@ -29,6 +30,8 @@
 #include <unordered_map>
 
 namespace lof {
+    //extern EntityID selectedEntityID;
+    extern bool select_entity;
 
     /**
      * @class IMGUI_Manager
@@ -52,6 +55,8 @@ namespace lof {
         //Vector to get and hold the prefab names for display
         std::vector<std::string> prefab_names{};
 
+        ImVec2 Mouse_Pos;
+
     public:
 
         /**
@@ -63,6 +68,7 @@ namespace lof {
         //Deleted copy constructor and copy assignmemt to enforce singleton pattern
         IMGUI_Manager(const IMGUI_Manager&) = delete;
         IMGUI_Manager& operator=(const IMGUI_Manager&) = delete;
+
 
         /**
          * @brief Get singleton instance of IMGUI_Manager.
@@ -145,6 +151,10 @@ namespace lof {
          * @brief Shuts down all IMGUI_Manager services. Called after the game loop to ensure proper cleanup.
          */
         void shut_down() override;
+
+        ImVec2 get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
+
+        ImVec2 imgui_mouse_pos();
     };
 
 } // namespace lof

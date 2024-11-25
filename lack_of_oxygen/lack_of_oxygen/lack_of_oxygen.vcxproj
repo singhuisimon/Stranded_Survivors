@@ -53,6 +53,7 @@
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
+    <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
     <ClCompile Include="Utility\Force_Helper.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
@@ -82,6 +83,7 @@
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="System\GUI_System.h" />
+    <ClInclude Include="System\Header.h" />
     <ClInclude Include="System\Logic_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
@@ -89,6 +91,7 @@
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\Constant.h" />
+    <ClInclude Include="Utility\Entity_Selector_Helper.h" />
     <ClInclude Include="Utility\Force_Helper.h" />
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Globals.h" />
@@ -99,6 +102,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Config\config.json" />
+    <None Include="Assets\Level_Design\Level_Design.csv" />
+    <None Include="Assets\Prefab\prefab.json" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Data\square.msh" />
@@ -114,6 +119,53 @@
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Textures\Air_1.png" />
+    <Image Include="Assets\Textures\Air_2.png" />
+    <Image Include="Assets\Textures\Air_3.png" />
+    <Image Include="Assets\Textures\Air_Batch_4.png" />
+    <Image Include="Assets\Textures\Alexandrite_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Alexandrite_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Amethyst_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Amethyst_002_Batch 4.png" />
+    <Image Include="Assets\Textures\BG.png" />
+    <Image Include="Assets\Textures\Citrine_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Citrine_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Dirt mined_Batch 4.png" />
+    <Image Include="Assets\Textures\Dirt.png" />
+    <Image Include="Assets\Textures\Dirt_Batch_4.png" />
+    <Image Include="Assets\Textures\Emerald_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Emerald_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Emerald_Geode.png" />
+    <Image Include="Assets\Textures\Explosion radius_Batch 4.png" />
+    <Image Include="Assets\Textures\Lava Vignette_Batch 4.png" />
+    <Image Include="Assets\Textures\Lava_Batch_4.png" />
+    <Image Include="Assets\Textures\Oxygen Tank_Batch 4.png" />
+    <Image Include="Assets\Textures\Oxygen_Refill_Green_circle.png" />
+    <Image Include="Assets\Textures\Oxygen_Refill_Red_circle.png" />
+    <Image Include="Assets\Textures\Prisoner.png" />
+    <Image Include="Assets\Textures\Prisoner_Spritesheet.png" />
+    <Image Include="Assets\Textures\Quartz_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Quartz_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Quartz_Geode.png" />
+    <Image Include="Assets\Textures\Rock Mined_Batch 4.png" />
+    <Image Include="Assets\Textures\Rock.png" />
+    <Image Include="Assets\Textures\Rock_Batch_4.png" />
+    <Image Include="Assets\Textures\Sapphire_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Sapphire_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Skybox_ALL.png" />
+    <Image Include="Assets\Textures\Snowflake.png" />
+    <Image Include="Assets\Textures\Spritesheet_Animate.png" />
+    <Image Include="Assets\Textures\Sun.png" />
+    <Image Include="Assets\Textures\TNT.png" />
+    <Image Include="Assets\Textures\TNT_Batch_4.png" />
+    <Image Include="Assets\Textures\Vent.png" />
+    <Image Include="Assets\Textures\Wormhole.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Assets\Textures\Prisoner_Atlas.txt" />
+    <Text Include="Assets\Textures\Texture_Names.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -97,8 +97,8 @@
             30.0
           ],
           "scale": [
-            102.4000015258789,
-            153.60000610351563
+            98.0,
+            98.0
           ]
         },
         "Graphics_Component": {
@@ -129,8 +129,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 102.4000015258789,
-          "height": 153.60000610351563
+          "width": 98.0,
+          "height": 98.0
         },
         "Physics_Component": {
           "gravity": [

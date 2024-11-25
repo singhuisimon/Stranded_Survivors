@@ -15,6 +15,7 @@
 #include "Render_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
+#include "Collision_System.h"
 
 
 // FOR TESTING
@@ -57,7 +58,7 @@ namespace lof {
                 if (ECSM.has_component<Collision_Component>(entity_id)) {
 
                     auto& collision = ECSM.get_component<Collision_Component>(entity_id);
-
+#if 0
                     int scale_flag = GFXM.get_scale_flag();
                     if (scale_flag == GLFW_KEY_UP) {
                         LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
@@ -87,6 +88,7 @@ namespace lof {
                         }
                     }
 
+
                     // Rotation update when left or right arrow key pressed
                     int rotation_flag = GFXM.get_rotation_flag();
                     if (rotation_flag == GLFW_KEY_LEFT) {
@@ -99,6 +101,7 @@ namespace lof {
                         transform.orientation.x -= rot_change;
                         LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
                     }
+#endif
                 }
 
             }
@@ -300,8 +303,19 @@ namespace lof {
 
             // Check if entity has a texture
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
-                // Assign texture object to use texture image unit 5 
-                glBindTextureUnit(5, textures[graphics.texture_name]);
+
+                // Look for texture in texture storage. If not found, load texture 
+                if (textures.find(graphics.texture_name) == textures.end()) {
+                    GFXM.load_texture(graphics.texture_name);
+                }
+
+                // Assign texture object to use texture image unit 5. If texture
+                // is not loaded, render with default black texture
+                if (textures.find(graphics.texture_name) == textures.end()) {
+                    glBindTextureUnit(5, 0);
+                } else {
+                    glBindTextureUnit(5, textures[graphics.texture_name]);
+                }
 
                 LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
