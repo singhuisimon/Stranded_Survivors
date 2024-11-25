@@ -163,6 +163,7 @@ int main(void) {
     unsigned int win_width = mode->width;
 
     bool enter_key_was_pressed_last_frame = false;
+    Window_Control win_control;
 
     // -------------------------- Game Loop Setup --------------------------
 
@@ -209,18 +210,7 @@ int main(void) {
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
-            if (is_full_screen) {
-                win_height = SCR_HEIGHT;
-                win_width = SCR_WIDTH;
-                glfwSetWindowMonitor(window, nullptr, 200, 200, win_width, win_height, GLFW_DONT_CARE);
-                is_full_screen = false;
-            }
-            else {
-                win_height = mode->height;
-                win_width = mode->width;
-                glfwSetWindowMonitor(window, monitor, 0, 0, win_width, win_height, GLFW_DONT_CARE);
-                is_full_screen = true;
-            }
+            win_control.toggle_fullscreen(window, monitor, mode, is_full_screen, SCR_WIDTH, SCR_HEIGHT);
         }
         enter_key_was_pressed_last_frame = is_ENTER_pressed;
 
