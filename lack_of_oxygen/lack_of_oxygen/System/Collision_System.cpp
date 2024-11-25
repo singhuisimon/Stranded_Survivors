@@ -439,7 +439,7 @@ namespace lof {
     EntityID Collision_System::top_collision_entity = -1;
     bool Collision_System::has_top_collision = false;
 
-
+ 
 
     void Collision_System::collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time) {
 
@@ -456,6 +456,7 @@ namespace lof {
         EntityID current_left_entity = -1;
         EntityID current_right_entity = -1;
         EntityID current_top_entity = -1;
+
         // Level grid constants
         const float LEFT_BOUND = -1020.0f;
         const float RIGHT_BOUND = 1020.0f;
@@ -465,7 +466,7 @@ namespace lof {
 
         // Calculate cell dimensions based on level size
         const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
-        const float CELL_HEIGHT = CELL_WIDTH; // Assuming square cells
+        const float CELL_HEIGHT = CELL_WIDTH; 
 
         for (auto it_1 = collision_entities.begin(); it_1 != collision_entities.end(); ++it_1) {
             EntityID entity_ID1 = *it_1;
@@ -492,7 +493,7 @@ namespace lof {
             LM.write_log("Player (Entity %d) world position: (%.2f, %.2f)",
                 entity_ID1, transform1.position.x, transform1.position.y);
             //LM.write_log("Player grid position: [Row: %d, Col: %d]", player_row, player_col);
-            //printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
+            printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
 
             // Define the 5x5 check area around the player
             const int CHECK_RADIUS = 1; // 2 cells in each direction + current cell = 5x5
@@ -542,15 +543,13 @@ namespace lof {
                     if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
                         CollisionSide side = compute_collision_side(aabb1, aabb2);
 
-#if 0
                         if (side == CollisionSide::BOTTOM && !is_grounded) {
                             //printf("this logic is occur \n");
                             is_grounded = true;
                             physic1.set_gravity(Vec2D(0.0f, 0.0f));
                             found_bottom_collision = true;
                             current_bottom_entity = entity_ID2;
-                            found_left_collision = false;
-                            found_right_collision = false;
+                            
 
                         }
                         else {
@@ -558,34 +557,7 @@ namespace lof {
                             is_grounded = false;
                             bottom_collision_entity = -1;
                         }
-#endif
-                        switch (side) {
-                        case CollisionSide::BOTTOM:
-                            if (!is_grounded) {
-                                is_grounded = true;
-                                physic1.set_gravity(Vec2D(0.0f, 0.0f));
-                                found_bottom_collision = true;
-                                current_bottom_entity = entity_ID2;
-                            }
-                            break;
-
-                        case CollisionSide::LEFT:
-                            found_left_collision = true;
-                            current_left_entity = entity_ID2;
-                            break;
-
-                        case CollisionSide::RIGHT:
-                            found_right_collision = true;
-                            current_right_entity = entity_ID2;
-                            break;
-
-                        case CollisionSide::TOP:
-                            found_top_collision = true;
-                            current_top_entity = entity_ID2;
-                            break;
-                        }
-
-
+                 
                         //printf("Collision detected: Entity %d with Entity %d at side %d\n", entity_ID1, entity_ID2, side);
                         //printf("this is frame counter: %f\n" , static_cast<float>(frame_counter));
                         //printf("this is bool of is_grounded %d\n", is_grounded);
@@ -594,12 +566,47 @@ namespace lof {
                         collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side,  static_cast<float>(frame_counter) });
 
                     }
-                    if (!found_top_collision && aabb2.min.y > aabb1.max.y && // Entity2 is above Entity1
-                        aabb2.min.x < aabb1.max.x && aabb2.max.x > aabb1.min.x && // Horizontally aligned
-                        (aabb2.min.y - aabb1.max.y) < collision1.height) { // Within one unit height
+                  
+                    // Left check
+                    if (!found_left_collision &&
+                        entity2_col == player_col - 1 && // one column to the left
+                        entity2_row == player_row && // ensure it is same row
+                        std::abs(transform2.position.x - transform1.position.x) < (CELL_WIDTH * 1.2f)) { //ensure is close to tile
+                        found_left_collision = true;
+                        current_left_entity = entity_ID2;
+                        //LM.write_log("Left entity detected in column %d: %d\n", entity2_col, entity_ID2);
+                    }
+
+                    // Right check
+                    if (!found_right_collision &&
+                        entity2_col == player_col + 1 && // one column to the right
+                        entity2_row == player_row && // ensure it is same row
+                        std::abs(transform2.position.x - transform1.position.x) < (CELL_WIDTH * 1.2f)) { // ensure is close to tile
+                        found_right_collision = true;
+                        current_right_entity = entity_ID2;
+                        //LM.write_log("Right entity detected in column %d: %d\n", entity2_col, entity_ID2);
+                    }
+
+                    // Top check 
+                    if (!found_top_collision &&
+                        entity2_row == player_row - 1 && // Exactly one row above
+                        entity2_col == player_col && // ensure it is same row
+                        std::abs(transform2.position.y - transform1.position.y) < (CELL_HEIGHT * 1.2f)) { 
                         found_top_collision = true;
                         current_top_entity = entity_ID2;
+                        //LM.write_log("Top entity detected in row %d: %d", entity2_row, entity_ID2);
                     }
+
+                    // Bottom check (only work if level_design map first row is empty 'e')
+                    //if (!found_bottom_collision &&
+                    //    entity2_row == player_row + 1 && // Exactly one row below
+                    //    entity2_col == player_col && // ensure it is same row
+                    //    std::abs(transform2.position.y - transform1.position.y) < (CELL_HEIGHT * 1.2f)) {
+                    //    found_bottom_collision = true;
+                    //    current_bottom_entity = entity_ID2;
+                    //    //LM.write_log("Top entity detected in row %d: %d", entity2_row, entity_ID2);
+                    //}
+
                 }
             } //end of -150
 
