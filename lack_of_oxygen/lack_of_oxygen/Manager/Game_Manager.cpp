@@ -308,30 +308,40 @@ namespace lof {
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
 
-                //if (IM.is_key_held(GLFW_KEY_SPACE)) {
-                //    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component
-                //}
-                //// Handle horizontal movement
-
-                ////activate and deactivate the forces.
-                //if (IM.is_key_held(GLFW_KEY_A)) {
-                //    physics.force_helper.activate_force(MOVE_LEFT);
-                //    if (physics.get_is_grounded()) {
-                //        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
-                //    }
-                //}
-                //else {
-                //    physics.force_helper.deactivate_force(MOVE_LEFT);
-                //}
-                //if (IM.is_key_held(GLFW_KEY_D)) {
-                //    physics.force_helper.activate_force(MOVE_RIGHT);
-                //    if (physics.get_is_grounded()) {
-                //        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
-                //    }
-                //}
-                //else {
-                //    physics.force_helper.deactivate_force(MOVE_RIGHT);
-                //}
+                if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                    if (CS.has_left_collide_detect()) {
+                        EntityID block_to_remove = CS.get_left_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block on the left
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                    if (CS.has_right_collide_detect()) {
+                        EntityID block_to_remove = CS.get_right_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block on the right
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_UP)) {
+                    // Note: You might need to add top collision detection in Collision System
+                    // Similar to left/right collisions
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                    if (CS.has_bottom_collide_detect()) {
+                        EntityID block_to_remove = CS.get_bottom_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block below
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
 
 
                 // Handle horizontal movement

@@ -772,10 +772,6 @@
             [ 0.0, 0.0, 0.0 ]
           ]
         },
-        "Collision_Component": {
-          "width": 102.0,
-          "height": 102.0
-        },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
           "damping_factor": 0.0,
@@ -815,10 +811,6 @@
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
-        },
-        "Collision_Component": {
-          "width": 102.0,
-          "height": 102.0
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
