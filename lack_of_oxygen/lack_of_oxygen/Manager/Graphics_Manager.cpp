@@ -12,8 +12,9 @@
 #include "Graphics_Manager.h" 
 //#include "../Utility/Path_Helper.h" // For file path resolution
 #include "Assets_Manager.h"
+#include "../Utility/globals.h"       // For accessing window object
 
-// FOR TESTING (texture loading)
+// Texture loading
 #define STB_IMAGE_IMPLEMENTATION 
 #include "STB/stb_image.h"  // For loading textures/sprites 
 
@@ -55,8 +56,10 @@ namespace lof {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Set viewport position and dimensions
-        GLuint scr_width = SM.get_scr_width();
-        GLuint scr_height = SM.get_scr_height();
+        //GLuint scr_width = SM.get_scr_width();
+        //GLuint scr_height = SM.get_scr_height();
+        int scr_width, scr_height;
+        glfwGetWindowSize(window, &scr_width, &scr_height);
         glViewport(0, 0, scr_width, scr_height);
 
         // Set up default render mode 
