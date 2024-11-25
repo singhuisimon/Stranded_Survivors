@@ -101,17 +101,41 @@ namespace lof {
 					continue;
 				}
 
+				const float epsilon = 0.01f;  // Tolerance for small differences
+
 				if (channel_map.find(key_id) != channel_map.end()) {
 					float currvolume, currpitch;
 
-					if (channel_map[key_id]->getVolume(&currvolume) != audio.get_volume(audio_key)) {
-						set_channel_volume(key_id, audio.get_volume(audio_key));
+					// Get current volume and target volume
+					float targetVolume = audio.get_volume(audio_key);
+					channel_map[key_id]->getVolume(&currvolume);
+
+					// Calculate the difference
+					float volumeDiff = std::abs(currvolume - targetVolume);
+					//LM.write_log("Audio_System::Update, Volume Diff: %f (Curr: %f, Target: %f)", volumeDiff, currvolume, targetVolume);
+
+					// Only set volume if the difference exceeds the tolerance
+					if (volumeDiff > epsilon) {
+						LM.write_log("Audio_System::Update, Channel volume before setting: %f", currvolume);
+						set_channel_volume(key_id, targetVolume);  // Set volume only if it's different
+						LM.write_log("Audio_System::Update, Channel volume after setting: %f", targetVolume);
 					}
 
-					if (channel_map[key_id]->getPitch(&currpitch) != audio.get_pitch(audio_key)) {
-						set_channel_pitch(key_id, audio.get_pitch(audio_key));
+					// Get current pitch and target pitch
+					float targetPitch = audio.get_pitch(audio_key);
+					channel_map[key_id]->getPitch(&currpitch);
+
+					// Calculate the pitch difference
+					float pitchDiff = std::abs(currpitch - targetPitch);
+					//LM.write_log("Audio_System::Update, Pitch Diff: %f (Curr: %f, Target: %f)", pitchDiff, currpitch, targetPitch);
+
+					// Only set pitch if the difference exceeds the tolerance
+					if (pitchDiff > epsilon) {
+						LM.write_log("Audio_System::Update, Channel pitch before setting: %f", currpitch);
+						set_channel_pitch(key_id, targetPitch);  // Set pitch only if it's different
 					}
 				}
+
 			}
 			
 		}
@@ -162,14 +186,17 @@ namespace lof {
 			return;
 		}
 		LM.write_log("The file path for load_sound is: %s", file_path.c_str());
+		
 		FMOD::Sound* sound = nullptr;
 		FMOD_MODE mode = FMOD_DEFAULT;
 		FMOD_RESULT result = core_system->createSound(file_path.c_str(), mode, 0, &sound);
 		if (errorcheck(result,"Audio_System::load_sound():", "create sound") != 0) {
 			return;
 		}
-		std::pair<std::string, FMOD::Sound*> pair = std::make_pair(file_path, sound);
-		sound_map.insert(pair);
+		
+		//std::pair<std::string, FMOD::Sound*> pair = std::make_pair(file_path, sound);
+		//sound_map.insert(pair);
+		sound_map[file_path] = sound;
 
 		LM.write_log("Audio_System::load_sound(): Successfully loaded the sound from system.");
 		return;
@@ -197,19 +224,19 @@ namespace lof {
 			return;	//sound is already playing
 		}
 
+		auto sound = sound_map.find(file_path);
+
 		//find the loaded sound file
 		FMOD::Channel* channel = nullptr;
 		//FMOD::ChannelGroup* group = nullptr;
-		auto sound = sound_map.find(file_path);
 
 		FMOD_RESULT result = core_system->playSound(sound->second, nullptr, false, &channel);
 		if (errorcheck(result, "Audio_System::play_sound", "play sound" + file_path) != 0 || !channel) {
 			LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 			return;
 		}
-		else {
-			channel_map[cskey] = channel;
-		}
+
+		channel_map[cskey] = channel;
 
 		//add channel into the respective channel group
 		if (audio.get_audio_type(audio_key) == BGM) {
@@ -245,45 +272,33 @@ namespace lof {
 	}
 
 	void Audio_System::pause_resume_sound(const std::string& channel_key, bool pause) {
-		if (channel_map.find(channel_key) == channel_map.end()) {
+		auto channel = channel_map.find(channel_key);
+		if (channel == channel_map.end()) {
 			LM.write_log("Audio_System::pause_resume_sound: failed to pause/resume sound as sound isn't even playing in the channel.");
 			return;
 		}
-		auto channel = channel_map.find(channel_key);
-
+		
 		//check pause state of channel
 		bool is_currchannel_pause;
 		channel->second->getPaused(&is_currchannel_pause);
 
 		//based off the user command if its pause or not.
-		if (pause) {
-			//if it is pause determine if there is a need to set pause at all based off the current pause state of channel
-			//if ispaused is false, means channel is still playing thereafter we need set it to pause
-			if (!is_currchannel_pause) {
-				errorcheck(channel->second->setPaused(pause), "Audio_System::pause_resume_sound", "pause the channel");
-			}
-			else {
-				return;
-			}
+		if (pause && !is_currchannel_pause) {
+			//if pause command is detected from user input and current channel is not pause, pause the channel
+			errorcheck(channel->second->setPaused(pause), "Audio_System::pause_resume_sound", "pause the channel");
 		}
-		else {	//if pause is false this means they want to resume the sound if its paused.
-			if (is_currchannel_pause) {
-				//if current channel is paused and the command is to set it to resume/not pause
-				errorcheck(channel->second->setPaused(pause), "Audio_System::pause_resume_sound", "resume sound"); //set the pause to be pause(false), aka resume the sound.
-			}
-			else {
-				return;
-			}
+		else if(!pause && is_currchannel_pause){	//if pause is false this means they want to resume the sound if its paused.
+			errorcheck(channel->second->setPaused(pause), "Audio_System::pause_resume_sound", "resume sound"); //set the pause to be pause(false), aka resume the sound.
 		}
 
 	}
 
 	void Audio_System::stop_sound(const std::string& channel_key) {
-		if (channel_map.find(channel_key) == channel_map.end()) {
+		auto channel = channel_map.find(channel_key);
+		if (channel == channel_map.end()) {
 			LM.write_log("Audio_System::stop_sound: failed to stop sound as %s isn't even playing in the channel.", channel_key.c_str());
 			return;
 		}
-		auto channel = channel_map.find(channel_key);
 
 		bool playstate_currchannel;
 		channel->second->isPlaying(&playstate_currchannel);
@@ -297,12 +312,13 @@ namespace lof {
 
 	//not sure if i am keeping this message
 	void Audio_System::unload_sound(const std::string& filepath) {
-		if (sound_map.find(filepath) == sound_map.end()) {
+		auto sound = sound_map.find(filepath);
+		if (sound == sound_map.end()) {
 			return; //this means sound is not loaded which means no need to unload at all
 		}
-		auto sound = sound_map.find(filepath);
-		FMOD::Sound* sounds = sound->second;
-		FMOD_RESULT result = sounds->release();
+		
+		//FMOD::Sound* sounds = sound->second;
+		FMOD_RESULT result = sound->second->release();
 		if (errorcheck(result, "Audio_System::unload_sound", "release sound" + filepath) != 0) {
 			return;
 		}
@@ -312,19 +328,19 @@ namespace lof {
 
 	//set and getters for channel & channel group
 	void Audio_System::set_channel_pitch(const std::string& channel_key, float pitch) {
-		if (channel_map.find(channel_key) == channel_map.end()) {
+		/*if (channel_map.find(channel_key) == channel_map.end()) {
 			LM.write_log("Audio_System::set_channel_pitch: failed to set channel pitch as channel is not in channel map.");
 			return;
-		}
+		}*/
 		auto channel = channel_map.find(channel_key);
 		errorcheck(channel->second->setPitch(pitch), "Audio_System::set_channel_pitch", "set pitch for channel: " + channel_key);
 	}
 
 	void Audio_System::set_channel_volume(const std::string& channel_key, float volume) {
-		if (channel_map.find(channel_key) == channel_map.end()) {
+		/*if (channel_map.find(channel_key) == channel_map.end()) {
 			LM.write_log("Audio_System::set_channel_volume: failed to set channel volume as channel is not in channel map.");
 			return;
-		}
+		}*/
 		auto channel = channel_map.find(channel_key);
 		errorcheck(channel->second->setVolume(volume), "Audio_System::set_channel_volume", "set volume for channel: " + channel_key);
 	}

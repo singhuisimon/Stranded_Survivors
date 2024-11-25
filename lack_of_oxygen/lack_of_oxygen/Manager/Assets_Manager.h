@@ -247,7 +247,8 @@ namespace lof {
         const std::string SHADER_PATH = "Shaders";
         const std::string FONT_PATH = "Fonts";
         const std::string LEVEL_PATH = "Level_Design";
-        const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
+        const std::string BASE_PATH = "Assets\\";
+        //const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
     };
 
 } // namespace lof

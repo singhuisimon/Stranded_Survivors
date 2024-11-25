@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		installer|x64 = installer|x64
+		installer|x86 = installer|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -17,6 +19,10 @@ Global
 		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.Debug|x64.Build.0 = Debug|x64
 		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.Debug|x86.ActiveCfg = Debug|Win32
 		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.Debug|x86.Build.0 = Debug|Win32
+		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.installer|x64.ActiveCfg = installer|x64
+		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.installer|x64.Build.0 = installer|x64
+		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.installer|x86.ActiveCfg = installer|Win32
+		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.installer|x86.Build.0 = installer|Win32
 		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.Release|x64.ActiveCfg = Release|x64
 		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.Release|x64.Build.0 = Release|x64
 		{AED06C91-0EAD-4157-B823-3EA75B2F47D6}.Release|x86.ActiveCfg = Release|Win32
