@@ -100,6 +100,7 @@
   <ItemGroup>
     <None Include="Assets\Config\config.json" />
     <None Include="Assets\Scenes\scene1.scn" />
+    <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
     <None Include="Shaders\lack_of_oxygen_debug.frag" />
