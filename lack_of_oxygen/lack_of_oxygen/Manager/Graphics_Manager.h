@@ -174,15 +174,13 @@ namespace lof {
          */
         GLboolean add_model(std::string const& file_name);
 
-
         /**
          * @brief Add a texture into the texture storage.
          *
-         * @param file_name The filepath to the textures that are being added.
-         * @return True if the textures are added successfully, false otherwise.
+         * @param texture_name The name of the textures that are being added.
+         * @return True if the texture is added successfully, false otherwise.
          */
-        GLboolean add_textures(const std::vector<std::string>& texture_names);
-
+        GLboolean load_texture(std::string const& texture_name);
 
         /**
          * @brief Add animations into the animation storage.
@@ -250,9 +248,6 @@ namespace lof {
          */
         int& get_player_direction();
 
-
-        // FOR TESTING
-
         /**
          * @brief Get a reference to the framebuffer object.
          */
@@ -263,11 +258,10 @@ namespace lof {
          */
         GLuint& get_framebuffer_texture();
 
+        /**
+         * @brief Get a reference to the editor mode flag.
+         */
         int& get_editor_mode();
-
-
-        // FOR TESTING
-
 
         /**
         * @brief Compile the shaders, link the shader objects to create an executable,
@@ -299,12 +293,8 @@ namespace lof {
          */
          //GLuint get_shader_program_handle(ShaderProgram shader) const;
         GLuint get_shader_program_handle(Assets_Manager::ShaderProgram shader) const;
-
-
     };
 
 } // namespace lof
 
 #endif // LOF_GRAPHICS_MANAGER_H
-
-

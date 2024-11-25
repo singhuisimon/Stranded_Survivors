@@ -83,24 +83,13 @@ namespace lof {
         }
 
         std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, "models.msh");
-        std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
+        //std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
         std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Prisoner_Atlas.txt");
         std::string font_path = ASM.get_full_path(ASM.FONT_PATH, "Fonts.txt");
 
         if (!add_model(mesh_path)) {
             LM.write_log("Graphics_Manager::start_up(): Failed to add models");
             return -2;
-        }
-
-        std::vector<std::string> texture_names;
-        if (!ASM.load_all_textures(texture_path, texture_names)) {
-            LM.write_log("Graphics_Manager: Failed to load texture list");
-            return -3;
-        }
-
-        if (!add_textures(texture_names)) {
-            LM.write_log("Graphics_Manager: Failed to create textures");
-            return -3;
         }
 
         // Add animations
@@ -115,9 +104,7 @@ namespace lof {
             return -5;
         }
 
-
-
-        // FOR TESTING (SET UP FRAMEBUFFER AND GAME SCENE TEXTURE FOR IMGUI)
+        // Set up the framebuffer and game scene texture for imgui viewport
         glGenFramebuffers(1, &imgui_fbo);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
             LM.write_log("Graphics_Manager::start_up(): FRAME BUFFER CREATION SUCCESSFUL.");
@@ -237,53 +224,56 @@ namespace lof {
         return GL_TRUE;
     }
 
-    GLboolean Graphics_Manager::add_textures(const std::vector<std::string>& texture_names) {
-        for (const auto& tex_name : texture_names) {
-            // Construct the full path
-            std::string tex_filepath = ASM.get_full_path(ASM.TEXTURE_PATH, tex_name + ".png");
+    // Add a texture into the texture storage
+    GLboolean Graphics_Manager::load_texture(std::string const& texture_name) {
+        // Texture file path
+        std::string texture_file = texture_name + ".png";
+
+        texture_file = ASM.get_full_path(ASM.TEXTURE_PATH, texture_file);
+        std::ifstream input_file{ texture_file, std::ios::in };
+        if (!input_file) {
+            LM.write_log("Assets_Manager: Unable to open texture list %s", texture_file.c_str());
+            return GL_FALSE;
+        }
+        input_file.close();
+
+        LM.write_log("Assets_Manager: Loading texture from %s", texture_file.c_str());
+
+        // Load texture data
+        int width{ 0 }, height{ 0 }, channels{ 0 };
+        stbi_set_flip_vertically_on_load(1);
+        unsigned char* tex_data = stbi_load(texture_file.c_str(), &width, &height, &channels, 4);
+
+        // Add debug logging for dimensions
+        LM.write_log("Assets_Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
+
+        // Create and initialize texture object
+        GLuint tex_id{};
+        if (tex_data) {
+            glGenTextures(1, &tex_id);
+            glBindTexture(GL_TEXTURE_2D, tex_id);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            stbi_image_free(tex_data);
 
             // Add debug logging
-            //LM.write_log("Assets_Manager: Providing texture path: %s", tex_filepath.c_str());
-            LM.write_log("Graphics_Manager: Loading texture from %s", tex_filepath.c_str());
-
-            // Load texture data
-            int width{ 0 }, height{ 0 }, channels{ 0 };
-            stbi_set_flip_vertically_on_load(1);
-            unsigned char* tex_data = stbi_load(tex_filepath.c_str(), &width, &height, &channels, 4);
-
-            // Add debug logging for dimensions
-            LM.write_log("Graphics_Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
-
-            // Create and initialize texture object
-            GLuint tex_id{};
-            if (tex_data) {
-                glGenTextures(1, &tex_id);
-                glBindTexture(GL_TEXTURE_2D, tex_id);
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
-                glBindTexture(GL_TEXTURE_2D, 0);
-
-                stbi_image_free(tex_data);
-
-                // Add debug logging
-                LM.write_log("Graphics_Manager: Created texture with ID %u for %s", tex_id, tex_name.c_str());
-            }
-            else {
-                stbi_image_free(tex_data);
-                LM.write_log("Graphics_Manager: Failed to load texture data for %s", tex_name.c_str());
-                return GL_FALSE;
-            }
-
-            // Add texture object id to texture storage
-            texture_storage[tex_name] = tex_id;
+            LM.write_log("Assets_Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
+        }
+        else {
+            stbi_image_free(tex_data);
+            LM.write_log("Assets_Manager: Failed to load texture data for %s", texture_name.c_str());
+            return GL_FALSE;
         }
 
-        LM.write_log("Graphics_Manager: Added %d textures to storage", texture_storage.size());
+        // Add newly created texture into texture storage
+        texture_storage.emplace(std::make_pair(texture_name, tex_id));
         return GL_TRUE;
     }
 
@@ -408,6 +398,15 @@ namespace lof {
     // Return reference to player direction
     int& Graphics_Manager::get_player_direction() { return player_direction; }
 
+    // Return reference to the framebuffer
+    GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }
+
+    // Return reference to the framebuffer texture object
+    GLuint& Graphics_Manager::get_framebuffer_texture() { return imgui_tex; }
+
+    // Return reference to the editor mode flag
+    int& Graphics_Manager::get_editor_mode() { return editor_mode; }
+
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, Assets_Manager::ShaderProgram& shader) {
         // Read each shader file details such as shader type and file path
         for (auto& file : shader_files) {
@@ -499,26 +498,6 @@ namespace lof {
     GLuint Graphics_Manager::get_shader_program_handle(Assets_Manager::ShaderProgram shader) const {
         return shader.program_handle;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // FOR TESTING
-
-    GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }
-
-    GLuint& Graphics_Manager::get_framebuffer_texture() { return imgui_tex; }
-
-    int& Graphics_Manager::get_editor_mode() { return editor_mode; }
 
 } // namespace lof
 
