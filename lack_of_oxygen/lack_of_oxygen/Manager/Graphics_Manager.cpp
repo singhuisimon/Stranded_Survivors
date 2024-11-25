@@ -56,11 +56,7 @@ namespace lof {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Set viewport position and dimensions
-        //GLuint scr_width = SM.get_scr_width();
-        //GLuint scr_height = SM.get_scr_height();
-        int scr_width, scr_height;
-        glfwGetWindowSize(window, &scr_width, &scr_height);
-        glViewport(0, 0, scr_width, scr_height);
+        glViewport(0, 0, win_width, win_height);
 
         // Set up default render mode 
         render_mode = GL_FILL;

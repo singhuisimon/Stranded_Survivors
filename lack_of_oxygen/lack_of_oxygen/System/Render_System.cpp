@@ -21,6 +21,10 @@
 // FOR TESTING
 #include "../System/GUI_System.h"  // Add this for GUI system access
 
+
+// Testing
+#include"../Utility/globals.h"
+
 namespace lof {
 
     Render_System::Render_System() {
@@ -36,9 +40,15 @@ namespace lof {
     // Updates the model-to-world-to-NDC transformation matrix of the entity per frame.
     void Render_System::update(float delta_time) {
 
+
         // Get screen width and height
-        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
-        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+        int scr_width = mode->width; 
+        int scr_height = mode->height; 
+        GLfloat screen_width = static_cast<GLfloat>(scr_width); 
+        GLfloat screen_height = static_cast<GLfloat>(scr_height);  
+        std::cout << "RENDER: Screen width is " << screen_width
+            << ", screen height is " << screen_height << std::endl;
+
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
@@ -193,10 +203,6 @@ namespace lof {
 
     // Renders the entity onto the window based on the graphics components
     void Render_System::draw() {
-
-        // Get screen width and height
-        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
-        GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
