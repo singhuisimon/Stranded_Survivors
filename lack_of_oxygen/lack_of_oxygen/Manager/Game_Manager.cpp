@@ -691,6 +691,7 @@ namespace lof {
 
         // Getting delta time for Graphics Manager
         GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        glViewport(0, 0, win_width, win_height); 
         GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
         // Getting delta time for ECS Manager
