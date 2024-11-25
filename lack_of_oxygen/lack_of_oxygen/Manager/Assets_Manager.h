@@ -39,7 +39,8 @@ namespace lof {
 
     class Assets_Manager : public Manager {
         
-        friend class Graphics_Manager; // To Graphics Manager to access the class private (Hui Shan)
+        friend class Graphics_Manager;      // To Graphics Manager to access the class private (Hui Shan)
+        friend class Serialization_Manager; // To Serialization Manager to access the class private (Hui Shan)
 
     public:
 
@@ -245,9 +246,9 @@ namespace lof {
         const std::string MODEL_PATH = "Models";
         const std::string SHADER_PATH = "Shaders";
         const std::string FONT_PATH = "Fonts";
-        //const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
+        const std::string LEVEL_PATH = "Level_Design";
         const std::string BASE_PATH = "Assets\\";
-
+        //const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
     };
 
 } // namespace lof

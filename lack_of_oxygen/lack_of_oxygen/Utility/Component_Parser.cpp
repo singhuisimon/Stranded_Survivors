@@ -277,9 +277,6 @@ namespace lof {
                 LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
             }
             // ------------------------------------- Audio_Component ---------------------------------------------
-            // In Component_Parser.cpp
-
-// ------------------------------------- Audio_Component ---------------------------------------------
             else if (component_name == "Audio_Component") {
                 // Parse Audio_Component
                 Audio_Component audio_component;
@@ -387,7 +384,7 @@ namespace lof {
                     LM.write_log("Verified sound in component - Key: %s, Path: %s",
                         sound.key.c_str(), sound.filepath.c_str());
                 }
-                }
+            }
             // ------------------------------------ GUI_Component -------------------------------------------
             else if (component_name == "GUI_Component") {
                 // Parse GUI_Component

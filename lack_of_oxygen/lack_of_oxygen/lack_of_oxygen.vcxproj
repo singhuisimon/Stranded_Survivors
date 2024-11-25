@@ -5,12 +5,12 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Installer|Win32">
-      <Configuration>Installer</Configuration>
+    <ProjectConfiguration Include="installer|Win32">
+      <Configuration>installer</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Installer|x64">
-      <Configuration>Installer</Configuration>
+    <ProjectConfiguration Include="installer|x64">
+      <Configuration>installer</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -61,6 +61,7 @@
     <ClCompile Include="System\Render_System.cpp" />
     <ClCompile Include="Utility\Clock.cpp" />
     <ClCompile Include="Utility\Component_Parser.cpp" />
+    <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
     <ClCompile Include="Utility\Force_Helper.cpp" />
     <ClCompile Include="Utility\Matrix3x3.cpp" />
     <ClCompile Include="Utility\Vector2D.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
     <ClInclude Include="System\GUI_System.h" />
+    <ClInclude Include="System\Header.h" />
     <ClInclude Include="System\Logic_System.h" />
     <ClInclude Include="System\Movement_System.h" />
     <ClInclude Include="System\Render_System.h" />
@@ -97,6 +99,7 @@
     <ClInclude Include="Utility\Clock.h" />
     <ClInclude Include="Utility\Component_Parser.h" />
     <ClInclude Include="Utility\Constant.h" />
+    <ClInclude Include="Utility\Entity_Selector_Helper.h" />
     <ClInclude Include="Utility\Force_Helper.h" />
     <ClInclude Include="Utility\FPS.h" />
     <ClInclude Include="Utility\Globals.h" />
@@ -107,7 +110,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Config\config.json" />
+    <None Include="Assets\Level_Design\Level_Design.csv" />
+    <None Include="Assets\Prefab\prefab.json" />
     <None Include="Assets\Scenes\scene1.scn" />
+    <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
     <None Include="Shaders\lack_of_oxygen_debug.frag" />
@@ -121,6 +127,53 @@
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Textures\Air_1.png" />
+    <Image Include="Assets\Textures\Air_2.png" />
+    <Image Include="Assets\Textures\Air_3.png" />
+    <Image Include="Assets\Textures\Air_Batch_4.png" />
+    <Image Include="Assets\Textures\Alexandrite_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Alexandrite_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Amethyst_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Amethyst_002_Batch 4.png" />
+    <Image Include="Assets\Textures\BG.png" />
+    <Image Include="Assets\Textures\Citrine_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Citrine_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Dirt mined_Batch 4.png" />
+    <Image Include="Assets\Textures\Dirt.png" />
+    <Image Include="Assets\Textures\Dirt_Batch_4.png" />
+    <Image Include="Assets\Textures\Emerald_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Emerald_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Emerald_Geode.png" />
+    <Image Include="Assets\Textures\Explosion radius_Batch 4.png" />
+    <Image Include="Assets\Textures\Lava Vignette_Batch 4.png" />
+    <Image Include="Assets\Textures\Lava_Batch_4.png" />
+    <Image Include="Assets\Textures\Oxygen Tank_Batch 4.png" />
+    <Image Include="Assets\Textures\Oxygen_Refill_Green_circle.png" />
+    <Image Include="Assets\Textures\Oxygen_Refill_Red_circle.png" />
+    <Image Include="Assets\Textures\Prisoner.png" />
+    <Image Include="Assets\Textures\Prisoner_Spritesheet.png" />
+    <Image Include="Assets\Textures\Quartz_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Quartz_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Quartz_Geode.png" />
+    <Image Include="Assets\Textures\Rock Mined_Batch 4.png" />
+    <Image Include="Assets\Textures\Rock.png" />
+    <Image Include="Assets\Textures\Rock_Batch_4.png" />
+    <Image Include="Assets\Textures\Sapphire_001_Batch_4.png" />
+    <Image Include="Assets\Textures\Sapphire_002_Batch 4.png" />
+    <Image Include="Assets\Textures\Skybox_ALL.png" />
+    <Image Include="Assets\Textures\Snowflake.png" />
+    <Image Include="Assets\Textures\Spritesheet_Animate.png" />
+    <Image Include="Assets\Textures\Sun.png" />
+    <Image Include="Assets\Textures\TNT.png" />
+    <Image Include="Assets\Textures\TNT_Batch_4.png" />
+    <Image Include="Assets\Textures\Vent.png" />
+    <Image Include="Assets\Textures\Wormhole.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Assets\Textures\Prisoner_Atlas.txt" />
+    <Text Include="Assets\Textures\Texture_Names.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -143,7 +196,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Installer|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='installer|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -163,7 +216,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Installer|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='installer|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -181,7 +234,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Installer|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='installer|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -190,7 +243,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Installer|x64'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='installer|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -222,7 +275,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Installer|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='installer|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -281,11 +334,10 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q
-xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"
-</Command>
+xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Installer|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='installer|x64'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -295,7 +347,6 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(Out
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)External_Libraries\include;$(SolutionDir)External_Libraries\include\KHR;$(SolutionDir)External_Libraries\include\rapidjson;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\core;$(SolutionDir)External_Libraries\include\FMOD Studio API Windows\studio</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -303,12 +354,11 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(Out
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q
-xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"
-</Command>
+xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

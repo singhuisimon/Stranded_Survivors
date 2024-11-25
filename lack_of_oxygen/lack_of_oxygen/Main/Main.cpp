@@ -68,7 +68,7 @@ int main(void) {
 
     // Create a windowed mode window and its OpenGL context using default values
     // window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
-
+    
     // Create a fullscreen window
     window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
     glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
@@ -156,7 +156,7 @@ int main(void) {
     //    LM.write_log("GLFW window size adjusted to %ux%u based on configuration.", SCR_WIDTH, SCR_HEIGHT);
     //    std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
     //}
-
+    
     // ----------------------------- Set Window Variables ---------------------------
 
     unsigned int win_height = mode->height;
@@ -206,7 +206,7 @@ int main(void) {
             level_editor_mode = !level_editor_mode;
         }
         tab_key_was_pressed_last_frame = is_TAB_pressed;
-
+    
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
             if (is_full_screen) {
