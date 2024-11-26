@@ -68,6 +68,7 @@
     <ClCompile Include="Utility\Vector2D.cpp" />
     <ClCompile Include="Utility\FPS.cpp" />
     <ClCompile Include="Utility\Vector3D.cpp" />
+    <ClCompile Include="Utility\Win_Control.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
@@ -109,6 +110,7 @@
     <ClInclude Include="Utility\Type.h" />
     <ClInclude Include="Utility\Vector2D.h" />
     <ClInclude Include="Utility\Vector3D.h" />
+    <ClInclude Include="Utility\Win_Control.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Config\config.json" />
