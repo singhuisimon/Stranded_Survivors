@@ -130,7 +130,8 @@
         },
         "Collision_Component": {
           "width": 98.0,
-          "height": 98.0
+          "height": 98.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -263,8 +264,8 @@
             100.0
           ],
           "prev_position": [
-            -545.9752197265625,
-            600.0
+            600.0,
+            100.0
           ],
           "orientation": [
             0.0,
@@ -314,8 +315,8 @@
             -60.0
           ],
           "prev_position": [
-            -545.9752197265625,
-            600.0
+            550.0,
+            -60.0
           ],
           "orientation": [
             0.0,
@@ -352,7 +353,31 @@
               1.0
             ]
           ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 120.0,
+          "collidable": false
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
+
       }
     },
 
@@ -365,8 +390,8 @@
             -100.0
           ],
           "prev_position": [
-            -545.9752197265625,
-            600.0
+            800.0,
+            -100.0
           ],
           "orientation": [
             0.0,
@@ -403,6 +428,29 @@
               1.0
             ]
           ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0,
+          "collidable": false
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
         }
       }
     },
@@ -457,7 +505,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -552,7 +601,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [

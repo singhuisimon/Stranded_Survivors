@@ -201,6 +201,11 @@ namespace lof {
 
         }
 
+        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
+        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
+        //std::cout << "collision: " << CS.mineral_tank_detected() << "\n";
+        //std::cout << "collision: " << CS.oxygen_tank_detected() << "\n";
+
         //printf("-----------------in game manager--------------------------------\n\n");
 
 #if 0

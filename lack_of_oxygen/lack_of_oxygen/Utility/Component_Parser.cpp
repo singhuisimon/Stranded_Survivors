@@ -272,6 +272,10 @@ namespace lof {
                     collision_component.height = component_data["height"].GetFloat();
                 }
 
+                if (component_data.HasMember("collidable") && component_data["collidable"].IsBool()) {
+                    collision_component.collidable = component_data["collidable"].GetBool();
+                }
+
                 // Add component to entity
                 ecs_manager.add_component<Collision_Component>(entity, collision_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);

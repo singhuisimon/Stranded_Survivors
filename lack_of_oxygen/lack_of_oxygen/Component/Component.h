@@ -318,10 +318,11 @@ namespace lof {
     {
     public:
         float width, height;
+        bool collidable;
 
         //constructor for collision components 
-        Collision_Component(float width = 0.0f, float height = 0.0f)
-            : width(width), height(height) {}
+        Collision_Component(float width = 0.0f, float height = 0.0f, bool collidable = false)
+            : width(width), height(height), collidable(collidable) {}
     };
 
     /**

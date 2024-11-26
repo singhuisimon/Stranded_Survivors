@@ -346,11 +346,10 @@ namespace lof {
 
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
 
-
+          
             // Skip if entity is static
             if (physic1.get_is_static())
                 continue;
-
 
             auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
             auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
@@ -366,12 +365,12 @@ namespace lof {
             // Check for collisions with other entities
             for (auto it_2 = collision_entities.begin(); it_2 != collision_entities.end(); ++it_2) {
                 EntityID entity_ID2 = *it_2;
-                //std::cout << "entity 1 is :" << entity_ID1 << "\n";
 
                 if (entity_ID1 == entity_ID2)
                 {
                     continue;
                 }
+                
 
 
                 //auto& physic2 = ECSM.get_component<Physics_Component>(entity_ID2);
@@ -380,7 +379,8 @@ namespace lof {
                 auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
                 auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
 
-
+               
+                if (!collision2.collidable) continue;
                 // Create AABB for object 2
                 AABB aabb2 = AABB::from_transform(transform2, collision2);
 
@@ -401,7 +401,7 @@ namespace lof {
                         physic1.set_gravity(Vec2D(0.0f, 0.0f));
                     }
 
-
+                    //std::cout << "entity 2 is :" << entity_ID2 << "\n";
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
                     //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
@@ -493,7 +493,7 @@ namespace lof {
             LM.write_log("Player (Entity %d) world position: (%.2f, %.2f)",
                 entity_ID1, transform1.position.x, transform1.position.y);
             //LM.write_log("Player grid position: [Row: %d, Col: %d]", player_row, player_col);
-            printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
+            //printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
 
             // Define the 5x5 check area around the player
             const int CHECK_RADIUS = 1; // 2 cells in each direction + current cell = 5x5
@@ -512,8 +512,8 @@ namespace lof {
 
             AABB aabb1 = AABB::from_transform(transform1, collision1);
 
-            if (transform1.position.y <= (START_Y + (collision1.height / 2.0f)))
-            {
+           if (transform1.position.y <= (START_Y + (collision1.height / 2.0f)))
+           {
                 // Check only entities in the surrounding cells
                 for (auto it_2 = collision_entities.begin(); it_2 != collision_entities.end(); ++it_2) {
                     EntityID entity_ID2 = *it_2;
@@ -522,6 +522,8 @@ namespace lof {
                         continue;
                     }
 
+                   
+                   
                     auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
 
                     // Calculate entity2's grid position
@@ -536,6 +538,8 @@ namespace lof {
 
                     auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
                     auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
+
+                    if (!collision2.collidable) continue;
 
                     AABB aabb2 = AABB::from_transform(transform2, collision2);
 
@@ -655,7 +659,88 @@ namespace lof {
         }
     }
 
+    EntityID Collision_System::check_non_collidable_entities = -1;
+    EntityID Collision_System::mineral_tank = -1;
+    EntityID Collision_System::oxygen_tank = -1;
+    bool Collision_System::entites_detect = false;
 
+    void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
+    {
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+        {
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
+            auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+            // std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+             // Create AABB for object 1
+            AABB aabb_player = AABB::from_transform(player_transform, player_collision1);
+
+            bool is_grounded = false; // Track if entity is grounded
+
+            auto it_2 = std::next(iter1); // Start from the next entity
+
+            // Check for collisions with other entities
+            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                EntityID entities_ID = *iter2;
+
+                if (player_ID == entities_ID)
+                {
+                    continue;
+                }
+
+                auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
+                auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
+                auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
+
+                if (entities_collision.collidable) continue;
+
+                AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
+                if (entities_ID == 3) {
+                    enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
+                }
+              
+                float collision_time = delta_time;
+                if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
+                    check_non_collidable_entities = entities_ID;
+                    
+                    entites_detect = true;
+                    break;
+                }
+                else
+                {
+                    check_non_collidable_entities = -1;
+                    entites_detect = false;
+                }
+
+
+
+            }
+
+            if (check_non_collidable_entities == 3)
+            {
+                mineral_tank = check_non_collidable_entities;
+            }
+            else if (check_non_collidable_entities == 4)
+            {
+                oxygen_tank = check_non_collidable_entities;
+            }
+            else {
+                oxygen_tank = -1;
+                mineral_tank = -1;
+            }
+
+       
+        }
+    }
     /**
     * @brief Resolves collisions between entities based on the provided collision pairs.
     *
@@ -745,6 +830,7 @@ namespace lof {
 
         // Update collision states
         for (const auto& collision : collisions) {
+
             if (collision.side == CollisionSide::LEFT) {
                 had_left_collision = true;
                 last_collision_time = collision.collide_time; // Or your game's time system
@@ -771,6 +857,8 @@ namespace lof {
             auto& physicsA = ECSM.get_component<Physics_Component>(entityA);
             auto& transformA = ECSM.get_component<Transform2D>(entityA);
             auto& velocityA = ECSM.get_component<Velocity_Component>(entityA);
+
+            
 
             if (!physicsA.get_is_static()) {
                 Vec2D normal(0.0f, 0.0f);
@@ -1142,7 +1230,9 @@ namespace lof {
 
         //printf("this is the entity that get %d\n", get_bottom_collide_entity());
         // printf("entity bottom: %d\n", has_bottom_collide_detect());
-        EntityID test = get_left_collide_entity();
+        //EntityID test = get_left_collide_entity();
+
+        Colliside_Oxygen_Mineral(delta_time);
 
         //sprintf("this is the entity left %d\n", test);
         //printf("entity left: %d\n", has_left_collide_detect());

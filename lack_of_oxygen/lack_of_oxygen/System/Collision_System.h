@@ -141,6 +141,11 @@ namespace lof {
         EntityID get_right_collide_entity() const { return static_cast<int>(right_collision_entity); }
         EntityID get_top_collide_entity() const { return static_cast<int>(top_collision_entity); }
 
+        EntityID get_detect_entities() const { return static_cast<int>(check_non_collidable_entities); }
+        bool entities_detected() const { return entites_detect; }
+
+        EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
+        EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
 
     private:
@@ -148,6 +153,7 @@ namespace lof {
 
         static std::once_flag once_flag;
 
+        // for detect the rows and cols to destroy
         int frame_counter = 0;
         static bool has_bottom_collision;
         static bool has_left_collision;
@@ -159,6 +165,14 @@ namespace lof {
         static EntityID right_collision_entity;
         static EntityID top_collision_entity;
 
+
+
+        static EntityID check_non_collidable_entities;
+        static bool entites_detect;
+
+        //incase want specific entity
+        static EntityID mineral_tank;
+        static EntityID oxygen_tank;
         //static bool collision_handled;
         //float accumulated_time = 0.0f;
 
@@ -204,6 +218,9 @@ namespace lof {
           * @return Return the string side that is collide
           */
         std::string collisionSideToString(CollisionSide side);
+
+        void Colliside_Oxygen_Mineral(float delta_time);
+
 
     };
 

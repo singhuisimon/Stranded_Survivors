@@ -491,6 +491,7 @@ namespace lof {
 
         comp_obj.AddMember("width", component.width, allocator);
         comp_obj.AddMember("height", component.height, allocator);
+        comp_obj.AddMember("collidable", component.collidable, allocator);
 
         return comp_obj;
     }
@@ -1101,6 +1102,7 @@ namespace lof {
                         auto& collision = ECSM.get_component<Collision_Component>(entity);
                         collision.width = tile_width;
                         collision.height = tile_height;
+                        //collision.collidable = true;
 
                         // Debug print collision component
                         LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
