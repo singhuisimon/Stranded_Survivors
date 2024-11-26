@@ -304,7 +304,11 @@ namespace lof {
 
                             // Construct the full path
                             std::string full_filepath = ASM.get_executable_directory() +
+                                "\\..\\..\\lack_of_oxygen\\Assets\\Audio\\" + filepath + ".wav";
+#ifndef _DEBUG
+                            std::string full_filepath = ASM.get_executable_directory() +
                                 "\\Assets\\Audio\\" + filepath + ".wav";
+#endif
 
                             // Get other properties with defaults
                             PlayState play_state = NONE;

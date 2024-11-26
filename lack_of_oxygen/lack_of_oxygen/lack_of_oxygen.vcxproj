@@ -309,8 +309,7 @@
       <AdditionalDependencies>opengl32.lib;glfw3.lib;fmodL_vc.lib;fmodstudioL_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q
-xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\*.dll" "$(OutDir)"
+      <Command>xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\*.dll" "$(OutDir)"
 xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
