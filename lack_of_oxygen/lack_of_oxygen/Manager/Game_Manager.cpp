@@ -316,7 +316,6 @@ namespace lof {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
-
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
