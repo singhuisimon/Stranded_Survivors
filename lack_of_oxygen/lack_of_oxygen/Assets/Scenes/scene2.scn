@@ -255,6 +255,159 @@
     },
 
     {
+      "name": "ship",
+      "components": {
+        "Transform2D": {
+          "position": [
+            600.0,
+            100.0
+          ],
+          "prev_position": [
+            -545.9752197265625,
+            600.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            576.0,
+            576.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.800000011920929,
+            0.20000000298023224
+          ],
+          "texture_name": "Ship Open_Batch_2",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "mineral_hopper_conveyor",
+      "components": {
+        "Transform2D": {
+          "position": [
+            550.0,
+            -60.0
+          ],
+          "prev_position": [
+            -545.9752197265625,
+            600.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            180.0,
+            180.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.800000011920929,
+            0.20000000298023224
+          ],
+          "texture_name": "Mineral_Hopper_Conveyor_Empty_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "Oxygen_Tank",
+      "components": {
+        "Transform2D": {
+          "position": [
+            800.0,
+            -100.0
+          ],
+          "prev_position": [
+            -545.9752197265625,
+            600.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            100.0,
+            100.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.800000011920929,
+            0.20000000298023224
+          ],
+          "texture_name": "Oxygen_Tank_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+
+    {
       "name": "moving_sun_horizontal",
       "components": {
         "Transform2D": {
