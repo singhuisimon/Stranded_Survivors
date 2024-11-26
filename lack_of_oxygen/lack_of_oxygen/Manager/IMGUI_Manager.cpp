@@ -26,7 +26,7 @@
 // Include utility function
 #include "../Utility/Constant.h"
 #include "Assets_Manager.h"
-#include "../System/Entity_Selector_System.h"
+#include "../Utility/Entity_Selector_Helper.h"
 
 namespace lof {
 

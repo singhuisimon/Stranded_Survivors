@@ -93,7 +93,7 @@ namespace lof {
         };
 
         LevelData current_level;
-
+        static int scene_no;
     public:
 
         /**
@@ -142,6 +142,11 @@ namespace lof {
         void debug_print_level() const;
         bool create_level_entities();  // Function to create entities from the loaded tile data
         bool is_scene2_file(const char* filepath) const;
+
+        // ----------------- use for collision---------------------------------//
+        size_t get_level_rows() const { return current_level.rows; }
+        size_t get_level_cols() const { return current_level.cols; }
+        int scene_switch() const { return scene_no; }
     };
 
 } // namespace lof

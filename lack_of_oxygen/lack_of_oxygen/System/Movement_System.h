@@ -44,12 +44,18 @@ namespace lof {
          */
         std::string get_type() const override;
 
+        void reset_jump_timer() { jump_timer = 0.0f; };
+        float get_max_jump_time() const { return MAX_JUMP_TIME; };
+
     private:
         /**
          * @brief Integrates physics calculations for movement, applying forces and updating positions.
          * @param delta_time The time increment for updating entity positions and velocities.
          */
         void integrate(float deltatime);
+        float jump_timer = 0.0f;
+        const float MAX_JUMP_TIME = 0.25f;
+       
 
     };
 

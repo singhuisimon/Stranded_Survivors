@@ -86,11 +86,11 @@
         "Transform2D": {
           "position": [
             0.0,
-            -150.39999389648438
+            -180.39999389648438
           ],
           "prev_position": [
             0.0,
-            -150.39999389648438
+            -180.39999389648438
           ],
           "orientation": [
             0.0,
@@ -130,7 +130,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -211,7 +212,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -292,7 +294,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -373,7 +376,8 @@
         },
         "Collision_Component": {
           "width": 102.4000015258789,
-          "height": 153.60000610351563
+          "height": 153.60000610351563,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -464,7 +468,8 @@
         },
         "Collision_Component": {
           "width": 102.4000015258789,
-          "height": 153.60000610351563
+          "height": 153.60000610351563,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -637,7 +642,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -731,7 +737,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -1070,5 +1077,7 @@
         }
       }
     }
+
+
   ]
 }
