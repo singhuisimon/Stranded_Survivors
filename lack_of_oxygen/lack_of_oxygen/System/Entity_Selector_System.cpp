@@ -36,7 +36,11 @@ namespace lof
         {
             EntityID entityID = entity->get_id();
 
-            
+            //temporary solution to avoid clicking on background
+            /*if (entityID == 0) {
+                continue;
+            }*/
+
             if (!ECSM.has_component<Transform2D>(entityID) ){
                 //sstd::cout << "Entity " << entityID << " does not have the required components.\n";
                 continue;

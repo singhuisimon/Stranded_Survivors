@@ -79,7 +79,7 @@ namespace lof {
 
 			for (const auto& sound : sounds) {
 				std::string audio_key = sound.key;
-				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID);
+				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID) + audio_key;
 				PlayState state = audio.get_audio_state(audio_key);
 
 				switch (state) {

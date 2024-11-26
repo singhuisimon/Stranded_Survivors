@@ -55,6 +55,12 @@ namespace lof {
         //Vector to get and hold the prefab names for display
         std::vector<std::string> prefab_names{};
 
+        //Audio file names
+        std::vector<std::pair<std::string, std::string>> audio_file_names{};
+        
+        //Audio types
+        std::vector<std::pair<std::string, AudioType>> audio_types{};
+
         ImVec2 Mouse_Pos;
 
     public:
@@ -141,6 +147,12 @@ namespace lof {
          * @param prefab_name Const char* string containing the prefab name
          */
         void fill_prefab_names(const char* prefab_name);
+
+        /**
+         * @brief Pushes back the prefab_name string to the prefab_names vector.
+         * @param prefab_name Const char* string containing the prefab name
+         */
+        void fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name);
 
         /**
          * @brief Calls functions from IMGUI that renders the level editor in an OpenGL and GLFW context
