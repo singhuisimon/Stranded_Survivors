@@ -468,6 +468,8 @@ namespace lof {
         const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
         const float CELL_HEIGHT = CELL_WIDTH; 
 
+     
+
         for (auto it_1 = collision_entities.begin(); it_1 != collision_entities.end(); ++it_1) {
             EntityID entity_ID1 = *it_1;
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
@@ -476,10 +478,11 @@ namespace lof {
                 continue;
             }
 
+
+
             auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
             auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
             auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
-
 
             // Calculate player's position in the level grid
             int player_col = static_cast<int>((transform1.position.x - LEFT_BOUND) / CELL_WIDTH);
@@ -599,6 +602,18 @@ namespace lof {
                         found_top_collision = true;
                         current_top_entity = entity_ID2;
                         //LM.write_log("Top entity detected in row %d: %d", entity2_row, entity_ID2);
+                    }
+
+                    if (player_col <= 0 || player_col >= TOTAL_COLS - 1) {
+                        // Player is at edge columns, prevent horizontal movement towards the edge
+                        if (player_col <= 0 && velocity1.velocity.x < 0) {
+                            velocity1.velocity.x = 0.0f;
+                            transform1.position.x = LEFT_BOUND + CELL_WIDTH;
+                        }
+                        else if (player_col >= TOTAL_COLS - 1 && velocity1.velocity.x > 0) {
+                            velocity1.velocity.x = 0.0f;
+                            transform1.position.x = RIGHT_BOUND - CELL_WIDTH;
+                        }
                     }
 
                     // Bottom check (only work if level_design map first row is empty 'e')
