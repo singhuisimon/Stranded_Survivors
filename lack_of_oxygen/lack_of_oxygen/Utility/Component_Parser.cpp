@@ -291,6 +291,106 @@ namespace lof {
                         if ((sound.HasMember("key") && sound["key"].IsString()) &&
                             (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
+                            std::string filepath = sound["filepath"].GetString();
+
+                            // Remove .wav extension if present
+                            size_t extension = filepath.find(".wav");
+                            if (extension != std::string::npos) {
+                                filepath = filepath.substr(0, extension);
+                            }
+
+                            // Verify audio file exists
+                            if (!ASM.load_audio_file(filepath)) {
+                                LM.write_log("Warning: Audio file not found for %s", filepath.c_str());
+                                continue;
+                            }
+
+                            // Get the full path using Assets Manager
+                            std::string full_filepath = ASM.get_audio_path(filepath);
+
+                            // Get other properties with defaults
+                            PlayState play_state = NONE;
+                            if (sound.HasMember("audio_state") && sound["audio_state"].IsInt()) {
+                                play_state = static_cast<PlayState>(sound["audio_state"].GetInt());
+                            }
+
+                            AudioType audio_type = SFX;
+                            if (sound.HasMember("audio_type") && sound["audio_type"].IsInt()) {
+                                audio_type = static_cast<AudioType>(sound["audio_type"].GetInt());
+                            }
+
+                            float volume = 1.0f;
+                            if (sound.HasMember("volume") && sound["volume"].IsFloat()) {
+                                volume = sound["volume"].GetFloat();
+                            }
+
+                            float pitch = 1.0f;
+                            if (sound.HasMember("pitch") && sound["pitch"].IsFloat()) {
+                                pitch = sound["pitch"].GetFloat();
+                            }
+
+                            bool islooping = false;
+                            if (sound.HasMember("islooping") && sound["islooping"].IsBool()) {
+                                islooping = sound["islooping"].GetBool();
+                            }
+                            else if (sound.HasMember("is_looping") && sound["is_looping"].IsBool()) {
+                                islooping = sound["is_looping"].GetBool();
+                            }
+
+                            // Add sound to component
+                            audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
+
+                            LM.write_log("Added sound - Key: %s, Path: %s, State: %d, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d",
+                                key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                        }
+                        else {
+                            LM.write_log("Warning: Sound missing required key or filepath properties");
+                        }
+                    }
+                }
+
+                // Handle 3D audio properties
+                if (component_data.HasMember("is_3d")) {
+                    audio_component.set_is3d(component_data["is_3d"].GetBool());
+                }
+
+                if (component_data.HasMember("position") && component_data["position"].IsArray()) {
+                    const auto& pos = component_data["position"];
+                    Vec3D position(
+                        pos[0].GetFloat(),
+                        pos[1].GetFloat(),
+                        pos[2].GetFloat()
+                    );
+                    audio_component.set_position(position);
+                }
+
+                if (component_data.HasMember("min_distance")) {
+                    audio_component.set_min_distance(component_data["min_distance"].GetFloat());
+                }
+
+                if (component_data.HasMember("max_distance")) {
+                    audio_component.set_max_distance(component_data["max_distance"].GetFloat());
+                }
+
+                // Add component to entity
+                ecs_manager.add_component<Audio_Component>(entity, audio_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Audio_Component to entity ID %u", entity);
+
+                // Log all sounds in the component for verification
+                const auto& sounds = audio_component.get_sounds();
+                for (const auto& sound : sounds) {
+                    LM.write_log("Verified sound in component - Key: %s, Path: %s",
+                        sound.key.c_str(), sound.filepath.c_str());
+                }
+                
+#if 0
+                if (component_data.HasMember("sounds") && component_data["sounds"].IsArray()) {
+                    const auto& sounds_array = component_data["sounds"];
+
+                    for (const auto& sound : sounds_array.GetArray()) {
+                        if ((sound.HasMember("key") && sound["key"].IsString()) &&
+                            (sound.HasMember("filepath") && sound["filepath"].IsString())) {
+                            std::string key = sound["key"].GetString();
 
                             // Handle filepath
                             std::string filepath = sound["filepath"].GetString();
@@ -384,6 +484,7 @@ namespace lof {
                     LM.write_log("Verified sound in component - Key: %s, Path: %s",
                         sound.key.c_str(), sound.filepath.c_str());
                 }
+#endif
                 }
             // ------------------------------------ GUI_Component -------------------------------------------
             else if (component_name == "GUI_Component") {

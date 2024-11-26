@@ -376,6 +376,31 @@ namespace lof {
         input_file.close();
         return true;
     }
+
+    std::string Assets_Manager::get_audio_path(const std::string& audio_name) {
+        return get_full_path("Audio", audio_name + ".wav");
+    }
+#if 1
+    bool Assets_Manager::load_audio_file(const std::string& audio_name) {
+        std::string full_path = get_audio_path(audio_name);
+
+        // Check if file exists and is readable
+        std::ifstream file(full_path, std::ios::binary);
+        if (!file.good()) {
+            LM.write_log("Assets_Manager: Failed to load audio file: %s", full_path.c_str());
+            return false;
+        }
+        file.close();
+
+        LM.write_log("Assets_Manager: Successfully loaded audio file: %s", full_path.c_str());
+        return true;
+    }
+#endif
+
+
+
+
+    
 } // namespace lof
 
 

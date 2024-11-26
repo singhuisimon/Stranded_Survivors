@@ -475,7 +475,7 @@ namespace lof {
         }
 
 #if 0
-        // Object scaling when up and down arrow keys pressed
+        // Object  when up and down arrow keys pressed
         if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             int& flag = GFXM.get_scale_flag();
             flag = GLFW_KEY_UP;

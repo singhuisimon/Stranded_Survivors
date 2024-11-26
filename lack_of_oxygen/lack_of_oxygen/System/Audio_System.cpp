@@ -9,6 +9,7 @@
  */
 
 #include "Audio_System.h"
+#include "../Manager/Assets_Manager.h"
 
 namespace lof {
 
@@ -156,11 +157,14 @@ namespace lof {
 		return "Audio_System";
 	}
 
+#if 0
 	void Audio_System::load_sound(const std::string& file_path) {
 		if (sound_map.find(file_path) != sound_map.end()) {
 			//sound is already loaded in the map.
 			return;
 		}
+
+
 		LM.write_log("The file path for load_sound is: %s", file_path.c_str());
 		FMOD::Sound* sound = nullptr;
 		FMOD_MODE mode = FMOD_DEFAULT;
@@ -174,6 +178,7 @@ namespace lof {
 		LM.write_log("Audio_System::load_sound(): Successfully loaded the sound from system.");
 		return;
 	}
+	#endif
 
 	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
 		//check if sound has already been loaded.
@@ -235,6 +240,32 @@ namespace lof {
 
 		LM.write_log("Audio_System::play_sound: sound %s is playing", cskey.c_str());
 	}
+
+	void Audio_System::load_sound(const std::string& file_path) {
+		if (sound_map.find(file_path) != sound_map.end()) {
+			return; // Sound already loaded
+		}
+
+		// Use Assets Manager to get path and verify file
+		if (!ASM.load_audio_file(file_path)) {
+			LM.write_log("Audio_System::load_sound: Failed to find audio file %s", file_path.c_str());
+			return;
+		}
+
+		std::string full_path = ASM.get_audio_path(file_path);
+		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
+
+		FMOD::Sound* sound = nullptr;
+		FMOD_MODE mode = FMOD_DEFAULT;
+		FMOD_RESULT result = core_system->createSound(full_path.c_str(), mode, 0, &sound);
+		if (errorcheck(result, "Audio_System::load_sound", "create sound") != 0) {
+			return;
+		}
+
+		sound_map[file_path] = sound;
+		LM.write_log("Audio_System::load_sound: Successfully loaded sound");
+	}
+
 
 	void Audio_System::stop_mastergroup() {
 		bool playing;

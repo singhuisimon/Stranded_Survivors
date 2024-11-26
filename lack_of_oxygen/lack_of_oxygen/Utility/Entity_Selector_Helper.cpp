@@ -24,7 +24,7 @@ namespace lof
         return g_selected_entity_info;
     }
 
-#if 1
+#if 0
     void Entity_Selector_Helper::Check_Selected_Entity()
     {
         bool entitySelected = false;
@@ -42,19 +42,21 @@ namespace lof
                 continue;
             }
 
-            if (!ECSM.has_component<Collision_Component>(entityID)) {
-               // std::cout << "Entity " << entityID << " does not have a Collision_Component.\n";
-                continue;
-            }
+            //if (!ECSM.has_component<Collision_Component>(entityID)) {
+            //   // std::cout << "Entity " << entityID << " does not have a Collision_Component.\n";
+            //    continue;
+            //}
 
             // std::cout << "Testing what is this entity id in entity selector system " << entityID << "\n";
             auto& transform = ECSM.get_component<Transform2D>(entityID);
-            auto& collision = ECSM.get_component<Collision_Component>(entityID);
+            //auto& collision = ECSM.get_component<Collision_Component>(entityID);
 
             float entityX = transform.position.x;
             float entityY = transform.position.y;
-            float entityWidth = collision.width;
-            float entityHeight = collision.height;
+            /*float entityWidth = collision.width;
+            float entityHeight = collision.height;*/
+            float entityWidth = transform.scale.x;
+            float entityHeight = transform.scale.y;
 
             Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
             EntityInfo selectedInfo = g_selected_entity_info;
@@ -70,6 +72,88 @@ namespace lof
 
         }
     }
+#endif
+
+#if 1
+    void Entity_Selector_Helper::Check_Selected_Entity()
+    {
+        bool entitySelected = false;
+        EntityID selectedEntityID = -1;
+        EntityID checkFont = -1;
+
+        const auto& entities = ECSM.get_entities();
+
+        // Step 1: Check smaller (foreground) entities first
+        for (const auto& entity : entities)
+        {
+            EntityID entityID = entity->get_id();
+
+            // Skip background entity (entity 0) with large scale
+            if (entityID == 0) {
+                continue;
+            }
+
+            if (!ECSM.has_component<Transform2D>(entityID)) {
+                continue;
+            }
+
+            auto& transform = ECSM.get_component<Transform2D>(entityID);
+            float entityX = transform.position.x;
+            float entityY = transform.position.y;
+            float entityWidth = transform.scale.x;
+            float entityHeight = transform.scale.y;
+
+            bool isFontEntity = (entityWidth <= 2.0f && entityHeight <= 2.0f);
+            if (isFontEntity) {
+                printf("Detected font entity with scale: %f x %f\n", entityWidth, entityHeight);
+            }
+
+            if (isFontEntity) {
+                // Increase the selection hitbox for font entities to make them easier to select
+                const float fontHitboxScale = 20.0f;  // Example: increase by a factor of 4
+                entityWidth *= fontHitboxScale;
+                entityHeight *= fontHitboxScale;
+               // printf("font width: %f, font height: %f\n", entityWidth, entityHeight);
+                //checkFont = entityID;
+                //std::cout << checkFont<< "this is font entity\n";
+                printf("Font entity selection box adjusted to: %f x %f\n", entityWidth, entityHeight);
+            }
+
+
+
+            Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
+            EntityInfo selectedInfo = g_selected_entity_info;
+
+            if (selectedInfo.isSelected) {
+                entitySelected = true;
+                selectedEntityID = selectedInfo.selectedEntity;  // Store the selected entity ID
+                break;  // Stop the loop if an entity is selected
+            }
+        }
+
+      
+        if (!entitySelected) {
+            // Check the background entity (assumed entityID = 0) if no other entities were selected
+            EntityID backgroundEntityID = 0; // Background entity ID
+            if (ECSM.has_component<Transform2D>(backgroundEntityID)) {
+                auto& transform = ECSM.get_component<Transform2D>(backgroundEntityID);
+                float backgroundX = transform.position.x;
+                float backgroundY = transform.position.y;
+                float backgroundWidth = transform.scale.x;
+                float backgroundHeight = transform.scale.y;
+
+                Update_Selected_Entity_Info(backgroundEntityID, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+                EntityInfo selectedInfo = g_selected_entity_info;
+
+                if (selectedInfo.isSelected) {
+                    selectedEntityID = backgroundEntityID; // Background is selected
+                }
+            }
+        }
+
+        
+    }
+
 #endif
 
     
