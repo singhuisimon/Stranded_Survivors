@@ -354,7 +354,7 @@
             0.0,
             1.0
           ],
-          "texture_name": "Spritesheet_Animate",
+          "texture_name": "Spritesheet_Test",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -446,7 +446,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "Spritesheet_Animate",
+          "texture_name": "Spritesheet_Test",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -552,7 +552,7 @@
             {
               "key": "moving right",
               "filepath": "Fx27",
-              "audio_state": 0,
+              "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
               "pitch": 1.0,

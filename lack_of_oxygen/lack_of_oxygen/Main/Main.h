@@ -31,6 +31,7 @@
 #include "../Utility/Vector2D.h"
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Globals.h"
+#include "../Utility/Win_Control.h"
 
 // Include Manager headers
 #include "../Manager/Game_Manager.h"

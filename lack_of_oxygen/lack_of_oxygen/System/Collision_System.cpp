@@ -385,7 +385,6 @@ namespace lof {
                 AABB aabb2 = AABB::from_transform(transform2, collision2);
 
 
-
                 // Check for intersection between two entities
                 float collision_time = delta_time;
                 if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
@@ -1031,6 +1030,123 @@ namespace lof {
                 }
 
                 transformA.position += correction;
+            }
+        }
+    }
+#endif 
+  
+#if 1 // new one ASH side
+
+    void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
+        // Store the last frame's collision states
+        static bool had_left_collision = false;
+        static bool had_right_collision = false;
+        static float last_collision_time = 0.0f;
+        static const float COLLISION_MEMORY_TIME = 0.1f;
+
+        // Constants for collision response tuning
+        const float PENETRATION_TOLERANCE = 0.005f;   // Reduced from 0.01f for less sinking
+        const float CORRECTION_FACTOR = 0.15f;        // Reduced from 0.2f for gentler correction
+        const float VELOCITY_DAMPING = 0.8f;          // Added to smooth out collision responses
+        const float MIN_VELOCITY = 0.01f;             // Threshold for zeroing out small velocities
+
+        // Update collision states
+        for (const auto& collision : collisions) {
+            if (collision.side == CollisionSide::LEFT) {
+                had_left_collision = true;
+                last_collision_time = collision.collide_time; // Or your game's time system
+            }
+            if (collision.side == CollisionSide::RIGHT) {
+                had_right_collision = true;
+                last_collision_time = collision.collide_time;
+            }
+        }
+
+        // Reset states if too much time has passed
+
+        if (frame_counter - last_collision_time > COLLISION_MEMORY_TIME) {
+            had_left_collision = false;
+            had_right_collision = false;
+        }
+
+        // Check for vertical gap scenario
+        bool is_in_vertical_gap = had_left_collision && had_right_collision;
+
+        // Process collisions
+        for (const auto& collision : collisions) {
+            EntityID entityA = collision.entity1;
+            auto& physicsA = ECSM.get_component<Physics_Component>(entityA);
+            auto& transformA = ECSM.get_component<Transform2D>(entityA);
+            auto& velocityA = ECSM.get_component<Velocity_Component>(entityA);
+
+            if (!physicsA.get_is_static()) {
+                Vec2D normal(0.0f, 0.0f);
+                if (collision.side == CollisionSide::LEFT) normal = Vec2D(1.0f, 0.0f);
+                else if (collision.side == CollisionSide::RIGHT) normal = Vec2D(-1.0f, 0.0f);
+                else if (collision.side == CollisionSide::TOP) normal = Vec2D(0.0f, -1.0f);
+                else if (collision.side == CollisionSide::BOTTOM) normal = Vec2D(0.0f, 1.0f);
+
+                if (is_in_vertical_gap && (collision.side == CollisionSide::LEFT || collision.side == CollisionSide::RIGHT) && (SM.scene_switch() == 2)) {
+                    // Special handling for vertical gap
+                    velocityA.velocity.x = 0.0f;
+                    physicsA.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                    physicsA.set_is_grounded(false);
+
+                    float minimal_correction = 0.05f; // Reduced from 0.1f
+                    // Minimal position correction to prevent sticking
+                    float correction_x = (collision.side == CollisionSide::LEFT) ? minimal_correction : -minimal_correction;
+                    transformA.position.x += correction_x;
+                    continue;
+                }
+
+                // Normal collision handling
+                Vec2D relative_velocity = velocityA.velocity * VELOCITY_DAMPING;
+
+                float restitution = (collision.side == CollisionSide::BOTTOM) ? 0.0f : 0.05f; //reduced from 0.1f to 0.05f
+
+                float impulse_scalar = -(1.0f + restitution) * dot_product_vec2d(relative_velocity, normal);
+                impulse_scalar /= physicsA.get_inv_mass();
+                Vec2D impulse = normal * impulse_scalar;
+                velocityA.velocity += impulse * physicsA.get_inv_mass();
+
+                /*
+                float percent = 0.2f;
+                float slop = 0.01f;
+                Vec2D correction = normal * std::max((collision.overlap.y - slop) * percent, 0.0f);
+                */
+
+                Vec2D correction(0.0f, 0.0f); 
+
+                if (collision.overlap.y > PENETRATION_TOLERANCE) {
+
+                    float correction_magnitude = (collision.overlap.y - PENETRATION_TOLERANCE) * CORRECTION_FACTOR; 
+                    correction = normal * correction_magnitude; 
+
+                    if (collision.side == CollisionSide::BOTTOM) {
+                        correction.x = 0.0f;
+                        physicsA.set_is_grounded(true);
+                        physicsA.set_has_jumped(false);
+                        physicsA.set_gravity(Vec2D(0.0f, 0.0f));
+
+                        //zero out very small vertical velocity
+                        if (std::abs(velocityA.velocity.y) < 0.1f) {
+                            velocityA.velocity.y = 0.0f;
+                        }
+                    }
+                    //for side collisions, reduce horizontal correction
+                    else if (collision.side == CollisionSide::LEFT ||
+                        collision.side == CollisionSide::RIGHT) {
+                        correction *= 0.1f; //reduce horizontal push back
+                    }
+                }
+
+                transformA.position += correction;
+
+                //additional velocity dampening for horizontal collisions
+                if (collision.side == CollisionSide::LEFT ||
+                    collision.side == CollisionSide::RIGHT) {
+                    velocityA.velocity.x *= 0.9f; //reduce horizontal velocity
+                }
             }
         }
     }

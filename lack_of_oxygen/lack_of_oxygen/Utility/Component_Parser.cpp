@@ -48,6 +48,12 @@ namespace lof {
                     // Optional: Set a default value for prev_position if not provided
                     transform.prev_position = transform.position; // Or Vec2D(0.0f, 0.0f) as appropriate
                 }
+                if (component_data.HasMember("prev_position") && component_data["prev_position"].IsArray()) {
+                    const rapidjson::Value& pos = component_data["prev_position"];
+                    transform.prev_position.x = pos[0].GetFloat();
+                    transform.prev_position.y = pos[1].GetFloat();
+                }
+
                 if (component_data.HasMember("orientation") && component_data["orientation"].IsArray()) {
                     const rapidjson::Value& ori = component_data["orientation"];
                     transform.orientation.x = ori[0].GetFloat();
@@ -281,9 +287,6 @@ namespace lof {
                 LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
             }
             // ------------------------------------- Audio_Component ---------------------------------------------
-            // In Component_Parser.cpp
-
-// ------------------------------------- Audio_Component ---------------------------------------------
             else if (component_name == "Audio_Component") {
                 // Parse Audio_Component
                 Audio_Component audio_component;
@@ -412,6 +415,10 @@ namespace lof {
                             // Construct the full path
                             std::string full_filepath = ASM.get_executable_directory() +
                                 "\\..\\..\\lack_of_oxygen\\Assets\\Audio\\" + filepath + ".wav";
+#ifndef _DEBUG
+                            std::string full_filepath = ASM.get_executable_directory() +
+                                "\\Assets\\Audio\\" + filepath + ".wav";
+#endif
 
                             // Get other properties with defaults
                             PlayState play_state = NONE;
