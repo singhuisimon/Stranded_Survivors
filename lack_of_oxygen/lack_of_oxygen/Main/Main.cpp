@@ -31,9 +31,6 @@ GLFWwindow* window = nullptr;
 bool is_full_screen = true;
 GLFWmonitor* monitor = nullptr;
 const GLFWvidmode* mode = nullptr;
-unsigned int win_height = 0;
-unsigned int win_width = 0;
-
 
 int main(void) {
 
@@ -162,8 +159,8 @@ int main(void) {
     
     // ----------------------------- Set Window Variables ---------------------------
 
-    win_height = mode->height;
-    win_width = mode->width;
+    unsigned int win_height = mode->height;
+    unsigned int win_width = mode->width;
 
     bool enter_key_was_pressed_last_frame = false;
 
