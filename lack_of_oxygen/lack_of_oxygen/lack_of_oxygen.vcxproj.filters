@@ -96,6 +96,7 @@
     <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Prefab\prefab.json" />
+    <None Include="Assets\Level_Design\Level_Design_Small.csv" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -123,7 +124,7 @@
     <Image Include="Assets\Textures\Explosion radius_Batch 4.png" />
     <Image Include="Assets\Textures\Lava Vignette_Batch 4.png" />
     <Image Include="Assets\Textures\Lava_Batch_4.png" />
-    <Image Include="Assets\Textures\Oxygen Tank_Batch 4.png" />
+    <Image Include="Assets\Textures\Oxygen_Tank_Batch_4.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Green_circle.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Red_circle.png" />
     <Image Include="Assets\Textures\Prisoner.png" />
@@ -144,6 +145,12 @@
     <Image Include="Assets\Textures\TNT_Batch_4.png" />
     <Image Include="Assets\Textures\Vent.png" />
     <Image Include="Assets\Textures\Wormhole.png" />
+    <Image Include="Assets\Textures\Mineral_Hopper_Box_Empty_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Hopper_Box_Filled_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Hopper_Conveyor_Empty_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Hopper_Conveyor_Filled_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral Hopper_Minerals_Batch 4.png" />
+    <Image Include="Assets\Textures\Ship Open_Batch_2.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Prisoner_Atlas.txt" />
