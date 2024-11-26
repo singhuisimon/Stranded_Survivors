@@ -278,6 +278,10 @@ namespace lof {
                     collision_component.height = component_data["height"].GetFloat();
                 }
 
+                if (component_data.HasMember("collidable") && component_data["collidable"].IsBool()) {
+                    collision_component.collidable = component_data["collidable"].GetBool();
+                }
+
                 // Add component to entity
                 ecs_manager.add_component<Collision_Component>(entity, collision_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
@@ -294,28 +298,31 @@ namespace lof {
                         if ((sound.HasMember("key") && sound["key"].IsString()) &&
                             (sound.HasMember("filepath") && sound["filepath"].IsString())) {
                             std::string key = sound["key"].GetString();
-
-                            // Handle filepath
                             std::string filepath = sound["filepath"].GetString();
-                            // If the filepath is a full path, extract just the base name
-                            size_t last_slash = filepath.find_last_of("/\\");
-                            if (last_slash != std::string::npos) {
-                                filepath = filepath.substr(last_slash + 1);
-                            }
+
                             // Remove .wav extension if present
                             size_t extension = filepath.find(".wav");
                             if (extension != std::string::npos) {
                                 filepath = filepath.substr(0, extension);
                             }
-#ifndef NDEBUG
-                            // Construct the full path
-                            std::string full_filepath = ASM.get_executable_directory() +
-                                "\\..\\..\\lack_of_oxygen\\Assets\\Audio\\" + filepath + ".wav";
-#endif
-#ifndef _DEBUG
-                            std::string full_filepath = ASM.get_executable_directory() +
-                                "\\Assets\\Audio\\" + filepath + ".wav";
-#endif
+// #ifndef NDEBUG
+//                             // Construct the full path
+//                             std::string full_filepath = ASM.get_executable_directory() +
+//                                 "\\..\\..\\lack_of_oxygen\\Assets\\Audio\\" + filepath + ".wav";
+// #endif
+// #ifndef _DEBUG
+//                             std::string full_filepath = ASM.get_executable_directory() +
+//                                 "\\Assets\\Audio\\" + filepath + ".wav";
+// #endif
+
+                            // Verify audio file exists
+                            if (!ASM.load_audio_file(filepath)) {
+                                LM.write_log("Warning: Audio file not found for %s", filepath.c_str());
+                                continue;
+                            }
+
+                            // Get the full path using Assets Manager
+                            std::string full_filepath = ASM.get_audio_path(filepath);
 
                             // Get other properties with defaults
                             PlayState play_state = NONE;
@@ -339,7 +346,6 @@ namespace lof {
                             }
 
                             bool islooping = false;
-                            // Check both possible property names for backward compatibility
                             if (sound.HasMember("islooping") && sound["islooping"].IsBool()) {
                                 islooping = sound["islooping"].GetBool();
                             }
@@ -347,11 +353,11 @@ namespace lof {
                                 islooping = sound["is_looping"].GetBool();
                             }
 
-                            // Adds the sound into the soundconfig
-                            audio_component.add_sound(key, full_filepath, play_state, audio_type, volume, pitch, islooping);
+                            // Add sound to component
+                            audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
 
                             LM.write_log("Added sound - Key: %s, Path: %s, State: %d, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d",
-                                key.c_str(), full_filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                                key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
                         }
                         else {
                             LM.write_log("Warning: Sound missing required key or filepath properties");
@@ -392,6 +398,7 @@ namespace lof {
                     LM.write_log("Verified sound in component - Key: %s, Path: %s",
                         sound.key.c_str(), sound.filepath.c_str());
                 }
+
             }
             // ------------------------------------ GUI_Component -------------------------------------------
             else if (component_name == "GUI_Component") {

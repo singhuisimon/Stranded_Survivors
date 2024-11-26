@@ -148,11 +148,11 @@ namespace lof {
         m_is_started = false;
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
-    
+
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
 
     EntityID selectedID = -1;
-    
+
 
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
@@ -163,40 +163,54 @@ namespace lof {
         //printf("-----------------in game manager--------------------------------\n");
         bool has_collision_bottom = CS.has_bottom_collide_detect();
         EntityID collision_entity_bottom = CS.get_bottom_collide_entity();
-    
+
         bool has_collision_left = CS.has_left_collide_detect();
         EntityID collision_entity_left = CS.get_left_collide_entity();
 
         bool has_collision_right = CS.has_right_collide_detect();
         EntityID collision_entity_right = CS.get_right_collide_entity();
 
+        bool has_collision_top = CS.has_top_collide_detect();
+        EntityID collision_entity_top = CS.get_top_collide_entity();
+
         //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
         //printf("left collision entity outside: %d\n\n", collision_entity_left);
 
-        if (IM.is_key_pressed(GLFW_KEY_S) && !level_editor_mode && has_collision_bottom) {
-        
+        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
+
             printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
             printf("Bottom collision entity: %d\n", collision_entity_bottom);
 
         }
-        if (IM.is_key_held(GLFW_KEY_A) && !level_editor_mode && has_collision_left) {
+        if (IM.is_key_held(GLFW_KEY_LEFT) && !level_editor_mode && has_collision_left) {
 
-           printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
-           printf("left collision entity: %d\n", collision_entity_left);
+            printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
+            printf("left collision entity: %d\n", collision_entity_left);
 
         }
-        if (IM.is_key_held(GLFW_KEY_D) && !level_editor_mode && has_collision_right) {
+        if (IM.is_key_held(GLFW_KEY_RIGHT) && !level_editor_mode && has_collision_right) {
 
             printf("Has right collision: %s\n", has_collision_right ? "true" : "false");
-            printf("Bottom right entity: %d\n", collision_entity_right);
+            printf("right entity: %d\n", collision_entity_right);
+
+        }
+        if (IM.is_key_held(GLFW_KEY_UP) && !level_editor_mode && has_collision_top) {
+
+            printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
+            printf("top entity: %d\n", collision_entity_top);
 
         }
 
+        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
+        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
+        //std::cout << "collision: " << CS.mineral_tank_detected() << "\n";
+        //std::cout << "collision: " << CS.oxygen_tank_detected() << "\n";
+
         //printf("-----------------in game manager--------------------------------\n\n");
-        
+
 #if 0
         ESS.Check_Selected_Entity();
-        
+
         // Check if the left mouse button was pressed
         EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
         if (IM.is_key_held(GLFW_KEY_W) && !level_editor_mode) {
@@ -207,7 +221,7 @@ namespace lof {
             if (selectedEntityInfo.isSelected) {
                 select_entity = true;
                 selectedID = selectedEntityInfo.selectedEntity;
-            
+
                 std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
                 std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
                 std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
@@ -217,7 +231,7 @@ namespace lof {
             else {
                 select_entity = false;
                 selectedID = selectedEntityInfo.selectedEntity;
-       
+
                 std::cout << "No entity is selected.\n";
                 std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
                 std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
@@ -307,37 +321,54 @@ namespace lof {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
-
-                //if (IM.is_key_held(GLFW_KEY_SPACE)) {
-                //    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component
-                //}
-                //// Handle horizontal movement
-
-                ////activate and deactivate the forces.
-                //if (IM.is_key_held(GLFW_KEY_A)) {
-                //    physics.force_helper.activate_force(MOVE_LEFT);
-                //    if (physics.get_is_grounded()) {
-                //        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
-                //    }
-                //}
-                //else {
-                //    physics.force_helper.deactivate_force(MOVE_LEFT);
-                //}
-                //if (IM.is_key_held(GLFW_KEY_D)) {
-                //    physics.force_helper.activate_force(MOVE_RIGHT);
-                //    if (physics.get_is_grounded()) {
-                //        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
-                //    }
-                //}
-                //else {
-                //    physics.force_helper.deactivate_force(MOVE_RIGHT);
-                //}
+                if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                    if (CS.has_left_collide_detect()) {
+                        EntityID block_to_remove = CS.get_left_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block on the left
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                    if (CS.has_right_collide_detect()) {
+                        EntityID block_to_remove = CS.get_right_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block on the right
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_UP)) {
+                    // Note: You might need to add top collision detection in Collision System
+                    // Similar to left/right collisions
+                    if (CS.has_top_collide_detect()) {
+                        EntityID block_to_remove = CS.get_top_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block on the right
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                    if (CS.has_bottom_collide_detect()) {
+                        EntityID block_to_remove = CS.get_bottom_collide_entity();
+                        if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Destroy the colliding block below
+                            ECSM.destroy_entity(block_to_remove);
+                            LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                        }
+                    }
+                }
 
 
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
                     physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
-                } 
+                }
                 else {
                     physics.set_jump_requested(false);
                 }
@@ -448,7 +479,7 @@ namespace lof {
         }
 
 #if 0
-        // Object scaling when up and down arrow keys pressed
+        // Object  when up and down arrow keys pressed
         if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             int& flag = GFXM.get_scale_flag();
             flag = GLFW_KEY_UP;
@@ -481,7 +512,7 @@ namespace lof {
         }
 
         //std::cout << selectedID << "in game manager\n";
-        
+
 
 #if 1
         //std::cout << "bool if is selected (1 is selected, 0 is not): " << select_entity << "\n";
@@ -530,7 +561,7 @@ namespace lof {
             }
         }
 #endif 
-       
+
 #if 0
         // Object rotation when left and right arrow keys pressed
         if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
@@ -555,7 +586,7 @@ namespace lof {
             flag = 0;
         }
 #endif
-        
+
 
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
@@ -686,6 +717,8 @@ namespace lof {
                 current_scene = (current_scene == 1) ? 2 : 1;
             }
         }
+
+
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
