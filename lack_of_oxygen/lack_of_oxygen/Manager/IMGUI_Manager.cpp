@@ -76,6 +76,37 @@ namespace lof {
         ImGui_ImplOpenGL3_Init();
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
+
+        const auto& entities = ecs.get_entities();
+        for (auto& entity : entities) {
+
+            if (entity->has_component(ecs.get_component_id<Audio_Component>())) {
+                Audio_Component& audio = ecs.get_component<Audio_Component>(entity.get()->get_id());
+
+                auto& sounds = audio.get_sounds();
+                for (auto& sound : sounds) {
+
+                    auto filepath = audio.get_filepath(sound.key);
+
+                    size_t last_slash = filepath.find_last_of('\\');
+                    size_t last_dot = filepath.find_last_of('.');
+
+                    fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
+
+                    //std::cout << filepath << std::endl;
+                    //IMGUIM.fill_audio_file_names(filepath.c_str());
+                    //std::cout << filepath.substr(last_slash + 1, last_dot - last_slash -1) << std::endl;
+                    //IMGUIM.fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1).c_str());
+                }
+            }
+
+        }
+
+        
+        audio_types.push_back(std::make_pair("BGM", (AudioType)0));
+        audio_types.push_back(std::make_pair("SFX", (AudioType)1));
+        audio_types.push_back(std::make_pair("NIL", (AudioType)2));
+
         return 0;
     }
 
@@ -229,9 +260,6 @@ namespace lof {
         ImGui::End();
 
 
-
-
-
         //Game Viewport
         if (GFXM.get_editor_mode() == 1) {
 
@@ -258,10 +286,7 @@ namespace lof {
 
             // Check if the left mouse button was pressed
             EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-
-
-
-
+            
             // If Mouse within texture
             if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
                 mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
@@ -495,6 +520,8 @@ namespace lof {
     static bool is_reverse_on = false;
     static bool is_rotate_on = true;;
 
+    // Use a static map to store buffers for each sound by index or key
+    static std::unordered_map<int, std::string> buffer_map;
 
     void IMGUI_Manager::imgui_game_objects_edit() {
 
@@ -514,6 +541,7 @@ namespace lof {
             if (selected_object_index != last_selected_object_index) {
                 last_selected_object_index = selected_object_index;
                 assigned_names.clear();
+                buffer_map.clear();
                 filled = false; // Reset filled to allow repopulating `assigned_names` for the new object
             }
 
@@ -744,6 +772,153 @@ namespace lof {
                         ImGui::InputFloat2("Original Position", &original_position.x);
                     }
                 }
+
+                //Audio Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
+                    Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Audio")) {
+
+                        // Get sounds (from your audio system)
+                        auto& sounds = audio.get_sounds();
+
+                        // Initialize the selected indices for the combo boxes
+                        static std::vector<int> selected_sounds;
+                        selected_sounds.clear();
+                        selected_sounds.resize(sounds.size(), -1);
+
+
+                        // Loop through each sound in the sounds map
+                        
+                        for (int i = 0; i < sounds.size(); ++i) {
+
+                            // Get the current sound's file path
+                            auto sound_filepath = audio.get_filepath(sounds[i].key);
+                            std::string saved_keyID = sound_filepath + std::to_string(entities[selected_object_index]->get_id()) + sounds[i].key;
+
+                            // Prepare a list of representative strings for the combo box
+                            std::vector<const char*> file_name_cstr;
+                            for (const auto& file_name_pair : audio_file_names) {
+                                file_name_cstr.push_back(file_name_pair.first.c_str());
+                            }
+
+                            // Find the matching representative string for the file path
+                            auto its = std::find_if(audio_file_names.begin(), audio_file_names.end(),
+                                [&sound_filepath](const std::pair<std::string, std::string>& p) {
+                                    return p.second == sound_filepath;
+                                });
+
+                            // Show the current sound's representative string in a text label
+                            if (its != audio_file_names.end()) {
+                                ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), its->first.c_str());
+                            }
+                            else {
+                                ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
+                            }
+
+                            // Create a combo box to choose the new representative string for this sound
+                            std::string label = "Choose Sound for " + std::to_string(i); // Label for the dropdown
+                            if (ImGui::Combo(label.c_str(), &selected_sounds[i], file_name_cstr.data(), static_cast<int>(file_name_cstr.size()))) {
+
+                                // Get the selected representative string index
+                                int selected_index = selected_sounds[i];
+                                if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
+
+                                    //need to stop channel first
+                                    //audio.set_audio_state(saved_keyID, STOPPED);
+
+                                    // Update the sound's file path based on the selected rep string
+                                    audio.set_filepath(sounds[i].key, audio_file_names[selected_index].second);
+                                    LM.write_log("IMGUIM:: Sound being chnaged to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
+                                }
+                            }
+                        }
+
+                        //for key
+                        for (int i = 0; i < sounds.size(); ++i) {
+                      
+                            std::string old_key_name = sounds[i].key;
+                            std::string condition_name_key = "key for " + std::to_string(i);
+
+                            if (buffer_map.find(i) == buffer_map.end()) {
+                                buffer_map[i] = old_key_name;
+                            }
+
+                            char Buffer[128];
+                            strncpy_s(Buffer, buffer_map[i].c_str(), sizeof(Buffer));
+                            Buffer[sizeof(Buffer) - 1] = '\0';
+
+                            if (ImGui::InputText(condition_name_key.c_str(), Buffer, sizeof(Buffer))) {
+                                buffer_map[i] = std::string(Buffer); // Save changes to the persistent buffer
+                            }
+
+                            // Save button
+                            std::string save = "save " + condition_name_key;
+                            const char* button_name = save.c_str();
+                            if (ImGui::Button(button_name)) {
+                                std::string new_key_name = buffer_map[i];
+                                audio.set_key(old_key_name, new_key_name);
+
+                            }
+                            
+
+                        }
+
+
+
+                        //Initialize the selected indices for the combo boxes
+                        static std::vector<int> selected_sounds_type;
+                        selected_sounds_type.clear();
+                        selected_sounds_type.resize(sounds.size(), -1);
+
+                        //for audio_type
+                        int type_index = 0;
+                        for (int i = 0; i < sounds.size(); ++i, ++type_index) {
+
+          
+                            auto audio_type = audio.get_audio_type(sounds[i].key);
+
+                            std::vector<const char*> audio_type_cstr;
+
+                            for (const auto& fill_audio_type_pair : audio_types) {
+                                audio_type_cstr.push_back(fill_audio_type_pair.first.c_str());
+                            }
+
+                            // Find the matching representative string for the file path
+                            auto its = std::find_if(audio_types.begin(), audio_types.end(),
+                                [&audio_type](const std::pair<std::string, AudioType>& p) {
+                                    return p.second == audio_type;
+                                });
+
+
+                            // Show the current sound's representative string in a text label
+                            if (its != audio_types.end()) {
+                                ImGui::Text("Audio Type for %s: %s", sounds[i].key.c_str(), its->first.c_str());
+                            }
+                            else {
+                                ImGui::Text("Audio Type for %s: Not Found", sounds[i].key.c_str());
+                            }
+
+                            // Create a combo box to choose the new representative string for this sound
+                            std::string label = "Choose Audio Type for " + std::to_string(type_index); // Label for the dropdown
+                            if (ImGui::Combo(label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
+
+                                // Get the selected representative string type_index
+                                int selected_index = selected_sounds_type[type_index];
+                                if (selected_index >= 0 && selected_index < audio_type_cstr.size()) {
+
+                                    // Update the sound's file path based on the selected rep string
+                                    audio.set_audio_type(sounds[i].key, audio_types[selected_index].second);
+                                    //LM.write_log("IMGUIM:: Sound being chnaged to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
+                                }
+                            }
+
+
+                        }
+
+
+
+                    }
+                }
             }
         }
 
@@ -804,36 +979,6 @@ namespace lof {
             }
         }
 
-        /*static const char* prefab_options[]{"player", "dummy_object", "gui_container", "gui_progress_bar", "gui_image"};
-        static int selected_item = -1;
-        if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, IM_ARRAYSIZE(prefab_options))){
-            //Simon's code
-            EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
-            if (new_entity != INVALID_ENTITY_ID) {
-                // Generate random position
-                static std::default_random_engine generator;
-                static std::uniform_real_distribution<float> distribution(-2500.0f, 2500.0f);
-
-                float random_x = distribution(generator);
-                float random_y = distribution(generator);
-
-                // Get the Transform2D component and set its position
-                if (ECSM.has_component<Transform2D>(new_entity)) {
-                    Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
-                    transform.position.x = random_x;
-                    transform.position.y = random_y;
-
-                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
-                }
-                else {
-                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
-                }
-            }
-            else {
-                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
-            }
-        }*/
-
 
         ImGui::End();
     }
@@ -865,6 +1010,15 @@ namespace lof {
 
     void IMGUI_Manager::fill_prefab_names(const char* prefab_name) {
         prefab_names.push_back(prefab_name);
+    }
+
+    void IMGUI_Manager::fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name) {
+        
+        //audio_file_names[audio_file_name] = audio_filepath_name;
+        
+        audio_file_names.push_back(std::make_pair(audio_file_name, audio_filepath_name));
+
+        std::cout << "key is: " << audio_file_name << "\nfilepath is: " << audio_filepath_name << std::endl;
     }
 
     void IMGUI_Manager::render() {

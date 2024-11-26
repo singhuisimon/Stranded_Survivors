@@ -36,7 +36,11 @@ namespace lof
         {
             EntityID entityID = entity->get_id();
 
-            
+            //temporary solution to avoid clicking on background
+            /*if (entityID == 0) {
+                continue;
+            }*/
+
             if (!ECSM.has_component<Transform2D>(entityID) ){
                 //sstd::cout << "Entity " << entityID << " does not have the required components.\n";
                 continue;
@@ -103,21 +107,21 @@ namespace lof
             float entityWidth = transform.scale.x;
             float entityHeight = transform.scale.y;
 
-            bool isFontEntity = (entityWidth <= 2.0f && entityHeight <= 2.0f);
-            if (isFontEntity) {
-                printf("Detected font entity with scale: %f x %f\n", entityWidth, entityHeight);
-            }
+            //bool isFontEntity = (entityWidth <= 2.0f && entityHeight <= 2.0f);
+            //if (isFontEntity) {
+            //    printf("Detected font entity with scale: %f x %f\n", entityWidth, entityHeight);
+            //}
 
-            if (isFontEntity) {
-                // Increase the selection hitbox for font entities to make them easier to select
-                const float fontHitboxScale = 20.0f;  // Example: increase by a factor of 4
-                entityWidth *= fontHitboxScale;
-                entityHeight *= fontHitboxScale;
-               // printf("font width: %f, font height: %f\n", entityWidth, entityHeight);
-                //checkFont = entityID;
-                //std::cout << checkFont<< "this is font entity\n";
-                printf("Font entity selection box adjusted to: %f x %f\n", entityWidth, entityHeight);
-            }
+            //if (isFontEntity) {
+            //    // Increase the selection hitbox for font entities to make them easier to select
+            //    const float fontHitboxScale = 20.0f;  // Example: increase by a factor of 4
+            //    entityWidth *= fontHitboxScale;
+            //    entityHeight *= fontHitboxScale;
+            //   // printf("font width: %f, font height: %f\n", entityWidth, entityHeight);
+            //    //checkFont = entityID;
+            //    //std::cout << checkFont<< "this is font entity\n";
+            //    printf("Font entity selection box adjusted to: %f x %f\n", entityWidth, entityHeight);
+            //}
 
 
 

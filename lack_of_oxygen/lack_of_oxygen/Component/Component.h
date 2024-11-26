@@ -421,6 +421,19 @@ namespace lof {
             return nullptr;
         }
 
+        
+        void set_key(const std::string& old_key, std::string& new_key) {
+
+            std::cout << "checking: old_key = " << old_key << "; new_key = " << new_key << std::endl;
+            for (auto& sound : sounds) {
+                if (sound.key == old_key) {
+                    std::cout << "sound.key before: " << sound.key << std::endl;
+                    sound.key = new_key;
+                    std::cout << "sound.key after: " << sound.key << std::endl;
+                }
+            }
+        }
+
         /**
         * @brief Setter for the filepath in soundconfig
         * @param key The unique identifier of soundconfig
