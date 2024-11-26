@@ -177,7 +177,7 @@
                   1.0
                 ],
                 "type": "JUMP_UP",
-                "magnitude": 20000.0,
+                "magnitude": 2000.0,
                 "lifetime": 0.0,
                 "is_active": false
               }

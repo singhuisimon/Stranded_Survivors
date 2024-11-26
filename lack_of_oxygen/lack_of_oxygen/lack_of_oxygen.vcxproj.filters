@@ -38,8 +38,9 @@
     <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Logic_System.cpp" />
-    <ClCompile Include="Manager\Assets_Manager.cpp" />
     <ClCompile Include="Utility\Force_Helper.cpp" />
+    <ClCompile Include="Manager\Assets_Manager.cpp" />
+    <ClCompile Include="System\Interruption_System.cpp" />
     <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -77,8 +78,9 @@
     <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Logic_System.h" />
-    <ClInclude Include="Manager\Assets_Manager.h" />
     <ClInclude Include="Utility\Force_Helper.h" />
+    <ClInclude Include="Manager\Assets_Manager.h" />
+    <ClInclude Include="System\Interruption_System.h" />
     <ClInclude Include="System\Header.h" />
     <ClInclude Include="Utility\Entity_Selector_Helper.h" />
   </ItemGroup>

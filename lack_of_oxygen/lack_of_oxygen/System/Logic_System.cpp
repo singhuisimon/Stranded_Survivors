@@ -15,7 +15,6 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Input_Manager.h"
-#include "../Utility/Globals.h"
 
 namespace lof {
     Logic_System::Logic_System() {
@@ -54,7 +53,7 @@ namespace lof {
                     logic.origin_pos.y);
             }
 
-            if (logic.is_active && !level_editor_mode) {
+            if (logic.is_active) {
                 logic.timer += delta_time;
 
                 // Debug every second

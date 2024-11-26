@@ -48,6 +48,12 @@ namespace lof {
                     // Optional: Set a default value for prev_position if not provided
                     transform.prev_position = transform.position; // Or Vec2D(0.0f, 0.0f) as appropriate
                 }
+                if (component_data.HasMember("prev_position") && component_data["prev_position"].IsArray()) {
+                    const rapidjson::Value& pos = component_data["prev_position"];
+                    transform.prev_position.x = pos[0].GetFloat();
+                    transform.prev_position.y = pos[1].GetFloat();
+                }
+
                 if (component_data.HasMember("orientation") && component_data["orientation"].IsArray()) {
                     const rapidjson::Value& ori = component_data["orientation"];
                     transform.orientation.x = ori[0].GetFloat();

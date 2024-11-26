@@ -23,6 +23,7 @@
 #include "../System/Audio_System.h"
 #include "../System/Animation_System.h"
 #include "../System/Logic_System.h"
+#include "../System/Interruption_System.h"
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -59,6 +60,16 @@ namespace lof {
         if (is_started()) {
             LM.write_log("ECS_Manager::start_up(): ECS_Manager is already started.");
             return 0; // Already started
+        }
+
+       /*
+       This is to pass the window to the Interruption System constructor!
+       */
+
+        GLFWwindow* window = glfwGetCurrentContext(); 
+        if (!window) {
+            LM.write_log("ECS Manager:: start_up(): No current GLFW window context.");
+            return -1;
         }
 
         try {
@@ -118,6 +129,9 @@ namespace lof {
 
             add_system(std::make_unique<Logic_System>());
             LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
+
+            add_system(std::make_unique<Interruption_System>(window)); 
+            LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");
