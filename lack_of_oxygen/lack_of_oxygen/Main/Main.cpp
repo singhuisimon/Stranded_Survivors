@@ -159,11 +159,13 @@ int main(void) {
     
     // ----------------------------- Set Window Variables ---------------------------
 
-    unsigned int win_height = mode->height;
-    unsigned int win_width = mode->width;
+/*    unsigned int win_height = mode->height;
+    unsigned int win_width = mode->width*/;
 
     bool enter_key_was_pressed_last_frame = false;
     Window_Control win_control;
+
+    win_control.set_win_size(mode->width, mode->height);
 
     // -------------------------- Game Loop Setup --------------------------
 
@@ -238,7 +240,7 @@ int main(void) {
             
 
         if (level_editor_mode) {
-            IMGUIM.render_ui(win_width, win_height);
+            IMGUIM.render_ui(win_control.get_win_width(), win_control.get_win_height());
         }
 
         // Rendering
