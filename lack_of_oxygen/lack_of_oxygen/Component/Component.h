@@ -41,7 +41,8 @@ namespace lof {
      * @brief Alias for the data type used to represent component identifiers.
      */
     using ComponentID = std::uint8_t;
-
+    //forward declaration
+    class Force_Helper;
     /**
      * @class Component
      * @brief Base class for all components in the ECS.
@@ -99,6 +100,8 @@ namespace lof {
         Velocity_Component(float vx = 0.0f, float vy = 0.0f)
             : velocity(vx, vy) {}
     };
+
+
 
     /**
     * @class Physics_Component
@@ -243,7 +246,6 @@ namespace lof {
          */
         void reset_forces() {
             accumulated_force = Vec2D(0, 0);
-
         }
 
         void reset_jump_request() { jump_requested = false; }

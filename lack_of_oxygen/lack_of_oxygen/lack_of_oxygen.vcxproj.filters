@@ -38,9 +38,11 @@
     <ClCompile Include="System\GUI_System.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Logic_System.cpp" />
-    <ClCompile Include="Manager\Assets_Manager.cpp" />
     <ClCompile Include="Utility\Force_Helper.cpp" />
+    <ClCompile Include="Manager\Assets_Manager.cpp" />
+    <ClCompile Include="System\Interruption_System.cpp" />
     <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
+    <ClCompile Include="Utility\Win_Control.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -77,20 +79,16 @@
     <ClInclude Include="Utility\Globals.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Logic_System.h" />
-    <ClInclude Include="Manager\Assets_Manager.h" />
     <ClInclude Include="Utility\Force_Helper.h" />
+    <ClInclude Include="Manager\Assets_Manager.h" />
+    <ClInclude Include="System\Interruption_System.h" />
     <ClInclude Include="System\Header.h" />
     <ClInclude Include="Utility\Entity_Selector_Helper.h" />
+    <ClInclude Include="Utility\Win_Control.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
-    <None Include="Shaders\lack_of_oxygen_debug.frag" />
-    <None Include="Shaders\lack_of_oxygen_debug.vert" />
-    <None Include="Shaders\lack_of_oxygen_font.frag" />
-    <None Include="Shaders\lack_of_oxygen_font.vert" />
-    <None Include="Shaders\lack_of_oxygen_obj.frag" />
-    <None Include="Shaders\lack_of_oxygen_obj.vert" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Config\config.json" />
     <None Include="Assets\Scenes\scene2.scn" />
@@ -151,6 +149,7 @@
     <Image Include="Assets\Textures\Mineral_Hopper_Conveyor_Filled_Batch_4.png" />
     <Image Include="Assets\Textures\Mineral Hopper_Minerals_Batch 4.png" />
     <Image Include="Assets\Textures\Ship Open_Batch_2.png" />
+    <Image Include="Assets\Textures\Spritesheet_Test.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Prisoner_Atlas.txt" />

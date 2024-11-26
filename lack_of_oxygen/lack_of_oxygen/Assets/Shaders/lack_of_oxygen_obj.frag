@@ -22,18 +22,30 @@ uniform vec3 uColor;
 uniform sampler2D uTex2d; 
 uniform bool uTexFlag;		// Flag for texture
 uniform bool  uAnimateFlag; // Flag for animation
-uniform float uTex_W;
-uniform float uTex_H;
-uniform float uFrame_Size;	// Usually frame w and h is the same, split if needed
-uniform float uPos_X;		// Pos x in texture
-uniform float uPos_Y;		// Pos y in texture
+uniform int uFrameNo;
 
 void main() {
 	if(uTexFlag == true && uAnimateFlag == true) {
-		float scaling_x = uTex_W / uFrame_Size; // Scaling factor to resize TextCoord.x accordingly
-		float scaling_y = uTex_H / uFrame_Size; // Scaling factor to resize TextCoord.y accordingly	
-		float offset_x = uPos_X / uFrame_Size;  // Accounting for offset due to position in texture
-		float offset_y = uPos_Y / uFrame_Size;
+		ivec2 tex_size;
+		tex_size = textureSize(uTex2d, 0);
+		int padding = 2;
+		int frame_size = 16;
+
+		// Size is always 16 for each spritesheet texture/frame
+		float scaling_x = tex_size.x / float(frame_size); // Scaling factor to resize TextCoord.x accordingly
+		float scaling_y = tex_size.y / float(frame_size); // Scaling factor to resize TextCoord.y accordingly
+			
+		// Find number of col and rows of textures/frames
+		int cols = (tex_size.x - padding) / (frame_size + padding);
+		int rows = (tex_size.y - padding) / (frame_size + padding);
+
+		// Find position x & y based on frame number
+		float Pos_X = padding + (uFrameNo % cols) * (frame_size + padding);
+		int y_pos_multiplier = uFrameNo / cols;
+		float Pos_Y = padding + (rows - 1 - y_pos_multiplier) * (frame_size + padding);
+
+		float offset_x = Pos_X / frame_size;  // Accounting for offset due to position in texture
+		float offset_y = Pos_Y / frame_size;
 		fFragColor = texture(uTex2d, vec2(vTextCoord.x / scaling_x, vTextCoord.y / scaling_y) + vec2(offset_x / scaling_x, offset_y / scaling_y));
 	} else if (uTexFlag == true){
 		fFragColor = texture(uTex2d, vTextCoord);	

@@ -98,10 +98,17 @@ namespace lof {
 		NONE = 4		///<Audio is not played at all nor need to stop
 	};
 
-	// ----------------------------- Movement_System.cpp -------------------------------------------
+	// ----------------------------- 
+	// 
+	// 
+	// 
+	// 
+	// 
+	// 
+	// .cpp -------------------------------------------
 	//Movement_System constants
 
-	constexpr float DEFAULT_SPEED = 1000.0f;
+	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
 	// ------------------------------ Audio_Manager.cpp --------------------------------
