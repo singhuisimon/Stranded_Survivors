@@ -144,6 +144,7 @@
     <Image Include="Assets\Textures\TNT_Batch_4.png" />
     <Image Include="Assets\Textures\Vent.png" />
     <Image Include="Assets\Textures\Wormhole.png" />
+    <Image Include="Assets\Textures\Spritesheet_Test.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Prisoner_Atlas.txt" />

@@ -298,21 +298,10 @@ namespace lof {
             }
             else if (prefix == "texture") {
                 file_line_ss >> animation.texture_name;
+                LM.write_log("Assets_Manager: animation texture name: %s", animation.texture_name.c_str());
             }
-            else if (prefix == "tex_width") {
-                file_line_ss >> animation.tex_w;
-            }
-            else if (prefix == "tex_height") {
-                file_line_ss >> animation.tex_h;
-            }
-            else if (prefix == "pos") {
-                file_line_ss >> frame.uv_x;
-                float temp_y;
-                file_line_ss >> temp_y;
-                frame.uv_y = animation.tex_h - temp_y - DEFAULT_Y_OFFSET;
-            }
-            else if (prefix == "size") {
-                file_line_ss >> frame.size;
+            else if (prefix == "frame_no") {
+                file_line_ss >> frame.frame_number;
             }
             else if (prefix == "time_delay") {
                 file_line_ss >> frame.time_delay;
@@ -321,6 +310,17 @@ namespace lof {
                 animation.frames.emplace_back(frame);
             }
             else if (prefix == "EA") {
+                //LM.write_log("Assets_Manager New Animation Loading: Animation name: %s", anim_name.c_str());
+                //LM.write_log("Assets_Manager New Animation Loading: Texture name: %s", animation.texture_name.c_str());
+                //LM.write_log("Assets_Manager New Animation Loading: curr_frame idx %u", animation.curr_frame_index);
+                //int cnt = 0;
+                //for (auto& it : animation.frames) {
+                //    LM.write_log("Assets_Manager New Animation Loading: Frame %u:", cnt);
+                //    LM.write_log("Assets_Manager New Animation Loading: Frame Number: %u", it.frame_number);
+                //    LM.write_log("Assets_Manager New Animation Loading: time delay: %f", it.time_delay);
+                //    cnt++; 
+                //}
+
                 animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
                 GFXM.animation_storage[anim_name] = animation;
                 animation = {};
