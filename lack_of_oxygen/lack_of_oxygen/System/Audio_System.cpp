@@ -88,7 +88,7 @@ namespace lof {
 					break;
 				case STOPPED:
 					stop_sound(key_id);
-					stopchannel.push_back(key_id);
+					//stopchannel.push_back(key_id);
 					break;
 				case PAUSED:
 					pause_resume_sound(key_id, true);
@@ -140,8 +140,17 @@ namespace lof {
 			
 		}
 		//free up unused channel.
-		for (std::string const& key : stopchannel) {
-			channel_map.erase(key);
+		for (auto it = channel_map.begin(); it != channel_map.end();) {
+			bool isPlaying = false;
+			it->second->isPlaying(&isPlaying);
+
+			if (!isPlaying) {
+				LM.write_log("Audio_System::update: Freeing channel %s.", it->first.c_str());
+				it = channel_map.erase(it);
+			}
+			else {
+				it++;
+			}
 		}
 
 		//update the fmod system with the core system
@@ -301,13 +310,15 @@ namespace lof {
 		}
 
 		bool playstate_currchannel;
-		channel->second->isPlaying(&playstate_currchannel);
+		errorcheck(channel->second->isPlaying(&playstate_currchannel), "Audio_System::stop_sound", "check sound playing");
 		if (playstate_currchannel) {
 			errorcheck(channel->second->stop(), "Audio_System::stop_sound", "stop channel" + channel_key); //if the channel is playing stop it
 		}
 		else {
 			return;	//nothing to do as channel has already finish playing music
 		}
+
+		channel_map.erase(channel_key);
 	}
 
 	//not sure if i am keeping this message

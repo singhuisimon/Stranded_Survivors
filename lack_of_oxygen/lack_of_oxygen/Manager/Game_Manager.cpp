@@ -8,7 +8,7 @@
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
-// Include header file
+ // Include header file
 #include "Game_Manager.h"
 
 // Include other managers
@@ -335,7 +335,7 @@ namespace lof {
 
 
                 // Handle horizontal movement
-                if (IM.is_key_held(GLFW_KEY_SPACE)) { 
+                if (IM.is_key_held(GLFW_KEY_SPACE)) {
                     physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
                 } 
                 else {
@@ -345,47 +345,50 @@ namespace lof {
                 //activate and deactivate the forces. 
                 if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
                     // Updates forces
-                    physics.force_helper.deactivate_force(MOVE_RIGHT); 
+                    physics.force_helper.deactivate_force(MOVE_RIGHT);
                     physics.force_helper.activate_force(MOVE_LEFT);
-                    forces_flag = MOVE_LEFT;  
+                    forces_flag = MOVE_LEFT;
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
                     direction = MOVE_LEFT;
 
                     // Update sound effect for player moving left
-                    if (physics.get_is_grounded()) { 
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING); 
+                    if (physics.get_is_grounded()) {
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
                     }
-                } else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) { 
+                }
+                else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
                     // Update forces
-                    physics.force_helper.deactivate_force(MOVE_LEFT); 
-                    physics.force_helper.activate_force(MOVE_RIGHT); 
+                    physics.force_helper.deactivate_force(MOVE_LEFT);
+                    physics.force_helper.activate_force(MOVE_RIGHT);
                     forces_flag = MOVE_RIGHT;
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_RIGHT; 
+                    direction = MOVE_RIGHT;
 
                     // Update sound effect for player moving right
-                    if (physics.get_is_grounded()) { 
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING); 
+                    if (physics.get_is_grounded()) {
+                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
                     }
-                } else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
+                }
+                else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
                     if (forces_flag == MOVE_LEFT) {
                         // Update forces
-                        physics.force_helper.activate_force(MOVE_LEFT); 
-                        forces_flag = MOVE_LEFT; 
+                        physics.force_helper.activate_force(MOVE_LEFT);
+                        forces_flag = MOVE_LEFT;
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_LEFT; 
+                        direction = MOVE_LEFT;
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
                             ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
                         }
-                    } else {
+                    }
+                    else {
                         // Update forces
                         physics.force_helper.deactivate_force(MOVE_LEFT);
                         physics.force_helper.activate_force(MOVE_RIGHT);
@@ -400,13 +403,14 @@ namespace lof {
                             ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
                         }
                     }
-                } else {
+                }
+                else {
                     // Reset forces and player animation
-                    physics.force_helper.deactivate_force(MOVE_LEFT);  
+                    physics.force_helper.deactivate_force(MOVE_LEFT);
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                     forces_flag = -1;
 
-                    int& direction = GFXM.get_player_direction(); 
+                    int& direction = GFXM.get_player_direction();
                     direction = -1;
                 }
 

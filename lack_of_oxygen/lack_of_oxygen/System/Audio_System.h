@@ -113,7 +113,6 @@ namespace lof {
 		* @param volume The new volume value
 		*/
 		void set_channel_volume(const std::string& channel_key, float volume);
-
 		/**
 		* @brief Pause the channels under the bgm channelgroup
 		*/
