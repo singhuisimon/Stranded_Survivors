@@ -302,7 +302,7 @@ namespace lof {
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_KP_5)) {
+        if (IM.is_key_pressed(GLFW_KEY_5)) {
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "Audio_System") {
                     auto* audio_system = static_cast<Audio_System*>(system.get());

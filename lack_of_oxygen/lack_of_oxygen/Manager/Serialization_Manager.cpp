@@ -24,7 +24,7 @@
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
 #include "IMGUI_Manager.h"
-#include "Assets_Manager.h"  // Access the file
+#include "Assets_Manager.h"
 
 // Include all component headers
 #include "../Component/Component.h"
@@ -32,6 +32,7 @@
 // Include Utility headers
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Component_Parser.h" // Adding components from JSON
+#include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
 //#include "../Utility/Path_Helper.h"
 #include "../Utility/Force_Helper.h"
@@ -187,13 +188,15 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
 
         // Read the JSON file into a string
-        std::string json_content;  // This will receive the file content
-
-        // Read JSON file through Assets_Manager
-        if (!ASM.read_json_file(filepath, json_content)) {  // json_content is passed by reference
-            LM.write_log("Serialization_Manager::load_config(): Failed to read configuration file");
+        std::ifstream ifs(filepath);
+        if (!ifs.is_open()) {
+            LM.write_log("Serialization_Manager::load_config(): Failed to open configuration file: %s", filepath);
             return false;
         }
+
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        std::string json_content = buffer.str();
 
         // Parse the JSON content
         m_document.Parse(json_content.c_str());
@@ -249,13 +252,15 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
 
         // Read and parse the prefab file
-        std::string json_content;  // This will receive the file content
-
-        // Read JSON file through Assets_Manager
-        if (!ASM.read_json_file(filepath, json_content)) {  // json_content is passed by reference
-            LM.write_log("Serialization_Manager::load_config(): Failed to read prefabs file");
+        std::ifstream ifs(filepath);
+        if (!ifs.is_open()) {
+            LM.write_log("Serialization_Manager::load_prefabs(): Failed to open prefab file: %s", filepath);
             return false;
         }
+
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        std::string json_content = buffer.str();
 
         rapidjson::Document prefab_document;
         prefab_document.Parse(json_content.c_str());
@@ -278,6 +283,9 @@ namespace lof {
             std::string prefab_name = it->name.GetString();
             
             IMGUIM.fill_prefab_names(prefab_name.c_str());
+
+            //DEBUG
+            LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());
 
             // Deep copy the prefab definition into the map
             rapidjson::Value prefab_value(rapidjson::kObjectType);
@@ -328,13 +336,15 @@ namespace lof {
         LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
 
         // Read and parse the scene file
-        std::string json_content;  // This will receive the file content
-
-        // Read JSON file through Assets_Manager
-        if (!ASM.read_json_file(filename, json_content)) {  // json_content is passed by reference
-            LM.write_log("Serialization_Manager::load_config(): Failed to read configuration file");
+        std::ifstream ifs(filename);
+        if (!ifs.is_open()) {
+            LM.write_log("Serialization_Manager::load_scene(): Failed to open scene file: %s", filename);
             return false;
         }
+
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        std::string json_content = buffer.str();
 
         rapidjson::Document scene_document;
         scene_document.Parse(json_content.c_str());
@@ -693,219 +703,122 @@ namespace lof {
     }
 
     bool Serialization_Manager::save_game_state(const char* filepath) {
-        try {
-            LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
+        LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
+        rapidjson::Document save_doc;
+        save_doc.SetObject();
+        rapidjson::Document::AllocatorType& allocator = save_doc.GetAllocator();
 
-            // Create document and keep it in scope
-            rapidjson::Document save_doc;
-            save_doc.SetObject();
-            auto& allocator = save_doc.GetAllocator();
+        // Create array for objects (matching your scene format)
+        rapidjson::Value objects_array(rapidjson::kArrayType);
 
-            // Create array and add it to document immediately
-            rapidjson::Value objects_array(rapidjson::kArrayType);
+        // Counter for generating unique names if needed
+        int unnamed_counter = 0;
 
-            int unnamed_counter = 0;
+        // Iterate through all entities
+        for (const auto& entity_ptr : ECSM.get_entities()) {
+            EntityID entity_id = entity_ptr->get_id();
 
-            for (const auto& entity_ptr : ECSM.get_entities()) {
-                if (!entity_ptr) {
-                    LM.write_log("Skipping null entity pointer");
-                    continue;
-                }
-
-                EntityID entity_id = entity_ptr->get_id();
-
-                // Skip GUI-only components
-                if (entity_ptr->get_component_mask().count() == 1 &&
-                    ECSM.has_component<GUI_Component>(entity_id)) {
-                    continue;
-                }
-
-                try {
-                    // Create the entity object
-                    rapidjson::Value entity_obj(rapidjson::kObjectType);
-                    rapidjson::Value components_obj(rapidjson::kObjectType);
-
-                    // Handle name
-                    std::string entity_name;
-                    if (entity_id == 0) {
-                        entity_name = "background";
-                    }
-                    else {
-                        entity_name = entity_ptr->get_name();
-                        if (entity_name.empty()) {
-                            entity_name = "entity_" + std::to_string(unnamed_counter++);
-                        }
-                    }
-
-                    // Create string value and immediately add it
-                    rapidjson::Value name_value;
-                    name_value.SetString(entity_name.c_str(), entity_name.length(), allocator);
-                    entity_obj.AddMember("name", name_value, allocator);
-
-                    // Transform2D Component
-                    if (ECSM.has_component<Transform2D>(entity_id)) {
-                        try {
-                            const auto& transform = ECSM.get_component<Transform2D>(entity_id);
-                            rapidjson::Value comp_value = serialize_transform_component(transform, allocator);
-                            components_obj.AddMember("Transform2D", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Transform2D for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Graphics Component
-                    if (ECSM.has_component<Graphics_Component>(entity_id)) {
-                        try {
-                            const auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_graphics_component(graphics, allocator);
-                            components_obj.AddMember("Graphics_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Graphics_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Collision Component
-                    if (ECSM.has_component<Collision_Component>(entity_id)) {
-                        try {
-                            const auto& collision = ECSM.get_component<Collision_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_collision_component(collision, allocator);
-                            components_obj.AddMember("Collision_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Collision_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Physics Component
-                    if (ECSM.has_component<Physics_Component>(entity_id)) {
-                        try {
-                            const auto& physics = ECSM.get_component<Physics_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_physics_component(physics, allocator);
-                            components_obj.AddMember("Physics_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Physics_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Velocity Component
-                    if (ECSM.has_component<Velocity_Component>(entity_id)) {
-                        try {
-                            const auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_velocity_component(velocity, allocator);
-                            components_obj.AddMember("Velocity_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Velocity_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Audio Component
-                    if (ECSM.has_component<Audio_Component>(entity_id)) {
-                        try {
-                            const auto& audio = ECSM.get_component<Audio_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_audio_component(audio, allocator);
-                            components_obj.AddMember("Audio_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Audio_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Animation Component
-                    if (ECSM.has_component<Animation_Component>(entity_id)) {
-                        try {
-                            const auto& animation = ECSM.get_component<Animation_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_animation_component(animation, allocator);
-                            components_obj.AddMember("Animation_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Animation_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Logic Component
-                    if (ECSM.has_component<Logic_Component>(entity_id)) {
-                        try {
-                            const auto& logic = ECSM.get_component<Logic_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_logic_component(logic, allocator);
-                            components_obj.AddMember("Logic_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Logic_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Text Component
-                    if (ECSM.has_component<Text_Component>(entity_id)) {
-                        try {
-                            const auto& text = ECSM.get_component<Text_Component>(entity_id);
-                            rapidjson::Value comp_value = serialize_text_component(text, allocator);
-                            components_obj.AddMember("Text_Component", comp_value, allocator);
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error serializing Text_Component for entity %s: %s", entity_name.c_str(), e.what());
-                        }
-                    }
-
-                    // Only add if we have components
-                    if (components_obj.MemberCount() > 0) {
-                        try {
-                            // Store the count before moving
-                            size_t component_count = components_obj.MemberCount();
-
-                            // Create a string value for the key
-                            rapidjson::Value components_key("components", allocator);
-
-                            // Move the components object into the entity object
-                            entity_obj.AddMember(components_key, components_obj.Move(), allocator);
-
-                            // Move the entity object into the array
-                            objects_array.PushBack(entity_obj.Move(), allocator);
-
-                            LM.write_log("Successfully serialized entity %s with %d components",
-                                entity_name.c_str(), component_count);  // Use stored count instead
-                        }
-                        catch (const std::exception& e) {
-                            LM.write_log("Error adding components to entity %s: %s",
-                                entity_name.c_str(), e.what());
-                        }
-                    }
-                }
-                catch (const std::exception& e) {
-                    LM.write_log("Error processing entity %d: %s", entity_id, e.what());
-                    continue;  // Skip this entity on error
-                }
+            // Skip if this entity only has a GUI component
+            if (entity_ptr->get_component_mask().count() == 1 &&
+                ECSM.has_component<GUI_Component>(entity_id)) {
+                continue;
             }
 
-            // Add the array to the document
-            save_doc.AddMember("objects", objects_array, allocator);
+            // Create object for this entity
+            rapidjson::Value entity_obj(rapidjson::kObjectType);
 
-            // Write to file
+            // Generate a name for the entity
+            std::string entity_name;
+            if (entity_id == 0) {
+                entity_name = "background";
+            }
+            else {
+                entity_name = "entity_" + std::to_string(unnamed_counter++);
+            }
+            entity_obj.AddMember("name", rapidjson::Value(entity_name.c_str(), allocator), allocator);
+
+            // Create object for components
+            rapidjson::Value components_obj(rapidjson::kObjectType);
+
+            // Add Transform2D component if present
+            if (ECSM.has_component<Transform2D>(entity_id)) {
+                const Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
+                components_obj.AddMember("Transform2D", serialize_transform_component(transform, allocator), allocator);
+            }
+
+            // Add Graphics_Component if present
+            if (ECSM.has_component<Graphics_Component>(entity_id)) {
+                const Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+                components_obj.AddMember("Graphics_Component", serialize_graphics_component(graphics, allocator), allocator);
+            }
+
+            // Add Collision_Component if present
+            if (ECSM.has_component<Collision_Component>(entity_id)) {
+                const Collision_Component& collision = ECSM.get_component<Collision_Component>(entity_id);
+                components_obj.AddMember("Collision_Component", serialize_collision_component(collision, allocator), allocator);
+            }
+
+            // Add Physics_Component if present
+            if (ECSM.has_component<Physics_Component>(entity_id)) {
+                const Physics_Component& physics = ECSM.get_component<Physics_Component>(entity_id);
+                components_obj.AddMember("Physics_Component", serialize_physics_component(physics, allocator), allocator);
+            }
+
+            // Add Velocity_Component if present
+            if (ECSM.has_component<Velocity_Component>(entity_id)) {
+                const Velocity_Component& velocity = ECSM.get_component<Velocity_Component>(entity_id);
+                components_obj.AddMember("Velocity_Component", serialize_velocity_component(velocity, allocator), allocator);
+            }
+
+            // Add Audio_Component if present
+            if (ECSM.has_component<Audio_Component>(entity_id)) {
+                const Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_id);
+                components_obj.AddMember("Audio_Component", serialize_audio_component(audio, allocator), allocator);
+            }
+
+            // Add Animation_Component if present
+            if (ECSM.has_component<Animation_Component>(entity_id)) {
+                const Animation_Component& animation = ECSM.get_component<Animation_Component>(entity_id);
+                components_obj.AddMember("Animation_Component", serialize_animation_component(animation, allocator), allocator);
+            }
+
+            //// Add Text_Component if present
+            //if (ECSM.has_component<Text_Component>(entity_id)) {
+            //    const Text_Component& text = ECSM.get_component<Text_Component>(entity_id);
+            //    components_obj.AddMember("Text_Component", serialize_text_component(text, allocator), allocator);
+            //}
+
+            // Only add entity to save file if it has components to save
+            if (components_obj.MemberCount() > 0) {
+                // Add components object to entity object
+                entity_obj.AddMember("components", components_obj, allocator);
+                // Add entity object to objects array
+                objects_array.PushBack(entity_obj, allocator);
+            }
+        }
+
+        // Add objects array to root object
+        save_doc.AddMember("objects", objects_array, allocator);
+
+        // Write to file
+        try {
             std::ofstream ofs(filepath);
             if (!ofs.is_open()) {
-                LM.write_log("Failed to open file for writing: %s", filepath);
+                LM.write_log("Serialization_Manager::save_game_state(): Failed to open file for writing: %s", filepath);
                 return false;
             }
 
-            rapidjson::StringBuffer buffer;
-            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+            rapidjson::StringBuffer strbuf;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(strbuf);
             save_doc.Accept(writer);
-
-            ofs << buffer.GetString();
+            ofs << strbuf.GetString();
             ofs.close();
 
-            LM.write_log("Successfully saved game state to: %s", filepath);
+            LM.write_log("Serialization_Manager::save_game_state(): Successfully saved game state to %s", filepath);
             return true;
         }
         catch (const std::exception& e) {
-            LM.write_log("Fatal error in save_game_state: %s", e.what());
-            return false;
-        }
-        catch (...) {
-            LM.write_log("Unknown fatal error in save_game_state");
+            LM.write_log("Serialization_Manager::save_game_state(): Error writing save file: %s", e.what());
             return false;
         }
     }

@@ -73,18 +73,15 @@ namespace lof {
 
         // Struct of a frame for animation
         struct Frame {
-            float uv_x, uv_y;   // Bottom-left of frame
-            float size;         // Dimensions of the Frame (W = H by default)
+            unsigned int frame_number;
             float time_delay;
         };
 
         // Struct of an animation
         struct Animation {
-            std::vector<Frame> frames;  // Collection of frames data
-            unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
+            std::vector<Frame> frames;  // Collection of frames time_delay 
             std::string texture_name;
-            float tex_w{ DEFAULT_TEXTURE_SIZE };   // Texture width 
-            float tex_h{ DEFAULT_TEXTURE_SIZE };   // Texture height
+            unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
             float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
         };
 
