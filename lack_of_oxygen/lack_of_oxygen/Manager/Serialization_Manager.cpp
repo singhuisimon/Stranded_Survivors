@@ -23,7 +23,7 @@
 
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
-#include "IMGUI_Manager.h"
+//#include "IMGUI_Manager.h"
 #include "Assets_Manager.h"
 
 // Include all component headers
@@ -282,7 +282,7 @@ namespace lof {
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
             
-            IMGUIM.fill_prefab_names(prefab_name.c_str());
+            //IMGUIM.fill_prefab_names(prefab_name.c_str());
 
             //DEBUG
             LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());

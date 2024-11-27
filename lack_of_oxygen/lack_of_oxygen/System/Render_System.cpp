@@ -180,9 +180,9 @@ namespace lof {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Set up the imgui framebuffer when entering editor mode
-        if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
-        }
+        //if (GFXM.get_editor_mode() == 1) {
+        //    glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
+        //}
 
         // Set up for the drawing of objects
         glClear(GL_COLOR_BUFFER_BIT);
@@ -567,9 +567,9 @@ namespace lof {
             glBindTexture(GL_TEXTURE_2D, 0);
             GFXM.program_free();
         }
-        if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
-        }
+        //if (GFXM.get_editor_mode() == 1) {
+        //    glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
+        //}
 
     }
 

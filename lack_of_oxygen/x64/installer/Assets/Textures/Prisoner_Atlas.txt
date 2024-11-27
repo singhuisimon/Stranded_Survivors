@@ -1,62 +1,42 @@
 name prisoner_idle_right	// Name of the animation
-texture Spritesheet_Animate // Texture name of the animation
-tex_width 254				// Width of texture
-tex_height 236				// Height of texture
-pos 2 17					// X and Y of frame (Give Y as if reading from top left of the texture, parsing will manipulate it to read from bottom left)
-size 16						// Width and Height of frame
+texture Spritesheet_Test	// Texture name of the animation
+frame_no 0					// Frame number in spritesheet (left - right, top - bottom)
 time_delay 0.0				// Time delay of frame in milliseconds
 EF							// Indicate end of frame data
 EA							// Indicate end of animation data
 name prisoner_idle_left
-texture Spritesheet_Animate
-tex_width 254
-tex_height 236  
-pos 110 17
-size 16
+texture Spritesheet_Test
+frame_no 14
 time_delay 0.0
 EF
 EA
 name prisoner_running_right
-texture Spritesheet_Animate
-tex_width 254
-tex_height 236  
-pos 2 37
-size 16
+texture Spritesheet_Test
+frame_no 3
 time_delay 100.0
 EF
-pos 20 37
-size 16
+frame_no 4
 time_delay 100.0
 EF
 EA
 name prisoner_running_left
-texture Spritesheet_Animate
-tex_width 254
-tex_height 236 
-pos 110 37
-size 16
+texture Spritesheet_Test
+frame_no 17
 time_delay 100.0
 EF
-pos 91 37
-size 16
+frame_no 18
 time_delay 100.0
 EF
 EA
 name air_vent
-texture Spritesheet_Animate
-tex_width 254
-tex_height 236  
-pos 236 53
-size 16
+texture Spritesheet_Test
+frame_no 28
 time_delay 100.0
 EF
-pos 236 35
-size 16
+frame_no 29
 time_delay 100.0
 EF
-frame 
-pos 236 17
-size 16
+frame_no 30
 time_delay 100.0
 EF
 EA

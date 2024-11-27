@@ -176,25 +176,25 @@ namespace lof {
         //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
         //printf("left collision entity outside: %d\n\n", collision_entity_left);
 
-        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
+        if (IM.is_key_pressed(GLFW_KEY_DOWN)&& has_collision_bottom) {
 
             printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
             printf("Bottom collision entity: %d\n", collision_entity_bottom);
 
         }
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !level_editor_mode && has_collision_left) {
+        if (IM.is_key_held(GLFW_KEY_LEFT)&& has_collision_left) {
 
             printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
             printf("left collision entity: %d\n", collision_entity_left);
 
         }
-        if (IM.is_key_held(GLFW_KEY_RIGHT) && !level_editor_mode && has_collision_right) {
+        if (IM.is_key_held(GLFW_KEY_RIGHT) && has_collision_right) {
 
             printf("Has right collision: %s\n", has_collision_right ? "true" : "false");
             printf("right entity: %d\n", collision_entity_right);
 
         }
-        if (IM.is_key_held(GLFW_KEY_UP) && !level_editor_mode && has_collision_top) {
+        if (IM.is_key_held(GLFW_KEY_UP) && has_collision_top) {
 
             printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
             printf("top entity: %d\n", collision_entity_top);
@@ -258,7 +258,7 @@ namespace lof {
         }
 
         // GUI System control
-        if (IM.is_key_pressed(GLFW_KEY_G) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_G)){//} && !level_editor_mode) {
             // Find GUI System
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "GUI_System") {
@@ -283,7 +283,7 @@ namespace lof {
         }
 
         // Test progress bar updates with H key
-        if (IM.is_key_pressed(GLFW_KEY_H) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_H)){//} && !level_editor_mode) {
             static float test_progress = 0.0f;
             test_progress += 0.1f;
             if (test_progress > 1.0f) test_progress = 0.0f;
@@ -503,10 +503,10 @@ namespace lof {
         }
 #endif
         if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            if (select_entity)
+            /*if (select_entity)
             {
                 selectedID = selectedEntityInfo.selectedEntity;
-            }
+            }*/
 
 
         }
@@ -517,49 +517,49 @@ namespace lof {
 #if 1
         //std::cout << "bool if is selected (1 is selected, 0 is not): " << select_entity << "\n";
        // std::cout << select_entity << " this is select entity\n";
-        if (select_entity && selectedID != -1 && level_editor_mode) {
-            auto& transform = ECSM.get_component<Transform2D>(selectedID);
-            auto& collision = ECSM.get_component<Collision_Component>(selectedID);
+        //if (select_entity && selectedID != -1 && level_editor_mode) {
+        //    auto& transform = ECSM.get_component<Transform2D>(selectedID);
+        //    auto& collision = ECSM.get_component<Collision_Component>(selectedID);
 
-            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-            GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
-            // Example: Scaling the selected entity
-            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
-                // Increase the size of the selected entity
-                transform.scale.x += scale_change;
-                transform.scale.y += scale_change;
-                collision.width += scale_change;
-                collision.height += scale_change;
-            }
-            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
-                // Increase the size of the selected entity
-                if (transform.scale.x > 0.0f) {
-                    transform.scale.x -= scale_change;
-                    collision.width -= scale_change;
-                }
-                else {
-                    transform.scale.x = 0.0f;
-                    collision.width = 0.0f;
-                }
+        //    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+        //    GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+        //    // Example: Scaling the selected entity
+        //    if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
+        //        // Increase the size of the selected entity
+        //        transform.scale.x += scale_change;
+        //        transform.scale.y += scale_change;
+        //        collision.width += scale_change;
+        //        collision.height += scale_change;
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
+        //        // Increase the size of the selected entity
+        //        if (transform.scale.x > 0.0f) {
+        //            transform.scale.x -= scale_change;
+        //            collision.width -= scale_change;
+        //        }
+        //        else {
+        //            transform.scale.x = 0.0f;
+        //            collision.width = 0.0f;
+        //        }
 
-                if (transform.scale.y > 0.0f) {
-                    transform.scale.y -= scale_change;
-                    collision.height -= scale_change;
-                }
-                else {
-                    transform.scale.y = 0.0f;
-                    collision.height = 0.0f;
-                }
-            }
-            else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
-            {
-                transform.orientation.x += rot_change;
-            }
-            else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
-            {
-                transform.orientation.x -= rot_change;
-            }
-        }
+        //        if (transform.scale.y > 0.0f) {
+        //            transform.scale.y -= scale_change;
+        //            collision.height -= scale_change;
+        //        }
+        //        else {
+        //            transform.scale.y = 0.0f;
+        //            collision.height = 0.0f;
+        //        }
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
+        //    {
+        //        transform.orientation.x += rot_change;
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
+        //    {
+        //        transform.orientation.x -= rot_change;
+        //    }
+        //}
 #endif 
 
 #if 0

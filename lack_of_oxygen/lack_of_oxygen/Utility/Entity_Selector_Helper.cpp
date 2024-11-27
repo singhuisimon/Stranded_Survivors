@@ -165,19 +165,19 @@ namespace lof
     void Entity_Selector_Helper::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
     {
         bool isSelected = false;
-        if (level_editor_mode)
-        {
+        //if (level_editor_mode)
+        //{
 
-            ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
-            g_selected_entity_info.mousePos = mousePos;
-            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-        }
-        else
-        {
-            Vec2D mousePos = Get_World_MousePos();
-            g_selected_entity_info.entitypos = mousePos;
-            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-        }
+        //    ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
+        //    g_selected_entity_info.mousePos = mousePos;
+        //    isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        //}
+        //else
+        //{
+        //    Vec2D mousePos = Get_World_MousePos();
+        //    g_selected_entity_info.entitypos = mousePos;
+        //    isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        //}
         
 
         g_selected_entity_info.isSelected = isSelected;

@@ -59,12 +59,12 @@ namespace lof {
             return 0; // Already started
         }
 
-        this->log_file_name = new_log_file_name;
-        log_file.open(new_log_file_name, std::ios::out | std::ios::trunc);
+        //this->log_file_name = new_log_file_name;
+        //log_file.open(new_log_file_name, std::ios::out | std::ios::trunc);
 
-        if (!log_file.is_open()) {
-            return -1; // Failed to open log file
-        }
+        //if (!log_file.is_open()) {
+        //    return -1; // Failed to open log file
+        //}
 
         m_is_started = true;
 
@@ -83,16 +83,16 @@ namespace lof {
             return; // Not started
         }
 
-        if (log_file.is_open()) {
-            log_file.close();
-        }
+        //if (log_file.is_open()) {
+        //    log_file.close();
+        //}
 
         m_is_started = false;
     }
 
 
     int Log_Manager::write_log(const char* fmt, ...) {
-        if (!is_started() || !log_file.is_open()) {
+        if (!is_started()){//} || !log_file.is_open()) {
             return -1; // Log_Manager not started or log file not open
         }
 
@@ -131,11 +131,11 @@ namespace lof {
         }
 
         // Write the timestamped log entry
-        log_file << time_stream.str() << buffer << std::endl;
+        //log_file << time_stream.str() << buffer << std::endl;
 
-        if (do_flush) {
-            log_file.flush();
-        }
+        //if (do_flush) {
+        //    log_file.flush();
+        //}
 
         // Optionally, return the number of characters written
         // Here, we return the number of characters in the user message

@@ -105,25 +105,25 @@ namespace lof {
         }
 
         // Set up the framebuffer and game scene texture for imgui viewport
-        glGenFramebuffers(1, &imgui_fbo);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-            LM.write_log("Graphics_Manager::start_up(): FRAME BUFFER CREATION SUCCESSFUL.");
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, imgui_fbo);
+        //glGenFramebuffers(1, &imgui_fbo);
+        //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
+        //    LM.write_log("Graphics_Manager::start_up(): FRAME BUFFER CREATION SUCCESSFUL.");
+        //}
+        //glBindFramebuffer(GL_FRAMEBUFFER, imgui_fbo);
 
-        // Creating texture object for imgui
-        glGenTextures(1, &imgui_tex);
-        glBindTexture(GL_TEXTURE_2D, imgui_tex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        //// Creating texture object for imgui
+        //glGenTextures(1, &imgui_tex);
+        //glBindTexture(GL_TEXTURE_2D, imgui_tex);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        // Attaching texture object for imgui to framebuffer 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, imgui_tex, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        //// Attaching texture object for imgui to framebuffer 
+        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, imgui_tex, 0);
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glBindTexture(GL_TEXTURE_2D, 0);
 
         m_is_started = true;
         return 0;
@@ -141,9 +141,9 @@ namespace lof {
         texture_storage.clear();
         animation_storage.clear();
 
-        // Free imgui framebuffer and tex object
-        glDeleteFramebuffers(1, &imgui_fbo);
-        glDeleteTextures(1, &imgui_tex);
+        //// Free imgui framebuffer and tex object
+        //glDeleteFramebuffers(1, &imgui_fbo);
+        //glDeleteTextures(1, &imgui_tex);
 
         m_is_started = false;
     }
@@ -398,11 +398,11 @@ namespace lof {
     // Return reference to player direction
     int& Graphics_Manager::get_player_direction() { return player_direction; }
 
-    // Return reference to the framebuffer
-    GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }
+    //// Return reference to the framebuffer
+    //GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }
 
-    // Return reference to the framebuffer texture object
-    GLuint& Graphics_Manager::get_framebuffer_texture() { return imgui_tex; }
+    //// Return reference to the framebuffer texture object
+    //GLuint& Graphics_Manager::get_framebuffer_texture() { return imgui_tex; }
 
     // Return reference to the editor mode flag
     int& Graphics_Manager::get_editor_mode() { return editor_mode; }
