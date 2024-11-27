@@ -357,4 +357,162 @@ namespace lof {
         }
         LM.write_log("=== End GUI State Validation ===");
     }
+
+    void GUI_System::show_mineral_tank_gui() {
+        if (mineral_interaction_container != INVALID_ENTITY_ID) {
+            return; // GUI already shown
+        }
+
+        // Create main container with the background texture
+        mineral_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (mineral_interaction_container != INVALID_ENTITY_ID) {
+            auto* container_gui = get_component_safe<GUI_Component>(mineral_interaction_container);
+            if (!container_gui) {
+                hide_mineral_tank_gui();
+                return;
+            }
+            container_gui->is_container = true;
+
+            // Set background texture and properties
+            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Mineral_Deposit_UI_BG_Batch_4";
+                graphics->color = glm::vec3(1.0f);
+            }
+
+            // Position and scale the container
+            if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
+                transform->position = Vec2D(-350.0f, 180.0f);
+                transform->scale = Vec2D(500.0f, 300.0f);
+            }
+
+            // Add GUI overlay image containing all text
+            mineral_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
+            if (mineral_text_overlay != INVALID_ENTITY_ID) {
+                if (auto* graphics = get_component_safe<Graphics_Component>(mineral_text_overlay)) {
+                    graphics->model_name = "square";
+                    graphics->texture_name = "Mineral_Deposit_UI_Text_Batch_4";
+                    graphics->color = glm::vec3(1.0f);
+                }
+                if (auto* transform = get_component_safe<Transform2D>(mineral_text_overlay)) {
+                    transform->position = Vec2D(-350.0f, 180.0f);
+                    transform->scale = Vec2D(420.0f, 215.0f);
+                }
+            }
+        }
+    }
+
+    void GUI_System::show_oxygen_tank_gui() {
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            return; // GUI already shown
+        }
+
+        // Create main container with the background texture
+        oxygen_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            auto* container_gui = get_component_safe<GUI_Component>(oxygen_interaction_container);
+            if (!container_gui) {
+                hide_oxygen_tank_gui();
+                return;
+            }
+            container_gui->is_container = true;
+
+            // Set background texture and properties
+            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Oxygen_Refill_UI_BG_Batch_4";
+                graphics->color = glm::vec3(1.0f);
+            }
+
+            // Position and scale the container
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
+                transform->position = Vec2D(-350.0f, 180.0f);
+                transform->scale = Vec2D(500.0f, 300.0f);
+            }
+
+            // Add text overlay
+            oxygen_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
+            if (oxygen_text_overlay != INVALID_ENTITY_ID) {
+                if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_text_overlay)) {
+                    graphics->model_name = "square";
+                    graphics->texture_name = "Oxygen_Refill_UI_Text_Batch_4";
+                    graphics->color = glm::vec3(1.0f);
+                }
+                if (auto* transform = get_component_safe<Transform2D>(oxygen_text_overlay)) {
+                    transform->position = Vec2D(-362.0f, 175.0f);
+                    transform->scale = Vec2D(400.0f, 250.0f);
+                }
+            }
+
+            // Add red circle
+            red_circle_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
+            if (red_circle_overlay != INVALID_ENTITY_ID) {
+                if (auto* graphics = get_component_safe<Graphics_Component>(red_circle_overlay)) {
+                    graphics->model_name = "square";
+                    graphics->texture_name = "Oxygen_Refill_UI_Red_circle_Flattened_Batch_4";
+                    graphics->color = glm::vec3(1.0f);
+                }
+                if (auto* transform = get_component_safe<Transform2D>(red_circle_overlay)) {
+                    transform->position = Vec2D(-475.0f, 190.0f);
+                    transform->scale = Vec2D(150.0f, 150.0f);
+                }
+            }
+
+            // Add green circle
+            green_circle_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
+            if (green_circle_overlay != INVALID_ENTITY_ID) {
+                if (auto* graphics = get_component_safe<Graphics_Component>(green_circle_overlay)) {
+                    graphics->model_name = "square";
+                    graphics->texture_name = "Oxygen_Refill_UI_Green_circle_Batch_4";
+                    graphics->color = glm::vec3(1.0f);
+                }
+                if (auto* transform = get_component_safe<Transform2D>(green_circle_overlay)) {
+                    transform->position = Vec2D(-225.0f, 190.0f);
+                    transform->scale = Vec2D(150.0f, 150.0f);
+                }
+            }
+        }
+    }
+
+    void GUI_System::hide_mineral_tank_gui() {
+        if (mineral_text_overlay != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(mineral_text_overlay);
+            mineral_text_overlay = INVALID_ENTITY_ID;
+        }
+
+        if (mineral_interaction_container != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(mineral_interaction_container);
+            mineral_interaction_container = INVALID_ENTITY_ID;
+        }
+    }
+
+    void GUI_System::hide_oxygen_tank_gui() {
+        // Destroy green circle overlay
+        if (green_circle_overlay != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying green_circle_overlay ID: %u", green_circle_overlay);
+            ecs_manager.destroy_entity(green_circle_overlay);
+            green_circle_overlay = INVALID_ENTITY_ID;
+        }
+
+        // Destroy red circle overlay
+        if (red_circle_overlay != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying red_circle_overlay ID: %u", red_circle_overlay);
+            ecs_manager.destroy_entity(red_circle_overlay);
+            red_circle_overlay = INVALID_ENTITY_ID;
+        }
+
+        // Destroy text overlay
+        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen_text_overlay ID: %u", oxygen_text_overlay);
+            ecs_manager.destroy_entity(oxygen_text_overlay);
+            oxygen_text_overlay = INVALID_ENTITY_ID;
+        }
+
+        // Destroy the container
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen_interaction_container ID: %u", oxygen_interaction_container);
+            ecs_manager.destroy_entity(oxygen_interaction_container);
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+        }
+    }
 }

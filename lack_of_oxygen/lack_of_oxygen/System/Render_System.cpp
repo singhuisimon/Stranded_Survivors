@@ -317,7 +317,7 @@ namespace lof {
                     glBindTextureUnit(5, textures[graphics.texture_name]);
                 }
 
-                LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
+                //LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
                 GLuint tex_flag_true_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");

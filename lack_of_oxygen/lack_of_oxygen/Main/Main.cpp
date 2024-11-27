@@ -67,12 +67,12 @@ int main(void) {
     // --------------------------- Create GLFW Window ---------------------------
 
     // Create a windowed mode window and its OpenGL context using default values
-    // window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
 
     
     // Create a fullscreen window
-    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
-    glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
+    //window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
+    //glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
 
     if (!window) {
         LM.write_log("Failed to create GLFW window!");
