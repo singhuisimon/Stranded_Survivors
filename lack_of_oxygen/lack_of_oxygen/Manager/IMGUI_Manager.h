@@ -167,6 +167,8 @@ namespace lof {
         ImVec2 get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 
         ImVec2 imgui_mouse_pos();
+
+        bool imgui_toggle_files(int& current_scene);
     };
 
 } // namespace lof

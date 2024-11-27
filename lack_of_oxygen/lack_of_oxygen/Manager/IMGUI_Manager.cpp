@@ -47,6 +47,13 @@ namespace lof {
     //Vector of assigned names
     std::vector<std::string> assigned_names;
 
+    
+    
+    static bool mouse_was_down = false;
+    static ImVec2 mouse_pos_before_press;
+    static bool mouse_prev_down = false;
+    
+    
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -116,6 +123,24 @@ namespace lof {
 
         ImGui::Begin("File List");
         selected_file_index = current_object_index;
+
+        //int current_object_index = 0;
+        //const auto& entities = ecs.get_entities();
+        //if (selected_object_index >= entities.size()) {
+        //    selected_object_index = -1;
+        //}
+        //for (int i = 0; i < entities.size(); ++i) {
+        //    if (entities[i] != nullptr) {
+        //        std::string obj_name = entities[i]->get_name();
+        //        //selectable for clicking; second param for highlighting
+        //        if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index) && !mouse_clicked_or_dragged) {
+        //            //selected; casuing seceond param state to change
+        //            selected_object_index = current_object_index;
+        //        }
+        //    }
+        //    ++current_object_index;
+        //}
+
         if (ImGui::Button("Load Scene")) {
             load_selected = !load_selected;
         }
@@ -124,7 +149,7 @@ namespace lof {
         if (load_selected && (selected_file_index != -1)) {
             const std::string SCENES = "Scenes";;
             if (SM.load_scene(ASM.get_full_path(SCENES, "scene1.scn").c_str())) {
-
+            //if (SM.load_scene(ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn"))){
                 //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
 
                 load_selected = !load_selected;
@@ -144,6 +169,16 @@ namespace lof {
         ImGui::NewFrame();
     }
 
+
+    //bool IMGUI_Manager::imgui_toggle_files(int& current_scene) {
+    //    
+    //    //get 
+    //    const std::string SCENES = "Scenes";
+    //    std::string scene_path1 = ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn");
+    //    std::string scene_path2 = ASM.get_full_path(SCENES, "scene" + std::to_string(2) + ".scn");
+
+    //    return true;
+    //}
 
     //Gets mouse position in terms of game world
     ImVec2 IMGUI_Manager::get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
@@ -275,6 +310,9 @@ namespace lof {
                 ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
 
+
+
+            //-----------------------------------------For mouse----------------------------------------//
             // Get the mouse position in terms of IMGUI screen
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
 
@@ -291,6 +329,9 @@ namespace lof {
             if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
                 mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
 
+                ImGui::Text("Mouse_Pos: %.2f, %.2f", Mouse_Pos.x, Mouse_Pos.y);
+
+                //-------------------------------clicking----------------------------------//
                 //Click with  mouse
                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
@@ -298,20 +339,11 @@ namespace lof {
                     if (selectedEntityInfo.isSelected) {
                         select_entity = true;
                         selectedEntityID = selectedEntityInfo.selectedEntity;
-
-                        std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
                         LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
-
                     }
                     else {
-
                         select_entity = false;
-
                         selectedEntityID = selectedEntityInfo.selectedEntity;
-                        std::cout << "No entity is selected.\n";
-                        std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n\n";
-
-                  
                     }
                 }
                 else {
@@ -324,95 +356,58 @@ namespace lof {
                     selected_object_index = selectedEntityID;
                 }
 
-                static ImVec2 previousMousePos;    // Previous mouse position
-                static bool mouse_was_down = false;
+                //-------------------------------dragging----------------------------------//
 
-                
-                bool isDragging = false;
-                Vec2D Drag_Offset;
+                static ImVec2 selected_entity_start_pos;
                 auto& entities = ecs.get_entities();
-                ImVec2 currentMousePos = ImGui::GetMousePos();
 
-                //calculate
+                //Drag with mouse
                 if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
 
-                    mouse_clicked_or_dragged = true;
-
+                    //if mouse was previously down
                     if (!mouse_was_down) {
-
-                        mouse_was_down = true;
-                        previousMousePos = currentMousePos;
-
-                    }
-                    else {
-
-                        // Get the mouse position in terms of IMGUI screen
-                        ImVec2 mouse_pos = ImGui::GetIO().MousePos;
-                        ImVec2 texture_pos = ImGui::GetCursorScreenPos();
-
-                        //Gets mouse position in terms of game world
-                        Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
-
-                        
-                        auto& entities_change = ecs.get_entities();
+                       
+                        //get mouse position before mouse is held down
+                        mouse_pos_before_press = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
 
                         if (selectedEntityInfo.isSelected) {
-
-                            if (entities_change[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities_change[selectedEntityID].get()->get_id());
-
-                                auto& position = transform.position;
-
-                                position.x = Mouse_Pos.x;
-                                position.y = Mouse_Pos.y;
-
-                                auto& prev_position = transform.prev_position;
-                                prev_position = position;
-
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                selected_entity_start_pos.x = transform.position.x;
+                                selected_entity_start_pos.y = transform.position.y;
                             }
-                            
-
-                            selected_object_index = selectedEntityID;
                         }
+                        mouse_was_down = true;
 
-                        /*if (selectedEntityInfo.isSelected) {
-                            if (entities_change[selectedEntityID]) {
+                    }
+                    else { //mouse is not previously down
 
-                                std::cout << "entity dragged;" << std::endl;
+                        ImVec2 dragged_offset;
+                        dragged_offset.x = Mouse_Pos.x - mouse_pos_before_press.x;
+                        dragged_offset.y = Mouse_Pos.y - mouse_pos_before_press.y;
 
-                                if (entities_change[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                    std::cout << "entity has transformation component;" << std::endl;
+                        if (selectedEntityInfo.isSelected) {
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                
+                                transform.position.x = selected_entity_start_pos.x + dragged_offset.x;
+                                transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
+                                transform.prev_position.x = transform.position.x;
+                                transform.prev_position.y = transform.position.y;
 
-                                    Transform2D& transform = ecs.get_component<Transform2D>(entities_change[selectedEntityID].get()->get_id());
-
-                                    auto& position = transform.position;
-
-                                    position.x = Mouse_Pos.x;
-                                    position.y = Mouse_Pos.y;
-
-                                    auto& prev_position = transform.prev_position;
-                                    prev_position = position;
-
-                                }
                             }
 
-                            selected_object_index = selectedEntityID;
-                        }*/
+                        }
 
                     }
 
-                    //selected_object_index = selectedEntityID;
-
                 }
-                else {
-
-                    mouse_clicked_or_dragged = false;
+                else { //mouse is now down
+                    
                     mouse_was_down = false;
-                }
+                }    
             
             }
-
 
             ImGui::Separator();
             if (selectedEntityID == -1)
@@ -428,7 +423,7 @@ namespace lof {
 
         //asset manager to be added later
         ImGui::Begin("Console");
-        ImGui::Text("Console stuff:\nSelected Object Index: %.f\n", selected_object_index);
+        ImGui::Text("Asset Manager stuff:\nSelected Object Index: %.f\n", selected_object_index);
         ImGui::Text("selectedEntityID: %.f", selectedEntityID);
         ImGui::End();
 
