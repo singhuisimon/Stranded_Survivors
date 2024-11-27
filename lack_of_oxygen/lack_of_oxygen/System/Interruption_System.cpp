@@ -14,13 +14,18 @@ namespace lof {
         , previous_state(WindowState::NORMAL)
         , current_state(WindowState::NORMAL)
         , was_fullscreen(false)
-        , prev_width(DEFAULT_SCREEN_WIDTH)
-        , prev_height(DEFAULT_SCREEN_HEIGHT)
+        , prev_width(0)
+        , prev_height(0)
         , prev_x(0)
         , prev_y(0)
-        , alt_tab(false)
-        , ctrl_alt_del(false)
+        , alt_tab_active(false)
+        , ctrl_alt_del_active(false)
+        , force_minimize(false)
         {
+
+        //Initialize key states 
+        current_keys = { false, false, false, false, false, false };
+        previous_keys = { false, false, false, false, false, false };
 
         store_window_state(); 
 
@@ -32,36 +37,15 @@ namespace lof {
     }
 
     void Interruption_System::update(float delta_time) {
-       // static WindowState previous_logged_state = current_state;
 
         check_key_combinations();
 
         // Check current window state
         check_window_state();
 
-#if 0
-        // Only handle state changes if the state has actually changed
-        if (current_state != previous_state) {
-            // Log state transition if it's different from last logged state
-            if (current_state != previous_logged_state) {
-                LM.write_log("Interruption_System: State changed from %d to %d",
-                    static_cast<int>(previous_logged_state),
-                    static_cast<int>(current_state));
-                previous_logged_state = current_state;
-            }
-
-            if (current_state == WindowState::INTERRUPTED ||
-                current_state == WindowState::MINIMIZED) {
-                handle_interruption();
-            }
-            else {
-                handle_restoration();
-            }
-            previous_state = current_state;
-        }
-#endif
-
     }
+
+
     void Interruption_System::check_window_state() {
         bool is_visible = glfwGetWindowAttrib(window, GLFW_VISIBLE);
         bool is_focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
@@ -78,18 +62,6 @@ namespace lof {
         // Add debug logging to understand window state
         LM.write_log("Interruption_System: Window State Debug - Visible: %d, Focused: %d, Iconified: %d",
             is_visible, is_focused, is_iconified);
-
-        // Only consider it interrupted if 
-        //1. Window is actually minimized (iconified)
-        //2. Window becomes invisible
-         
-/*
-        if (!is_focused && !is_iconified && is_visible) {
-            glfwIconifyWindow(window);
-            LM.write_log("Interruption_System: Auto-minimizing window due to focus check");
-            return;
-        }
-*/
         
         if (!is_visible  || is_iconified) {
             if (!is_minimized) {  // Only trigger once when first minimized
@@ -323,21 +295,7 @@ namespace lof {
             if (auto* interrupt_system = dynamic_cast<Interruption_System*>(system.get())) {
                 LM.write_log("Interruption_System: Focus callback - focused: %d", focused);
 
-#if 0
-                //check for CTRL+ALT+DEL
-                bool ctrl_alt_del =
-                    (IM.is_key_held(GLFW_KEY_LEFT_CONTROL) ||
-                        IM.is_key_held(GLFW_KEY_RIGHT_CONTROL)) &&
-                    (IM.is_key_held(GLFW_KEY_LEFT_ALT) ||
-                        IM.is_key_held(GLFW_KEY_RIGHT_ALT)) &&
-                    IM.is_key_held(GLFW_KEY_DELETE);
-
-                bool alt_pressed =
-                    IM.is_key_held(GLFW_KEY_LEFT_ALT) ||
-                    IM.is_key_held(GLFW_KEY_RIGHT_ALT);
-
-#endif
-                if (!focused) {
+                 if (!focused) {
                     //check for ALT+TAB
       
 
@@ -348,13 +306,13 @@ namespace lof {
                                    // Let iconify_callback handle regular minimize/restore
 
 
-                    if (interrupt_system->alt_tab || interrupt_system->ctrl_alt_del) {
+                    if (interrupt_system->alt_tab_active || interrupt_system->ctrl_alt_del_active) {
                         if (!interrupt_system->is_minimized && !focused) {
                             interrupt_system->current_state = WindowState::INTERRUPTED;
                             glfwIconifyWindow(window);
                             interrupt_system->handle_interruption();
 
-                            if (interrupt_system->ctrl_alt_del) {
+                            if (interrupt_system->ctrl_alt_del_active) {
                                 LM.write_log("Interruption_System: Handling CTRL+ALT+DEL interruption");
                             }
                             else {
@@ -434,7 +392,9 @@ namespace lof {
     }
 #endif 
 
+#if 0
     void Interruption_System::check_key_combinations() {
+
         // Direct GLFW key state check
         bool ctrl = (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
             glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS);
@@ -474,6 +434,57 @@ namespace lof {
         }
     }
 
+#endif 
+
+    void Interruption_System::check_key_combinations() {
+       
+      //store previous frame's key states 
+        previous_keys = current_keys;
+
+        //get current key states 
+        current_keys.ctrl = IM.is_key_held(GLFW_KEY_LEFT_CONTROL) ||
+            IM.is_key_held(GLFW_KEY_RIGHT_CONTROL);
+
+        current_keys.alt = IM.is_key_held(GLFW_KEY_LEFT_ALT) ||
+            IM.is_key_held(GLFW_KEY_RIGHT_ALT);
+
+        current_keys.del = IM.is_key_held(GLFW_KEY_DELETE); 
+
+        //update "was pressed" states
+        current_keys.ctrl_was_pressed = previous_keys.ctrl || current_keys.ctrl;
+        current_keys.alt_was_pressed = previous_keys.alt || current_keys.alt;
+        current_keys.del_was_pressed = previous_keys.del || current_keys.del;
+
+        //check for ALT+TAB
+        alt_tab_active = current_keys.alt;
+
+        //check for CTRL+ALT+DEL
+        bool potential_ctrl_alt_del = (current_keys.ctrl_was_pressed &&
+            current_keys.alt_was_pressed &&
+            current_keys.del_was_pressed);
+
+        if (potential_ctrl_alt_del) {
+            ctrl_alt_del_active = true;
+            LM.write_log("CTRL+ALT+DEL detected (using frame history)");
+        }
+
+
+        //Log Key states for debugging
+        if (current_keys.ctrl || current_keys.alt || current_keys.del) {
+            LM.write_log("Raw Key States - CTRL: %d, ALT: %d, DEL: %d",
+                current_keys.ctrl, current_keys.alt, current_keys.del);
+            LM.write_log("Key History States - CTRL: %d, ALT: %d, DEL: %d",
+                current_keys.ctrl_was_pressed, current_keys.alt_was_pressed, current_keys.del_was_pressed);
+        }
+
+        //reset the history if no keys are pressed 
+        if (!current_keys.ctrl && !current_keys.alt && !current_keys.del) {
+            current_keys.ctrl_was_pressed = false;
+            current_keys.alt_was_pressed = false;
+            current_keys.del_was_pressed = false;
+        }
+       
+    }
 
     bool Interruption_System::is_game_paused() const {
         return is_paused;
