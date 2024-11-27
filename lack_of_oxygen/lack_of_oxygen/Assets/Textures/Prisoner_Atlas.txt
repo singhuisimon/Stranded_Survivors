@@ -1,17 +1,17 @@
 name prisoner_idle_right	// Name of the animation
-texture Spritesheet_Test	// Texture name of the animation
+texture Spritesheet_Player	// Texture name of the animation
 frame_no 0					// Frame number in spritesheet (left - right, top - bottom)
 time_delay 0.0				// Time delay of frame in milliseconds
 EF							// Indicate end of frame data
 EA							// Indicate end of animation data
 name prisoner_idle_left
-texture Spritesheet_Test
+texture Spritesheet_Player
 frame_no 14
 time_delay 0.0
 EF
 EA
 name prisoner_running_right
-texture Spritesheet_Test
+texture Spritesheet_Player
 frame_no 3
 time_delay 100.0
 EF
@@ -20,7 +20,7 @@ time_delay 100.0
 EF
 EA
 name prisoner_running_left
-texture Spritesheet_Test
+texture Spritesheet_Player
 frame_no 17
 time_delay 100.0
 EF
@@ -28,15 +28,174 @@ frame_no 18
 time_delay 100.0
 EF
 EA
-name air_vent
-texture Spritesheet_Test
-frame_no 28
+name prisoner_mining_left
+texture Spritesheet_Player
+frame_no 22
+time_delay 50.0
+EF
+frame_no 23
+time_delay 50.0
+EF
+EA
+name prisoner_mining_right
+texture Spritesheet_Player
+frame_no 8
+time_delay 50.0
+EF
+frame_no 9
+time_delay 50.0
+EF
+EA
+name prisoner_mining_up_left
+texture Spritesheet_Player
+frame_no 26
+time_delay 50.0
+EF
+frame_no 27
+time_delay 50.0
+EF
+EA
+name prisoner_mining_up_right
+texture Spritesheet_Player
+frame_no 12
+time_delay 50.0
+EF
+frame_no 13
+time_delay 50.0
+EF
+EA
+name prisoner_mining_down_left
+texture Spritesheet_Player
+frame_no 24
+time_delay 50.0
+EF
+frame_no 25
+time_delay 50.0
+EF
+EA
+name prisoner_mining_down_right
+texture Spritesheet_Player
+frame_no 10
+time_delay 50.0
+EF
+frame_no 11
+time_delay 50.0
+EF
+EA
+name vent_strip
+texture Spritesheet_Map
+frame_no 20
 time_delay 100.0
 EF
-frame_no 29
+frame_no 21
 time_delay 100.0
 EF
-frame_no 30
+frame_no 22
+time_delay 100.0
+EF
+EA
+name dirt
+texture Spritesheet_Map
+frame_no 0
+time_delay 0.0
+EF
+frame_no 1
+time_delay 0.0
+EF
+EA
+name rock
+texture Spritesheet_Map
+frame_no 2
+time_delay 0.0
+EF
+frame_no 3
+time_delay 0.0
+EF
+EA
+name quartz
+texture Spritesheet_Map
+frame_no 4
+time_delay 0.0
+EF
+frame_no 5
+time_delay 0.0
+EF
+EA
+name emerald
+texture Spritesheet_Map
+frame_no 6
+time_delay 0.0
+EF
+frame_no 7
+time_delay 0.0
+EF
+EA
+name sapphire
+texture Spritesheet_Map
+frame_no 8
+time_delay 0.0
+EF
+frame_no 9
+time_delay 0.0
+EF
+EA
+name amethyst
+texture Spritesheet_Map
+frame_no 10
+time_delay 0.0
+EF
+frame_no 11
+time_delay 0.0
+EF
+EA
+name citrine
+texture Spritesheet_Map
+frame_no 12
+time_delay 0.0
+EF
+frame_no 13
+time_delay 0.0
+EF
+EA
+name alexandrite
+texture Spritesheet_Map
+frame_no 14
+time_delay 0.0
+EF
+frame_no 15
+time_delay 0.0
+EF
+EA
+name vent
+texture Spritesheet_Map
+frame_no 17
+time_delay 0.0
+EF
+EA
+name TNT
+texture Spritesheet_Map
+frame_no 18
+time_delay 0.0
+EF
+frame_no 32
+time_delay 0.0
+EF
+EA
+name wormhole
+texture Spritesheet_Map
+frame_no 19
+time_delay 0.0
+EF
+EA
+name lava
+texture Spritesheet_Map
+frame_no 23
+time_delay 100.0
+EF
+frame_no 24
+time_delay 100.0
+EF
+frame_no 25
 time_delay 100.0
 EF
 EA

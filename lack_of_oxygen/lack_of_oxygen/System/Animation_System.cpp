@@ -28,14 +28,15 @@ namespace lof {
     // Updates the animation of the entity according to the current frame and time delay.
     void Animation_System::update(float delta_time) { 
 
+        // Get a reference to the animation container
+        auto& animations_storage = GFXM.get_animation_storage();   
+        EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {  
 
-            // Get reference to the animation component and animation container
+            // Get reference to the animation component
             auto& animation_comp = ECSM.get_component<Animation_Component>(entity_id);  
-            auto& animations_storage = GFXM.get_animation_storage();   
-
-            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
             // Determine which frame of which animation to play
             // Set logic for player animation here first (This should be done before coming into animation system)
@@ -47,24 +48,24 @@ namespace lof {
                 // (When changing animation index, reset previous animation curr_frame_idx and frame_time_elapsed to 0)
                 if (player_direction == MOVE_LEFT) { // Set running_left animation if not playing currently
                     if (animation_comp.curr_animation_idx != 2) {
-                        animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                        animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
                         animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
                         animation_comp.curr_animation_idx = 2;
                     }
                 } else if (player_direction == MOVE_RIGHT) { // set running_right animation if not playing currently
                     if (animation_comp.curr_animation_idx != 3) {
-                        animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                        animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
                         animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                         animation_comp.curr_animation_idx = 3;
                     }
                 } else { // Idling (No animation)
                     // Check last direction based on last animation
                     if (animation_comp.curr_animation_idx == 2) { // Was running left
-                        animations_storage[animation_comp.animations["2"]].curr_frame_index = 0; // Reset running_left animation curr_frame_idx  
+                        animation_comp.curr_frame_index = 0; // Reset running_left animation curr_frame_idx  
                         animations_storage[animation_comp.animations["2"]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
                         animation_comp.curr_animation_idx = 0;    // Set idle left
                     } else if (animation_comp.curr_animation_idx == 3) { // Was running right
-                        animations_storage[animation_comp.animations["3"]].curr_frame_index = 0; // Reset running_right animation curr_frame_idx 
+                        animation_comp.curr_frame_index = 0; // Reset running_right animation curr_frame_idx 
                         animations_storage[animation_comp.animations["3"]].frame_elapsed_time = 0.0f; // Reset running_right animation frame_time_elapsed
                         animation_comp.curr_animation_idx = 1;    // Set idle right
                     }
@@ -72,8 +73,8 @@ namespace lof {
 
                 // Retrieve the time delay of the current frame in the current animation
                 std::string const& curr_animation_name = animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]; 
-                unsigned int& curr_frame_idx = animations_storage[curr_animation_name].curr_frame_index; 
-                float delay = animations_storage[curr_animation_name].frames[curr_frame_idx].time_delay;
+                //unsigned int& curr_frame_idx = animations_storage[curr_animation_name].curr_frame_index; 
+                float delay = animations_storage[curr_animation_name].frames[animation_comp.curr_frame_index].time_delay;
 
                 // Calculate the time delay to determine current frame index of current animation
                 if (delay == 0) { // delay = 0 means animation only has one frame, no changes 
@@ -82,24 +83,37 @@ namespace lof {
                     animations_storage[curr_animation_name].frame_elapsed_time += delta_time * MILLISECONDS_PER_SECOND; 
                 } else { // Frame elapsed time has surpassed frame's delay time, time to change frame
                     animations_storage[curr_animation_name].frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
-                    if (curr_frame_idx < (animations_storage[curr_animation_name].frames.size() - 1)) {
-                        curr_frame_idx++;
+                    if (animation_comp.curr_frame_index < (animations_storage[curr_animation_name].frames.size() - 1)) {
+                        animation_comp.curr_frame_index++;
                     } else { // Reset animation to the start
-                        curr_frame_idx = 0;
+                        animation_comp.curr_frame_index = 0;
                     }
                 }
             } else { // Other objects that animates based on time only (i.e vent, etc)
-
                 // Retrieve the time delay of the current frame in the current animation
                 std::string const& curr_animation_name = animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]; 
-                unsigned int& curr_frame_idx = animations_storage[curr_animation_name].curr_frame_index; 
-                float delay = animations_storage[curr_animation_name].frames[curr_frame_idx].time_delay; 
+                unsigned int& curr_frame_idx = animations_storage[curr_animation_name].curr_frame_index; // For shared animations
+                
+                // Shared animations v.s. individual animations
+                float delay = 0;
+                if (curr_animation_name == "vent_strip" || curr_animation_name == "lava") {
+                    delay = animations_storage[curr_animation_name].frames[curr_frame_idx].time_delay;
+                } else {
+                    delay = animations_storage[curr_animation_name].frames[animation_comp.curr_frame_index].time_delay;
+                }
 
                 // Calculate the time delay to determine current frame index of current animation
-                if (delay == 0) { // delay = 0 means animation only has one frame, no changes 
+                if (delay == 0) { // delay = 0 means animation only has one frame, no changes
+                    if (animation_comp.curr_tile_health <= (animation_comp.start_tile_health / 2)) {
+                        animation_comp.curr_frame_index = 1;
+                    }
                     continue;
                 } else if ((animations_storage[curr_animation_name].frame_elapsed_time < delay)) { // Frame elapsed time is still within delay time, increment by frame delta time
+                    if (animations_storage[curr_animation_name].is_updated == true) {
+                        continue;
+                    }
                     animations_storage[curr_animation_name].frame_elapsed_time += delta_time * MILLISECONDS_PER_SECOND;
+                    animations_storage[curr_animation_name].is_updated = true;
                 } else { // Frame elapsed time has surpassed frame's delay time, time to change frame
                     animations_storage[curr_animation_name].frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED; 
                     if (curr_frame_idx < (animations_storage[curr_animation_name].frames.size() - 1)) {
@@ -109,6 +123,10 @@ namespace lof {
                     }
                 }
             }    
+        }
+        // Reset animations update status
+        for (auto& animation : animations_storage) {
+            animation.second.is_updated = false;
         }
     }
 

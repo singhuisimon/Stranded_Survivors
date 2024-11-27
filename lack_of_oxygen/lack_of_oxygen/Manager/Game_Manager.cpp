@@ -325,9 +325,17 @@ namespace lof {
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            } 
+
                             // Destroy the colliding block on the left
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
@@ -335,9 +343,17 @@ namespace lof {
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            }
+
                             // Destroy the colliding block on the right
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
@@ -347,9 +363,17 @@ namespace lof {
                     if (CS.has_top_collide_detect()) {
                         EntityID block_to_remove = CS.get_top_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            }
+
                             // Destroy the colliding block on the right
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
@@ -357,9 +381,17 @@ namespace lof {
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            }
+
                             // Destroy the colliding block below
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
