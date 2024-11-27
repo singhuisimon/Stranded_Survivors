@@ -38,7 +38,7 @@
               {
                 "direction": [ 0.0, 1.0 ],
                 "type": "JUMP_UP",
-                "magnitude": 20000.0,
+                "magnitude": 2000.0,
                 "lifetime": 0.0,
                 "is_active": false
               }
@@ -48,7 +48,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 0.0, 1.0, 0.0 ],
-          "texture_name": "Spritesheet_Animate",
+          "texture_name": "Spritesheet_Test",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -58,7 +58,8 @@
         },
         "Collision_Component": {
           "width": 102.4,
-          "height": 153.6
+          "height": 153.6,
+          "collidable": true
         },
         "Animation_Component": {
           "animations": [
@@ -106,7 +107,8 @@
         },
         "Collision_Component": {
           "width": 300.0,
-          "height": 100.0
+          "height": 100.0,
+          "collidable": true
         }
       }
     },
@@ -228,7 +230,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.8
+          "height": 76.8,
+          "collidable": true
         },
         "Logic_Component": {
           "logic_type": 0,
@@ -290,7 +293,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -334,7 +338,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -378,7 +383,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -422,7 +428,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -466,7 +473,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -510,7 +518,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -554,7 +563,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -598,7 +608,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -642,7 +653,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -686,7 +698,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -730,7 +743,8 @@
         },
         "Collision_Component": {
           "width": 102.0,
-          "height": 102.0
+          "height": 102.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -772,10 +786,6 @@
             [ 0.0, 0.0, 0.0 ]
           ]
         },
-        "Collision_Component": {
-          "width": 102.0,
-          "height": 102.0
-        },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
           "damping_factor": 0.0,
@@ -815,10 +825,6 @@
             [ 0.0, 0.0, 0.0 ],
             [ 0.0, 0.0, 0.0 ]
           ]
-        },
-        "Collision_Component": {
-          "width": 102.0,
-          "height": 102.0
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],

@@ -298,21 +298,10 @@ namespace lof {
             }
             else if (prefix == "texture") {
                 file_line_ss >> animation.texture_name;
+                LM.write_log("Assets_Manager: animation texture name: %s", animation.texture_name.c_str());
             }
-            else if (prefix == "tex_width") {
-                file_line_ss >> animation.tex_w;
-            }
-            else if (prefix == "tex_height") {
-                file_line_ss >> animation.tex_h;
-            }
-            else if (prefix == "pos") {
-                file_line_ss >> frame.uv_x;
-                float temp_y;
-                file_line_ss >> temp_y;
-                frame.uv_y = animation.tex_h - temp_y - DEFAULT_Y_OFFSET;
-            }
-            else if (prefix == "size") {
-                file_line_ss >> frame.size;
+            else if (prefix == "frame_no") {
+                file_line_ss >> frame.frame_number;
             }
             else if (prefix == "time_delay") {
                 file_line_ss >> frame.time_delay;
@@ -321,6 +310,17 @@ namespace lof {
                 animation.frames.emplace_back(frame);
             }
             else if (prefix == "EA") {
+                //LM.write_log("Assets_Manager New Animation Loading: Animation name: %s", anim_name.c_str());
+                //LM.write_log("Assets_Manager New Animation Loading: Texture name: %s", animation.texture_name.c_str());
+                //LM.write_log("Assets_Manager New Animation Loading: curr_frame idx %u", animation.curr_frame_index);
+                //int cnt = 0;
+                //for (auto& it : animation.frames) {
+                //    LM.write_log("Assets_Manager New Animation Loading: Frame %u:", cnt);
+                //    LM.write_log("Assets_Manager New Animation Loading: Frame Number: %u", it.frame_number);
+                //    LM.write_log("Assets_Manager New Animation Loading: time delay: %f", it.time_delay);
+                //    cnt++; 
+                //}
+
                 animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
                 GFXM.animation_storage[anim_name] = animation;
                 animation = {};
@@ -376,6 +376,31 @@ namespace lof {
         input_file.close();
         return true;
     }
+
+    std::string Assets_Manager::get_audio_path(const std::string& audio_name) {
+        return get_full_path("Audio", audio_name + ".wav");
+    }
+#if 1
+    bool Assets_Manager::load_audio_file(const std::string& audio_name) {
+        std::string full_path = get_audio_path(audio_name);
+
+        // Check if file exists and is readable
+        std::ifstream file(full_path, std::ios::binary);
+        if (!file.good()) {
+            LM.write_log("Assets_Manager: Failed to load audio file: %s", full_path.c_str());
+            return false;
+        }
+        file.close();
+
+        LM.write_log("Assets_Manager: Successfully loaded audio file: %s", full_path.c_str());
+        return true;
+    }
+#endif
+
+
+
+
+    
 } // namespace lof
 
 

@@ -41,7 +41,8 @@ namespace lof {
      * @brief Alias for the data type used to represent component identifiers.
      */
     using ComponentID = std::uint8_t;
-
+    //forward declaration
+    class Force_Helper;
     /**
      * @class Component
      * @brief Base class for all components in the ECS.
@@ -99,6 +100,8 @@ namespace lof {
         Velocity_Component(float vx = 0.0f, float vy = 0.0f)
             : velocity(vx, vy) {}
     };
+
+
 
     /**
     * @class Physics_Component
@@ -243,7 +246,6 @@ namespace lof {
          */
         void reset_forces() {
             accumulated_force = Vec2D(0, 0);
-
         }
 
         void reset_jump_request() { jump_requested = false; }
@@ -318,10 +320,11 @@ namespace lof {
     {
     public:
         float width, height;
+        bool collidable;
 
         //constructor for collision components 
-        Collision_Component(float width = 0.0f, float height = 0.0f)
-            : width(width), height(height) {}
+        Collision_Component(float width = 0.0f, float height = 0.0f, bool collidable = false)
+            : width(width), height(height), collidable(collidable) {}
     };
 
     /**
@@ -416,6 +419,19 @@ namespace lof {
                 }
             }
             return nullptr;
+        }
+
+        
+        void set_key(const std::string& old_key, std::string& new_key) {
+
+            std::cout << "checking: old_key = " << old_key << "; new_key = " << new_key << std::endl;
+            for (auto& sound : sounds) {
+                if (sound.key == old_key) {
+                    std::cout << "sound.key before: " << sound.key << std::endl;
+                    sound.key = new_key;
+                    std::cout << "sound.key after: " << sound.key << std::endl;
+                }
+            }
         }
 
         /**

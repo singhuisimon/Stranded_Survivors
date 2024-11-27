@@ -65,7 +65,6 @@ namespace lof {
                 physics.set_is_grounded(false);
                 physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 physics.set_has_jumped(true);
-
                 velocity.velocity.y = physics.get_jump_force();
                 //reset the jump request
                 physics.reset_jump_request();

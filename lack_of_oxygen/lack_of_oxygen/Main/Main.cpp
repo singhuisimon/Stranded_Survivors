@@ -68,6 +68,7 @@ int main(void) {
 
     // Create a windowed mode window and its OpenGL context using default values
     // window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+
     
     // Create a fullscreen window
     window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
@@ -156,13 +157,17 @@ int main(void) {
     //    LM.write_log("GLFW window size adjusted to %ux%u based on configuration.", SCR_WIDTH, SCR_HEIGHT);
     //    std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
     //}
+
     
     // ----------------------------- Set Window Variables ---------------------------
 
-    unsigned int win_height = mode->height;
-    unsigned int win_width = mode->width;
+/*    unsigned int win_height = mode->height;
+    unsigned int win_width = mode->width*/;
 
     bool enter_key_was_pressed_last_frame = false;
+    Window_Control win_control;
+
+    win_control.set_win_size(mode->width, mode->height);
 
     // -------------------------- Game Loop Setup --------------------------
 
@@ -206,21 +211,11 @@ int main(void) {
             level_editor_mode = !level_editor_mode;
         }
         tab_key_was_pressed_last_frame = is_TAB_pressed;
+
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
-            if (is_full_screen) {
-                win_height = SCR_HEIGHT;
-                win_width = SCR_WIDTH;
-                glfwSetWindowMonitor(window, nullptr, 200, 200, win_width, win_height, GLFW_DONT_CARE);
-                is_full_screen = false;
-            }
-            else {
-                win_height = mode->height;
-                win_width = mode->width;
-                glfwSetWindowMonitor(window, monitor, 0, 0, win_width, win_height, GLFW_DONT_CARE);
-                is_full_screen = true;
-            }
+            win_control.toggle_fullscreen(window, monitor, mode, is_full_screen, SCR_WIDTH, SCR_HEIGHT);
         }
         enter_key_was_pressed_last_frame = is_ENTER_pressed;
 
@@ -248,7 +243,7 @@ int main(void) {
 
 
         if (level_editor_mode) {
-            IMGUIM.render_ui(win_width, win_height);
+            IMGUIM.render_ui(win_control.get_win_width(), win_control.get_win_height());
         }
 
         // Rendering

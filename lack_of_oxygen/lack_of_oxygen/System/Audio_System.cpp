@@ -9,6 +9,7 @@
  */
 
 #include "Audio_System.h"
+#include "../Manager/Assets_Manager.h"
 
 namespace lof {
 
@@ -79,7 +80,7 @@ namespace lof {
 
 			for (const auto& sound : sounds) {
 				std::string audio_key = sound.key;
-				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID);
+				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID) + audio_key;
 				PlayState state = audio.get_audio_state(audio_key);
 
 				switch (state) {
@@ -88,7 +89,7 @@ namespace lof {
 					break;
 				case STOPPED:
 					stop_sound(key_id);
-					stopchannel.push_back(key_id);
+					//stopchannel.push_back(key_id);
 					break;
 				case PAUSED:
 					pause_resume_sound(key_id, true);
@@ -140,8 +141,17 @@ namespace lof {
 			
 		}
 		//free up unused channel.
-		for (std::string const& key : stopchannel) {
-			channel_map.erase(key);
+		for (auto it = channel_map.begin(); it != channel_map.end();) {
+			bool isPlaying = false;
+			it->second->isPlaying(&isPlaying);
+
+			if (!isPlaying) {
+				LM.write_log("Audio_System::update: Freeing channel %s.", it->first.c_str());
+				it = channel_map.erase(it);
+			}
+			else {
+				it++;
+			}
 		}
 
 		//update the fmod system with the core system
@@ -180,11 +190,14 @@ namespace lof {
 		return "Audio_System";
 	}
 
+#if 0
 	void Audio_System::load_sound(const std::string& file_path) {
 		if (sound_map.find(file_path) != sound_map.end()) {
 			//sound is already loaded in the map.
 			return;
 		}
+
+
 		LM.write_log("The file path for load_sound is: %s", file_path.c_str());
 		
 		FMOD::Sound* sound = nullptr;
@@ -201,6 +214,7 @@ namespace lof {
 		LM.write_log("Audio_System::load_sound(): Successfully loaded the sound from system.");
 		return;
 	}
+	#endif
 
 	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
 		//check if sound has already been loaded.
@@ -263,6 +277,32 @@ namespace lof {
 		LM.write_log("Audio_System::play_sound: sound %s is playing", cskey.c_str());
 	}
 
+	void Audio_System::load_sound(const std::string& file_path) {
+		if (sound_map.find(file_path) != sound_map.end()) {
+			return; // Sound already loaded
+		}
+
+		// Use Assets Manager to get path and verify file
+		if (!ASM.load_audio_file(file_path)) {
+			LM.write_log("Audio_System::load_sound: Failed to find audio file %s", file_path.c_str());
+			return;
+		}
+
+		std::string full_path = ASM.get_audio_path(file_path);
+		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
+
+		FMOD::Sound* sound = nullptr;
+		FMOD_MODE mode = FMOD_DEFAULT;
+		FMOD_RESULT result = core_system->createSound(full_path.c_str(), mode, 0, &sound);
+		if (errorcheck(result, "Audio_System::load_sound", "create sound") != 0) {
+			return;
+		}
+
+		sound_map[file_path] = sound;
+		LM.write_log("Audio_System::load_sound: Successfully loaded sound");
+	}
+
+
 	void Audio_System::stop_mastergroup() {
 		bool playing;
 		mastergroup->isPlaying(&playing);
@@ -301,13 +341,15 @@ namespace lof {
 		}
 
 		bool playstate_currchannel;
-		channel->second->isPlaying(&playstate_currchannel);
+		errorcheck(channel->second->isPlaying(&playstate_currchannel), "Audio_System::stop_sound", "check sound playing");
 		if (playstate_currchannel) {
 			errorcheck(channel->second->stop(), "Audio_System::stop_sound", "stop channel" + channel_key); //if the channel is playing stop it
 		}
 		else {
 			return;	//nothing to do as channel has already finish playing music
 		}
+
+		channel_map.erase(channel_key);
 	}
 
 	//not sure if i am keeping this message

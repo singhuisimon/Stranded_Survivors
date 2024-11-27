@@ -23,7 +23,7 @@
 #include <iostream>
 
 namespace lof {
-    #define CS lof::Collision_System::get_instance()
+#define CS lof::Collision_System::get_instance()
 
     // A enum class for the possible collide side 
     enum class CollisionSide {
@@ -77,15 +77,15 @@ namespace lof {
     };
 
 
-   // extern SelectedEntityInfo g_selected_Entity_Info;
-    /**
-     * @class Collision_System
-     * @brief Handles collision detection and resolution between entities.
-     */
+    // extern SelectedEntityInfo g_selected_Entity_Info;
+     /**
+      * @class Collision_System
+      * @brief Handles collision detection and resolution between entities.
+      */
     class Collision_System : public System {
     public:
 
-        
+
         /**
          * @brief Constructor for Collision_System.
          * Initializes the system's signature.
@@ -98,7 +98,7 @@ namespace lof {
          */
         void update(float delta_time) override;
 
-        
+
 
         /**
          * @brief Returns the type of the collision system.
@@ -123,9 +123,9 @@ namespace lof {
             const Vec2D& vel1,
             const AABB& aabb2,
             const Vec2D& vel2,
-            float& firstTimeOfCollision, 
+            float& firstTimeOfCollision,
             float delta_time);
-   
+
         bool isInterseptBox(float box_x, float box_y, float width, float height, int X, int mouseY);
 
         static Collision_System& get_instance();
@@ -133,12 +133,19 @@ namespace lof {
         bool has_bottom_collide_detect() const { return has_bottom_collision; }
         bool has_left_collide_detect() const { return has_left_collision; }
         bool has_right_collide_detect() const { return has_right_collision; }
-        
+        bool has_top_collide_detect() const { return has_top_collision; }
+
 
         EntityID get_bottom_collide_entity() const { return static_cast<int>(bottom_collision_entity); }
         EntityID get_left_collide_entity() const { return static_cast<int>(left_collision_entity); }
         EntityID get_right_collide_entity() const { return static_cast<int>(right_collision_entity); }
+        EntityID get_top_collide_entity() const { return static_cast<int>(top_collision_entity); }
 
+        EntityID get_detect_entities() const { return static_cast<int>(check_non_collidable_entities); }
+        bool entities_detected() const { return entites_detect; }
+
+        EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
+        EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
 
     private:
@@ -146,18 +153,29 @@ namespace lof {
 
         static std::once_flag once_flag;
 
+        // for detect the rows and cols to destroy
         int frame_counter = 0;
         static bool has_bottom_collision;
         static bool has_left_collision;
         static bool has_right_collision;
+        static bool has_top_collision;
 
         static EntityID bottom_collision_entity;
         static EntityID left_collision_entity;
         static EntityID right_collision_entity;
+        static EntityID top_collision_entity;
 
+
+
+        static EntityID check_non_collidable_entities;
+        static bool entites_detect;
+
+        //incase want specific entity
+        static EntityID mineral_tank;
+        static EntityID oxygen_tank;
         //static bool collision_handled;
         //float accumulated_time = 0.0f;
-        
+
         //sstd::vector<CollisionPair> collision_pairs; // Store collisions
 
         /**
@@ -191,19 +209,22 @@ namespace lof {
          * @param velocity1 The velocity of the dynamic object.
          * @param overlap The overlap between AABBs along the x and y axis.
          */
-        //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
+         //void resolve_collision_static_dynamic(const AABB& aabb1, const AABB& aabb2, Transform2D& transform1, Vec2D& velocity1, const Vec2D& overlap);
 
 
-        /**
-         * @brief Get the string of which side to collide 
-         * @param side The side of the collide side 
-         * @return Return the string side that is collide
-         */
+         /**
+          * @brief Get the string of which side to collide
+          * @param side The side of the collide side
+          * @return Return the string side that is collide
+          */
         std::string collisionSideToString(CollisionSide side);
-    
+
+        void Colliside_Oxygen_Mineral(float delta_time);
+
+
     };
-    
-   
+
+
 
 } // namespace lof
 

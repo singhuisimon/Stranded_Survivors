@@ -12,10 +12,12 @@ namespace lof {
 #if 1
 	struct EntityInfo {
 		EntityID selectedEntity;
-		bool isSelected; // Flag to indicate if an entity is selected
+		bool isSelected = false; // Flag to indicate if an entity is selected
 		ImVec2 mousePos;  // Store the mouse position 
 		Vec2D entitypos;
 	};
+
+
 #endif
 	class Entity_Selector_Helper
 	{
