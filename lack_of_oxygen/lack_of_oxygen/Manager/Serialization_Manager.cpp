@@ -105,7 +105,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_Small.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -501,6 +501,7 @@ namespace lof {
 
         comp_obj.AddMember("width", component.width, allocator);
         comp_obj.AddMember("height", component.height, allocator);
+        comp_obj.AddMember("collidable", component.collidable, allocator);
 
         return comp_obj;
     }
@@ -1014,6 +1015,7 @@ namespace lof {
                         auto& collision = ECSM.get_component<Collision_Component>(entity);
                         collision.width = tile_width;
                         collision.height = tile_height;
+                        //collision.collidable = true;
 
                         // Debug print collision component
                         LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
