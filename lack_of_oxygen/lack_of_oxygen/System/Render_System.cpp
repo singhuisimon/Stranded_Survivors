@@ -317,7 +317,7 @@ namespace lof {
                     glBindTextureUnit(5, textures[graphics.texture_name]);
                 }
 
-                LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
+                //LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
                 GLuint tex_flag_true_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
@@ -357,31 +357,15 @@ namespace lof {
                         std::exit(EXIT_FAILURE);
                     }
 
-                    // Pass texture width, height, and frame size
-                    GLuint tex_w_uniform_loc = glGetUniformLocation(shader->program_handle, "uTex_W");
-                    GLuint tex_h_uniform_loc = glGetUniformLocation(shader->program_handle, "uTex_H");
-                    GLuint frame_size_uniform_loc = glGetUniformLocation(shader->program_handle, "uFrame_Size");
-                    if (tex_w_uniform_loc >= 0 && tex_h_uniform_loc >= 0 && frame_size_uniform_loc >= 0) {
-                        glUniform1f(tex_w_uniform_loc, animations[curr_animation_name].tex_w);
-                        glUniform1f(tex_h_uniform_loc, animations[curr_animation_name].tex_h);
-                        glUniform1f(frame_size_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].size);
+                    // Pass frame number of current frame
+                    GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
+                    if (frame_no_loc >= 0) {
+                        glUniform1i(frame_no_loc, animations[curr_animation_name].frames[curr_frame_idx].frame_number);
                     }
                     else {
-                        LM.write_log("Render_System::draw(): Texture width, Texture height, and/or frame size uniform variable doesn't exist.");
+                        LM.write_log("Render_System::draw(): Frame number value doesn't exist.");
                         std::exit(EXIT_FAILURE);
-                    }
-
-                    // Pass frame position
-                    GLuint frame_pos_x_uniform_loc = glGetUniformLocation(shader->program_handle, "uPos_X");
-                    GLuint frame_pos_y_uniform_loc = glGetUniformLocation(shader->program_handle, "uPos_Y");
-                    if (frame_pos_x_uniform_loc >= 0 && frame_pos_y_uniform_loc >= 0) {
-                        glUniform1f(frame_pos_x_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_x);
-                        glUniform1f(frame_pos_y_uniform_loc, animations[curr_animation_name].frames[curr_frame_idx].uv_y);
-                    }
-                    else {
-                        LM.write_log("Render_System::draw(): Frame x and y uniform variable doesn't exist.");
-                        std::exit(EXIT_FAILURE);
-                    }
+                    } 
 
                 }
                 else {

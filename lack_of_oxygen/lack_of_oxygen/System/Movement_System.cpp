@@ -40,7 +40,7 @@ namespace lof {
 
         // Iterate through entities matching the system's signature
 
-        LM.write_log("Movement system start update");
+        //LM.write_log("Movement system start update");
 
         for (EntityID entity_id : get_entities()) {
             // std::cout << entity_id << "in physic \n\n";

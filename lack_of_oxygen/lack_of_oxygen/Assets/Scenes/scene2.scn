@@ -81,6 +81,206 @@
       }
     },
     {
+      "name": "ship",
+      "components": {
+        "Transform2D": {
+          "position": [
+            600.0,
+            100.0
+          ],
+          "prev_position": [
+            600.0,
+            100.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            576.0,
+            576.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.800000011920929,
+            0.20000000298023224
+          ],
+          "texture_name": "Ship Open_Batch_2",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "mineral_hopper_conveyor",
+      "components": {
+        "Transform2D": {
+          "position": [
+            550.0,
+            -60.0
+          ],
+          "prev_position": [
+            550.0,
+            -60.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            180.0,
+            180.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.800000011920929,
+            0.20000000298023224
+          ],
+          "texture_name": "Mineral_Hopper_Conveyor_Empty_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 120.0,
+          "collidable": false
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        }
+
+      }
+    },
+
+    {
+      "name": "Oxygen_Tank",
+      "components": {
+        "Transform2D": {
+          "position": [
+            800.0,
+            -100.0
+          ],
+          "prev_position": [
+            800.0,
+            -100.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            100.0,
+            100.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.800000011920929,
+            0.20000000298023224
+          ],
+          "texture_name": "Oxygen_Tank_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0,
+          "collidable": false
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        }
+      }
+    },
+
+    {
       "name": "player1",
       "components": {
         "Transform2D": {
@@ -108,7 +308,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "Spritesheet_Animate",
+          "texture_name": "Spritesheet_Test",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -130,7 +330,8 @@
         },
         "Collision_Component": {
           "width": 98.0,
-          "height": 98.0
+          "height": 98.0,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -304,7 +505,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [
@@ -399,7 +601,8 @@
         },
         "Collision_Component": {
           "width": 512.0,
-          "height": 76.80000305175781
+          "height": 76.80000305175781,
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [

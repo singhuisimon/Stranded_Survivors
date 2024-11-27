@@ -63,8 +63,8 @@ namespace lof {
         //If window is visible and not minimized, store its current state 
         if (is_visible && !is_iconified && is_focused) {
             store_window_state(); 
-            LM.write_log("Interruption_System: Stored window state - Fullscreen: %d, Size: %dx%d, Pos: (%d,%d)",
-                was_fullscreen, prev_width, prev_height, prev_x, prev_y);
+            //LM.write_log("Interruption_System: Stored window state - Fullscreen: %d, Size: %dx%d, Pos: (%d,%d)",
+            //    was_fullscreen, prev_width, prev_height, prev_x, prev_y);
         }
 
 

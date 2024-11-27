@@ -9,6 +9,7 @@
  */
 
 #include "Audio_System.h"
+#include "../Manager/Assets_Manager.h"
 
 namespace lof {
 
@@ -42,7 +43,7 @@ namespace lof {
 			LM.write_log("%s failed to %s. FMOD Error: %s.", function_name.c_str(), function_purpose.c_str(), FMOD_ErrorString(result));
 			return -1;
 		}
-		LM.write_log("%s successfully executed %s.", function_name.c_str(), function_purpose.c_str());
+		//LM.write_log("%s successfully executed %s.", function_name.c_str(), function_purpose.c_str());
 		return 0;
 	}
 
@@ -79,7 +80,7 @@ namespace lof {
 
 			for (const auto& sound : sounds) {
 				std::string audio_key = sound.key;
-				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID);
+				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID) + audio_key;
 				PlayState state = audio.get_audio_state(audio_key);
 
 				switch (state) {
@@ -154,7 +155,8 @@ namespace lof {
 		}
 
 		//update the fmod system with the core system
-		errorcheck(core_system->update(), "Audio_System::update", "update core system");
+		errorcheck(core_system->update());
+		// errorcheck(core_system->update(), "Audio_System::update", "update core system");
 	}
 
 	void Audio_System::shutdown() {
@@ -189,11 +191,14 @@ namespace lof {
 		return "Audio_System";
 	}
 
+#if 0
 	void Audio_System::load_sound(const std::string& file_path) {
 		if (sound_map.find(file_path) != sound_map.end()) {
 			//sound is already loaded in the map.
 			return;
 		}
+
+
 		LM.write_log("The file path for load_sound is: %s", file_path.c_str());
 		
 		FMOD::Sound* sound = nullptr;
@@ -210,6 +215,7 @@ namespace lof {
 		LM.write_log("Audio_System::load_sound(): Successfully loaded the sound from system.");
 		return;
 	}
+	#endif
 
 	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
 		//check if sound has already been loaded.
@@ -225,7 +231,8 @@ namespace lof {
 		if ((channel_map.find(cskey) != channel_map.end()) && channel_map.find(cskey)->second != nullptr) {
 			//check if sound has finish playing, if so change the audio_state to stopped.
 			bool playing = false;
-			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
+			// errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
+			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing));
 			if (!playing) {
 				audio.set_audio_state(audio_key, NONE);
 				channel_map.erase(cskey);
@@ -240,10 +247,14 @@ namespace lof {
 		//FMOD::ChannelGroup* group = nullptr;
 
 		FMOD_RESULT result = core_system->playSound(sound->second, nullptr, false, &channel);
-		if (errorcheck(result, "Audio_System::play_sound", "play sound" + file_path) != 0 || !channel) {
+		if (errorcheck(result) != 0 || !channel) {
 			LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 			return;
 		}
+		//if (errorcheck(result, "Audio_System::play_sound", "play sound" + file_path) != 0 || !channel) {
+		//	LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
+		//	return;
+		//}
 
 		channel_map[cskey] = channel;
 
@@ -271,6 +282,32 @@ namespace lof {
 
 		LM.write_log("Audio_System::play_sound: sound %s is playing", cskey.c_str());
 	}
+
+	void Audio_System::load_sound(const std::string& file_path) {
+		if (sound_map.find(file_path) != sound_map.end()) {
+			return; // Sound already loaded
+		}
+
+		// Use Assets Manager to get path and verify file
+		if (!ASM.load_audio_file(file_path)) {
+			LM.write_log("Audio_System::load_sound: Failed to find audio file %s", file_path.c_str());
+			return;
+		}
+
+		std::string full_path = ASM.get_audio_path(file_path);
+		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
+
+		FMOD::Sound* sound = nullptr;
+		FMOD_MODE mode = FMOD_DEFAULT;
+		FMOD_RESULT result = core_system->createSound(full_path.c_str(), mode, 0, &sound);
+		if (errorcheck(result, "Audio_System::load_sound", "create sound") != 0) {
+			return;
+		}
+
+		sound_map[file_path] = sound;
+		LM.write_log("Audio_System::load_sound: Successfully loaded sound");
+	}
+
 
 	void Audio_System::stop_mastergroup() {
 		bool playing;

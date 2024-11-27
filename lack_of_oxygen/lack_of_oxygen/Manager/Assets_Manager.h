@@ -179,6 +179,9 @@ namespace lof {
        */
         bool read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names);
 
+        std::string get_audio_path(const std::string& audio_name) ;
+        bool load_audio_file(const std::string& audio_name);
+
         std::string get_executable_directory();
     private:
         // A unique_ptr to the single instance of Assets_Manager
@@ -189,8 +192,10 @@ namespace lof {
         // Stores the path to the executable
         std::string executable_path;
 
+        std::unordered_map<std::string, std::string> audio_paths;
+
         // An unordered_map that caches textures, mapping texture names to their respective IDs
-        std::unordered_map<std::string, unsigned int> texture_cache;
+        //std::unordered_map<std::string, unsigned int> texture_cache;
         // An unordered_map that caches shader programs, mapping shader names to ShaderProgram objects
         std::unordered_map<std::string, ShaderProgram> shader_cache;
 
@@ -247,8 +252,11 @@ namespace lof {
         const std::string SHADER_PATH = "Shaders";
         const std::string FONT_PATH = "Fonts";
         const std::string LEVEL_PATH = "Level_Design";
+        const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
+#ifndef _DEBUG
         const std::string BASE_PATH = "Assets\\";
-        //const std::string BASE_PATH = "..\\..\\lack_of_oxygen\\Assets\\";
+#endif
+
     };
 
 } // namespace lof

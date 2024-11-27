@@ -67,7 +67,7 @@ int main(void) {
     // --------------------------- Create GLFW Window ---------------------------
 
     // Create a windowed mode window and its OpenGL context using default values
-    // window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+    //window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
 
     
     // Create a fullscreen window
