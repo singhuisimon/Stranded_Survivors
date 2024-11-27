@@ -1,5 +1,14 @@
+/**
+ * @file Interruption_System.cpp
+ * @author Wai Lwin Thit (100%)
+ * @date November 27, 2024
+ * @brief Implementation of Interruption_System methods
+ * @details Implements window state management, key combination detection, and interrupt handling
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
-#if 1 
 #include "Interruption_System.h"
 #include "../Manager/Input_Manager.h"
 #include "Audio_System.h"
@@ -37,6 +46,7 @@ namespace lof {
     }
 
     void Interruption_System::update(float delta_time) {
+        (void)delta_time;
 
         check_key_combinations();
 
@@ -44,7 +54,6 @@ namespace lof {
         check_window_state();
 
     }
-
 
     void Interruption_System::check_window_state() {
         bool is_visible = glfwGetWindowAttrib(window, GLFW_VISIBLE);
@@ -137,7 +146,6 @@ namespace lof {
                     break;
                 }
             }
-
         // Reset input states again to ensure clean state
         IM.reset();
 
@@ -154,6 +162,7 @@ namespace lof {
 
                   if (iconified) {
                         //interrupt_system->current_state = WindowState::MINIMIZED;
+                        glfwIconifyWindow(window);
                         interrupt_system->minimize_window();
                         LM.write_log("Interruption_System: Window minimized via iconify");
                   }
@@ -287,9 +296,6 @@ namespace lof {
     }
 #endif
 
-
-#if 1
-
     void Interruption_System::focus_callback(GLFWwindow* window, int focused) {
         for (auto const& system : ECSM.get_systems()) {
             if (auto* interrupt_system = dynamic_cast<Interruption_System*>(system.get())) {
@@ -345,8 +351,6 @@ namespace lof {
         }
     }
 
-#endif
-
 
     void Interruption_System::minimize_window() {
         if (!is_minimized) {
@@ -373,68 +377,6 @@ namespace lof {
         glfwGetWindowSize(window, &prev_width, &prev_height); 
         glfwGetWindowPos(window, &prev_x, &prev_y);
     }
-#if 0
-    void Interruption_System:: check_key_combinations() {
-
-        //check for alt tab
-        alt_tab = (IM.is_key_held(GLFW_KEY_LEFT_ALT) || IM.is_key_held(GLFW_KEY_RIGHT_ALT));
-        int both_alt = (IM.is_key_held(GLFW_KEY_LEFT_ALT) && IM.is_key_held(GLFW_KEY_RIGHT_ALT));
-
-        //check for control alt del
-        ctrl_alt_del = ((IM.is_key_held(GLFW_KEY_LEFT_CONTROL) || IM.is_key_held(GLFW_KEY_RIGHT_CONTROL)) &&
-                (IM.is_key_held(GLFW_KEY_LEFT_ALT) || IM.is_key_held(GLFW_KEY_RIGHT_ALT))) &&
-                   IM.is_key_held(GLFW_KEY_DELETE);
-
-        if (ctrl_alt_del) LM.write_log("CTRL+ALT+DEL is detected.");
-        if (alt_tab) LM.write_log("Only detected left or right alt");
-        if (both_alt) LM.write_log("BOTH ALT is detected.");
-
-    }
-#endif 
-
-#if 0
-    void Interruption_System::check_key_combinations() {
-
-        // Direct GLFW key state check
-        bool ctrl = (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
-            glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS);
-
-        bool alt = (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS ||
-            glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS);
-
-        bool del = (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS);
-
-        // Test both Input Manager and direct GLFW methods
-        bool im_ctrl_alt_del = ((IM.is_key_held(GLFW_KEY_LEFT_CONTROL) || IM.is_key_held(GLFW_KEY_RIGHT_CONTROL)) &&
-            (IM.is_key_held(GLFW_KEY_LEFT_ALT) || IM.is_key_held(GLFW_KEY_RIGHT_ALT)) &&
-            IM.is_key_held(GLFW_KEY_DELETE));
-
-        bool glfw_ctrl_alt_del = ctrl && alt && del;
-
-        // Log both results for comparison
-        if (glfw_ctrl_alt_del || im_ctrl_alt_del) {
-            LM.write_log("Ctrl+Alt+Del Detection - GLFW: %d, Input Manager: %d",
-                glfw_ctrl_alt_del, im_ctrl_alt_del);
-            ctrl_alt_del = true;
-        }
-
-        // Same for Alt+Tab
-        bool im_alt_tab = (IM.is_key_held(GLFW_KEY_LEFT_ALT) || IM.is_key_held(GLFW_KEY_RIGHT_ALT));
-        bool glfw_alt_tab = alt;
-
-        if (glfw_alt_tab || im_alt_tab) {
-            LM.write_log("Alt+Tab Detection - GLFW: %d, Input Manager: %d",
-                glfw_alt_tab, im_alt_tab);
-            alt_tab = true;
-        }
-
-        // Log raw key states for debugging
-        if (ctrl || alt || del) {
-            LM.write_log("Raw Key States - CTRL: %d, ALT: %d, DEL: %d", ctrl, alt, del);
-        }
-    }
-
-#endif 
 
     void Interruption_System::check_key_combinations() {
        
@@ -494,4 +436,3 @@ namespace lof {
         return "Interruption_System";
     }
 }
-#endif+
