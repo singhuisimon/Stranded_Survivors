@@ -16,10 +16,11 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "Collision_System.h"
+#include "../System/GUI_System.h"  // Add this for GUI system access
 
 
 // FOR TESTING
-#include "../System/GUI_System.h"  // Add this for GUI system access
+#include "../Utility/globals.h"
 
 namespace lof {
 
@@ -204,6 +205,23 @@ namespace lof {
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
+            ///// Render only what is on the viewport (Back up for if instancing doesn't work)
+            if (level_editor_mode == false) {
+                EntityID player_id = ECSM.find_entity_by_name("player1");
+                if (entity_id != 0 && entity_id != player_id) {
+                    auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+
+                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+
+                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+                        continue;
+                    }
+                }
+            }
+
+            ///// Render only what is on the viewport (Back up for if instancing doesn't work)
+
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
             auto& models = GFXM.get_model_storage();
@@ -345,7 +363,6 @@ namespace lof {
 
                     auto& animation = ECSM.get_component<Animation_Component>(entity_id);
                     std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
-                    unsigned int& curr_frame_idx = animations[curr_animation_name].curr_frame_index;
 
                     // Set animation flag to be true
                     GLuint animate_flag_true_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
@@ -360,7 +377,12 @@ namespace lof {
                     // Pass frame number of current frame
                     GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
                     if (frame_no_loc >= 0) {
-                        glUniform1i(frame_no_loc, animations[curr_animation_name].frames[curr_frame_idx].frame_number);
+                        if (curr_animation_name == "vent_strip" || curr_animation_name == "lava") {
+                            glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animations[curr_animation_name].curr_frame_index].frame_number);
+                        }
+                        else {
+                            glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animation.curr_frame_index].frame_number);
+                        }
                     }
                     else {
                         LM.write_log("Render_System::draw(): Frame number value doesn't exist.");

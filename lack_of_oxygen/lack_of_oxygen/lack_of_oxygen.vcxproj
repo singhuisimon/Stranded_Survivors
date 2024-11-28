@@ -173,7 +173,8 @@
     <Image Include="Assets\Textures\Skybox_ALL.png" />
     <Image Include="Assets\Textures\Snowflake.png" />
     <Image Include="Assets\Textures\Spritesheet_Animate.png" />
-    <Image Include="Assets\Textures\Spritesheet_Test.png" />
+    <Image Include="Assets\Textures\Spritesheet_Map.png" />
+    <Image Include="Assets\Textures\Spritesheet_Player.png" />
     <Image Include="Assets\Textures\Sun.png" />
     <Image Include="Assets\Textures\TNT.png" />
     <Image Include="Assets\Textures\TNT_Batch_4.png" />

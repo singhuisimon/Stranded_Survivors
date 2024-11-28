@@ -69,8 +69,8 @@ namespace lof {
 
 
         // Add debug logging to understand window state
-        LM.write_log("Interruption_System: Window State Debug - Visible: %d, Focused: %d, Iconified: %d",
-            is_visible, is_focused, is_iconified);
+        //LM.write_log("Interruption_System: Window State Debug - Visible: %d, Focused: %d, Iconified: %d",
+        //    is_visible, is_focused, is_iconified);
         
         if (!is_visible  || is_iconified) {
             if (!is_minimized) {  // Only trigger once when first minimized

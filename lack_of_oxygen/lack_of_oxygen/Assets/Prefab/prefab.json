@@ -66,10 +66,17 @@
             [ "0", "prisoner_idle_left" ],
             [ "1", "prisoner_idle_right" ],
             [ "2", "prisoner_running_left" ],
-            [ "3", "prisoner_running_right" ]
+            [ "3", "prisoner_running_right" ],
+            [ "4", "prisoner_mining_left" ],
+            [ "5", "prisoner_mining_right" ],
+            [ "6", "prisoner_mining_up_left" ],
+            [ "7", "prisoner_mining_up_right" ],
+            [ "8", "prisoner_mining_down_left" ],
+            [ "9", "prisoner_mining_down_right" ]
           ],
           "curr_animation_idx": 0,
-          "start_animation_idx": 0
+          "start_animation_idx": 0,
+          "curr_frame_index": 0
         }
       }
     },
@@ -283,7 +290,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Dirt_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -313,6 +320,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "dirt"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 2,
+          "curr_tile_health": 2
         }
       }
     },
@@ -328,7 +348,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Rock_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -358,6 +378,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "rock"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 10,
+          "curr_tile_health": 10
         }
       }
     },
@@ -373,7 +406,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "TNT_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -403,6 +436,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "TNT"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 2,
+          "curr_tile_health": 2
         }
       }
     },
@@ -418,7 +464,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Quartz_001_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -448,6 +494,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "quartz"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 2,
+          "curr_tile_health": 2
         }
       }
     },
@@ -463,7 +522,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Sapphire_001_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -493,6 +552,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "sapphire"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 6,
+          "curr_tile_health": 6
         }
       }
     },
@@ -508,7 +580,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Lava_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -553,7 +625,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Emerald_001_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -583,6 +655,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "emerald"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 4,
+          "curr_tile_health": 4
         }
       }
     },
@@ -598,7 +683,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Amethyst_001_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -628,6 +713,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "amethyst"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 8,
+          "curr_tile_health": 8
         }
       }
     },
@@ -643,7 +741,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Citrine_001_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -673,6 +771,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "citrine"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 10,
+          "curr_tile_health": 10
         }
       }
     },
@@ -688,7 +799,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Alexandrite_001_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -718,6 +829,19 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "alexandrite"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 12,
+          "curr_tile_health": 12
         }
       }
     },
@@ -818,7 +942,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Air_Batch_4",
+          "texture_name": "Spritesheet_Map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -843,6 +967,16 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "vent_strip"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0
         }
       }
     }
