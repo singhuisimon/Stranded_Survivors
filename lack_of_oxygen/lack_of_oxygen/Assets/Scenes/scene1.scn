@@ -783,11 +783,11 @@
       "components": {
         "Transform2D": {
           "position": [
-            -200.0,
-            180.0
+            0.0,
+            150.0
           ],
           "prev_position": [
-            -200.0,
+            0.0,
             180.0
           ],
           "orientation": [
@@ -795,8 +795,8 @@
             30.0
           ],
           "scale": [
-            1.2000000476837158,
-            1.2000000476837158
+            1.0,
+            1.0
           ]
         },
         "Graphics_Component": {
@@ -833,7 +833,8 @@
             0.0,
             0.0,
             0.0
-          ]
+          ],
+          "scale": [ 1.0, 1.0 ]
         }
       }
     },
@@ -842,8 +843,8 @@
       "components": {
         "Transform2D": {
           "position": [
-            -240.0,
-            260.0
+            0.0,
+            400.0
           ],
           "prev_position": [
             -240.0,
@@ -854,8 +855,8 @@
             30.0
           ],
           "scale": [
-            2.0,
-            2.0
+            1.0,
+            1.0
           ]
         },
         "Graphics_Component": {
@@ -892,7 +893,8 @@
             0.0,
             0.0,
             0.0
-          ]
+          ],
+          "scale": [ 1.0, 1.0 ]
         }
       }
     },
@@ -905,7 +907,7 @@
           "position": [ 600.0, 100.0 ],
           "prev_position": [ 600.0, 100.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 2000.0, 100.0 ]
+          "scale": [ 2000.0, 175.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",
@@ -1034,8 +1036,8 @@
             0.0
           ],
           "scale": [
-            50.0,
-            50.0
+            80.0,
+            80.0
           ]
         },
         "Graphics_Component": {
@@ -1090,7 +1092,8 @@
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "O2",
-          "color": [ 1.0, 1.0, 1.0 ]
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 1.0, 1.0 ]
         }
       }
     },
@@ -1116,7 +1119,8 @@
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "Panic",
-          "color": [ 1.0, 1.0, 1.0 ]
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 1.0, 1.0 ]
         }
       }
     },
@@ -1142,7 +1146,8 @@
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "0",
-          "color": [ 1.0, 1.0, 1.0 ]
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 1.0, 1.0 ]
         }
       }
     }

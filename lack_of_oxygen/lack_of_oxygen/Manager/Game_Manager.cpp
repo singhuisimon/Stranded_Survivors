@@ -334,11 +334,11 @@ namespace lof {
 
                 // Define layout constants for vertical stacking
                 constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
-                constexpr float METER_SPACING = 30.0f;           // Vertical space between meters
-                constexpr float METER_WIDTH = 200.0f;            // Width of the meters
-                constexpr float METER_HEIGHT = 25.0f;            // Height of each meter bar
-                constexpr float TEXT_OFFSET_X = 30.0f;           // Horizontal offset from the UI element
-                constexpr float TEXT_OFFSET_Y = 0.0f;            // Vertical offset from the UI element
+                constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
+                constexpr float METER_WIDTH = 400.0f;            // Width of the meters
+                constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
+                //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
@@ -357,26 +357,27 @@ namespace lof {
 
                     // Set position and scale for oxygen meter
                     oxygen_transform.position = {
-                        base_position.x - METER_WIDTH / 2,  // Center horizontally
-                        base_position.y                   // Top position
+                        base_position.x - METER_WIDTH,  // Center horizontally
+                        base_position.y                 // Top position
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     oxygen_transform.prev_position = oxygen_transform.position;
                 }
 
-                //// Position oxygen text
-                //if (oxygen_text_id != INVALID_ENTITY_ID && 
-                //    ECSM.has_component<Transform2D>(oxygen_text_id)) { 
-                //    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
-                //    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id); 
+                // Position oxygen text
+                if (oxygen_text_id != INVALID_ENTITY_ID && 
+                    ECSM.has_component<Transform2D>(oxygen_text_id)) { 
+                    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
+                    //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
+                    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
 
-                //    // Position text to the left of the oxygen meter
-                //    oxygen_text_transform.position = {
-                //        oxygen_transform.position.x - TEXT_OFFSET_X,  // Left of meter
-                //        oxygen_transform.position.y  // Vertically centered with oxygen meter
-                //    };
-                //    oxygen_text_transform.prev_position = oxygen_text_transform.position;
-                //}
+                    // Position text to the left of the oxygen meter
+                    oxygen_text_transform.position = {
+                        (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
+                        oxygen_transform.position.y // Vertically centered with oxygen meter
+                    };
+                    oxygen_text_transform.prev_position = oxygen_text_transform.position;
+                }
 
                 // Position panic meter (bottom meter)
                 if (panic_meter_id != INVALID_ENTITY_ID &&
@@ -385,11 +386,25 @@ namespace lof {
 
                     // Set position and scale for panic meter
                     panic_transform.position = {
-                        base_position.x - METER_WIDTH / 2,          // Center horizontally
-                        base_position.y - METER_SPACING           // Below oxygen meter
+                        base_position.x - METER_WIDTH,          // Center horizontally
+                        base_position.y - METER_SPACING         // Below oxygen meter
                     };
                     panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     panic_transform.prev_position = panic_transform.position;
+                }
+
+                // Position panic text
+                if (panic_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(panic_text_id)) {
+                    auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id); 
+
+                    // Position text to the left of the panic meter
+                    panic_text_transform.position = {
+                        (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
+                        panic_transform.position.y  // Vertically centered with panic meter
+                    };
+                    panic_text_transform.prev_position = panic_text_transform.position;
                 }
 
                 // Position mineral texture on the right side
@@ -397,56 +412,28 @@ namespace lof {
                     ECSM.has_component<Transform2D>(mineral_texture_id)) {
                     auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
 
-                    constexpr float MINERAL_OFFSET = 400.0f;  // Distance from center
                     mineral_transform.position = {
-                        base_position.x + MINERAL_OFFSET,      // Right side position
-                        base_position.y - METER_SPACING / 2      // Vertically centered between meters
+                        base_position.x,                         // Center position
+                        base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
                     };
-                    mineral_transform.scale = Vec2D(50.0f, 50.0f);  // Smaller scale for icon
                     mineral_transform.prev_position = mineral_transform.position;
                 }
 
-                // --- Update Text Entities ---
-                //// Position oxygen text
-                //if (oxygen_text_id != INVALID_ENTITY_ID &&
-                //    ECSM.has_component<Transform2D>(oxygen_text_id)) {
-                //    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id);
+                // Position mineral count text
+                if (mineral_count_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(mineral_count_text_id) && 
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) { 
+                    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id); 
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id); 
 
-                //    // Position text to the left of the oxygen meter
-                //    oxygen_text_transform.position = {
-                //        base_position.x - METER_WIDTH / 2 - TEXT_OFFSET_X,  // Left of meter
-                //        base_position.y + METER_HEIGHT / 2 - TEXT_OFFSET_Y  // Vertically centered with oxygen meter
-                //    };
-                //    oxygen_text_transform.prev_position = oxygen_text_transform.position;
-                //}
-
-                //// Position panic text
-                //if (panic_text_id != INVALID_ENTITY_ID &&
-                //    ECSM.has_component<Transform2D>(panic_text_id)) {
-                //    auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
-
-                //    // Position text to the left of the panic meter
-                //    panic_text_transform.position = {
-                //        base_position.x - METER_WIDTH / 2 - TEXT_OFFSET_X,  // Left of meter
-                //        base_position.y - METER_SPACING + METER_HEIGHT / 2 - TEXT_OFFSET_Y  // Vertically centered with panic meter
-                //    };
-                //    panic_text_transform.prev_position = panic_text_transform.position;
-                //}
-
-                //// Position mineral count text
-                //if (mineral_count_text_id != INVALID_ENTITY_ID &&
-                //    ECSM.has_component<Transform2D>(mineral_count_text_id) &&
-                //    ECSM.has_component<Transform2D>(mineral_texture_id)) {
-                //    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
-                //    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-
-                //    // Position text to the right of the mineral texture
-                //    mineral_count_text_transform.position = {
-                //        mineral_transform.position.x + mineral_transform.scale.x + TEXT_OFFSET_X,  // Right of icon
-                //        mineral_transform.position.y + mineral_transform.scale.y / 2 - TEXT_OFFSET_Y  // Vertically centered with mineral icon
-                //    };
-                //    mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
-                //}
+                    constexpr float MINERAL_COUNT_OFFSET = 40.0f;
+                    // Position text to the right of the mineral texture
+                    mineral_count_text_transform.position = {
+                        (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
+                        mineral_transform.position.y  - TEXT_OFFSET_Y  // Vertically centered with mineral icon
+                    };
+                    mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
+                }
             }
 
 

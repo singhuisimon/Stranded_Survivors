@@ -119,8 +119,8 @@ namespace lof {
                                                -1, -transform.position.y, 1 };
 
                 // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / (screen_width / 2), 0, 0,
-                                                       0, 1.f / (screen_height / 2), 0,
+                camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                       0, 2.f / screen_height, 0,
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix
@@ -134,8 +134,8 @@ namespace lof {
                                                -camera.pos_x, -camera.pos_y, 1 };
 
                 // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 1.f / (screen_width / 2), 0, 0,
-                                                       0, 1.f / (screen_height / 2), 0,
+                camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                       0, 2.f / screen_height, 0,
                                                        0, 0, 1 };
 
                 // Update world-to-NDC transformation matrix
@@ -143,9 +143,26 @@ namespace lof {
             }
 
             // Compute object scale matrix
-            glm::mat3 scale_mat{ transform.scale.x, 0, 0,
-                                    0, transform.scale.y, 0,
-                                    0, 0, 1 };
+            // Special case for text objects
+            float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
+            if (ECSM.has_component<Text_Component>(entity_id)) {
+                // Get text component's scaling factor
+                auto& text = ECSM.get_component<Text_Component>(entity_id);
+                scale_x = text.scale.x;
+                scale_y = text.scale.y;
+                translate_x = 1.0f;
+                translate_y = 1.0f;
+            }
+            else {
+                scale_x = transform.scale.x;
+                scale_y = transform.scale.y;
+                translate_x = transform.position.x;
+                translate_y = transform.position.y;
+            }
+
+            glm::mat3 scale_mat{ scale_x, 0, 0,
+                                 0, scale_y, 0,
+                                 0, 0, 1 };
 
             // Compute current orientation of object
             GLfloat rad_disp = glm::radians(transform.orientation.x);
@@ -158,7 +175,7 @@ namespace lof {
             // Compute object translation matrix
             glm::mat3 trans_mat{ 1, 0, 0,
                                     0, 1, 0,
-                                    transform.position.x, transform.position.y, 1 };
+                                    translate_x, translate_y, 1 };
 
             graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
         }
@@ -206,19 +223,19 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             ///// Render only what is on the viewport (Back up for if instancing doesn't work)
-            if (level_editor_mode == false) {
-                EntityID player_id = ECSM.find_entity_by_name("player1");
-                if (entity_id != 0 && entity_id != player_id) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+            //if (level_editor_mode == false) {
+            //    EntityID player_id = ECSM.find_entity_by_name("player1");
+            //    if (entity_id != 0 && entity_id != player_id) {
+            //        auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
 
-                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+            //        float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+            //        float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
-                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
-                        continue;
-                    }
-                }
-            }
+            //        if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+            //            continue;
+            //        }
+            //    }
+            //}
 
             ///// Render only what is on the viewport (Back up for if instancing doesn't work)
 
@@ -250,9 +267,10 @@ namespace lof {
                 }
 
                 // Pass object's mdl_to_ndc_xform to vertex shader to compute object's final position
-                GLint text_mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
+                GLuint text_mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
                 if (text_mat_uniform_loc >= 0) {
                     glUniformMatrix3fv(text_mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
+                    //glUniformMatrix3fv(text_mat_uniform_loc, 1, GL_FALSE, &final_xform[0][0]);
                 }
                 else {
                     LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
@@ -266,6 +284,8 @@ namespace lof {
                 // Iterate through all characters
                 std::string::const_iterator c;
                 float base_x = transform.position.x;
+                float scale_x = transform.position.x;
+                float scale_y = 0;
                 for (c = text_comp.text.begin(); c != text_comp.text.end(); c++)
                 {
                     // Get read-only values from character
@@ -274,20 +294,23 @@ namespace lof {
                     auto const& texture_id = fonts[text_comp.font_name].characters[*c].TextureID;
                     auto const& advance = fonts[text_comp.font_name].characters[*c].Advance;
 
+                    // Get largest glpyh for scale factor 
+                    scale_y = scale_y < size.y ? size.y : scale_y;
+
                     // Calculate the position and size of character in world 
-                    float xpos = base_x + bearing.x * transform.scale.x;
-                    float ypos = transform.position.y - (size.y - bearing.y) * transform.scale.y;
-                    float w = size.x * transform.scale.x;
-                    float h = size.y * transform.scale.y;
+                    float xpos = base_x - ((transform.scale.x / text_comp.scale.x) / 2.0f) + bearing.x;
+                    float ypos = transform.position.y - ((transform.scale.y / text_comp.scale.y) / 2.0f) - (size.y - bearing.y);
+
+                    LM.write_log("Render_System::draw(): Font glyph size check: x - %u, y - %u.", size.x, size.y);
 
                     // Update VBO for each character
                     float vertices[6][4] = {
-                        { xpos,     ypos + h,   0.0f, 0.0f },
-                        { xpos,     ypos,       0.0f, 1.0f },
-                        { xpos + w, ypos,       1.0f, 1.0f },
-                        { xpos,     ypos + h,   0.0f, 0.0f },
-                        { xpos + w, ypos,       1.0f, 1.0f },
-                        { xpos + w, ypos + h,   1.0f, 0.0f }
+                        { xpos,          ypos + size.y,   0.0f, 0.0f },
+                        { xpos,          ypos,            0.0f, 1.0f },
+                        { xpos + size.x, ypos,            1.0f, 1.0f },
+                        { xpos,          ypos + size.y,   0.0f, 0.0f },
+                        { xpos + size.x, ypos,            1.0f, 1.0f },
+                        { xpos + size.x, ypos + size.y,   1.0f, 0.0f }
                     };
 
                     // Set texture id to render
@@ -302,12 +325,20 @@ namespace lof {
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
                     // Advance cursors for next glyph 
-                    base_x += (advance >> 6) * transform.scale.x;
+                    LM.write_log("Render_System::draw(): Font base check: %f", base_x);
+                    base_x += (advance >> 6);
+
                 }
                 // Free VAO, texture id, and program once rendering completed
                 glBindVertexArray(0);
                 glBindTexture(GL_TEXTURE_2D, 0);
                 GFXM.program_free();
+
+                // Set the scale of text object
+                transform.scale.x = (base_x - scale_x) * text_comp.scale.x;
+                transform.scale.y = scale_y * text_comp.scale.y;
+                LM.write_log("Render_System::draw(): Font scale_x check: %f", transform.scale.x);
+                LM.write_log("Render_System::draw(): Font scale_y check: %f", transform.scale.y);
 
                 // Skip other rendering operations
                 continue;

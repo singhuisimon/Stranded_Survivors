@@ -643,134 +643,13 @@
     },
 
     {
-      "name": "game_title",
-      "components": {
-        "Transform2D": {
-          "position": [
-            -200.0,
-            180.0
-          ],
-          "prev_position": [
-            -200.0,
-            180.0
-          ],
-          "orientation": [
-            0.0,
-            30.0
-          ],
-          "scale": [
-            1.2000000476837158,
-            1.2000000476837158
-          ]
-        },
-        "Graphics_Component": {
-          "model_name": "square",
-          "color": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "texture_name": "NoTexture",
-          "shd_ref": 2,
-          "mdl_to_ndc_xform": [
-            [
-              0.0023437500931322575,
-              0.0,
-              0.0
-            ],
-            [
-              0.0,
-              0.0031250002793967724,
-              0.0
-            ],
-            [
-              -0.390625,
-              0.5604426860809326,
-              1.0
-            ]
-          ]
-        },
-        "Text_Component": {
-          "font_name": "PressStart2P",
-          "text": "Lack of Oxygen",
-          "color": [
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      }
-    },
-
-    {
-      "name": "team_name",
-      "components": {
-        "Transform2D": {
-          "position": [
-            -240.0,
-            260.0
-          ],
-          "prev_position": [
-            -240.0,
-            260.0
-          ],
-          "orientation": [
-            0.0,
-            30.0
-          ],
-          "scale": [
-            2.0,
-            2.0
-          ]
-        },
-        "Graphics_Component": {
-          "model_name": "square",
-          "color": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "texture_name": "NoTexture",
-          "shd_ref": 2,
-          "mdl_to_ndc_xform": [
-            [
-              0.00390625,
-              0.0,
-              0.0
-            ],
-            [
-              0.0,
-              0.0052083334885537624,
-              0.0
-            ],
-            [
-              -0.46875,
-              0.7687760591506958,
-              1.0
-            ]
-          ]
-        },
-        "Text_Component": {
-          "font_name": "arial_narrow_7",
-          "text": "Stranded Survivors",
-          "color": [
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      }
-    },
-
-
-    {
       "name": "top_ui_overlay",
       "components": {
         "Transform2D": {
           "position": [ 600.0, 100.0 ],
           "prev_position": [ 600.0, 100.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 2000.0, 100.0 ]
+          "scale": [ 2000.0, 175.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",
@@ -899,8 +778,8 @@
             0.0
           ],
           "scale": [
-            50.0,
-            50.0
+            80.0,
+            80.0
           ]
         },
         "Graphics_Component": {
@@ -929,6 +808,88 @@
               1.0
             ]
           ]
+        }
+      }
+    },
+
+    {
+      "name": "top_ui_oxygen_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 30.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "O2",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "top_ui_panic_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Panic",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "top_ui_mineral_count_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "0",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 1.0, 1.0 ]
         }
       }
     }

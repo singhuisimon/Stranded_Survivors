@@ -674,9 +674,10 @@ namespace lof {
         std::string font_name;
         std::string text;
         glm::vec3 color;
+        glm::vec2 scale;
 
         // Default constructor
-        Text_Component() : font_name(DEFAULT_FONT_NAME), text(DEFAULT_FONT_NAME), color(DEFAULT_COLOR) {}
+        Text_Component() : font_name(DEFAULT_FONT_NAME), text(DEFAULT_FONT_NAME), color(DEFAULT_COLOR), scale(glm::vec2(1.0f, 1.0f)) {}
 
         /**
          * @brief Constructor for Text_Component.
@@ -685,8 +686,8 @@ namespace lof {
          * @param color Color of the text.
          */
 
-        Text_Component(std::string name, std::string text, glm::vec3 color) :
-            font_name(name), text(text), color(color) {}
+        Text_Component(std::string name, std::string text, glm::vec3 color, glm::vec2 scale) :
+            font_name(name), text(text), color(color), scale(scale) {}
 
     };
 

@@ -552,6 +552,12 @@ namespace lof {
                     text_component.color.z = clr[2].GetFloat();
                 }
 
+                if (component_data.HasMember("scale") && component_data["scale"].IsArray()) {
+                    const rapidjson::Value& scale = component_data["scale"];
+                    text_component.scale.x = scale[0].GetFloat();
+                    text_component.scale.y = scale[1].GetFloat();
+                }
+
                 // Add component to entity
                 ecs_manager.add_component<Text_Component>(entity, text_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Text_Component to entity ID %u.", entity);
