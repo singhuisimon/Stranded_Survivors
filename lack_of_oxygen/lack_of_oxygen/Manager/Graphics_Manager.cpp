@@ -12,6 +12,7 @@
 #include "Graphics_Manager.h" 
 //#include "../Utility/Path_Helper.h" // For file path resolution
 #include "Assets_Manager.h"
+#include "../Utility/win_control.h"
 
 // FOR TESTING (texture loading)
 #define STB_IMAGE_IMPLEMENTATION 
@@ -55,9 +56,10 @@ namespace lof {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Set viewport position and dimensions
-        GLuint scr_width = SM.get_scr_width();
-        GLuint scr_height = SM.get_scr_height();
-        glViewport(0, 0, scr_width, scr_height);
+        //GLuint scr_width = SM.get_scr_width();
+        //GLuint scr_height = SM.get_scr_height();
+        //glViewport(0, 0, scr_width, scr_height);
+        glViewport(0, 0, WC.get_win_width(), WC.get_win_height());
 
         // Set up default render mode 
         render_mode = GL_FILL;
@@ -114,7 +116,8 @@ namespace lof {
         // Creating texture object for imgui
         glGenTextures(1, &imgui_tex);
         glBindTexture(GL_TEXTURE_2D, imgui_tex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WC.get_win_width(), WC.get_win_height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

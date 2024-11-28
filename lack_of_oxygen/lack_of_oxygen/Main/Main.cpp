@@ -104,6 +104,13 @@ int main(void) {
         std::cout << "GLAD initialized successfully." << std::endl;
     }
 
+
+    // ---------------------- Set Window Control Variables ----------------------
+
+    bool enter_key_was_pressed_last_frame = false;
+
+    WC.update_win_size(window);
+
     // --------------------------- Start Game_Manager ---------------------------
 
     // Initialize Game_Manager (which initializes Log_Manager, Config_Manager, ECS_Manager, FPS_Manager, Input_Manager)
@@ -158,17 +165,6 @@ int main(void) {
     //    std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
     //}
 
-    
-    // ----------------------------- Set Window Variables ---------------------------
-
-/*    unsigned int win_height = mode->height;
-    unsigned int win_width = mode->width*/;
-
-    bool enter_key_was_pressed_last_frame = false;
-    Window_Control win_control;
-
-    win_control.set_win_size(mode->width, mode->height);
-
     // -------------------------- Game Loop Setup --------------------------
 
     // Variables for FPS display
@@ -215,7 +211,8 @@ int main(void) {
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
-            win_control.toggle_fullscreen(window, monitor, mode, is_full_screen, SCR_WIDTH, SCR_HEIGHT);
+            WC.toggle_fullscreen(window, monitor, mode, is_full_screen, SCR_WIDTH, SCR_HEIGHT);
+            std::cout << WC.get_win_height() << "enter is pressed" << std::endl;
         }
         enter_key_was_pressed_last_frame = is_ENTER_pressed;
 
@@ -243,7 +240,7 @@ int main(void) {
 
 
         if (level_editor_mode) {
-            IMGUIM.render_ui(win_control.get_win_width(), win_control.get_win_height());
+            IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
         }
 
         // Rendering
