@@ -32,6 +32,8 @@ namespace lof {
 
     //constants to replace
     int selected_file_index = -1;
+    int prev_file_selected = -1;
+
     int selected_object_index = -1;
     bool load_selected = false;
     bool show_window = false;
@@ -119,48 +121,99 @@ namespace lof {
 
     void IMGUI_Manager::display_loading_options() {
 
-        int current_object_index = 0;
-
         ImGui::Begin("File List");
-        selected_file_index = current_object_index;
 
-        //int current_object_index = 0;
-        //const auto& entities = ecs.get_entities();
-        //if (selected_object_index >= entities.size()) {
-        //    selected_object_index = -1;
-        //}
-        //for (int i = 0; i < entities.size(); ++i) {
-        //    if (entities[i] != nullptr) {
-        //        std::string obj_name = entities[i]->get_name();
-        //        //selectable for clicking; second param for highlighting
-        //        if (ImGui::Selectable(obj_name.c_str(), selected_object_index == current_object_index) && !mouse_clicked_or_dragged) {
-        //            //selected; casuing seceond param state to change
-        //            selected_object_index = current_object_index;
-        //        }
-        //    }
-        //    ++current_object_index;
-        //}
+        const std::string SCENES = "Scenes";
+        std::string level_path = ASM.get_full_path(SCENES, "");
+        std::vector<std::string> file_names;
 
+        // Iterate through the directory and collect file names
+        for (const auto& entry : std::filesystem::directory_iterator(level_path)) {
+            if (entry.is_regular_file()) {  
+                
+                file_names.push_back(entry.path().filename().string());
+            }
+
+        }
+
+        int current_file_index = 0;
+        int shown_file_index = -1;
+
+        std::string selected_file{};
+
+        //iterate through file names
+        for (int i = 0; i < file_names.size(); ++i) {
+
+            if (!file_names[i].empty()) {
+
+                //selectable for clicking; second param for highlighting
+                if (ImGui::Selectable(file_names[i].c_str(), selected_file_index == current_file_index)) {
+
+                    //selected; casuing seceond param state to change
+                    selected_file_index = current_file_index;
+                }
+
+                if (file_names[i] == get_current_file_shown()) {
+                    shown_file_index = i;
+                }
+
+            }
+
+            ++current_file_index;
+        }
+
+        if (selected_file_index != -1) {
+            selected_file = file_names[selected_file_index];
+        }
+        
         if (ImGui::Button("Load Scene")) {
-            load_selected = !load_selected;
+            load_selected = true;
+            
         }
+   
         ImGui::End();
+        if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
 
-        if (load_selected && (selected_file_index != -1)) {
-            const std::string SCENES = "Scenes";;
-            if (SM.load_scene(ASM.get_full_path(SCENES, "scene1.scn").c_str())) {
-            //if (SM.load_scene(ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn"))){
-                //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
+            const std::string SCENES = "Scenes";
+            if (SM.load_scene(ASM.get_full_path(SCENES, selected_file).c_str())) {
 
-                load_selected = !load_selected;
+                //if (SM.load_scene(ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn"))){
+                    //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
+                //to get second scene file
+                /*const std::string scenes = "Scenes";
+                    if (ASM.get_full_path(scenes, "Scene2"))
+                    {
+
+                    }*/
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Reset player position if exists
+                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (player_id != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Transform2D>(player_id)) {
+                        auto& transform = ECSM.get_component<Transform2D>(player_id);
+                        transform.position = Vec2D(0.0f, 0.0f);
+                        transform.prev_position = transform.position;
+                    }
+                    if (ECSM.has_component<Velocity_Component>(player_id)) {
+                        auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
+                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                    }
+                }
+
+                //load_selected = !load_selected;
+                set_current_file_shown(selected_file);
             }
-            else {
 
-                //LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
-
-                load_selected = !load_selected;
-            }
+            //prev_file_selected = selected_file_index;
+            load_selected = false;
         }
+
+        
     }
 
     void IMGUI_Manager::start_frame() {
@@ -168,17 +221,6 @@ namespace lof {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
-
-
-    //bool IMGUI_Manager::imgui_toggle_files(int& current_scene) {
-    //    
-    //    //get 
-    //    const std::string SCENES = "Scenes";
-    //    std::string scene_path1 = ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn");
-    //    std::string scene_path2 = ASM.get_full_path(SCENES, "scene" + std::to_string(2) + ".scn");
-
-    //    return true;
-    //}
 
     //Gets mouse position in terms of game world
     ImVec2 IMGUI_Manager::get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
@@ -458,9 +500,6 @@ namespace lof {
                     selected_object_index = current_object_index;
                 }
 
-          
-
-
             }
 
             ++current_object_index;
@@ -480,9 +519,11 @@ namespace lof {
             create_game_obj = !create_game_obj;
         }
 
+
         if (ImGui::Button("Save Changes")) {
             const std::string SCENES = "Scenes";
-            std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
+
+            std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
             if (SM.save_game_state(scene_path.c_str())) {
                 //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
@@ -1015,6 +1056,15 @@ namespace lof {
 
         std::cout << "key is: " << audio_file_name << "\nfilepath is: " << audio_filepath_name << std::endl;
     }
+
+
+    void IMGUI_Manager::set_current_file_shown(std::string current_file) {
+        current_file_shown = current_file;
+    }
+    std::string IMGUI_Manager::get_current_file_shown() {
+        return current_file_shown;
+    }
+
 
     void IMGUI_Manager::render() {
         // Rendering
