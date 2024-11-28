@@ -82,6 +82,8 @@ namespace lof {
 	// Animation component constants
 	constexpr const char* DEFAULT_ANIMATION_IDX = "0";
 	constexpr const char* DEFAULT_ANIMATION_NAME = "NoAnimation";
+	constexpr unsigned int DEFAULT_TILE_HEALTH = 2;
+
 
 	//Audio component constants
 	enum AudioType {

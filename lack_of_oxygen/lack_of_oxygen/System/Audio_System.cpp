@@ -83,6 +83,16 @@ namespace lof {
 				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID) + audio_key;
 				PlayState state = audio.get_audio_state(audio_key);
 
+				//check if audio file still exist
+				if (!ASM.load_audio_file(audio.get_filepath(audio_key))) {
+					LM.write_log("Audio_System::update Audio File %s no longer exist", audio.get_filepath(audio_key));
+					if (channel_map.find(key_id) != channel_map.end()) {
+						stop_sound(key_id);
+						unload_sound(audio.get_filepath(audio_key));
+					}
+					continue;
+				}
+
 				switch (state) {
 				case PLAYING:
 					play_sound(audio.get_filepath(audio_key), key_id, audio_key, audio);
@@ -98,10 +108,11 @@ namespace lof {
 					pause_resume_sound(key_id, false);
 					break;
 				default:
-					stopchannel.push_back(key_id);
+					//stopchannel.push_back(key_id);
 					continue;
 				}
 
+				//check if there is a change in volume n pitch for each channel/audio that is playing
 				const float epsilon = 0.01f;  // Tolerance for small differences
 
 				if (channel_map.find(key_id) != channel_map.end()) {
@@ -140,6 +151,7 @@ namespace lof {
 			}
 			
 		}
+
 		//free up unused channel.
 		for (auto it = channel_map.begin(); it != channel_map.end();) {
 			bool isPlaying = false;
@@ -218,6 +230,7 @@ namespace lof {
 	#endif
 
 	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
+		
 		//check if sound has already been loaded.
 		if (sound_map.find(file_path) == sound_map.end()) {
 			load_sound(file_path);
@@ -341,12 +354,12 @@ namespace lof {
 
 	void Audio_System::stop_sound(const std::string& channel_key) {
 		auto channel = channel_map.find(channel_key);
-		if (channel == channel_map.end()) {
+		if (channel == channel_map.end() || channel->second == nullptr) {
 			LM.write_log("Audio_System::stop_sound: failed to stop sound as %s isn't even playing in the channel.", channel_key.c_str());
 			return;
 		}
 
-		bool playstate_currchannel;
+		bool playstate_currchannel = false;
 		errorcheck(channel->second->isPlaying(&playstate_currchannel), "Audio_System::stop_sound", "check sound playing");
 		if (playstate_currchannel) {
 			errorcheck(channel->second->stop(), "Audio_System::stop_sound", "stop channel" + channel_key); //if the channel is playing stop it
@@ -358,14 +371,12 @@ namespace lof {
 		channel_map.erase(channel_key);
 	}
 
-	//not sure if i am keeping this message
 	void Audio_System::unload_sound(const std::string& filepath) {
 		auto sound = sound_map.find(filepath);
 		if (sound == sound_map.end()) {
 			return; //this means sound is not loaded which means no need to unload at all
 		}
 		
-		//FMOD::Sound* sounds = sound->second;
 		FMOD_RESULT result = sound->second->release();
 		if (errorcheck(result, "Audio_System::unload_sound", "release sound" + filepath) != 0) {
 			return;
@@ -376,19 +387,19 @@ namespace lof {
 
 	//set and getters for channel & channel group
 	void Audio_System::set_channel_pitch(const std::string& channel_key, float pitch) {
-		/*if (channel_map.find(channel_key) == channel_map.end()) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
 			LM.write_log("Audio_System::set_channel_pitch: failed to set channel pitch as channel is not in channel map.");
 			return;
-		}*/
+		}
 		auto channel = channel_map.find(channel_key);
 		errorcheck(channel->second->setPitch(pitch), "Audio_System::set_channel_pitch", "set pitch for channel: " + channel_key);
 	}
 
 	void Audio_System::set_channel_volume(const std::string& channel_key, float volume) {
-		/*if (channel_map.find(channel_key) == channel_map.end()) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
 			LM.write_log("Audio_System::set_channel_volume: failed to set channel volume as channel is not in channel map.");
 			return;
-		}*/
+		}
 		auto channel = channel_map.find(channel_key);
 		errorcheck(channel->second->setVolume(volume), "Audio_System::set_channel_volume", "set volume for channel: " + channel_key);
 	}

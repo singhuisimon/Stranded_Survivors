@@ -83,6 +83,7 @@ namespace lof {
             std::string texture_name;
             unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
             float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
+            bool is_updated{ false };
         };
 
         // Struct of a camera
