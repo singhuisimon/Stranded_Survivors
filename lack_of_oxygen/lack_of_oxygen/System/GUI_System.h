@@ -29,6 +29,18 @@ namespace lof {
         EntityID right_image_id;    // Right image entity
         float last_progress_value = 0.0f;  // Store last progress value
 
+        EntityID mineral_interaction_container = INVALID_ENTITY_ID;
+        EntityID mineral_text_overlay = INVALID_ENTITY_ID;
+
+        EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
+        EntityID oxygen_text_overlay = INVALID_ENTITY_ID;
+        EntityID red_circle_overlay = INVALID_ENTITY_ID;
+        EntityID green_circle_overlay = INVALID_ENTITY_ID;
+
+
+        float current_oxygen_level = 100.0f; // Track oxygen level
+        float current_mineral_count = 0.0f;  // Track mineral count
+
         /**
          * @brief Clamps a value between a minimum and maximum range.
          * @param value The value to be clamped.
@@ -87,21 +99,22 @@ namespace lof {
          */
         GUI_System(ECS_Manager& ecs_manager);
 
-        /**
-         * @brief Creates and shows the loading screen GUI elements.
-         */
-        void show_loading_screen();
 
-        /**
-         * @brief Hides and cleans up the loading screen GUI elements.
-         */
+        void show_loading_screen();
         void hide_loading_screen();
 
         /**
-         * @brief Updates the progress bar value.
+         * @brief Updates the progress bar value in loading screen.
          * @param progress The new progress value between 0.0 and 1.0.
          */
         void set_progress(float progress);
+
+
+        void show_mineral_tank_gui();
+        void show_oxygen_tank_gui();
+
+        void hide_mineral_tank_gui();
+        void hide_oxygen_tank_gui();
 
         /**
          * @brief Updates the GUI system's state.
@@ -130,6 +143,7 @@ namespace lof {
          * @return True if the GUI container exists, false otherwise.
          */
         bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
+
     };
 } // namespace lof
 

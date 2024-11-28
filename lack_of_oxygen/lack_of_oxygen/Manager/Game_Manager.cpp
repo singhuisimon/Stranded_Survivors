@@ -149,9 +149,9 @@ namespace lof {
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
 
-    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); 
 
-    EntityID selectedID = -1;
+    EntityID selectedID = -1; // for imgui
 
 
     void Game_Manager::update(float delta_time) {
@@ -208,36 +208,7 @@ namespace lof {
 
         //printf("-----------------in game manager--------------------------------\n\n");
 
-#if 0
-        ESS.Check_Selected_Entity();
 
-        // Check if the left mouse button was pressed
-        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-        if (IM.is_key_held(GLFW_KEY_W) && !level_editor_mode) {
-            // Handle left mouse button press
-            std::cout << "Left mouse button pressed." << std::endl;
-
-
-            if (selectedEntityInfo.isSelected) {
-                select_entity = true;
-                selectedID = selectedEntityInfo.selectedEntity;
-
-                std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
-
-            }
-            else {
-                select_entity = false;
-                selectedID = selectedEntityInfo.selectedEntity;
-
-                std::cout << "No entity is selected.\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-            }
-        }
-#endif
         //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
         try {
             // Simulate a crash when the 'P' key is pressed
@@ -478,77 +449,89 @@ namespace lof {
             mode = GL_FALSE;
         }
 
-#if 0
-        // Object  when up and down arrow keys pressed
-        if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
-            int& flag = GFXM.get_scale_flag();
-            flag = GLFW_KEY_UP;
-        }
-        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
-            int& flag = GFXM.get_scale_flag();
-            flag = GLFW_KEY_DOWN;
-        }
-        else if (IM.is_key_held(GLFW_KEY_UP) && IM.is_key_held(GLFW_KEY_DOWN)) {
-            int& flag = GFXM.get_scale_flag();
-            if (flag == GLFW_KEY_UP) {
-                flag = GLFW_KEY_UP;
+        // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
+#if 1
+        ESS.Check_Selected_Entity();
+
+        // Check if the left mouse button was pressed
+        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+
+            if (selectedEntityInfo.isSelected) {
+                select_entity = true;
+                selectedID = selectedEntityInfo.selectedEntity;
+
+            /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
+
             }
             else {
-                flag = GLFW_KEY_DOWN;
+                select_entity = false;
+                selectedID = -1;
+
             }
         }
-        else {
-            int& flag = GFXM.get_scale_flag();
-            flag = 0;
-        }
-#endif
-        if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            if (select_entity)
-            {
-                selectedID = selectedEntityInfo.selectedEntity;
+
+        
+        if (level_editor_mode && selectedID != -1)
+        {
+            // First check if entity has required components
+            if (!ECSM.has_component<Transform2D>(selectedID)) {
+                std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
+                return;
             }
 
-
-        }
-
-        //std::cout << selectedID << "in game manager\n";
-
-
-#if 1
-        //std::cout << "bool if is selected (1 is selected, 0 is not): " << select_entity << "\n";
-       // std::cout << select_entity << " this is select entity\n";
-        if (select_entity && selectedID != -1 && level_editor_mode) {
             auto& transform = ECSM.get_component<Transform2D>(selectedID);
-            auto& collision = ECSM.get_component<Collision_Component>(selectedID);
-
             GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
             GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
-            // Example: Scaling the selected entity
-            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
-                // Increase the size of the selected entity
+
+            // Check if entity has collision component before using it
+            bool has_collision = ECSM.has_component<Collision_Component>(selectedID);
+            Collision_Component* collision = nullptr;
+            if (has_collision) {
+                collision = &ECSM.get_component<Collision_Component>(selectedID);
+            }
+
+            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
+            {
+                std::cout << selectedID << " scaling up in level editor\n";
                 transform.scale.x += scale_change;
                 transform.scale.y += scale_change;
-                collision.width += scale_change;
-                collision.height += scale_change;
+
+                if (collision) {
+                    collision->width += scale_change;
+                    collision->height += scale_change;
+                }
             }
-            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
-                // Increase the size of the selected entity
+            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP)))
+            {
+
                 if (transform.scale.x > 0.0f) {
                     transform.scale.x -= scale_change;
-                    collision.width -= scale_change;
+                    if (collision) {
+                        collision->width -= scale_change;
+                    }
                 }
                 else {
                     transform.scale.x = 0.0f;
-                    collision.width = 0.0f;
+                    if (collision) {
+                        collision->width = 0.0f;
+                    }
                 }
 
                 if (transform.scale.y > 0.0f) {
                     transform.scale.y -= scale_change;
-                    collision.height -= scale_change;
+                    if (collision) {
+                        collision->height -= scale_change;
+                    }
                 }
                 else {
                     transform.scale.y = 0.0f;
-                    collision.height = 0.0f;
+                    if (collision) {
+                        collision->height = 0.0f;
+                    }
                 }
             }
             else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
@@ -560,34 +543,8 @@ namespace lof {
                 transform.orientation.x -= rot_change;
             }
         }
-#endif 
-
-#if 0
-        // Object rotation when left and right arrow keys pressed
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
-            int& flag = GFXM.get_rotation_flag();
-            flag = GLFW_KEY_LEFT;
-        }
-        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))) {
-            int& flag = GFXM.get_rotation_flag();
-            flag = GLFW_KEY_RIGHT;
-        }
-        else if (IM.is_key_held(GLFW_KEY_LEFT) && IM.is_key_held(GLFW_KEY_RIGHT)) {
-            int& flag = GFXM.get_rotation_flag();
-            if (flag == GLFW_KEY_LEFT) {
-                flag = GLFW_KEY_LEFT;
-            }
-            else {
-                flag = GLFW_KEY_RIGHT;
-            }
-        }
-        else {
-            int& flag = GFXM.get_rotation_flag();
-            flag = 0;
-        }
+        // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #endif
-
-
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE) {
