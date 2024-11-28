@@ -465,6 +465,27 @@ namespace lof {
                     animation_component.start_animation_idx = std::stoi(DEFAULT_ANIMATION_IDX); // Default value
                 }
 
+                if (component_data.HasMember("curr_frame_index") && component_data["curr_frame_index"].IsUint()) {
+                    animation_component.curr_frame_index = component_data["curr_frame_index"].GetUint();
+                }
+                else {
+                    animation_component.curr_frame_index = DEFAULT_FRAME_INDEX; // Default value
+                }
+
+                if (component_data.HasMember("start_tile_health") && component_data["start_tile_health"].IsUint()) {
+                    animation_component.start_tile_health = component_data["start_tile_health"].GetUint();
+                }
+                else {
+                    animation_component.start_tile_health = DEFAULT_TILE_HEALTH; // Default value
+                }
+
+                if (component_data.HasMember("curr_tile_health") && component_data["curr_tile_health"].IsUint()) {
+                    animation_component.curr_tile_health = component_data["curr_tile_health"].GetUint();
+                }
+                else {
+                    animation_component.curr_tile_health = DEFAULT_TILE_HEALTH; // Default value
+                }
+
                 // Add component to entity
                 ecs_manager.add_component<Animation_Component>(entity, animation_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Animation_Component to entity ID %u.", entity);
@@ -529,6 +550,12 @@ namespace lof {
                     text_component.color.x = clr[0].GetFloat();
                     text_component.color.y = clr[1].GetFloat();
                     text_component.color.z = clr[2].GetFloat();
+                }
+
+                if (component_data.HasMember("scale") && component_data["scale"].IsArray()) {
+                    const rapidjson::Value& scale = component_data["scale"];
+                    text_component.scale.x = scale[0].GetFloat();
+                    text_component.scale.y = scale[1].GetFloat();
                 }
 
                 // Add component to entity

@@ -287,7 +287,128 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != 0) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID) {  // If player entity exists
+
+            // Update top UI overlay position to follow player
+            EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+            EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
+            EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
+            EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
+
+            EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
+            EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
+            EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+            if (ui_overlay_id != INVALID_ENTITY_ID) {
+                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
+
+                // Define layout constants for vertical stacking
+                constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
+                constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
+                constexpr float METER_WIDTH = 400.0f;            // Width of the meters
+                constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
+                //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
+
+                // Calculate base position for UI elements
+                Vec2D base_position{
+                    0.0f,
+                    player_transform.position.y + VERTICAL_OFFSET
+                };
+
+                // Update main UI overlay position
+                ui_transform.position = base_position;
+                ui_transform.prev_position = ui_transform.position;
+
+                // Position oxygen meter (top meter)
+                if (oxygen_meter_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(oxygen_meter_id)) {
+                    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                    // Set position and scale for oxygen meter
+                    oxygen_transform.position = {
+                        base_position.x - METER_WIDTH,  // Center horizontally
+                        base_position.y                 // Top position
+                    };
+                    oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                    oxygen_transform.prev_position = oxygen_transform.position;
+                }
+
+                // Position oxygen text
+                if (oxygen_text_id != INVALID_ENTITY_ID && 
+                    ECSM.has_component<Transform2D>(oxygen_text_id)) { 
+                    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
+                    //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
+                    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                    // Position text to the left of the oxygen meter
+                    oxygen_text_transform.position = {
+                        (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
+                        oxygen_transform.position.y // Vertically centered with oxygen meter
+                    };
+                    oxygen_text_transform.prev_position = oxygen_text_transform.position;
+                }
+
+                // Position panic meter (bottom meter)
+                if (panic_meter_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(panic_meter_id)) {
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+
+                    // Set position and scale for panic meter
+                    panic_transform.position = {
+                        base_position.x - METER_WIDTH,          // Center horizontally
+                        base_position.y - METER_SPACING         // Below oxygen meter
+                    };
+                    panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                    panic_transform.prev_position = panic_transform.position;
+                }
+
+                // Position panic text
+                if (panic_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(panic_text_id)) {
+                    auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id); 
+
+                    // Position text to the left of the panic meter
+                    panic_text_transform.position = {
+                        (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
+                        panic_transform.position.y  // Vertically centered with panic meter
+                    };
+                    panic_text_transform.prev_position = panic_text_transform.position;
+                }
+
+                // Position mineral texture on the right side
+                if (mineral_texture_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) {
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
+
+                    mineral_transform.position = {
+                        base_position.x,                         // Center position
+                        base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
+                    };
+                    mineral_transform.prev_position = mineral_transform.position;
+                }
+
+                // Position mineral count text
+                if (mineral_count_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(mineral_count_text_id) && 
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) { 
+                    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id); 
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id); 
+
+                    constexpr float MINERAL_COUNT_OFFSET = 40.0f;
+                    // Position text to the right of the mineral texture
+                    mineral_count_text_transform.position = {
+                        (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
+                        mineral_transform.position.y  - TEXT_OFFSET_Y  // Vertically centered with mineral icon
+                    };
+                    mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
+                }
+            }
+
+
+
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
@@ -296,9 +417,17 @@ namespace lof {
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            } 
+
                             // Destroy the colliding block on the left
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
@@ -306,9 +435,17 @@ namespace lof {
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            }
+
                             // Destroy the colliding block on the right
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
@@ -318,9 +455,17 @@ namespace lof {
                     if (CS.has_top_collide_detect()) {
                         EntityID block_to_remove = CS.get_top_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            }
+
                             // Destroy the colliding block on the right
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
@@ -328,9 +473,17 @@ namespace lof {
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                animation.curr_tile_health--;
+                            }
+
                             // Destroy the colliding block below
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                            if (animation.curr_tile_health == 0) {
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                            }
                         }
                     }
                 }
