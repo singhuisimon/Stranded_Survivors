@@ -316,7 +316,84 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != 0) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID) {  // If player entity exists
+
+            // Update top UI overlay position to follow player
+            EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+            EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
+            EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
+            EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
+
+            EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
+            EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
+            EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+            if (ui_overlay_id != INVALID_ENTITY_ID) {
+                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
+
+                // Define layout constants for vertical stacking
+                constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
+                constexpr float METER_SPACING = 30.0f;           // Vertical space between meters
+                constexpr float METER_WIDTH = 200.0f;            // Width of the meters
+                constexpr float METER_HEIGHT = 25.0f;            // Height of each meter bar
+                constexpr float TEXT_OFFSET_X = 30.0f;           // Horizontal offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 0.0f;            // Vertical offset from the UI element
+
+                // Calculate base position for UI elements
+                Vec2D base_position{
+                    player_transform.position.x,
+                    player_transform.position.y + VERTICAL_OFFSET
+                };
+
+                // Update main UI overlay position
+                ui_transform.position = base_position;
+                ui_transform.prev_position = ui_transform.position;
+
+                // Position oxygen meter (top meter)
+                if (oxygen_meter_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(oxygen_meter_id)) {
+                    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                    // Set position and scale for oxygen meter
+                    oxygen_transform.position = {
+                        base_position.x - METER_WIDTH / 2,  // Center horizontally
+                        base_position.y                   // Top position
+                    };
+                    oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                    oxygen_transform.prev_position = oxygen_transform.position;
+                }
+
+                // Position panic meter (bottom meter)
+                if (panic_meter_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(panic_meter_id)) {
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+
+                    // Set position and scale for panic meter
+                    panic_transform.position = {
+                        base_position.x - METER_WIDTH / 2,          // Center horizontally
+                        base_position.y - METER_SPACING           // Below oxygen meter
+                    };
+                    panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                    panic_transform.prev_position = panic_transform.position;
+                }
+
+                // Position mineral texture on the right side
+                if (mineral_texture_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) {
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
+
+                    constexpr float MINERAL_OFFSET = 400.0f;  // Distance from center
+                    mineral_transform.position = {
+                        base_position.x + MINERAL_OFFSET,      // Right side position
+                        base_position.y - METER_SPACING / 2      // Vertically centered between meters
+                    };
+                    mineral_transform.scale = Vec2D(50.0f, 50.0f);  // Smaller scale for icon
+                    mineral_transform.prev_position = mineral_transform.position;
+                }
+            }
+
+
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
