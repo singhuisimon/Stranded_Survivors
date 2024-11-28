@@ -43,7 +43,7 @@ namespace lof {
 			LM.write_log("%s failed to %s. FMOD Error: %s.", function_name.c_str(), function_purpose.c_str(), FMOD_ErrorString(result));
 			return -1;
 		}
-		LM.write_log("%s successfully executed %s.", function_name.c_str(), function_purpose.c_str());
+		//LM.write_log("%s successfully executed %s.", function_name.c_str(), function_purpose.c_str());
 		return 0;
 	}
 
@@ -155,7 +155,8 @@ namespace lof {
 		}
 
 		//update the fmod system with the core system
-		errorcheck(core_system->update(), "Audio_System::update", "update core system");
+		errorcheck(core_system->update());
+		// errorcheck(core_system->update(), "Audio_System::update", "update core system");
 	}
 
 	void Audio_System::shutdown() {
@@ -230,7 +231,8 @@ namespace lof {
 		if ((channel_map.find(cskey) != channel_map.end()) && channel_map.find(cskey)->second != nullptr) {
 			//check if sound has finish playing, if so change the audio_state to stopped.
 			bool playing = false;
-			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
+			// errorcheck(channel_map.find(cskey)->second->isPlaying(&playing), "Audio_System::play_sound", "check if channel is playing");
+			errorcheck(channel_map.find(cskey)->second->isPlaying(&playing));
 			if (!playing) {
 				audio.set_audio_state(audio_key, NONE);
 				channel_map.erase(cskey);
@@ -245,10 +247,14 @@ namespace lof {
 		//FMOD::ChannelGroup* group = nullptr;
 
 		FMOD_RESULT result = core_system->playSound(sound->second, nullptr, false, &channel);
-		if (errorcheck(result, "Audio_System::play_sound", "play sound" + file_path) != 0 || !channel) {
+		if (errorcheck(result) != 0 || !channel) {
 			LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 			return;
 		}
+		//if (errorcheck(result, "Audio_System::play_sound", "play sound" + file_path) != 0 || !channel) {
+		//	LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
+		//	return;
+		//}
 
 		channel_map[cskey] = channel;
 

@@ -148,6 +148,9 @@
     <Image Include="Assets\Textures\Explosion radius_Batch 4.png" />
     <Image Include="Assets\Textures\Lava Vignette_Batch 4.png" />
     <Image Include="Assets\Textures\Lava_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_Bar_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_BG_Batch 4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch 4.png" />
     <Image Include="Assets\Textures\Mineral_Hopper_Box_Empty_Batch_4.png" />
     <Image Include="Assets\Textures\Mineral_Hopper_Box_Filled_Batch_4.png" />
     <Image Include="Assets\Textures\Mineral_Hopper_Conveyor_Empty_Batch_4.png" />
