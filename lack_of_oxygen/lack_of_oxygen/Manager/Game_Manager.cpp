@@ -228,49 +228,49 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
-        // GUI System control
-        if (IM.is_key_pressed(GLFW_KEY_G) && !level_editor_mode) {
-            // Find GUI System
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        // Toggle loading screen
-                        static bool loading_screen_visible = false;
-                        if (!loading_screen_visible) {
-                            loading_screen_visible = true;
-                            gui_system->show_loading_screen();
-                            LM.write_log("Game_Manager::update(): Showing loading screen");
-                        }
-                        else {
-                            loading_screen_visible = false;
-                            gui_system->hide_loading_screen();
-                            LM.write_log("Game_Manager::update(): Hiding loading screen");
-                        }
-                    }
-                    break;
-                }
-            }
-        }
+        //// GUI System control
+        //if (IM.is_key_pressed(GLFW_KEY_G) && !level_editor_mode) {
+        //    // Find GUI System
+        //    for (auto& system : ECSM.get_systems()) {
+        //        if (system->get_type() == "GUI_System") {
+        //            auto* gui_system = static_cast<GUI_System*>(system.get());
+        //            if (gui_system) {
+        //                // Toggle loading screen
+        //                static bool loading_screen_visible = false;
+        //                if (!loading_screen_visible) {
+        //                    loading_screen_visible = true;
+        //                    gui_system->show_loading_screen();
+        //                    LM.write_log("Game_Manager::update(): Showing loading screen");
+        //                }
+        //                else {
+        //                    loading_screen_visible = false;
+        //                    gui_system->hide_loading_screen();
+        //                    LM.write_log("Game_Manager::update(): Hiding loading screen");
+        //                }
+        //            }
+        //            break;
+        //        }
+        //    }
+        //}
 
-        // Test progress bar updates with H key
-        if (IM.is_key_pressed(GLFW_KEY_H) && !level_editor_mode) {
-            static float test_progress = 0.0f;
-            test_progress += 0.1f;
-            if (test_progress > 1.0f) test_progress = 0.0f;
+        //// Test progress bar updates with H key
+        //if (IM.is_key_pressed(GLFW_KEY_H) && !level_editor_mode) {
+        //    static float test_progress = 0.0f;
+        //    test_progress += 0.1f;
+        //    if (test_progress > 1.0f) test_progress = 0.0f;
 
-            // Find GUI System and update progress
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        gui_system->set_progress(test_progress);
-                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
-                    }
-                    break;
-                }
-            }
-        }
+        //    // Find GUI System and update progress
+        //    for (auto& system : ECSM.get_systems()) {
+        //        if (system->get_type() == "GUI_System") {
+        //            auto* gui_system = static_cast<GUI_System*>(system.get());
+        //            if (gui_system) {
+        //                gui_system->set_progress(test_progress);
+        //                LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
+        //            }
+        //            break;
+        //        }
+        //    }
+        //}
 
         //to pause all the sound that is playing
         if (IM.is_key_pressed(GLFW_KEY_5) || IM.is_key_pressed(GLFW_KEY_TAB)) {
@@ -406,8 +406,6 @@ namespace lof {
                     mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
                 }
             }
-
-
 
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
@@ -832,8 +830,6 @@ namespace lof {
             std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
             IMGUIM.set_current_file_shown(get_file_name);
         }
-
-
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

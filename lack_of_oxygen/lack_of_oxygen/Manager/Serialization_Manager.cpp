@@ -694,12 +694,18 @@ namespace lof {
         comp_obj.AddMember("font_name", rapidjson::Value(component.font_name.c_str(), allocator), allocator);
         comp_obj.AddMember("text", rapidjson::Value(component.text.c_str(), allocator), allocator);
 
-        // Add color
+        // Add color array
         rapidjson::Value color(rapidjson::kArrayType);
         color.PushBack(component.color.x, allocator);
         color.PushBack(component.color.y, allocator);
         color.PushBack(component.color.z, allocator);
         comp_obj.AddMember("color", color, allocator);
+
+        // Add scale array
+        rapidjson::Value scale(rapidjson::kArrayType);
+        scale.PushBack(component.scale.x, allocator);
+        scale.PushBack(component.scale.y, allocator);
+        comp_obj.AddMember("scale", scale, allocator);
 
         return comp_obj;
     }
