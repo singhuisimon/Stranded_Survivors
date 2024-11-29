@@ -409,6 +409,8 @@ namespace lof {
     bool select_entity = false; // to ensure mouse click selected
     EntityID selectedEntityID = static_cast<EntityID>(-1);
 
+
+#if 1
     //Rendering UI
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
@@ -425,8 +427,12 @@ namespace lof {
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        //if (ImGui::Combo(""))
+        static int currentMode = 0; // Default to "Drag"
+        const char* modes[] = { "None","Drag", "Scale", "Rotate" };
 
         ImGui::Begin("Level Editor Mode", nullptr, window_flags);
+        
 
         //Set up Dockspace
         ImGuiIO& io = ImGui::GetIO();
@@ -457,47 +463,34 @@ namespace lof {
         ImGui::PopStyleVar(2);
         ImGui::End();
 
-
-        //Game Viewport
         if (GFXM.get_editor_mode() == 1) {
-
             ImGui::Begin("Game Viewport", nullptr);
 
-            // Ensure the texture is updated before displaying
             auto texture = GFXM.get_framebuffer_texture();
-
-            // Get the position where the texture will be rendered
             ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
             if (texture) {
-
-                //ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
-                ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(static_cast<float>(SCR_WIDTH) / 2, static_cast<float>(SCR_HEIGHT) / 2), ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(),
+                    ImVec2(static_cast<float>(SCR_WIDTH) / 2, static_cast<float>(SCR_HEIGHT) / 2),
+                    ImVec2(0, 1), ImVec2(1, 0));
             }
 
-            //-----------------------------------------For mouse----------------------------------------//
-            // Get the mouse position in terms of IMGUI screen
+            //static int currentMode = 0;
+            //const char* Selectmodes[] = { "Drag", "Scale", "Rotate" };
+
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
-
-            //Gets mouse position in terms of game world
             Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
-
-            //Check if entity is hovered on
             ESS.Check_Selected_Entity();
-
-            // Check if the left mouse button was pressed
             EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-            
-            // If Mouse within texture
+
+            // Check if mouse is within texture bounds
             if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
                 mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
 
                 ImGui::Text("Mouse_Pos: %.2f, %.2f", Mouse_Pos.x, Mouse_Pos.y);
 
-                //-------------------------------clicking----------------------------------//
-                //Click with  mouse
+                // Handle entity selection with left click
                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-
                     mouse_clicked_or_dragged = true;
                     if (selectedEntityInfo.isSelected) {
                         select_entity = true;
@@ -510,102 +503,161 @@ namespace lof {
                     }
                 }
                 else {
-
                     mouse_clicked_or_dragged = false;
                     select_entity = false;
+                }
+
+                // Show context menu on right click when an entity is selected
+                if (selectedEntityID != INVALID_ENTITY_ID && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                    ImGui::OpenPopup("OperationContextMenu");
+                }
+
+                // Position the context menu at the mouse position
+                if (ImGui::BeginPopup("OperationContextMenu")) {
+                    ImGui::Text("Select Operation");
+                    ImGui::Separator();
+
+                    for (int i = 0; i < IM_ARRAYSIZE(modes); i++) {
+                        if (ImGui::Selectable(modes[i])) {
+                            currentMode = i;
+                        }
+                    }
+
+                    ImGui::EndPopup();
                 }
 
                 if (select_entity && selectedEntityID != INVALID_ENTITY_ID) {
                     selected_object_index = selectedEntityID;
                 }
 
-                //-------------------------------dragging----------------------------------//
-
+                // Handle mouse operations
                 static ImVec2 selected_entity_start_pos;
                 auto& entities = ecs.get_entities();
 
-                //Drag with mouse
                 if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && selectedEntityID != INVALID_ENTITY_ID) {
-
-                    //if mouse was previously down
                     if (!mouse_was_down) {
-                       
-                        //get mouse position before mouse is held down
                         mouse_pos_before_press = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
-
                         if (selectedEntityInfo.isSelected) {
                             if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
                                 Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
-                                selected_entity_start_pos.x = transform.position.x;
-                                selected_entity_start_pos.y = transform.position.y;
+                                // Store initial values based on operation type
+                                switch (currentMode) {
+                                case 0: // None - do nothing
+                                    break;
+                                case 1: // Drag
+                                    selected_entity_start_pos.x = transform.position.x;
+                                    selected_entity_start_pos.y = transform.position.y;
+                                    break;
+                                case 2: // Scale
+                                    selected_entity_start_pos.x = transform.scale.x;
+                                    selected_entity_start_pos.y = transform.scale.y;
+                                    break;
+                                case 3: // Rotate
+                                    selected_entity_start_pos.x = transform.orientation.x;
+                                    selected_entity_start_pos.y = transform.orientation.y;
+                                    break;
+                                }
                             }
                         }
                         mouse_was_down = true;
-
                     }
-                    else { //mouse is not previously down
 
+                    switch (currentMode) {
+                    case 0: 
+                        break;
+                    case 1: // Drag
+                    {
                         ImVec2 dragged_offset;
-
                         unsigned int game_scale_width = SM.get_scr_width();
                         unsigned int game_scale_height = SM.get_scr_height();
-                        //printf("game width, height (%i, %i)\n", game_scale_width, game_scale_height);
-
                         unsigned int window_width = WC.get_win_width();
                         unsigned int window_height = WC.get_win_height();
-                        //printf("window width, height (%i, %i)\n", window_width, window_height);
-
                         float ratio_width = static_cast<float>(game_scale_width) / window_width;
                         float ratio_height = static_cast<float>(game_scale_height) / window_height;
-                        //printf("ratio width, ratio height (%.f, %.f)\n", ratio_width, ratio_height);
 
                         if (is_full_screen) {
                             dragged_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) * ratio_width;
                             dragged_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) * ratio_height;
                         }
                         else {
-                            
                             dragged_offset.x = Mouse_Pos.x - mouse_pos_before_press.x;
                             dragged_offset.y = Mouse_Pos.y - mouse_pos_before_press.y;
                         }
-                        
 
-                        if (selectedEntityInfo.isSelected) {
-                            if (selectedEntityID != INVALID_ENTITY_ID)
-                            {
-                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
-                                
-                                    transform.position.x = (selected_entity_start_pos.x + dragged_offset.x) ;
-                                    transform.position.y = (selected_entity_start_pos.y + dragged_offset.y) ;
-                                    transform.prev_position.x = transform.position.x;
-                                    transform.prev_position.y = transform.position.y;
-
-                                }
-                                
+                        if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                transform.position.x = selected_entity_start_pos.x + dragged_offset.x;
+                                transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
+                                transform.prev_position = transform.position;
                             }
-
                         }
-
+                        break;
                     }
+                    case 2: // Scale
+                    {
+                        ImVec2 scale_offset;
+                        constexpr float SCALE_SENSITIVITY = 0.05f;
+                        scale_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) * SCALE_SENSITIVITY;
+                        scale_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) * SCALE_SENSITIVITY;
 
+                        if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+
+                                float scale_factor = 1.0f + scale_offset.x;
+                                float new_scale_x = selected_entity_start_pos.x * scale_factor;
+                                transform.scale.x = std::max(0.1f, new_scale_x);
+
+                                scale_factor = 1.0f + scale_offset.y;
+                                float new_scale_y = selected_entity_start_pos.y * scale_factor;
+                                transform.scale.y = std::max(0.1f, new_scale_y);
+
+                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Collision_Component>())) {
+                                    Collision_Component& collision = ecs.get_component<Collision_Component>(entities[selectedEntityID].get()->get_id());
+                                    collision.width = transform.scale.x;
+                                    collision.height = transform.scale.y;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case 3: //rotate
+                    {
+                        float rotation_offset = (Mouse_Pos.x - mouse_pos_before_press.x) * 0.5f;
+
+                        if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+
+                                // Update rotation
+                                transform.orientation.x = selected_entity_start_pos.x + rotation_offset;
+
+                                // Normalize rotation angle to keep it between 0 and 360 degrees
+                                while (transform.orientation.x >= 360.0f) transform.orientation.x -= 360.0f;
+                                while (transform.orientation.x < 0.0f) transform.orientation.x += 360.0f;
+                            }
+                        }
+                        break;
+                        }
+                   
+                    }
+       
                 }
-                else { //mouse is now down
-                    
+                else {
                     mouse_was_down = false;
-                }    
-            
+                }
             }
 
             ImGui::Separator();
-            if (selectedEntityID == -1)
-            {
+            if (selectedEntityID == -1) {
                 ImGui::Text("Selected Entity: None");
-            }else
-            {
-                ImGui::Text("Selected Entity: %d", selectedEntityID);
             }
-         
+            else {
+                ImGui::Text("Selected Entity: %d", selectedEntityID);
+                //ImGui::Text("Current Operation: %s", modes[currentMode]);
+            }
+
             ImGui::End();
         }
 
@@ -620,6 +672,7 @@ namespace lof {
         IMGUIM.imgui_game_objects_edit();
 
     }
+#endif
 
     void IMGUI_Manager::disable_GUI() {
 
