@@ -41,6 +41,7 @@ namespace lof {
 
     float imgui_camara_pos_x = 0.0f;
     float imgui_camera_pos_y = 0.0f;
+    unsigned int mining_strength = DEFAULT_STRENGTH;
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
@@ -149,10 +150,8 @@ namespace lof {
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
 
-    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-
-    EntityID selectedID = -1;
-
+    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); 
+    EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
@@ -208,36 +207,7 @@ namespace lof {
 
         //printf("-----------------in game manager--------------------------------\n\n");
 
-#if 0
-        ESS.Check_Selected_Entity();
 
-        // Check if the left mouse button was pressed
-        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-        if (IM.is_key_held(GLFW_KEY_W) && !level_editor_mode) {
-            // Handle left mouse button press
-            std::cout << "Left mouse button pressed." << std::endl;
-
-
-            if (selectedEntityInfo.isSelected) {
-                select_entity = true;
-                selectedID = selectedEntityInfo.selectedEntity;
-
-                std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
-
-            }
-            else {
-                select_entity = false;
-                selectedID = selectedEntityInfo.selectedEntity;
-
-                std::cout << "No entity is selected.\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-            }
-        }
-#endif
         //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
         try {
             // Simulate a crash when the 'P' key is pressed
@@ -257,52 +227,8 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
-        // GUI System control
-        if (IM.is_key_pressed(GLFW_KEY_G)){//} && !level_editor_mode) {
-            // Find GUI System
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        // Toggle loading screen
-                        static bool loading_screen_visible = false;
-                        if (!loading_screen_visible) {
-                            loading_screen_visible = true;
-                            gui_system->show_loading_screen();
-                            LM.write_log("Game_Manager::update(): Showing loading screen");
-                        }
-                        else {
-                            loading_screen_visible = false;
-                            gui_system->hide_loading_screen();
-                            LM.write_log("Game_Manager::update(): Hiding loading screen");
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Test progress bar updates with H key
-        if (IM.is_key_pressed(GLFW_KEY_H)){//} && !level_editor_mode) {
-            static float test_progress = 0.0f;
-            test_progress += 0.1f;
-            if (test_progress > 1.0f) test_progress = 0.0f;
-
-            // Find GUI System and update progress
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        gui_system->set_progress(test_progress);
-                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
-                    }
-                    break;
-                }
-            }
-        }
-
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5)) {
+        if (IM.is_key_pressed(GLFW_KEY_5) || IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "Audio_System") {
                     auto* audio_system = static_cast<Audio_System*>(system.get());
@@ -316,54 +242,333 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != 0) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+
+            // Update top UI overlay position to follow player
+            EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+            EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
+            EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
+            EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
+
+            EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
+            EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
+            EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+            if (ui_overlay_id != INVALID_ENTITY_ID) {
+                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
+
+                // Define layout constants for vertical stacking
+                constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
+                constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
+                constexpr float METER_WIDTH = 400.0f;            // Width of the meters
+                constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
+                //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
+
+                // Calculate base position for UI elements
+                Vec2D base_position{
+                    0.0f,
+                    player_transform.position.y + VERTICAL_OFFSET
+                };
+
+                // Update main UI overlay position
+                ui_transform.position = base_position;
+                ui_transform.prev_position = ui_transform.position;
+
+                // Position oxygen meter (top meter)
+                if (oxygen_meter_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(oxygen_meter_id)) {
+                    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                    // Set position and scale for oxygen meter
+                    oxygen_transform.position = {
+                        base_position.x - METER_WIDTH,  // Center horizontally
+                        base_position.y                 // Top position
+                    };
+                    oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                    oxygen_transform.prev_position = oxygen_transform.position;
+                }
+
+                // Position oxygen text
+                if (oxygen_text_id != INVALID_ENTITY_ID && 
+                    ECSM.has_component<Transform2D>(oxygen_text_id)) { 
+                    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
+                    //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
+                    auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                    // Position text to the left of the oxygen meter
+                    oxygen_text_transform.position = {
+                        (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
+                        oxygen_transform.position.y // Vertically centered with oxygen meter
+                    };
+                    oxygen_text_transform.prev_position = oxygen_text_transform.position;
+                }
+
+                // Position panic meter (bottom meter)
+                if (panic_meter_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(panic_meter_id)) {
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+
+                    // Set position and scale for panic meter
+                    panic_transform.position = {
+                        base_position.x - METER_WIDTH,          // Center horizontally
+                        base_position.y - METER_SPACING         // Below oxygen meter
+                    };
+                    panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                    panic_transform.prev_position = panic_transform.position;
+                }
+
+                // Position panic text
+                if (panic_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(panic_text_id)) {
+                    auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id); 
+
+                    // Position text to the left of the panic meter
+                    panic_text_transform.position = {
+                        (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
+                        panic_transform.position.y  // Vertically centered with panic meter
+                    };
+                    panic_text_transform.prev_position = panic_text_transform.position;
+                }
+
+                // Position mineral texture on the right side
+                if (mineral_texture_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) {
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
+
+                    mineral_transform.position = {
+                        base_position.x,                         // Center position
+                        base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
+                    };
+                    mineral_transform.prev_position = mineral_transform.position;
+                }
+
+                // Position mineral count text
+                if (mineral_count_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(mineral_count_text_id) && 
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) { 
+                    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id); 
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id); 
+
+                    constexpr float MINERAL_COUNT_OFFSET = 40.0f;
+                    // Position text to the right of the mineral texture
+                    mineral_count_text_transform.position = {
+                        (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
+                        mineral_transform.position.y  - TEXT_OFFSET_Y  // Vertically centered with mineral icon
+                    };
+                    mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
+                }
+            }
+
+            //cheat code in mining
+            if (IM.is_key_pressed(GLFW_KEY_H)) {
+                if (mining_strength == DEFAULT_STRENGTH) {
+                    mining_strength = GOD_STRENGTH;
+                }
+                else {
+                    mining_strength = DEFAULT_STRENGTH;
+                }
+                std::cout << "mining strength: " << mining_strength << std::endl;
+            }
+
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_LEFT;
+
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Destroy the colliding block on the left
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
+                            }
+
+                            // Destroy the block and update mineral count when health reaches 0
+                            if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
+                            }
                         }
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_RIGHT;
+
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Destroy the colliding block on the right
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
+                            }
+
+                            // Destroy the block and update mineral count when health reaches 0
+                            if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
+                            }
                         }
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_UP)) {
-                    // Note: You might need to add top collision detection in Collision System
-                    // Similar to left/right collisions
                     if (CS.has_top_collide_detect()) {
                         EntityID block_to_remove = CS.get_top_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Destroy the colliding block on the right
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
+                            }
+
+                            // Destroy the block and update mineral count when health reaches 0
+                            if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
+                            }
                         }
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_DOWN;
+
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Destroy the colliding block below
-                            ECSM.destroy_entity(block_to_remove);
-                            LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                            // Update tile health
+                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                            if (animation.curr_tile_health > 0) {
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
+                            }
+
+                            // Destroy the block and update mineral count when health reaches 0
+                            if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
+                                ECSM.destroy_entity(block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
+                            }
                         }
                     }
                 }
 
+                //cheat code to increase mineral
+                if (IM.is_key_held(GLFW_KEY_G)) {
+                    int val_to_add = 500;
+                    update_mineral_count_text(val_to_add);
+                }
+
+
+                // Mining animations
+                if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_LEFT;
+                    int& direction = GFXM.get_player_direction();
+                    direction = FACE_LEFT; 
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_UP)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_UP;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_DOWN;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_RIGHT;
+                    int& direction = GFXM.get_player_direction(); 
+                    direction = FACE_RIGHT; 
+
+                }
+                else {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = NO_ACTION;
+                }
+                auto& mining_status = GFXM.get_mining_status();
+              
 
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
@@ -382,12 +587,26 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_LEFT;
+                    direction = FACE_LEFT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_LEFT;
 
                     // Update sound effect for player moving left
                     if (physics.get_is_grounded()) {
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                        if (current_scene == 1) {
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                        } else if (current_scene == 2) {
+                            // Generate a random number between 1 and 3
+                            int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                            // Create the file path by appending the random number to "Walking_0"
+                            std::string key = "moving " + std::to_string(randomNumber);
+                            LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
+                            //play walking sound
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
+                        }
                     }
+                    //std::cout << "moving left current scene number is " << current_scene << std::endl;
                 }
                 else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
                     // Update forces
@@ -397,11 +616,24 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_RIGHT;
+                    direction = FACE_RIGHT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_RIGHT;
 
                     // Update sound effect for player moving right
                     if (physics.get_is_grounded()) {
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                        if (current_scene == 1) {
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                        } else if (current_scene == 2) {
+                            // Generate a random number between 1 and 3
+                            int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                            // Create the file path by appending the random number to "Walking_0"
+                            std::string key = "moving " + std::to_string(randomNumber);
+                            LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
+                            //play walking sound
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
+                        }
                     }
                 }
                 else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
@@ -412,11 +644,25 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_LEFT;
+                        direction = FACE_LEFT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_LEFT;
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                            if (current_scene == 1) {
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                            }
+                            else if (current_scene == 2) {
+                                // Generate a random number between 1 and 3
+                                int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                                // Create the file path by appending the random number to "Walking_0"
+                                std::string key = "moving " + std::to_string(randomNumber);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
+                                //play walking sound
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
+                            }
                         }
                     }
                     else {
@@ -427,11 +673,25 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_RIGHT;
+                        direction = FACE_RIGHT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_RIGHT;
 
                         // Update sound effect for player moving right
                         if (physics.get_is_grounded()) {
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                            if (current_scene == 1) {
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                            }
+                            else if (current_scene == 2) {
+                                // Generate a random number between 1 and 3
+                                int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                                // Create the file path by appending the random number to "Walking_0"
+                                std::string key = "moving " + std::to_string(randomNumber);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
+                                //play walking sound
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
+                            }
                         }
                     }
                 }
@@ -441,8 +701,8 @@ namespace lof {
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                     forces_flag = -1;
 
-                    int& direction = GFXM.get_player_direction();
-                    direction = -1;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = NO_ACTION;
                 }
 
             }
@@ -478,116 +738,102 @@ namespace lof {
             mode = GL_FALSE;
         }
 
-#if 0
-        // Object  when up and down arrow keys pressed
-        if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
-            int& flag = GFXM.get_scale_flag();
-            flag = GLFW_KEY_UP;
-        }
-        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
-            int& flag = GFXM.get_scale_flag();
-            flag = GLFW_KEY_DOWN;
-        }
-        else if (IM.is_key_held(GLFW_KEY_UP) && IM.is_key_held(GLFW_KEY_DOWN)) {
-            int& flag = GFXM.get_scale_flag();
-            if (flag == GLFW_KEY_UP) {
-                flag = GLFW_KEY_UP;
-            }
-            else {
-                flag = GLFW_KEY_DOWN;
-            }
-        }
-        else {
-            int& flag = GFXM.get_scale_flag();
-            flag = 0;
-        }
-#endif
-        if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            /*if (select_entity)
-            {
-                selectedID = selectedEntityInfo.selectedEntity;
-            }*/
-
-
-        }
-
-        //std::cout << selectedID << "in game manager\n";
-
-
+        // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #if 1
-        //std::cout << "bool if is selected (1 is selected, 0 is not): " << select_entity << "\n";
-       // std::cout << select_entity << " this is select entity\n";
-        //if (select_entity && selectedID != -1 && level_editor_mode) {
-        //    auto& transform = ECSM.get_component<Transform2D>(selectedID);
-        //    auto& collision = ECSM.get_component<Collision_Component>(selectedID);
+        ESS.Check_Selected_Entity();
 
-        //    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-        //    GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
-        //    // Example: Scaling the selected entity
-        //    if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
-        //        // Increase the size of the selected entity
-        //        transform.scale.x += scale_change;
-        //        transform.scale.y += scale_change;
-        //        collision.width += scale_change;
-        //        collision.height += scale_change;
-        //    }
-        //    else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
-        //        // Increase the size of the selected entity
-        //        if (transform.scale.x > 0.0f) {
-        //            transform.scale.x -= scale_change;
-        //            collision.width -= scale_change;
-        //        }
-        //        else {
-        //            transform.scale.x = 0.0f;
-        //            collision.width = 0.0f;
-        //        }
+        // Check if the left mouse button was pressed
+        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
-        //        if (transform.scale.y > 0.0f) {
-        //            transform.scale.y -= scale_change;
-        //            collision.height -= scale_change;
-        //        }
-        //        else {
-        //            transform.scale.y = 0.0f;
-        //            collision.height = 0.0f;
-        //        }
-        //    }
-        //    else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
-        //    {
-        //        transform.orientation.x += rot_change;
-        //    }
-        //    else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
-        //    {
-        //        transform.orientation.x -= rot_change;
-        //    }
-        //}
-#endif 
+            if (selectedEntityInfo.isSelected) {
+                select_entity = true;
+                selectedID = selectedEntityInfo.selectedEntity;
 
-#if 0
-        // Object rotation when left and right arrow keys pressed
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
-            int& flag = GFXM.get_rotation_flag();
-            flag = GLFW_KEY_LEFT;
-        }
-        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))) {
-            int& flag = GFXM.get_rotation_flag();
-            flag = GLFW_KEY_RIGHT;
-        }
-        else if (IM.is_key_held(GLFW_KEY_LEFT) && IM.is_key_held(GLFW_KEY_RIGHT)) {
-            int& flag = GFXM.get_rotation_flag();
-            if (flag == GLFW_KEY_LEFT) {
-                flag = GLFW_KEY_LEFT;
+            /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
+
             }
             else {
-                flag = GLFW_KEY_RIGHT;
+                select_entity = false;
+                selectedID = -1;
+
             }
         }
-        else {
-            int& flag = GFXM.get_rotation_flag();
-            flag = 0;
+
+        
+        if (level_editor_mode && selectedID != -1)
+        {
+            // First check if entity has required components
+            if (!ECSM.has_component<Transform2D>(selectedID)) {
+                std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
+                return;
+            }
+
+            auto& transform = ECSM.get_component<Transform2D>(selectedID);
+            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+            GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+
+            // Check if entity has collision component before using it
+            bool has_collision = ECSM.has_component<Collision_Component>(selectedID);
+            Collision_Component* collision = nullptr;
+            if (has_collision) {
+                collision = &ECSM.get_component<Collision_Component>(selectedID);
+            }
+
+            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
+            {
+                std::cout << selectedID << " scaling up in level editor\n";
+                transform.scale.x += scale_change;
+                transform.scale.y += scale_change;
+
+                if (collision) {
+                    collision->width += scale_change;
+                    collision->height += scale_change;
+                }
+            }
+            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP)))
+            {
+
+                if (transform.scale.x > 0.0f) {
+                    transform.scale.x -= scale_change;
+                    if (collision) {
+                        collision->width -= scale_change;
+                    }
+                }
+                else {
+                    transform.scale.x = 0.0f;
+                    if (collision) {
+                        collision->width = 0.0f;
+                    }
+                }
+
+                if (transform.scale.y > 0.0f) {
+                    transform.scale.y -= scale_change;
+                    if (collision) {
+                        collision->height -= scale_change;
+                    }
+                }
+                else {
+                    transform.scale.y = 0.0f;
+                    if (collision) {
+                        collision->height = 0.0f;
+                    }
+                }
+            }
+            else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
+            {
+                transform.orientation.x += rot_change;
+            }
+            else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
+            {
+                transform.orientation.x -= rot_change;
+            }
         }
+        // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #endif
-
-
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE) {
@@ -710,15 +956,18 @@ namespace lof {
                         velocity.velocity = Vec2D(0.0f, 0.0f);
                     }
                 }
+
+               
             }
             else {
                 LM.write_log("Game_Manager::update(): Failed to load scene%d: %s", current_scene, scene_path.c_str());
                 // Revert the scene number since load failed
                 current_scene = (current_scene == 1) ? 2 : 1;
             }
+
+            std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
+            IMGUIM.set_current_file_shown(get_file_name);
         }
-
-
 
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -751,6 +1000,75 @@ namespace lof {
 
     int Game_Manager::get_step_count() const {
         return m_step_count;
+    }
+
+    int Game_Manager::get_mineral_value(EntityID block_id) const {
+        if (!ECSM.has_component<Animation_Component>(block_id)) {
+            return 0;
+        }
+
+        auto* entity = ECSM.get_entity(block_id);
+        if (!entity) {
+            return 0;
+        }
+
+        const std::string& name = entity->get_name();
+        LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
+
+        // Match the prefab names with their corresponding values
+        if (name.find("quartz") != std::string::npos) {
+            LM.write_log("Found quartz mineral, value: 100");
+            return 100;
+        }
+        if (name.find("emerald") != std::string::npos) {
+            LM.write_log("Found emerald mineral, value: 800");
+            return 800;
+        }
+        if (name.find("sapphire") != std::string::npos) {
+            LM.write_log("Found sapphire mineral, value: 1600");
+            return 1600;
+        }
+        if (name.find("amethyst") != std::string::npos) {
+            LM.write_log("Found amethyst mineral, value: 2400");
+            return 2400;
+        }
+        if (name.find("citrine") != std::string::npos) {
+            LM.write_log("Found citrine mineral, value: 3200");
+            return 3200;
+        }
+        if (name.find("alexandrite") != std::string::npos) {
+            LM.write_log("Found alexandrite mineral, value: 4000");
+            return 4000;
+        }
+
+        LM.write_log("No mineral value found for this entity");
+        return 0;
+    }
+
+    void Game_Manager::update_mineral_count_text(int value_to_add) {
+        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+        if (text_entity == INVALID_ENTITY_ID) {
+            LM.write_log("Could not find mineral count text entity");
+            return;
+        }
+
+        if (!ECSM.has_component<Text_Component>(text_entity)) {
+            LM.write_log("Mineral count entity does not have Text_Component");
+            return;
+        }
+
+        try {
+            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+            // Convert current text to integer, add new value
+            int current_value = std::stoi(text_comp.text);
+            current_value += value_to_add;
+            // Convert back to string and update text
+            text_comp.text = std::to_string(current_value);
+            LM.write_log("Updated mineral count to: %d", current_value);
+        }
+        catch (const std::exception& e) {
+            LM.write_log("Error updating mineral count: %s", e.what());
+        }
     }
 
 } // namespace lof

@@ -82,6 +82,8 @@ namespace lof {
 	// Animation component constants
 	constexpr const char* DEFAULT_ANIMATION_IDX = "0";
 	constexpr const char* DEFAULT_ANIMATION_NAME = "NoAnimation";
+	constexpr unsigned int DEFAULT_TILE_HEALTH = 2;
+
 
 	//Audio component constants
 	enum AudioType {
@@ -148,6 +150,18 @@ namespace lof {
 	constexpr float DEFAULT_FRAME_TIME_ELAPSED = 0.0f;
 	constexpr float DEFAULT_Y_OFFSET = 1.0f;
 
+	enum PlayerAnimation {
+		NO_ACTION, 
+		FACE_LEFT,
+		FACE_RIGHT,
+		RUN_LEFT,
+		RUN_RIGHT,
+		MINE_LEFT,
+		MINE_RIGHT,
+		MINE_UP,
+		MINE_DOWN
+	};
+
 	// ------------------------------ Collision_System.cpp --------------------------------
 	constexpr const float         BOUNDING_RECT_SIZE = 1.0f;
 	constexpr const unsigned int	COLLISION_LEFT = 0x00000001;	//0001
@@ -165,6 +179,10 @@ namespace lof {
 	constexpr float DEFAULT_GUI_IMAGE_OFFSET = 150.0f;
 	constexpr float DEFAULT_GUI_IMAGE_SIZE = 100.0f;
 	constexpr float DEFAULT_GUI_VERTICAL_SPACING = 50.0f;
+
+	// --------------------------- Cheat Code --------------------------------
+	constexpr unsigned int DEFAULT_STRENGTH = 1;		//normal strength
+	constexpr unsigned int GOD_STRENGTH = 20;			//extra god strength
 
 } // namespace lof
 

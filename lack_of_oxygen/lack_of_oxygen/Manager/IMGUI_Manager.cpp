@@ -32,6 +32,8 @@ namespace lof {
 
     //constants to replace
     int selected_file_index = -1;
+    int prev_file_selected = -1;
+
     int selected_object_index = -1;
     bool load_selected = false;
     bool show_window = false;
@@ -47,6 +49,13 @@ namespace lof {
     //Vector of assigned names
     std::vector<std::string> assigned_names;
 
+    
+    
+    static bool mouse_was_down = false;
+    static ImVec2 mouse_pos_before_press;
+    static bool mouse_prev_down = false;
+    
+    
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -77,6 +86,14 @@ namespace lof {
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
 
+        fill_up_sound_names();
+
+        return 0;
+    }
+
+
+    void IMGUI_Manager::fill_up_sound_names() {
+        
         const auto& entities = ecs.get_entities();
         for (auto& entity : entities) {
 
@@ -93,49 +110,111 @@ namespace lof {
 
                     fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
 
-                    //std::cout << filepath << std::endl;
-                    //IMGUIM.fill_audio_file_names(filepath.c_str());
-                    //std::cout << filepath.substr(last_slash + 1, last_dot - last_slash -1) << std::endl;
-                    //IMGUIM.fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1).c_str());
+
                 }
             }
-
         }
 
-        
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
         audio_types.push_back(std::make_pair("SFX", (AudioType)1));
         audio_types.push_back(std::make_pair("NIL", (AudioType)2));
-
-        return 0;
     }
 
     void IMGUI_Manager::display_loading_options() {
 
-        int current_object_index = 0;
-
         ImGui::Begin("File List");
-        selected_file_index = current_object_index;
+
+        const std::string SCENES = "Scenes";
+        std::string level_path = ASM.get_full_path(SCENES, "");
+        std::vector<std::string> file_names;
+
+        // Iterate through the directory and collect file names
+        for (const auto& entry : std::filesystem::directory_iterator(level_path)) {
+            if (entry.is_regular_file()) {  
+                
+                file_names.push_back(entry.path().filename().string());
+            }
+
+        }
+
+        int current_file_index = 0;
+        int shown_file_index = -1;
+
+        std::string selected_file{};
+
+        //iterate through file names
+        for (int i = 0; i < file_names.size(); ++i) {
+
+            if (!file_names[i].empty()) {
+
+                //selectable for clicking; second param for highlighting
+                if (ImGui::Selectable(file_names[i].c_str(), selected_file_index == current_file_index)) {
+
+                    //selected; casuing seceond param state to change
+                    selected_file_index = current_file_index;
+                }
+
+                if (file_names[i] == get_current_file_shown()) {
+                    shown_file_index = i;
+                }
+
+            }
+
+            ++current_file_index;
+        }
+
+        if (selected_file_index != -1) {
+            selected_file = file_names[selected_file_index];
+        }
+        
         if (ImGui::Button("Load Scene")) {
-            load_selected = !load_selected;
+            load_selected = true;
+            
         }
+   
         ImGui::End();
+        if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
 
-        if (load_selected && (selected_file_index != -1)) {
-            const std::string SCENES = "Scenes";;
-            if (SM.load_scene(ASM.get_full_path(SCENES, "scene1.scn").c_str())) {
+            const std::string SCENES = "Scenes";
+            if (SM.load_scene(ASM.get_full_path(SCENES, selected_file).c_str())) {
 
-                //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
+                //if (SM.load_scene(ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn"))){
+                    //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
+                //to get second scene file
+                /*const std::string scenes = "Scenes";
+                    if (ASM.get_full_path(scenes, "Scene2"))
+                    {
 
-                load_selected = !load_selected;
+                    }*/
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Reset player position if exists
+                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (player_id != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Transform2D>(player_id)) {
+                        auto& transform = ECSM.get_component<Transform2D>(player_id);
+                        transform.position = Vec2D(0.0f, 0.0f);
+                        transform.prev_position = transform.position;
+                    }
+                    if (ECSM.has_component<Velocity_Component>(player_id)) {
+                        auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
+                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                    }
+                }
+
+                //load_selected = !load_selected;
+                set_current_file_shown(selected_file);
             }
-            else {
 
-                //LM.write_log("IMGUI_Manager::display_loading_options(): Failed to load %s.", Path_Helper::get_scene_path());
-
-                load_selected = !load_selected;
-            }
+            //prev_file_selected = selected_file_index;
+            load_selected = false;
         }
+
+        
     }
 
     void IMGUI_Manager::start_frame() {
@@ -143,7 +222,6 @@ namespace lof {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
-
 
     //Gets mouse position in terms of game world
     ImVec2 IMGUI_Manager::get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
@@ -272,9 +350,11 @@ namespace lof {
             ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
             if (texture) {
+
                 ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
 
+            //-----------------------------------------For mouse----------------------------------------//
             // Get the mouse position in terms of IMGUI screen
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
 
@@ -291,6 +371,9 @@ namespace lof {
             if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
                 mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
 
+                ImGui::Text("Mouse_Pos: %.2f, %.2f", Mouse_Pos.x, Mouse_Pos.y);
+
+                //-------------------------------clicking----------------------------------//
                 //Click with  mouse
                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
@@ -298,20 +381,11 @@ namespace lof {
                     if (selectedEntityInfo.isSelected) {
                         select_entity = true;
                         selectedEntityID = selectedEntityInfo.selectedEntity;
-
-                        std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
                         LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
-
                     }
                     else {
-
                         select_entity = false;
-
                         selectedEntityID = selectedEntityInfo.selectedEntity;
-                        std::cout << "No entity is selected.\n";
-                        std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n\n";
-
-                  
                     }
                 }
                 else {
@@ -324,95 +398,58 @@ namespace lof {
                     selected_object_index = selectedEntityID;
                 }
 
-                static ImVec2 previousMousePos;    // Previous mouse position
-                static bool mouse_was_down = false;
+                //-------------------------------dragging----------------------------------//
 
-                
-                bool isDragging = false;
-                Vec2D Drag_Offset;
+                static ImVec2 selected_entity_start_pos;
                 auto& entities = ecs.get_entities();
-                ImVec2 currentMousePos = ImGui::GetMousePos();
 
-                //calculate
+                //Drag with mouse
                 if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
 
-                    mouse_clicked_or_dragged = true;
-
+                    //if mouse was previously down
                     if (!mouse_was_down) {
-
-                        mouse_was_down = true;
-                        previousMousePos = currentMousePos;
-
-                    }
-                    else {
-
-                        // Get the mouse position in terms of IMGUI screen
-                        ImVec2 mouse_pos = ImGui::GetIO().MousePos;
-                        ImVec2 texture_pos = ImGui::GetCursorScreenPos();
-
-                        //Gets mouse position in terms of game world
-                        Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
-
-                        
-                        auto& entities_change = ecs.get_entities();
+                       
+                        //get mouse position before mouse is held down
+                        mouse_pos_before_press = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
 
                         if (selectedEntityInfo.isSelected) {
-
-                            if (entities_change[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities_change[selectedEntityID].get()->get_id());
-
-                                auto& position = transform.position;
-
-                                position.x = Mouse_Pos.x;
-                                position.y = Mouse_Pos.y;
-
-                                auto& prev_position = transform.prev_position;
-                                prev_position = position;
-
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                selected_entity_start_pos.x = transform.position.x;
+                                selected_entity_start_pos.y = transform.position.y;
                             }
-                            
-
-                            selected_object_index = selectedEntityID;
                         }
+                        mouse_was_down = true;
 
-                        /*if (selectedEntityInfo.isSelected) {
-                            if (entities_change[selectedEntityID]) {
+                    }
+                    else { //mouse is not previously down
 
-                                std::cout << "entity dragged;" << std::endl;
+                        ImVec2 dragged_offset;
+                        dragged_offset.x = Mouse_Pos.x - mouse_pos_before_press.x;
+                        dragged_offset.y = Mouse_Pos.y - mouse_pos_before_press.y;
 
-                                if (entities_change[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                    std::cout << "entity has transformation component;" << std::endl;
+                        if (selectedEntityInfo.isSelected) {
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                
+                                transform.position.x = selected_entity_start_pos.x + dragged_offset.x;
+                                transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
+                                transform.prev_position.x = transform.position.x;
+                                transform.prev_position.y = transform.position.y;
 
-                                    Transform2D& transform = ecs.get_component<Transform2D>(entities_change[selectedEntityID].get()->get_id());
-
-                                    auto& position = transform.position;
-
-                                    position.x = Mouse_Pos.x;
-                                    position.y = Mouse_Pos.y;
-
-                                    auto& prev_position = transform.prev_position;
-                                    prev_position = position;
-
-                                }
                             }
 
-                            selected_object_index = selectedEntityID;
-                        }*/
+                        }
 
                     }
 
-                    //selected_object_index = selectedEntityID;
-
                 }
-                else {
-
-                    mouse_clicked_or_dragged = false;
+                else { //mouse is now down
+                    
                     mouse_was_down = false;
-                }
+                }    
             
             }
-
 
             ImGui::Separator();
             if (selectedEntityID == -1)
@@ -428,7 +465,7 @@ namespace lof {
 
         //asset manager to be added later
         ImGui::Begin("Console");
-        ImGui::Text("Console stuff:\nSelected Object Index: %.f\n", selected_object_index);
+        ImGui::Text("Asset Manager stuff:\nSelected Object Index: %.f\n", selected_object_index);
         ImGui::Text("selectedEntityID: %.f", selectedEntityID);
         ImGui::End();
 
@@ -463,9 +500,6 @@ namespace lof {
                     selected_object_index = current_object_index;
                 }
 
-          
-
-
             }
 
             ++current_object_index;
@@ -485,12 +519,22 @@ namespace lof {
             create_game_obj = !create_game_obj;
         }
 
+
         if (ImGui::Button("Save Changes")) {
             const std::string SCENES = "Scenes";
-            std::string scene_path = ASM.get_full_path(SCENES, "scene1.scn");
+
+            std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
             if (SM.save_game_state(scene_path.c_str())) {
+                
                 //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
+                
+                audio_file_names.clear();
+                audio_types.clear();
+
+                fill_up_sound_names();
+
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
+
             }
             else {
                 //LM.write_log("IMGUI_Manager::update(): Failed to initate save game state to %s", Path_Helper::get_scene_path().c_str());
@@ -1020,6 +1064,15 @@ namespace lof {
 
         std::cout << "key is: " << audio_file_name << "\nfilepath is: " << audio_filepath_name << std::endl;
     }
+
+
+    void IMGUI_Manager::set_current_file_shown(std::string current_file) {
+        current_file_shown = current_file;
+    }
+    std::string IMGUI_Manager::get_current_file_shown() {
+        return current_file_shown;
+    }
+
 
     void IMGUI_Manager::render() {
         // Rendering

@@ -21,6 +21,7 @@
 // Include other necessary headers
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
+#include "../System/GUI_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Main/Main.h" // for extern
@@ -57,9 +58,9 @@ namespace lof {
         max.x = transform.prev_position.x + (collision.width / 2.0f);
         max.y = transform.prev_position.y + (collision.height / 2.0f);
 
-        LM.write_log("Creating AABB for entity at (%.2f, %.2f) with size (%.2f, %.2f)",
-            transform.prev_position.x, transform.prev_position.y,
-            collision.width, collision.height);
+        //LM.write_log("Creating AABB for entity at (%.2f, %.2f) with size (%.2f, %.2f)",
+        //    transform.prev_position.x, transform.prev_position.y,
+        //    collision.width, collision.height);
 #endif
 #if 0
         // Use the actual world position
@@ -317,8 +318,8 @@ namespace lof {
                 side = (dy > 0) ? CollisionSide::BOTTOM : CollisionSide::TOP;
             }
         }
-        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
 
+        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
         //return CollisionSide::NONE; // No collision
         return side;
     }
@@ -740,11 +741,11 @@ namespace lof {
 
             }
 
-            if (check_non_collidable_entities == 3)
+            if (check_non_collidable_entities == 2)
             {
                 mineral_tank = check_non_collidable_entities;
             }
-            else if (check_non_collidable_entities == 4)
+            else if (check_non_collidable_entities == 3)
             {
                 oxygen_tank = check_non_collidable_entities;
             }
@@ -1248,6 +1249,28 @@ namespace lof {
         //EntityID test = get_left_collide_entity();
 
         Colliside_Oxygen_Mineral(delta_time);
+
+        // Find GUI System to trigger interface
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                // Check mineral tank collision
+                if (mineral_tank_detected() != -1) {
+                    gui_system->show_mineral_tank_gui();
+                }
+                else {
+                    gui_system->hide_mineral_tank_gui();
+                }
+
+                // Check oxygen tank collision
+                if (oxygen_tank_detected() != -1) {
+                    gui_system->show_oxygen_tank_gui();
+                }
+                else {
+                    gui_system->hide_oxygen_tank_gui();
+                }
+                break;
+            }
+        }
 
         //sprintf("this is the entity left %d\n", test);
         //printf("entity left: %d\n", has_left_collide_detect());

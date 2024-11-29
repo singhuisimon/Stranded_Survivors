@@ -78,7 +78,7 @@ namespace lof
     }
 #endif
 
-#if 1
+#if 0
     void Entity_Selector_Helper::Check_Selected_Entity()
     {
         bool entitySelected = false;
@@ -93,9 +93,9 @@ namespace lof
             EntityID entityID = entity->get_id();
 
             // Skip background entity (entity 0) with large scale
-            if (entityID == 0) {
+           /* if (entityID == 0) {
                 continue;
-            }
+            }*/
 
             if (!ECSM.has_component<Transform2D>(entityID)) {
                 continue;
@@ -135,31 +135,111 @@ namespace lof
             }
         }
 
+        //printf("selected entity: %d\n", selectedEntityID);
+
       
-        if (!entitySelected) {
-            // Check the background entity (assumed entityID = 0) if no other entities were selected
-            EntityID backgroundEntityID = 0; // Background entity ID
-            if (ECSM.has_component<Transform2D>(backgroundEntityID)) {
-                auto& transform = ECSM.get_component<Transform2D>(backgroundEntityID);
-                float backgroundX = transform.position.x;
-                float backgroundY = transform.position.y;
-                float backgroundWidth = transform.scale.x;
-                float backgroundHeight = transform.scale.y;
+        //if (!entitySelected) {
+        //    // Check the background entity
+        //    EntityID backgroundEntityID = 0; // Background entity ID
+        //    if (ECSM.has_component<Transform2D>(backgroundEntityID)) {
+        //        auto& transform = ECSM.get_component<Transform2D>(backgroundEntityID);
+        //        float backgroundX = transform.position.x;
+        //        float backgroundY = transform.position.y;
+        //        float backgroundWidth = transform.scale.x;
+        //        float backgroundHeight = transform.scale.y;
 
-                Update_Selected_Entity_Info(backgroundEntityID, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
-                EntityInfo selectedInfo = g_selected_entity_info;
+        //        Update_Selected_Entity_Info(backgroundEntityID, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
+        //        EntityInfo selectedInfo = g_selected_entity_info;
 
-                if (selectedInfo.isSelected) {
-                    selectedEntityID = backgroundEntityID; // Background is selected
-                }
-            }
-        }
+        //        if (selectedInfo.isSelected) {
+        //            selectedEntityID = backgroundEntityID; // Background is selected
+        //        }
+        //    }
+        //}
 
         
     }
 
 #endif
+    void Entity_Selector_Helper::Check_Selected_Entity()
+    {
+        bool entitySelected = false;
+        EntityID selectedEntityID = -1;
 
+        const auto& entities = ECSM.get_entities();
+
+        // a vector of entities with their sizes for sorting
+        struct EntitySize {
+            EntityID id;
+            float size;  
+        };
+        std::vector<EntitySize> sortedEntities;
+
+        // Collect all entities and their sizes
+        for (const auto& entity : entities)
+        {
+            EntityID entityID = entity->get_id();
+
+            if (!ECSM.has_component<Transform2D>(entityID)) {
+                continue;
+            }
+
+            auto& transform = ECSM.get_component<Transform2D>(entityID);
+            float width = transform.scale.x;
+            float height = transform.scale.y;
+
+            if (ECSM.has_component<Collision_Component>(entityID)) {
+                auto& collision = ECSM.get_component<Collision_Component>(entityID);
+                width = collision.width;
+                height = collision.height;
+            }
+
+            // Calculate total area
+            float area = width * height;
+            sortedEntities.push_back({ entityID, area });
+        }
+
+        // Sort entities by size (smallest to largest) //lambda function
+        std::sort(sortedEntities.begin(), sortedEntities.end(),
+            [](const EntitySize& a, const EntitySize& b) {
+                return a.size < b.size;
+            });
+
+        // Check entities from smallest to largest
+        for (const auto& entitySize : sortedEntities)
+        {
+            EntityID entityID = entitySize.id;
+            auto& transform = ECSM.get_component<Transform2D>(entityID);
+
+            float entityX = transform.position.x;
+            float entityY = transform.position.y;
+            float entityWidth = transform.scale.x;
+            float entityHeight = transform.scale.y;
+
+            if (ECSM.has_component<Collision_Component>(entityID)) {
+                auto& collision = ECSM.get_component<Collision_Component>(entityID);
+                entityWidth = collision.width;
+                entityHeight = collision.height;
+            }
+
+            
+            Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
+
+            if (g_selected_entity_info.isSelected) {
+                entitySelected = true;
+                selectedEntityID = entityID;
+               
+                break;  // Stop at first hit, which will be the smallest entity at that position
+            }
+        }
+
+        // If nothing was selected, clear the selection
+        if (!entitySelected) {
+            g_selected_entity_info.isSelected = false;
+            g_selected_entity_info.selectedEntity = -1;
+            
+        }
+    }
     
 #if 1
     void Entity_Selector_Helper::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)

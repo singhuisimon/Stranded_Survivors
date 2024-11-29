@@ -63,6 +63,8 @@ namespace lof {
 
         ImVec2 Mouse_Pos;
 
+        std::string current_file_shown;
+
     public:
 
         /**
@@ -167,6 +169,13 @@ namespace lof {
         ImVec2 get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 
         ImVec2 imgui_mouse_pos();
+
+        bool imgui_toggle_files(int& current_scene);
+
+        void set_current_file_shown(std::string current_file);
+        std::string get_current_file_shown();
+
+        void fill_up_sound_names();
     };
 
 } // namespace lof

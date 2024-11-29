@@ -130,6 +130,9 @@
     <Image Include="Assets\Textures\Explosion radius_Batch 4.png" />
     <Image Include="Assets\Textures\Lava Vignette_Batch 4.png" />
     <Image Include="Assets\Textures\Lava_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_Bar_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_BG_Batch 4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch 4.png" />
     <Image Include="Assets\Textures\Mineral_Hopper_Box_Empty_Batch_4.png" />
     <Image Include="Assets\Textures\Mineral_Hopper_Box_Filled_Batch_4.png" />
     <Image Include="Assets\Textures\Mineral_Hopper_Conveyor_Empty_Batch_4.png" />
@@ -152,7 +155,8 @@
     <Image Include="Assets\Textures\Skybox_ALL.png" />
     <Image Include="Assets\Textures\Snowflake.png" />
     <Image Include="Assets\Textures\Spritesheet_Animate.png" />
-    <Image Include="Assets\Textures\Spritesheet_Test.png" />
+    <Image Include="Assets\Textures\Spritesheet_Map.png" />
+    <Image Include="Assets\Textures\Spritesheet_Player.png" />
     <Image Include="Assets\Textures\Sun.png" />
     <Image Include="Assets\Textures\TNT.png" />
     <Image Include="Assets\Textures\TNT_Batch_4.png" />
@@ -317,7 +321,7 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q

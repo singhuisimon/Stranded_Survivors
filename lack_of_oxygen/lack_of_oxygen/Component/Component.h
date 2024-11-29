@@ -292,10 +292,14 @@ namespace lof {
         std::map<std::string, std::string> animations; 
         unsigned int curr_animation_idx;
         unsigned int start_animation_idx;
+        unsigned int curr_frame_index;
+        unsigned int start_tile_health;
+        unsigned int curr_tile_health;
 
         // Default constructor
         Animation_Component()
-            : curr_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)), start_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)) {
+            : curr_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)), start_animation_idx(std::stoi(DEFAULT_ANIMATION_IDX)),
+              curr_frame_index(DEFAULT_FRAME_INDEX), start_tile_health(DEFAULT_TILE_HEALTH), curr_tile_health(DEFAULT_TILE_HEALTH){
             animations.insert(std::make_pair(DEFAULT_ANIMATION_IDX, DEFAULT_ANIMATION_NAME));
         }
 
@@ -306,8 +310,8 @@ namespace lof {
          * @param start_animation_idx Index of the starting animation.
          */
 
-        Animation_Component(std::pair<std::string, std::string> animation, int curr_animation, int start_animation) :
-            curr_animation_idx(curr_animation), start_animation_idx(start_animation) {
+        Animation_Component(std::pair<std::string, std::string> animation, unsigned int curr_animation, unsigned int start_animation, unsigned int curr_frame, unsigned int start_health) :
+            curr_animation_idx(curr_animation), start_animation_idx(start_animation), curr_frame_index(curr_frame), start_tile_health(start_health), curr_tile_health(start_health){
             animations.insert(animation);
         }
     };
@@ -670,9 +674,10 @@ namespace lof {
         std::string font_name;
         std::string text;
         glm::vec3 color;
+        glm::vec2 scale;
 
         // Default constructor
-        Text_Component() : font_name(DEFAULT_FONT_NAME), text(DEFAULT_FONT_NAME), color(DEFAULT_COLOR) {}
+        Text_Component() : font_name(DEFAULT_FONT_NAME), text(DEFAULT_FONT_NAME), color(DEFAULT_COLOR), scale(glm::vec2(1.0f, 1.0f)) {}
 
         /**
          * @brief Constructor for Text_Component.
@@ -681,8 +686,8 @@ namespace lof {
          * @param color Color of the text.
          */
 
-        Text_Component(std::string name, std::string text, glm::vec3 color) :
-            font_name(name), text(text), color(color) {}
+        Text_Component(std::string name, std::string text, glm::vec3 color, glm::vec2 scale) :
+            font_name(name), text(text), color(color), scale(scale) {}
 
     };
 

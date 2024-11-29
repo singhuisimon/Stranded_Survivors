@@ -150,6 +150,9 @@
     <Image Include="Assets\Textures\Mineral Hopper_Minerals_Batch 4.png" />
     <Image Include="Assets\Textures\Ship Open_Batch_2.png" />
     <Image Include="Assets\Textures\Spritesheet_Test.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_Bar_Batch_4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_BG_Batch 4.png" />
+    <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch 4.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Prisoner_Atlas.txt" />

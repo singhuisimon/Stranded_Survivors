@@ -17,6 +17,8 @@
 // Include base Manager class
 #include "Manager.h"
 
+#include "../Entity/Entity.h"
+
 namespace lof {
     extern float imgui_camara_pos_x;
     extern float imgui_camera_pos_y;
@@ -55,6 +57,20 @@ namespace lof {
 
         // Flag for scn file
         int current_scene = 1;
+
+
+        /**
+         * @brief Determines the mineral value based on the block entity type
+         * @param block_id The EntityID of the block being destroyed
+         * @return The mineral value associated with that block type
+         */
+        int get_mineral_value(EntityID block_id) const;
+
+        /**
+         * @brief Updates the mineral count text in the UI
+         * @param value_to_add The value to add to the current mineral count
+         */
+        void update_mineral_count_text(int value_to_add);
 
     public:
         /**
@@ -109,8 +125,6 @@ namespace lof {
          * @return The number of game loop iterations executed.
          */
         int get_step_count() const;
-
-        
     };
 
 } // namespace lof
