@@ -28,6 +28,7 @@
 #include "../Utility/Constant.h"
 #include "Assets_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
+#include "../Utility/Win_Control.h"
 
 namespace lof {
 
@@ -352,6 +353,7 @@ namespace lof {
             mouse_texture_coord_screen.x = (mouse_pos.x - texture_pos.x);
             mouse_texture_coord_screen.y = (mouse_pos.y - texture_pos.y);
 
+
             //Get camera position and changes
             auto& camera = GFXM.get_camera();
 
@@ -380,17 +382,18 @@ namespace lof {
             }
 
             //Display debug information
-            /*ImGui::Text("0,0 starts at center");
+            ImGui::Text("0,0 starts at center");
             ImGui::Text("Mouse in texture at: (%.2f, %.2f)", mouse_texture_coord_world.x, mouse_texture_coord_world.y);
+            ImGui::Text("Mouse in screen at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
             ImGui::Separator();
             ImGui::Text("");
-            ImGui::Text("Camera: (%.2f, %.2f)", camera.pos_x, camera.pos_y);*/
+            ImGui::Text("Camera: (%.2f, %.2f)", camera.pos_x, camera.pos_y);
 
         }
         else {
 
             //Display debug information
-            /*ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", mouse_pos.x, mouse_pos);*/
+            ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", mouse_pos.x, mouse_pos);
         }
 
         //Return mouse in terms of game world
@@ -404,7 +407,7 @@ namespace lof {
 
 
     bool select_entity = false; // to ensure mouse click selected
-    EntityID selectedEntityID = -1;
+    EntityID selectedEntityID = static_cast<EntityID>(-1);
 
     //Rendering UI
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
@@ -543,18 +546,43 @@ namespace lof {
                     else { //mouse is not previously down
 
                         ImVec2 dragged_offset;
-                        dragged_offset.x = Mouse_Pos.x - mouse_pos_before_press.x;
-                        dragged_offset.y = Mouse_Pos.y - mouse_pos_before_press.y;
+
+                        unsigned int game_scale_width = SM.get_scr_width();
+                        unsigned int game_scale_height = SM.get_scr_height();
+                        //printf("game width, height (%i, %i)\n", game_scale_width, game_scale_height);
+
+                        unsigned int window_width = WC.get_win_width();
+                        unsigned int window_height = WC.get_win_height();
+                        //printf("window width, height (%i, %i)\n", window_width, window_height);
+
+                        float ratio_width = static_cast<float>(game_scale_width) / window_width;
+                        float ratio_height = static_cast<float>(game_scale_height) / window_height;
+                        //printf("ratio width, ratio height (%.f, %.f)\n", ratio_width, ratio_height);
+
+                        if (is_full_screen) {
+                            dragged_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) * ratio_width;
+                            dragged_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) * ratio_height;
+                        }
+                        else {
+                            
+                            dragged_offset.x = Mouse_Pos.x - mouse_pos_before_press.x;
+                            dragged_offset.y = Mouse_Pos.y - mouse_pos_before_press.y;
+                        }
+                        
 
                         if (selectedEntityInfo.isSelected) {
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                            if (selectedEntityID != INVALID_ENTITY_ID)
+                            {
+                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
                                 
-                                transform.position.x = selected_entity_start_pos.x + dragged_offset.x;
-                                transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
-                                transform.prev_position.x = transform.position.x;
-                                transform.prev_position.y = transform.position.y;
+                                    transform.position.x = (selected_entity_start_pos.x + dragged_offset.x) ;
+                                    transform.position.y = (selected_entity_start_pos.y + dragged_offset.y) ;
+                                    transform.prev_position.x = transform.position.x;
+                                    transform.prev_position.y = transform.position.y;
 
+                                }
+                                
                             }
 
                         }
