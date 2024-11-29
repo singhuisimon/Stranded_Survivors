@@ -26,7 +26,7 @@ namespace lof {
 	//initialize the core system
 	Audio_System::Audio_System() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr) {
 		signature.set(ECSM.get_component_id<Audio_Component>());	//initialize the signature set for the audio component
-		//initializegroups();
+
 		if (initialize()) {
 			LM.write_log("successfully initialize audio system.");
 		}
@@ -69,7 +69,20 @@ namespace lof {
 	void Audio_System::update(float delta_time) {
 		(void)delta_time;
 		const auto& entityids = get_entities();
-		std::vector<std::string> stopchannel;
+
+		//if there isn't any entity existing (possibly indicating scene change), clean up everything.
+		if (entityids.empty()) {
+			for (auto it = channel_map.begin(); it != channel_map.end();) {
+				if (it->second) {
+					//it->second->stop();
+					stop_sound(it->first);
+				}
+				it = channel_map.erase(it);
+			}
+			all_prev_filepath_map.clear();
+			return;
+		}
+
 		for (EntityID entityID : entityids) {
 			if (!ECSM.has_component<Audio_Component>(entityID)) {
 				continue;	//need not process if entity has no audio
@@ -99,7 +112,6 @@ namespace lof {
 					break;
 				case STOPPED:
 					stop_sound(key_id);
-					//stopchannel.push_back(key_id);
 					break;
 				case PAUSED:
 					pause_resume_sound(key_id, true);
@@ -108,7 +120,6 @@ namespace lof {
 					pause_resume_sound(key_id, false);
 					break;
 				default:
-					//stopchannel.push_back(key_id);
 					continue;
 				}
 
@@ -124,7 +135,6 @@ namespace lof {
 
 					// Calculate the difference
 					float volumeDiff = std::abs(currvolume - targetVolume);
-					//LM.write_log("Audio_System::Update, Volume Diff: %f (Curr: %f, Target: %f)", volumeDiff, currvolume, targetVolume);
 
 					// Only set volume if the difference exceeds the tolerance
 					if (volumeDiff > epsilon) {
@@ -139,7 +149,6 @@ namespace lof {
 
 					// Calculate the pitch difference
 					float pitchDiff = std::abs(currpitch - targetPitch);
-					//LM.write_log("Audio_System::Update, Pitch Diff: %f (Curr: %f, Target: %f)", pitchDiff, currpitch, targetPitch);
 
 					// Only set pitch if the difference exceeds the tolerance
 					if (pitchDiff > epsilon) {
@@ -203,34 +212,29 @@ namespace lof {
 		return "Audio_System";
 	}
 
-#if 0
-	void Audio_System::load_sound(const std::string& file_path) {
-		if (sound_map.find(file_path) != sound_map.end()) {
-			//sound is already loaded in the map.
-			return;
-		}
-
-
-		LM.write_log("The file path for load_sound is: %s", file_path.c_str());
-		
-		FMOD::Sound* sound = nullptr;
-		FMOD_MODE mode = FMOD_DEFAULT;
-		FMOD_RESULT result = core_system->createSound(file_path.c_str(), mode, 0, &sound);
-		if (errorcheck(result,"Audio_System::load_sound():", "create sound") != 0) {
-			return;
-		}
-		
-		//std::pair<std::string, FMOD::Sound*> pair = std::make_pair(file_path, sound);
-		//sound_map.insert(pair);
-		sound_map[file_path] = sound;
-
-		LM.write_log("Audio_System::load_sound(): Successfully loaded the sound from system.");
-		return;
-	}
-	#endif
-
 	void Audio_System::play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& audio) {
 		
+		//if the audio_key was not recorded before, add it in else check if filepath for current and previous is the same
+		auto it = all_prev_filepath_map.find(audio_key);
+		if (it == all_prev_filepath_map.end()) {
+			all_prev_filepath_map[audio_key] = file_path;
+		}
+		else {
+			if (it->second != file_path) {
+				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch.", it->second.c_str(), audio_key.c_str());
+
+				// Get entityID portion from the current cskey
+				std::string entityID_str = cskey.substr(file_path.length(), cskey.length() - file_path.length() - audio_key.length());
+
+				// Construct old channel key using same pattern but with old filepath
+				std::string old_key_id = it->second + entityID_str + audio_key;
+
+				stop_sound(old_key_id);
+
+				all_prev_filepath_map[audio_key] = file_path;
+			}
+		}
+
 		//check if sound has already been loaded.
 		if (sound_map.find(file_path) == sound_map.end()) {
 			load_sound(file_path);
@@ -257,7 +261,6 @@ namespace lof {
 
 		//find the loaded sound file
 		FMOD::Channel* channel = nullptr;
-		//FMOD::ChannelGroup* group = nullptr;
 
 		FMOD_RESULT result = core_system->playSound(sound->second, nullptr, false, &channel);
 		if (errorcheck(result) != 0 || !channel) {

@@ -41,6 +41,7 @@ namespace lof {
 
     float imgui_camara_pos_x = 0.0f;
     float imgui_camera_pos_y = 0.0f;
+    unsigned int mining_strength = DEFAULT_STRENGTH;
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
@@ -152,6 +153,7 @@ namespace lof {
   
 
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
+    EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
     EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
@@ -366,18 +368,39 @@ namespace lof {
                 }
             }
 
+            //cheat code in mining
+            if (IM.is_key_pressed(GLFW_KEY_H)) {
+                if (mining_strength == DEFAULT_STRENGTH) {
+                    mining_strength = GOD_STRENGTH;
+                }
+                else {
+                    mining_strength = DEFAULT_STRENGTH;
+                }
+                std::cout << "mining strength: " << mining_strength << std::endl;
+            }
+
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_LEFT;
+
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -399,13 +422,23 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_RIGHT;
+
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -433,7 +466,13 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -455,13 +494,23 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_DOWN;
+
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -483,6 +532,49 @@ namespace lof {
                     }
                 }
 
+                //cheat code to increase mineral
+                if (IM.is_key_held(GLFW_KEY_G)) {
+                    int val_to_add = 500;
+                    update_mineral_count_text(val_to_add);
+                }
+
+
+                // Mining animations
+                if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_LEFT;
+                    int& direction = GFXM.get_player_direction();
+                    direction = FACE_LEFT; 
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_UP)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_UP;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_DOWN;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_RIGHT;
+                    int& direction = GFXM.get_player_direction(); 
+                    direction = FACE_RIGHT; 
+
+                }
+                else {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = NO_ACTION;
+                }
+                auto& mining_status = GFXM.get_mining_status();
+              
 
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
@@ -501,7 +593,9 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_LEFT;
+                    direction = FACE_LEFT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_LEFT;
 
                     // Update sound effect for player moving left
                     if (physics.get_is_grounded()) {
@@ -528,7 +622,9 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_RIGHT;
+                    direction = FACE_RIGHT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_RIGHT;
 
                     // Update sound effect for player moving right
                     if (physics.get_is_grounded()) {
@@ -545,7 +641,6 @@ namespace lof {
                             ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
                         }
                     }
-                    //std::cout << "moving right current scene number is " << current_scene << std::endl;
                 }
                 else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
                     if (forces_flag == MOVE_LEFT) {
@@ -555,7 +650,9 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_LEFT;
+                        direction = FACE_LEFT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_LEFT;
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
@@ -582,7 +679,9 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_RIGHT;
+                        direction = FACE_RIGHT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_RIGHT;
 
                         // Update sound effect for player moving right
                         if (physics.get_is_grounded()) {
@@ -608,8 +707,8 @@ namespace lof {
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                     forces_flag = -1;
 
-                    int& direction = GFXM.get_player_direction();
-                    direction = -1;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = NO_ACTION;
                 }
 
             }
@@ -671,7 +770,7 @@ namespace lof {
         }
 
         
-        if (level_editor_mode && selectedID != static_cast<EntityID>(-1))
+        if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
         {
             // First check if entity has required components
             if (!ECSM.has_component<Transform2D>(selectedID)) {
@@ -840,15 +939,6 @@ namespace lof {
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
             std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
-
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "Audio_System") {
-                    auto* audio_system = static_cast<Audio_System*>(system.get());
-                    if (audio_system) {
-                        audio_system->stop_mastergroup();
-                    }
-                }
-            }
 
             // Try to load the new scene
             if (SM.load_scene(scene_path.c_str())) {

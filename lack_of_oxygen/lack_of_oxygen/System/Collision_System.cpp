@@ -900,6 +900,7 @@ namespace lof {
                 else {
                     gui_system->hide_oxygen_tank_gui();
                 }
+
                 break;
             }
         }

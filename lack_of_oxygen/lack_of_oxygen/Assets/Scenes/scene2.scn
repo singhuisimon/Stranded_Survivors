@@ -394,7 +394,7 @@
         "Audio_Component": {
           "sounds": [
             {
-              "key": "jumping",
+              "key": "jumping1",
               "filepath": "Fx01",
               "audio_state": 4,
               "audio_type": 1,
@@ -403,7 +403,7 @@
               "islooping": false
             },
             {
-              "key": "jumping",
+              "key": "jumping2",
               "filepath": "Fx04",
               "audio_state": 4,
               "audio_type": 1,

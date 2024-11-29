@@ -23,6 +23,7 @@
 #include <filesystem>
 #include <vector>
 
+#include "../System/GUI_System.h"
 // Include utility function
 #include "../Utility/Constant.h"
 #include "Assets_Manager.h"
@@ -74,7 +75,7 @@ namespace lof {
         throw std::runtime_error("No-parameter start_up() is disabled in IMGUI_Manager. start_up() now has a parameter GLFWwindow*& window");
     }
 
-    int IMGUI_Manager::start_up(GLFWwindow*& window) {
+    int IMGUI_Manager::start_up(GLFWwindow*& glfwindow) {
         if (is_started()) {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
             return 0; // Already started
@@ -82,7 +83,7 @@ namespace lof {
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplGlfw_InitForOpenGL(glfwindow, true);
         ImGui_ImplOpenGL3_Init();
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
@@ -179,19 +180,23 @@ namespace lof {
             const std::string scenes = "Scenes";
             if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
 
-                //if (SM.load_scene(ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn"))){
-                    //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
-                //to get second scene file
-                /*const std::string scenes = "Scenes";
-                    if (ASM.get_full_path(scenes, "Scene2"))
-                    {
-
-                    }*/
+                selected_object_index = -1;
 
                 // Reset camera position
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+
+                // Update top UI overlay position to follow player
+                EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+                EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
+                EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
+                EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
+
+                EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
+                EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
+                EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
 
                 // Reset player position if exists
                 EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -207,8 +212,120 @@ namespace lof {
                     }
                 }
 
+                if (ui_overlay_id != INVALID_ENTITY_ID) {
+                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                    auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
+
+                    // Define layout constants for vertical stacking
+                    constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
+                    constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
+                    constexpr float METER_WIDTH = 400.0f;            // Width of the meters
+                    constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
+                    //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
+                    constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
+
+                    // Calculate base position for UI elements
+                    Vec2D base_position{
+                        0.0f,
+                        player_transform.position.y + VERTICAL_OFFSET
+                    };
+
+                    // Update main UI overlay position
+                    ui_transform.position = base_position;
+                    ui_transform.prev_position = ui_transform.position;
+
+                    // Position oxygen meter (top meter)
+                    if (oxygen_meter_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(oxygen_meter_id)) {
+                        auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                        // Set position and scale for oxygen meter
+                        oxygen_transform.position = {
+                            base_position.x - METER_WIDTH,  // Center horizontally
+                            base_position.y                 // Top position
+                        };
+                        oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                        oxygen_transform.prev_position = oxygen_transform.position;
+                    }
+
+                    // Position oxygen text
+                    if (oxygen_text_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(oxygen_text_id)) {
+                        auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id);
+                        //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
+                        auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+
+                        // Position text to the left of the oxygen meter
+                        oxygen_text_transform.position = {
+                            (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
+                            oxygen_transform.position.y // Vertically centered with oxygen meter
+                        };
+                        oxygen_text_transform.prev_position = oxygen_text_transform.position;
+                    }
+
+                    // Position panic meter (bottom meter)
+                    if (panic_meter_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(panic_meter_id)) {
+                        auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+
+                        // Set position and scale for panic meter
+                        panic_transform.position = {
+                            base_position.x - METER_WIDTH,          // Center horizontally
+                            base_position.y - METER_SPACING         // Below oxygen meter
+                        };
+                        panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
+                        panic_transform.prev_position = panic_transform.position;
+                    }
+
+                    // Position panic text
+                    if (panic_text_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(panic_text_id)) {
+                        auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
+                        auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+
+                        // Position text to the left of the panic meter
+                        panic_text_transform.position = {
+                            (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
+                            panic_transform.position.y  // Vertically centered with panic meter
+                        };
+                        panic_text_transform.prev_position = panic_text_transform.position;
+                    }
+
+                    // Position mineral texture on the right side
+                    if (mineral_texture_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(mineral_texture_id)) {
+                        auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
+
+                        mineral_transform.position = {
+                            base_position.x,                         // Center position
+                            base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
+                        };
+                        mineral_transform.prev_position = mineral_transform.position;
+                    }
+
+                    // Position mineral count text
+                    if (mineral_count_text_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(mineral_count_text_id) &&
+                        ECSM.has_component<Transform2D>(mineral_texture_id)) {
+                        auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
+                        auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
+
+                        // Position text to the right of the mineral texture
+                        mineral_count_text_transform.position = {
+                            (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
+                            mineral_transform.position.y - TEXT_OFFSET_Y  // Vertically centered with mineral icon
+                        };
+                        mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
+                    }
+                }
+
                 //load_selected = !load_selected;
                 set_current_file_shown(selected_file);
+
+                audio_file_names.clear();
+                audio_types.clear();
+                fill_up_sound_names();
+
             }
 
             //prev_file_selected = selected_file_index;
@@ -354,7 +471,8 @@ namespace lof {
 
             if (texture) {
 
-                ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / static_cast<unsigned int>(2), SCR_HEIGHT / static_cast<unsigned int>(2)), ImVec2(0, 1), ImVec2(1, 0));
+                //ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(static_cast<float>(SCR_WIDTH) / 2, static_cast<float>(SCR_HEIGHT) / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
 
             //-----------------------------------------For mouse----------------------------------------//
@@ -397,7 +515,7 @@ namespace lof {
                     select_entity = false;
                 }
 
-                if (select_entity) {
+                if (select_entity && selectedEntityID != INVALID_ENTITY_ID) {
                     selected_object_index = selectedEntityID;
                 }
 
@@ -407,7 +525,7 @@ namespace lof {
                 auto& entities = ecs.get_entities();
 
                 //Drag with mouse
-                if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && selectedEntityID != INVALID_ENTITY_ID) {
 
                     //if mouse was previously down
                     if (!mouse_was_down) {
@@ -503,6 +621,18 @@ namespace lof {
 
     }
 
+    void IMGUI_Manager::disable_GUI() {
+
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+          
+                gui_system->hide_mineral_tank_gui();
+                gui_system->hide_oxygen_tank_gui();
+     
+            }
+        }
+    }
+
 
     void IMGUI_Manager::imgui_game_objects_list() {
 
@@ -555,12 +685,6 @@ namespace lof {
             if (SM.save_game_state(scene_path.c_str())) {
                 
                 //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
-                
-                audio_file_names.clear();
-                audio_types.clear();
-
-                fill_up_sound_names();
-
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
 
             }
@@ -915,12 +1039,12 @@ namespace lof {
                                 buffer_map[i] = old_key_name;
                             }
 
-                            char Buffer[128];
-                            strncpy_s(Buffer, buffer_map[i].c_str(), sizeof(Buffer));
-                            Buffer[sizeof(Buffer) - 1] = '\0';
+                            char buffer_key[128];
+                            strncpy_s(buffer_key, buffer_map[i].c_str(), sizeof(buffer_key));
+                            buffer_key[sizeof(buffer_key) - 1] = '\0';
 
-                            if (ImGui::InputText(condition_name_key.c_str(), Buffer, sizeof(Buffer))) {
-                                buffer_map[i] = std::string(Buffer); // Save changes to the persistent buffer
+                            if (ImGui::InputText(condition_name_key.c_str(), buffer_key, sizeof(buffer_key))) {
+                                buffer_map[i] = std::string(buffer_key); // Save changes to the persistent buffer
                             }
 
                             // Save button

@@ -141,8 +141,6 @@ int main(void) {
 
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
-    bool lvl_manager_mode = false;
-    bool object_editor_mode = false;
 
     // --------------------------- Retrieve Configuration ---------------------------
 
@@ -241,6 +239,7 @@ int main(void) {
 
         if (level_editor_mode) {
             IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
+            IMGUIM.disable_GUI();
         }
 
         // Rendering

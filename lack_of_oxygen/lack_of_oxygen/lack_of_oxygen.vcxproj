@@ -123,6 +123,17 @@
     <None Include="Data\triangle.msh" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="Assets\Audio\audio_test1.wav" />
+    <Media Include="Assets\Audio\audio_test2.wav" />
+    <Media Include="Assets\Audio\Fx01.wav" />
+    <Media Include="Assets\Audio\Fx04.wav" />
+    <Media Include="Assets\Audio\Fx16_2.wav" />
+    <Media Include="Assets\Audio\Fx27.wav" />
+    <Media Include="Assets\Audio\Fx28.wav" />
+    <Media Include="Assets\Audio\GAM_2_Surface_Music.wav" />
+    <Media Include="Assets\Audio\Walking_01.wav" />
+    <Media Include="Assets\Audio\Walking_02.wav" />
+    <Media Include="Assets\Audio\Walking_03.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -338,7 +349,7 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q

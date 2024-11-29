@@ -400,6 +400,13 @@ namespace lof {
 
     // Return reference to player direction
     int& Graphics_Manager::get_player_direction() { return player_direction; }
+    
+    ///////////// TESTING ANIMATIONS
+    int& Graphics_Manager::get_moving_status() { return is_moving; }
+
+    int& Graphics_Manager::get_mining_status() { return is_mining; }
+
+    ///////////// TESTING ANIMATIONS
 
     // Return reference to the framebuffer
     GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }

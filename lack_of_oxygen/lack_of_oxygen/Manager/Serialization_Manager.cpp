@@ -331,6 +331,7 @@ namespace lof {
 
         // Remove all existing entities
         for (EntityID eid : entities_to_remove) {
+            (void)eid;
             ECSM.destroy_entity(0);
         }
 
@@ -889,7 +890,7 @@ namespace lof {
                     if (components_obj.MemberCount() > 0) {
                         try {
                             rapidjson::Value name_value;
-                            name_value.SetString(entity_name.c_str(), entity_name.length(), allocator);
+                            name_value.SetString(entity_name.c_str(), static_cast<rapidjson::SizeType>(entity_name.length()), allocator); // Explicit cast
                             entity_obj.AddMember("name", name_value, allocator);
                             entity_obj.AddMember("components", components_obj, allocator);
                             objects_array.PushBack(entity_obj, allocator);
@@ -900,6 +901,7 @@ namespace lof {
                             LM.write_log("Error adding components to entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
+
                 }
                 catch (const std::exception& e) {
                     LM.write_log("Error processing entity %d: %s", entity_id, e.what());
