@@ -301,7 +301,7 @@ namespace lof {
                     float xpos = base_x - ((transform.scale.x / text_comp.scale.x) / 2.0f) + bearing.x;
                     float ypos = transform.position.y - ((transform.scale.y / text_comp.scale.y) / 2.0f) - (size.y - bearing.y);
 
-                    LM.write_log("Render_System::draw(): Font glyph size check: x - %u, y - %u.", size.x, size.y);
+                    //LM.write_log("Render_System::draw(): Font glyph size check: x - %u, y - %u.", size.x, size.y);
 
                     // Update VBO for each character
                     float vertices[6][4] = {

@@ -174,6 +174,8 @@ namespace lof {
 
         void set_current_file_shown(std::string current_file);
         std::string get_current_file_shown();
+
+        void fill_up_sound_names();
     };
 
 } // namespace lof

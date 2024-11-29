@@ -86,6 +86,14 @@ namespace lof {
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
 
+        fill_up_sound_names();
+
+        return 0;
+    }
+
+
+    void IMGUI_Manager::fill_up_sound_names() {
+        
         const auto& entities = ecs.get_entities();
         for (auto& entity : entities) {
 
@@ -102,21 +110,14 @@ namespace lof {
 
                     fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
 
-                    //std::cout << filepath << std::endl;
-                    //IMGUIM.fill_audio_file_names(filepath.c_str());
-                    //std::cout << filepath.substr(last_slash + 1, last_dot - last_slash -1) << std::endl;
-                    //IMGUIM.fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1).c_str());
+
                 }
             }
-
         }
 
-        
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
         audio_types.push_back(std::make_pair("SFX", (AudioType)1));
         audio_types.push_back(std::make_pair("NIL", (AudioType)2));
-
-        return 0;
     }
 
     void IMGUI_Manager::display_loading_options() {
@@ -349,10 +350,9 @@ namespace lof {
             ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
             if (texture) {
+
                 ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
-
-
 
             //-----------------------------------------For mouse----------------------------------------//
             // Get the mouse position in terms of IMGUI screen
@@ -525,8 +525,16 @@ namespace lof {
 
             std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
             if (SM.save_game_state(scene_path.c_str())) {
+                
                 //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
+                
+                audio_file_names.clear();
+                audio_types.clear();
+
+                fill_up_sound_names();
+
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
+
             }
             else {
                 //LM.write_log("IMGUI_Manager::update(): Failed to initate save game state to %s", Path_Helper::get_scene_path().c_str());
