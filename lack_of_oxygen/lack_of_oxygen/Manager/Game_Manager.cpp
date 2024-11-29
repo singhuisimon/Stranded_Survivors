@@ -269,8 +269,7 @@ namespace lof {
                 constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
-                constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;              // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
@@ -300,13 +299,12 @@ namespace lof {
                 if (oxygen_text_id != INVALID_ENTITY_ID && 
                     ECSM.has_component<Transform2D>(oxygen_text_id)) { 
                     auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
-                    //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
 
                     // Position text to the left of the oxygen meter
                     oxygen_text_transform.position = {
                         (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
-                        oxygen_transform.position.y // Vertically centered with oxygen meter
+                        oxygen_transform.position.y                                                         // Vertically centered with oxygen meter
                     };
                     oxygen_text_transform.prev_position = oxygen_text_transform.position;
                 }
@@ -334,7 +332,7 @@ namespace lof {
                     // Position text to the left of the panic meter
                     panic_text_transform.position = {
                         (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
-                        panic_transform.position.y  // Vertically centered with panic meter
+                        panic_transform.position.y                                                         // Vertically centered with panic meter
                     };
                     panic_text_transform.prev_position = panic_text_transform.position;
                 }
@@ -358,11 +356,10 @@ namespace lof {
                     auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id); 
                     auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id); 
 
-                    constexpr float MINERAL_COUNT_OFFSET = 40.0f;
                     // Position text to the right of the mineral texture
                     mineral_count_text_transform.position = {
-                        (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
-                        mineral_transform.position.y  - TEXT_OFFSET_Y  // Vertically centered with mineral icon
+                        (mineral_transform.position.x + (mineral_transform.scale.x * 3.0f)) ,  // Right of icon
+                        mineral_transform.position.y  - TEXT_OFFSET_Y                          // Vertically centered with mineral icon
                     };
                     mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
                 }
@@ -384,10 +381,6 @@ namespace lof {
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
-                    //// Get mining status for animation
-                    //auto& mining_status = GFXM.get_mining_status();
-                    //mining_status = MINE_LEFT;
-
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -422,10 +415,6 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
-                    //// Get mining status for animation
-                    //auto& mining_status = GFXM.get_mining_status();
-                    //mining_status = MINE_RIGHT;
-
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -494,10 +483,6 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
-                    //// Get mining status for animation
-                    //auto& mining_status = GFXM.get_mining_status();
-                    //mining_status = MINE_DOWN;
-
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -538,7 +523,6 @@ namespace lof {
                     update_mineral_count_text(val_to_add);
                 }
 
-
                 // Mining animations
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
                     // Get mining status for animation
@@ -572,9 +556,7 @@ namespace lof {
                     // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = NO_ACTION;
-                }
-                auto& mining_status = GFXM.get_mining_status();
-              
+                }  
 
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
@@ -862,7 +844,7 @@ namespace lof {
         if (IM.is_key_held(GLFW_KEY_KP_8) && !(IM.is_key_held(GLFW_KEY_KP_2))) {
             camera_up_down_scroll_flag = GLFW_KEY_KP_8;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -871,7 +853,7 @@ namespace lof {
         else if (IM.is_key_held(GLFW_KEY_KP_2) && !(IM.is_key_held(GLFW_KEY_KP_8))) {
             camera_up_down_scroll_flag = GLFW_KEY_KP_2;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
@@ -898,7 +880,7 @@ namespace lof {
         if (IM.is_key_held(GLFW_KEY_KP_4) && !(IM.is_key_held(GLFW_KEY_KP_6))) {
             camera_left_right_scroll_flag = GLFW_KEY_KP_4;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -907,7 +889,7 @@ namespace lof {
         else if (IM.is_key_held(GLFW_KEY_KP_6) && !(IM.is_key_held(GLFW_KEY_KP_4))) {
             camera_left_right_scroll_flag = GLFW_KEY_KP_6;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
