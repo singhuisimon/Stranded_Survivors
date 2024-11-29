@@ -307,7 +307,6 @@ namespace lof {
      * @param filename The complete path to the scene file.
      * @return True if loading and parsing are successful, false otherwise.
      */
-    
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
