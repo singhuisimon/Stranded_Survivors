@@ -287,7 +287,7 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != INVALID_ENTITY_ID) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
