@@ -9,6 +9,10 @@
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
+#ifndef _DEBUG
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+#endif
+
  // Include file headers
 #include "Main.h"
 
@@ -18,6 +22,7 @@
 #include <iostream>
 #include <iomanip>    // For std::fixed and std::setprecision
 #include <sstream>    // For std::stringstream
+#include <Windows.h>
 
 // Include for memory leaks
 #define _CRTDBG_MAP_ALLOC
@@ -38,6 +43,11 @@ int main(void) {
 
     // Enable debug heap allocations and automatic leak checking at exit
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+#ifndef _DEBUG
+    //disable console when its release or installer
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
 
     // -------------------------- GLFW Initialization --------------------------
 
