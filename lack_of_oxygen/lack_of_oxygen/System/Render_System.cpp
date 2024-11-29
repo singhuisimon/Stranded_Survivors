@@ -47,6 +47,9 @@ namespace lof {
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
+
+            //LM.write_log("Checking entity and name %u: %s", entity_id, graphics.texture_name.c_str()); 
+
             // Access player's ID
             EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
@@ -222,20 +225,22 @@ namespace lof {
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
+            //LM.write_log("Checking entity and name %u: %s", entity_id, graphics.texture_name.c_str());
+
             ///// Render only what is on the viewport (Back up for if instancing doesn't work)
-            //if (level_editor_mode == false) {
-            //    EntityID player_id = ECSM.find_entity_by_name("player1");
-            //    if (entity_id != 0 && entity_id != player_id) {
-            //        auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+            if (level_editor_mode == false) {
+                EntityID player_id = ECSM.find_entity_by_name("player1");
+                if (entity_id != 0 && entity_id != player_id) {
+                    auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
 
-            //        float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-            //        float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
-            //        if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
-            //            continue;
-            //        }
-            //    }
-            //}
+                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+                        continue;
+                    }
+                }
+            }
 
             ///// Render only what is on the viewport (Back up for if instancing doesn't work)
 
@@ -325,7 +330,7 @@ namespace lof {
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
                     // Advance cursors for next glyph 
-                    LM.write_log("Render_System::draw(): Font base check: %f", base_x);
+                    //LM.write_log("Render_System::draw(): Font base check: %f", base_x);
                     base_x += (advance >> 6);
 
                 }
@@ -337,8 +342,8 @@ namespace lof {
                 // Set the scale of text object
                 transform.scale.x = (base_x - scale_x) * text_comp.scale.x;
                 transform.scale.y = scale_y * text_comp.scale.y;
-                LM.write_log("Render_System::draw(): Font scale_x check: %f", transform.scale.x);
-                LM.write_log("Render_System::draw(): Font scale_y check: %f", transform.scale.y);
+                //LM.write_log("Render_System::draw(): Font scale_x check: %f", transform.scale.x);
+                //LM.write_log("Render_System::draw(): Font scale_y check: %f", transform.scale.y);
 
                 // Skip other rendering operations
                 continue;

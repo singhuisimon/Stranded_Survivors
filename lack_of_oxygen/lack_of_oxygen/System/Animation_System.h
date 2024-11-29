@@ -29,6 +29,18 @@ namespace lof {
      * @brief System responsible for updating animation and frames sequence.
      */
     class Animation_System : public System {
+
+        // Player action flag
+        enum Player_Action {
+            IDLE,
+            MOVING,
+            MINING,
+            MOVING_N_MINING
+        };
+        int player_action = IDLE;
+        bool has_mined = false;
+        
+
     public:
         /**
          * @brief Constructor for Animation_System.
