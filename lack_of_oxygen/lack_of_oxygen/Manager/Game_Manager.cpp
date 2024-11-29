@@ -41,7 +41,7 @@ namespace lof {
 
     float imgui_camara_pos_x = 0.0f;
     float imgui_camera_pos_y = 0.0f;
-    int mining_strength = DEFAULT_STRENGTH;
+    unsigned int mining_strength = DEFAULT_STRENGTH;
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
@@ -389,7 +389,12 @@ namespace lof {
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
                                 //animation.curr_tile_health--;
-                                animation.curr_tile_health -= mining_strength;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -422,7 +427,12 @@ namespace lof {
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
                                 //animation.curr_tile_health--;
-                                animation.curr_tile_health -= mining_strength;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -451,7 +461,12 @@ namespace lof {
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
                                 //animation.curr_tile_health--;
-                                animation.curr_tile_health -= mining_strength;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -484,7 +499,12 @@ namespace lof {
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
                                 //animation.curr_tile_health--;
-                                animation.curr_tile_health -= mining_strength;
+                                if (animation.curr_tile_health <= mining_strength) {
+                                    animation.curr_tile_health -= animation.curr_tile_health;
+                                }
+                                else {
+                                    animation.curr_tile_health -= mining_strength;
+                                }
                             }
 
                             // Destroy the block and update mineral count when health reaches 0

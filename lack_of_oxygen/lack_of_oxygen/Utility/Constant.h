@@ -181,8 +181,8 @@ namespace lof {
 	constexpr float DEFAULT_GUI_VERTICAL_SPACING = 50.0f;
 
 	// --------------------------- Cheat Code --------------------------------
-	constexpr int DEFAULT_STRENGTH = 1;		//normal strength
-	constexpr int GOD_STRENGTH = 2;			//extra god strength
+	constexpr unsigned int DEFAULT_STRENGTH = 1;		//normal strength
+	constexpr unsigned int GOD_STRENGTH = 20;			//extra god strength
 
 } // namespace lof
 
