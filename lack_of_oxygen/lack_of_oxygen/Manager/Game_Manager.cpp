@@ -841,8 +841,8 @@ namespace lof {
         }
 
         // Camera up-down scrolling when Number Pad 8 or 2 pressed
-        if (IM.is_key_held(GLFW_KEY_KP_8) && !(IM.is_key_held(GLFW_KEY_KP_2))) {
-            camera_up_down_scroll_flag = GLFW_KEY_KP_8;
+        if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
+            camera_up_down_scroll_flag = GLFW_KEY_UP;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -850,8 +850,8 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_2) && !(IM.is_key_held(GLFW_KEY_KP_8))) {
-            camera_up_down_scroll_flag = GLFW_KEY_KP_2;
+        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
+            camera_up_down_scroll_flag = GLFW_KEY_DOWN;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -859,9 +859,9 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_8) && IM.is_key_held(GLFW_KEY_KP_2)) {
+        else if (IM.is_key_held(GLFW_KEY_UP) && IM.is_key_held(GLFW_KEY_DOWN)) {
             auto& camera = GFXM.get_camera();
-            if (camera_up_down_scroll_flag == GLFW_KEY_KP_8) {
+            if (camera_up_down_scroll_flag == GLFW_KEY_UP) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -877,8 +877,8 @@ namespace lof {
         }
 
         // Camera left-right scrolling when Number Pad 4 or 6 pressed
-        if (IM.is_key_held(GLFW_KEY_KP_4) && !(IM.is_key_held(GLFW_KEY_KP_6))) {
-            camera_left_right_scroll_flag = GLFW_KEY_KP_4;
+        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
+            camera_left_right_scroll_flag = GLFW_KEY_LEFT;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -886,8 +886,8 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_6) && !(IM.is_key_held(GLFW_KEY_KP_4))) {
-            camera_left_right_scroll_flag = GLFW_KEY_KP_6;
+        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))) {
+            camera_left_right_scroll_flag = GLFW_KEY_RIGHT;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -895,9 +895,9 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_4) && IM.is_key_held(GLFW_KEY_KP_6)) {
+        else if (IM.is_key_held(GLFW_KEY_LEFT) && IM.is_key_held(GLFW_KEY_RIGHT)) {
             auto& camera = GFXM.get_camera();
-            if (camera_left_right_scroll_flag == GLFW_KEY_KP_4) {
+            if (camera_left_right_scroll_flag == GLFW_KEY_LEFT) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
