@@ -667,9 +667,13 @@ namespace lof {
             show_window = !show_window;
         }
 
+        ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
         if (ImGui::Button("Remove Game Object")) {
             remove_game_obj = !remove_game_obj;
         }
+        ImGui::EndDisabled();
+
+        
 
         ImGui::Text("\n\n%s", "Create Game Object From Prefab");
         if (ImGui::Button("Create Game Object From Prefab")) {
