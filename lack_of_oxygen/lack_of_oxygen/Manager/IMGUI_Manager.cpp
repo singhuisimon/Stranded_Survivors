@@ -407,7 +407,7 @@ namespace lof {
 
 
     bool select_entity = false; // to ensure mouse click selected
-    EntityID selectedEntityID = static_cast<int>(-1);
+    EntityID selectedEntityID = static_cast<EntityID>(-1);
 
     //Rendering UI
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
