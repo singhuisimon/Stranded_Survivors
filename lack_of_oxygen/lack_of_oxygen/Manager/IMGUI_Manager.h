@@ -95,7 +95,7 @@ namespace lof {
          * @param window A reference to a pointer to the GLFWwindow window created with the GLFW library in main.
          * @return Will return 0 after sucessful initalistion.
          */
-        int start_up(GLFWwindow*& window);
+        int start_up(GLFWwindow*& glfwindow);
 
         /**
          * @brief Calls functions from IMGUI that set up a new frame for rendering with ImGui in an OpenGL and GLFW context

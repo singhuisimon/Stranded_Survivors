@@ -74,7 +74,7 @@ namespace lof {
         throw std::runtime_error("No-parameter start_up() is disabled in IMGUI_Manager. start_up() now has a parameter GLFWwindow*& window");
     }
 
-    int IMGUI_Manager::start_up(GLFWwindow*& window) {
+    int IMGUI_Manager::start_up(GLFWwindow*& glfwindow) {
         if (is_started()) {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
             return 0; // Already started
@@ -82,7 +82,7 @@ namespace lof {
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplGlfw_InitForOpenGL(glfwindow, true);
         ImGui_ImplOpenGL3_Init();
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
@@ -176,8 +176,8 @@ namespace lof {
         ImGui::End();
         if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
 
-            const std::string SCENES = "Scenes";
-            if (SM.load_scene(ASM.get_full_path(SCENES, selected_file).c_str())) {
+            const std::string scenes = "Scenes";
+            if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
 
                 // Reset camera position
                 auto& camera = GFXM.get_camera();
@@ -307,7 +307,6 @@ namespace lof {
                         auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
                         auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
 
-                        constexpr float MINERAL_COUNT_OFFSET = 40.0f;
                         // Position text to the right of the mineral texture
                         mineral_count_text_transform.position = {
                             (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
@@ -467,7 +466,8 @@ namespace lof {
 
             if (texture) {
 
-                ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
+                //ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(SCR_WIDTH / 2, SCR_HEIGHT / 2), ImVec2(0, 1), ImVec2(1, 0));
+                ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(), ImVec2(static_cast<float>(SCR_WIDTH) / 2, static_cast<float>(SCR_HEIGHT) / 2), ImVec2(0, 1), ImVec2(1, 0));
             }
 
             //-----------------------------------------For mouse----------------------------------------//
@@ -1009,12 +1009,12 @@ namespace lof {
                                 buffer_map[i] = old_key_name;
                             }
 
-                            char Buffer[128];
-                            strncpy_s(Buffer, buffer_map[i].c_str(), sizeof(Buffer));
-                            Buffer[sizeof(Buffer) - 1] = '\0';
+                            char buffer_key[128];
+                            strncpy_s(buffer_key, buffer_map[i].c_str(), sizeof(buffer_key));
+                            buffer_key[sizeof(buffer_key) - 1] = '\0';
 
-                            if (ImGui::InputText(condition_name_key.c_str(), Buffer, sizeof(Buffer))) {
-                                buffer_map[i] = std::string(Buffer); // Save changes to the persistent buffer
+                            if (ImGui::InputText(condition_name_key.c_str(), buffer_key, sizeof(buffer_key))) {
+                                buffer_map[i] = std::string(buffer_key); // Save changes to the persistent buffer
                             }
 
                             // Save button
