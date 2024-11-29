@@ -179,6 +179,8 @@ namespace lof {
             const std::string scenes = "Scenes";
             if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
 
+                selected_object_index = -1;
+
                 // Reset camera position
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
@@ -510,7 +512,7 @@ namespace lof {
                     select_entity = false;
                 }
 
-                if (select_entity) {
+                if (select_entity && selectedEntityID != INVALID_ENTITY_ID) {
                     selected_object_index = selectedEntityID;
                 }
 
@@ -520,7 +522,7 @@ namespace lof {
                 auto& entities = ecs.get_entities();
 
                 //Drag with mouse
-                if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && selectedEntityID != INVALID_ENTITY_ID) {
 
                     //if mouse was previously down
                     if (!mouse_was_down) {

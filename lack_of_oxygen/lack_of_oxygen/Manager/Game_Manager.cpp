@@ -764,7 +764,7 @@ namespace lof {
         }
 
         
-        if (level_editor_mode && selectedID != -1)
+        if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
         {
             // First check if entity has required components
             if (!ECSM.has_component<Transform2D>(selectedID)) {
