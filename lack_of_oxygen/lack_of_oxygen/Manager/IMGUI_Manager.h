@@ -176,6 +176,8 @@ namespace lof {
         std::string get_current_file_shown();
 
         void fill_up_sound_names();
+
+        void disable_GUI();
     };
 
 } // namespace lof

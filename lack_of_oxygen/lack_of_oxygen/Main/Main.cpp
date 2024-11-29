@@ -241,6 +241,7 @@ int main(void) {
 
         if (level_editor_mode) {
             IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
+            IMGUIM.disable_GUI();
         }
 
         // Rendering
