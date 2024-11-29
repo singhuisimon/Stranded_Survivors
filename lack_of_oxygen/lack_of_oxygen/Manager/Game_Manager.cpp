@@ -150,9 +150,7 @@ namespace lof {
     }
 
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); 
-
-    EntityID selectedID = -1; // for imgui
-
+    EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
     void Game_Manager::update(float delta_time) {
         if (!is_started()) {
@@ -565,7 +563,7 @@ namespace lof {
 
                                 // Create the file path by appending the random number to "Walking_0"
                                 std::string key = "moving " + std::to_string(randomNumber);
-                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
                                 //play walking sound
                                 ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
                             }
@@ -592,7 +590,7 @@ namespace lof {
 
                                 // Create the file path by appending the random number to "Walking_0"
                                 std::string key = "moving " + std::to_string(randomNumber);
-                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
                                 //play walking sound
                                 ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
                             }
