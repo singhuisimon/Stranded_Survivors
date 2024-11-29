@@ -325,7 +325,7 @@ namespace lof {
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
                     // Advance cursors for next glyph 
-                    LM.write_log("Render_System::draw(): Font base check: %f", base_x);
+                    //LM.write_log("Render_System::draw(): Font base check: %f", base_x);
                     base_x += (advance >> 6);
 
                 }
@@ -337,8 +337,8 @@ namespace lof {
                 // Set the scale of text object
                 transform.scale.x = (base_x - scale_x) * text_comp.scale.x;
                 transform.scale.y = scale_y * text_comp.scale.y;
-                LM.write_log("Render_System::draw(): Font scale_x check: %f", transform.scale.x);
-                LM.write_log("Render_System::draw(): Font scale_y check: %f", transform.scale.y);
+               // LM.write_log("Render_System::draw(): Font scale_x check: %f", transform.scale.x);
+                //LM.write_log("Render_System::draw(): Font scale_y check: %f", transform.scale.y);
 
                 // Skip other rendering operations
                 continue;

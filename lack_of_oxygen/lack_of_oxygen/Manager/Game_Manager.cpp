@@ -149,12 +149,15 @@ namespace lof {
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
 
-    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); 
+  
 
-    EntityID selectedID = -1; // for imgui
+    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
 
-
+    EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
+
+        
+
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
@@ -565,7 +568,7 @@ namespace lof {
 
                                 // Create the file path by appending the random number to "Walking_0"
                                 std::string key = "moving " + std::to_string(randomNumber);
-                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
                                 //play walking sound
                                 ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
                             }
@@ -592,7 +595,7 @@ namespace lof {
 
                                 // Create the file path by appending the random number to "Walking_0"
                                 std::string key = "moving " + std::to_string(randomNumber);
-                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
                                 //play walking sound
                                 ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
                             }
@@ -614,17 +617,17 @@ namespace lof {
 
 
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_pressed(GLFW_KEY_1)) {
+        if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_FILL;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_2)) {
+        else if (IM.is_key_pressed(GLFW_KEY_2)&& !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_LINE;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_3)) {
+        else if (IM.is_key_pressed(GLFW_KEY_3)&& !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
@@ -647,7 +650,7 @@ namespace lof {
         ESS.Check_Selected_Entity();
 
         // Check if the left mouse button was pressed
-        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+        //EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
             if (selectedEntityInfo.isSelected) {
@@ -662,13 +665,13 @@ namespace lof {
             }
             else {
                 select_entity = false;
-                selectedID = -1;
+                selectedID = static_cast<EntityID>(-1);
 
             }
         }
 
         
-        if (level_editor_mode && selectedID != -1)
+        if (level_editor_mode && selectedID != static_cast<EntityID>(-1))
         {
             // First check if entity has required components
             if (!ECSM.has_component<Transform2D>(selectedID)) {
@@ -828,7 +831,7 @@ namespace lof {
             camera_left_right_scroll_flag = 0;
         }
 
-        if (IM.is_key_pressed(GLFW_KEY_0)) {
+        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
             // Toggle between scenes
@@ -857,15 +860,15 @@ namespace lof {
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                 // Reset player position if exists
-                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (player_id != INVALID_ENTITY_ID) {
-                    if (ECSM.has_component<Transform2D>(player_id)) {
-                        auto& transform = ECSM.get_component<Transform2D>(player_id);
+                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (playerId != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Transform2D>(playerId)) {
+                        auto& transform = ECSM.get_component<Transform2D>(playerId);
                         transform.position = Vec2D(0.0f, 0.0f);
                         transform.prev_position = transform.position;
                     }
                     if (ECSM.has_component<Velocity_Component>(player_id)) {
-                        auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
+                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
                         velocity.velocity = Vec2D(0.0f, 0.0f);
                     }
                 }
