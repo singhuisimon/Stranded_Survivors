@@ -52,7 +52,7 @@
           "sounds": [
             {
               "key": "bgm1",
-              "filepath": "audio_test1",
+              "filepath": "GAM_2_Surface_Music",
               "audio_state": 0,
               "audio_type": 0,
               "volume": 0.5,
@@ -395,28 +395,46 @@
           "sounds": [
             {
               "key": "jumping",
-              "filepath": "Fx16_2",
+              "filepath": "Fx01",
               "audio_state": 4,
               "audio_type": 1,
-              "volume": 0.5,
+              "volume": 0.1,
+              "pitch": 2.0,
+              "islooping": false
+            },
+            {
+              "key": "jumping",
+              "filepath": "Fx04",
+              "audio_state": 4,
+              "audio_type": 1,
+              "volume": 0.178,
               "pitch": 1.0,
               "islooping": false
             },
             {
-              "key": "moving left",
-              "filepath": "Fx28",
+              "key": "moving 1",
+              "filepath": "Walking_01",
               "audio_state": 4,
               "audio_type": 1,
-              "volume": 0.5,
+              "volume": 0.178,
               "pitch": 1.0,
               "islooping": false
             },
             {
-              "key": "moving right",
-              "filepath": "Fx27",
-              "audio_state": 0,
+              "key": "moving 2",
+              "filepath": "Walking_02",
+              "audio_state": 4,
               "audio_type": 1,
-              "volume": 0.5,
+              "volume": 0.178,
+              "pitch": 1.0,
+              "islooping": false
+            },
+            {
+              "key": "moving 3",
+              "filepath": "Walking_03",
+              "audio_state": 4,
+              "audio_type": 1,
+              "volume": 0.178,
               "pitch": 1.0,
               "islooping": false
             }
