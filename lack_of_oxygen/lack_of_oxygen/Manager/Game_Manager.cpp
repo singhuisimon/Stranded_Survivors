@@ -502,8 +502,20 @@ namespace lof {
 
                     // Update sound effect for player moving left
                     if (physics.get_is_grounded()) {
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                        if (current_scene == 1) {
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                        } else if (current_scene == 2) {
+                            // Generate a random number between 1 and 3
+                            int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                            // Create the file path by appending the random number to "Walking_0"
+                            std::string key = "moving " + std::to_string(randomNumber);
+                            LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
+                            //play walking sound
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
+                        }
                     }
+                    //std::cout << "moving left current scene number is " << current_scene << std::endl;
                 }
                 else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
                     // Update forces
@@ -517,8 +529,20 @@ namespace lof {
 
                     // Update sound effect for player moving right
                     if (physics.get_is_grounded()) {
-                        ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                        if (current_scene == 1) {
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                        } else if (current_scene == 2) {
+                            // Generate a random number between 1 and 3
+                            int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                            // Create the file path by appending the random number to "Walking_0"
+                            std::string key = "moving " + std::to_string(randomNumber);
+                            LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
+                            //play walking sound
+                            ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
+                        }
                     }
+                    //std::cout << "moving right current scene number is " << current_scene << std::endl;
                 }
                 else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
                     if (forces_flag == MOVE_LEFT) {
@@ -532,7 +556,19 @@ namespace lof {
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                            if (current_scene == 1) {
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                            }
+                            else if (current_scene == 2) {
+                                // Generate a random number between 1 and 3
+                                int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                                // Create the file path by appending the random number to "Walking_0"
+                                std::string key = "moving " + std::to_string(randomNumber);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key);
+                                //play walking sound
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
+                            }
                         }
                     }
                     else {
@@ -547,7 +583,19 @@ namespace lof {
 
                         // Update sound effect for player moving right
                         if (physics.get_is_grounded()) {
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                            if (current_scene == 1) {
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
+                            }
+                            else if (current_scene == 2) {
+                                // Generate a random number between 1 and 3
+                                int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
+
+                                // Create the file path by appending the random number to "Walking_0"
+                                std::string key = "moving " + std::to_string(randomNumber);
+                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key);
+                                //play walking sound
+                                ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
+                            }
                         }
                     }
                 }
@@ -789,6 +837,15 @@ namespace lof {
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
             std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
+
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->stop_mastergroup();
+                    }
+                }
+            }
 
             // Try to load the new scene
             if (SM.load_scene(scene_path.c_str())) {
