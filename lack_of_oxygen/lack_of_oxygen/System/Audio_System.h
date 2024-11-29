@@ -138,6 +138,9 @@ namespace lof {
 		*/
 		void stop_mastergroup();
 
+		/**
+		* @brief Pause and Resume the mastergroup
+		*/
 		void pause_resume_mastergroup();
 
 		/**
@@ -247,6 +250,7 @@ namespace lof {
 
 		std::unordered_map<std::string, FMOD::Sound*> sound_map;		///< Map of Sound with the filepath as the key
 		std::unordered_map<std::string, FMOD::Channel*> channel_map;	///< Map of Channel with the filepath + entityid as the key
+		std::unordered_map<std::string, std::string> all_prev_filepath_map;	///< Map of String with audio key as key and filepath as data
 	};
 }
 

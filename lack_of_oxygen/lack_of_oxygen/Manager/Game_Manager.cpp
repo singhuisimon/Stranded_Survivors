@@ -41,6 +41,7 @@ namespace lof {
 
     float imgui_camara_pos_x = 0.0f;
     float imgui_camera_pos_y = 0.0f;
+    int mining_strength = DEFAULT_STRENGTH;
     Game_Manager::Game_Manager()
         : m_game_over(false), m_step_count(0) {
         set_type("Game_Manager");
@@ -363,6 +364,17 @@ namespace lof {
                 }
             }
 
+            //cheat code in mining
+            if (IM.is_key_pressed(GLFW_KEY_H)) {
+                if (mining_strength == DEFAULT_STRENGTH) {
+                    mining_strength = GOD_STRENGTH;
+                }
+                else {
+                    mining_strength = DEFAULT_STRENGTH;
+                }
+                std::cout << "mining strength: " << mining_strength << std::endl;
+            }
+
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
@@ -374,7 +386,8 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                animation.curr_tile_health -= mining_strength;
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -402,7 +415,8 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                animation.curr_tile_health -= mining_strength;
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -430,7 +444,8 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                animation.curr_tile_health -= mining_strength;
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -458,7 +473,8 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                animation.curr_tile_health--;
+                                //animation.curr_tile_health--;
+                                animation.curr_tile_health -= mining_strength;
                             }
 
                             // Destroy the block and update mineral count when health reaches 0
@@ -478,6 +494,12 @@ namespace lof {
                             }
                         }
                     }
+                }
+
+                //cheat code to increase mineral
+                if (IM.is_key_held(GLFW_KEY_G)) {
+                    int val_to_add = 500;
+                    update_mineral_count_text(val_to_add);
                 }
 
 
@@ -542,7 +564,6 @@ namespace lof {
                             ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
                         }
                     }
-                    //std::cout << "moving right current scene number is " << current_scene << std::endl;
                 }
                 else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
                     if (forces_flag == MOVE_LEFT) {
@@ -837,15 +858,6 @@ namespace lof {
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
             std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
-
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "Audio_System") {
-                    auto* audio_system = static_cast<Audio_System*>(system.get());
-                    if (audio_system) {
-                        audio_system->stop_mastergroup();
-                    }
-                }
-            }
 
             // Try to load the new scene
             if (SM.load_scene(scene_path.c_str())) {
