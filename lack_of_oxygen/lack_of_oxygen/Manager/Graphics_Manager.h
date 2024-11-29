@@ -134,7 +134,9 @@ namespace lof {
         int rotation_flag = 0;
 
         // Flag for player direction animation
-        int player_direction = -1;
+        int player_direction = FACE_LEFT;
+        int is_moving = 0;
+        int is_mining = 0;
 
         // FOR TESTING
         GLuint imgui_fbo, imgui_tex;
@@ -246,6 +248,18 @@ namespace lof {
          */
         int& get_player_direction();
 
+        ///////////// TESTING ANIMATIONS
+        /**
+         * @brief Get a reference to the player direction.
+         */
+        int& get_moving_status();
+
+        /**
+         * @brief Get a reference to the player direction.
+         */
+        int& get_mining_status();
+
+        ///////////// TESTING ANIMATIONS
         /**
          * @brief Get a reference to the framebuffer object.
          */

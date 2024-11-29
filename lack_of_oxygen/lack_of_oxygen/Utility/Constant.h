@@ -150,6 +150,18 @@ namespace lof {
 	constexpr float DEFAULT_FRAME_TIME_ELAPSED = 0.0f;
 	constexpr float DEFAULT_Y_OFFSET = 1.0f;
 
+	enum PlayerAnimation {
+		NO_ACTION, 
+		FACE_LEFT,
+		FACE_RIGHT,
+		RUN_LEFT,
+		RUN_RIGHT,
+		MINE_LEFT,
+		MINE_RIGHT,
+		MINE_UP,
+		MINE_DOWN
+	};
+
 	// ------------------------------ Collision_System.cpp --------------------------------
 	constexpr const float         BOUNDING_RECT_SIZE = 1.0f;
 	constexpr const unsigned int	COLLISION_LEFT = 0x00000001;	//0001
