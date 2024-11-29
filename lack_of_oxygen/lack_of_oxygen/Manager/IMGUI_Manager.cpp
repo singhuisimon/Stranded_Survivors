@@ -178,15 +178,6 @@ namespace lof {
             const std::string SCENES = "Scenes";
             if (SM.load_scene(ASM.get_full_path(SCENES, selected_file).c_str())) {
 
-                //if (SM.load_scene(ASM.get_full_path(SCENES, "scene" + std::to_string(1) + ".scn"))){
-                    //LM.write_log("IMGUI_Manager::display_loading_options(): %s is loaded.", Path_Helper::get_scene_path());
-                //to get second scene file
-                /*const std::string scenes = "Scenes";
-                    if (ASM.get_full_path(scenes, "Scene2"))
-                    {
-
-                    }*/
-
                 // Reset camera position
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
@@ -208,6 +199,11 @@ namespace lof {
 
                 //load_selected = !load_selected;
                 set_current_file_shown(selected_file);
+
+                audio_file_names.clear();
+                audio_types.clear();
+                fill_up_sound_names();
+
             }
 
             //prev_file_selected = selected_file_index;
@@ -527,12 +523,6 @@ namespace lof {
             if (SM.save_game_state(scene_path.c_str())) {
                 
                 //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
-                
-                audio_file_names.clear();
-                audio_types.clear();
-
-                fill_up_sound_names();
-
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
 
             }
