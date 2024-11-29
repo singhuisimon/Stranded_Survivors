@@ -318,8 +318,8 @@ namespace lof {
                 side = (dy > 0) ? CollisionSide::BOTTOM : CollisionSide::TOP;
             }
         }
-        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
 
+        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
         //return CollisionSide::NONE; // No collision
         return side;
     }

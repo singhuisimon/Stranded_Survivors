@@ -287,7 +287,7 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != INVALID_ENTITY_ID) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -820,12 +820,17 @@ namespace lof {
                         velocity.velocity = Vec2D(0.0f, 0.0f);
                     }
                 }
+
+               
             }
             else {
                 LM.write_log("Game_Manager::update(): Failed to load scene%d: %s", current_scene, scene_path.c_str());
                 // Revert the scene number since load failed
                 current_scene = (current_scene == 1) ? 2 : 1;
             }
+
+            std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
+            IMGUIM.set_current_file_shown(get_file_name);
         }
 
 
