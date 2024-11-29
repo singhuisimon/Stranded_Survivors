@@ -43,28 +43,214 @@ namespace lof {
             if (entity_id == player_id) { 
 
                 int& player_direction = GFXM.get_player_direction(); 
+                int& moving_status = GFXM.get_moving_status();
+                int& mining_status = GFXM.get_mining_status();
 
-                // Determine player animation index
+                // Determine player action
+                if (moving_status != NO_ACTION || mining_status != NO_ACTION) {
+                    // Moving and not mining
+                    if (moving_status != NO_ACTION && mining_status == NO_ACTION) {
+                        player_action = MOVING;
+                        has_mined = false;
+                    }
+                    // Mining and not moving
+                    else if (moving_status == NO_ACTION && mining_status != NO_ACTION) {
+                        player_action = MINING;
+                    }
+                    // Moving and mining
+                    else {
+                        player_action = MOVING_N_MINING; 
+                    }
+                }
+                else {
+                    player_action = IDLE;
+                    has_mined = false;
+                }
+                
+                // Moving-only animations
+                if (player_action == MOVING) { 
+                    if (moving_status == RUN_LEFT) { 
+                        if (animation_comp.curr_animation_idx != 2) { // Set running left animation
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
+                            animation_comp.curr_animation_idx = 2;
+                        }
+                    } else if (moving_status == RUN_RIGHT) { 
+                        if (animation_comp.curr_animation_idx != 3) { // Set running right animation
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                            animation_comp.curr_animation_idx = 3;
+                        }
+                    } 
+                } // Mining-only animations
+                else if (player_action == MINING) {
+                    if (mining_status == MINE_LEFT) { // Set mining left animation
+                        if (animation_comp.curr_animation_idx != 4 && has_mined == false) {
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
+                            animation_comp.curr_animation_idx = 4;
+                        }
+                        else if (has_mined == true) {
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx  
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
+                            animation_comp.curr_animation_idx = 0;    // Set idle left
+                        }
+                    }
+                    else if (mining_status == MINE_RIGHT) { 
+                        if (animation_comp.curr_animation_idx != 5 && has_mined == false) { // Set mining right animation
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                            animation_comp.curr_animation_idx = 5;
+                        }
+                        else if (has_mined == true) {
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx  
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
+                            animation_comp.curr_animation_idx = 1;    // Set idle right
+                        }
+                    }
+                    else if (mining_status == MINE_UP) {
+                        if (player_direction == FACE_LEFT) {
+                            if (animation_comp.curr_animation_idx != 6 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 6;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 6;
+                            }
+                        }
+                        else if (player_direction == FACE_RIGHT) {
+                            if (animation_comp.curr_animation_idx != 7 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 7;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 7;
+                            }
+                        }
+                    }
+                    else if (mining_status == MINE_DOWN) {
+                        if (player_direction == FACE_LEFT) {
+                            if (animation_comp.curr_animation_idx != 8 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 8;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 8;
+                            }
+                        }
+                        else if (player_direction == FACE_RIGHT) {
+                            if (animation_comp.curr_animation_idx != 9 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 9;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 9;
+                            }
+                        }
+                    }
+                } // Moving & Mining combined animations
+                else if (player_action == MOVING_N_MINING) {
+                    if (mining_status == MINE_LEFT) { // Set mining left animation
+                        if (animation_comp.curr_animation_idx != 4 && has_mined == false) {
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
+                            animation_comp.curr_animation_idx = 4;
+                        }
+                        else if (has_mined == true) {
+                            if (animation_comp.curr_animation_idx != 2) { // Set running left animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
+                                animation_comp.curr_animation_idx = 2;
+                            }
+                        }
+                    }
+                    else if (mining_status == MINE_RIGHT) {
+                        if (animation_comp.curr_animation_idx != 5 && has_mined == false) { // Set mining right animation
+                            animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                            animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                            animation_comp.curr_animation_idx = 5;
+                        }
+                        else if (has_mined == true) {
+                            if (animation_comp.curr_animation_idx != 3) { // Set running right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 3;
+                            }
+                        }
+                    }
+                    else if (mining_status == MINE_UP) {
+                        if (player_direction == FACE_LEFT) {
+                            if (animation_comp.curr_animation_idx != 6 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 6;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 6;
+                            }
+                        }
+                        else if (player_direction == FACE_RIGHT) {
+                            if (animation_comp.curr_animation_idx != 7 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 7;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 7;
+                            }
+                        }
+                    }
+                    else if (mining_status == MINE_DOWN) {
+                        if (player_direction == FACE_LEFT) {
+                            if (animation_comp.curr_animation_idx != 8 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 8;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 8;
+                            }
+                        }
+                        else if (player_direction == FACE_RIGHT) {
+                            if (animation_comp.curr_animation_idx != 9 && has_mined == false) { // Set mining right animation
+                                animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 9;
+                            }
+                            else if (has_mined == true) {
+                                animation_comp.curr_frame_index = 1; // Fix on idle frame
+                                animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
+                                animation_comp.curr_animation_idx = 9;
+                            }
+                        }
+                    }
+                }
+                else { // Idling (No animation)
                 // (When changing animation index, reset previous animation curr_frame_idx and frame_time_elapsed to 0)
-                if (player_direction == MOVE_LEFT) { // Set running_left animation if not playing currently
-                    if (animation_comp.curr_animation_idx != 2) {
-                        animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
-                        animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
-                        animation_comp.curr_animation_idx = 2;
-                    }
-                } else if (player_direction == MOVE_RIGHT) { // set running_right animation if not playing currently
-                    if (animation_comp.curr_animation_idx != 3) {
-                        animation_comp.curr_frame_index = 0; // Reset previous animation curr_frame_idx
-                        animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
-                        animation_comp.curr_animation_idx = 3;
-                    }
-                } else { // Idling (No animation)
                     // Check last direction based on last animation
-                    if (animation_comp.curr_animation_idx == 2) { // Was running left
+                    if (player_direction == FACE_LEFT) { // Was running left
                         animation_comp.curr_frame_index = 0; // Reset running_left animation curr_frame_idx  
                         animations_storage[animation_comp.animations["2"]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
                         animation_comp.curr_animation_idx = 0;    // Set idle left
-                    } else if (animation_comp.curr_animation_idx == 3) { // Was running right
+                    } else if (player_direction == FACE_RIGHT) { // Was running right
                         animation_comp.curr_frame_index = 0; // Reset running_right animation curr_frame_idx 
                         animations_storage[animation_comp.animations["3"]].frame_elapsed_time = 0.0f; // Reset running_right animation frame_time_elapsed
                         animation_comp.curr_animation_idx = 1;    // Set idle right
@@ -82,6 +268,9 @@ namespace lof {
                 } else if ((animations_storage[curr_animation_name].frame_elapsed_time < delay)) { // Frame elapsed time is still within delay time, increment by frame delta time
                     animations_storage[curr_animation_name].frame_elapsed_time += delta_time * MILLISECONDS_PER_SECOND; 
                 } else { // Frame elapsed time has surpassed frame's delay time, time to change frame
+                    if (mining_status != NO_ACTION) {
+                        has_mined = true;
+                    }
                     animations_storage[curr_animation_name].frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
                     if (animation_comp.curr_frame_index < (animations_storage[curr_animation_name].frames.size() - 1)) {
                         animation_comp.curr_frame_index++;

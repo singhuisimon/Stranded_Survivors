@@ -361,11 +361,16 @@ namespace lof {
                 }
             }
 
+
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_LEFT;
+
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -394,6 +399,10 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_RIGHT;
+
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -450,6 +459,10 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_DOWN;
+
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -479,6 +492,43 @@ namespace lof {
                 }
 
 
+                // Mining animations
+                if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_LEFT;
+                    int& direction = GFXM.get_player_direction();
+                    direction = FACE_LEFT; 
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_UP)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_UP;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_DOWN;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_RIGHT;
+                    int& direction = GFXM.get_player_direction(); 
+                    direction = FACE_RIGHT; 
+
+                }
+                else {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = NO_ACTION;
+                }
+                auto& mining_status = GFXM.get_mining_status();
+              
+
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
                     physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
@@ -496,7 +546,9 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_LEFT;
+                    direction = FACE_LEFT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_LEFT;
 
                     // Update sound effect for player moving left
                     if (physics.get_is_grounded()) {
@@ -523,7 +575,9 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_RIGHT;
+                    direction = FACE_RIGHT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_RIGHT;
 
                     // Update sound effect for player moving right
                     if (physics.get_is_grounded()) {
@@ -550,7 +604,9 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_LEFT;
+                        direction = FACE_LEFT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_LEFT;
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
@@ -577,7 +633,9 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_RIGHT;
+                        direction = FACE_RIGHT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_RIGHT;
 
                         // Update sound effect for player moving right
                         if (physics.get_is_grounded()) {
@@ -603,8 +661,8 @@ namespace lof {
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                     forces_flag = -1;
 
-                    int& direction = GFXM.get_player_direction();
-                    direction = -1;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = NO_ACTION;
                 }
 
             }
