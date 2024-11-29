@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 #include "Entity_Selector_Helper.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Main/Main.h" // for extern window
@@ -210,3 +211,4 @@ namespace lof
 
 
 }
+#endif

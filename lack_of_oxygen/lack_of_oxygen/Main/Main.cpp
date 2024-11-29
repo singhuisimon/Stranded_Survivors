@@ -135,7 +135,7 @@ int main(void) {
         LM.write_log("Game_Manager started up successfully.");
         std::cout << "Game_Manager started up successfully." << std::endl;
     }
-
+#ifndef NDEBUG
     // --------------------------- Start IMGUI_Manager ---------------------------
 
     IMGUIM.start_up(window); // Might need to integrate with game manager 
@@ -151,7 +151,7 @@ int main(void) {
 
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
-
+#endif
     // --------------------------- Retrieve Configuration ---------------------------
 
     // Retrieve configuration values from Config_Manager
@@ -195,9 +195,12 @@ int main(void) {
 
         // Update window title with FPS
         std::stringstream ss;
-        ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
+        ss << "Lack Of Oxygen";
+#ifndef NDEBUG
+        ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
+#endif
         glfwSetWindowTitle(window, ss.str().c_str());
-
+#ifndef NDEBUG
         // Update FPS timer
         fps_timer += delta_time;
         if (fps_timer >= FPS_DISPLAY_INTERVAL) {
@@ -206,16 +209,17 @@ int main(void) {
             // Display FPS in console
             std::cout << "Current FPS: " << fps << std::endl;
         }
+#endif
 
         // Poll for and process events 
         glfwPollEvents();
-
+#ifndef NDEBUG
         bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
         if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
             level_editor_mode = !level_editor_mode;
         }
         tab_key_was_pressed_last_frame = is_TAB_pressed;
-
+#endif
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
@@ -230,7 +234,7 @@ int main(void) {
         // Update game world state
         GM.update(delta_time);
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
-
+#ifndef NDEBUG
         // Start the Dear ImGui frame
         IMGUIM.start_frame();
 
@@ -254,7 +258,7 @@ int main(void) {
 
         // Rendering
         IMGUIM.render();
-
+#endif
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {
             glfwSetWindowShouldClose(window, true);
@@ -267,7 +271,7 @@ int main(void) {
 
         // End of frame timing and FPS control
         FPSM.frame_end();
-
+#ifndef NDEBUG
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -275,11 +279,12 @@ int main(void) {
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+#endif
 
     }
-
+#ifndef NDEBUG
     IMGUIM.shut_down();
-
+#endif
     glfwDestroyWindow(window);
     glfwTerminate();
 

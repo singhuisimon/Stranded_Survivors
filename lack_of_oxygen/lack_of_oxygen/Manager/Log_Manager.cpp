@@ -58,14 +58,14 @@ namespace lof {
         if (is_started()) {
             return 0; // Already started
         }
-
+#ifndef NDEBUG
         this->log_file_name = new_log_file_name;
         log_file.open(new_log_file_name, std::ios::out | std::ios::trunc);
 
         if (!log_file.is_open()) {
             return -1; // Failed to open log file
         }
-
+#endif
         m_is_started = true;
 
         // Reset the Clock to start timing from now
@@ -82,17 +82,18 @@ namespace lof {
         if (!is_started()) {
             return; // Not started
         }
-
+#ifndef NDEBUG
         if (log_file.is_open()) {
             log_file.close();
         }
-
+#endif
         m_is_started = false;
     }
 
 
     int Log_Manager::write_log(const char* fmt, ...) {
-        if (!is_started() || !log_file.is_open()) {
+        //uncomment it for non_installer
+        if (!is_started()){//} || !log_file.is_open()) {
             return -1; // Log_Manager not started or log file not open
         }
 
@@ -129,14 +130,14 @@ namespace lof {
         if (written < 0) {
             return -1; // Error during formatting
         }
-
+#ifndef NDEBUG
         // Write the timestamped log entry
         log_file << time_stream.str() << buffer << std::endl;
 
         if (do_flush) {
             log_file.flush();
         }
-
+#endif
         // Optionally, return the number of characters written
         // Here, we return the number of characters in the user message
         return written;

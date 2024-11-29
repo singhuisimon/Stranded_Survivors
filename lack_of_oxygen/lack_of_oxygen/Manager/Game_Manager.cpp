@@ -29,9 +29,9 @@
 #include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../System/Animation_System.h"  // For player_direction
 #include "../System/Collision_System.h" // for click entity object
-
+#ifndef NDEBUG
 #include "../Utility/Entity_Selector_Helper.h"
-
+#endif
 // Include iostream for console output
 #include <iostream>
 #include <random>
@@ -151,11 +151,12 @@ namespace lof {
     }
 
   
-
+#ifndef NDEBUG
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
     //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
+#endif
     void Game_Manager::update(float delta_time) {
 
         
@@ -181,25 +182,25 @@ namespace lof {
         //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
         //printf("left collision entity outside: %d\n\n", collision_entity_left);
 
-        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
+        if (IM.is_key_pressed(GLFW_KEY_DOWN) && has_collision_bottom){//} && !level_editor_mode) {
 
             printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
             printf("Bottom collision entity: %d\n", collision_entity_bottom);
 
         }
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !level_editor_mode && has_collision_left) {
+        if (IM.is_key_held(GLFW_KEY_LEFT) && has_collision_left){//} && !level_editor_mode) {
 
             printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
             printf("left collision entity: %d\n", collision_entity_left);
 
         }
-        if (IM.is_key_held(GLFW_KEY_RIGHT) && !level_editor_mode && has_collision_right) {
+        if (IM.is_key_held(GLFW_KEY_RIGHT)  && has_collision_right){//} && !level_editor_mode) {
 
             printf("Has right collision: %s\n", has_collision_right ? "true" : "false");
             printf("right entity: %d\n", collision_entity_right);
 
         }
-        if (IM.is_key_held(GLFW_KEY_UP) && !level_editor_mode && has_collision_top) {
+        if (IM.is_key_held(GLFW_KEY_UP) && has_collision_top){//} && !level_editor_mode) {
 
             printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
             printf("top entity: %d\n", collision_entity_top);
@@ -248,7 +249,7 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID){//} && !level_editor_mode) {  // If player entity exists
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -698,17 +699,17 @@ namespace lof {
 
 
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_1)){//} && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_FILL;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_2)&& !level_editor_mode) {
+        else if (IM.is_key_pressed(GLFW_KEY_2)){//} && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_LINE;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_3)&& !level_editor_mode) {
+        else if (IM.is_key_pressed(GLFW_KEY_3)){//} && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
@@ -725,9 +726,9 @@ namespace lof {
             GLboolean& mode = GFXM.get_debug_mode();
             mode = GL_FALSE;
         }
-
+#ifndef NDEBUG
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
-#if 1
+//#if 1
         ESS.Check_Selected_Entity();
 
         // Check if the left mouse button was pressed
@@ -752,7 +753,7 @@ namespace lof {
         }
 
         
-        if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
+        if (selectedID != -1 && selectedID < ECSM.get_entities().size())// && level_editor_mode)
         {
             // First check if entity has required components
             if (!ECSM.has_component<Transform2D>(selectedID)) {
@@ -821,7 +822,7 @@ namespace lof {
             }
         }
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
-#endif
+//#endif
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE) {
@@ -911,8 +912,9 @@ namespace lof {
         else {
             camera_left_right_scroll_flag = 0;
         }
+#endif
 
-        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_0)){//} && !level_editor_mode) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
             // Toggle between scenes
@@ -954,7 +956,9 @@ namespace lof {
             }
 
             std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
+#ifndef NDEBUG
             IMGUIM.set_current_file_shown(get_file_name);
+#endif
         }
 
         // Getting delta time for Input Manager

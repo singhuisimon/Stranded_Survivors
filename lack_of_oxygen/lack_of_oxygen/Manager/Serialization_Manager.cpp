@@ -98,7 +98,9 @@ namespace lof {
         // Load scene file 
         const std::string scene_folder = "Scenes";
         std::string loaded_scene = "scene1.scn";
+#ifndef NDEBUG
         IMGUIM.set_current_file_shown(loaded_scene);
+#endif
         std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
@@ -283,9 +285,9 @@ namespace lof {
         const rapidjson::Value& prefabs = prefab_document["prefabs"];
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
-            
+#ifndef NDEBUG
             IMGUIM.fill_prefab_names(prefab_name.c_str());
-
+#endif
             //DEBUG
             LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());
 
