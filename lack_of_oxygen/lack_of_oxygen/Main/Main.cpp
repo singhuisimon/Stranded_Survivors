@@ -146,9 +146,6 @@ int main(void) {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
-    ImGuiStyle& style = ImGui::GetStyle();
-    //ImGui::StyleColorsDark();
-
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
 
