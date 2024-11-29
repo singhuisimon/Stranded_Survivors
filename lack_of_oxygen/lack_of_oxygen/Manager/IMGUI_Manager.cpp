@@ -180,6 +180,9 @@ namespace lof {
             const std::string scenes = "Scenes";
             if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
 
+                
+                GM.set_current_scene(selected_file_index + 1);
+
                 selected_object_index = -1;
 
                 // Reset camera position
@@ -200,7 +203,7 @@ namespace lof {
 
                 // Reset player position if exists
                 EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (player_id != INVALID_ENTITY_ID) {
+                if (player_id != INVALID_ENTITY_ID && GM.get_current_scene() == 2) {
                     if (ECSM.has_component<Transform2D>(player_id)) {
                         auto& transform = ECSM.get_component<Transform2D>(player_id);
                         transform.position = Vec2D(0.0f, 0.0f);
