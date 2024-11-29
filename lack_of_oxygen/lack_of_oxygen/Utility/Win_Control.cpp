@@ -1,3 +1,13 @@
+/**
+ * @file Audio_System.cpp
+ * @brief Defining of the Window_Control class function for controlling game resolution.
+ * @author Amanda Leow Boon Suan (100%)
+ * @date November 20, 2024
+ * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "../Utility/Win_Control.h"
 #include "../Manager/Graphics_Manager.h"
 
