@@ -1059,4 +1059,12 @@ namespace lof {
         }
     }
 
+    void Game_Manager::set_current_scene(int scene_num) {
+        current_scene = scene_num;
+    }
+
+    int Game_Manager::get_current_scene() {
+        return current_scene;
+    }
+
 } // namespace lof
