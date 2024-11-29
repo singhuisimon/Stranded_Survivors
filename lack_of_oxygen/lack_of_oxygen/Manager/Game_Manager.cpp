@@ -155,7 +155,7 @@ namespace lof {
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
-    EntityID selectedID = static_cast<EntityID>(-1); // for imgui
+    //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
 
         
