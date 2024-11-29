@@ -98,7 +98,7 @@ namespace lof {
 
 				//check if audio file still exist
 				if (!ASM.load_audio_file(audio.get_filepath(audio_key))) {
-					LM.write_log("Audio_System::update Audio File %s no longer exist", audio.get_filepath(audio_key));
+					LM.write_log("Audio_System::update Audio File %s no longer exist", audio.get_filepath(audio_key).c_str());
 					if (channel_map.find(key_id) != channel_map.end()) {
 						stop_sound(key_id);
 						unload_sound(audio.get_filepath(audio_key));
