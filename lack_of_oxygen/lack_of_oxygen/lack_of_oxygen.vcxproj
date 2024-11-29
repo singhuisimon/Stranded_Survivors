@@ -338,7 +338,7 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\studio\*.dll" "$(OutD
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)External_Libraries\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;fmod_vc.lib;fmodstudio_vc.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q
