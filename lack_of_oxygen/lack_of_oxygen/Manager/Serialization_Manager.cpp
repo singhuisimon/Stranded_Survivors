@@ -662,6 +662,7 @@ namespace lof {
         // Add other animation component properties
         comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator);
         comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator);
+        comp_obj.AddMember("curr_frame_index", component.curr_frame_index, allocator);
 
         return comp_obj;
     }
