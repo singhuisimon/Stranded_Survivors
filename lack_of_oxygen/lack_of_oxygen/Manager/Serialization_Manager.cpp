@@ -708,16 +708,16 @@ namespace lof {
         try {
             LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
 
-            // Create document and keep it in scope
+            // Create document and initialize allocator
             rapidjson::Document save_doc;
             save_doc.SetObject();
             auto& allocator = save_doc.GetAllocator();
 
-            // Create array and add it to document immediately
+            // Create array for storing entities
             rapidjson::Value objects_array(rapidjson::kArrayType);
-
             int unnamed_counter = 0;
 
+            // Iterate through all entities
             for (const auto& entity_ptr : ECSM.get_entities()) {
                 if (!entity_ptr) {
                     LM.write_log("Skipping null entity pointer");
@@ -732,13 +732,35 @@ namespace lof {
                     continue;
                 }
 
+                // Get the entity name
+                std::string entity_name = entity_ptr->get_name();
+
+                // Skip level geometry entities identified by their naming pattern
+                if (entity_name.find("_prefab_") != std::string::npos &&
+                    (entity_name.find("dirt") == 0 ||
+                        entity_name.find("rock") == 0 ||
+                        entity_name.find("tnt") == 0 ||
+                        entity_name.find("quartz") == 0 ||
+                        entity_name.find("emerald") == 0 ||
+                        entity_name.find("sapphire") == 0 ||
+                        entity_name.find("amethyst") == 0 ||
+                        entity_name.find("citrine") == 0 ||
+                        entity_name.find("alexandrite") == 0 ||
+                        entity_name.find("tunnel") == 0 ||
+                        entity_name.find("vent") == 0 ||
+                        entity_name.find("lava") == 0 ||
+                        entity_name.find("obsidian") == 0 ||
+                        entity_name.find("ventStrip") == 0)) {
+                    LM.write_log("Skipping level geometry entity: %s", entity_name.c_str());
+                    continue;
+                }
+
                 try {
-                    // Create the entity object
+                    // Create entity and components objects
                     rapidjson::Value entity_obj(rapidjson::kObjectType);
                     rapidjson::Value components_obj(rapidjson::kObjectType);
 
-                    // Handle name
-                    std::string entity_name;
+                    // Handle entity naming
                     if (entity_id == 0) {
                         entity_name = "background";
                     }
@@ -748,11 +770,6 @@ namespace lof {
                             entity_name = "entity_" + std::to_string(unnamed_counter++);
                         }
                     }
-
-                    // Create string value and immediately add it
-                    rapidjson::Value name_value;
-                    name_value.SetString(entity_name.c_str(), entity_name.length(), allocator);
-                    entity_obj.AddMember("name", name_value, allocator);
 
                     // Transform2D Component
                     if (ECSM.has_component<Transform2D>(entity_id)) {
@@ -862,33 +879,25 @@ namespace lof {
                         }
                     }
 
-                    // Only add if we have components
+                    // Only add entities that have components
                     if (components_obj.MemberCount() > 0) {
                         try {
-                            // Store the count before moving
-                            size_t component_count = components_obj.MemberCount();
+                            rapidjson::Value name_value;
+                            name_value.SetString(entity_name.c_str(), entity_name.length(), allocator);
+                            entity_obj.AddMember("name", name_value, allocator);
+                            entity_obj.AddMember("components", components_obj, allocator);
+                            objects_array.PushBack(entity_obj, allocator);
 
-                            // Create a string value for the key
-                            rapidjson::Value components_key("components", allocator);
-
-                            // Move the components object into the entity object
-                            entity_obj.AddMember(components_key, components_obj.Move(), allocator);
-
-                            // Move the entity object into the array
-                            objects_array.PushBack(entity_obj.Move(), allocator);
-
-                            LM.write_log("Successfully serialized entity %s with %d components",
-                                entity_name.c_str(), component_count);  // Use stored count instead
+                            LM.write_log("Successfully serialized entity %s", entity_name.c_str());
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error adding components to entity %s: %s",
-                                entity_name.c_str(), e.what());
+                            LM.write_log("Error adding components to entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
                 }
                 catch (const std::exception& e) {
                     LM.write_log("Error processing entity %d: %s", entity_id, e.what());
-                    continue;  // Skip this entity on error
+                    continue;
                 }
             }
 
@@ -921,7 +930,6 @@ namespace lof {
             return false;
         }
     }
-
 
     bool Serialization_Manager::load_level_data(const char* filepath) {
         LM.write_log("Serialization_Manager::load_level_data(): Loading level from %s", filepath);
