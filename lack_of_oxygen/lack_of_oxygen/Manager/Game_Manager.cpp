@@ -228,50 +228,6 @@ namespace lof {
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
-        // GUI System control
-        if (IM.is_key_pressed(GLFW_KEY_G) && !level_editor_mode) {
-            // Find GUI System
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        // Toggle loading screen
-                        static bool loading_screen_visible = false;
-                        if (!loading_screen_visible) {
-                            loading_screen_visible = true;
-                            gui_system->show_loading_screen();
-                            LM.write_log("Game_Manager::update(): Showing loading screen");
-                        }
-                        else {
-                            loading_screen_visible = false;
-                            gui_system->hide_loading_screen();
-                            LM.write_log("Game_Manager::update(): Hiding loading screen");
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        // Test progress bar updates with H key
-        if (IM.is_key_pressed(GLFW_KEY_H) && !level_editor_mode) {
-            static float test_progress = 0.0f;
-            test_progress += 0.1f;
-            if (test_progress > 1.0f) test_progress = 0.0f;
-
-            // Find GUI System and update progress
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "GUI_System") {
-                    auto* gui_system = static_cast<GUI_System*>(system.get());
-                    if (gui_system) {
-                        gui_system->set_progress(test_progress);
-                        LM.write_log("Game_Manager::update(): Updated progress bar to %.2f", test_progress);
-                    }
-                    break;
-                }
-            }
-        }
-
         //to pause all the sound that is playing
         if (IM.is_key_pressed(GLFW_KEY_5) || IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
@@ -408,12 +364,15 @@ namespace lof {
             }
 
 
-
             if (ECSM.has_component<Physics_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_LEFT;
+
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -421,17 +380,31 @@ namespace lof {
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
                                 animation.curr_tile_health--;
-                            } 
+                            }
 
-                            // Destroy the colliding block on the left
+                            // Destroy the block and update mineral count when health reaches 0
                             if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
                                 ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed left block (Entity %u)", block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
                             }
                         }
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_RIGHT;
+
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -441,17 +414,25 @@ namespace lof {
                                 animation.curr_tile_health--;
                             }
 
-                            // Destroy the colliding block on the right
+                            // Destroy the block and update mineral count when health reaches 0
                             if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
                                 ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
                             }
                         }
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_UP)) {
-                    // Note: You might need to add top collision detection in Collision System
-                    // Similar to left/right collisions
                     if (CS.has_top_collide_detect()) {
                         EntityID block_to_remove = CS.get_top_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -461,15 +442,29 @@ namespace lof {
                                 animation.curr_tile_health--;
                             }
 
-                            // Destroy the colliding block on the right
+                            // Destroy the block and update mineral count when health reaches 0
                             if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
                                 ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed right block (Entity %u)", block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
                             }
                         }
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                    //// Get mining status for animation
+                    //auto& mining_status = GFXM.get_mining_status();
+                    //mining_status = MINE_DOWN;
+
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -479,15 +474,62 @@ namespace lof {
                                 animation.curr_tile_health--;
                             }
 
-                            // Destroy the colliding block below
+                            // Destroy the block and update mineral count when health reaches 0
                             if (animation.curr_tile_health == 0) {
+                                // Get mineral value before destroying the entity
+                                int mineral_value = get_mineral_value(block_to_remove);
+
+                                // Update the mineral count text
+                                if (mineral_value > 0) {
+                                    update_mineral_count_text(mineral_value);
+                                }
+
+                                // Destroy the entity
                                 ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed bottom block (Entity %u)", block_to_remove);
+                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                    block_to_remove, mineral_value);
                             }
                         }
                     }
                 }
 
+
+                // Mining animations
+                if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_LEFT;
+                    int& direction = GFXM.get_player_direction();
+                    direction = FACE_LEFT; 
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_UP)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_UP;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_DOWN;
+
+                }
+                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = MINE_RIGHT;
+                    int& direction = GFXM.get_player_direction(); 
+                    direction = FACE_RIGHT; 
+
+                }
+                else {
+                    // Get mining status for animation
+                    auto& mining_status = GFXM.get_mining_status();
+                    mining_status = NO_ACTION;
+                }
+                auto& mining_status = GFXM.get_mining_status();
+              
 
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
@@ -506,7 +548,9 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_LEFT;
+                    direction = FACE_LEFT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_LEFT;
 
                     // Update sound effect for player moving left
                     if (physics.get_is_grounded()) {
@@ -533,7 +577,9 @@ namespace lof {
 
                     // Update player animation flag
                     int& direction = GFXM.get_player_direction();
-                    direction = MOVE_RIGHT;
+                    direction = FACE_RIGHT;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = RUN_RIGHT;
 
                     // Update sound effect for player moving right
                     if (physics.get_is_grounded()) {
@@ -560,7 +606,9 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_LEFT;
+                        direction = FACE_LEFT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_LEFT;
 
                         // Update sound effect for player moving left
                         if (physics.get_is_grounded()) {
@@ -587,7 +635,9 @@ namespace lof {
 
                         // Update player animation flag
                         int& direction = GFXM.get_player_direction();
-                        direction = MOVE_RIGHT;
+                        direction = FACE_RIGHT;
+                        int& moving_status = GFXM.get_moving_status();
+                        moving_status = RUN_RIGHT;
 
                         // Update sound effect for player moving right
                         if (physics.get_is_grounded()) {
@@ -613,8 +663,8 @@ namespace lof {
                     physics.force_helper.deactivate_force(MOVE_RIGHT);
                     forces_flag = -1;
 
-                    int& direction = GFXM.get_player_direction();
-                    direction = -1;
+                    int& moving_status = GFXM.get_moving_status();
+                    moving_status = NO_ACTION;
                 }
 
             }
@@ -890,8 +940,6 @@ namespace lof {
             IMGUIM.set_current_file_shown(get_file_name);
         }
 
-
-
         // Getting delta time for Input Manager
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
         // Update Input_Manager
@@ -923,6 +971,75 @@ namespace lof {
 
     int Game_Manager::get_step_count() const {
         return m_step_count;
+    }
+
+    int Game_Manager::get_mineral_value(EntityID block_id) const {
+        if (!ECSM.has_component<Animation_Component>(block_id)) {
+            return 0;
+        }
+
+        auto* entity = ECSM.get_entity(block_id);
+        if (!entity) {
+            return 0;
+        }
+
+        const std::string& name = entity->get_name();
+        LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
+
+        // Match the prefab names with their corresponding values
+        if (name.find("quartz") != std::string::npos) {
+            LM.write_log("Found quartz mineral, value: 100");
+            return 100;
+        }
+        if (name.find("emerald") != std::string::npos) {
+            LM.write_log("Found emerald mineral, value: 800");
+            return 800;
+        }
+        if (name.find("sapphire") != std::string::npos) {
+            LM.write_log("Found sapphire mineral, value: 1600");
+            return 1600;
+        }
+        if (name.find("amethyst") != std::string::npos) {
+            LM.write_log("Found amethyst mineral, value: 2400");
+            return 2400;
+        }
+        if (name.find("citrine") != std::string::npos) {
+            LM.write_log("Found citrine mineral, value: 3200");
+            return 3200;
+        }
+        if (name.find("alexandrite") != std::string::npos) {
+            LM.write_log("Found alexandrite mineral, value: 4000");
+            return 4000;
+        }
+
+        LM.write_log("No mineral value found for this entity");
+        return 0;
+    }
+
+    void Game_Manager::update_mineral_count_text(int value_to_add) {
+        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+        if (text_entity == INVALID_ENTITY_ID) {
+            LM.write_log("Could not find mineral count text entity");
+            return;
+        }
+
+        if (!ECSM.has_component<Text_Component>(text_entity)) {
+            LM.write_log("Mineral count entity does not have Text_Component");
+            return;
+        }
+
+        try {
+            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+            // Convert current text to integer, add new value
+            int current_value = std::stoi(text_comp.text);
+            current_value += value_to_add;
+            // Convert back to string and update text
+            text_comp.text = std::to_string(current_value);
+            LM.write_log("Updated mineral count to: %d", current_value);
+        }
+        catch (const std::exception& e) {
+            LM.write_log("Error updating mineral count: %s", e.what());
+        }
     }
 
 } // namespace lof

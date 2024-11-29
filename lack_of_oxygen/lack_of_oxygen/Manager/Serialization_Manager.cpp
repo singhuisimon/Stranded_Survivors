@@ -307,7 +307,6 @@ namespace lof {
      * @param filename The complete path to the scene file.
      * @return True if loading and parsing are successful, false otherwise.
      */
-    
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
@@ -662,6 +661,7 @@ namespace lof {
         // Add other animation component properties
         comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator);
         comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator);
+        comp_obj.AddMember("curr_frame_index", component.curr_frame_index, allocator);
 
         // Add current frame index
         comp_obj.AddMember("curr_frame_index", component.curr_frame_index, allocator);
