@@ -27,6 +27,7 @@
 #include "../Utility/Constant.h"
 #include "Assets_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
+#include "../Utility/Win_Control.h"
 
 namespace lof {
 
@@ -235,6 +236,7 @@ namespace lof {
             mouse_texture_coord_screen.x = (mouse_pos.x - texture_pos.x);
             mouse_texture_coord_screen.y = (mouse_pos.y - texture_pos.y);
 
+
             //Get camera position and changes
             auto& camera = GFXM.get_camera();
 
@@ -427,9 +429,21 @@ namespace lof {
 
                         ImVec2 dragged_offset;
 
+                        unsigned int game_scale_width = SM.get_scr_width();
+                        unsigned int game_scale_height = SM.get_scr_height();
+                        //printf("game width, height (%i, %i)\n", game_scale_width, game_scale_height);
+
+                        unsigned int window_width = WC.get_win_width();
+                        unsigned int window_height = WC.get_win_height();
+                        //printf("window width, height (%i, %i)\n", window_width, window_height);
+
+                        float ratio_width = static_cast<float>(game_scale_width) / window_width;
+                        float ratio_height = static_cast<float>(game_scale_height) / window_height;
+                        //printf("ratio width, ratio height (%.f, %.f)\n", ratio_width, ratio_height);
+
                         if (is_full_screen) {
-                            dragged_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) /1.34f;
-                            dragged_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) /1.48f;
+                            dragged_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) * ratio_width;
+                            dragged_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) * ratio_height;
                         }
                         else {
                             

@@ -3,6 +3,7 @@
 #include "../Main/Main.h" // for extern window
 #include <iostream>
 #include "../Manager/IMGUI_Manager.h"
+#include "../Utility/Win_Control.h"
 
 
 
@@ -114,14 +115,14 @@ namespace lof
         {
 
             ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
-            g_selected_entity_info.mousePos = mousePos;
             isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+            g_selected_entity_info.mousePos = mousePos;
         }
         else
         {
             Vec2D mousePos = Get_World_MousePos();
-            g_selected_entity_info.entitypos = mousePos;
             isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+            g_selected_entity_info.entitypos = mousePos;
         }
         
 
@@ -177,24 +178,35 @@ namespace lof
 
     }
 
-  
+#if 1
     bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        int window_width, window_height;
-        glfwGetWindowSize(window, &window_width, &window_height);
+        
+        unsigned int current_width =  WC.get_win_width();
+        unsigned int current_height = WC.get_win_height();
 
-        float current_width = window_width;
-        float current_height = window_height;
+        //auto & camera = GFXM.get_camera();
+
         //printf("window width, height (%.f, %.f)\n", current_width, current_height);
-        float scaleX = current_width/ SM.get_scr_width();
-        float scaleY = current_height / SM.get_scr_height();
+        float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
+        //float scaleX = static_cast<float>(SM.get_scr_width() / current_width);
+        float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
+        //float scaleY = static_cast<float>(SM.get_scr_height() / current_height);
 
-        float adjustX = mouseX / scaleX;
-        float adjustY = mouseY / scaleY;
+        float adjustX = (mouseX /scaleX);
+        float adjustY = (mouseY / scaleY);
+
+        //float camera_pos_x = camera.pos_x / scaleX;
+        //float camera_pos_y = camera.pos_y / scaleY;
+
+        //box_x -= camera_pos_x;
+        //box_y -= camera_pos_y;
+
         //flioat adjustX = mouseX / scaleX;
         return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
             adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
     }
+#endif
 
-  
+
 }
