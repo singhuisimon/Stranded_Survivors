@@ -180,8 +180,20 @@ namespace lof
   
     bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
-            mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
+        int window_width, window_height;
+        glfwGetWindowSize(window, &window_width, &window_height);
+
+        float current_width = window_width;
+        float current_height = window_height;
+        //printf("window width, height (%.f, %.f)\n", current_width, current_height);
+        float scaleX = current_width/ SM.get_scr_width();
+        float scaleY = current_height / SM.get_scr_height();
+
+        float adjustX = mouseX / scaleX;
+        float adjustY = mouseY / scaleY;
+        //flioat adjustX = mouseX / scaleX;
+        return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
+            adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
     }
 
   
