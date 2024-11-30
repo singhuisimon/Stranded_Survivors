@@ -471,7 +471,7 @@ namespace lof {
     }
 
     void GUI_System::hide_mineral_tank_gui() {
-        LM.write_log("Starting to hide mineral tank GUI");
+        //LM.write_log("Starting to hide mineral tank GUI");
 
         // Check and destroy container first since it was created last
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
@@ -495,12 +495,12 @@ namespace lof {
             LM.write_log("Warning: Some entities still exist after destruction attempt");
         }
         else {
-            LM.write_log("All mineral tank GUI entities successfully destroyed");
+            //LM.write_log("All mineral tank GUI entities successfully destroyed");
         }
     }
 
     void GUI_System::hide_oxygen_tank_gui() {
-        LM.write_log("Starting to hide oxygen tank GUI");
+        //LM.write_log("Starting to hide oxygen tank GUI");
 
         // Destroy container first since it was created last
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
@@ -540,7 +540,7 @@ namespace lof {
             LM.write_log("Warning: Some entities still exist after destruction attempt");
         }
         else {
-            LM.write_log("All oxygen tank GUI entities successfully destroyed");
+            //LM.write_log("All oxygen tank GUI entities successfully destroyed");
         }
     }
 }

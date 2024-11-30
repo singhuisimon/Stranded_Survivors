@@ -56,12 +56,12 @@ namespace lof {
 	}
 
 	unsigned int Window_Control::get_win_width() const {
-		LM.write_log("Window_Control::get_win_width: width is %ui", win_width);
+		//LM.write_log("Window_Control::get_win_width: width is %ui", win_width);
 		return win_width;
 	}
 
 	unsigned int Window_Control::get_win_height() const {
-		LM.write_log("Window_Control::get_win_width: height is %ui", win_height);
+		//LM.write_log("Window_Control::get_win_height: height is %ui", win_height);
 		return win_height;
 	}
 

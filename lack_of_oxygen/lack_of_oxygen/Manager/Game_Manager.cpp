@@ -234,7 +234,19 @@ namespace lof {
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5) || IM.is_key_pressed(GLFW_KEY_TAB)) {
+        if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->pause_resume_mastergroup();
+                    }
+                }
+            }
+        }
+
+        //to ensure sound pause during level_editor_mode
+        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "Audio_System") {
                     auto* audio_system = static_cast<Audio_System*>(system.get());
@@ -713,7 +725,7 @@ namespace lof {
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-
+#if _DEBUG
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
@@ -725,6 +737,7 @@ namespace lof {
             GLboolean& mode = GFXM.get_debug_mode();
             mode = GL_FALSE;
         }
+#endif
 
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #if 1
@@ -840,9 +853,9 @@ namespace lof {
             }
         }
 
-        // Camera up-down scrolling when Number Pad 8 or 2 pressed
-        if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
-            camera_up_down_scroll_flag = GLFW_KEY_UP;
+        // Camera up-down scrolling when I or K pressed
+        if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
+            camera_up_down_scroll_flag = GLFW_KEY_I;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -850,8 +863,8 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP))) {
-            camera_up_down_scroll_flag = GLFW_KEY_DOWN;
+        else if (IM.is_key_held(GLFW_KEY_K) && !(IM.is_key_held(GLFW_KEY_I))) {
+            camera_up_down_scroll_flag = GLFW_KEY_K;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -859,9 +872,9 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_UP) && IM.is_key_held(GLFW_KEY_DOWN)) {
+        else if (IM.is_key_held(GLFW_KEY_I) && IM.is_key_held(GLFW_KEY_K)) {
             auto& camera = GFXM.get_camera();
-            if (camera_up_down_scroll_flag == GLFW_KEY_UP) {
+            if (camera_up_down_scroll_flag == GLFW_KEY_I) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -876,9 +889,9 @@ namespace lof {
             camera_up_down_scroll_flag = 0;
         }
 
-        // Camera left-right scrolling when Number Pad 4 or 6 pressed
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))) {
-            camera_left_right_scroll_flag = GLFW_KEY_LEFT;
+        // Camera left-right scrolling when J or L pressed
+        if (IM.is_key_held(GLFW_KEY_J) && !(IM.is_key_held(GLFW_KEY_L))) {
+            camera_left_right_scroll_flag = GLFW_KEY_J;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -886,8 +899,8 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))) {
-            camera_left_right_scroll_flag = GLFW_KEY_RIGHT;
+        else if (IM.is_key_held(GLFW_KEY_L) && !(IM.is_key_held(GLFW_KEY_J))) {
+            camera_left_right_scroll_flag = GLFW_KEY_L;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -895,9 +908,9 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_LEFT) && IM.is_key_held(GLFW_KEY_RIGHT)) {
+        else if (IM.is_key_held(GLFW_KEY_J) && IM.is_key_held(GLFW_KEY_L)) {
             auto& camera = GFXM.get_camera();
-            if (camera_left_right_scroll_flag == GLFW_KEY_LEFT) {
+            if (camera_left_right_scroll_flag == GLFW_KEY_J) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
