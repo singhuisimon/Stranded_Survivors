@@ -330,7 +330,7 @@
         },
         "Collision_Component": {
           "width": 95.0,
-          "height": 95.0,
+          "height": 96.0,
           "collidable": true
         },
         "Physics_Component": {
