@@ -135,8 +135,8 @@ namespace lof {
         int is_moving = 0;
         int is_mining = 0;
 
-        // FOR TESTING
-        GLuint imgui_fbo, imgui_tex;
+        // Texture for imgui level editor viewport
+        GLuint imgui_fbo{ 0 }, imgui_tex{ 0 };
         int editor_mode = 0;
 
     public:

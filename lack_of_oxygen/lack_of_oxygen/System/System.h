@@ -14,7 +14,7 @@
 
 // Include standard headers
 #include <string>
-#include <unordered_set>       // For std::unordered_set
+#include <set>       // For std::unordered_set
 
 // Include other necessary headers
 #include "../Utility/Constant.h"
@@ -29,7 +29,7 @@ namespace lof {
     class System { 
     protected:
         Signature signature;                      ///< Components required by the system
-        std::unordered_set<EntityID> entities;    ///< Entities matching the system's signature
+        std::set<EntityID> entities;    ///< Entities matching the system's signature
 
     private:
 
@@ -97,7 +97,7 @@ namespace lof {
          * @brief Get the list of entities the system processes.
          * @return A constant reference to the set of entity IDs.
          */
-        const std::unordered_set<EntityID>& get_entities() const {
+        const std::set<EntityID>& get_entities() const {
             return entities;
         }
 
