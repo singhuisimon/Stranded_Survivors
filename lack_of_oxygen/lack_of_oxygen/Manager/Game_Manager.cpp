@@ -922,6 +922,7 @@ namespace lof {
 
             // Toggle between scenes
             //current_scene = (current_scene == 1) ? 2 : 1;
+            mining_strength = DEFAULT_STRENGTH;
 
             // Create full path to the scene file
             const std::string SCENES = "Scenes";

@@ -124,12 +124,12 @@ namespace lof {
         debug_print_level();
 
         // Only create level entities if startup on scene file is scene2.scn
-        if (is_scene2_file(scene_path.c_str())) {
-            if (!create_level_entities()) {
-                LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
-                return -5;
-            }
-        }
+        //if (is_scene2_file(scene_path.c_str())) {
+        //    if (!create_level_entities()) {
+        //        LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
+        //        return -5;
+        //    }
+        //}
 
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
