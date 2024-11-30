@@ -2,7 +2,7 @@
  * @file Main.h
  * @brief Main header file for the game engine application.
  * @details Includes necessary libraries and headers for the application entry point.
- * @author Simon Chan (90.909%), Liliana Hanawardani (9.090%)
+ * @author Simon Chan (90%), Liliana Hanawardani (9%), Amanda Leow Boon Suan (1%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
