@@ -95,6 +95,14 @@ namespace lof {
             return -2;
         }
 
+        // Load level data
+        const std::string level_folder = "Level_Design";
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        if (!load_level_data(level_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
+            return -4;
+        }
+
         // Load scene file 
         //const std::string scene_folder = "Scenes";
 #ifndef NDEBUG
@@ -105,31 +113,8 @@ namespace lof {
         const std::string SCENES = "Scenes";
         std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(2) + ".scn");
 
-        // Load level data
-        const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
-        if (!load_level_data(level_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
-            return -4;
-        }
-
-        if (!load_scene(scene_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
-            return -3;
-        }
-
-       
-
         // Debug print level data if loaded successfully
         debug_print_level();
-
-        // Only create level entities if startup on scene file is scene2.scn
-        //if (is_scene2_file(scene_path.c_str())) {
-        //    if (!create_level_entities()) {
-        //        LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
-        //        return -5;
-        //    }
-        //}
 
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
@@ -1054,9 +1039,11 @@ namespace lof {
             return false;
         }
 
+        LM.write_log("Serialization_Manager::create_level_entities(): CHECKING IF SCENE 2 IS LOADED TWICE");
+
         // Define bounds
-        const float LEFT_BOUND = -1020.0f;
-        const float RIGHT_BOUND = 1020.0f;
+        const float LEFT_BOUND = -960.0f;
+        const float RIGHT_BOUND = 960.0f;
         const float START_Y = -150.0f;
 
         // Calculate tile size based on the bounds and number of columns

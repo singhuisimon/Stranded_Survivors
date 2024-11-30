@@ -15,6 +15,7 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
+#include "../Manager/Game_Manager.h"
 #include "../System/Render_System.h"
 #include "Collision_System.h"
 
@@ -69,9 +70,16 @@ namespace lof {
                 //reset the jump request
                 physics.reset_jump_request();
                 physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
+                
+                if (GM.get_current_scene() == 1) {
+                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping", PLAYING);
 
-                ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping1", PLAYING);
-                ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping2", PLAYING);
+                }
+                else {
+                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping1", PLAYING);
+                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping2", PLAYING);
+                }
+                
             }
 
             //update forces based on time

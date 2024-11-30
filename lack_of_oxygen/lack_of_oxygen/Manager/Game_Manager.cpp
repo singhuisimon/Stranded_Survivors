@@ -237,7 +237,19 @@ namespace lof {
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_TAB)){//} || IM.is_key_pressed(GLFW_KEY_TAB)) {
+        if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->pause_resume_mastergroup();
+                    }
+                }
+            }
+        }
+
+        //to ensure sound pause during level_editor_mode
+        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "Audio_System") {
                     auto* audio_system = static_cast<Audio_System*>(system.get());
@@ -272,7 +284,7 @@ namespace lof {
                 constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                constexpr float TEXT_OFFSET_Y = 10.0f;              // Vertical offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;           // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
@@ -716,7 +728,7 @@ namespace lof {
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-
+#if _DEBUG
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
@@ -728,6 +740,7 @@ namespace lof {
             GLboolean& mode = GFXM.get_debug_mode();
             mode = GL_FALSE;
         }
+#endif
 
 
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
@@ -844,9 +857,9 @@ namespace lof {
             }
         }
 
-        // Camera up-down scrolling when Number Pad 8 or 2 pressed
-        if (IM.is_key_held(GLFW_KEY_KP_8) && !(IM.is_key_held(GLFW_KEY_KP_2))) {
-            camera_up_down_scroll_flag = GLFW_KEY_KP_8;
+        // Camera up-down scrolling when I or K pressed
+        if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
+            camera_up_down_scroll_flag = GLFW_KEY_I;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -854,8 +867,8 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_2) && !(IM.is_key_held(GLFW_KEY_KP_8))) {
-            camera_up_down_scroll_flag = GLFW_KEY_KP_2;
+        else if (IM.is_key_held(GLFW_KEY_K) && !(IM.is_key_held(GLFW_KEY_I))) {
+            camera_up_down_scroll_flag = GLFW_KEY_K;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -863,9 +876,9 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_8) && IM.is_key_held(GLFW_KEY_KP_2)) {
+        else if (IM.is_key_held(GLFW_KEY_I) && IM.is_key_held(GLFW_KEY_K)) {
             auto& camera = GFXM.get_camera();
-            if (camera_up_down_scroll_flag == GLFW_KEY_KP_8) {
+            if (camera_up_down_scroll_flag == GLFW_KEY_I) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -880,9 +893,9 @@ namespace lof {
             camera_up_down_scroll_flag = 0;
         }
 
-        // Camera left-right scrolling when Number Pad 4 or 6 pressed
-        if (IM.is_key_held(GLFW_KEY_KP_4) && !(IM.is_key_held(GLFW_KEY_KP_6))) {
-            camera_left_right_scroll_flag = GLFW_KEY_KP_4;
+        // Camera left-right scrolling when J or L pressed
+        if (IM.is_key_held(GLFW_KEY_J) && !(IM.is_key_held(GLFW_KEY_L))) {
+            camera_left_right_scroll_flag = GLFW_KEY_J;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -890,8 +903,8 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_6) && !(IM.is_key_held(GLFW_KEY_KP_4))) {
-            camera_left_right_scroll_flag = GLFW_KEY_KP_6;
+        else if (IM.is_key_held(GLFW_KEY_L) && !(IM.is_key_held(GLFW_KEY_J))) {
+            camera_left_right_scroll_flag = GLFW_KEY_L;
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
@@ -899,9 +912,9 @@ namespace lof {
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_4) && IM.is_key_held(GLFW_KEY_KP_6)) {
+        else if (IM.is_key_held(GLFW_KEY_J) && IM.is_key_held(GLFW_KEY_L)) {
             auto& camera = GFXM.get_camera();
-            if (camera_left_right_scroll_flag == GLFW_KEY_KP_4) {
+            if (camera_left_right_scroll_flag == GLFW_KEY_J) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -1069,6 +1082,14 @@ namespace lof {
         catch (const std::exception& e) {
             LM.write_log("Error updating mineral count: %s", e.what());
         }
+    }
+
+    void Game_Manager::set_current_scene(int scene_num) {
+        current_scene = scene_num;
+    }
+
+    int Game_Manager::get_current_scene() {
+        return current_scene;
     }
 
 } // namespace lof

@@ -127,6 +127,10 @@ namespace lof {
          * @return The number of game loop iterations executed.
          */
         int get_step_count() const;
+
+        void set_current_scene(int scene_num);
+
+        int get_current_scene();
     };
 
 } // namespace lof

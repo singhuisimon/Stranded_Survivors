@@ -240,7 +240,7 @@ namespace lof {
         }
         input_file.close();
 
-        LM.write_log("Assets_Manager: Loading texture from %s", texture_file.c_str());
+        LM.write_log("Graphics Manager: Loading texture from %s", texture_file.c_str());
 
         // Load texture data
         int width{ 0 }, height{ 0 }, channels{ 0 };
@@ -248,7 +248,7 @@ namespace lof {
         unsigned char* tex_data = stbi_load(texture_file.c_str(), &width, &height, &channels, 4);
 
         // Add debug logging for dimensions
-        LM.write_log("Assets_Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
+        LM.write_log("Graphics Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
 
         // Create and initialize texture object
         GLuint tex_id{};
@@ -267,11 +267,11 @@ namespace lof {
             stbi_image_free(tex_data);
 
             // Add debug logging
-            LM.write_log("Assets_Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
+            LM.write_log("Graphics Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
         }
         else {
             stbi_image_free(tex_data);
-            LM.write_log("Assets_Manager: Failed to load texture data for %s", texture_name.c_str());
+            LM.write_log("Graphics Manager: Failed to load texture data for %s", texture_name.c_str());
             return GL_FALSE;
         }
 

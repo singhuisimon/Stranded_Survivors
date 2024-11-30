@@ -462,7 +462,7 @@ namespace lof {
             else {
                 glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
             }
-
+#if _DEBUG
             // Draw debugging features if debug mode is ON 
             if (entity_id != 0) { // Background object unaffected 
                 if (GFXM.get_debug_mode() == GL_TRUE) {
@@ -603,6 +603,7 @@ namespace lof {
                     }
                 }
             }
+#endif
             // Clean up by unbinding the VAO and ending the shader program
             glBindVertexArray(0);
             glBindTexture(GL_TEXTURE_2D, 0);
