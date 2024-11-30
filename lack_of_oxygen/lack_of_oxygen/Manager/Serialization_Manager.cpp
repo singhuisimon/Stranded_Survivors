@@ -415,15 +415,18 @@ namespace lof {
 
             // Add components to the entity
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
-        }
 
-        // Create level entities only for scene2
-        if (is_scene2_file(filename)) {
-            LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
-            if (!create_level_entities()) {
-                LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
-                return false;
+            // Create level entities only for scene2
+            if (i == 4) {
+                if (is_scene2_file(filename)) {
+                    LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
+                    if (!create_level_entities()) {
+                        LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
+                        return false;
+                    }
+                }
             }
+
         }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
