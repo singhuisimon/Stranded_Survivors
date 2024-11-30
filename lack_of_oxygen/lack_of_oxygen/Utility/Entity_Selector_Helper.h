@@ -9,16 +9,15 @@
 namespace lof {
 
 #define ESS lof::Entity_Selector_Helper::get_instance()
-#if 1
+
 	struct EntityInfo {
-		EntityID selectedEntity;
+		EntityID selectedEntity = static_cast<uint32_t>(-1);
 		bool isSelected = false; // Flag to indicate if an entity is selected
 		//ImVec2 mousePos;  // Store the mouse position 
 		Vec2D entitypos;
 	};
 
 
-#endif
 	class Entity_Selector_Helper
 	{
 	public:
@@ -34,7 +33,7 @@ namespace lof {
 		void Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight);
 
 		
-		bool Mouse_Over_AABB(float box_x, float box_y, float width, float height, int X, int mouseY);
+		bool Mouse_Over_AABB(float box_x, float box_y, float width, float height, float X, float mouseY);
 		
 		Vec2D Get_World_MousePos();
 
@@ -44,14 +43,9 @@ namespace lof {
 
 		static EntityInfo g_selected_entity_info;
 
-
-
-
 		static std::unique_ptr<Entity_Selector_Helper> instance;
 
 		static std::once_flag once_flag;
-
-
 	};
 }
 

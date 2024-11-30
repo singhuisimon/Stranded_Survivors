@@ -1,5 +1,4 @@
 
-#if 1
 /**
  * @file Render_System.cpp
  * @brief Implements the Render_System class for the ECS that
@@ -17,10 +16,7 @@
 #include "../Component/Component.h"
 #include "Collision_System.h"
 #include "../System/GUI_System.h"  // Add this for GUI system access
-
-
-// FOR TESTING
-#include "../Utility/globals.h"
+#include "../Utility/globals.h"    // To access level_editor_mode
 
 namespace lof {
 
@@ -47,9 +43,6 @@ namespace lof {
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
-
-            //LM.write_log("Checking entity and name %u: %s", entity_id, graphics.texture_name.c_str()); 
-
             // Access player's ID
             EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
@@ -62,7 +55,7 @@ namespace lof {
                 if (ECSM.has_component<Collision_Component>(entity_id)) {
 
                     auto& collision = ECSM.get_component<Collision_Component>(entity_id);
-#if 0
+
                     int scale_flag = GFXM.get_scale_flag();
                     if (scale_flag == GLFW_KEY_UP) {
                         LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
@@ -95,7 +88,7 @@ namespace lof {
 
                     // Rotation update when left or right arrow key pressed
                     int rotation_flag = GFXM.get_rotation_flag();
-                    if (rotation_flag == GLFW_KEY_LEFT) {
+                    if (rotation_flag == GLFW_KEY_LEFT) {  
                         GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
                         transform.orientation.x += rot_change;
                         LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
@@ -105,7 +98,7 @@ namespace lof {
                         transform.orientation.x -= rot_change;
                         LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
                     }
-#endif
+
                 }
 
             }
@@ -201,9 +194,9 @@ namespace lof {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Set up the imgui framebuffer when entering editor mode
-        //if (GFXM.get_editor_mode() == 1) {
-        //    glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
-        //}
+        if (GFXM.get_editor_mode() == 1) {
+            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
+        }
 
         // Set up for the drawing of objects
         glClear(GL_COLOR_BUFFER_BIT);
@@ -215,8 +208,7 @@ namespace lof {
     // Renders the entity onto the window based on the graphics components
     void Render_System::draw() {
 
-        // Get screen width and height
-        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+        // Get screen height
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
         // Loop over the entities that match the system's signature
@@ -225,10 +217,8 @@ namespace lof {
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
-            //LM.write_log("Checking entity and name %u: %s", entity_id, graphics.texture_name.c_str());
-
-            ///// Render only what is on the viewport (Back up for if instancing doesn't work)
-            if (level_editor_mode == false) {
+            // Render only what is on the viewport
+            //if (level_editor_mode == false) {
                 EntityID player_id = ECSM.find_entity_by_name("player1");
                 if (entity_id != 0 && entity_id != player_id) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
@@ -240,9 +230,7 @@ namespace lof {
                         continue;
                     }
                 }
-            }
-
-            ///// Render only what is on the viewport (Back up for if instancing doesn't work)
+            //}
 
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
@@ -330,7 +318,6 @@ namespace lof {
                     glDrawArrays(GL_TRIANGLES, 0, 6);
 
                     // Advance cursors for next glyph 
-                    //LM.write_log("Render_System::draw(): Font base check: %f", base_x);
                     base_x += (advance >> 6);
 
                 }
@@ -342,8 +329,6 @@ namespace lof {
                 // Set the scale of text object
                 transform.scale.x = (base_x - scale_x) * text_comp.scale.x;
                 transform.scale.y = scale_y * text_comp.scale.y;
-                //LM.write_log("Render_System::draw(): Font scale_x check: %f", transform.scale.x);
-                //LM.write_log("Render_System::draw(): Font scale_y check: %f", transform.scale.y);
 
                 // Skip other rendering operations
                 continue;
@@ -370,8 +355,6 @@ namespace lof {
                 } else {
                     glBindTextureUnit(5, textures[graphics.texture_name]);
                 }
-
-                //LM.write_log("Render_System::draw(): Texture name: %s.", graphics.texture_name.c_str());
 
                 // Set texture flag to true
                 GLuint tex_flag_true_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
@@ -625,13 +608,8 @@ namespace lof {
             glBindTexture(GL_TEXTURE_2D, 0);
             GFXM.program_free();
         }
-        //if (GFXM.get_editor_mode() == 1) {
-        //    glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
-        //}
-
+        if (GFXM.get_editor_mode() == 1) {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
+        }
     }
-
 } // namespace lof
-
-#endif
-

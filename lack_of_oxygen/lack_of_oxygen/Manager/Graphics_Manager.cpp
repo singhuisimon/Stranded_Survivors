@@ -199,7 +199,7 @@ namespace lof {
 
             // Set up position attributes (attribute index 0, binding point 6)
             glEnableVertexArrayAttrib(vaoid, 0);
-            glVertexArrayVertexBuffer(vaoid, 6, vbo_hdl, 0, data_size);
+            glVertexArrayVertexBuffer(vaoid, 6, vbo_hdl, 0, static_cast<GLsizei>(data_size));
             glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
             glVertexArrayAttribBinding(vaoid, 0, 6);
 

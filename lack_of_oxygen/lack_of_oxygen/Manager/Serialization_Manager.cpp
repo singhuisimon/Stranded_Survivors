@@ -23,7 +23,7 @@
 
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
-//#include "IMGUI_Manager.h"
+#include "IMGUI_Manager.h"
 #include "Assets_Manager.h"
 
 // Include all component headers
@@ -96,14 +96,14 @@ namespace lof {
         }
 
         // Load scene file 
-        const std::string scene_folder = "Scenes";
+        //const std::string scene_folder = "Scenes";
+#ifndef NDEBUG
         std::string loaded_scene = "scene1.scn";
+
         IMGUIM.set_current_file_shown(loaded_scene);
-        std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
-        if (!load_scene(scene_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
-            return -3;
-        }
+#endif
+        const std::string SCENES = "Scenes";
+        std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(2) + ".scn");
 
         // Load level data
         const std::string level_folder = "Level_Design";
@@ -113,16 +113,23 @@ namespace lof {
             return -4;
         }
 
+        if (!load_scene(scene_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
+            return -3;
+        }
+
+       
+
         // Debug print level data if loaded successfully
         debug_print_level();
 
         // Only create level entities if startup on scene file is scene2.scn
-        if (is_scene2_file(scene_path.c_str())) {
-            if (!create_level_entities()) {
-                LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
-                return -5;
-            }
-        }
+        //if (is_scene2_file(scene_path.c_str())) {
+        //    if (!create_level_entities()) {
+        //        LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
+        //        return -5;
+        //    }
+        //}
 
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
@@ -283,9 +290,9 @@ namespace lof {
         const rapidjson::Value& prefabs = prefab_document["prefabs"];
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
-            
-            //IMGUIM.fill_prefab_names(prefab_name.c_str());
-
+#ifndef NDEBUG
+            IMGUIM.fill_prefab_names(prefab_name.c_str());
+#endif
             //DEBUG
             LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());
 

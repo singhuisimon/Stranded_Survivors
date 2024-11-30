@@ -21,11 +21,11 @@
 
 namespace lof {
 
-    // Hui Shan
+ 
     std::unique_ptr<Assets_Manager> Assets_Manager::instance;
     std::once_flag Assets_Manager::once_flag;
 
-    // Hui Shan
+    
     Assets_Manager::Assets_Manager() {
         set_type("Assets_Manager");
         initialize_paths();
@@ -177,7 +177,7 @@ namespace lof {
     }
 
 
-    // Get the shader program (Hui Shan)
+    // Get the shader program 
     Assets_Manager::ShaderProgram* Assets_Manager::get_shader_program(size_t index) {
         if (index < shader_programs.size()) {
             return &shader_programs[index];
@@ -185,7 +185,7 @@ namespace lof {
         return nullptr;
     }
 
-    // Unload the shader as shader handle in assets manager now (Hui Shan)
+    // Unload the shader as shader handle in assets manager
     void Assets_Manager::unload_shader_programs() {
         // Delete all shader programs
         for (auto& shader : shader_programs) {
@@ -276,7 +276,6 @@ namespace lof {
     }
 
    
-   // kenny code 
     bool Assets_Manager::load_animations(const std::string& file_name) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
@@ -332,7 +331,6 @@ namespace lof {
         return true;
     }
 
-    // kenny 
     bool Assets_Manager::load_fonts(const std::string& font_name, FT_Library& out_ft, FT_Face& out_face) {
         if (FT_Init_FreeType(&out_ft)) {
             LM.write_log("Assets_Manager: Could not initialize FreeType Library");
@@ -340,8 +338,9 @@ namespace lof {
         }
 
         //std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
-        std::string font_filepath = BASE_PATH + FONT_PATH + "\\" + font_name + ".ttf";
+
         //std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+        std::string font_filepath = BASE_PATH + FONT_PATH + "\\" + font_name + ".ttf";
         if (!std::filesystem::exists(font_filepath))
         {
             font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
@@ -361,7 +360,7 @@ namespace lof {
         return true;
     }
 
-    // kenny 
+  
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
@@ -380,7 +379,8 @@ namespace lof {
     std::string Assets_Manager::get_audio_path(const std::string& audio_name) {
         return get_full_path("Audio", audio_name + ".wav");
     }
-#if 1
+
+
     bool Assets_Manager::load_audio_file(const std::string& audio_name) {
         std::string full_path = get_audio_path(audio_name);
 
@@ -395,9 +395,9 @@ namespace lof {
         LM.write_log("Assets_Manager: Successfully loaded audio file: %s", full_path.c_str());
         return true;
     }
-#endif
 
 
+  
 
 
     

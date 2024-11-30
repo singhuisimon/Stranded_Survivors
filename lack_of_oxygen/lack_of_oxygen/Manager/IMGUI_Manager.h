@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 /**
  * @file IMGUI_Manager.h
  * @brief Declaration of the IMGUI_Manager class for running the IMGUI level editor.
@@ -95,7 +96,7 @@ namespace lof {
          * @param window A reference to a pointer to the GLFWwindow window created with the GLFW library in main.
          * @return Will return 0 after sucessful initalistion.
          */
-        int start_up(GLFWwindow*& window);
+        int start_up(GLFWwindow*& glfwindow);
 
         /**
          * @brief Calls functions from IMGUI that set up a new frame for rendering with ImGui in an OpenGL and GLFW context
@@ -176,8 +177,11 @@ namespace lof {
         std::string get_current_file_shown();
 
         void fill_up_sound_names();
+
+        void disable_GUI();
     };
 
 } // namespace lof
 
 #endif // LOF_IMGUI_MANAGER_H
+#endif

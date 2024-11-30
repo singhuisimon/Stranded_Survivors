@@ -1,8 +1,10 @@
+#ifndef NDEBUG
 #include "Entity_Selector_Helper.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Main/Main.h" // for extern window
 #include <iostream>
 #include "../Manager/IMGUI_Manager.h"
+#include "../Utility/Win_Control.h"
 
 
 
@@ -24,147 +26,11 @@ namespace lof
         return g_selected_entity_info;
     }
 
-#if 0
+
     void Entity_Selector_Helper::Check_Selected_Entity()
     {
         bool entitySelected = false;
-        EntityID selectedEntityID = -1;
-
-        const auto& entities = ECSM.get_entities();
-
-        for (const auto& entity : entities)
-        {
-            EntityID entityID = entity->get_id();
-
-            //temporary solution to avoid clicking on background
-            /*if (entityID == 0) {
-                continue;
-            }*/
-
-            if (!ECSM.has_component<Transform2D>(entityID) ){
-                //sstd::cout << "Entity " << entityID << " does not have the required components.\n";
-                continue;
-            }
-
-            //if (!ECSM.has_component<Collision_Component>(entityID)) {
-            //   // std::cout << "Entity " << entityID << " does not have a Collision_Component.\n";
-            //    continue;
-            //}
-
-            // std::cout << "Testing what is this entity id in entity selector system " << entityID << "\n";
-            auto& transform = ECSM.get_component<Transform2D>(entityID);
-            //auto& collision = ECSM.get_component<Collision_Component>(entityID);
-
-            float entityX = transform.position.x;
-            float entityY = transform.position.y;
-            /*float entityWidth = collision.width;
-            float entityHeight = collision.height;*/
-            float entityWidth = transform.scale.x;
-            float entityHeight = transform.scale.y;
-
-            Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
-            EntityInfo selectedInfo = g_selected_entity_info;
-
-            if (selectedInfo.isSelected) {
-                entitySelected = true;
-                selectedEntityID = selectedInfo.selectedEntity;  // Store the selected entity ID
-                //std::cout << "x pos of the entity " << entityX << " y pos " << entityY << "\n";
-                //std::cout << " yees !!! is selected in entitty selector system  " << selectedEntityID << "\n";
-                //std::cout << "mouse x: " << selectedInfo.mousePos.x << " mouse y: " << selectedInfo.mousePos.y << "\n\n";
-                break;  // Exit the loop early if an entity is selected 
-            }
-
-        }
-    }
-#endif
-
-#if 0
-    void Entity_Selector_Helper::Check_Selected_Entity()
-    {
-        bool entitySelected = false;
-        EntityID selectedEntityID = -1;
-        EntityID checkFont = -1;
-
-        const auto& entities = ECSM.get_entities();
-
-        // Step 1: Check smaller (foreground) entities first
-        for (const auto& entity : entities)
-        {
-            EntityID entityID = entity->get_id();
-
-            // Skip background entity (entity 0) with large scale
-           /* if (entityID == 0) {
-                continue;
-            }*/
-
-            if (!ECSM.has_component<Transform2D>(entityID)) {
-                continue;
-            }
-
-            auto& transform = ECSM.get_component<Transform2D>(entityID);
-            float entityX = transform.position.x;
-            float entityY = transform.position.y;
-            float entityWidth = transform.scale.x;
-            float entityHeight = transform.scale.y;
-
-            //bool isFontEntity = (entityWidth <= 2.0f && entityHeight <= 2.0f);
-            //if (isFontEntity) {
-            //    printf("Detected font entity with scale: %f x %f\n", entityWidth, entityHeight);
-            //}
-
-            //if (isFontEntity) {
-            //    // Increase the selection hitbox for font entities to make them easier to select
-            //    const float fontHitboxScale = 20.0f;  // Example: increase by a factor of 4
-            //    entityWidth *= fontHitboxScale;
-            //    entityHeight *= fontHitboxScale;
-            //   // printf("font width: %f, font height: %f\n", entityWidth, entityHeight);
-            //    //checkFont = entityID;
-            //    //std::cout << checkFont<< "this is font entity\n";
-            //    printf("Font entity selection box adjusted to: %f x %f\n", entityWidth, entityHeight);
-            //}
-
-
-
-            Update_Selected_Entity_Info(entityID, entityX, entityY, entityWidth, entityHeight);
-            EntityInfo selectedInfo = g_selected_entity_info;
-
-            if (selectedInfo.isSelected) {
-                entitySelected = true;
-                selectedEntityID = selectedInfo.selectedEntity;  // Store the selected entity ID
-                break;  // Stop the loop if an entity is selected
-            }
-        }
-
-        //printf("selected entity: %d\n", selectedEntityID);
-
-      
-        //if (!entitySelected) {
-        //    // Check the background entity
-        //    EntityID backgroundEntityID = 0; // Background entity ID
-        //    if (ECSM.has_component<Transform2D>(backgroundEntityID)) {
-        //        auto& transform = ECSM.get_component<Transform2D>(backgroundEntityID);
-        //        float backgroundX = transform.position.x;
-        //        float backgroundY = transform.position.y;
-        //        float backgroundWidth = transform.scale.x;
-        //        float backgroundHeight = transform.scale.y;
-
-        //        Update_Selected_Entity_Info(backgroundEntityID, backgroundX, backgroundY, backgroundWidth, backgroundHeight);
-        //        EntityInfo selectedInfo = g_selected_entity_info;
-
-        //        if (selectedInfo.isSelected) {
-        //            selectedEntityID = backgroundEntityID; // Background is selected
-        //        }
-        //    }
-        //}
-
-        
-    }
-
-#endif
-    void Entity_Selector_Helper::Check_Selected_Entity()
-    {
-        bool entitySelected = false;
-        EntityID selectedEntityID = -1;
+        EntityID selectedEntityID = static_cast<EntityID>(-1);
 
         const auto& entities = ECSM.get_entities();
 
@@ -236,28 +102,29 @@ namespace lof
         // If nothing was selected, clear the selection
         if (!entitySelected) {
             g_selected_entity_info.isSelected = false;
-            g_selected_entity_info.selectedEntity = -1;
+            g_selected_entity_info.selectedEntity = static_cast<EntityID>(-1);
             
         }
     }
+
     
 #if 1
     void Entity_Selector_Helper::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
     {
         bool isSelected = false;
-        //if (level_editor_mode)
-        //{
+        if (level_editor_mode)
+        {
 
-        //    ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
-        //    g_selected_entity_info.mousePos = mousePos;
-        //    isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-        //}
-        //else
-        //{
-        //    Vec2D mousePos = Get_World_MousePos();
-        //    g_selected_entity_info.entitypos = mousePos;
-        //    isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-        //}
+            ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
+            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+            g_selected_entity_info.mousePos = mousePos;
+        }
+        else
+        {
+            Vec2D mousePos = Get_World_MousePos();
+            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+            g_selected_entity_info.entitypos = mousePos;
+        }
         
 
         g_selected_entity_info.isSelected = isSelected;
@@ -275,24 +142,6 @@ namespace lof
 
 #endif
 
-#if 0
-    bool Entity_Selector_System::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
-    {
-        Vec2D mousePos = Get_World_MousePos();
-        g_selected_entity_info.mousePos = mousePos;
-
-        bool isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-
-        if (isSelected) {
-            g_selected_entity_info.selectedEntity = entityID;  // Store the selected entity's ID
-            return true; // Return true if the entity is selected
-        }
-        else {
-            g_selected_entity_info.selectedEntity = static_cast<EntityID>(-1);  // No entity is being selected
-            return false; // Return false if no entity is selected
-        }
-    }
-#endif
 
     Vec2D Entity_Selector_Helper::Get_World_MousePos()
     {
@@ -316,27 +165,7 @@ namespace lof
         mouse_x = mouse_x;
         mouse_y = mouse_y;
         mouse_y = -mouse_y;
-       /* int framebuffer_width, framebuffer_height;
-        glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
-
-        int window_width, window_height;
-        glfwGetWindowSize(window, &window_width, &window_height);
-
-        double mouse_x, mouse_y;
-        glfwGetCursorPos(window, &mouse_x, &mouse_y);
-
-        double x_scale = static_cast<double>(framebuffer_width) / window_width;
-        double y_scale = static_cast<double>(framebuffer_height) / window_height;
-
-        mouse_x *= x_scale;
-        mouse_y *= y_scale;
-
-        double screen_width = framebuffer_width;
-        double screen_height = framebuffer_height;
-
-        mouse_x -= (screen_width / 2);
-        mouse_y -= (screen_height / 2);
-        mouse_y = -mouse_y;*/
+   
     
         // Get camera position
         auto& camera = GFXM.get_camera();
@@ -350,12 +179,36 @@ namespace lof
 
     }
 
-  
-    bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
+#if 1
+    bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
-            mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
-    }
+        
+        unsigned int current_width =  WC.get_win_width();
+        unsigned int current_height = WC.get_win_height();
 
-  
+        //auto & camera = GFXM.get_camera();
+
+        //printf("window width, height (%.f, %.f)\n", current_width, current_height);
+        float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
+        //float scaleX = static_cast<float>(SM.get_scr_width() / current_width);
+        float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
+        //float scaleY = static_cast<float>(SM.get_scr_height() / current_height);
+
+        float adjustX = (mouseX /scaleX);
+        float adjustY = (mouseY / scaleY);
+
+        //float camera_pos_x = camera.pos_x / scaleX;
+        //float camera_pos_y = camera.pos_y / scaleY;
+
+        //box_x -= camera_pos_x;
+        //box_y -= camera_pos_y;
+
+        //flioat adjustX = mouseX / scaleX;
+        return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
+            adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
+    }
+#endif
+
+
 }
+#endif

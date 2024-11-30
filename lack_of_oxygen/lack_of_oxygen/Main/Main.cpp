@@ -9,6 +9,10 @@
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
+#ifndef _DEBUG
+ #pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+#endif
+
  // Include file headers
 #include "Main.h"
 
@@ -18,6 +22,7 @@
 #include <iostream>
 #include <iomanip>    // For std::fixed and std::setprecision
 #include <sstream>    // For std::stringstream
+#include <Windows.h>
 
 // Include for memory leaks
 #define _CRTDBG_MAP_ALLOC
@@ -38,6 +43,11 @@ int main(void) {
 
     // Enable debug heap allocations and automatic leak checking at exit
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+#ifndef _DEBUG
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
+
 
     // -------------------------- GLFW Initialization --------------------------
 
@@ -125,25 +135,23 @@ int main(void) {
         LM.write_log("Game_Manager started up successfully.");
         std::cout << "Game_Manager started up successfully." << std::endl;
     }
-
+#ifndef NDEBUG
     // --------------------------- Start IMGUI_Manager ---------------------------
 
-    //IMGUIM.start_up(window); // Might need to integrate with game manager 
-    //ImGuiIO& io = ImGui::GetIO(); (void)io;
+    IMGUIM.start_up(window); // Might need to integrate with game manager 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
-    //ImGuiStyle& style = ImGui::GetStyle();
+    ImGuiStyle& style = ImGui::GetStyle();
     //ImGui::StyleColorsDark();
 
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
-    bool lvl_manager_mode = false;
-    bool object_editor_mode = false;
-
+#endif
     // --------------------------- Retrieve Configuration ---------------------------
 
     // Retrieve configuration values from Config_Manager
@@ -187,9 +195,12 @@ int main(void) {
 
         // Update window title with FPS
         std::stringstream ss;
-        ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
+        ss << "Lack Of Oxygen";
+#ifndef NDEBUG
+        ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
+#endif
         glfwSetWindowTitle(window, ss.str().c_str());
-
+#ifndef NDEBUG
         // Update FPS timer
         fps_timer += delta_time;
         if (fps_timer >= FPS_DISPLAY_INTERVAL) {
@@ -198,16 +209,17 @@ int main(void) {
             // Display FPS in console
             std::cout << "Current FPS: " << fps << std::endl;
         }
+#endif
 
         // Poll for and process events 
         glfwPollEvents();
-
-        //bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
-        //if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
-        //    level_editor_mode = !level_editor_mode;
-        //}
-        //tab_key_was_pressed_last_frame = is_TAB_pressed;
-
+#ifndef NDEBUG
+        bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
+        if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
+            level_editor_mode = !level_editor_mode;
+        }
+        tab_key_was_pressed_last_frame = is_TAB_pressed;
+#endif
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
@@ -222,30 +234,31 @@ int main(void) {
         // Update game world state
         GM.update(delta_time);
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
-
+#ifndef NDEBUG
         // Start the Dear ImGui frame
-        //IMGUIM.start_frame();
+        IMGUIM.start_frame();
 
 
-        //ImGui::Begin("Performance Viewer");
+        ImGui::Begin("Performance Viewer");
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
         system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
-        //ImGui::Text("In ECS Manager: \n");
-        //for (auto& system : ECSM.get_systems()) {
-        //    system_performance(GM.get_time(), system->get_time(), system->get_type());
-        //}
-        //ImGui::End();
+        ImGui::Text("In ECS Manager: \n");
+        for (auto& system : ECSM.get_systems()) {
+            system_performance(GM.get_time(), system->get_time(), system->get_type());
+        }
+        ImGui::End();
 
 
 
-        // if (level_editor_mode) {
-        //     IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
-        // }
+        if (level_editor_mode) {
+            IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
+            IMGUIM.disable_GUI();
+        }
 
-        //// Rendering
-        //IMGUIM.render();
-
+        // Rendering
+        IMGUIM.render();
+#endif
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {
             glfwSetWindowShouldClose(window, true);
@@ -258,19 +271,20 @@ int main(void) {
 
         // End of frame timing and FPS control
         FPSM.frame_end();
-
-        //if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        //{
-        //    GLFWwindow* backup_current_context = glfwGetCurrentContext();
-        //    //ImGui::UpdatePlatformWindows();
-        //    //ImGui::RenderPlatformWindowsDefault();
-        //    glfwMakeContextCurrent(backup_current_context);
-        //}
+#ifndef NDEBUG
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
+#endif
 
     }
-
-    //IMGUIM.shut_down();
-
+#ifndef NDEBUG
+    IMGUIM.shut_down();
+#endif
     glfwDestroyWindow(window);
     glfwTerminate();
 

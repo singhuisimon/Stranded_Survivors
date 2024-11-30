@@ -56,8 +56,10 @@ namespace lof {
         int forces_flag = -1;
 
         // Flag for scn file
+        int current_scene = 2;
+#ifndef NDEBUG
         int current_scene = 1;
-
+#endif
 
         /**
          * @brief Determines the mineral value based on the block entity type
