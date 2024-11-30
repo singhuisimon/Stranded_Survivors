@@ -9,6 +9,7 @@
  */
 
 #include "Audio_System.h"
+#include "../Utility/globals.h"
 #include "../Manager/Assets_Manager.h"
 
 namespace lof {
@@ -453,13 +454,17 @@ namespace lof {
 		//get_mastergroup;
 		bool pause;
 		mastergroup->getPaused(&pause);
+		
+		if (level_editor_mode && pause) {
+			return;
+		}
+
 		if (pause) {
 			errorcheck(mastergroup->setPaused(false), "Audio_System::pause_resume_group", "resume mastergroup");
 		}
 		else {
 			errorcheck(mastergroup->setPaused(true), "Audio_System::pause_resume_group", "pause mastergroup");
 		}
-		
 	}
 
 	float Audio_System::get_bgmgroup_volume() const {
