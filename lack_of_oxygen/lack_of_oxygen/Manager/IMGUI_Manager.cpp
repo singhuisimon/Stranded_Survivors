@@ -441,19 +441,17 @@ namespace lof {
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
         {
-            ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+            ImGuiID dockspace_id = ImGui::GetID("DockSpace");
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), docking_flags);
         }
 
         //Set up Menu
         if (ImGui::BeginMenuBar())
         {
-            if (ImGui::BeginMenu("Options"))
+            if (ImGui::BeginMenu("Menu"))
             {
-                if (ImGui::MenuItem("Flag: NoSplit", "", (docking_flags & ImGuiDockNodeFlags_NoSplit) != 0)) {
-                    docking_flags ^= ImGuiDockNodeFlags_NoSplit;
-                }
-                if (ImGui::MenuItem("Flag: NoResize", "", (docking_flags & ImGuiDockNodeFlags_NoResize) != 0)) {
+                
+                if (ImGui::MenuItem("Stop Resizing ImGui Window", "", (docking_flags & ImGuiDockNodeFlags_NoResize) != 0)) {
                     docking_flags ^= ImGuiDockNodeFlags_NoResize;
                 }
 
