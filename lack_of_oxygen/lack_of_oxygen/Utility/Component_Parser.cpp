@@ -158,7 +158,7 @@ namespace lof {
                             }
 
                             // Parse force type 
-                            ForceType type;
+                            ForceType type = MOVE_LEFT;
                             if (force.HasMember("type") && force["type"].IsString()) {
                                 std::string type_str = force["type"].GetString();
                                 type = Force::string_to_ftype(type_str);
