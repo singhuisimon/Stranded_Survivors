@@ -181,7 +181,7 @@ namespace lof {
         //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
         //printf("left collision entity outside: %d\n\n", collision_entity_left);
 
-        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
+     /*   if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
 
             printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
             printf("Bottom collision entity: %d\n", collision_entity_bottom);
@@ -204,7 +204,7 @@ namespace lof {
             printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
             printf("top entity: %d\n", collision_entity_top);
 
-        }
+        }*/
 
         //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
         //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
