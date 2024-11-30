@@ -699,24 +699,24 @@ namespace lof {
             }
         }
 
-
+#ifndef NDEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_pressed(GLFW_KEY_1)){//} && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_FILL;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_2)){//} && !level_editor_mode) {
+        else if (IM.is_key_pressed(GLFW_KEY_2) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_LINE;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_3)){//} && !level_editor_mode) {
+        else if (IM.is_key_pressed(GLFW_KEY_3) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-#ifndef NDEBUG
+
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
@@ -728,8 +728,8 @@ namespace lof {
             GLboolean& mode = GFXM.get_debug_mode();
             mode = GL_FALSE;
         }
-#endif
-#ifndef NDEBUG
+
+
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 //#if 1
         ESS.Check_Selected_Entity();
@@ -952,11 +952,13 @@ namespace lof {
 
                
             }
+#ifndef NDEBUG
             else {
                 LM.write_log("Game_Manager::update(): Failed to load scene%d: %s", current_scene, scene_path.c_str());
                 // Revert the scene number since load failed
                 current_scene = (current_scene == 1) ? 2 : 1;
             }
+#endif
 
 
 #ifndef NDEBUG
