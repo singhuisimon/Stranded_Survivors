@@ -281,7 +281,7 @@ namespace lof {
                 constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                constexpr float TEXT_OFFSET_Y = 10.0f;              // Vertical offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;           // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
