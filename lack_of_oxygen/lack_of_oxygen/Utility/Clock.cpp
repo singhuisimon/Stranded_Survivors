@@ -1,7 +1,7 @@
 /**
  * @file Clock.cpp
  * @brief Implements the Clock class methods for precise time measurements and sleep functionality.
- * @author Simon Chan
+ * @author Simon Chan (100%)
  * @date September 15, 2024
  * Copyright (C) 20xx DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

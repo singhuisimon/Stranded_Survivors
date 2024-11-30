@@ -1,7 +1,7 @@
 /**
  * @file Graphics_Manager.cpp
  * @brief Implements the Graphics_Manager class methods.
- * @author Chua Wen Bin Kenny (99.64%), Liliana Hanawardani (0.359%)
+ * @author Chua Wen Bin Kenny (99%), Liliana Hanawardani (1%)
  * @date September 18, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

@@ -1,7 +1,7 @@
 /**
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class helper functions.
- * @author Simon Chan (82.901%), Amanda Leow (11.91%), Liliana Hanawardani (5.181%)
+ * @author Simon Chan (75%), Chua Wen Bin Kenny (12%), Amanda Leow (6%),Saw Hui Shan (4%), Liliana Hanawardani (3%), 
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

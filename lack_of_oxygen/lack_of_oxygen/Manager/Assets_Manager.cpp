@@ -1,7 +1,7 @@
 /**
  * @file Assets_Manager.cpp
  * @brief Implements the Assets_Manager.
- * @author Saw Hui Shan (%), Chua Wen Bin Kenny (%) 
+ * @author Saw Hui Shan (60%), Chua Wen Bin Kenny (40%) 
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

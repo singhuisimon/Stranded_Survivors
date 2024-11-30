@@ -1,7 +1,7 @@
 /**
  * @file ECS_Manager.cpp
  * @brief Implements the ECS_Manager class helper functions.
- * @author Simon Chan (97.56%), Liliana Hanawardani (2.439%)
+ * @author Simon Chan (96%), Liliana Hanawardani (2%), Amanda Leow Boon Suan (1%), Wai Lwin Thit (1%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
