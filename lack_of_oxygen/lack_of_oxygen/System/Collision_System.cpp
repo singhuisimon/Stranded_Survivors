@@ -575,42 +575,6 @@ namespace lof {
                         LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
-                    // Add edge case handling for leftmost and rightmost columns
-                    if (player_col == 0 || player_col == TOTAL_COLS - 1) {
-                        // For leftmost column
-                        if (player_col == 0) {
-                            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
-                                EntityID entity_ID2 = *iter2;
-                                if (entity_ID1 == entity_ID2) continue;
-
-                                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
-                                int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
-
-                                if (entity2_col == 0) {
-                                    found_left_collision = true;
-                                    current_left_entity = entity_ID2;
-                                    break;
-                                }
-                            }
-                        }
-                        // For rightmost column
-                        if (player_col == TOTAL_COLS - 1) {
-                            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
-                                EntityID entity_ID2 = *iter2;
-                                if (entity_ID1 == entity_ID2) continue;
-
-                                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
-                                int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
-
-                                if (entity2_col == TOTAL_COLS - 1) {
-                                    found_right_collision = true;
-                                    current_right_entity = entity_ID2;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
                     // Top check 
                     if (!found_top_collision &&
                         entity2_row == player_row - 1 && // Exactly one row above
