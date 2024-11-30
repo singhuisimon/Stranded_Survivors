@@ -106,6 +106,12 @@ namespace lof {
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
+	// File
+	constexpr const char* DEFAULT_MODEL_MSH_FILE = "models.msh";
+	constexpr const char* DEFAULT_ATLAS_FILE = "Spritesheet_Atlas.txt";
+	constexpr const char* DEFAULT_FONTS_FILE = "Fonts.txt";
+	
+	// Textures
 	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;
 	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
 

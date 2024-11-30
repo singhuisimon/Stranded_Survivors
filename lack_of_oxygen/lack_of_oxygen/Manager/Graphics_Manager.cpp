@@ -84,10 +84,9 @@ namespace lof {
             LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
 
-        std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, "models.msh");
-        //std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
-        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Prisoner_Atlas.txt");
-        std::string font_path = ASM.get_full_path(ASM.FONT_PATH, "Fonts.txt");
+        std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, DEFAULT_MODEL_MSH_FILE);
+        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, DEFAULT_ATLAS_FILE);
+        std::string font_path = ASM.get_full_path(ASM.FONT_PATH, DEFAULT_FONTS_FILE);
 
         if (!add_model(mesh_path)) {
             LM.write_log("Graphics_Manager::start_up(): Failed to add models");
