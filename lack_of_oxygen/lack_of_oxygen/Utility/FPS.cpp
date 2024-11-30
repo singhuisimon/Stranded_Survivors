@@ -10,7 +10,9 @@
 // Include header file
 #include "FPS.h"
 #include "../Utility/Constant.h"
+#ifndef NDEBUG
 #include "../Manager/IMGUI_Manager.h"
+#endif
 
 namespace lof {
 
@@ -57,9 +59,9 @@ namespace lof {
 
         // Prints calculated value for system in console
         //std::cout << std::left << std::setw(DEBUG_LEFT_WIDTH) << name << ": "  << std::right << std::setprecision(DEBUG_RIGHT_WIDTH) << percent << "%"  << " of total game loop" << std::endl;
-
+#ifndef NDEBUG
         ImGui::Text("%s : %.3f%%\n", name.c_str(), percent);
-
+#endif
     }
 
 } // namespace lof

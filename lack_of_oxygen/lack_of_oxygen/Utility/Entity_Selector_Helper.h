@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 #pragma once
 #ifndef ENTITY_SELECTOR_HELPER_H
 #define ENTITY_SELECTOR_HELPER_H
@@ -51,4 +52,5 @@ namespace lof {
 
 
 
+#endif
 #endif

@@ -338,8 +338,10 @@ namespace lof {
         }
 
         //std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
-
+#ifndef NDEBUG
         std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+#endif
+        std::string font_filepath = BASE_PATH + FONT_PATH + "\\" + font_name + ".ttf";
         if (!std::filesystem::exists(font_filepath))
         {
             font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";

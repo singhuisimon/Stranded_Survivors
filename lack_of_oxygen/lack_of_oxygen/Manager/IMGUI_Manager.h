@@ -1,3 +1,4 @@
+#ifndef NDEBUG
 /**
  * @file IMGUI_Manager.h
  * @brief Declaration of the IMGUI_Manager class for running the IMGUI level editor.
@@ -25,6 +26,7 @@
 
 // Include standard headers
 #include <string>
+#ifndef NDEBUG
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
@@ -183,3 +185,5 @@ namespace lof {
 } // namespace lof
 
 #endif // LOF_IMGUI_MANAGER_H
+#endif
+#endif

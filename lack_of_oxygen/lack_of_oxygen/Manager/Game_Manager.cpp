@@ -151,9 +151,10 @@ namespace lof {
     }
 
   
-
+#ifndef NDEBUG
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
+#endif
 
     //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
@@ -185,7 +186,7 @@ namespace lof {
             LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
             std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
-
+#ifndef NDEBUG
         //to pause all the sound that is playing
         if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
             for (auto& system : ECSM.get_systems()) {
@@ -197,7 +198,7 @@ namespace lof {
                 }
             }
         }
-
+#endif
         //to ensure sound pause during level_editor_mode
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
@@ -213,7 +214,7 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID){//} && !level_editor_mode) {  // If player entity exists
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -661,7 +662,7 @@ namespace lof {
             }
         }
 
-
+#ifndef NDEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
         if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
@@ -678,6 +679,7 @@ namespace lof {
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
+#endif
 #if _DEBUG
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
@@ -693,6 +695,7 @@ namespace lof {
 #endif
 
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
+#ifndef NDEBUG
 #if 1
         ESS.Check_Selected_Entity();
 
@@ -877,12 +880,15 @@ namespace lof {
         else {
             camera_left_right_scroll_flag = 0;
         }
-
-        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
+#endif
+        if (IM.is_key_pressed(GLFW_KEY_0)){//} && !level_editor_mode) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
             // Toggle between scenes
+#ifndef NDEBUG
             current_scene = (current_scene == 1) ? 2 : 1;
+#endif
+            mining_strength = DEFAULT_STRENGTH;
 
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
@@ -920,7 +926,9 @@ namespace lof {
             }
 
             std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
+#ifndef NDEBUG
             IMGUIM.set_current_file_shown(get_file_name);
+#endif
         }
 
         // Getting delta time for Input Manager

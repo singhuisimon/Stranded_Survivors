@@ -218,7 +218,7 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Render only what is on the viewport
-            if (level_editor_mode == false) {
+            //if (level_editor_mode == false) {
                 EntityID player_id = ECSM.find_entity_by_name("player1");
                 if (entity_id != 0 && entity_id != player_id) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
@@ -230,7 +230,7 @@ namespace lof {
                         continue;
                     }
                 }
-            }
+            //}
 
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);

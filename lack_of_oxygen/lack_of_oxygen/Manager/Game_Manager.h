@@ -56,9 +56,12 @@ namespace lof {
         int forces_flag = -1;
 
         // Flag for scn file
+#ifndef NDEBUG
         int current_scene = 1;
-
-
+#endif
+#ifndef _DEBUG
+        int current_scene = 2;
+#endif
         /**
          * @brief Determines the mineral value based on the block entity type
          * @param block_id The EntityID of the block being destroyed

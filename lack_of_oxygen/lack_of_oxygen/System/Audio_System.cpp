@@ -454,10 +454,11 @@ namespace lof {
 		//get_mastergroup;
 		bool pause;
 		mastergroup->getPaused(&pause);
-		
+#ifndef NDEBUG
 		if (level_editor_mode && pause) {
 			return;
 		}
+#endif
 
 		if (pause) {
 			errorcheck(mastergroup->setPaused(false), "Audio_System::pause_resume_group", "resume mastergroup");

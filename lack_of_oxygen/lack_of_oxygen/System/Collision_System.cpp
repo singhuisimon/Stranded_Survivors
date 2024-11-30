@@ -622,15 +622,31 @@ namespace lof {
                     }
 
                     if (player_col <= 0 || player_col >= TOTAL_COLS - 1) {
-                        if (transform1.position.x <= LEFT_BOUND) {
+
+                        float leftmost_tile_center = LEFT_BOUND + (CELL_WIDTH * 0.5f);
+                        float rightmost_tile_center = RIGHT_BOUND - (CELL_WIDTH * 0.5f);
+
+                        if (transform1.position.x <= leftmost_tile_center) {
                             velocity1.velocity.x = 0.0f;
-                            transform1.position.x = LEFT_BOUND + (CELL_WIDTH * 0.5f);
+                            transform1.position.x = leftmost_tile_center;
                         }
-                        else if (transform1.position.x >= RIGHT_BOUND) {
+                        else if (transform1.position.x >= rightmost_tile_center) {
                             velocity1.velocity.x = 0.0f;
-                            transform1.position.x = RIGHT_BOUND - (CELL_WIDTH * 0.5f);
+                            transform1.position.x = rightmost_tile_center;
                         }
                     }
+
+                    //old huishan code
+                    //if (player_col <= 0 || player_col >= TOTAL_COLS - 1) {
+                    //    if (transform1.position.x <= LEFT_BOUND) {
+                    //        velocity1.velocity.x = 0.0f;
+                    //        transform1.position.x = LEFT_BOUND + (CELL_WIDTH * 0.5f);
+                    //    }
+                    //    else if (transform1.position.x >= RIGHT_BOUND) {
+                    //        velocity1.velocity.x = 0.0f;
+                    //        transform1.position.x = RIGHT_BOUND - (CELL_WIDTH * 0.5f);
+                    //    }
+                    //}
 
                     // Bottom check (only work if level_design map first row is empty 'e')
                     //if (!found_bottom_collision &&
