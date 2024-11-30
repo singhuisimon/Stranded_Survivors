@@ -29,9 +29,11 @@
 #include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../System/Animation_System.h"  // For player_direction
 #include "../System/Collision_System.h" // for click entity object
+
 #ifndef NDEBUG
 #include "../Utility/Entity_Selector_Helper.h"
 #endif
+
 // Include iostream for console output
 #include <iostream>
 #include <random>
@@ -235,7 +237,7 @@ namespace lof {
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5) || IM.is_key_pressed(GLFW_KEY_TAB)) {
+        if (IM.is_key_pressed(GLFW_KEY_TAB)){//} || IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "Audio_System") {
                     auto* audio_system = static_cast<Audio_System*>(system.get());
@@ -714,7 +716,7 @@ namespace lof {
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-
+#ifndef NDEBUG
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
@@ -726,6 +728,7 @@ namespace lof {
             GLboolean& mode = GFXM.get_debug_mode();
             mode = GL_FALSE;
         }
+#endif
 #ifndef NDEBUG
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 //#if 1
@@ -918,7 +921,7 @@ namespace lof {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
             // Toggle between scenes
-            current_scene = (current_scene == 1) ? 2 : 1;
+            //current_scene = (current_scene == 1) ? 2 : 1;
 
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
@@ -955,8 +958,10 @@ namespace lof {
                 current_scene = (current_scene == 1) ? 2 : 1;
             }
 
-            std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
+
 #ifndef NDEBUG
+            std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
+
             IMGUIM.set_current_file_shown(get_file_name);
 #endif
         }

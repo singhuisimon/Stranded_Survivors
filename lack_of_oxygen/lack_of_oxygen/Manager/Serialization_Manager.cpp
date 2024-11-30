@@ -96,16 +96,14 @@ namespace lof {
         }
 
         // Load scene file 
-        const std::string scene_folder = "Scenes";
-        std::string loaded_scene = "scene1.scn";
+        //const std::string scene_folder = "Scenes";
 #ifndef NDEBUG
+        std::string loaded_scene = "scene1.scn";
+
         IMGUIM.set_current_file_shown(loaded_scene);
 #endif
-        std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
-        if (!load_scene(scene_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
-            return -3;
-        }
+        const std::string SCENES = "Scenes";
+        std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(2) + ".scn");
 
         // Load level data
         const std::string level_folder = "Level_Design";
@@ -114,6 +112,13 @@ namespace lof {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
         }
+
+        if (!load_scene(scene_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
+            return -3;
+        }
+
+       
 
         // Debug print level data if loaded successfully
         debug_print_level();
