@@ -440,8 +440,8 @@ namespace lof {
         EntityID current_top_entity = static_cast<EntityID>(-1);
 
         // Level grid constants
-        const float LEFT_BOUND = -1020.0f;
-        const float RIGHT_BOUND = 1020.0f;
+        const float LEFT_BOUND = -960.0f;
+        const float RIGHT_BOUND = 960.0f;
         const float START_Y = -150.0f;
         const int TOTAL_ROWS = static_cast<int>(SM.get_level_rows());
         const int TOTAL_COLS = static_cast<int>(SM.get_level_cols());
@@ -554,24 +554,61 @@ namespace lof {
 
                     }
 
-                    // Left check
                     if (!found_left_collision &&
                         entity2_col == player_col - 1 && // one column to the left
-                        entity2_row == player_row && // ensure it is same row
-                        std::abs(transform2.position.x - transform1.position.x) < (CELL_WIDTH * 1.2f)) { //ensure is close to tile
+                        entity2_row == player_row && // same row
+                        transform2.position.x < transform1.position.x && // entity2 is actually to the left
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
                         found_left_collision = true;
                         current_left_entity = entity_ID2;
-                        //LM.write_log("Left entity detected in column %d: %d\n", entity2_col, entity_ID2);
+                        LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
-                    // Right check
+                    // Right check - Modified to be more reliable
                     if (!found_right_collision &&
                         entity2_col == player_col + 1 && // one column to the right
-                        entity2_row == player_row && // ensure it is same row
-                        std::abs(transform2.position.x - transform1.position.x) < (CELL_WIDTH * 1.2f)) { // ensure is close to tile
+                        entity2_row == player_row && // same row
+                        transform2.position.x > transform1.position.x && // entity2 is actually to the right
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
                         found_right_collision = true;
                         current_right_entity = entity_ID2;
-                        //LM.write_log("Right entity detected in column %d: %d\n", entity2_col, entity_ID2);
+                        LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
+                    }
+
+                    // Add edge case handling for leftmost and rightmost columns
+                    if (player_col == 0 || player_col == TOTAL_COLS - 1) {
+                        // For leftmost column
+                        if (player_col == 0) {
+                            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                                EntityID entity_ID2 = *iter2;
+                                if (entity_ID1 == entity_ID2) continue;
+
+                                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
+                                int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
+
+                                if (entity2_col == 0) {
+                                    found_left_collision = true;
+                                    current_left_entity = entity_ID2;
+                                    break;
+                                }
+                            }
+                        }
+                        // For rightmost column
+                        if (player_col == TOTAL_COLS - 1) {
+                            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                                EntityID entity_ID2 = *iter2;
+                                if (entity_ID1 == entity_ID2) continue;
+
+                                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
+                                int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
+
+                                if (entity2_col == TOTAL_COLS - 1) {
+                                    found_right_collision = true;
+                                    current_right_entity = entity_ID2;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     // Top check 
@@ -585,14 +622,13 @@ namespace lof {
                     }
 
                     if (player_col <= 0 || player_col >= TOTAL_COLS - 1) {
-                        // Player is at edge columns, prevent horizontal movement towards the edge
-                        if (player_col <= 0 && velocity1.velocity.x < 0) {
+                        if (transform1.position.x <= LEFT_BOUND) {
                             velocity1.velocity.x = 0.0f;
-                            transform1.position.x = LEFT_BOUND + CELL_WIDTH;
+                            transform1.position.x = LEFT_BOUND + (CELL_WIDTH * 0.5f);
                         }
-                        else if (player_col >= TOTAL_COLS - 1 && velocity1.velocity.x > 0) {
+                        else if (transform1.position.x >= RIGHT_BOUND) {
                             velocity1.velocity.x = 0.0f;
-                            transform1.position.x = RIGHT_BOUND - CELL_WIDTH;
+                            transform1.position.x = RIGHT_BOUND - (CELL_WIDTH * 0.5f);
                         }
                     }
 

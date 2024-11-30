@@ -165,53 +165,6 @@ namespace lof {
             return;
         }
 
-        //printf("-----------------in game manager--------------------------------\n");
-        bool has_collision_bottom = CS.has_bottom_collide_detect();
-        EntityID collision_entity_bottom = CS.get_bottom_collide_entity();
-
-        bool has_collision_left = CS.has_left_collide_detect();
-        EntityID collision_entity_left = CS.get_left_collide_entity();
-
-        bool has_collision_right = CS.has_right_collide_detect();
-        EntityID collision_entity_right = CS.get_right_collide_entity();
-
-        bool has_collision_top = CS.has_top_collide_detect();
-        EntityID collision_entity_top = CS.get_top_collide_entity();
-
-        //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
-        //printf("left collision entity outside: %d\n\n", collision_entity_left);
-
-        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
-
-            printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
-            printf("Bottom collision entity: %d\n", collision_entity_bottom);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !level_editor_mode && has_collision_left) {
-
-            printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
-            printf("left collision entity: %d\n", collision_entity_left);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_RIGHT) && !level_editor_mode && has_collision_right) {
-
-            printf("Has right collision: %s\n", has_collision_right ? "true" : "false");
-            printf("right entity: %d\n", collision_entity_right);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_UP) && !level_editor_mode && has_collision_top) {
-
-            printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
-            printf("top entity: %d\n", collision_entity_top);
-
-        }
-
-        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
-        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
-        //std::cout << "collision: " << CS.mineral_tank_detected() << "\n";
-        //std::cout << "collision: " << CS.oxygen_tank_detected() << "\n";
-
-        //printf("-----------------in game manager--------------------------------\n\n");
 
 
         //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
