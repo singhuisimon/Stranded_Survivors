@@ -29,6 +29,7 @@
 #include "Assets_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Utility/Win_Control.h"
+#include "../Component/Component.h"
 
 namespace lof {
 
@@ -385,18 +386,17 @@ namespace lof {
             }
 
             //Display debug information
-            ImGui::Text("0,0 starts at center");
-            ImGui::Text("Mouse in texture at: (%.2f, %.2f)", mouse_texture_coord_world.x, mouse_texture_coord_world.y);
+            ImGui::Separator();
+            ImGui::Text("Mouse in Game World at: (%.2f, %.2f)", mouse_texture_coord_world.x, mouse_texture_coord_world.y);
             ImGui::Text("Mouse in screen at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
             ImGui::Separator();
-            ImGui::Text("");
-            ImGui::Text("Camera: (%.2f, %.2f)", camera.pos_x, camera.pos_y);
+            ImGui::Text("Camera at: (%.2f, %.2f)", camera.pos_x, camera.pos_y);
 
         }
         else {
 
             //Display debug information
-            ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", mouse_pos.x, mouse_pos);
+            ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
         }
 
         //Return mouse in terms of game world
@@ -430,7 +430,7 @@ namespace lof {
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        //if (ImGui::Combo(""))
+        
         static int currentMode = 0; // Default to "Drag"
         const char* modes[] = { "None","Drag", "Scale", "Rotate" };
 
@@ -478,8 +478,6 @@ namespace lof {
                     ImVec2(0, 1), ImVec2(1, 0));
             }
 
-            //static int currentMode = 0;
-            //const char* Selectmodes[] = { "Drag", "Scale", "Rotate" };
 
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
             Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
@@ -489,8 +487,6 @@ namespace lof {
             // Check if mouse is within texture bounds
             if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
                 mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
-
-                ImGui::Text("Mouse_Pos: %.2f, %.2f", Mouse_Pos.x, Mouse_Pos.y);
 
                 // Handle entity selection with left click
                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
@@ -594,6 +590,11 @@ namespace lof {
                                 transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
                                 transform.prev_position = transform.position;
                             }
+                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
+                                Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selectedEntityID].get()->get_id());
+                                logic.origin_pos.x = selected_entity_start_pos.x + dragged_offset.x;
+                                logic.origin_pos.y = selected_entity_start_pos.y + dragged_offset.y;
+                            }
                         }
                         break;
                     }
@@ -658,16 +659,13 @@ namespace lof {
             }
             else {
                 ImGui::Text("Selected Entity: %d", selectedEntityID);
-                //ImGui::Text("Current Operation: %s", modes[currentMode]);
             }
 
             ImGui::End();
         }
 
-        //asset manager to be added later
-        ImGui::Begin("Console");
-        ImGui::Text("Asset Manager stuff:\nSelected Object Index: %.f\n", selected_object_index);
-        ImGui::Text("selectedEntityID: %.f", selectedEntityID);
+        
+        ImGui::Begin("Asset Manager");
         ImGui::End();
 
         IMGUIM.imgui_game_objects_list();
@@ -719,6 +717,8 @@ namespace lof {
             ++current_object_index;
         }
 
+        
+        ImGui::Text("\n");
         if (ImGui::Button("Edit Game Object")) {
             show_window = !show_window;
         }
@@ -728,10 +728,7 @@ namespace lof {
             remove_game_obj = !remove_game_obj;
         }
         ImGui::EndDisabled();
-
-        
-
-        ImGui::Text("\n\n%s", "Create Game Object From Prefab");
+        ImGui::Text("\n");
         if (ImGui::Button("Create Game Object From Prefab")) {
 
             create_game_obj = !create_game_obj;
@@ -995,6 +992,8 @@ namespace lof {
                     }
                 }
 
+                const char* logic_behaviour[] = { "Horizontal", "Circular"};
+
                 //Logic Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
                     Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
@@ -1004,6 +1003,15 @@ namespace lof {
                         std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
                         if (button_toggle(s_label, &is_active_on)) {
                             is_active = !is_active;
+                        }
+
+                        auto& movement_pattern = logic.movement_pattern;
+                        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
+
+                        ImGui::Text("Choose Logic Behaviour");
+                        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
+                            
+                            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
                         }
 
                         auto& movement_speed = logic.movement_speed;
