@@ -110,24 +110,24 @@ namespace lof {
     }
 
 
-    bool Assets_Manager::load_all_textures(const std::string& filepath, std::vector<std::string>& texture_names) {
-        std::ifstream input_file{ filepath, std::ios::in };
-        if (!input_file) {
-            LM.write_log("Assets_Manager: Unable to open texture list %s", filepath.c_str());
-            return false;
-        }
+    //bool Assets_Manager::load_all_textures(const std::string& filepath, std::vector<std::string>& texture_names) {
+    //    std::ifstream input_file{ filepath, std::ios::in };
+    //    if (!input_file) {
+    //        LM.write_log("Assets_Manager: Unable to open texture list %s", filepath.c_str());
+    //        return false;
+    //    }
 
-        std::string tex_name;
-        while (getline(input_file, tex_name)) {
+    //    std::string tex_name;
+    //    while (getline(input_file, tex_name)) {
 
-            LM.write_log("Assets_Manager: Found texture name: %s", tex_name.c_str());
-            texture_names.push_back(tex_name);
-        }
-        input_file.close();
+    //        LM.write_log("Assets_Manager: Found texture name: %s", tex_name.c_str());
+    //        texture_names.push_back(tex_name);
+    //    }
+    //    input_file.close();
 
-        LM.write_log("Assets_Manager: Loaded %d texture names", texture_names.size());
-        return true;
-    }
+    //    LM.write_log("Assets_Manager: Loaded %d texture names", texture_names.size());
+    //    return true;
+    //}
 
 
     bool Assets_Manager::read_shader_file(const std::string& file_path, std::string& shader_source) {

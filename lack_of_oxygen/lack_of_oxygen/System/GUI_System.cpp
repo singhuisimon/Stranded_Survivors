@@ -363,21 +363,7 @@ namespace lof {
             return; // GUI already shown
         }
 
-        // First add GUI overlay image containing all text 
-        mineral_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (mineral_text_overlay != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_text_overlay)) {
-                graphics->model_name = "square";
-                graphics->texture_name = "Mineral_Deposit_UI_Text_Batch_4";
-                graphics->color = glm::vec3(1.0f);
-            }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_text_overlay)) {
-                transform->position = Vec2D(-350.0f, 180.0f);
-                transform->scale = Vec2D(420.0f, 215.0f);
-            }
-        }
-
-        // Then create main container with the background texture
+        // First create main container with the background texture
         mineral_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             auto* container_gui = get_component_safe<GUI_Component>(mineral_interaction_container);
@@ -398,6 +384,21 @@ namespace lof {
                 transform->scale = Vec2D(500.0f, 300.0f);
             }
         }
+
+        // Then add GUI overlay image containing all text 
+        mineral_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (mineral_text_overlay != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_text_overlay)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Mineral_Deposit_UI_Text_Batch_4";
+                graphics->color = glm::vec3(1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(mineral_text_overlay)) {
+                transform->position = Vec2D(-350.0f, 180.0f);
+                transform->scale = Vec2D(420.0f, 215.0f);
+            }
+        }
+
     }
 
     void GUI_System::show_oxygen_tank_gui() {
@@ -405,17 +406,25 @@ namespace lof {
             return; // GUI already shown
         }
 
-        // First add text overlay
-        oxygen_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_text_overlay)) {
+        // First  create main container with the background texture
+        oxygen_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            auto* container_gui = get_component_safe<GUI_Component>(oxygen_interaction_container);
+            if (!container_gui) {
+                hide_oxygen_tank_gui();
+                return;
+            }
+            container_gui->is_container = true;
+            // Set background texture and properties
+            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill_UI_Text_Batch_4";
+                graphics->texture_name = "Oxygen_Refill_UI_BG_Batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_text_overlay)) {
-                transform->position = Vec2D(-362.0f, 175.0f);
-                transform->scale = Vec2D(400.0f, 250.0f);
+            // Position and scale the container
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
+                transform->position = Vec2D(-350.0f, 180.0f);
+                transform->scale = Vec2D(500.0f, 300.0f);
             }
         }
 
@@ -447,25 +456,17 @@ namespace lof {
             }
         }
 
-        // Finally create main container with the background texture
-        oxygen_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            auto* container_gui = get_component_safe<GUI_Component>(oxygen_interaction_container);
-            if (!container_gui) {
-                hide_oxygen_tank_gui();
-                return;
-            }
-            container_gui->is_container = true;
-            // Set background texture and properties
-            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
+        // Finally text overlay
+        oxygen_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_text_overlay)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill_UI_BG_Batch_4";
+                graphics->texture_name = "Oxygen_Refill_UI_Text_Batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
-            // Position and scale the container
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 180.0f);
-                transform->scale = Vec2D(500.0f, 300.0f);
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_text_overlay)) {
+                transform->position = Vec2D(-362.0f, 175.0f);
+                transform->scale = Vec2D(400.0f, 250.0f);
             }
         }
     }
@@ -473,18 +474,18 @@ namespace lof {
     void GUI_System::hide_mineral_tank_gui() {
         //LM.write_log("Starting to hide mineral tank GUI");
 
-        // Check and destroy container first since it was created last
-        if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy container entity: %d", mineral_interaction_container);
-            ecs_manager.destroy_entity(mineral_interaction_container);
-            mineral_interaction_container = INVALID_ENTITY_ID;
-        }
-
-        // Then destroy text overlay
+        // Check and destroy text overlay first since it was created last
         if (mineral_text_overlay != INVALID_ENTITY_ID) {
             LM.write_log("Attempting to destroy text overlay entity: %d", mineral_text_overlay);
             ecs_manager.destroy_entity(mineral_text_overlay);
             mineral_text_overlay = INVALID_ENTITY_ID;
+        }
+
+        // Then destroy container
+        if (mineral_interaction_container != INVALID_ENTITY_ID) {
+            LM.write_log("Attempting to destroy container entity: %d", mineral_interaction_container);
+            ecs_manager.destroy_entity(mineral_interaction_container);
+            mineral_interaction_container = INVALID_ENTITY_ID;
         }
 
         // Verify destruction
@@ -502,11 +503,11 @@ namespace lof {
     void GUI_System::hide_oxygen_tank_gui() {
         //LM.write_log("Starting to hide oxygen tank GUI");
 
-        // Destroy container first since it was created last
-        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy container entity: %d", oxygen_interaction_container);
-            ecs_manager.destroy_entity(oxygen_interaction_container);
-            oxygen_interaction_container = INVALID_ENTITY_ID;
+        // Destroy text overlay first since it was created last
+        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
+            LM.write_log("Attempting to destroy text overlay entity: %d", oxygen_text_overlay);
+            ecs_manager.destroy_entity(oxygen_text_overlay);
+            oxygen_text_overlay = INVALID_ENTITY_ID;
         }
 
         // Then green circle
@@ -523,11 +524,11 @@ namespace lof {
             red_circle_overlay = INVALID_ENTITY_ID;
         }
 
-        // Finally destroy text overlay
-        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy text overlay entity: %d", oxygen_text_overlay);
-            ecs_manager.destroy_entity(oxygen_text_overlay);
-            oxygen_text_overlay = INVALID_ENTITY_ID;
+        // Finally destroy container
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            LM.write_log("Attempting to destroy container entity: %d", oxygen_interaction_container);
+            ecs_manager.destroy_entity(oxygen_interaction_container);
+            oxygen_interaction_container = INVALID_ENTITY_ID;
         }
 
         // Verify destruction
