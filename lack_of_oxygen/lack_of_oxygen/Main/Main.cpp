@@ -163,13 +163,6 @@ int main(void) {
         << ", SCR_HEIGHT: " << SCR_HEIGHT
         << ", FPS_DISPLAY_INTERVAL: " << FPS_DISPLAY_INTERVAL << std::endl;
 
-    // If the window size from Config_Manager differs from the created window, adjust it
-    //if (SCR_WIDTH != 800 || SCR_HEIGHT != 600) {
-    //    glfwSetWindowSize(window, SCR_WIDTH, SCR_HEIGHT);
-    //    LM.write_log("GLFW window size adjusted to %ux%u based on configuration.", SCR_WIDTH, SCR_HEIGHT);
-    //    std::cout << "GLFW window size adjusted to " << SCR_WIDTH << "x" << SCR_HEIGHT << " based on configuration." << std::endl;
-    //}
-
     // -------------------------- Game Loop Setup --------------------------
 
     // Variables for FPS display
@@ -192,7 +185,10 @@ int main(void) {
 
         // Update window title with FPS
         std::stringstream ss;
-        ss << "Lack Of Oxygen, FPS: " << std::fixed << std::setprecision(2) << fps;
+        ss << "Lack Of Oxygen"; 
+#ifndef NDEBUG
+        ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
+#endif
         glfwSetWindowTitle(window, ss.str().c_str());
 
         // Update FPS timer
@@ -231,7 +227,7 @@ int main(void) {
         // Start the Dear ImGui frame
         IMGUIM.start_frame();
 
-
+#ifndef NDEBUG
         ImGui::Begin("Performance Viewer");
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
         system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
@@ -241,7 +237,7 @@ int main(void) {
             system_performance(GM.get_time(), system->get_time(), system->get_type());
         }
         ImGui::End();
-
+#endif
 
 
         if (level_editor_mode) {
