@@ -6,11 +6,11 @@
         "Transform2D": {
           "position": [
             0.0,
-            -7296.0
+            -4450.0
           ],
           "prev_position": [
             0.0,
-            -7296.0
+            -4450.0
           ],
           "orientation": [
             0.0,
@@ -28,7 +28,7 @@
             0.5,
             0.5
           ],
-          "texture_name": "Skybox_ALL",
+          "texture_name": "Skybox_Batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [

@@ -105,7 +105,7 @@ namespace lof {
         }
 
         std::string full_path = executable_path + "\\" + BASE_PATH + base_path + "\\" + clean_name;
-        LM.write_log("Assets_Manager: Full path: %s", full_path.c_str());
+        //LM.write_log("Assets_Manager: Full path: %s", full_path.c_str());
         return full_path;
     }
 
@@ -391,7 +391,7 @@ namespace lof {
         }
         file.close();
 
-        LM.write_log("Assets_Manager: Successfully loaded audio file: %s", full_path.c_str());
+        //LM.write_log("Assets_Manager: Successfully loaded audio file: %s", full_path.c_str());
         return true;
     }
 
