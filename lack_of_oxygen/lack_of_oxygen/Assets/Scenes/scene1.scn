@@ -17,7 +17,7 @@
             0.0
           ],
           "scale": [
-            2048.0,
+            1920.0,
             16128.0
           ]
         },
@@ -907,7 +907,7 @@
           "position": [ 600.0, 100.0 ],
           "prev_position": [ 600.0, 100.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 2000.0, 175.0 ]
+          "scale": [ 1920.0, 175.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",
