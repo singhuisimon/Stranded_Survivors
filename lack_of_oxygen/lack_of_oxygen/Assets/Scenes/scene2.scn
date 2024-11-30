@@ -297,8 +297,8 @@
             30.0
           ],
           "scale": [
-            98.0,
-            98.0
+            96.0,
+            96.0
           ]
         },
         "Graphics_Component": {
@@ -329,8 +329,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 98.0,
-          "height": 98.0,
+          "width": 95.0,
+          "height": 95.0,
           "collidable": true
         },
         "Physics_Component": {
