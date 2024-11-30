@@ -25,6 +25,7 @@
 
 // Include header
 #include "Manager.h"
+#include "../Utility/Type.h"
 
 // Include other header
 #include "../Utility/constant.h"  // To access constants 
@@ -184,6 +185,10 @@ namespace lof {
 
         std::string get_executable_directory();
     private:
+
+      
+
+
         // A unique_ptr to the single instance of Assets_Manager
         static std::unique_ptr<Assets_Manager> instance;
         // Used with std::call_once to initialize the singleton instance safely in a multithreaded environment.

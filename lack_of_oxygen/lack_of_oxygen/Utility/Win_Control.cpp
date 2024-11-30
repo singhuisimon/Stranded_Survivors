@@ -48,20 +48,18 @@ namespace lof {
 		glViewport(0, 0, win_width, win_height);	//update the viewport
 		LM.write_log("Window_Control::update_win_size: width set to %d, height set to %d", win_width, win_height);
 
-#ifndef NDEBUG
 		//for imgui_tex update <- this affect the viewport of game in imgui
 		glBindTexture(GL_TEXTURE_2D, GFXM.get_framebuffer_texture());
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-#endif
 	}
 
 	unsigned int Window_Control::get_win_width() const {
-		LM.write_log("Window_Control::get_win_width: width is %ui", win_width);
+		//LM.write_log("Window_Control::get_win_width: width is %ui", win_width);
 		return win_width;
 	}
 
 	unsigned int Window_Control::get_win_height() const {
-		LM.write_log("Window_Control::get_win_width: height is %ui", win_height);
+		//LM.write_log("Window_Control::get_win_height: height is %ui", win_height);
 		return win_height;
 	}
 

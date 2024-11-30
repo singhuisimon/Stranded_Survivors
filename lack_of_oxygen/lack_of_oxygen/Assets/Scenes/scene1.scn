@@ -6,18 +6,18 @@
         "Transform2D": {
           "position": [
             0.0,
-            -7296.0
+            -4450.0
           ],
           "prev_position": [
             0.0,
-            -7296.0
+            -4450.0
           ],
           "orientation": [
             0.0,
             0.0
           ],
           "scale": [
-            2048.0,
+            1920.0,
             16128.0
           ]
         },
@@ -28,7 +28,7 @@
             0.5,
             0.5
           ],
-          "texture_name": "Skybox_ALL",
+          "texture_name": "Skybox_Batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -436,8 +436,8 @@
             30.0
           ],
           "scale": [
-            102.4000015258789,
-            153.60000610351563
+            95,
+            95
           ]
         },
         "Graphics_Component": {
@@ -468,8 +468,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 102.4000015258789,
-          "height": 153.60000610351563,
+          "width": 95,
+          "height": 95,
           "collidable": true
         },
         "Physics_Component": {
@@ -779,135 +779,13 @@
       }
     },
     {
-      "name": "game_title",
-      "components": {
-        "Transform2D": {
-          "position": [
-            0.0,
-            150.0
-          ],
-          "prev_position": [
-            0.0,
-            180.0
-          ],
-          "orientation": [
-            0.0,
-            30.0
-          ],
-          "scale": [
-            1.0,
-            1.0
-          ]
-        },
-        "Graphics_Component": {
-          "model_name": "square",
-          "color": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "texture_name": "NoTexture",
-          "shd_ref": 2,
-          "mdl_to_ndc_xform": [
-            [
-              0.0023437500931322575,
-              0.0,
-              0.0
-            ],
-            [
-              0.0,
-              0.0031250002793967724,
-              0.0
-            ],
-            [
-              -0.390625,
-              0.5604426860809326,
-              1.0
-            ]
-          ]
-        },
-        "Text_Component": {
-          "font_name": "PressStart2P",
-          "text": "Lack of Oxygen",
-          "color": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "scale": [ 1.0, 1.0 ]
-        }
-      }
-    },
-    {
-      "name": "team_name",
-      "components": {
-        "Transform2D": {
-          "position": [
-            0.0,
-            400.0
-          ],
-          "prev_position": [
-            -240.0,
-            260.0
-          ],
-          "orientation": [
-            0.0,
-            30.0
-          ],
-          "scale": [
-            1.0,
-            1.0
-          ]
-        },
-        "Graphics_Component": {
-          "model_name": "square",
-          "color": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "texture_name": "NoTexture",
-          "shd_ref": 2,
-          "mdl_to_ndc_xform": [
-            [
-              0.00390625,
-              0.0,
-              0.0
-            ],
-            [
-              0.0,
-              0.0052083334885537624,
-              0.0
-            ],
-            [
-              -0.46875,
-              0.7687760591506958,
-              1.0
-            ]
-          ]
-        },
-        "Text_Component": {
-          "font_name": "arial_narrow_7",
-          "text": "Stranded Survivors",
-          "color": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "scale": [ 1.0, 1.0 ]
-        }
-      }
-    },
-
-
-    {
       "name": "top_ui_overlay",
       "components": {
         "Transform2D": {
           "position": [ 600.0, 100.0 ],
           "prev_position": [ 600.0, 100.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 2000.0, 175.0 ]
+          "scale": [ 1920.0, 175.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",

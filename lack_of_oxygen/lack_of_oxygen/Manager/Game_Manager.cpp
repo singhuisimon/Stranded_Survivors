@@ -150,62 +150,21 @@ namespace lof {
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
 
-    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); 
+  
+
+    EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
+    //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
+
+        
+
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
         }
 
-        //printf("-----------------in game manager--------------------------------\n");
-        bool has_collision_bottom = CS.has_bottom_collide_detect();
-        EntityID collision_entity_bottom = CS.get_bottom_collide_entity();
-
-        bool has_collision_left = CS.has_left_collide_detect();
-        EntityID collision_entity_left = CS.get_left_collide_entity();
-
-        bool has_collision_right = CS.has_right_collide_detect();
-        EntityID collision_entity_right = CS.get_right_collide_entity();
-
-        bool has_collision_top = CS.has_top_collide_detect();
-        EntityID collision_entity_top = CS.get_top_collide_entity();
-
-        //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
-        //printf("left collision entity outside: %d\n\n", collision_entity_left);
-
-        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
-
-            printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
-            printf("Bottom collision entity: %d\n", collision_entity_bottom);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !level_editor_mode && has_collision_left) {
-
-            printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
-            printf("left collision entity: %d\n", collision_entity_left);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_RIGHT) && !level_editor_mode && has_collision_right) {
-
-            printf("Has right collision: %s\n", has_collision_right ? "true" : "false");
-            printf("right entity: %d\n", collision_entity_right);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_UP) && !level_editor_mode && has_collision_top) {
-
-            printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
-            printf("top entity: %d\n", collision_entity_top);
-
-        }
-
-        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
-        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
-        //std::cout << "collision: " << CS.mineral_tank_detected() << "\n";
-        //std::cout << "collision: " << CS.oxygen_tank_detected() << "\n";
-
-        //printf("-----------------in game manager--------------------------------\n\n");
 
 
         //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
@@ -228,7 +187,19 @@ namespace lof {
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5) || IM.is_key_pressed(GLFW_KEY_TAB)) {
+        if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->pause_resume_mastergroup();
+                    }
+                }
+            }
+        }
+
+        //to ensure sound pause during level_editor_mode
+        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             for (auto& system : ECSM.get_systems()) {
                 if (system->get_type() == "Audio_System") {
                     auto* audio_system = static_cast<Audio_System*>(system.get());
@@ -263,8 +234,7 @@ namespace lof {
                 constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
-                constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;           // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
@@ -294,13 +264,12 @@ namespace lof {
                 if (oxygen_text_id != INVALID_ENTITY_ID && 
                     ECSM.has_component<Transform2D>(oxygen_text_id)) { 
                     auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
-                    //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
 
                     // Position text to the left of the oxygen meter
                     oxygen_text_transform.position = {
                         (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
-                        oxygen_transform.position.y // Vertically centered with oxygen meter
+                        oxygen_transform.position.y                                                         // Vertically centered with oxygen meter
                     };
                     oxygen_text_transform.prev_position = oxygen_text_transform.position;
                 }
@@ -328,7 +297,7 @@ namespace lof {
                     // Position text to the left of the panic meter
                     panic_text_transform.position = {
                         (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
-                        panic_transform.position.y  // Vertically centered with panic meter
+                        panic_transform.position.y                                                         // Vertically centered with panic meter
                     };
                     panic_text_transform.prev_position = panic_text_transform.position;
                 }
@@ -352,11 +321,10 @@ namespace lof {
                     auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id); 
                     auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id); 
 
-                    constexpr float MINERAL_COUNT_OFFSET = 40.0f;
                     // Position text to the right of the mineral texture
                     mineral_count_text_transform.position = {
-                        (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
-                        mineral_transform.position.y  - TEXT_OFFSET_Y  // Vertically centered with mineral icon
+                        (mineral_transform.position.x + (mineral_transform.scale.x * 3.0f)) ,  // Right of icon
+                        mineral_transform.position.y  - TEXT_OFFSET_Y                          // Vertically centered with mineral icon
                     };
                     mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
                 }
@@ -378,10 +346,6 @@ namespace lof {
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
-                    //// Get mining status for animation
-                    //auto& mining_status = GFXM.get_mining_status();
-                    //mining_status = MINE_LEFT;
-
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -416,10 +380,6 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
-                    //// Get mining status for animation
-                    //auto& mining_status = GFXM.get_mining_status();
-                    //mining_status = MINE_RIGHT;
-
                     if (CS.has_right_collide_detect()) {
                         EntityID block_to_remove = CS.get_right_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -488,10 +448,6 @@ namespace lof {
                     }
                 }
                 else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
-                    //// Get mining status for animation
-                    //auto& mining_status = GFXM.get_mining_status();
-                    //mining_status = MINE_DOWN;
-
                     if (CS.has_bottom_collide_detect()) {
                         EntityID block_to_remove = CS.get_bottom_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
@@ -532,7 +488,6 @@ namespace lof {
                     update_mineral_count_text(val_to_add);
                 }
 
-
                 // Mining animations
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
                     // Get mining status for animation
@@ -566,9 +521,7 @@ namespace lof {
                     // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = NO_ACTION;
-                }
-                auto& mining_status = GFXM.get_mining_status();
-              
+                }  
 
                 // Handle horizontal movement
                 if (IM.is_key_held(GLFW_KEY_SPACE)) {
@@ -710,22 +663,22 @@ namespace lof {
 
 
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_pressed(GLFW_KEY_1)) {
+        if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_FILL;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_2)) {
+        else if (IM.is_key_pressed(GLFW_KEY_2)&& !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_LINE;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_3)) {
+        else if (IM.is_key_pressed(GLFW_KEY_3)&& !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-
+#if _DEBUG
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");
@@ -737,13 +690,14 @@ namespace lof {
             GLboolean& mode = GFXM.get_debug_mode();
             mode = GL_FALSE;
         }
+#endif
 
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #if 1
         ESS.Check_Selected_Entity();
 
         // Check if the left mouse button was pressed
-        EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
+        //EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
             if (selectedEntityInfo.isSelected) {
@@ -758,7 +712,7 @@ namespace lof {
             }
             else {
                 select_entity = false;
-                selectedID = -1;
+                selectedID = static_cast<EntityID>(-1);
 
             }
         }
@@ -852,28 +806,28 @@ namespace lof {
             }
         }
 
-        // Camera up-down scrolling when Number Pad 8 or 2 pressed
-        if (IM.is_key_held(GLFW_KEY_KP_8) && !(IM.is_key_held(GLFW_KEY_KP_2))) {
-            camera_up_down_scroll_flag = GLFW_KEY_KP_8;
+        // Camera up-down scrolling when I or K pressed
+        if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
+            camera_up_down_scroll_flag = GLFW_KEY_I;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_2) && !(IM.is_key_held(GLFW_KEY_KP_8))) {
-            camera_up_down_scroll_flag = GLFW_KEY_KP_2;
+        else if (IM.is_key_held(GLFW_KEY_K) && !(IM.is_key_held(GLFW_KEY_I))) {
+            camera_up_down_scroll_flag = GLFW_KEY_K;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_8) && IM.is_key_held(GLFW_KEY_KP_2)) {
+        else if (IM.is_key_held(GLFW_KEY_I) && IM.is_key_held(GLFW_KEY_K)) {
             auto& camera = GFXM.get_camera();
-            if (camera_up_down_scroll_flag == GLFW_KEY_KP_8) {
+            if (camera_up_down_scroll_flag == GLFW_KEY_I) {
                 camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camera_pos_y = camera.pos_y;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -888,28 +842,28 @@ namespace lof {
             camera_up_down_scroll_flag = 0;
         }
 
-        // Camera left-right scrolling when Number Pad 4 or 6 pressed
-        if (IM.is_key_held(GLFW_KEY_KP_4) && !(IM.is_key_held(GLFW_KEY_KP_6))) {
-            camera_left_right_scroll_flag = GLFW_KEY_KP_4;
+        // Camera left-right scrolling when J or L pressed
+        if (IM.is_key_held(GLFW_KEY_J) && !(IM.is_key_held(GLFW_KEY_L))) {
+            camera_left_right_scroll_flag = GLFW_KEY_J;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_6) && !(IM.is_key_held(GLFW_KEY_KP_4))) {
-            camera_left_right_scroll_flag = GLFW_KEY_KP_6;
+        else if (IM.is_key_held(GLFW_KEY_L) && !(IM.is_key_held(GLFW_KEY_J))) {
+            camera_left_right_scroll_flag = GLFW_KEY_L;
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == true) {
+            if (camera.is_free_cam == GL_TRUE) {
                 camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
             }
         }
-        else if (IM.is_key_held(GLFW_KEY_KP_4) && IM.is_key_held(GLFW_KEY_KP_6)) {
+        else if (IM.is_key_held(GLFW_KEY_J) && IM.is_key_held(GLFW_KEY_L)) {
             auto& camera = GFXM.get_camera();
-            if (camera_left_right_scroll_flag == GLFW_KEY_KP_4) {
+            if (camera_left_right_scroll_flag == GLFW_KEY_J) {
                 camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
                 imgui_camara_pos_x = camera.pos_x;
                 LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
@@ -924,7 +878,7 @@ namespace lof {
             camera_left_right_scroll_flag = 0;
         }
 
-        if (IM.is_key_pressed(GLFW_KEY_0)) {
+        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
             // Toggle between scenes
@@ -944,15 +898,15 @@ namespace lof {
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                 // Reset player position if exists
-                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (player_id != INVALID_ENTITY_ID) {
-                    if (ECSM.has_component<Transform2D>(player_id)) {
-                        auto& transform = ECSM.get_component<Transform2D>(player_id);
+                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (playerId != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Transform2D>(playerId)) {
+                        auto& transform = ECSM.get_component<Transform2D>(playerId);
                         transform.position = Vec2D(0.0f, 0.0f);
                         transform.prev_position = transform.position;
                     }
                     if (ECSM.has_component<Velocity_Component>(player_id)) {
-                        auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
+                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
                         velocity.velocity = Vec2D(0.0f, 0.0f);
                     }
                 }
@@ -1069,6 +1023,14 @@ namespace lof {
         catch (const std::exception& e) {
             LM.write_log("Error updating mineral count: %s", e.what());
         }
+    }
+
+    void Game_Manager::set_current_scene(int scene_num) {
+        current_scene = scene_num;
+    }
+
+    int Game_Manager::get_current_scene() {
+        return current_scene;
     }
 
 } // namespace lof

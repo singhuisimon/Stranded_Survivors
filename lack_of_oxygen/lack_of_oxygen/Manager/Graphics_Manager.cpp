@@ -84,10 +84,9 @@ namespace lof {
             LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
 
-        std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, "models.msh");
-        //std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
-        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Prisoner_Atlas.txt");
-        std::string font_path = ASM.get_full_path(ASM.FONT_PATH, "Fonts.txt");
+        std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, DEFAULT_MODEL_MSH_FILE);
+        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, DEFAULT_ATLAS_FILE);
+        std::string font_path = ASM.get_full_path(ASM.FONT_PATH, DEFAULT_FONTS_FILE);
 
         if (!add_model(mesh_path)) {
             LM.write_log("Graphics_Manager::start_up(): Failed to add models");
@@ -199,7 +198,7 @@ namespace lof {
 
             // Set up position attributes (attribute index 0, binding point 6)
             glEnableVertexArrayAttrib(vaoid, 0);
-            glVertexArrayVertexBuffer(vaoid, 6, vbo_hdl, 0, data_size);
+            glVertexArrayVertexBuffer(vaoid, 6, vbo_hdl, 0, static_cast<GLsizei>(data_size));
             glVertexArrayAttribFormat(vaoid, 0, 2, GL_FLOAT, GL_FALSE, 0);
             glVertexArrayAttribBinding(vaoid, 0, 6);
 
@@ -240,7 +239,7 @@ namespace lof {
         }
         input_file.close();
 
-        LM.write_log("Assets_Manager: Loading texture from %s", texture_file.c_str());
+        LM.write_log("Graphics Manager: Loading texture from %s", texture_file.c_str());
 
         // Load texture data
         int width{ 0 }, height{ 0 }, channels{ 0 };
@@ -248,7 +247,7 @@ namespace lof {
         unsigned char* tex_data = stbi_load(texture_file.c_str(), &width, &height, &channels, 4);
 
         // Add debug logging for dimensions
-        LM.write_log("Assets_Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
+        LM.write_log("Graphics Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
 
         // Create and initialize texture object
         GLuint tex_id{};
@@ -267,11 +266,11 @@ namespace lof {
             stbi_image_free(tex_data);
 
             // Add debug logging
-            LM.write_log("Assets_Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
+            LM.write_log("Graphics Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
         }
         else {
             stbi_image_free(tex_data);
-            LM.write_log("Assets_Manager: Failed to load texture data for %s", texture_name.c_str());
+            LM.write_log("Graphics Manager: Failed to load texture data for %s", texture_name.c_str());
             return GL_FALSE;
         }
 

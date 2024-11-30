@@ -23,6 +23,7 @@
 #include "Log_Manager.h"            // For Logging
 #include "Input_Manager.h"          // To check for input
 #include "Serialization_Manager.h"  // To get screen width and height
+#include "Assets_Manager.h"         // For assets management
 
 // Include Utility headers
 #include "../Utility/constant.h"    // To access constants and OpenGL API
@@ -36,10 +37,6 @@
 #include <map>
 #include <unordered_map>
 #include <mutex>
-#include <../ft2build.h>
-
-#include "Assets_Manager.h"
-#include FT_FREETYPE_H 
 
 namespace lof {
 
@@ -138,8 +135,8 @@ namespace lof {
         int is_moving = 0;
         int is_mining = 0;
 
-        // FOR TESTING
-        GLuint imgui_fbo, imgui_tex;
+        // Texture for imgui level editor viewport
+        GLuint imgui_fbo{ 0 }, imgui_tex{ 0 };
         int editor_mode = 0;
 
     public:

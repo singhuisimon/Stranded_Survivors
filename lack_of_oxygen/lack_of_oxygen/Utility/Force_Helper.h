@@ -59,6 +59,7 @@ namespace lof {
 			if (type_str == "JUMP_UP") return JUMP_UP;
 			if (type_str == "DRAG") return DRAG;
 			if (type_str == "IMPULSE") return IMPULSE;
+			return IMPULSE;
 		}
 
 		static std::string ftype_to_string(const ForceType type) {

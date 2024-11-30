@@ -100,25 +100,18 @@ namespace lof {
 		NONE = 4		///<Audio is not played at all nor need to stop
 	};
 
-	// ----------------------------- 
-	// 
-	// 
-	// 
-	// 
-	// 
-	// 
-	// .cpp -------------------------------------------
-	//Movement_System constants
+	// ------------------------- Movement_System.cpp constants ------------------------- 
 
 	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
 
-	// ------------------------------ Audio_Manager.cpp --------------------------------
-
-	constexpr int TRACK1 = 1;
-	constexpr int TRACK2 = 2;
-
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
+	// File
+	constexpr const char* DEFAULT_MODEL_MSH_FILE = "models.msh";
+	constexpr const char* DEFAULT_ATLAS_FILE = "Spritesheet_Atlas.txt";
+	constexpr const char* DEFAULT_FONTS_FILE = "Fonts.txt";
+	
+	// Textures
 	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;
 	constexpr float DEFAULT_TEXTURE_SIZE = 254.0f;
 
