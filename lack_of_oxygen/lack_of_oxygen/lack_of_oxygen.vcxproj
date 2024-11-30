@@ -355,7 +355,8 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\Freetype API\*.dll" "$(OutDir)
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q
-xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"</Command>
+xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)External_Libraries\lib\Freetype API\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='installer|x64'">
@@ -380,7 +381,8 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(Out
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lack_of_oxygen\Assets\*" "$(OutDir)Assets\" /s /r /y /q
-xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"</Command>
+xcopy /y /d "$(SolutionDir)External_Libraries\lib\FMOD API\core\fmod.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)External_Libraries\lib\Freetype API\*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
