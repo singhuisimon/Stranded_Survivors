@@ -61,7 +61,7 @@ namespace lof {
         signature.set(ECSM.get_component_id<Physics_Component>()); 
         signature.set(ECSM.get_component_id<Velocity_Component>()); 
 
-        LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
+        //LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
     }
 
     std::string Collision_System::get_type() const {
@@ -522,7 +522,7 @@ namespace lof {
                         std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range 
                         found_left_collision = true;
                         current_left_entity = entity_ID2;
-                        LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
+                        //LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
                     // Right check 
@@ -533,7 +533,7 @@ namespace lof {
                         std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range 
                         found_right_collision = true;
                         current_right_entity = entity_ID2;
-                        LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
+                       // LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
                     // Top check 
