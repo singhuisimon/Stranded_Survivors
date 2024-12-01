@@ -161,16 +161,16 @@
     <Image Include="Assets\Textures\Lava_Batch_4.png" />
     <Image Include="Assets\Textures\mineral_deposit_ui_bar_batch_4.png" />
     <Image Include="Assets\Textures\Mineral_Deposit_UI_BG_Batch 4.png" />
-    <Image Include="Assets\Textures\Mineral_Deposit_UI_BG_Batch_4.png" />
+    <Image Include="Assets\Textures\mineral_deposit_ui_bg_batch_4.png" />
     <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch 4.png" />
-    <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch_4.png" />
+    <Image Include="Assets\Textures\mineral_deposit_ui_text_batch_4.png" />
     <Image Include="Assets\Textures\mineral_hopper_conveyor_empty_batch_4.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Green_circle.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Red_circle.png" />
-    <Image Include="Assets\Textures\Oxygen_Refill_UI_BG_Batch_4.png" />
-    <Image Include="Assets\Textures\Oxygen_Refill_UI_Green_circle_Batch_4.png" />
-    <Image Include="Assets\Textures\Oxygen_Refill_UI_Red_circle_Flattened_Batch_4.png" />
-    <Image Include="Assets\Textures\Oxygen_Refill_UI_Text_Batch_4.png" />
+    <Image Include="Assets\Textures\oxygen_refill_ui_bg_batch_4.png" />
+    <Image Include="Assets\Textures\oxygen_refill_UI_green_circle_batch_4.png" />
+    <Image Include="Assets\Textures\oxygen_refill_ui_red_circle_flattened_batch_4.png" />
+    <Image Include="Assets\Textures\oxygen_refill_ui_text_batch_4.png" />
     <Image Include="Assets\Textures\oxygen_tank_batch_4.png" />
     <Image Include="Assets\Textures\Prisoner.png" />
     <Image Include="Assets\Textures\Prisoner_Spritesheet.png" />
@@ -184,7 +184,7 @@
     <Image Include="Assets\Textures\Sapphire_002_Batch 4.png" />
     <Image Include="Assets\Textures\ship_open_batch_2.png" />
     <Image Include="Assets\Textures\Skybox_ALL.png" />
-    <Image Include="Assets\Textures\Skybox_Batch_4.png" />
+    <Image Include="Assets\Textures\skybox_batch_4.png" />
     <Image Include="Assets\Textures\snowflake.png" />
     <Image Include="Assets\Textures\Spritesheet_Animate.png" />
     <Image Include="Assets\Textures\spritesheet_map.png" />
@@ -192,9 +192,9 @@
     <Image Include="Assets\Textures\sun.png" />
     <Image Include="Assets\Textures\TNT.png" />
     <Image Include="Assets\Textures\TNT_Batch_4.png" />
-    <Image Include="Assets\Textures\Top_UI_Minerals_Batch_4.png" />
-    <Image Include="Assets\Textures\Top_UI_O2_meter_Batch_4.png" />
-    <Image Include="Assets\Textures\Top_UI_Panik_meter_Batch_4.png" />
+    <Image Include="Assets\Textures\top_ui_minerals_batch_4.png" />
+    <Image Include="Assets\Textures\top_ui_o2_meter_batch_4.png" />
+    <Image Include="Assets\Textures\top_ui_panik_meter_batch_4.png" />
     <Image Include="Assets\Textures\vent.png" />
     <Image Include="Assets\Textures\wormhole.png" />
   </ItemGroup>
