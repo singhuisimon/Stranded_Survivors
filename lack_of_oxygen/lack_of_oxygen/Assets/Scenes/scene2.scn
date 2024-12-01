@@ -52,21 +52,12 @@
           "sounds": [
             {
               "key": "bgm1",
-              "filepath": "GAM_2_Surface_Music",
+              "filepath": "bgm_surface_music",
               "audio_state": 0,
               "audio_type": 0,
               "volume": 0.5,
               "pitch": 1.0,
               "islooping": true
-            },
-            {
-              "key": "bgm2",
-              "filepath": "audio_test2",
-              "audio_state": 4,
-              "audio_type": 0,
-              "volume": 0.5,
-              "pitch": 1.0,
-              "islooping": false
             }
           ],
           "is_3d": false,
@@ -395,7 +386,7 @@
           "sounds": [
             {
               "key": "jumping1",
-              "filepath": "Fx01",
+              "filepath": "player_jumping_Fx01",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.1,
@@ -404,7 +395,7 @@
             },
             {
               "key": "jumping2",
-              "filepath": "Fx04",
+              "filepath": "player_jumping_Fx04",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -413,7 +404,7 @@
             },
             {
               "key": "moving 1",
-              "filepath": "Walking_01",
+              "filepath": "player_walking_01",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -422,7 +413,7 @@
             },
             {
               "key": "moving 2",
-              "filepath": "Walking_02",
+              "filepath": "player_walking_02",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -431,7 +422,7 @@
             },
             {
               "key": "moving 3",
-              "filepath": "Walking_03",
+              "filepath": "player_walking_03",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,

@@ -28,7 +28,7 @@
             0.5,
             0.5
           ],
-          "texture_name": "Skybox_Batch_4",
+          "texture_name": "skybox_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -52,7 +52,7 @@
           "sounds": [
             {
               "key": "bgm1",
-              "filepath": "audio_test1",
+              "filepath": "audio_test_1",
               "audio_state": 0,
               "audio_type": 0,
               "volume": 0.5,
@@ -61,7 +61,7 @@
             },
             {
               "key": "bgm2",
-              "filepath": "audio_test2",
+              "filepath": "audio_test_2",
               "audio_state": 4,
               "audio_type": 0,
               "volume": 0.5,
@@ -108,7 +108,7 @@
             0.0,
             1.0
           ],
-          "texture_name": "Dirt",
+          "texture_name": "dirt",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -190,7 +190,7 @@
             0.0,
             1.0
           ],
-          "texture_name": "Rock",
+          "texture_name": "rock",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -354,7 +354,7 @@
             0.0,
             1.0
           ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -447,7 +447,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "Spritesheet_Player",
+          "texture_name": "spritesheet_player",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -534,7 +534,7 @@
           "sounds": [
             {
               "key": "jumping",
-              "filepath": "Fx16_2",
+              "filepath": "audio_test_Fx16_2",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
@@ -543,7 +543,7 @@
             },
             {
               "key": "moving left",
-              "filepath": "Fx28",
+              "filepath": "audio_test_Fx28",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
@@ -552,7 +552,7 @@
             },
             {
               "key": "moving right",
-              "filepath": "Fx27",
+              "filepath": "audio_test_Fx27",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.5,
@@ -711,7 +711,7 @@
             0.20000000298023224,
             0.0
           ],
-          "texture_name": "Snowflake",
+          "texture_name": "snowflake",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -823,7 +823,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_O2_meter_Batch_4",
+          "texture_name": "top_ui_o2_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -874,7 +874,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_Panik_meter_Batch_4",
+          "texture_name": "top_ui_panik_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -925,7 +925,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_Minerals_Batch_4",
+          "texture_name": "top_ui_minerals_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
