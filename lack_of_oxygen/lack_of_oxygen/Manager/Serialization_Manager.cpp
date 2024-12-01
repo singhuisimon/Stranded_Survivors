@@ -50,10 +50,7 @@ namespace lof {
     class Graphics_Component;
     class Collision_Component;
 
-    /**
-     * @brief Private constructor for the singleton pattern.
-     * Initializes member variables with default values.
-     */
+
     Serialization_Manager::Serialization_Manager()
         : m_scr_width(DEFAULT_SCREEN_WIDTH),
         m_scr_height(DEFAULT_SCREEN_HEIGHT),
@@ -63,19 +60,13 @@ namespace lof {
         LM.write_log("Serialization_Manager::Serialization_Manager(): Initialized with default configurations.");
     }
 
-    /**
-     * @brief Retrieves the singleton instance of Serialization_Manager.
-     * @return Reference to the singleton instance.
-     */
     Serialization_Manager& Serialization_Manager::get_instance() {
         static Serialization_Manager instance;
         return instance;
     }
     int Serialization_Manager::scene_no = 1;
-    /**
-     * @brief Starts up the Serialization_Manager by loading configuration, prefabs, and scene files.
-     * @return 0 on success, negative value on failure.
-     */
+
+
     int Serialization_Manager::start_up() {
         m_is_started = true;
 
@@ -130,15 +121,7 @@ namespace lof {
         m_is_started = false;
     }
 
-    /**
-     * @brief Merges two JSON objects. Source object's members are merged into the destination object.
-     * If a member exists in both objects and both are objects, the merge is performed recursively.
-     * Otherwise, the destination's member is overwritten by the source's member.
-     *
-     * @param source The source JSON object to merge from.
-     * @param destination The destination JSON object to merge into.
-     * @param allocator The RapidJSON allocator to use for memory management.
-     */
+
     void Serialization_Manager::merge_objects(const rapidjson::Value& source,
         rapidjson::Value& destination,
         rapidjson::Document::AllocatorType& allocator) {
@@ -172,12 +155,6 @@ namespace lof {
     }
 
 
-    /**
-     * @brief Loads the configuration file and initializes screen settings and FPS display interval.
-     *
-     * @param filepath The complete path to the configuration file.
-     * @return True if loading and parsing are successful, false otherwise.
-     */
     bool Serialization_Manager::load_config(const char* filepath) {
         LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
 
@@ -236,12 +213,7 @@ namespace lof {
         return true;
     }
 
-    /**
-     * @brief Loads the prefab file and caches the prefab definitions for quick access.
-     *
-     * @param filepath The complete path to the prefab file.
-     * @return True if loading and parsing are successful, false otherwise.
-     */
+
     bool Serialization_Manager::load_prefabs(const char* filepath) {
         LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
 
@@ -293,12 +265,6 @@ namespace lof {
         return true;
     }
 
-    /**
-     * @brief Loads the scene file, creates entities, and assigns components based on the scene and prefabs.
-     *
-     * @param filename The complete path to the scene file.
-     * @return True if loading and parsing are successful, false otherwise.
-     */
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
