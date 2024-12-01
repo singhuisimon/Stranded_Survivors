@@ -56,10 +56,10 @@ namespace lof {
 
     Collision_System::Collision_System() {
         // Set the required components for this system
-        signature.set(ECSM.get_component_id<Transform2D>()); // simon
-        signature.set(ECSM.get_component_id<Collision_Component>()); // simon
-        signature.set(ECSM.get_component_id<Physics_Component>()); // simon
-        signature.set(ECSM.get_component_id<Velocity_Component>()); // simon
+        signature.set(ECSM.get_component_id<Transform2D>()); 
+        signature.set(ECSM.get_component_id<Collision_Component>()); 
+        signature.set(ECSM.get_component_id<Physics_Component>()); 
+        signature.set(ECSM.get_component_id<Velocity_Component>()); 
 
         LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
     }
@@ -342,6 +342,8 @@ namespace lof {
 
 
                 if (!collision2.collidable) continue;
+
+
                 // Create AABB for object 2
                 AABB aabb2 = AABB::from_transform(transform2, collision2);
 
@@ -432,7 +434,7 @@ namespace lof {
 
 
             // Ensure coordinate is within the range
-            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1); //
+            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1); 
             player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
 
             //// Debug output for player position
@@ -473,7 +475,7 @@ namespace lof {
                     int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
                     int entity2_row = static_cast<int>((START_Y - transform2.position.y) / CELL_HEIGHT);
 
-                    // Skip if entity2 is outside our 5x5 check area
+                    // Skip if entity2 is outside check area
                     if (entity2_row < start_row || entity2_row > end_row ||
                         entity2_col < start_col || entity2_col > end_col) {
                         continue;
@@ -517,18 +519,18 @@ namespace lof {
                         entity2_col == player_col - 1 && // one column to the left
                         entity2_row == player_row && // same row
                         transform2.position.x < transform1.position.x && // entity2 is actually to the left
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range 
                         found_left_collision = true;
                         current_left_entity = entity_ID2;
                         LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
-                    // Right check - Modified to be more reliable
+                    // Right check 
                     if (!found_right_collision &&
                         entity2_col == player_col + 1 && // one column to the right
                         entity2_row == player_row && // same row
                         transform2.position.x > transform1.position.x && // entity2 is actually to the right
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range 
                         found_right_collision = true;
                         current_right_entity = entity_ID2;
                         LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
