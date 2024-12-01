@@ -1,7 +1,7 @@
 /**
  * @file Component.h
  * @brief Defines the base Component class and specific component types for the Entity Component System (ECS).
- * @author Simon Chan (50%), Wai Lwin Thit (20%), Amanda Leow Boon Suan (20%), Saw Hui Shan (10%)
+ * @author Simon Chan (49%), Wai Lwin Thit (20%), Amanda Leow Boon Suan (20%), Saw Hui Shan (10%), Liliana Hanawardani (1%)
  * @date September 15, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

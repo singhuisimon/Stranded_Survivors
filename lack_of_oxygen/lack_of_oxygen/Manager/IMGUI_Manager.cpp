@@ -1,7 +1,7 @@
 /**
  * @file IMGUI_Manager.cpp
  * @brief Declaration of the IMGUI_Manager class for running the IMGUI level editor.
- * @author Liliana Hanawardani (100%)
+ * @author Liliana Hanawardani (80%), Simon Chan (13%), Saw Hui Shan (7%)
  * @date November 8, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

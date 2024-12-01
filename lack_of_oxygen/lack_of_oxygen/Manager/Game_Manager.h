@@ -1,7 +1,7 @@
 /**
  * @file Game_Manager.h
  * @brief Defines the Game_Manager class for managing the game state and logic.
- * @author Simon Chan (95%), Chua Wen Bin Kenny (3%), Amanda Leow Boon Suan (2%)
+ * @author Simon Chan (93%), Chua Wen Bin Kenny (3%), Amanda Leow Boon Suan (2%), Saw Hui Shan (1%), Liliana Hanawardani (1%),  
  * @date September 21, 2024 
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
