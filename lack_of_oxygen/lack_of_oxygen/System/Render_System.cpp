@@ -237,7 +237,6 @@ namespace lof {
             auto& models = GFXM.get_model_storage();
             auto& textures = GFXM.get_texture_storage();
             auto& animations = GFXM.get_animation_storage();
-            [[maybe_unused]] auto& camera = GFXM.get_camera();
 
             // Check for text objects to render 
             bool is_text = ECSM.has_component<Text_Component>(entity_id);
