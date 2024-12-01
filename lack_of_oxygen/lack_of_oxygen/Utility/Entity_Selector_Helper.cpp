@@ -198,24 +198,13 @@ namespace lof
         unsigned int current_width =  WC.get_win_width();
         unsigned int current_height = WC.get_win_height();
 
-        //auto & camera = GFXM.get_camera();
-
         //printf("window width, height (%.f, %.f)\n", current_width, current_height);
         float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
-        //float scaleX = static_cast<float>(SM.get_scr_width() / current_width);
         float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
-        //float scaleY = static_cast<float>(SM.get_scr_height() / current_height);
 
         float adjustX = (mouseX /scaleX);
         float adjustY = (mouseY / scaleY);
 
-        //float camera_pos_x = camera.pos_x / scaleX;
-        //float camera_pos_y = camera.pos_y / scaleY;
-
-        //box_x -= camera_pos_x;
-        //box_y -= camera_pos_y;
-
-        //flioat adjustX = mouseX / scaleX;
         return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
             adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
     }

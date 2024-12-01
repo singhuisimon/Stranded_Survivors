@@ -53,20 +53,34 @@ namespace lof {
 		void toggle_fullscreen(GLFWwindow* window, GLFWmonitor* monitor, const GLFWvidmode* mode,
 			bool& is_full_screen, unsigned int width, unsigned int height);
 
+		/**
+		* @brief Updates the window private member width and height
+		*/
 		void update_win_size(GLFWwindow* window);
 
+		/**
+		* @brief Getter for private memeber win_width
+		*/
 		unsigned int get_win_width() const;
 
+		/**
+		* @brief Getter for private memeber win_height
+		*/
 		unsigned int get_win_height() const;
 
 	private:
 
+		/**
+		* @brief Paramaterized constructor for Window_Control class
+		* @param x The starting x pos of the window
+		* @param y The starting y pos of the window
+		*/
 		Window_Control(int x = 200, int y = 200);
 
-		int window_x;
-		int window_y;
-		unsigned int win_height;
-		unsigned int win_width;
+		int window_x;	///< Where the window is rendered in x pos
+		int window_y;	///< Where the window is rendered in y pos
+		unsigned int win_height; ///< The game window height
+		unsigned int win_width;	 ///< The game window width
 	};
 
 }

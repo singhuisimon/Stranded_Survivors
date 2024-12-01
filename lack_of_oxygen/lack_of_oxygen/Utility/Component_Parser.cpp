@@ -304,15 +304,6 @@ namespace lof {
                             if (extension != std::string::npos) {
                                 filepath = filepath.substr(0, extension);
                             }
-// #ifndef NDEBUG
-//                             // Construct the full path
-//                             std::string full_filepath = ASM.get_executable_directory() +
-//                                 "\\..\\..\\lack_of_oxygen\\Assets\\Audio\\" + filepath + ".wav";
-// #endif
-// #ifndef _DEBUG
-//                             std::string full_filepath = ASM.get_executable_directory() +
-//                                 "\\Assets\\Audio\\" + filepath + ".wav";
-// #endif
 
                             // Verify audio file exists
                             if (!ASM.load_audio_file(filepath)) {

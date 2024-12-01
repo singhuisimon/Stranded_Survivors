@@ -129,8 +129,6 @@ namespace lof {
 		pow2y = vec0.y * vec0.y;
 		pow2z = vec0.z * vec0.z;
 		length = pow2x + pow2y + pow2z;
-		/*float length = length_vec3d(vec0);
-		length *= length;*/
 		return length;
 	}
 
