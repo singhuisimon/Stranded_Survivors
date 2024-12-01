@@ -1,7 +1,7 @@
 /**
  * @file Assets_Manager.cpp
  * @brief Implements the Assets_Manager.
- * @author Saw Hui Shan (60%), Chua Wen Bin Kenny (40%) 
+ * @author Saw Hui Shan (90%), Chua Wen Bin Kenny (10%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -36,7 +36,7 @@ namespace lof {
         return std::string(buffer).substr(0, pos);
         }
 
-    void Assets_Manager::initialize_paths() { // (Simon file path)
+    void Assets_Manager::initialize_paths() { 
         
         char buffer[MAX_PATH];
         GetModuleFileNameA(NULL, buffer, MAX_PATH);
@@ -54,7 +54,7 @@ namespace lof {
     Assets_Manager::~Assets_Manager() {}
 
 
-    bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) { // (Hui Shan)
+    bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) { 
         file.open(filepath, std::ios::in);
         if (!file.good()) {
             LM.write_log("Assets_Manager: Unable to open file: %s", filepath.c_str());
@@ -107,7 +107,6 @@ namespace lof {
         return full_path;
     }
 
-    // Read and ensure shader file is valid
     bool Assets_Manager::read_shader_file(const std::string& file_path, std::string& shader_source) {
         // Check if file's state is good for reading
         std::ifstream input_file(file_path);
