@@ -57,12 +57,12 @@ namespace lof {
     bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) { 
         file.open(filepath, std::ios::in);
         if (!file.good()) {
-            LM.write_log("Assets_Manager: Unable to open file: %s", filepath.c_str());
+           // LM.write_log("Assets_Manager: Unable to open file: %s", filepath.c_str());
             return false;
         }
         else
         {
-            LM.write_log("Assets_Manager: Successfully open file: %s", filepath.c_str());
+           // LM.write_log("Assets_Manager: Successfully open file: %s", filepath.c_str());
         }
             
         file.seekg(0, std::ios::beg);
@@ -86,7 +86,7 @@ namespace lof {
     bool Assets_Manager::read_json_file(const std::string& filepath, std::string& json_content) {
         std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
-            LM.write_log("Assets_Manager::read_json_file(): Failed to open file: %s", filepath.c_str());
+            //LM.write_log("Assets_Manager::read_json_file(): Failed to open file: %s", filepath.c_str());
             return false;
         }
 
@@ -111,7 +111,7 @@ namespace lof {
         // Check if file's state is good for reading
         std::ifstream input_file(file_path);
         if (input_file.good() == GL_FALSE) {
-            LM.write_log("Assets_Manager: File %s has error.", file_path.c_str());
+           // LM.write_log("Assets_Manager: File %s has error.", file_path.c_str());
             return false;
         }
 
@@ -121,7 +121,7 @@ namespace lof {
         input_file.close();
 
         shader_source = ss.str();
-        LM.write_log("Assets_Manager: Successfully read shader file %s", file_path.c_str());
+        //LM.write_log("Assets_Manager: Successfully read shader file %s", file_path.c_str());
         return true;
     }
 
@@ -138,7 +138,7 @@ namespace lof {
 
             // Use Graphics_Manager to compile the shader
             if (!GFXM.compile_shader(shader_files, shader_program)) {
-                LM.write_log("Assets_Manager::load_shader_programs(): Shader program failed to compile.");
+                //LM.write_log("Assets_Manager::load_shader_programs(): Shader program failed to compile.");
                 return false;
             }
 
@@ -146,10 +146,10 @@ namespace lof {
             shader_programs.emplace_back(shader_program);
             std::size_t shader_idx = shader_programs.size() - 1;
 
-            LM.write_log("Assets_Manager::load_shader_programs(): Shader program handle is %u.",
-                shader_program.program_handle);
-            LM.write_log("Assets_Manager::load_shader_programs(): Shader program %zu created, compiled and added successfully.",
-                shader_idx);
+            //LM.write_log("Assets_Manager::load_shader_programs(): Shader program handle is %u.",
+               // shader_program.program_handle);
+            //LM.write_log("Assets_Manager::load_shader_programs(): Shader program %zu created, compiled and added successfully.",
+              //  shader_idx);
         }
         return true;
     }
@@ -240,7 +240,7 @@ namespace lof {
             else if (prefix == "e") {
                 if (!is_model_exist && !currentModel.modelName.empty()) {
                     model_storage[currentModel.modelName] = currentModel;
-                    LM.write_log("Assets_Manager: Loaded model data for %s", currentModel.modelName.c_str());
+                    //LM.write_log("Assets_Manager: Loaded model data for %s", currentModel.modelName.c_str());
                 }
                 // Reset for next model, just like original code
                 currentModel = ModelData();
@@ -275,7 +275,7 @@ namespace lof {
             }
             else if (prefix == "texture") {
                 file_line_ss >> animation.texture_name;
-                LM.write_log("Assets_Manager: animation texture name: %s", animation.texture_name.c_str());
+                //LM.write_log("Assets_Manager: animation texture name: %s", animation.texture_name.c_str());
             }
             else if (prefix == "frame_no") {
                 file_line_ss >> frame.frame_number;
@@ -287,21 +287,11 @@ namespace lof {
                 animation.frames.emplace_back(frame);
             }
             else if (prefix == "EA") {
-                //LM.write_log("Assets_Manager New Animation Loading: Animation name: %s", anim_name.c_str());
-                //LM.write_log("Assets_Manager New Animation Loading: Texture name: %s", animation.texture_name.c_str());
-                //LM.write_log("Assets_Manager New Animation Loading: curr_frame idx %u", animation.curr_frame_index);
-                //int cnt = 0;
-                //for (auto& it : animation.frames) {
-                //    LM.write_log("Assets_Manager New Animation Loading: Frame %u:", cnt);
-                //    LM.write_log("Assets_Manager New Animation Loading: Frame Number: %u", it.frame_number);
-                //    LM.write_log("Assets_Manager New Animation Loading: time delay: %f", it.time_delay);
-                //    cnt++; 
-                //}
-
+           
                 animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
                 GFXM.animation_storage[anim_name] = animation;
                 animation = {};
-                LM.write_log("Assets_Manager: %s animation loaded", anim_name.c_str());
+                //LM.write_log("Assets_Manager: %s animation loaded", anim_name.c_str());
             }
         }
 
@@ -312,11 +302,11 @@ namespace lof {
     // Load and store font data from name 
     bool Assets_Manager::load_fonts(const std::string& font_name, FT_Library& out_ft, FT_Face& out_face) {
         if (FT_Init_FreeType(&out_ft)) {
-            LM.write_log("Assets_Manager: Could not initialize FreeType Library");
+            //LM.write_log("Assets_Manager: Could not initialize FreeType Library");
             return false;
         }
 
-        //std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
+        
 #ifndef NDEBUG
         std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
 #endif
@@ -330,13 +320,13 @@ namespace lof {
         }
         std::ifstream ifs{ font_filepath, std::ios::binary };
         if (!ifs) {
-            LM.write_log("Assets_Manager: Font file does not exist: %s", font_filepath.c_str());
+            //LM.write_log("Assets_Manager: Font file does not exist: %s", font_filepath.c_str());
             return false;
         }
         ifs.close();
 
         if (FT_New_Face(out_ft, font_filepath.c_str(), 0, &out_face)) {
-            LM.write_log("Assets_Manager:: Failed to load font %s", font_name.c_str());
+            //LM.write_log("Assets_Manager:: Failed to load font %s", font_name.c_str());
             return false;
         }
 
@@ -347,7 +337,7 @@ namespace lof {
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
-            LM.write_log("Assets_Manager:: Unable to open %s", file_name.c_str());
+            //LM.write_log("Assets_Manager:: Unable to open %s", file_name.c_str());
             return false;
         }
 
@@ -370,7 +360,7 @@ namespace lof {
         // Check if file exists and is readable
         std::ifstream file(full_path, std::ios::binary);
         if (!file.good()) {
-            LM.write_log("Assets_Manager: Failed to load audio file: %s", full_path.c_str());
+            //LM.write_log("Assets_Manager: Failed to load audio file: %s", full_path.c_str());
             return false;
         }
         file.close();

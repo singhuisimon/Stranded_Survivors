@@ -359,13 +359,10 @@ namespace lof {
                         physic1.set_gravity(Vec2D(0.0f, 0.0f));
                     }
 
-                    //std::cout << "entity 2 is :" << entity_ID2 << "\n";
+                    
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
-                    //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
-                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
-                    //std::cout << "State of is grouded for player: " << physic1.is_grounded << "\n";
-                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
+            
                 }
             }
             physic1.set_is_grounded(is_grounded);
@@ -437,10 +434,7 @@ namespace lof {
             player_col = std::clamp(player_col, 0, TOTAL_COLS - 1); 
             player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
 
-            //// Debug output for player position
-            //LM.write_log("\n=== Collision Check Debug ===");
-            //printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
-
+   
             
             const int CHECK_RADIUS = 1; // 1 cell away from player 
             int start_row = std::max(0, player_row - CHECK_RADIUS); //get the starting rows that will be check always 1 rows before the player 
@@ -450,10 +444,7 @@ namespace lof {
             int start_col = std::max(0, player_col - CHECK_RADIUS); // get the starting cols, always check 1 cols before the player
             int end_col = std::min(TOTAL_COLS - 1, player_col + CHECK_RADIUS); // get the ending cols, always check 1 cols before the player
 
-            // Debug output for check area
-            //LM.write_log("\nChecking area:");
-            //printf("Rows: %d to %d\n", start_row, end_row);
-            //printf("Cols: %d to %d\n", start_col, end_col);
+      
 
 
             AABB aabb1 = AABB::from_transform(transform1, collision1);
@@ -508,9 +499,6 @@ namespace lof {
                             bottom_collision_entity = static_cast<EntityID>(-1);
                         }
 
-                        //printf("Collision detected: Entity %d with Entity %d at side %d\n", entity_ID1, entity_ID2, side);
-                        //printf("this is frame counter: %f\n" , static_cast<float>(frame_counter));
-                        //printf("this is bool of is_grounded %d\n", is_grounded);
                         collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side,  static_cast<float>(frame_counter) });
 
                     }
@@ -561,16 +549,7 @@ namespace lof {
                         }
                     }
 
-                    // Bottom check (only work if level_design map first row is empty 'e')
-                    //if (!found_bottom_collision &&
-                    //    entity2_row == player_row + 1 && // Exactly one row below
-                    //    entity2_col == player_col && // ensure it is same row
-                    //    std::abs(transform2.position.y - transform1.position.y) < (CELL_HEIGHT * 1.2f)) {
-                    //    found_bottom_collision = true;
-                    //    current_bottom_entity = entity_ID2;
-                    //    //LM.write_log("Top entity detected in row %d: %d", entity2_row, entity_ID2);
-                    //}
-
+     
                 }
             } //end of -150
 
@@ -849,33 +828,15 @@ namespace lof {
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
-        //std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
+       
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
-        //printf("this is bool of is_collide_bottom %d\n", is_collide_bottom);
-        // printf("this is the entity that get %d\n", get_bottom_collide_entity());
-        //printf("entity bottom: %d\n", has_bottom_collide_detect());
-
-        //printf("this is the entity that get %d\n", get_bottom_collide_entity());
-        // printf("entity bottom: %d\n", has_bottom_collide_detect());
-        //EntityID test = get_left_collide_entity();
+ 
 
         Colliside_Oxygen_Mineral(delta_time);
 
-  
-
-        //sprintf("this is the entity left %d\n", test);
-        //printf("entity left: %d\n", has_left_collide_detect());
-        //
-
-        //printf("this is the entity right %d\n", get_right_collide_entity());
-        //printf("entity right: %d\n", has_right_collide_detect());
-
-        //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
+ 
         resolve_collision_event(collisions);
-        //Check_Selected_Entity();
-
-        // std::cout << "collision time: " << delta_time << "\n";
-        // std::cout << SM.scene_switch() << "in game mode\n";
+    
     }
 
     bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
