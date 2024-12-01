@@ -320,7 +320,7 @@ namespace lof {
 #ifndef NDEBUG
         std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
 #endif
-#ifndef DEBUG
+#ifndef _DEBUG
         std::string font_filepath = BASE_PATH + FONT_PATH + "\\" + font_name + ".ttf";
 #endif
 
