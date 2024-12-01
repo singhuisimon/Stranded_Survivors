@@ -273,6 +273,7 @@ namespace lof {
     }
 
     void GUI_System::update(float delta_time) {
+        (void)delta_time;
         auto* container_transform = get_component_safe<Transform2D>(container_id);
         if (!container_transform) return;
 
