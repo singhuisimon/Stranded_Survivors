@@ -16,34 +16,38 @@
 #include "ECS_Manager.h"
 #include "Game_Manager.h"
 #include "Graphics_Manager.h"
+#include "Assets_Manager.h"
 
+// Include utility functions
+#include "../Utility/Constant.h"
+#include "../Utility/Entity_Selector_Helper.h"
+#include "../Utility/Win_Control.h"
+
+//Include other file headers
+#include "../Component/Component.h"
+#include "../System/GUI_System.h"
+
+//Include standard headers
 #include <iostream>
 #include <random>
 #include <chrono>
 #include <filesystem>
 #include <vector>
 
-#include "../System/GUI_System.h"
-// Include utility function
-#include "../Utility/Constant.h"
-#include "Assets_Manager.h"
-#include "../Utility/Entity_Selector_Helper.h"
-#include "../Utility/Win_Control.h"
-#include "../Component/Component.h"
 
 namespace lof {
 
-    //constants to replace
+    //variables to note down indexes of files or objects
     int selected_file_index = -1;
     int prev_file_selected = -1;
-
     int selected_object_index = -1;
+
+    //booleans to open IMGUI windows or execute functionalities
     bool load_selected = false;
     bool show_window = false;
     bool remove_game_obj = false;
     bool create_game_obj = false;
     bool filled = false;
-
     static bool mouse_clicked_or_dragged = false;
 
     //mouse position in terms of game world
@@ -52,14 +56,11 @@ namespace lof {
     //Vector of assigned names
     std::vector<std::string> assigned_names;
 
-    
-    
+    //booleans to note down mouse behaviour
     static bool mouse_was_down = false;
     static ImVec2 mouse_pos_before_press;
-    static bool mouse_prev_down = false;
     
     
-
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
     IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager) {
@@ -103,21 +104,21 @@ namespace lof {
             if (entity->has_component(ecs.get_component_id<Audio_Component>())) {
                 Audio_Component& audio = ecs.get_component<Audio_Component>(entity.get()->get_id());
 
+                //Iterate through sounds
                 auto& sounds = audio.get_sounds();
                 for (auto& sound : sounds) {
 
+                    //Get the file name and the filepath and push it to audio_file_names
                     auto filepath = audio.get_filepath(sound.key);
-
                     size_t last_slash = filepath.find_last_of('\\');
                     size_t last_dot = filepath.find_last_of('.');
-
                     fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
-
 
                 }
             }
         }
 
+        //Fill in audio_types vector 
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
         audio_types.push_back(std::make_pair("SFX", (AudioType)1));
         audio_types.push_back(std::make_pair("NIL", (AudioType)2));
@@ -131,8 +132,10 @@ namespace lof {
         std::string level_path = ASM.get_full_path(SCENES, "");
         std::vector<std::string> file_names;
 
-        // Iterate through the directory and collect file names
+        //Iterate through the directory and collect file names
         for (const auto& entry : std::filesystem::directory_iterator(level_path)) {
+            
+            //If the file is found, add to the list of file names
             if (entry.is_regular_file()) {  
                 
                 file_names.push_back(entry.path().filename().string());
@@ -140,12 +143,12 @@ namespace lof {
 
         }
 
+        //Indexes for files
         int current_file_index = 0;
         int shown_file_index = -1;
-
         std::string selected_file{};
 
-        //iterate through file names
+        //Iterate through file names
         for (int i = 0; i < file_names.size(); ++i) {
 
             if (!file_names[i].empty()) {
@@ -166,24 +169,28 @@ namespace lof {
             ++current_file_index;
         }
 
+        //If file is selecetd
         if (selected_file_index != -1) {
             selected_file = file_names[selected_file_index];
         }
         
+        //load scene button
         if (ImGui::Button("Load Scene")) {
             load_selected = true;
             
         }
    
         ImGui::End();
+
+        //If file name is clicked and button is pressed
         if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
 
+            //Gets file according to index load
             const std::string scenes = "Scenes";
             if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
 
-                
+               
                 GM.set_current_scene(selected_file_index + 1);
-
                 selected_object_index = -1;
 
                 // Reset camera position
@@ -323,16 +330,16 @@ namespace lof {
                     }
                 }
 
-                //load_selected = !load_selected;
+                //Note down current file
                 set_current_file_shown(selected_file);
 
+                //Reset audio names
                 audio_file_names.clear();
                 audio_types.clear();
                 fill_up_sound_names();
 
             }
 
-            //prev_file_selected = selected_file_index;
             load_selected = false;
         }
 
@@ -356,7 +363,6 @@ namespace lof {
             ImVec2 mouse_texture_coord_screen{};
             mouse_texture_coord_screen.x = (mouse_pos.x - texture_pos.x);
             mouse_texture_coord_screen.y = (mouse_pos.y - texture_pos.y);
-
 
             //Get camera position and changes
             auto& camera = GFXM.get_camera();
@@ -409,7 +415,7 @@ namespace lof {
     }
 
 
-    bool select_entity = false; // to ensure mouse click selected
+    bool select_entity = false; //to ensure mouse click selected
     EntityID selectedEntityID = static_cast<EntityID>(-1);
 
 
@@ -464,6 +470,7 @@ namespace lof {
         ImGui::PopStyleVar(2);
         ImGui::End();
 
+        //In the game world viewport
         if (GFXM.get_editor_mode() == 1) {
             ImGui::Begin("Game Viewport", nullptr);
 
@@ -666,6 +673,7 @@ namespace lof {
         ImGui::Begin("Asset Manager");
         ImGui::End();
 
+        //Calls other window's functions
         IMGUIM.imgui_game_objects_list();
         IMGUIM.display_loading_options();
         IMGUIM.imgui_game_objects_edit();
@@ -693,7 +701,7 @@ namespace lof {
         int current_object_index = 0;
         const auto& entities = ecs.get_entities();
 
-
+        //Resets selected_object_index to -1 to notify not selecting anything
         if (selected_object_index >= entities.size()) {
             selected_object_index = -1;
         }
@@ -715,36 +723,35 @@ namespace lof {
             ++current_object_index;
         }
 
-        
+        //Edit button
         ImGui::Text("\n");
         if (ImGui::Button("Edit Game Object")) {
             show_window = !show_window;
         }
 
+        //Remove button; Disabled for when the Player entity is selecetd
         ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
         if (ImGui::Button("Remove Game Object")) {
             remove_game_obj = !remove_game_obj;
         }
         ImGui::EndDisabled();
+
+        //Create Game Object button
         ImGui::Text("\n");
         if (ImGui::Button("Create Game Object From Prefab")) {
 
             create_game_obj = !create_game_obj;
         }
 
-
+        //Save Changes button
         if (ImGui::Button("Save Changes")) {
             const std::string SCENES = "Scenes";
 
             std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
-            if (SM.save_game_state(scene_path.c_str())) {
-                
-                //LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s", Path_Helper::get_scene_path().c_str());
+            if (SM.save_game_state(scene_path.c_str())) {   
                 LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
-
             }
             else {
-                //LM.write_log("IMGUI_Manager::update(): Failed to initate save game state to %s", Path_Helper::get_scene_path().c_str());
                 LM.write_log("IMGUI_Manager::update(): Failed initated game state to %s");
             }
 
@@ -752,17 +759,20 @@ namespace lof {
 
         ImGui::End();
 
+        //Remove game object; Ensures selected_object_index is safe 
         if (selected_object_index != -1 && remove_game_obj && selected_object_index < entities.size()) {
             remove_game_objects(selected_object_index);
             selected_object_index = -1;
         }
 
+        //Create game object window
         if (create_game_obj) {
             add_game_objects();
         }
 
     }
 
+    //Booleans to note down state of component boolean
     static bool is_static_on = false;
     static bool is_moveable_on = true;
     static bool is_grounded_on = false;
@@ -776,10 +786,9 @@ namespace lof {
 
     void IMGUI_Manager::imgui_game_objects_edit() {
 
-        static int last_selected_object_index = -1; // Track the previous selected object index
+        static int last_selected_object_index = -1; //Track the previous selected object index
 
         ImGui::Begin("Edit Object Properties");
-
 
         if (!show_window) {
             ImGui::Text("Select a game object to edit it.");
@@ -787,13 +796,13 @@ namespace lof {
         else {
             const auto& entities = ecs.get_entities();
 
-            //for animation dropdown
-            // if the selected object has changed, reset filled and clear assigned names for new object
+            //For animation dropdown
+            //If the selected object has changed, reset filled and clear assigned names for new object
             if (selected_object_index != last_selected_object_index) {
                 last_selected_object_index = selected_object_index;
                 assigned_names.clear();
                 buffer_map.clear();
-                filled = false; // Reset filled to allow repopulating `assigned_names` for the new object
+                filled = false; 
             }
 
             if (selected_object_index == -1) {
@@ -804,8 +813,9 @@ namespace lof {
                 std::string Name = entities[selected_object_index]->get_name();
                 std::string condition_name_model = "Name of Entity";
 
-                char Buffer[128]; //add to constant.h
-                strncpy_s(Buffer, Name.c_str(), sizeof(Buffer));//s is safer
+                //Not using function due to disabling it
+                char Buffer[128];
+                strncpy_s(Buffer, Name.c_str(), sizeof(Buffer));
                 Buffer[sizeof(Buffer) - 1] = '\0';
 
                 ImGui::BeginDisabled();
@@ -821,16 +831,15 @@ namespace lof {
                     Transform2D& transform = ecs.get_component<Transform2D>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Transformation")) {
 
-                        //modifying values
                         auto& position = transform.position;
                         ImGui::InputFloat2("Position", &position.x);
 
                         auto& prev_position = transform.prev_position;
                         prev_position = position;
+                        //Disable input box
                         ImGui::BeginDisabled();
-                        ImGui::InputFloat2("Previous Position", &prev_position.x); // Disabled input box (no editing)
+                        ImGui::InputFloat2("Previous Position", &prev_position.x);
                         ImGui::EndDisabled();
-
 
                         auto& orientation = transform.orientation;
                         ImGui::InputFloat2("Orientation", &orientation.x);
@@ -929,6 +938,7 @@ namespace lof {
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Animation_Component>())) {
                     Animation_Component& animation = ecs.get_component<Animation_Component>(entities[selected_object_index].get()->get_id());
 
+                    //If the animation names have not been filled
                     if (!filled) {
 
                         auto& animation_list = animation.animations;
@@ -942,25 +952,38 @@ namespace lof {
 
                     if (ImGui::CollapsingHeader("Animation") && filled) {
 
+                        //Converts all of the names to c-string
                         std::vector<const char*> animation_names_c_str;
                         for (const auto& name : assigned_names) {
                             animation_names_c_str.push_back(name.c_str());
                         }
 
                         auto& animation_list = animation.animations;
+
+                        //vector to keep track of selected items for each animation
+                        //initialized with -1 for each item, no selection
                         static std::vector<int> selected_items(animation_list.size(), -1);
+
+                        //index of the action to select animation for
                         int index = 0;
+
                         for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
+
+                            //ensures the selected_items vector is the same size as the animation_list
                             if (selected_items.size() != animation_list.size()) {
                                 selected_items.resize(animation_list.size(), -1);
                             }
 
                             ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
                             std::string label = "Choose Animation for " + std::to_string(index);
+
+                            //Dropdown for the animation
                             if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
 
-                                // Update the specific animation in the list
+                                //If valid animation is selected, update the animation.
                                 if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
+
+                                    //Update the animation's name
                                     it->second = assigned_names[selected_items[index]];
                                 }
                             }
@@ -981,7 +1004,7 @@ namespace lof {
                                 temp_value = static_cast<int>(animation_list.size()) - 1;
                             }
 
-                            // Only update `curr_animation_idx` if temp_value is within valid bounds
+                            //Only update curr_animation_idx if temp_value is within valid bounds
                             if (temp_value >= 0 && temp_value < static_cast<int>(animation_list.size())) {
                                 curr = static_cast<unsigned int>(temp_value);
                             }
@@ -1004,11 +1027,11 @@ namespace lof {
                         }
 
                         auto& movement_pattern = logic.movement_pattern;
+                        //Update logic behavior, corresponds the string to the movement_pattern value
                         int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
-
                         ImGui::Text("Choose Logic Behaviour");
                         if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
-                            
+                           
                             movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
                         }
 
@@ -1040,36 +1063,33 @@ namespace lof {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
 
-                        // Get sounds (from your audio system)
+           
                         auto& sounds = audio.get_sounds();
 
-                        // Initialize the selected indices for the combo boxes
+                        //Updating Filepath
+                        //vector to keep track of selected sounds
                         static std::vector<int> selected_sounds;
                         selected_sounds.clear();
                         selected_sounds.resize(sounds.size(), -1);
 
-
-                        // Loop through each sound in the sounds map
-                        
                         for (int i = 0; i < sounds.size(); ++i) {
 
-                            // Get the current sound's file path
                             auto sound_filepath = audio.get_filepath(sounds[i].key);
                             std::string saved_keyID = sound_filepath + std::to_string(entities[selected_object_index]->get_id()) + sounds[i].key;
 
-                            // Prepare a list of representative strings for the combo box
+                            //Convert everything to c-string
                             std::vector<const char*> file_name_cstr;
                             for (const auto& file_name_pair : audio_file_names) {
                                 file_name_cstr.push_back(file_name_pair.first.c_str());
                             }
 
-                            // Find the matching representative string for the file path
+                            //Find the matching representative string for the file path
                             auto its = std::find_if(audio_file_names.begin(), audio_file_names.end(),
                                 [&sound_filepath](const std::pair<std::string, std::string>& p) {
                                     return p.second == sound_filepath;
                                 });
 
-                            // Show the current sound's representative string in a text label
+                            //Show the current sound's representative string in a text label
                             if (its != audio_file_names.end()) {
                                 ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), its->first.c_str());
                             }
@@ -1077,25 +1097,21 @@ namespace lof {
                                 ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
                             }
 
-                            // Create a combo box to choose the new representative string for this sound
+                            //Create a combo box to choose the new representative string for sound
                             std::string label = "Choose Sound for " + std::to_string(i); // Label for the dropdown
                             if (ImGui::Combo(label.c_str(), &selected_sounds[i], file_name_cstr.data(), static_cast<int>(file_name_cstr.size()))) {
 
-                                // Get the selected representative string index
                                 int selected_index = selected_sounds[i];
                                 if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
 
-                                    //need to stop channel first
-                                    //audio.set_audio_state(saved_keyID, STOPPED);
-
-                                    // Update the sound's file path based on the selected rep string
+                                    //Update the sound's file path based on the selected rep string
                                     audio.set_filepath(sounds[i].key, audio_file_names[selected_index].second);
                                     LM.write_log("IMGUIM:: Sound being chnaged to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
                                 }
                             }
                         }
 
-                        //for key
+                        //Updating Audio Key
                         for (int i = 0; i < sounds.size(); ++i) {
                       
                             std::string old_key_name = sounds[i].key;
@@ -1108,12 +1124,11 @@ namespace lof {
                             char buffer_key[128];
                             strncpy_s(buffer_key, buffer_map[i].c_str(), sizeof(buffer_key));
                             buffer_key[sizeof(buffer_key) - 1] = '\0';
-
                             if (ImGui::InputText(condition_name_key.c_str(), buffer_key, sizeof(buffer_key))) {
                                 buffer_map[i] = std::string(buffer_key); // Save changes to the persistent buffer
                             }
 
-                            // Save button
+                            //Save button
                             std::string save = "save " + condition_name_key;
                             const char* button_name = save.c_str();
                             if (ImGui::Button(button_name)) {
@@ -1125,34 +1140,29 @@ namespace lof {
 
                         }
 
-
-
-                        //Initialize the selected indices for the combo boxes
+                        //For Audio Type
                         static std::vector<int> selected_sounds_type;
                         selected_sounds_type.clear();
                         selected_sounds_type.resize(sounds.size(), -1);
-
-                        //for audio_type
+                        
                         int type_index = 0;
                         for (int i = 0; i < sounds.size(); ++i, ++type_index) {
 
-          
                             auto audio_type = audio.get_audio_type(sounds[i].key);
-
                             std::vector<const char*> audio_type_cstr;
 
                             for (const auto& fill_audio_type_pair : audio_types) {
                                 audio_type_cstr.push_back(fill_audio_type_pair.first.c_str());
                             }
 
-                            // Find the matching representative string for the file path
+                            //Find matching representative string for the file path
                             auto its = std::find_if(audio_types.begin(), audio_types.end(),
                                 [&audio_type](const std::pair<std::string, AudioType>& p) {
                                     return p.second == audio_type;
                                 });
 
 
-                            // Show the current sound's representative string in a text label
+                            //Show the current sound's representative string in a text label
                             if (its != audio_types.end()) {
                                 ImGui::Text("Audio Type for %s: %s", sounds[i].key.c_str(), its->first.c_str());
                             }
@@ -1160,17 +1170,17 @@ namespace lof {
                                 ImGui::Text("Audio Type for %s: Not Found", sounds[i].key.c_str());
                             }
 
-                            // Create a combo box to choose the new representative string for this sound
-                            std::string label = "Choose Audio Type for " + std::to_string(type_index); // Label for the dropdown
+                            //Create a combo box to choose the new representative string for this sound
+                            std::string label = "Choose Audio Type for " + std::to_string(type_index); 
                             if (ImGui::Combo(label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
 
-                                // Get the selected representative string type_index
+                                //Get the selected representative string type_index
                                 int selected_index = selected_sounds_type[type_index];
                                 if (selected_index >= 0 && selected_index < audio_type_cstr.size()) {
 
                                     // Update the sound's file path based on the selected rep string
                                     audio.set_audio_type(sounds[i].key, audio_types[selected_index].second);
-                                    //LM.write_log("IMGUIM:: Sound being chnaged to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
+                                    
                                 }
                             }
 
@@ -1189,7 +1199,6 @@ namespace lof {
 
     bool IMGUI_Manager::button_toggle(const std::string& boolean_name, bool* state) {
 
-
         bool clicked = ImGui::Button(boolean_name.c_str());
         if (clicked) {
             *state = !(*state);
@@ -1204,6 +1213,7 @@ namespace lof {
 
         std::vector <const char*> prefab_names_c_str{};
 
+        //Converts to C-String
         for (const std::string& name : prefab_names) {
             prefab_names_c_str.push_back(name.c_str());
         }
@@ -1214,7 +1224,6 @@ namespace lof {
 
         if (ImGui::Combo("Clone from Prefab Options", &selected_item, prefab_options, static_cast<int>(prefab_names_c_str.size()))) {
 
-            //Simon's code
             EntityID new_entity = ECSM.clone_entity_from_prefab(prefab_options[selected_item]);
             if (new_entity != INVALID_ENTITY_ID) {
                 // Generate random position
@@ -1229,18 +1238,10 @@ namespace lof {
                     Transform2D& transform = ECSM.get_component<Transform2D>(new_entity);
                     transform.position.x = random_x;
                     transform.position.y = random_y;
-
-                    LM.write_log("Game_Manager::update:Cloned entity %u at random position (%f, %f)", new_entity, random_x, random_y);
                 }
-                else {
-                    LM.write_log("Game_Manager::update:Cloned entity %u does not have a Transform2D component.", new_entity);
-                }
-            }
-            else {
-                LM.write_log("Game_Manager::update:Failed to clone entity from prefab 'dummy_object'.");
+                
             }
         }
-
 
         ImGui::End();
     }
@@ -1250,6 +1251,7 @@ namespace lof {
         const auto& entities = ecs.get_entities();
         EntityID eid = entities[index]->get_id();
 
+        //If entity exists
         if (eid != INVALID_ENTITY_ID) {
             ECSM.destroy_entity(eid);
             remove_game_obj = !remove_game_obj;
@@ -1259,13 +1261,17 @@ namespace lof {
 
     }
 
+    //For all text input
     void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
 
-        char Buffer[128]; //add to constant.h
-        strncpy_s(Buffer, data_name.c_str(), sizeof(Buffer));//s is safer
+        char Buffer[128];
+        //strncpy_s is safer
+        strncpy_s(Buffer, data_name.c_str(), sizeof(Buffer));
         Buffer[sizeof(Buffer) - 1] = '\0';
 
         if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
+            
+            //replaces the data with the input
             data_name = std::string(Buffer);
         }
     }
@@ -1275,25 +1281,19 @@ namespace lof {
     }
 
     void IMGUI_Manager::fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name) {
-        
-        //audio_file_names[audio_file_name] = audio_filepath_name;
-        
         audio_file_names.push_back(std::make_pair(audio_file_name, audio_filepath_name));
-
-        std::cout << "key is: " << audio_file_name << "\nfilepath is: " << audio_filepath_name << std::endl;
     }
 
 
     void IMGUI_Manager::set_current_file_shown(std::string current_file) {
         current_file_shown = current_file;
     }
+
     std::string IMGUI_Manager::get_current_file_shown() {
         return current_file_shown;
     }
 
-
     void IMGUI_Manager::render() {
-        // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }

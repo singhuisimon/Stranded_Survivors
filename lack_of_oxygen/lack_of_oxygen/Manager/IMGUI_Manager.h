@@ -30,7 +30,8 @@
 #include <unordered_map>
 
 namespace lof {
-    //extern EntityID selectedEntityID;
+
+    //boolean to notify if an entity has been selected
     extern bool select_entity;
 
     /**
@@ -55,14 +56,16 @@ namespace lof {
         //Vector to get and hold the prefab names for display
         std::vector<std::string> prefab_names{};
 
-        //Audio file names
+        //Vector to hold audio file names for display
         std::vector<std::pair<std::string, std::string>> audio_file_names{};
         
-        //Audio types
+        //Vector to hold audio types for display
         std::vector<std::pair<std::string, AudioType>> audio_types{};
 
+        //Mouse position in the game world
         ImVec2 Mouse_Pos;
 
+        //String holding the name of the current file loaded
         std::string current_file_shown;
 
     public:
@@ -76,7 +79,6 @@ namespace lof {
         //Deleted copy constructor and copy assignmemt to enforce singleton pattern
         IMGUI_Manager(const IMGUI_Manager&) = delete;
         IMGUI_Manager& operator=(const IMGUI_Manager&) = delete;
-
 
         /**
          * @brief Get singleton instance of IMGUI_Manager.
@@ -134,6 +136,7 @@ namespace lof {
          * @brief Function to create and display a button to toggle between boolean values.
          * @param boolean_name Reference to a string containing the name of the boolean to be displayed on the button.
          * @param state Pointer to the current state of the boolean.
+         * @return State of boolean
          */
         bool button_toggle(const std::string& boolean_name, bool* state);
 
@@ -166,17 +169,42 @@ namespace lof {
          */
         void shut_down() override;
 
+        /**
+         * @brief Calculates the mouse position in terms of the game world when in the IMGUI viewport
+         * @param texture_pos position of the texture in the screen
+         * @param mouse_pos position of the mouse in the screen
+         * @param SCR_WIDTH Width of the screen
+         * @param SCR_HEIGHT Height of the screen
+         * @return Mouse position in terms of the game world
+         */
         ImVec2 get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 
+        /**
+         * @brief Getter for the mouse position in terms of the game world when in the IMGUI viewport
+         * @return Mouse position in terms of the game world
+         */
         ImVec2 imgui_mouse_pos();
 
-        bool imgui_toggle_files(int& current_scene);
-
+        /**
+         * @brief Setter of current file to note down the file that is loaded.
+         * @param current_file The name of the current file.
+         */
         void set_current_file_shown(std::string current_file);
+
+        /**
+         * @brief Getter for the current file.
+         * @return The name of the current file.
+         */
         std::string get_current_file_shown();
 
+        /**
+         * @brief Function to fill up the vector of sound names.
+         */
         void fill_up_sound_names();
 
+        /**
+         * @brief Function to turn off in-game GUI.
+         */
         void disable_GUI();
     };
 

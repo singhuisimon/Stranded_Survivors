@@ -126,8 +126,16 @@ namespace lof {
          */
         int get_step_count() const;
 
+        /**
+         * @brief Set the value of current_scene.
+         * @param scene_num The index of the scene file in its name.
+         */
         void set_current_scene(int scene_num);
 
+        /**
+         * @brief Get current value of current_scene.
+         * @return The index of the current scene file in its name.
+         */
         int get_current_scene();
     };
 
