@@ -28,7 +28,7 @@
             0.5,
             0.5
           ],
-          "texture_name": "Skybox_Batch_4",
+          "texture_name": "skybox_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -52,21 +52,12 @@
           "sounds": [
             {
               "key": "bgm1",
-              "filepath": "GAM_2_Surface_Music",
+              "filepath": "bgm_surface_music",
               "audio_state": 0,
               "audio_type": 0,
               "volume": 0.5,
               "pitch": 1.0,
               "islooping": true
-            },
-            {
-              "key": "bgm2",
-              "filepath": "audio_test2",
-              "audio_state": 4,
-              "audio_type": 0,
-              "volume": 0.5,
-              "pitch": 1.0,
-              "islooping": false
             }
           ],
           "is_3d": false,
@@ -108,7 +99,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Ship Open_Batch_2",
+          "texture_name": "ship_open_batch_2",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -159,7 +150,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Mineral_Hopper_Conveyor_Empty_Batch_4",
+          "texture_name": "mineral_hopper_conveyor_empty_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -234,7 +225,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Oxygen_Tank_Batch_4",
+          "texture_name": "oxygen_tank_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -308,7 +299,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "Spritesheet_Player",
+          "texture_name": "spritesheet_player",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -330,7 +321,7 @@
         },
         "Collision_Component": {
           "width": 95.0,
-          "height": 95.0,
+          "height": 96.0,
           "collidable": true
         },
         "Physics_Component": {
@@ -395,7 +386,7 @@
           "sounds": [
             {
               "key": "jumping1",
-              "filepath": "Fx01",
+              "filepath": "player_jumping_Fx01",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.1,
@@ -404,7 +395,7 @@
             },
             {
               "key": "jumping2",
-              "filepath": "Fx04",
+              "filepath": "player_jumping_Fx04",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -413,7 +404,7 @@
             },
             {
               "key": "moving 1",
-              "filepath": "Walking_01",
+              "filepath": "player_walking_01",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -422,7 +413,7 @@
             },
             {
               "key": "moving 2",
-              "filepath": "Walking_02",
+              "filepath": "player_walking_02",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -431,7 +422,7 @@
             },
             {
               "key": "moving 3",
-              "filepath": "Walking_03",
+              "filepath": "player_walking_03",
               "audio_state": 4,
               "audio_type": 1,
               "volume": 0.178,
@@ -592,7 +583,7 @@
             0.20000000298023224,
             0.0
           ],
-          "texture_name": "Snowflake",
+          "texture_name": "snowflake",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -705,7 +696,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_O2_meter_Batch_4",
+          "texture_name": "top_ui_o2_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -756,7 +747,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_Panik_meter_Batch_4",
+          "texture_name": "top_ui_panik_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -807,7 +798,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_Minerals_Batch_4",
+          "texture_name": "top_ui_minerals_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [

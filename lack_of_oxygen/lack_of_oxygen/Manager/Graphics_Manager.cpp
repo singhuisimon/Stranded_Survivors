@@ -86,7 +86,7 @@ namespace lof {
 
         std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, "models.msh");
         //std::string texture_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Texture_Names.txt");
-        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Prisoner_Atlas.txt");
+        std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, "Spritesheet_Atlas.txt");
         std::string font_path = ASM.get_full_path(ASM.FONT_PATH, "Fonts.txt");
 
         if (!add_model(mesh_path)) {
