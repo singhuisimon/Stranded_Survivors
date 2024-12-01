@@ -1,7 +1,7 @@
 /**
  * @file Assets_Manager.cpp
  * @brief Implements the Assets Manager class methods.
- * @author Chua Wen Bin Kenny (99.64%), Liliana Hanawardani (0.359%), Saw Hui Shan (%)
+ * @author Saw Hui Shan (98%), Amanda Leow Boon Suan (2%)
  * @date November 8, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -57,7 +57,7 @@ namespace lof {
             glm::vec2 tex{};
         };
 
-        // Struct of data to create a model (Hui Shan)
+        
         struct ModelData {
             std::vector<TexVtxData> texVtxArr;  // For textured vertices
             std::vector<glm::vec2> posVtx;      // For position vertices
@@ -68,17 +68,17 @@ namespace lof {
         };
 
         /**
-        * @brief Virtual destrucctor for the Assets Manager (Hui Shan)
+        * @brief Virtual destrucctor for the Assets Manager 
         */
         virtual ~Assets_Manager(); 
 
         /**
-        * @brief Returns the singleton instance of Assets Manager (Hui Shan)
+        * @brief Returns the singleton instance of Assets Manager 
         */
         static Assets_Manager& get_instance();
 
         /**
-         * @brief Initializzes the asset directory paths (Hui Shan)
+         * @brief Initializzes the asset directory paths 
          */
         void initialize_paths();
 
@@ -90,15 +90,7 @@ namespace lof {
         */
         bool read_json_file(const std::string& filepath, std::string& json_content);
 
-        /**
-        * @brief Loads the texture
-        * @param file_path 
-            The path of the texture located
-        * @param texture_names 
-            The name of the texture 
-        * @return True if success to load textures, else false
-        */
-        bool load_all_textures(const std::string& file_path, std::vector<std::string>& texture_names);
+   
 
         /**
         * @brief Read the shader file
@@ -180,14 +172,32 @@ namespace lof {
        */
         bool read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names);
 
-        std::string get_audio_path(const std::string& audio_name) ;
+        /**
+        * @brief Get the path of an audio resource.
+        * @param audio_name
+        *    The name of the audio file
+        * @return
+        *    A `std::string` containing the full path to the audio file.
+        */
+        std::string get_audio_path(const std::string& audio_name);
+
+        /**
+        * @brief Load an audio file.
+        * @param audio_name
+        *    The name of the audio file to load.
+        * @return
+        *    True if the audio file is loaded successfully; false otherwise.
+        */
         bool load_audio_file(const std::string& audio_name);
 
+        /**
+        * @brief Get the directory where the executable is located.
+        *
+        * @return
+        *    A `std::string` containing the absolute path to the executable's directory.
+        */
         std::string get_executable_directory();
     private:
-
-      
-
 
         // A unique_ptr to the single instance of Assets_Manager
         static std::unique_ptr<Assets_Manager> instance;

@@ -34,11 +34,6 @@ namespace lof {
         BOTTOM
     };
 
-    struct SelectedEntityInfo {
-        EntityID selectedEntity;
-        bool isSelected; // Flag to indicate if an entity is selected
-        Vec2D mousePos;  // Store the mouse position 
-    };
 
     /**
     * @struct CollisionPair

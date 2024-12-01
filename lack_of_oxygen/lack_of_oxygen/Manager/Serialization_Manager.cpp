@@ -1,7 +1,7 @@
 /**
  * @file Serialization_Manager.cpp
  * @brief Implements the Serialization_Manager class methods.
- * @author Simon Chan (99.581%), Liliana Hanawardani (0.418%)
+ * @author Simon Chan (89%), Chua Wen Bin Kenny (8%), Wai Lwin Thit (1%), Liliana Hanawardani (1%), Saw Hui Shan (1%)
  * @date September 22, 2024 
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -658,6 +658,8 @@ namespace lof {
         comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator);
         comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator);
         comp_obj.AddMember("curr_frame_index", component.curr_frame_index, allocator);
+        comp_obj.AddMember("start_tile_health", component.start_tile_health, allocator);
+        comp_obj.AddMember("curr_tile_health", component.curr_tile_health, allocator);
 
         return comp_obj;
     }
