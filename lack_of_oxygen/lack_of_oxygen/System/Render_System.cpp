@@ -465,6 +465,10 @@ namespace lof {
             // Draw debugging features if debug mode is ON 
             if (entity_id != 0) { // Background object unaffected 
                 if (GFXM.get_debug_mode() == GL_TRUE) {
+
+                    // Get camera
+                    auto& camera = GFXM.get_camera();
+
                     // Check if entity has Velocity_Component and Collision_Component
                     bool has_velocity = ECSM.has_component<Velocity_Component>(entity_id);
                     bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
