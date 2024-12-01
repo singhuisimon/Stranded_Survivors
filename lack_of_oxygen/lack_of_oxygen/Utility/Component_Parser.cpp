@@ -19,7 +19,6 @@
 
 // Include other necessary headers
 #include "../Utility/Matrix3x3.h"
-//#include "../Utility/Path_Helper.h"
 #include "../Manager/Assets_Manager.h"
 
 namespace lof {
