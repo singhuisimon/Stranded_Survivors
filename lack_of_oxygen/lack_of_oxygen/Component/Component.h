@@ -1,7 +1,7 @@
 /**
  * @file Component.h
  * @brief Defines the base Component class and specific component types for the Entity Component System (ECS).
- * @author Simon Chan (48.453%), Wai Lwin Thit (44.329%), Saw Hui Shan (7.216%)
+ * @author Simon Chan (49%), Wai Lwin Thit (20%), Amanda Leow Boon Suan (20%), Saw Hui Shan (10%), Liliana Hanawardani (1%)
  * @date September 15, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -28,7 +28,8 @@
 // #include "../Utility/Path_Helper.h"
 #include "../Utility/Force_Helper.h"
 #include "../Manager/Log_Manager.h"
-// FOR TESTING 
+
+// For Graphics Component
 #include "../Glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <glm-0.9.9.8/glm/glm.hpp>
@@ -280,7 +281,6 @@ namespace lof {
 
         Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader, glm::mat3 xform) :
             model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
-
     };
 
     /**
@@ -308,6 +308,8 @@ namespace lof {
          * @param animations Collection of animations usable by entity.
          * @param curr_animation_idx Index of the current animation.
          * @param start_animation_idx Index of the starting animation.
+         * @param start_tile_health Starting tile health for tile objects.
+         * @param curr_tile_health Current tile health for tile objects.
          */
 
         Animation_Component(std::pair<std::string, std::string> animation, unsigned int curr_animation, unsigned int start_animation, unsigned int curr_frame, unsigned int start_health) :
@@ -681,14 +683,14 @@ namespace lof {
 
         /**
          * @brief Constructor for Text_Component.
-         * @param font_name Font type.
-         * @param text Text that will be rendered.
+         * @param font_name Name of font type.
+         * @param text The text that will be rendered.
          * @param color Color of the text.
+         * @param scale Scale value of the text.
          */
 
         Text_Component(std::string name, std::string text, glm::vec3 color, glm::vec2 scale) :
             font_name(name), text(text), color(color), scale(scale) {}
-
     };
 
 } // namespace lof

@@ -1,7 +1,7 @@
 /**
  * @file Serialization_Manager.cpp
  * @brief Implements the Serialization_Manager class methods.
- * @author Simon Chan (99.581%), Liliana Hanawardani (0.418%)
+ * @author Simon Chan (89%), Chua Wen Bin Kenny (8%), Wai Lwin Thit (1%), Liliana Hanawardani (1%), Saw Hui Shan (1%)
  * @date September 22, 2024 
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -50,10 +50,7 @@ namespace lof {
     class Graphics_Component;
     class Collision_Component;
 
-    /**
-     * @brief Private constructor for the singleton pattern.
-     * Initializes member variables with default values.
-     */
+
     Serialization_Manager::Serialization_Manager()
         : m_scr_width(DEFAULT_SCREEN_WIDTH),
         m_scr_height(DEFAULT_SCREEN_HEIGHT),
@@ -63,19 +60,13 @@ namespace lof {
         LM.write_log("Serialization_Manager::Serialization_Manager(): Initialized with default configurations.");
     }
 
-    /**
-     * @brief Retrieves the singleton instance of Serialization_Manager.
-     * @return Reference to the singleton instance.
-     */
     Serialization_Manager& Serialization_Manager::get_instance() {
         static Serialization_Manager instance;
         return instance;
     }
     int Serialization_Manager::scene_no = 1;
-    /**
-     * @brief Starts up the Serialization_Manager by loading configuration, prefabs, and scene files.
-     * @return 0 on success, negative value on failure.
-     */
+
+
     int Serialization_Manager::start_up() {
         m_is_started = true;
 
@@ -95,6 +86,14 @@ namespace lof {
             return -2;
         }
 
+        // Load level data
+        const std::string level_folder = "Level_Design";
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        if (!load_level_data(level_path.c_str())) {
+            LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
+            return -4;
+        }
+
         // Load scene file 
         const std::string scene_folder = "Scenes";
         std::string loaded_scene = "scene1.scn";
@@ -105,24 +104,8 @@ namespace lof {
             return -3;
         }
 
-        // Load level data
-        const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
-        if (!load_level_data(level_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
-            return -4;
-        }
-
         // Debug print level data if loaded successfully
         debug_print_level();
-
-        // Only create level entities if startup on scene file is scene2.scn
-        if (is_scene2_file(scene_path.c_str())) {
-            if (!create_level_entities()) {
-                LM.write_log("Serialization_Manager::start_up(): Failed to create level entities");
-                return -5;
-            }
-        }
 
         LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
@@ -138,15 +121,7 @@ namespace lof {
         m_is_started = false;
     }
 
-    /**
-     * @brief Merges two JSON objects. Source object's members are merged into the destination object.
-     * If a member exists in both objects and both are objects, the merge is performed recursively.
-     * Otherwise, the destination's member is overwritten by the source's member.
-     *
-     * @param source The source JSON object to merge from.
-     * @param destination The destination JSON object to merge into.
-     * @param allocator The RapidJSON allocator to use for memory management.
-     */
+
     void Serialization_Manager::merge_objects(const rapidjson::Value& source,
         rapidjson::Value& destination,
         rapidjson::Document::AllocatorType& allocator) {
@@ -180,12 +155,6 @@ namespace lof {
     }
 
 
-    /**
-     * @brief Loads the configuration file and initializes screen settings and FPS display interval.
-     *
-     * @param filepath The complete path to the configuration file.
-     * @return True if loading and parsing are successful, false otherwise.
-     */
     bool Serialization_Manager::load_config(const char* filepath) {
         LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
 
@@ -244,12 +213,7 @@ namespace lof {
         return true;
     }
 
-    /**
-     * @brief Loads the prefab file and caches the prefab definitions for quick access.
-     *
-     * @param filepath The complete path to the prefab file.
-     * @return True if loading and parsing are successful, false otherwise.
-     */
+
     bool Serialization_Manager::load_prefabs(const char* filepath) {
         LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
 
@@ -301,12 +265,6 @@ namespace lof {
         return true;
     }
 
-    /**
-     * @brief Loads the scene file, creates entities, and assigns components based on the scene and prefabs.
-     *
-     * @param filename The complete path to the scene file.
-     * @return True if loading and parsing are successful, false otherwise.
-     */
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
@@ -423,15 +381,18 @@ namespace lof {
 
             // Add components to the entity
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
-        }
 
-        // Create level entities only for scene2
-        if (is_scene2_file(filename)) {
-            LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
-            if (!create_level_entities()) {
-                LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
-                return false;
+            // Create level entities only for scene2
+            if (i == 4) {
+                if (is_scene2_file(filename)) {
+                    LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
+                    if (!create_level_entities()) {
+                        LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
+                        return false;
+                    }
+                }
             }
+
         }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
@@ -663,6 +624,8 @@ namespace lof {
         comp_obj.AddMember("curr_animation_idx", component.curr_animation_idx, allocator);
         comp_obj.AddMember("start_animation_idx", component.start_animation_idx, allocator);
         comp_obj.AddMember("curr_frame_index", component.curr_frame_index, allocator);
+        comp_obj.AddMember("start_tile_health", component.start_tile_health, allocator);
+        comp_obj.AddMember("curr_tile_health", component.curr_tile_health, allocator);
 
         return comp_obj;
     }
@@ -1047,9 +1010,11 @@ namespace lof {
             return false;
         }
 
+        LM.write_log("Serialization_Manager::create_level_entities(): CHECKING IF SCENE 2 IS LOADED TWICE");
+
         // Define bounds
-        const float LEFT_BOUND = -1020.0f;
-        const float RIGHT_BOUND = 1020.0f;
+        const float LEFT_BOUND = -960.0f;
+        const float RIGHT_BOUND = 960.0f;
         const float START_Y = -150.0f;
 
         // Calculate tile size based on the bounds and number of columns

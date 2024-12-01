@@ -195,7 +195,7 @@ namespace lof {
 
         // Set up the imgui framebuffer when entering editor mode
         if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
+            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); 
         }
 
         // Set up for the drawing of objects
@@ -237,7 +237,6 @@ namespace lof {
             auto& models = GFXM.get_model_storage();
             auto& textures = GFXM.get_texture_storage();
             auto& animations = GFXM.get_animation_storage();
-            auto& camera = GFXM.get_camera();
 
             // Check for text objects to render 
             bool is_text = ECSM.has_component<Text_Component>(entity_id);
@@ -466,6 +465,10 @@ namespace lof {
             // Draw debugging features if debug mode is ON 
             if (entity_id != 0) { // Background object unaffected 
                 if (GFXM.get_debug_mode() == GL_TRUE) {
+
+                    // Get camera
+                    auto& camera = GFXM.get_camera();
+
                     // Check if entity has Velocity_Component and Collision_Component
                     bool has_velocity = ECSM.has_component<Velocity_Component>(entity_id);
                     bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
@@ -610,7 +613,7 @@ namespace lof {
             GFXM.program_free();
         }
         if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
+            glBindFramebuffer(GL_FRAMEBUFFER, 0); 
         }
     }
 } // namespace lof

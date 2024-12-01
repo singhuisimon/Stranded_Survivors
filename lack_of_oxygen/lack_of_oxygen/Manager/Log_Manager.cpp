@@ -1,7 +1,7 @@
 /**
  * @file Log_Manager.cpp
  * @brief Implements the Log_Manager class helper functions.
- * @author Simon Chan (98.888%), Liliana Hanawardani (1.111%)
+ * @author Simon Chan (99%), Liliana Hanawardani (1%)
  * @date September 15, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -60,12 +60,13 @@ namespace lof {
         }
 
         this->log_file_name = new_log_file_name;
+#ifndef NDEBUG
         log_file.open(new_log_file_name, std::ios::out | std::ios::trunc);
 
         if (!log_file.is_open()) {
             return -1; // Failed to open log file
         }
-
+#endif
         m_is_started = true;
 
         // Reset the Clock to start timing from now
@@ -82,20 +83,24 @@ namespace lof {
         if (!is_started()) {
             return; // Not started
         }
-
+#ifndef NDEBUG
         if (log_file.is_open()) {
             log_file.close();
         }
-
+#endif
         m_is_started = false;
     }
 
 
     int Log_Manager::write_log(const char* fmt, ...) {
-        if (!is_started() || !log_file.is_open()) {
+        if (!is_started()) {
             return -1; // Log_Manager not started or log file not open
         }
-
+#ifndef NDEBUG
+        if (!log_file.is_open()) {
+            return -1; // Log_Manager not started or log file not open
+        }
+#endif
         // Get current elapsed time in microseconds since start
         int64_t current_time = clock.split_total();
 
@@ -129,14 +134,14 @@ namespace lof {
         if (written < 0) {
             return -1; // Error during formatting
         }
-
+#ifndef NDEBUG
         // Write the timestamped log entry
         log_file << time_stream.str() << buffer << std::endl;
 
         if (do_flush) {
             log_file.flush();
         }
-
+#endif
         // Optionally, return the number of characters written
         // Here, we return the number of characters in the user message
         return written;

@@ -1,7 +1,7 @@
 /**
  * @file Assets_Manager.cpp
  * @brief Implements the Assets_Manager.
- * @author Saw Hui Shan (%), Chua Wen Bin Kenny (%) 
+ * @author Saw Hui Shan (90%), Chua Wen Bin Kenny (10%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -16,7 +16,6 @@
 #include "../System/Audio_System.h"
 #include "../Utility/constant.h" 
 #include <windows.h>
-
 #include <filesystem>
 
 namespace lof {
@@ -24,7 +23,6 @@ namespace lof {
  
     std::unique_ptr<Assets_Manager> Assets_Manager::instance;
     std::once_flag Assets_Manager::once_flag;
-
     
     Assets_Manager::Assets_Manager() {
         set_type("Assets_Manager");
@@ -38,7 +36,7 @@ namespace lof {
         return std::string(buffer).substr(0, pos);
         }
 
-    void Assets_Manager::initialize_paths() { // (Simon file path)
+    void Assets_Manager::initialize_paths() { 
         
         char buffer[MAX_PATH];
         GetModuleFileNameA(NULL, buffer, MAX_PATH);
@@ -56,7 +54,7 @@ namespace lof {
     Assets_Manager::~Assets_Manager() {}
 
 
-    bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) { // (Hui Shan)
+    bool Assets_Manager::validate_file(const std::string& filepath, std::ifstream& file) { 
         file.open(filepath, std::ios::in);
         if (!file.good()) {
             LM.write_log("Assets_Manager: Unable to open file: %s", filepath.c_str());
@@ -109,27 +107,6 @@ namespace lof {
         return full_path;
     }
 
-
-    bool Assets_Manager::load_all_textures(const std::string& filepath, std::vector<std::string>& texture_names) {
-        std::ifstream input_file{ filepath, std::ios::in };
-        if (!input_file) {
-            LM.write_log("Assets_Manager: Unable to open texture list %s", filepath.c_str());
-            return false;
-        }
-
-        std::string tex_name;
-        while (getline(input_file, tex_name)) {
-
-            LM.write_log("Assets_Manager: Found texture name: %s", tex_name.c_str());
-            texture_names.push_back(tex_name);
-        }
-        input_file.close();
-
-        LM.write_log("Assets_Manager: Loaded %d texture names", texture_names.size());
-        return true;
-    }
-
-
     bool Assets_Manager::read_shader_file(const std::string& file_path, std::string& shader_source) {
         // Check if file's state is good for reading
         std::ifstream input_file(file_path);
@@ -148,6 +125,7 @@ namespace lof {
         return true;
     }
 
+    // Create, compile and check if shader programs are created successfully
     bool Assets_Manager::load_shader_programs(std::vector<std::pair<std::string, std::string>> shaders) {
         for (auto const& file : shaders) {
             // Create the shader files vector with types
@@ -200,7 +178,7 @@ namespace lof {
         LM.write_log("Assets_Manager: Unloaded all shader programs");
     }
 
- 
+    // Read from file and store model data
     bool Assets_Manager::load_model_data(const std::string& file_name) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
@@ -275,7 +253,7 @@ namespace lof {
         return true;
     }
 
-   
+    // Read from file and store animation data 
     bool Assets_Manager::load_animations(const std::string& file_name) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {
@@ -331,6 +309,7 @@ namespace lof {
         return true;
     }
 
+    // Load and store font data from name 
     bool Assets_Manager::load_fonts(const std::string& font_name, FT_Library& out_ft, FT_Face& out_face) {
         if (FT_Init_FreeType(&out_ft)) {
             LM.write_log("Assets_Manager: Could not initialize FreeType Library");
@@ -338,8 +317,13 @@ namespace lof {
         }
 
         //std::string font_filepath = get_executable_directory() + "\\..\\..\\lack_of_oxygen\\lack_of_oxygen\\Assets\\Fonts\\Fonts.txt";
-
+#ifndef NDEBUG
         std::string font_filepath = "../../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
+#endif
+#ifndef _DEBUG
+        std::string font_filepath = BASE_PATH + FONT_PATH + "\\" + font_name + ".ttf";
+#endif
+
         if (!std::filesystem::exists(font_filepath))
         {
             font_filepath = "../lack_of_oxygen/Assets/Fonts/" + font_name + ".ttf";
@@ -359,7 +343,7 @@ namespace lof {
         return true;
     }
 
-  
+    // Read and store names of fonts 
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
         std::ifstream input_file{ file_name, std::ios::in };
         if (!input_file) {

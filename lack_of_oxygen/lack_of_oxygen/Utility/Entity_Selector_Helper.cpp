@@ -1,7 +1,19 @@
-#include "Entity_Selector_Helper.h"
-#include "../Manager/ECS_Manager.h"
-#include "../Main/Main.h" // for extern window
+/**
+* @file Entity_Selector_Helper.cpp
+* @brief Implements the entity selector helper to get the entity that the mouse point to
+* @author Saw Hui Shan (100%)
+* @date December 1, 2024
+* Copyright (C) 2024 DigiPen Institute of Technology.
+* Reproduction or disclosure of this file or its contents without the
+* prior written consent of DigiPen Institute of Technology is prohibited.
+
+*/
 #include <iostream>
+
+#include "Entity_Selector_Helper.h"
+
+#include "../Main/Main.h" // for extern window
+#include "../Manager/ECS_Manager.h"
 #include "../Manager/IMGUI_Manager.h"
 #include "../Utility/Win_Control.h"
 
@@ -33,11 +45,12 @@ namespace lof
 
         const auto& entities = ECSM.get_entities();
 
-        // a vector of entities with their sizes for sorting
+        // struct to store entity id and its size 
         struct EntitySize {
             EntityID id;
             float size;  
         };
+
         std::vector<EntitySize> sortedEntities;
 
         // Collect all entities and their sizes
@@ -53,11 +66,11 @@ namespace lof
             float width = transform.scale.x;
             float height = transform.scale.y;
 
-            if (ECSM.has_component<Collision_Component>(entityID)) {
-                auto& collision = ECSM.get_component<Collision_Component>(entityID);
-                width = collision.width;
-                height = collision.height;
-            }
+            //if (ECSM.has_component<Collision_Component>(entityID)) {
+            //    auto& collision = ECSM.get_component<Collision_Component>(entityID);
+            //    width = collision.width;
+            //    height = collision.height;
+            //}
 
             // Calculate total area
             float area = width * height;
@@ -70,7 +83,7 @@ namespace lof
                 return a.size < b.size;
             });
 
-        // Check entities from smallest to largest
+        // Check entities from smallest to largest, so that it able to pick the entity that is smaller and infront the larger entity
         for (const auto& entitySize : sortedEntities)
         {
             EntityID entityID = entitySize.id;
@@ -94,7 +107,7 @@ namespace lof
                 entitySelected = true;
                 selectedEntityID = entityID;
                
-                break;  // Stop at first hit, which will be the smallest entity at that position
+                break;  
             }
         }
 

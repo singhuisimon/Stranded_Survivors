@@ -61,7 +61,6 @@ namespace lof {
         Graphics_Manager& operator=(const Graphics_Manager&) = delete;
 
         // Struct of data to create a model
-
         struct Model {
             GLenum primitive_type;
             GLuint vaoid;
@@ -85,12 +84,14 @@ namespace lof {
 
         // Struct of a camera
         struct Camera2D {
-            GLfloat pos_x{ DEFAULT_CAMERA_POS_X };
-            GLfloat pos_y{ DEFAULT_CAMERA_POS_Y };
+            GLfloat pos_x, pos_y;
             glm::mat3 view_xform, camwin_to_ndc_xform, world_to_ndc_xform;
 
             // Toggle for free camera mode
-            GLboolean is_free_cam{ GL_FALSE };
+            GLboolean is_free_cam;
+
+            Camera2D() : pos_x(DEFAULT_CAMERA_POS_X), pos_y(DEFAULT_CAMERA_POS_Y), view_xform(0),
+                        camwin_to_ndc_xform(0), world_to_ndc_xform(0), is_free_cam(GL_FALSE) {};
         };
 
         // Struct of a character
@@ -135,8 +136,8 @@ namespace lof {
         int is_moving = 0;
         int is_mining = 0;
 
-        // FOR TESTING
-        GLuint imgui_fbo, imgui_tex;
+        // Texture for imgui level editor viewport
+        GLuint imgui_fbo{ 0 }, imgui_tex{ 0 };
         int editor_mode = 0;
 
     public:
@@ -245,7 +246,6 @@ namespace lof {
          */
         int& get_player_direction();
 
-        ///////////// TESTING ANIMATIONS
         /**
          * @brief Get a reference to the player direction.
          */
@@ -256,7 +256,6 @@ namespace lof {
          */
         int& get_mining_status();
 
-        ///////////// TESTING ANIMATIONS
         /**
          * @brief Get a reference to the framebuffer object.
          */

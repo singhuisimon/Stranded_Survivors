@@ -1,7 +1,7 @@
 /**
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class helper functions.
- * @author Simon Chan (82.901%), Amanda Leow (11.91%), Liliana Hanawardani (5.181%)
+ * @author Simon Chan (75%), Chua Wen Bin Kenny (12%), Amanda Leow (6%), Saw Hui Shan (4%), Liliana Hanawardani (3%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -165,53 +165,6 @@ namespace lof {
             return;
         }
 
-        //printf("-----------------in game manager--------------------------------\n");
-        bool has_collision_bottom = CS.has_bottom_collide_detect();
-        EntityID collision_entity_bottom = CS.get_bottom_collide_entity();
-
-        bool has_collision_left = CS.has_left_collide_detect();
-        EntityID collision_entity_left = CS.get_left_collide_entity();
-
-        bool has_collision_right = CS.has_right_collide_detect();
-        EntityID collision_entity_right = CS.get_right_collide_entity();
-
-        bool has_collision_top = CS.has_top_collide_detect();
-        EntityID collision_entity_top = CS.get_top_collide_entity();
-
-        //printf("Has left collision outside: %s\n", has_collision_left ? "true" : "false");
-        //printf("left collision entity outside: %d\n\n", collision_entity_left);
-
-        if (IM.is_key_pressed(GLFW_KEY_DOWN) && !level_editor_mode && has_collision_bottom) {
-
-            printf("Has bottom collision: %s\n", has_collision_bottom ? "true" : "false");
-            printf("Bottom collision entity: %d\n", collision_entity_bottom);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_LEFT) && !level_editor_mode && has_collision_left) {
-
-            printf("Has left collision: %s\n", has_collision_left ? "true" : "false");
-            printf("left collision entity: %d\n", collision_entity_left);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_RIGHT) && !level_editor_mode && has_collision_right) {
-
-            printf("Has right collision: %s\n", has_collision_right ? "true" : "false");
-            printf("right entity: %d\n", collision_entity_right);
-
-        }
-        if (IM.is_key_held(GLFW_KEY_UP) && !level_editor_mode && has_collision_top) {
-
-            printf("Has top collision: %s\n", has_collision_top ? "true" : "false");
-            printf("top entity: %d\n", collision_entity_top);
-
-        }
-
-        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
-        //std::cout << "collision non collidable: " << CS.get_detect_entities() << "\n";
-        //std::cout << "collision: " << CS.mineral_tank_detected() << "\n";
-        //std::cout << "collision: " << CS.oxygen_tank_detected() << "\n";
-
-        //printf("-----------------in game manager--------------------------------\n\n");
 
 
         //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
@@ -281,7 +234,7 @@ namespace lof {
                 constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                constexpr float TEXT_OFFSET_Y = 10.0f;              // Vertical offset from the UI element
+                constexpr float TEXT_OFFSET_Y = 10.0f;           // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
@@ -300,7 +253,7 @@ namespace lof {
 
                     // Set position and scale for oxygen meter
                     oxygen_transform.position = {
-                        base_position.x - METER_WIDTH,  // Center horizontally
+                        base_position.x - METER_WIDTH,  // Left of UI overlay
                         base_position.y                 // Top position
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
@@ -328,7 +281,7 @@ namespace lof {
 
                     // Set position and scale for panic meter
                     panic_transform.position = {
-                        base_position.x - METER_WIDTH,          // Center horizontally
+                        base_position.x - METER_WIDTH,          // Left of UI overlay
                         base_position.y - METER_SPACING         // Below oxygen meter
                     };
                     panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
@@ -535,9 +488,8 @@ namespace lof {
                     update_mineral_count_text(val_to_add);
                 }
 
-                // Mining animations
+                // Get and set mining status for animation
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_LEFT;
                     int& direction = GFXM.get_player_direction();
@@ -545,27 +497,23 @@ namespace lof {
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_UP)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_UP;
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_DOWN;
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_RIGHT;
                     int& direction = GFXM.get_player_direction(); 
                     direction = FACE_RIGHT; 
 
                 }
-                else {
-                    // Get mining status for animation
+                else { 
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = NO_ACTION;
                 }  
@@ -709,6 +657,7 @@ namespace lof {
         }
 
 
+#if _DEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
         if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
@@ -725,7 +674,7 @@ namespace lof {
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-#if _DEBUG
+
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");

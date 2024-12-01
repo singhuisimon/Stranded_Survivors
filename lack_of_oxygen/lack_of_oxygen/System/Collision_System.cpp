@@ -1,14 +1,13 @@
 /**
  * @file Collision_Syetem.cpp
  * @brief Implements the collsion system.
- * @author Saw Hui Shan (100%)
+ * @author Saw Hui Shan (86%), Simon (3%), Ash (11%)
  * @date September 21, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
 
  */
-
 
 
  // Include standard headers
@@ -24,7 +23,6 @@
 #include "../System/GUI_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
-#include "../Main/Main.h" // for extern
 #include "../Manager/Input_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Manager/Serialization_Manager.h"
@@ -33,17 +31,12 @@ namespace lof {
     std::unique_ptr<Collision_System> Collision_System::instance;
     std::once_flag Collision_System::once_flag;
 
-
-
-
     Collision_System& Collision_System::get_instance() {
         std::call_once(once_flag, []() {
             instance.reset(new Collision_System);
             });
         return *instance;
     }
-
-
 
     AABB::AABB(const Vec2D& min, const Vec2D& max)
         : min(min), max(max) {}
@@ -57,10 +50,6 @@ namespace lof {
 
         max.x = transform.prev_position.x + (collision.width / 2.0f);
         max.y = transform.prev_position.y + (collision.height / 2.0f);
-
-        //LM.write_log("Creating AABB for entity at (%.2f, %.2f) with size (%.2f, %.2f)",
-        //    transform.prev_position.x, transform.prev_position.y,
-        //    collision.width, collision.height);
 
         return AABB(min, max);
     }
@@ -91,14 +80,11 @@ namespace lof {
         if (aabb1.max.x < aabb2.min.x || aabb1.min.x > aabb2.max.x ||
             aabb1.max.y < aabb2.min.y || aabb1.min.y > aabb2.max.y)
         {
-            //LM.write_log("Early exit: No intersection");
             return false; //no intersection
         }
-        // LM.write_log("Checking collision with velocities - V1(%.2f, %.2f), V2(%.2f, %.2f)",
-            // vel1.x, vel1.y, vel2.x, vel2.y);
+      
         float Vb_x = vel2.x - vel1.x;; //initialize Vb for x axis 
         float Vb_y = vel2.y - vel1.y;; //initialize Vb for y axis
-        //LM.write_log("Relative velocity: Vb(%.2f, %.2f)", Vb_x, Vb_y);
         float dFirst_x = aabb1.max.x - aabb2.min.x;  //initialize for dFirst for x-axis
         float dFirst_y = aabb1.max.y - aabb2.min.y;; // initialize for dFrist for y axis
         float dLast_x = aabb1.min.x - aabb2.max.x;; //initialize for dLast for x axis
@@ -243,8 +229,7 @@ namespace lof {
         // Ensure overlaps are non-negative
         overlap_x = std::max(0.0f, overlap_x);
         overlap_y = std::max(0.0f, overlap_y);
-        //std::cout << "Overlap X: " << overlap_x << ", Overlap Y: " << overlap_y << std::endl;
-
+        
         return Vec2D(overlap_x, overlap_y);
     }
 
@@ -300,8 +285,6 @@ namespace lof {
             }
         }
 
-        //std::cout << "Collision detected on side: " << collisionSideToString(side) << std::endl;
-        //return CollisionSide::NONE; // No collision
         return side;
     }
 
@@ -317,17 +300,15 @@ namespace lof {
         }
     }
 
-#if 1// original code
+
     void Collision_System::collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time) {
         // Iterate over entities matching the system's signature
         const auto& collision_entities = get_entities();
-        //std::cout << "Total entities: " << entities.size() << "\n";
 
         for (auto it_1 = collision_entities.begin(); it_1 != collision_entities.end(); ++it_1) {
             EntityID entity_ID1 = *it_1;
 
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
-
 
             // Skip if entity is static
             if (physic1.get_is_static())
@@ -336,7 +317,7 @@ namespace lof {
             auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
             auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
             auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
-            // std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
+           
              // Create AABB for object 1
             AABB aabb1 = AABB::from_transform(transform1, collision1);
 
@@ -353,8 +334,6 @@ namespace lof {
                     continue;
                 }
 
-
-
                 //auto& physic2 = ECSM.get_component<Physics_Component>(entity_ID2);
 
                 auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
@@ -366,20 +345,15 @@ namespace lof {
                 // Create AABB for object 2
                 AABB aabb2 = AABB::from_transform(transform2, collision2);
 
-
-
                 // Check for intersection between two entities
                 float collision_time = delta_time;
                 if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
-                    //LM.write_log("Player is collide with something checck\n");
 
                     CollisionSide side = compute_collision_side(aabb1, aabb2);
 
                     if (side == CollisionSide::BOTTOM)
                     {
                         is_grounded = true;
-                        //LM.write_log("is on a platform now ");
-                        //std::cout << "this is collide top\n";
                         physic1.set_gravity(Vec2D(0.0f, 0.0f));
                     }
 
@@ -387,17 +361,9 @@ namespace lof {
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
                     //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
-                    //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
-
-                    //std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
                     //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
                     //std::cout << "State of is grouded for player: " << physic1.is_grounded << "\n";
-
-                   // std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
                     //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
-                    //std::cout << "State of is grouded for player: " << physic1.get_is_grounded() << "\n";
-
-
                 }
             }
             physic1.set_is_grounded(is_grounded);
@@ -406,9 +372,8 @@ namespace lof {
             }
         }
     }
-#endif 
 
-    //bool Collision_System::collision_handled = false;
+   // Initialize value for detect the tiles that player is near to
     EntityID Collision_System::bottom_collision_entity = static_cast<EntityID>(-1);
     bool Collision_System::has_bottom_collision = false;
 
@@ -421,10 +386,9 @@ namespace lof {
     EntityID Collision_System::top_collision_entity = static_cast<EntityID>(-1);
     bool Collision_System::has_top_collision = false;
 
-
-
     void Collision_System::collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time) {
 
+        // initialize value 
         bool found_bottom_collision = false;
         bool found_left_collision = false;
         bool found_right_collision = false;
@@ -440,17 +404,15 @@ namespace lof {
         EntityID current_top_entity = static_cast<EntityID>(-1);
 
         // Level grid constants
-        const float LEFT_BOUND = -1020.0f;
-        const float RIGHT_BOUND = 1020.0f;
-        const float START_Y = -150.0f;
-        const int TOTAL_ROWS = static_cast<int>(SM.get_level_rows());
+        const float LEFT_BOUND = -960.0f; // follow the serialization file create_level_entities()
+        const float RIGHT_BOUND = 960.0f; // follow the serialization file create_level_entities()
+        const float START_Y = -150.0f; // follow the serialization file create_level_entities()
+        const int TOTAL_ROWS = static_cast<int>(SM.get_level_rows()); 
         const int TOTAL_COLS = static_cast<int>(SM.get_level_cols());
 
         // Calculate cell dimensions based on level size
         const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
         const float CELL_HEIGHT = CELL_WIDTH;
-
-
 
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
             EntityID entity_ID1 = *iter1;
@@ -464,37 +426,37 @@ namespace lof {
             auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
             auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
 
-            // Calculate player's position in the level grid
-            int player_col = static_cast<int>((transform1.position.x - LEFT_BOUND) / CELL_WIDTH);
-            int player_row = static_cast<int>((START_Y - transform1.position.y) / CELL_HEIGHT);
+            // Convert world coordinate to grid coordinate
+            int player_col = static_cast<int>((transform1.position.x - LEFT_BOUND) / CELL_WIDTH); // calculate the cols that player at 
+            int player_row = static_cast<int>((START_Y - transform1.position.y) / CELL_HEIGHT); // calculate the rows that player at 
 
-            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1);
+
+            // Ensure coordinate is within the range
+            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1); //
             player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
 
             //// Debug output for player position
             //LM.write_log("\n=== Collision Check Debug ===");
-            LM.write_log("Player (Entity %d) world position: (%.2f, %.2f)",
-                entity_ID1, transform1.position.x, transform1.position.y);
-            //LM.write_log("Player grid position: [Row: %d, Col: %d]", player_row, player_col);
             //printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
 
-            // Define the 5x5 check area around the player
-            const int CHECK_RADIUS = 1; // 2 cells in each direction + current cell = 5x5
-            int start_row = std::max(0, player_row - CHECK_RADIUS); //get the starting rows that will be check always 2 rows before the player
-            int end_row = std::min(TOTAL_ROWS - 1, player_row + CHECK_RADIUS);
+            
+            const int CHECK_RADIUS = 1; // 1 cell away from player 
+            int start_row = std::max(0, player_row - CHECK_RADIUS); //get the starting rows that will be check always 1 rows before the player 
+            int end_row = std::min(TOTAL_ROWS - 1, player_row + CHECK_RADIUS); //get the starting rows that will be check always 1 rows after the player
 
 
-            int start_col = std::max(0, player_col - CHECK_RADIUS); // get the starting cols, always check 2 cols before the player
-            int end_col = std::min(TOTAL_COLS - 1, player_col + CHECK_RADIUS);
+            int start_col = std::max(0, player_col - CHECK_RADIUS); // get the starting cols, always check 1 cols before the player
+            int end_col = std::min(TOTAL_COLS - 1, player_col + CHECK_RADIUS); // get the ending cols, always check 1 cols before the player
 
             // Debug output for check area
             //LM.write_log("\nChecking area:");
-            // printf("Rows: %d to %d\n", start_row, end_row);
-            // printf("Cols: %d to %d\n", start_col, end_col);
+            //printf("Rows: %d to %d\n", start_row, end_row);
+            //printf("Cols: %d to %d\n", start_col, end_col);
 
 
             AABB aabb1 = AABB::from_transform(transform1, collision1);
 
+            // only allow to check when the player is near the level design map
             if (transform1.position.y <= (START_Y + (collision1.height / 2.0f)))
             {
                 // Check only entities in the surrounding cells
@@ -504,8 +466,6 @@ namespace lof {
                     if (entity_ID1 == entity_ID2) {
                         continue;
                     }
-
-
 
                     auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
 
@@ -522,6 +482,7 @@ namespace lof {
                     auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
                     auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
 
+                    // skip if component for collidable set to false
                     if (!collision2.collidable) continue;
 
                     AABB aabb2 = AABB::from_transform(transform2, collision2);
@@ -548,30 +509,29 @@ namespace lof {
                         //printf("Collision detected: Entity %d with Entity %d at side %d\n", entity_ID1, entity_ID2, side);
                         //printf("this is frame counter: %f\n" , static_cast<float>(frame_counter));
                         //printf("this is bool of is_grounded %d\n", is_grounded);
-
-
                         collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side,  static_cast<float>(frame_counter) });
 
                     }
 
-                    // Left check
                     if (!found_left_collision &&
                         entity2_col == player_col - 1 && // one column to the left
-                        entity2_row == player_row && // ensure it is same row
-                        std::abs(transform2.position.x - transform1.position.x) < (CELL_WIDTH * 1.2f)) { //ensure is close to tile
+                        entity2_row == player_row && // same row
+                        transform2.position.x < transform1.position.x && // entity2 is actually to the left
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
                         found_left_collision = true;
                         current_left_entity = entity_ID2;
-                        //LM.write_log("Left entity detected in column %d: %d\n", entity2_col, entity_ID2);
+                        LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
-                    // Right check
+                    // Right check - Modified to be more reliable
                     if (!found_right_collision &&
                         entity2_col == player_col + 1 && // one column to the right
-                        entity2_row == player_row && // ensure it is same row
-                        std::abs(transform2.position.x - transform1.position.x) < (CELL_WIDTH * 1.2f)) { // ensure is close to tile
+                        entity2_row == player_row && // same row
+                        transform2.position.x > transform1.position.x && // entity2 is actually to the right
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
                         found_right_collision = true;
                         current_right_entity = entity_ID2;
-                        //LM.write_log("Right entity detected in column %d: %d\n", entity2_col, entity_ID2);
+                        LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
                     // Top check 
@@ -585,14 +545,17 @@ namespace lof {
                     }
 
                     if (player_col <= 0 || player_col >= TOTAL_COLS - 1) {
-                        // Player is at edge columns, prevent horizontal movement towards the edge
-                        if (player_col <= 0 && velocity1.velocity.x < 0) {
+                        
+                        float leftmost_tile_center = LEFT_BOUND + (CELL_WIDTH * 0.5f);
+                        float rightmost_tile_center = RIGHT_BOUND - (CELL_WIDTH * 0.5f);
+
+                        if (transform1.position.x <= leftmost_tile_center) {
                             velocity1.velocity.x = 0.0f;
-                            transform1.position.x = LEFT_BOUND + CELL_WIDTH;
+                            transform1.position.x = leftmost_tile_center;
                         }
-                        else if (player_col >= TOTAL_COLS - 1 && velocity1.velocity.x > 0) {
+                        else if (transform1.position.x >= rightmost_tile_center) {
                             velocity1.velocity.x = 0.0f;
-                            transform1.position.x = RIGHT_BOUND - CELL_WIDTH;
+                            transform1.position.x = rightmost_tile_center;
                         }
                     }
 
@@ -715,9 +678,6 @@ namespace lof {
                     check_non_collidable_entities = static_cast<EntityID>(-1);
                     entites_detect = false;
                 }
-
-
-
             }
 
             if (check_non_collidable_entities == 2)
@@ -735,6 +695,29 @@ namespace lof {
 
 
         }
+
+        // Find GUI System to trigger interface
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                // Check mineral tank collision
+                if (mineral_tank_detected() != -1) {
+                    gui_system->show_mineral_tank_gui();
+                }
+                else {
+                    gui_system->hide_mineral_tank_gui();
+                }
+
+                // Check oxygen tank collision
+                if (oxygen_tank_detected() != -1) {
+                    gui_system->show_oxygen_tank_gui();
+                }
+                else {
+                    gui_system->hide_oxygen_tank_gui();
+                }
+
+                break;
+            }
+        }
     }
     /**
     * @brief Resolves collisions between entities based on the provided collision pairs.
@@ -748,7 +731,6 @@ namespace lof {
     * @param collisions A vector of `CollisionPair` objects representing collisions between entities.
     */
 
-#if 1 // new one ASH side
 
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         // Store the last frame's collision states
@@ -768,7 +750,7 @@ namespace lof {
 
             if (collision.side == CollisionSide::LEFT) {
                 had_left_collision = true;
-                last_collision_time = collision.collide_time; // Or your game's time system
+                last_collision_time = collision.collide_time; 
             }
             if (collision.side == CollisionSide::RIGHT) {
                 had_right_collision = true;
@@ -825,12 +807,7 @@ namespace lof {
                 Vec2D impulse = normal * impulse_scalar;
                 velocityA.velocity += impulse * physicsA.get_inv_mass();
 
-                /*
-                float percent = 0.2f;
-                float slop = 0.01f;
-                Vec2D correction = normal * std::max((collision.overlap.y - slop) * percent, 0.0f);
-                */
-
+  
                 Vec2D correction(0.0f, 0.0f);
 
                 if (collision.overlap.y > PENETRATION_TOLERANCE) {
@@ -866,7 +843,7 @@ namespace lof {
             }
         }
     }
-#endif 
+
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
@@ -882,28 +859,7 @@ namespace lof {
 
         Colliside_Oxygen_Mineral(delta_time);
 
-        // Find GUI System to trigger interface
-        for (auto& system : ECSM.get_systems()) {
-            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                // Check mineral tank collision
-                if (mineral_tank_detected() != -1) {
-                    gui_system->show_mineral_tank_gui();
-                }
-                else {
-                    gui_system->hide_mineral_tank_gui();
-                }
-
-                // Check oxygen tank collision
-                if (oxygen_tank_detected() != -1) {
-                    gui_system->show_oxygen_tank_gui();
-                }
-                else {
-                    gui_system->hide_oxygen_tank_gui();
-                }
-
-                break;
-            }
-        }
+  
 
         //sprintf("this is the entity left %d\n", test);
         //printf("entity left: %d\n", has_left_collide_detect());
