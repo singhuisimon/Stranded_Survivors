@@ -253,7 +253,7 @@ namespace lof {
 
                     // Set position and scale for oxygen meter
                     oxygen_transform.position = {
-                        base_position.x - METER_WIDTH,  // Center horizontally
+                        base_position.x - METER_WIDTH,  // Left of UI overlay
                         base_position.y                 // Top position
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
@@ -281,7 +281,7 @@ namespace lof {
 
                     // Set position and scale for panic meter
                     panic_transform.position = {
-                        base_position.x - METER_WIDTH,          // Center horizontally
+                        base_position.x - METER_WIDTH,          // Left of UI overlay
                         base_position.y - METER_SPACING         // Below oxygen meter
                     };
                     panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
@@ -488,9 +488,8 @@ namespace lof {
                     update_mineral_count_text(val_to_add);
                 }
 
-                // Mining animations
+                // Get and set mining status for animation
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_LEFT;
                     int& direction = GFXM.get_player_direction();
@@ -498,27 +497,23 @@ namespace lof {
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_UP)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_UP;
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_DOWN;
 
                 }
                 else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                    // Get mining status for animation
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = MINE_RIGHT;
                     int& direction = GFXM.get_player_direction(); 
                     direction = FACE_RIGHT; 
 
                 }
-                else {
-                    // Get mining status for animation
+                else { 
                     auto& mining_status = GFXM.get_mining_status();
                     mining_status = NO_ACTION;
                 }  
@@ -662,6 +657,7 @@ namespace lof {
         }
 
 
+#if _DEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
         if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
@@ -678,7 +674,7 @@ namespace lof {
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
         }
-#if _DEBUG
+
         // Toggle debug mode using 'B" or 'N'
         if (IM.is_key_pressed(GLFW_KEY_B)) {
             LM.write_log("Graphics_Manager::update(): 'B' key pressed, Debug Mode is now ON.");

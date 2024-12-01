@@ -195,7 +195,7 @@ namespace lof {
 
         // Set up the imgui framebuffer when entering editor mode
         if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); // FOR TESTING 
+            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); 
         }
 
         // Set up for the drawing of objects
@@ -610,7 +610,7 @@ namespace lof {
             GFXM.program_free();
         }
         if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0); // FOR TESTING
+            glBindFramebuffer(GL_FRAMEBUFFER, 0); 
         }
     }
 } // namespace lof

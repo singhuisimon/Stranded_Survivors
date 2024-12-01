@@ -39,7 +39,6 @@ namespace lof {
         };
         int player_action = IDLE;
         bool has_mined = false;
-        
 
     public:
         /**

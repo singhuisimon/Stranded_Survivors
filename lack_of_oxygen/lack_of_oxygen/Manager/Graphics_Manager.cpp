@@ -10,11 +10,10 @@
 
  // Include header file
 #include "Graphics_Manager.h" 
-//#include "../Utility/Path_Helper.h" // For file path resolution
 #include "Assets_Manager.h"
 #include "../Utility/win_control.h"
 
-// FOR TESTING (texture loading)
+// For texture loading
 #define STB_IMAGE_IMPLEMENTATION 
 #include "STB/stb_image.h"  // For loading textures/sprites 
 
@@ -54,11 +53,6 @@ namespace lof {
 
         // Set framebuffer with color (Background color)
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-        // Set viewport position and dimensions
-        //GLuint scr_width = SM.get_scr_width();
-        //GLuint scr_height = SM.get_scr_height();
-        //glViewport(0, 0, scr_width, scr_height);
         glViewport(0, 0, WC.get_win_width(), WC.get_win_height());
 
         // Set up default render mode 
@@ -70,12 +64,14 @@ namespace lof {
         std::string vertex_font_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_font.vert");
         std::string fragment_font_path = ASM.get_full_path(ASM.SHADER_PATH, "lack_of_oxygen_font.frag");
 
-        std::vector<std::pair<std::string, std::string>> shader_files{ // vertex & fragment shader files
+        // Pair vertex and fragment shader files
+        std::vector<std::pair<std::string, std::string>> shader_files{ 
             std::make_pair(vertex_obj_path, fragment_obj_path),
             std::make_pair(vertex_debug_path, fragment_debug_path),
             std::make_pair(vertex_font_path, fragment_font_path)
         };
 
+        // Load shader files
         if (!ASM.load_shader_programs(shader_files)) {
             LM.write_log("Graphics_Manager::start_up(): Failed to load shader programs");
             return -1;
@@ -84,10 +80,12 @@ namespace lof {
             LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
 
+        // File path for assets
         std::string mesh_path = ASM.get_full_path(ASM.MODEL_PATH, DEFAULT_MODEL_MSH_FILE);
         std::string animation_path = ASM.get_full_path(ASM.TEXTURE_PATH, DEFAULT_ATLAS_FILE);
         std::string font_path = ASM.get_full_path(ASM.FONT_PATH, DEFAULT_FONTS_FILE);
 
+        // Add models
         if (!add_model(mesh_path)) {
             LM.write_log("Graphics_Manager::start_up(): Failed to add models");
             return -2;
@@ -116,7 +114,6 @@ namespace lof {
         glGenTextures(1, &imgui_tex);
         glBindTexture(GL_TEXTURE_2D, imgui_tex);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WC.get_win_width(), WC.get_win_height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -142,6 +139,7 @@ namespace lof {
         model_storage.clear();
         texture_storage.clear();
         animation_storage.clear();
+        font_storage.clear();
 
         // Free imgui framebuffer and tex object
         glDeleteFramebuffers(1, &imgui_fbo);
@@ -150,6 +148,7 @@ namespace lof {
         m_is_started = false;
     }
 
+    // Add models to storage
     GLboolean Graphics_Manager::add_model(const std::string& file_name) {
         if (!ASM.load_model_data(file_name)) {
             LM.write_log("Graphics_Manager: Failed to load model data");
@@ -165,7 +164,7 @@ namespace lof {
                 continue;
             }
 
-            // Create OpenGL resources
+            // Create model and buffer storages
             Model mdl{};
             GLuint vbo_hdl{}, vaoid{}, ebo_hdl{};
             glCreateVertexArrays(1, &vaoid);
@@ -366,6 +365,7 @@ namespace lof {
         return GL_TRUE;
     }
 
+    // Add animations with file name
     GLboolean Graphics_Manager::add_animations(const std::string& file_name) {
         return ASM.load_animations(file_name);
     }
@@ -400,12 +400,11 @@ namespace lof {
     // Return reference to player direction
     int& Graphics_Manager::get_player_direction() { return player_direction; }
     
-    ///////////// TESTING ANIMATIONS
+    // Return reference to the player moving status
     int& Graphics_Manager::get_moving_status() { return is_moving; }
 
+    // Return reference to the player mining status
     int& Graphics_Manager::get_mining_status() { return is_mining; }
-
-    ///////////// TESTING ANIMATIONS
 
     // Return reference to the framebuffer
     GLuint& Graphics_Manager::get_framebuffer() { return imgui_fbo; }
@@ -416,6 +415,7 @@ namespace lof {
     // Return reference to the editor mode flag
     int& Graphics_Manager::get_editor_mode() { return editor_mode; }
 
+    // Create and compile shader files to shader program
     GLboolean Graphics_Manager::compile_shader(std::vector<std::pair<GLenum, std::string>> shader_files, Assets_Manager::ShaderProgram& shader) {
         // Read each shader file details such as shader type and file path
         for (auto& file : shader_files) {
@@ -504,6 +504,7 @@ namespace lof {
     // Free shader program
     void Graphics_Manager::program_free() { glUseProgram(0); }
 
+    // Return shader program handle
     GLuint Graphics_Manager::get_shader_program_handle(Assets_Manager::ShaderProgram shader) const {
         return shader.program_handle;
     }
