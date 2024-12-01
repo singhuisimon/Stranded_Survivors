@@ -122,6 +122,7 @@ namespace lof {
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
         audio_types.push_back(std::make_pair("SFX", (AudioType)1));
         audio_types.push_back(std::make_pair("NIL", (AudioType)2));
+
     }
 
     void IMGUI_Manager::display_loading_options() {
@@ -338,6 +339,8 @@ namespace lof {
                 audio_types.clear();
                 fill_up_sound_names();
 
+                
+
             }
 
             load_selected = false;
@@ -411,7 +414,7 @@ namespace lof {
     }
 
     ImVec2 IMGUI_Manager::imgui_mouse_pos() {
-        return Mouse_Pos;
+        return mouse_pos_game;
     }
 
 
@@ -485,7 +488,7 @@ namespace lof {
 
 
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
-            Mouse_Pos = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
+            mouse_pos_game = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
             ESS.Check_Selected_Entity();
             EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
 
@@ -499,7 +502,7 @@ namespace lof {
                     if (selectedEntityInfo.isSelected) {
                         select_entity = true;
                         selectedEntityID = selectedEntityInfo.selectedEntity;
-                        LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
+                        LM.write_log("IMGUI_Manager::render_ui(): Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
                     }
                     else {
                         select_entity = false;
@@ -580,12 +583,12 @@ namespace lof {
                         float ratio_height = static_cast<float>(game_scale_height) / window_height;
 
                         if (is_full_screen) {
-                            dragged_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) * ratio_width;
-                            dragged_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) * ratio_height;
+                            dragged_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * ratio_width;
+                            dragged_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * ratio_height;
                         }
                         else {
-                            dragged_offset.x = Mouse_Pos.x - mouse_pos_before_press.x;
-                            dragged_offset.y = Mouse_Pos.y - mouse_pos_before_press.y;
+                            dragged_offset.x = mouse_pos_game.x - mouse_pos_before_press.x;
+                            dragged_offset.y = mouse_pos_game.y - mouse_pos_before_press.y;
                         }
 
                         if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
@@ -607,8 +610,8 @@ namespace lof {
                     {
                         ImVec2 scale_offset;
                         constexpr float SCALE_SENSITIVITY = 0.05f;
-                        scale_offset.x = (Mouse_Pos.x - mouse_pos_before_press.x) * SCALE_SENSITIVITY;
-                        scale_offset.y = (Mouse_Pos.y - mouse_pos_before_press.y) * SCALE_SENSITIVITY;
+                        scale_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * SCALE_SENSITIVITY;
+                        scale_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * SCALE_SENSITIVITY;
 
                         if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
                             if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
@@ -633,7 +636,7 @@ namespace lof {
                     }
                     case 3: //rotate
                     {
-                        float rotation_offset = (Mouse_Pos.x - mouse_pos_before_press.x) * 0.5f;
+                        float rotation_offset = (mouse_pos_game.x - mouse_pos_before_press.x) * 0.5f;
 
                         if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
                             if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
@@ -749,10 +752,10 @@ namespace lof {
 
             std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
             if (SM.save_game_state(scene_path.c_str())) {   
-                LM.write_log("IMGUI_Manager::update(): Successfully initated game state to %s");
+                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
             }
             else {
-                LM.write_log("IMGUI_Manager::update(): Failed initated game state to %s");
+                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Failed saved game state");
             }
 
         }
@@ -1240,6 +1243,10 @@ namespace lof {
                     transform.position.y = random_y;
                 }
                 
+                LM.write_log("IMGUI_Manager::add_game_objects(): New entity added: %i", new_entity);
+            }
+            else {
+                LM.write_log("IMGUI_Manager::add_game_objects(): No new entity added");
             }
         }
 
@@ -1254,6 +1261,7 @@ namespace lof {
         //If entity exists
         if (eid != INVALID_ENTITY_ID) {
             ECSM.destroy_entity(eid);
+            LM.write_log("IMGUI_Manager::remove_game_objects(): Removed entity: %i", eid);
             remove_game_obj = !remove_game_obj;
             return;
         }

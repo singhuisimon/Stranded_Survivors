@@ -63,7 +63,7 @@ namespace lof {
         std::vector<std::pair<std::string, AudioType>> audio_types{};
 
         //Mouse position in the game world
-        ImVec2 Mouse_Pos;
+        ImVec2 mouse_pos_game;
 
         //String holding the name of the current file loaded
         std::string current_file_shown;
