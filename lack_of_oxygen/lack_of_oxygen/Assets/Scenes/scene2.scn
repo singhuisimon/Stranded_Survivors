@@ -28,7 +28,7 @@
             0.5,
             0.5
           ],
-          "texture_name": "Skybox_Batch_4",
+          "texture_name": "skybox_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -108,7 +108,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Ship Open_Batch_2",
+          "texture_name": "ship_open_batch_2",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -159,7 +159,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Mineral_Hopper_Conveyor_Empty_Batch_4",
+          "texture_name": "mineral_hopper_conveyor_empty_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -234,7 +234,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Oxygen_Tank_Batch_4",
+          "texture_name": "oxygen_tank_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -308,7 +308,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "Spritesheet_Player",
+          "texture_name": "spritesheet_player",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -592,7 +592,7 @@
             0.20000000298023224,
             0.0
           ],
-          "texture_name": "Snowflake",
+          "texture_name": "snowflake",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -705,7 +705,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_O2_meter_Batch_4",
+          "texture_name": "top_ui_o2_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -756,7 +756,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_Panik_meter_Batch_4",
+          "texture_name": "top_ui_panik_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -807,7 +807,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "Top_UI_Minerals_Batch_4",
+          "texture_name": "top_ui_minerals_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [

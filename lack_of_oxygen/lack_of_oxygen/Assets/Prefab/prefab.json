@@ -227,7 +227,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 0.0, 0.8, 0.2 ],
-          "texture_name": "Rock",
+          "texture_name": "rock",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -290,7 +290,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -348,7 +348,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -406,7 +406,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -464,7 +464,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -522,7 +522,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -580,7 +580,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -625,7 +625,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -683,7 +683,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -741,7 +741,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -799,7 +799,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],
@@ -942,7 +942,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0 ],
-          "texture_name": "Spritesheet_Map",
+          "texture_name": "spritesheet_map",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0.0, 0.0, 0.0 ],

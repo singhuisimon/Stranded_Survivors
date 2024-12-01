@@ -375,7 +375,7 @@ namespace lof {
             // Set background texture and properties
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Mineral_Deposit_UI_BG_Batch_4";
+                graphics->texture_name = "mineral_deposit_ui_bg_batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
             // Position and scale the container
@@ -390,7 +390,7 @@ namespace lof {
         if (mineral_text_overlay != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_text_overlay)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Mineral_Deposit_UI_Text_Batch_4";
+                graphics->texture_name = "mineral_deposit_ui_text_batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_text_overlay)) {
@@ -418,7 +418,7 @@ namespace lof {
             // Set background texture and properties
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill_UI_BG_Batch_4";
+                graphics->texture_name = "oxygen_refill_ui_bg_batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
             // Position and scale the container
@@ -433,7 +433,7 @@ namespace lof {
         if (red_circle_overlay != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(red_circle_overlay)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill_UI_Red_circle_Flattened_Batch_4";
+                graphics->texture_name = "oxygen_refill_ui_red_circle_flattened_batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(red_circle_overlay)) {
@@ -447,7 +447,7 @@ namespace lof {
         if (green_circle_overlay != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(green_circle_overlay)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill_UI_Green_circle_Batch_4";
+                graphics->texture_name = "oxygen_refill_UI_green_circle_batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(green_circle_overlay)) {
@@ -461,7 +461,7 @@ namespace lof {
         if (oxygen_text_overlay != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_text_overlay)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill_UI_Text_Batch_4";
+                graphics->texture_name = "oxygen_refill_ui_text_batch_4";
                 graphics->color = glm::vec3(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_text_overlay)) {
