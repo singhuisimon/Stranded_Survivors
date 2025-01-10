@@ -135,18 +135,7 @@ namespace lof {
     void Movement_System::update(float delta_time) {
 
         Movement_System::integrate(delta_time);
-#if 0
-        SelectedEntityInfo& selectedEntityInfo = CS.get_selected_entity_info();
 
-        if (selectedEntityInfo.isSelected) {
-            std::cout << "Selected Entity ID in movement system: " << selectedEntityInfo.selectedEntity << "\n";
-        }
-        else {
-            std::cout << "No entity is selected.\n";
-    }
-#endif
-
-      
     }
 
     std::string Movement_System::get_type() const {

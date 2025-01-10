@@ -21,7 +21,6 @@
 
 // Include utility
 #include "../Utility/Constant.h"
-//#include "../Utility/Path_Helper.h"
 #include "../Utility/Globals.h"
 
 // Include systems
@@ -183,7 +182,7 @@ namespace lof {
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             set_game_over(true);
             LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
-            std::cout << "Escape key pressed. Closing the game." << std::endl;
+            //std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
         //to pause all the sound that is playing
@@ -352,7 +351,6 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                //animation.curr_tile_health--;
                                 if (animation.curr_tile_health <= mining_strength) {
                                     animation.curr_tile_health -= animation.curr_tile_health;
                                 }
@@ -386,7 +384,6 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                //animation.curr_tile_health--;
                                 if (animation.curr_tile_health <= mining_strength) {
                                     animation.curr_tile_health -= animation.curr_tile_health;
                                 }
@@ -420,7 +417,6 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                //animation.curr_tile_health--;
                                 if (animation.curr_tile_health <= mining_strength) {
                                     animation.curr_tile_health -= animation.curr_tile_health;
                                 }
@@ -454,7 +450,6 @@ namespace lof {
                             // Update tile health
                             auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             if (animation.curr_tile_health > 0) {
-                                //animation.curr_tile_health--;
                                 if (animation.curr_tile_health <= mining_strength) {
                                     animation.curr_tile_health -= animation.curr_tile_health;
                                 }
@@ -718,7 +713,7 @@ namespace lof {
         {
             // First check if entity has required components
             if (!ECSM.has_component<Transform2D>(selectedID)) {
-                std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
+                //std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
                 return;
             }
 

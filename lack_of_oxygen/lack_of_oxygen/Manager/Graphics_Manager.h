@@ -125,7 +125,7 @@ namespace lof {
         static std::once_flag once_flag;
         GLenum render_mode;
         GLboolean is_debug_mode = GL_FALSE;
-        Camera2D camera{}; 
+        Camera2D camera{};
 
         // Flags to prevent scaling and rotation buttons from conflicting
         int scale_flag = 0;

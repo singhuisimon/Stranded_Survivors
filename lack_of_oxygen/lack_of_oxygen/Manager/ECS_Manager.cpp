@@ -358,6 +358,7 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
         for (auto& system : systems) {
 
+            //Stops movement, collision and audio system in level editor
             if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System") {
 
                 if (!level_editor_mode) {

@@ -94,6 +94,7 @@ namespace lof {
 
         LevelData current_level;
         static int scene_no;
+
     public:
 
         /**
@@ -136,11 +137,43 @@ namespace lof {
         bool save_game_state(const char* filepath);
 
         // ---------------------------- LEVEL CONFIG LOGIC ---------------------------- //
+        /**
+         * @brief Loads level data from specified file
+         * @param filepath Path to the level data file
+         * @return True if loading successful, false otherwise
+         */
         bool load_level_data(const char* filepath);
+
+        /**
+         * @brief Gets reference to current level data
+         * @return Const reference to current level data
+         */
         const LevelData& get_current_level() const { return current_level; }
+
+        /**
+         * @brief Gets tile data at specified position
+         * @param row Row index of tile
+         * @param col Column index of tile
+         * @return TileData object for the specified position
+         */
         TileData get_tile(int row, int col) const;
+
+        /**
+         * @brief Prints level data for debugging purposes
+         */
         void debug_print_level() const;
-        bool create_level_entities();  // Function to create entities from the loaded tile data
+
+        /**
+         * @brief Creates game entities from loaded tile data
+         * @return True if entity creation successful, false otherwise
+         */
+        bool create_level_entities(); 
+
+        /**
+         * @brief Checks if file is Scene2 format
+         * @param filepath Path to file to check
+         * @return True if file is Scene2 format, false otherwise
+         */
         bool is_scene2_file(const char* filepath) const;
 
         // ----------------- use for collision---------------------------------//

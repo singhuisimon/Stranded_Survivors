@@ -108,8 +108,8 @@ namespace lof {
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
 	// File
 	constexpr const char* DEFAULT_MODEL_MSH_FILE = "models.msh";
-	constexpr const char* DEFAULT_ATLAS_FILE = "Spritesheet_Atlas.txt";
-	constexpr const char* DEFAULT_FONTS_FILE = "Fonts.txt";
+	constexpr const char* DEFAULT_ATLAS_FILE = "spritesheet_atlas.txt";
+	constexpr const char* DEFAULT_FONTS_FILE = "fonts.txt";
 	
 	// Textures
 	constexpr unsigned int DEFAULT_FRAME_INDEX = 0;

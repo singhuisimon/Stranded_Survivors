@@ -1,7 +1,7 @@
 /**
  * @file Audio_System.cpp
  * @brief Define of the Audio_System class for managing audio playback using FMOD.
- * @author Amanda Leow Boon Suan (100%)
+ * @author Amanda Leow Boon Suan (98%), Saw Hui Shan (2%)
  * @date September 27, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

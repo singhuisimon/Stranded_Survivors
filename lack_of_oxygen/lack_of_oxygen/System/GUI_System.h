@@ -99,7 +99,7 @@ namespace lof {
          */
         GUI_System(ECS_Manager& ecs_manager);
 
-
+        // Functions for displaying and hiding loading screen
         void show_loading_screen();
         void hide_loading_screen();
 
@@ -109,10 +109,11 @@ namespace lof {
          */
         void set_progress(float progress);
 
-
+        // Functions for displaying and hiding mineral tank GUI
         void show_mineral_tank_gui();
         void show_oxygen_tank_gui();
 
+        // Functions for displaying and hiding mineral tank GUI
         void hide_mineral_tank_gui();
         void hide_oxygen_tank_gui();
 

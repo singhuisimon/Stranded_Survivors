@@ -56,12 +56,12 @@ namespace lof {
 
     Collision_System::Collision_System() {
         // Set the required components for this system
-        signature.set(ECSM.get_component_id<Transform2D>()); // simon
-        signature.set(ECSM.get_component_id<Collision_Component>()); // simon
-        signature.set(ECSM.get_component_id<Physics_Component>()); // simon
-        signature.set(ECSM.get_component_id<Velocity_Component>()); // simon
+        signature.set(ECSM.get_component_id<Transform2D>()); 
+        signature.set(ECSM.get_component_id<Collision_Component>()); 
+        signature.set(ECSM.get_component_id<Physics_Component>()); 
+        signature.set(ECSM.get_component_id<Velocity_Component>()); 
 
-        LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
+        //LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
     }
 
     std::string Collision_System::get_type() const {
@@ -342,6 +342,8 @@ namespace lof {
 
 
                 if (!collision2.collidable) continue;
+
+
                 // Create AABB for object 2
                 AABB aabb2 = AABB::from_transform(transform2, collision2);
 
@@ -357,13 +359,10 @@ namespace lof {
                         physic1.set_gravity(Vec2D(0.0f, 0.0f));
                     }
 
-                    //std::cout << "entity 2 is :" << entity_ID2 << "\n";
+                    
                     // Store collision pair and overlap information
                     collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
-                    //std::cout << "Entity " << entity_ID1 << " collides with Entity " << entity_ID2 << " on side: " << static_cast<int>(side) << "\n";
-                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
-                    //std::cout << "State of is grouded for player: " << physic1.is_grounded << "\n";
-                    //std::cout << "Entity " << entity_ID2 << " Position: (" << transform2.position.x << ", " << transform2.position.y << ")\n";
+            
                 }
             }
             physic1.set_is_grounded(is_grounded);
@@ -432,13 +431,10 @@ namespace lof {
 
 
             // Ensure coordinate is within the range
-            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1); //
+            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1); 
             player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
 
-            //// Debug output for player position
-            //LM.write_log("\n=== Collision Check Debug ===");
-            //printf("Player grid position: [Row: %d, Col: %d]\n", player_row, player_col);
-
+   
             
             const int CHECK_RADIUS = 1; // 1 cell away from player 
             int start_row = std::max(0, player_row - CHECK_RADIUS); //get the starting rows that will be check always 1 rows before the player 
@@ -448,10 +444,7 @@ namespace lof {
             int start_col = std::max(0, player_col - CHECK_RADIUS); // get the starting cols, always check 1 cols before the player
             int end_col = std::min(TOTAL_COLS - 1, player_col + CHECK_RADIUS); // get the ending cols, always check 1 cols before the player
 
-            // Debug output for check area
-            //LM.write_log("\nChecking area:");
-            //printf("Rows: %d to %d\n", start_row, end_row);
-            //printf("Cols: %d to %d\n", start_col, end_col);
+      
 
 
             AABB aabb1 = AABB::from_transform(transform1, collision1);
@@ -473,7 +466,7 @@ namespace lof {
                     int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
                     int entity2_row = static_cast<int>((START_Y - transform2.position.y) / CELL_HEIGHT);
 
-                    // Skip if entity2 is outside our 5x5 check area
+                    // Skip if entity2 is outside check area
                     if (entity2_row < start_row || entity2_row > end_row ||
                         entity2_col < start_col || entity2_col > end_col) {
                         continue;
@@ -506,9 +499,6 @@ namespace lof {
                             bottom_collision_entity = static_cast<EntityID>(-1);
                         }
 
-                        //printf("Collision detected: Entity %d with Entity %d at side %d\n", entity_ID1, entity_ID2, side);
-                        //printf("this is frame counter: %f\n" , static_cast<float>(frame_counter));
-                        //printf("this is bool of is_grounded %d\n", is_grounded);
                         collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side,  static_cast<float>(frame_counter) });
 
                     }
@@ -517,21 +507,21 @@ namespace lof {
                         entity2_col == player_col - 1 && // one column to the left
                         entity2_row == player_row && // same row
                         transform2.position.x < transform1.position.x && // entity2 is actually to the left
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range 
                         found_left_collision = true;
                         current_left_entity = entity_ID2;
-                        LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
+                        //LM.write_log("Left collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
-                    // Right check - Modified to be more reliable
+                    // Right check 
                     if (!found_right_collision &&
                         entity2_col == player_col + 1 && // one column to the right
                         entity2_row == player_row && // same row
                         transform2.position.x > transform1.position.x && // entity2 is actually to the right
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range slightly
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) { // increased detection range 
                         found_right_collision = true;
                         current_right_entity = entity_ID2;
-                        LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
+                       // LM.write_log("Right collision detected: Entity %d at col %d", entity_ID2, entity2_col);
                     }
 
                     // Top check 
@@ -559,16 +549,7 @@ namespace lof {
                         }
                     }
 
-                    // Bottom check (only work if level_design map first row is empty 'e')
-                    //if (!found_bottom_collision &&
-                    //    entity2_row == player_row + 1 && // Exactly one row below
-                    //    entity2_col == player_col && // ensure it is same row
-                    //    std::abs(transform2.position.y - transform1.position.y) < (CELL_HEIGHT * 1.2f)) {
-                    //    found_bottom_collision = true;
-                    //    current_bottom_entity = entity_ID2;
-                    //    //LM.write_log("Top entity detected in row %d: %d", entity2_row, entity_ID2);
-                    //}
-
+     
                 }
             } //end of -150
 
@@ -847,33 +828,15 @@ namespace lof {
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
-        //std::cout << "---------------------------this is check collide in collision syystem----------------------------------------\n";
+       
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
-        //printf("this is bool of is_collide_bottom %d\n", is_collide_bottom);
-        // printf("this is the entity that get %d\n", get_bottom_collide_entity());
-        //printf("entity bottom: %d\n", has_bottom_collide_detect());
-
-        //printf("this is the entity that get %d\n", get_bottom_collide_entity());
-        // printf("entity bottom: %d\n", has_bottom_collide_detect());
-        //EntityID test = get_left_collide_entity();
+ 
 
         Colliside_Oxygen_Mineral(delta_time);
 
-  
-
-        //sprintf("this is the entity left %d\n", test);
-        //printf("entity left: %d\n", has_left_collide_detect());
-        //
-
-        //printf("this is the entity right %d\n", get_right_collide_entity());
-        //printf("entity right: %d\n", has_right_collide_detect());
-
-        //std::cout << "---------------------------this is end of check collide in collision syystem----------------------------------------\n";
+ 
         resolve_collision_event(collisions);
-        //Check_Selected_Entity();
-
-        // std::cout << "collision time: " << delta_time << "\n";
-        // std::cout << SM.scene_switch() << "in game mode\n";
+    
     }
 
     bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)

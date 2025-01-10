@@ -25,7 +25,7 @@ namespace lof {
         return "Animation_System";
     }
 
-    // Updates the animation of the entity according to the current frame and time delay.
+    // Updates the animation of the entity according to the current frame and time delay
     void Animation_System::update(float delta_time) { 
 
         // Get a reference to the animation container

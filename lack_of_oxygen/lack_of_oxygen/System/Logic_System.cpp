@@ -94,6 +94,7 @@ namespace lof {
     }
 
     void Logic_System::update_linear_movement(Logic_Component& logic, Transform2D& transform, float delta_time) {
+        (void)delta_time;
         float t = logic.movement_speed * logic.timer;
 
         if (!logic.reverse_direction) {

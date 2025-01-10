@@ -58,8 +58,9 @@ namespace lof {
         if (is_started()) {
             return 0; // Already started
         }
-#ifndef NDEBUG
+
         this->log_file_name = new_log_file_name;
+#ifndef NDEBUG
         log_file.open(new_log_file_name, std::ios::out | std::ios::trunc);
 
         if (!log_file.is_open()) {
