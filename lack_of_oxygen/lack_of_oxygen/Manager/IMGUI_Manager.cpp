@@ -672,11 +672,8 @@ namespace lof {
             ImGui::End();
         }
 
-        
-        ImGui::Begin("Asset Manager");
-        ImGui::End();
-
         //Calls other window's functions
+        IMGUIM.asset_browser();
         IMGUIM.imgui_game_objects_list();
         IMGUIM.display_loading_options();
         IMGUIM.imgui_game_objects_edit();
@@ -1194,8 +1191,248 @@ namespace lof {
 
                     }
                 }
+
+                static int selected = 0;
+                static std::vector<const char*> missing_components;
+
+                //populate the vector (done before rendering ImGui)
+                missing_components.clear(); //clear previous data
+                missing_components.push_back("None");
+
+                std::vector<std::pair<const char*, ComponentID>> component_checks = {
+                    {"Transform Component", static_cast<ComponentID>(ecs.get_component_id<Transform2D>())},
+                    {"Velocity Component", static_cast<ComponentID>(ecs.get_component_id<Velocity_Component>())},
+                    {"Physics Component", static_cast<ComponentID>(ecs.get_component_id<Physics_Component>())},
+                    {"Graphics Component", static_cast<ComponentID>(ecs.get_component_id<Graphics_Component>())},
+                    {"Collision Component", static_cast<ComponentID>(ecs.get_component_id<Collision_Component>())},
+                    {"Animation Component", static_cast<ComponentID>(ecs.get_component_id<Animation_Component>())},
+                    {"Logic Component", static_cast<ComponentID>(ecs.get_component_id<Logic_Component>())},
+                    {"Audio Component", static_cast<ComponentID>(ecs.get_component_id<Audio_Component>())}
+                };
+
+                for (const auto& paired : component_checks) {
+                    if (!entities[selected_object_index]->has_component(paired.second)) {
+                        missing_components.push_back(paired.first);
+                    }
+                }
+
+                std::string add_cmpt = "Add Component";
+                const char* add_button_name = add_cmpt.c_str();
+                if (ImGui::Button(add_button_name)) {
+                    ImGui::OpenPopup("Add Components");
+                }
+
+                if (ImGui::BeginPopup("Add Components")) {
+                    ImGui::Text("Add Components");
+                    ImGui::Separator();
+
+                    for (size_t i = 0; i < missing_components.size(); i++) {
+                        if (ImGui::Selectable(missing_components[i])) {  // Ensure it's a C-string
+                            selected = static_cast<int>(i);  // Store the selected index
+                        }
+                    }
+                    ImGui::EndPopup();
+                }
+
+                if (selected != -1) {  // Check if a valid selection was made
+
+                    switch (selected) {
+                    case 0: // None - do nothing
+                        break;
+                    default: // Handle component addition
+                        if (selected >= 0 && selected < missing_components.size()) {  // Bounds check
+
+                            const auto& component_name = missing_components[selected];
+                            if (std::string(component_name) == "Transform Component") {
+                                Transform2D transform;
+                                ecs.add_component<Transform2D>(entities[selected_object_index]->get_id(), transform);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added transform component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Velocity Component") {
+                                Velocity_Component velocity;
+                                ecs.add_component<Velocity_Component>(entities[selected_object_index]->get_id(), velocity);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added velocity component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Physics Component") {
+                                Physics_Component physics;
+                                ecs.add_component<Physics_Component>(entities[selected_object_index]->get_id(), physics);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added physics component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Graphics Component") {
+                                Graphics_Component graphics;
+                                ecs.add_component<Graphics_Component>(entities[selected_object_index]->get_id(), graphics);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added graphics component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Collision Component") {
+                                Collision_Component collision;
+                                ecs.add_component<Collision_Component>(entities[selected_object_index]->get_id(), collision);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added collision component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Animation Component") {
+                                Animation_Component animation;
+                                ecs.add_component<Animation_Component>(entities[selected_object_index]->get_id(), animation);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added animation component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Logic Component") {
+                                std::cout << "Adding Logic Component\n";
+                                Logic_Component logic;
+                                ecs.add_component<Logic_Component>(entities[selected_object_index]->get_id(), logic);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added logic component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Audio Component") {
+                                Audio_Component audio;
+                                ecs.add_component<Audio_Component>(entities[selected_object_index]->get_id(), audio);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added audio component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                        }
+                        break;
+                    }
+                    selected = -1;  // Reset `selected` after handling
+                }
+
+
+
+                static size_t selected_to_remove = 0;
+                static std::vector<const char*> present_components;
+
+                //populate the vector (done before rendering ImGui)
+                present_components.clear(); //clear previous data
+                present_components.push_back("None");
+
+                for (const auto& present : component_checks) {
+                    if (entities[selected_object_index]->has_component(present.second)) {
+                        present_components.push_back(present.first);
+                    }
+                }
+
+                std::string rmv_cmpt = "Remove Component";
+                const char* remove_button_name = rmv_cmpt.c_str();
+                if (ImGui::Button(remove_button_name)) {
+                    ImGui::OpenPopup("Remove Components");
+                }
+
+                if (ImGui::BeginPopup("Remove Components")) {
+                    ImGui::Text("Remove Components");
+                    ImGui::Separator();
+
+                    for (size_t i = 0; i < present_components.size(); i++) {
+                        if (ImGui::Selectable(present_components[i])) {
+                            selected_to_remove = i;
+                        }
+                    }
+                    ImGui::EndPopup();
+                }
+
+                if (selected_to_remove != -1) {  // Check if a valid selection was made
+
+                    switch (selected_to_remove) {
+                    case 0:
+                        break;
+                    default: 
+                        if (selected_to_remove >= 0 && selected_to_remove < present_components.size()) {  // Bounds check
+
+                            const auto& component_name = present_components[selected_to_remove];
+
+                            if (std::string(component_name) == "Transform Component") {
+                                ecs.remove_component<Transform2D>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed transform component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Velocity Component") {
+                                ecs.remove_component<Velocity_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed velocity component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Physics Component") {
+                                ecs.remove_component<Physics_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed physics component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Graphics Component") {
+                                ecs.remove_component<Graphics_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed graphics component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Collision Component") {
+                                ecs.remove_component<Collision_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed collision component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Animation Component") {
+                                ecs.remove_component<Animation_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed animation component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Logic Component") {
+                                ecs.remove_component<Logic_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed logic component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Audio Component") {
+                                ecs.remove_component<Audio_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed audio component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                        }
+                        break;
+                    }
+                    selected_to_remove = static_cast<size_t>(-1);
+                }
+
             }
         }
+
+        ImGui::End();
+    }
+
+    void IMGUI_Manager::asset_browser() {
+        
+        ImGui::Begin("Asset Manager");
+
+        const std::string ASSETS = "";
+        std::string assets_path = ASM.get_full_path(ASSETS, "");
+        
+
+        //Iterate through the directory and collect file names
+        for (const auto& entry : std::filesystem::directory_iterator(assets_path)) {
+            
+            //If the file is found, add to the list of file names
+            if (entry.is_directory()) {
+
+                if (ImGui::Button(entry.path().filename().string().c_str())){
+
+                    const std::string FOLDER = entry.path().filename().string();
+                    std::string folder_path = ASM.get_full_path(FOLDER, "");
+
+                    for (const auto& folder_entry : std::filesystem::directory_iterator(folder_path)) {
+
+                        if (folder_entry.is_regular_file()) {
+
+                            ImGui::Text("%s", folder_entry.path().filename().string().c_str());
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+        ////Indexes for files
+        //int current_file_index = 0;
+        //int shown_file_index = -1;
+        //std::string selected_file{};
+
+        ////Iterate through file names
+        //for (int i = 0; i < file_names.size(); ++i) {
+        //    if (!file_names[i].empty()) {
+        //        //selectable for clicking; second param for highlighting
+        //        if (ImGui::Selectable(file_names[i].c_str(), selected_file_index == current_file_index)) {
+        //            //selected; casuing seceond param state to change
+        //            selected_file_index = current_file_index;
+        //        }
+        //        if (file_names[i] == get_current_file_shown()) {
+        //            shown_file_index = i;
+        //        }
+        //    }
+        //    ++current_file_index;
+        //}
+
+        ////If file is selecetd
+        //if (selected_file_index != -1) {
+        //    selected_file = file_names[selected_file_index];
+        //}
 
         ImGui::End();
     }
