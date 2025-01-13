@@ -63,7 +63,7 @@ namespace lof {
     
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
-    IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager) {
+    IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager){
         set_type("IMGUI_Manager");
     }
 
@@ -1379,60 +1379,122 @@ namespace lof {
 
     void IMGUI_Manager::asset_browser() {
         
-        ImGui::Begin("Asset Manager");
+        ImGui::Begin("Asset Browser");
 
+        //current directory
+        static std::string current_directory = "";
+
+        //get asset folder directory
         const std::string ASSETS = "";
         std::string assets_path = ASM.get_full_path(ASSETS, "");
-        
 
-        //Iterate through the directory and collect file names
-        for (const auto& entry : std::filesystem::directory_iterator(assets_path)) {
-            
-            //If the file is found, add to the list of file names
-            if (entry.is_directory()) {
+        ImGui::Text("Current Directory: %s", current_directory.c_str());
+        const std::string AUDIO = "Audio";
+        ImGui::Text("Audio Directory: %s", ASM.get_full_path(AUDIO, "").c_str());
 
-                if (ImGui::Button(entry.path().filename().string().c_str())){
+        ImGui::Columns(7, 0, false);
 
-                    const std::string FOLDER = entry.path().filename().string();
-                    std::string folder_path = ASM.get_full_path(FOLDER, "");
+        //if asset folder cannot be found
+        if (assets_path.empty() || !std::filesystem::exists(assets_path)) {
+            ImGui::Text("Error: Invalid assets path.");
+        }
+        else { //otherwise if it can be found
 
-                    for (const auto& folder_entry : std::filesystem::directory_iterator(folder_path)) {
+            //if the current directory is empty
+            if (current_directory.empty()) {
 
-                        if (folder_entry.is_regular_file()) {
+                try { 
 
-                            ImGui::Text("%s", folder_entry.path().filename().string().c_str());
+                    //accessing each file in assets directory
+                    for (const auto& entry : std::filesystem::directory_iterator(assets_path)) {
+
+                        //if directory is selected
+                        if (entry.is_directory()) {
+                            if (ImGui::Button(entry.path().filename().string().c_str(), {128, 128})) {
+
+                                //current directory goes to that directory
+                                current_directory = entry.path().string();
+                            }
+                            ImGui::Text(entry.path().filename().string().c_str());
+                        }
+
+                        ImGui::NextColumn();
+                    }
+                }
+                catch (const std::filesystem::filesystem_error& e) {
+                    ImGui::Text("Error accessing assets directory: %s", e.what());
+                }
+            }
+            else { //if current directory isn't empty, its in a new directory
+
+                //Back button that goes back to the assets directory (when current_directory is empty)
+                if (ImGui::Button("<- Back")) {
+                    current_directory.clear();
+                }
+
+                ImGui::Separator();
+
+                if (!current_directory.empty()) {
+                    try {
+
+                        //accessing each file in the current directory
+                        for (const auto& folder_entry : std::filesystem::directory_iterator(current_directory)) {
+
+                            if (folder_entry.is_regular_file()) {
+
+                                //Loading code - tbc
+                                if (current_directory == ASM.get_full_path("Audio", "")) {
+                                   
+                                   ASM.load_audio_file(folder_entry.path().filename().string());
+                                   ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
+                                }
+                                else if (current_directory == ASM.get_full_path("Config", "")) {
+                                    
+                                }
+                                else if (current_directory == ASM.get_full_path("Fonts", "")) {
+                                    FT_Library font_type;
+                                    FT_Face face;
+                                    ASM.load_fonts(folder_entry.path().filename().string(), font_type, face);
+                                    ImGui::Text("Loaded Font: %s", folder_entry.path().filename().string().c_str());
+                                }
+                                else if (current_directory == ASM.get_full_path("Level_Design", "")) {
+                                    
+                                }
+                                else if (current_directory == ASM.get_full_path("Models", "")) {
+                                    ASM.load_model_data(folder_entry.path().filename().string());
+                                    ImGui::Text("Loaded Model: %s", folder_entry.path().filename().string().c_str());
+                                }
+                                else if (current_directory == ASM.get_full_path("Prefab", "")) {
+
+                                }
+                                else if (current_directory == ASM.get_full_path("Scenes", "")) {
+
+                                }
+                                else if (current_directory == ASM.get_full_path("Shaders", "")) {
+                                    //ASM.load_shader_programs()
+                                }
+                                else if (current_directory == ASM.get_full_path("Textures", "")) {
+
+                                }
+
+                                if (ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 })) {
+                                    //Handle file click
+                                }
+                                ImGui::Text(folder_entry.path().filename().string().c_str());
+                            }
+
+                            ImGui::NextColumn();
                         }
 
                     }
+                    catch (const std::filesystem::filesystem_error& e) {
+                        ImGui::Text("Error accessing current directory: %s", e.what());
+
+                    }
                 }
+                
             }
-
         }
-
-        ////Indexes for files
-        //int current_file_index = 0;
-        //int shown_file_index = -1;
-        //std::string selected_file{};
-
-        ////Iterate through file names
-        //for (int i = 0; i < file_names.size(); ++i) {
-        //    if (!file_names[i].empty()) {
-        //        //selectable for clicking; second param for highlighting
-        //        if (ImGui::Selectable(file_names[i].c_str(), selected_file_index == current_file_index)) {
-        //            //selected; casuing seceond param state to change
-        //            selected_file_index = current_file_index;
-        //        }
-        //        if (file_names[i] == get_current_file_shown()) {
-        //            shown_file_index = i;
-        //        }
-        //    }
-        //    ++current_file_index;
-        //}
-
-        ////If file is selecetd
-        //if (selected_file_index != -1) {
-        //    selected_file = file_names[selected_file_index];
-        //}
 
         ImGui::End();
     }
