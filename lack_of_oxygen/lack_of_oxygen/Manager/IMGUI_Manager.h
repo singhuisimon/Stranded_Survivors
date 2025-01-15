@@ -28,6 +28,7 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <filesystem>
 
 namespace lof {
 
@@ -104,6 +105,9 @@ namespace lof {
          */
         void start_frame();
 
+        /**
+         * @brief Renders the IMGUI dockspace, calls the IMGUI windows, displays the game world in the Game World Viewport and handles the mouse cursor actions in it.
+         */
         void render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 
         /**
@@ -206,6 +210,8 @@ namespace lof {
          * @brief Function to turn off in-game GUI.
          */
         void disable_GUI();
+
+        void asset_browser();
     };
 
 } // namespace lof
