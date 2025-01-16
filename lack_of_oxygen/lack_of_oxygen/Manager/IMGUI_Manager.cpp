@@ -918,6 +918,10 @@ namespace lof {
                         ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
                         ImGui::EndDisabled();
 
+                        /*if (ImGui::BeginDragDropTarget()) {
+
+                        }*/
+
                     }
                 }
 
@@ -1389,6 +1393,8 @@ namespace lof {
         std::string assets_path = ASM.get_full_path(ASSETS, "");
 
         ImGui::Text("Current Directory: %s", current_directory.c_str());
+        ImGui::Text("Assets Directory: %s", ASM.get_full_path(ASSETS, "").c_str());
+
         const std::string AUDIO = "Audio";
         ImGui::Text("Audio Directory: %s", ASM.get_full_path(AUDIO, "").c_str());
 
@@ -1413,7 +1419,9 @@ namespace lof {
                             if (ImGui::Button(entry.path().filename().string().c_str(), {128, 128})) {
 
                                 //current directory goes to that directory
-                                current_directory = entry.path().string();
+                                //current_directory = entry.path().string();
+
+                                current_directory = ASM.get_full_path(entry.path().filename().string(), "").c_str();
                             }
                             ImGui::Text(entry.path().filename().string().c_str());
                         }
@@ -1442,43 +1450,66 @@ namespace lof {
 
                             if (folder_entry.is_regular_file()) {
 
-                                //Loading code - tbc
-                                if (current_directory == ASM.get_full_path("Audio", "")) {
-                                   
-                                   ASM.load_audio_file(folder_entry.path().filename().string());
-                                   ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
-                                }
-                                else if (current_directory == ASM.get_full_path("Config", "")) {
-                                    
-                                }
-                                else if (current_directory == ASM.get_full_path("Fonts", "")) {
-                                    FT_Library font_type;
-                                    FT_Face face;
-                                    ASM.load_fonts(folder_entry.path().filename().string(), font_type, face);
-                                    ImGui::Text("Loaded Font: %s", folder_entry.path().filename().string().c_str());
-                                }
-                                else if (current_directory == ASM.get_full_path("Level_Design", "")) {
-                                    
-                                }
-                                else if (current_directory == ASM.get_full_path("Models", "")) {
-                                    ASM.load_model_data(folder_entry.path().filename().string());
-                                    ImGui::Text("Loaded Model: %s", folder_entry.path().filename().string().c_str());
-                                }
-                                else if (current_directory == ASM.get_full_path("Prefab", "")) {
-
-                                }
-                                else if (current_directory == ASM.get_full_path("Scenes", "")) {
-
-                                }
-                                else if (current_directory == ASM.get_full_path("Shaders", "")) {
-                                    //ASM.load_shader_programs()
-                                }
-                                else if (current_directory == ASM.get_full_path("Textures", "")) {
-
-                                }
+                                //if (current_directory == ASM.get_full_path("Audio", "")) {
+                                //   
+                                //    std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
+                                //    //ASM.load_audio_file(folder_entry.path().filename().string());
+                                //    ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Config", "")) {
+                                //    
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Fonts", "")) {
+                                //    /*FT_Library font_type;
+                                //    FT_Face face;
+                                //    ASM.load_fonts(folder_entry.path().filename().string(), font_type, face);*/
+                                //    ImGui::Text("Loaded Font: %s", folder_entry.path().filename().string().c_str());
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Level_Design", "")) {
+                                //    
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Models", "")) {
+                                //    //ASM.load_model_data(folder_entry.path().filename().string());
+                                //    ImGui::Text("Loaded Model: %s", folder_entry.path().filename().string().c_str());
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Prefab", "")) {
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Scenes", "")) {
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Shaders", "")) {
+                                //    //ASM.load_shader_programs()
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Textures", "")) {
+                                //}
 
                                 if (ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 })) {
-                                    //Handle file click
+                                    if (current_directory == ASM.get_full_path("Audio", "")) {
+
+                                        std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
+                                        std::string filename = folder_entry.path().filename().string().substr(0, folder_entry.path().filename().string().length() - 4);
+                                        std::cout << "loading: " << filename << std::endl;
+
+                                        if (ImGui::BeginDragDropSource()) {
+
+                                            std::string file_path = folder_entry.path().string();
+                                            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", file_path.c_str(), file_path.length() + 1);
+                                            ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                            ImGui::EndDragDropSource();
+
+                                        }  
+                                        if (!ASM.load_audio_file(filename)) {
+                                            std::cout << "fail to load audio file " << filename << std::endl;
+                                        }
+                                        else {
+                                            std::cout << "loaded file " << filename << std::endl;
+                                        }
+
+                                        //ASM.load_audio_file(folder_entry.path().filename().string());
+                                        //ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
+                                    }
+                                    else {
+                                        std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
+                                    }
                                 }
                                 ImGui::Text(folder_entry.path().filename().string().c_str());
                             }
