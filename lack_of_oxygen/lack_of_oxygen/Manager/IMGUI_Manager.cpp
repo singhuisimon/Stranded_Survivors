@@ -183,6 +183,31 @@ namespace lof {
    
         ImGui::End();
 
+
+        //DEBUGGING WINDOW
+        /*if (ImGui::Begin("Debugging Drop Target Window")) {
+            ImGui::Text("Drop files here:");
+
+            if (ImGui::BeginDragDropTarget()) {
+
+                
+
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    const char* droppedFilePath = (const char*)payload->Data;
+                    std::cout << "********************************************" << std::endl;
+                    std::cout << "Dropped file path: " << droppedFilePath << std::endl;
+                    std::cout << "********************************************" << std::endl;
+                    
+                    ImGui::Text("Dropped Audio: %s", payload->Data);
+                }
+
+                ImGui::EndDragDropTarget();
+            }
+
+            ImGui::End();
+        }*/
+
+
         //If file name is clicked and button is pressed
         if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
 
@@ -1446,6 +1471,7 @@ namespace lof {
                     try {
 
                         //accessing each file in the current directory
+                        //accessing each file in the current directory
                         for (const auto& folder_entry : std::filesystem::directory_iterator(current_directory)) {
 
                             if (folder_entry.is_regular_file()) {
@@ -1483,34 +1509,34 @@ namespace lof {
                                 //}
 
                                 if (ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 })) {
-                                    if (current_directory == ASM.get_full_path("Audio", "")) {
 
+                                    /*if (current_directory == ASM.get_full_path("Audio", "")) {
                                         std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
-                                        std::string filename = folder_entry.path().filename().string().substr(0, folder_entry.path().filename().string().length() - 4);
-                                        std::cout << "loading: " << filename << std::endl;
-
-                                        if (ImGui::BeginDragDropSource()) {
-
-                                            std::string file_path = folder_entry.path().string();
-                                            ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", file_path.c_str(), file_path.length() + 1);
-                                            ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
-                                            ImGui::EndDragDropSource();
-
-                                        }  
+                                        //std::string filename = folder_entry.path().filename().string().substr(0, folder_entry.path().filename().string().length() - 4);
+                                        //std::cout << "loading: " << filename << std::endl;
                                         if (!ASM.load_audio_file(filename)) {
                                             std::cout << "fail to load audio file " << filename << std::endl;
                                         }
                                         else {
                                             std::cout << "loaded file " << filename << std::endl;
                                         }
-
-                                        //ASM.load_audio_file(folder_entry.path().filename().string());
-                                        //ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
                                     }
                                     else {
                                         std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
-                                    }
+                                    }*/
                                 }
+
+                                if (ImGui::BeginDragDropSource()) {
+
+                                    std::cout << "Starting drag for: " << folder_entry.path().filename().string() << std::endl;
+                                    std::string file_path = folder_entry.path().string();
+                                    ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", file_path.c_str(), file_path.length() + 1);
+                                    std::cout << "Payload set for: " << file_path << "\n---------------------------------------" << std::endl; // Additional debug
+                                    ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                    ImGui::EndDragDropSource();
+
+                                }
+
                                 ImGui::Text(folder_entry.path().filename().string().c_str());
                             }
 
@@ -1528,6 +1554,8 @@ namespace lof {
         }
 
         ImGui::End();
+
+
     }
 
     bool IMGUI_Manager::button_toggle(const std::string& boolean_name, bool* state) {
