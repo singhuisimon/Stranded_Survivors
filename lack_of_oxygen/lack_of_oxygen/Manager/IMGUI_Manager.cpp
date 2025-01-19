@@ -26,6 +26,7 @@
 //Include other file headers
 #include "../Component/Component.h"
 #include "../System/GUI_System.h"
+#include "../System/Audio_System.h" // Add this for Audio System access
 
 //Include standard headers
 #include <iostream>
@@ -189,8 +190,6 @@ namespace lof {
             ImGui::Text("Drop files here:");
 
             if (ImGui::BeginDragDropTarget()) {
-
-                
 
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     const char* droppedFilePath = (const char*)payload->Data;
@@ -897,7 +896,7 @@ namespace lof {
                         ImGui::InputFloat("Damping Factor", &damping_factor);
 
                         auto& max_velocity = physics.get_max_velocity();
-                        ImGui::InputFloat("Maximun Velocity", &max_velocity);
+                        ImGui::InputFloat("Maximum Velocity", &max_velocity);
 
                         auto& accumulated_force = physics.get_accumulated_force();
                         ImGui::InputFloat2("Accumulated Force", &accumulated_force.x);
@@ -938,14 +937,32 @@ namespace lof {
                         std::string condition_name_texture = "texture_name";
                         text_input(texture_name, condition_name_texture);
 
+                        if (ImGui::BeginDragDropTarget()) {
+
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
+                                const char* droppedFilePath = (const char*)payload->Data;
+                                /*std::cout << "********************************************" << std::endl;
+                                std::cout << "Dropped file path: " << droppedFilePath << std::endl;*/
+                                
+                                std::string file_name = droppedFilePath;
+                                file_name.erase(0, ASM.get_full_path("Textures", "").length());
+                                file_name = file_name.substr(0, file_name.size()-4);
+                                /*std::cout << "Dropped file: " << file_name << std::endl;*/
+                                texture_name = file_name;
+
+                                /*std::cout << "********************************************" << std::endl;*/
+  
+                            }
+
+                            ImGui::EndDragDropTarget();
+                        }
+
                         auto& shd_ref = graphics.shd_ref;
                         ImGui::BeginDisabled();
                         ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
                         ImGui::EndDisabled();
 
-                        /*if (ImGui::BeginDragDropTarget()) {
-
-                        }*/
+                        
 
                     }
                 }
@@ -1100,45 +1117,152 @@ namespace lof {
                         static std::vector<int> selected_sounds;
                         selected_sounds.clear();
                         selected_sounds.resize(sounds.size(), -1);
+                        ImGui::Text("SELECTED SOUNDS SIZE: %i", selected_sounds.size());
 
                         for (int i = 0; i < sounds.size(); ++i) {
 
-                            auto sound_filepath = audio.get_filepath(sounds[i].key);
-                            std::string saved_keyID = sound_filepath + std::to_string(entities[selected_object_index]->get_id()) + sounds[i].key;
+                            //auto sound_filepath = audio.get_filepath(sounds[i].key);
+                            //std::string saved_keyID = sound_filepath + std::to_string(entities[selected_object_index]->get_id()) + sounds[i].key;
 
-                            //Convert everything to c-string
+                            ////Convert everything to c-string
+                            //std::vector<const char*> file_name_cstr;
+                            //for (const auto& file_name_pair : audio_file_names) {
+                            //    file_name_cstr.push_back(file_name_pair.first.c_str());
+                            //}
+
+                            //NOW REFERS TO SOUNDMAP TO POPULATE NAMES IN DROPSOWN
                             std::vector<const char*> file_name_cstr;
-                            for (const auto& file_name_pair : audio_file_names) {
-                                file_name_cstr.push_back(file_name_pair.first.c_str());
+                            std::vector<std::string> namesss;
+                            for (auto& system : ECSM.get_systems()) {
+                                if (system->get_type() == "Audio_System") {
+                                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                                    if (audio_system) {
+
+                                        namesss = audio_system->get_sound_map_filename();
+                                        for (int j = 0; j < namesss.size(); ++j) {
+
+                                            file_name_cstr.push_back(namesss[j].c_str());
+                                        }
+                                    }
+                                }
                             }
 
-                            //Find the matching representative string for the file path
-                            auto its = std::find_if(audio_file_names.begin(), audio_file_names.end(),
-                                [&sound_filepath](const std::pair<std::string, std::string>& p) {
-                                    return p.second == sound_filepath;
-                                });
+                           
 
-                            //Show the current sound's representative string in a text label
-                            if (its != audio_file_names.end()) {
-                                ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), its->first.c_str());
-                            }
-                            else {
-                                ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
-                            }
+                            ////Find the matching representative string for the file path
+                            //auto its = std::find_if(audio_file_names.begin(), audio_file_names.end(),
+                            //    [&sound_filepath](const std::pair<std::string, std::string>& p) {
+                            //        return p.second == sound_filepath;
+                            //    });
+
+                            ////Show the current sound's representative string in a text label
+                            //if (its != audio_file_names.end()) {
+                            //    ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), its->first.c_str());
+                            //}
+                            //else {
+                            //    ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
+                            //}
+
 
                             //Create a combo box to choose the new representative string for sound
                             std::string label = "Choose Sound for " + std::to_string(i); // Label for the dropdown
                             if (ImGui::Combo(label.c_str(), &selected_sounds[i], file_name_cstr.data(), static_cast<int>(file_name_cstr.size()))) {
 
-                                int selected_index = selected_sounds[i];
-                                if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
+                                //int selected_index = selected_sounds[i];
+                                //if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
+                                //    //Update the sound's file path based on the selected rep string
+                                //    audio.set_filepath(sounds[i].key, audio_file_names[selected_index].second);
+                                //    LM.write_log("IMGUIM:: Sound being changed to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
+                                //}
 
-                                    //Update the sound's file path based on the selected rep string
-                                    audio.set_filepath(sounds[i].key, audio_file_names[selected_index].second);
-                                    LM.write_log("IMGUIM:: Sound being chnaged to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
+                            }
+
+                            
+
+                            if (ImGui::BeginDragDropTarget()) {
+
+                                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("AUDIO_ITEM")) {
+                                    const char* droppedFilePath = (const char*)payload->Data;
+
+                                    /*std::cout << "********************************************" << std::endl;
+                                    std::cout << "Dropped file path: " << droppedFilePath << std::endl;*/
+
+                                    std::string file_path = droppedFilePath;
+                                    std::string file_name = droppedFilePath;
+                                    file_name.erase(0, ASM.get_full_path("Audio", "").length());
+                                    file_name = file_name.substr(0, file_name.find_last_of('.'));
+
+                                    /*std::cout << "Dropped file: " << file_name << std::endl;
+                                    std::cout << "********************************************" << std::endl;*/
+
+                                    bool file_in_dropdown = false;
+                                    for (int j = 0; j < file_name_cstr.size(); ++j) {
+                                        if (j < audio_file_names.size()) {
+                                            if (file_name == audio_file_names[j].first) {
+                                                audio.set_filepath(sounds[i].key, audio_file_names[j].second);
+                                                file_in_dropdown = true;
+                                                break;
+                                            }
+                                        }
+                                        
+                                    }
+
+
+                                    if (!file_in_dropdown) {
+                                        for (auto& system : ECSM.get_systems()) {
+                                            if (system->get_type() == "Audio_System") {
+                                                auto* audio_system = static_cast<Audio_System*>(system.get());
+                                                audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
+                                                fill_audio_file_names(file_name, file_path);
+                                            }
+                                        }
+                                    }
+                                    else {
+
+                                    }
+
+                                    std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
+                                    //for (size_t k = 0; k < )
+
+                                    for (auto& system : ECSM.get_systems()) {
+                                        if (system->get_type() == "Audio_System") {
+                                            auto* audio_system = static_cast<Audio_System*>(system.get());
+                                            if (audio_system) {
+                                                std::vector<std::string> names = audio_system->get_sound_map_filename();
+                                                for (int k = 0; k < names.size(); ++k) {
+                                                    std::cout << names[k] << std::endl;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    std::cout << "-------------------------------------------------" << std::endl;
+
+
+                                    //bool found = false;
+                                    //for (int j = 0; j < file_name_cstr.size(); ++j) {
+                                    //    // Compare file name with audio_file_names' first part
+                                    //    if (file_name == audio_file_names[j].first) {
+                                    //        audio.set_filepath(sounds[i].key, audio_file_names[j].second);
+                                    //        found = true;
+                                    //        break;
+                                    //    }
+                                    //}
+                                    //if (!found) {
+                                    //    ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
+                                    //}
+                                    //else {
+                                    //    // Optionally update UI or log success
+                                    //    ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), file_name.c_str());
+                                    //}
                                 }
+
+                                ImGui::EndDragDropTarget();
                             }
                         }
+
+                        
+
 
                         //Updating Audio Key
                         for (int i = 0; i < sounds.size(); ++i) {
@@ -1319,8 +1443,6 @@ namespace lof {
                     selected = -1;  // Reset `selected` after handling
                 }
 
-
-
                 static size_t selected_to_remove = 0;
                 static std::vector<const char*> present_components;
 
@@ -1471,7 +1593,7 @@ namespace lof {
                     try {
 
                         //accessing each file in the current directory
-                        //accessing each file in the current directory
+
                         for (const auto& folder_entry : std::filesystem::directory_iterator(current_directory)) {
 
                             if (folder_entry.is_regular_file()) {
@@ -1526,15 +1648,62 @@ namespace lof {
                                     }*/
                                 }
 
-                                if (ImGui::BeginDragDropSource()) {
+                                //if (current_directory == ASM.get_full_path("Audio", "")) {
+                                //   
+                                //    std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
+                                //    //ASM.load_audio_file(folder_entry.path().filename().string());
+                                //    ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Config", "")) {
+                                //    
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Fonts", "")) {
+                                //    /*FT_Library font_type;
+                                //    FT_Face face;
+                                //    ASM.load_fonts(folder_entry.path().filename().string(), font_type, face);*/
+                                //    ImGui::Text("Loaded Font: %s", folder_entry.path().filename().string().c_str());
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Level_Design", "")) {
+                                //    
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Models", "")) {
+                                //    //ASM.load_model_data(folder_entry.path().filename().string());
+                                //    ImGui::Text("Loaded Model: %s", folder_entry.path().filename().string().c_str());
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Prefab", "")) {
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Scenes", "")) {
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Shaders", "")) {
+                                //    //ASM.load_shader_programs()
+                                //}
+                                //else if (current_directory == ASM.get_full_path("Textures", "")) {
+                                //}
 
-                                    std::cout << "Starting drag for: " << folder_entry.path().filename().string() << std::endl;
-                                    std::string file_path = folder_entry.path().string();
-                                    ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", file_path.c_str(), file_path.length() + 1);
-                                    std::cout << "Payload set for: " << file_path << "\n---------------------------------------" << std::endl; // Additional debug
-                                    ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
-                                    ImGui::EndDragDropSource();
+                                if (current_directory == ASM.get_full_path("Textures", "")) {
+                                    if (ImGui::BeginDragDropSource()) {
 
+                                        //std::cout << "Starting drag for: " << folder_entry.path().filename().string() << std::endl;
+                                        std::string file_path = folder_entry.path().string();
+                                        ImGui::SetDragDropPayload("TEXTURE_ITEM", file_path.c_str(), file_path.length() + 1);
+                                        //std::cout << "Payload set for: " << file_path << "\n---------------------------------------" << std::endl; // Additional debug
+                                        ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                        ImGui::EndDragDropSource();
+
+                                    }
+                                }
+
+                                if (current_directory == ASM.get_full_path("Audio", "")) {
+                                    if (ImGui::BeginDragDropSource()) {
+
+                                        //std::cout << "Starting drag for: " << folder_entry.path().filename().string() << std::endl;
+                                        std::string file_path = folder_entry.path().string();
+                                        ImGui::SetDragDropPayload("AUDIO_ITEM", file_path.c_str(), file_path.length() + 1);
+                                        //std::cout << "Payload set for: " << file_path << "\n---------------------------------------" << std::endl; // Additional debug
+                                        ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                        ImGui::EndDragDropSource();
+
+                                    }
                                 }
 
                                 ImGui::Text(folder_entry.path().filename().string().c_str());
