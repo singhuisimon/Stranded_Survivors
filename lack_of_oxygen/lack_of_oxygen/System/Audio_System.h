@@ -19,6 +19,7 @@
 // Include standard headers
 #include <string>
 #include <iostream>
+#include <vector>
 
 //Include other necessary header
 #include "../Manager/Log_Manager.h"
@@ -70,7 +71,7 @@ namespace lof {
 		 * @brief Loads a sound from the specified file_path into the FMOD system
 		 * @param file_path The path to the audio file (current format .wav)
 		 */
-		void load_sound(const std::string& file_path);
+		void load_sound(const std::string& file_path, AudioType audio_type);
 
 		/**
 		 * @brief Plays the provided FMOD::Sound object.
@@ -234,6 +235,8 @@ namespace lof {
 		* @return string representing the type
 		*/
 		std::string get_type() const override;
+
+		std::vector<std::string> get_sound_map_filename();
 
 	private:
 
