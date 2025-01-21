@@ -58,6 +58,11 @@ namespace lof {
         // Flag for scn file
         int current_scene = 1;
 
+        // Top UI variables
+        float current_oxygen_level = 100.0f;  // Start at 100%
+        float oxygen_drain_rate = 1.0f;     // Drain 5% per second
+        float oxygen_update_timer = 0.0f;   // Track time for updates
+        float current_panic_level = 0.0f;  // Starts at 0%
 
         /**
          * @brief Determines the mineral value based on the block entity type

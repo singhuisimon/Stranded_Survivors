@@ -157,8 +157,6 @@ namespace lof {
     //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
 
-        
-
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
@@ -212,13 +210,27 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
+        // Code portion if in gameplay mode
         if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+
+            // Add oxygen update logic here, before the UI positioning
+            oxygen_update_timer += delta_time;
+            if (oxygen_update_timer >= 1.0f) { // Every second
+                oxygen_update_timer = 0.0f;
+                current_oxygen_level = std::max(0.0f, current_oxygen_level - oxygen_drain_rate);
+                // Update panic level inversely to oxygen level
+                current_panic_level = 100.0f - current_oxygen_level;
+            }
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+
             EntityID oxygen_meter_fill_id = ECSM.find_entity_by_name("top_ui_oxygen_meter_fill");
             EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
+
+            EntityID panic_meter_fill_id = ECSM.find_entity_by_name("top_ui_panik_meter_fill");
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
+
             EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
             EntityID timer_icon_id = ECSM.find_entity_by_name("top_ui_timer");
             EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
@@ -258,17 +270,24 @@ namespace lof {
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
                     auto& oxygen_fill_transform = ECSM.get_component<Transform2D>(oxygen_meter_fill_id);
 
-                    // Set position and scale for oxygen meter
+                    // Position and scale for meter stays the same
                     oxygen_transform.position = {
-                        base_position.x - 575.0f,  // Left of UI overlay
-                        base_position.y                 // Top position
+                        base_position.x - 575.0f,
+                        base_position.y
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     oxygen_transform.prev_position = oxygen_transform.position;
 
-                    // Set position and scale for oxygen meter fill
-                    oxygen_fill_transform.position = oxygen_transform.position;
-                    oxygen_fill_transform.scale = oxygen_transform.scale;
+                    // Calculate the new width of the fill bar
+                    float new_width = METER_WIDTH * (current_oxygen_level / 100.0f);
+
+                    // Update fill position and scale
+                    oxygen_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+                    // Anchor to left side by offsetting position based on the current width
+                    oxygen_fill_transform.position = {
+                        oxygen_transform.position.x + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
+                        oxygen_transform.position.y
+                    };
                     oxygen_fill_transform.prev_position = oxygen_fill_transform.position;
                 }
 
@@ -293,20 +312,40 @@ namespace lof {
                         oxygen_text_transform.position.y
                     };
                     oxygen_percentage_text_transform.prev_position = oxygen_percentage_text_transform.position;
+
+                    // Update oxygen text
+                    if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
+                        auto& text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
+                        text.text = std::to_string(static_cast<int>(current_oxygen_level)) + "%";
+                    }
                 }
 
-                // Position panic meter (bottom meter)
+                // Position panic meter and fill (bottom meter)
                 if (panic_meter_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(panic_meter_id)) {
+                    ECSM.has_component<Transform2D>(panic_meter_id) &&
+                    ECSM.has_component<Transform2D>(panic_meter_fill_id)) {
                     auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+                    auto& panic_fill_transform = ECSM.get_component<Transform2D>(panic_meter_fill_id);
 
                     // Set position and scale for panic meter
                     panic_transform.position = {
                         base_position.x - 575.0f,          // Left of UI overlay
-                        base_position.y - METER_SPACING         // Below oxygen meter
+                        base_position.y - METER_SPACING    // Below oxygen meter
                     };
                     panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     panic_transform.prev_position = panic_transform.position;
+
+                    // Calculate the new width of the panic fill bar
+                    float new_width = METER_WIDTH * (current_panic_level / 100.0f);
+
+                    // Update fill position and scale
+                    panic_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+                    // Anchor to left side by offsetting position based on the current width
+                    panic_fill_transform.position = {
+                        panic_transform.position.x + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
+                        panic_transform.position.y
+                    };
+                    panic_fill_transform.prev_position = panic_fill_transform.position;
                 }
 
                 // Position panic text
