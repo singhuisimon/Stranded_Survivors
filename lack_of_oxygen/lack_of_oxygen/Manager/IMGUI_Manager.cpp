@@ -78,6 +78,7 @@ namespace lof {
         throw std::runtime_error("No-parameter start_up() is disabled in IMGUI_Manager. start_up() now has a parameter GLFWwindow*& window");
     }
 
+    //start up
     int IMGUI_Manager::start_up(GLFWwindow*& glfwindow) {
         if (is_started()) {
             LM.write_log("IMGUI_Manager::start_up(): Already started.");
@@ -90,34 +91,29 @@ namespace lof {
         ImGui_ImplOpenGL3_Init();
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
-
         fill_up_sound_names();
 
         return 0;
     }
 
-
+    //fill up sound names
     void IMGUI_Manager::fill_up_sound_names() {
         
-        const auto& entities = ecs.get_entities();
-        for (auto& entity : entities) {
-
-            if (entity->has_component(ecs.get_component_id<Audio_Component>())) {
-                Audio_Component& audio = ecs.get_component<Audio_Component>(entity.get()->get_id());
-
-                //Iterate through sounds
-                auto& sounds = audio.get_sounds();
-                for (auto& sound : sounds) {
-
-                    //Get the file name and the filepath and push it to audio_file_names
-                    auto filepath = audio.get_filepath(sound.key);
-                    size_t last_slash = filepath.find_last_of('\\');
-                    size_t last_dot = filepath.find_last_of('.');
-                    fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
-
-                }
-            }
-        }
+        //const auto& entities = ecs.get_entities();
+        //for (auto& entity : entities) {
+        //    if (entity->has_component(ecs.get_component_id<Audio_Component>())) {
+        //        Audio_Component& audio = ecs.get_component<Audio_Component>(entity.get()->get_id());
+        //        //Iterate through sounds
+        //        auto& sounds = audio.get_sounds();
+        //        for (auto& sound : sounds) {
+        //            //Get the file name and the filepath and push it to audio_file_names
+        //            auto filepath = audio.get_filepath(sound.key);
+        //            size_t last_slash = filepath.find_last_of('\\');
+        //            size_t last_dot = filepath.find_last_of('.');
+        //            fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
+        //        }
+        //    }
+        //}
 
         //Fill in audio_types vector 
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
@@ -126,6 +122,7 @@ namespace lof {
 
     }
 
+    //file list
     void IMGUI_Manager::display_loading_options() {
 
         ImGui::Begin("File List");
@@ -183,29 +180,6 @@ namespace lof {
         }
    
         ImGui::End();
-
-
-        //DEBUGGING WINDOW
-        /*if (ImGui::Begin("Debugging Drop Target Window")) {
-            ImGui::Text("Drop files here:");
-
-            if (ImGui::BeginDragDropTarget()) {
-
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-                    const char* droppedFilePath = (const char*)payload->Data;
-                    std::cout << "********************************************" << std::endl;
-                    std::cout << "Dropped file path: " << droppedFilePath << std::endl;
-                    std::cout << "********************************************" << std::endl;
-                    
-                    ImGui::Text("Dropped Audio: %s", payload->Data);
-                }
-
-                ImGui::EndDragDropTarget();
-            }
-
-            ImGui::End();
-        }*/
-
 
         //If file name is clicked and button is pressed
         if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
@@ -363,8 +337,6 @@ namespace lof {
                 audio_types.clear();
                 fill_up_sound_names();
 
-                
-
             }
 
             load_selected = false;
@@ -373,6 +345,7 @@ namespace lof {
         
     }
 
+    //starts frame
     void IMGUI_Manager::start_frame() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -441,13 +414,12 @@ namespace lof {
         return mouse_pos_game;
     }
 
-
     bool select_entity = false; //to ensure mouse click selected
     EntityID selectedEntityID = static_cast<EntityID>(-1);
 
 
 #if 1
-    //Rendering UI
+    //Rendering overall UI and asset browser
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
         //Docking and window flags
@@ -705,6 +677,7 @@ namespace lof {
     }
 #endif
 
+    //to disable the GUI
     void IMGUI_Manager::disable_GUI() {
 
         for (auto& system : ECSM.get_systems()) {
@@ -717,7 +690,9 @@ namespace lof {
         }
     }
 
+    //----------------------------------------------- Game Object Manipulation -----------------------------------------------//
 
+    //game object list
     void IMGUI_Manager::imgui_game_objects_list() {
 
         ImGui::Begin("Hierarchy Object List");
@@ -808,6 +783,7 @@ namespace lof {
     // Use a static map to store buffers for each sound by index or key
     static std::unordered_map<int, std::string> buffer_map;
 
+    //edit game object property list
     void IMGUI_Manager::imgui_game_objects_edit() {
 
         static int last_selected_object_index = -1; //Track the previous selected object index
@@ -941,17 +917,10 @@ namespace lof {
 
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
                                 const char* droppedFilePath = (const char*)payload->Data;
-                                /*std::cout << "********************************************" << std::endl;
-                                std::cout << "Dropped file path: " << droppedFilePath << std::endl;*/
-                                
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Textures", "").length());
                                 file_name = file_name.substr(0, file_name.size()-4);
-                                /*std::cout << "Dropped file: " << file_name << std::endl;*/
                                 texture_name = file_name;
-
-                                /*std::cout << "********************************************" << std::endl;*/
-  
                             }
 
                             ImGui::EndDragDropTarget();
@@ -1109,121 +1078,104 @@ namespace lof {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
 
-           
+                        //gets a collection of sounds from audio component (not sound map)
                         auto& sounds = audio.get_sounds();
 
-                        //Updating Filepath
-                        //vector to keep track of selected sounds
+                        //Static vector to keep track of selected sounds(actions that need sounds)
                         static std::vector<int> selected_sounds;
-                        selected_sounds.clear();
-                        selected_sounds.resize(sounds.size(), -1);
-                        ImGui::Text("SELECTED SOUNDS SIZE: %i", selected_sounds.size());
 
+                        //Clears vector to make sure its empty
+                        selected_sounds.clear();
+
+                        //resizes it to match sounds/actions (initializing everything to -1 to indicate no selection)
+                        //sound size should be 3
+                        selected_sounds.resize(sounds.size(), -1);
+
+                        //Iterate through each sound/action
                         for (int i = 0; i < sounds.size(); ++i) {
 
-                            //auto sound_filepath = audio.get_filepath(sounds[i].key);
-                            //std::string saved_keyID = sound_filepath + std::to_string(entities[selected_object_index]->get_id()) + sounds[i].key;
+                            //Get corresponding filepath for the current sound's key
+                            auto sound_filepath = audio.get_filepath(sounds[i].key);
+                            std::string saved_keyID = sound_filepath + std::to_string(entities[selected_object_index]->get_id()) + sounds[i].key;
 
-                            ////Convert everything to c-string
-                            //std::vector<const char*> file_name_cstr;
-                            //for (const auto& file_name_pair : audio_file_names) {
-                            //    file_name_cstr.push_back(file_name_pair.first.c_str());
-                            //}
-
-                            //NOW REFERS TO SOUNDMAP TO POPULATE NAMES IN DROPSOWN
+                            //Populate file_name_cstr from the sound map in Audio_System
                             std::vector<const char*> file_name_cstr;
-                            std::vector<std::string> namesss;
+                            std::vector<std::string> sound_map_filenames;
+
+                            //Retrieve the sound map filenames from Audio_System
                             for (auto& system : ECSM.get_systems()) {
                                 if (system->get_type() == "Audio_System") {
                                     auto* audio_system = static_cast<Audio_System*>(system.get());
                                     if (audio_system) {
-
-                                        namesss = audio_system->get_sound_map_filename();
-                                        for (int j = 0; j < namesss.size(); ++j) {
-
-                                            file_name_cstr.push_back(namesss[j].c_str());
+                                        sound_map_filenames = audio_system->get_sound_map_filename();
+                                        for (const auto& name : sound_map_filenames) {
+                                            file_name_cstr.push_back(name.c_str());
                                         }
                                     }
                                 }
                             }
 
-                           
+                            //Find the current sound's representative string in the sound map
+                            auto its = std::find(sound_map_filenames.begin(), sound_map_filenames.end(), sound_filepath);
 
-                            ////Find the matching representative string for the file path
-                            //auto its = std::find_if(audio_file_names.begin(), audio_file_names.end(),
-                            //    [&sound_filepath](const std::pair<std::string, std::string>& p) {
-                            //        return p.second == sound_filepath;
-                            //    });
+                            //Show the current sound's representative string in a text label
+                            if (its != sound_map_filenames.end()) {
+                                ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), its->c_str());
+                            }
+                            else {
+                                ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
+                            }
 
-                            ////Show the current sound's representative string in a text label
-                            //if (its != audio_file_names.end()) {
-                            //    ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), its->first.c_str());
-                            //}
-                            //else {
-                            //    ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
-                            //}
-
-
-                            //Create a combo box to choose the new representative string for sound
+                            //Create a combo box to choose the new representative string for the sound
                             std::string label = "Choose Sound for " + std::to_string(i); // Label for the dropdown
                             if (ImGui::Combo(label.c_str(), &selected_sounds[i], file_name_cstr.data(), static_cast<int>(file_name_cstr.size()))) {
 
-                                //int selected_index = selected_sounds[i];
-                                //if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
-                                //    //Update the sound's file path based on the selected rep string
-                                //    audio.set_filepath(sounds[i].key, audio_file_names[selected_index].second);
-                                //    LM.write_log("IMGUIM:: Sound being changed to %s for %s", audio_file_names[selected_index].first.c_str(), sounds[i].key.c_str());
-                                //}
+                                int selected_index = selected_sounds[i];
+                                if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
 
+                                    //Update the sound's file path based on the selected string from the sound map
+                                    audio.set_filepath(sounds[i].key, sound_map_filenames[selected_index]);
+                                    LM.write_log("IMGUIM:: Sound being changed to %s for %s", sound_map_filenames[selected_index].c_str(), sounds[i].key.c_str());
+                                }
                             }
 
-                            
-
+                            //Drag and drop functionality
                             if (ImGui::BeginDragDropTarget()) {
 
                                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("AUDIO_ITEM")) {
                                     const char* droppedFilePath = (const char*)payload->Data;
-
-                                    /*std::cout << "********************************************" << std::endl;
-                                    std::cout << "Dropped file path: " << droppedFilePath << std::endl;*/
 
                                     std::string file_path = droppedFilePath;
                                     std::string file_name = droppedFilePath;
                                     file_name.erase(0, ASM.get_full_path("Audio", "").length());
                                     file_name = file_name.substr(0, file_name.find_last_of('.'));
 
-                                    /*std::cout << "Dropped file: " << file_name << std::endl;
-                                    std::cout << "********************************************" << std::endl;*/
-
                                     bool file_in_dropdown = false;
+                                    
                                     for (int j = 0; j < file_name_cstr.size(); ++j) {
-                                        if (j < audio_file_names.size()) {
-                                            if (file_name == audio_file_names[j].first) {
-                                                audio.set_filepath(sounds[i].key, audio_file_names[j].second);
+                                        if (j < sound_map_filenames.size()) {
+                                            if (file_name == sound_map_filenames[j]) {
+                                                audio.set_filepath(sounds[i].key, sound_map_filenames[j]);
                                                 file_in_dropdown = true;
                                                 break;
                                             }
                                         }
-                                        
-                                    }
 
+                                    }
 
                                     if (!file_in_dropdown) {
                                         for (auto& system : ECSM.get_systems()) {
                                             if (system->get_type() == "Audio_System") {
                                                 auto* audio_system = static_cast<Audio_System*>(system.get());
                                                 audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
-                                                fill_audio_file_names(file_name, file_path);
+                                                //fill_audio_file_names(file_name, file_path);
+
+                                                audio.set_filepath(sounds[i].key, file_name);
                                             }
                                         }
                                     }
-                                    else {
-
-                                    }
-
-                                    std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
-                                    //for (size_t k = 0; k < )
-
+                                   
+                                    /*std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
                                     for (auto& system : ECSM.get_systems()) {
                                         if (system->get_type() == "Audio_System") {
                                             auto* audio_system = static_cast<Audio_System*>(system.get());
@@ -1235,36 +1187,13 @@ namespace lof {
                                             }
                                         }
                                     }
-
-                                    std::cout << "-------------------------------------------------" << std::endl;
-
-
-                                    //bool found = false;
-                                    //for (int j = 0; j < file_name_cstr.size(); ++j) {
-                                    //    // Compare file name with audio_file_names' first part
-                                    //    if (file_name == audio_file_names[j].first) {
-                                    //        audio.set_filepath(sounds[i].key, audio_file_names[j].second);
-                                    //        found = true;
-                                    //        break;
-                                    //    }
-                                    //}
-                                    //if (!found) {
-                                    //    ImGui::Text("Selected Sound for %s: Not Found", sounds[i].key.c_str());
-                                    //}
-                                    //else {
-                                    //    // Optionally update UI or log success
-                                    //    ImGui::Text("Selected Sound for %s: %s", sounds[i].key.c_str(), file_name.c_str());
-                                    //}
+                                    std::cout << "-------------------------------------------------" << std::endl;*/
                                 }
-
                                 ImGui::EndDragDropTarget();
                             }
                         }
 
-                        
-
-
-                        //Updating Audio Key
+                        //Updating Audio Key - Has Bug
                         for (int i = 0; i < sounds.size(); ++i) {
                       
                             std::string old_key_name = sounds[i].key;
@@ -1336,15 +1265,61 @@ namespace lof {
                                     
                                 }
                             }
+                        }
+                    }
+                }
 
+                //Text Component
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Text_Component>())) {
+                    Text_Component& text_component = ecs.get_component<Text_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Text")) {
 
+                        auto& font_name = text_component.font_name;
+                        std::string text_condition = "Font Name";
+                        text_input(font_name, text_condition);
+
+                        if (ImGui::BeginDragDropTarget()) {
+
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FONT_ITEM")) {
+                                const char* droppedFilePath = (const char*)payload->Data;
+          
+                                std::string file_name = droppedFilePath;
+                                file_name.erase(0, ASM.get_full_path("Fonts", "").length());
+                                file_name = file_name.substr(0, file_name.size() - 4);
+                                font_name = file_name;
+                            }
+
+                            ImGui::EndDragDropTarget();
                         }
 
-
+                        auto& text_name = text_component.text;
+                        std::string name_condition = "Text Name";
+                        text_input(text_name, name_condition);
 
                     }
                 }
 
+                //GUI Component
+                /*if (entities[selected_object_index]->has_component(ecs.get_component_id<GUI_Component>())) {
+                    GUI_Component& gui = ecs.get_component<GUI_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("GUI Component")) {
+                        auto& progress = gui.progress;
+                        ImGui::InputFloat("Movement Range", &progress);
+                        auto& progress_bar = gui.is_progress_bar;
+                        std::string is_progress_bar = "is_progress_bar: " + std::string(progress_bar ? "On" : "Off");
+                        if (button_toggle(is_progress_bar, &progress_bar)) {
+                            progress_bar = !progress_bar;
+                        }
+                        auto& container = gui.is_container;
+                        std::string is_container = "is_container: " + std::string(container ? "On" : "Off");
+                        if (button_toggle(is_container, &container)) {
+                            container = !container;
+                        }
+                    }
+                }*/
+
+
+                //--------------------------------------------To Optimise -----------------------------------------//
                 static int selected = 0;
                 static std::vector<const char*> missing_components;
 
@@ -1360,7 +1335,8 @@ namespace lof {
                     {"Collision Component", static_cast<ComponentID>(ecs.get_component_id<Collision_Component>())},
                     {"Animation Component", static_cast<ComponentID>(ecs.get_component_id<Animation_Component>())},
                     {"Logic Component", static_cast<ComponentID>(ecs.get_component_id<Logic_Component>())},
-                    {"Audio Component", static_cast<ComponentID>(ecs.get_component_id<Audio_Component>())}
+                    {"Audio Component", static_cast<ComponentID>(ecs.get_component_id<Audio_Component>())},
+                    {"Text Component", static_cast<ComponentID>(ecs.get_component_id<Text_Component>())}
                 };
 
                 for (const auto& paired : component_checks) {
@@ -1436,6 +1412,11 @@ namespace lof {
                                 Audio_Component audio;
                                 ecs.add_component<Audio_Component>(entities[selected_object_index]->get_id(), audio);
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added audio component to %s", entities[selected_object_index]->get_name().c_str());
+                            }
+                            else if (std::string(component_name) == "Text Component") {
+                                Text_Component text;
+                                ecs.add_component<Text_Component>(entities[selected_object_index]->get_id(), text);
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added text component to %s", entities[selected_object_index]->get_name().c_str());
                             }
                         }
                         break;
@@ -1516,6 +1497,10 @@ namespace lof {
                                 ecs.remove_component<Audio_Component>(entities[selected_object_index]->get_id());
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed audio component from %s", entities[selected_object_index]->get_name().c_str());
                             }
+                            else if (std::string(component_name) == "Text Component") {
+                                ecs.remove_component<Text_Component>(entities[selected_object_index]->get_id());
+                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed text component from %s", entities[selected_object_index]->get_name().c_str());
+                            }
                         }
                         break;
                     }
@@ -1528,6 +1513,7 @@ namespace lof {
         ImGui::End();
     }
 
+    //asset browser
     void IMGUI_Manager::asset_browser() {
         
         ImGui::Begin("Asset Browser");
@@ -1539,11 +1525,27 @@ namespace lof {
         const std::string ASSETS = "";
         std::string assets_path = ASM.get_full_path(ASSETS, "");
 
-        ImGui::Text("Current Directory: %s", current_directory.c_str());
+        /*ImGui::Text("Current Directory: %s", current_directory.c_str());
         ImGui::Text("Assets Directory: %s", ASM.get_full_path(ASSETS, "").c_str());
-
         const std::string AUDIO = "Audio";
-        ImGui::Text("Audio Directory: %s", ASM.get_full_path(AUDIO, "").c_str());
+        ImGui::Text("Audio Directory: %s", ASM.get_full_path(AUDIO, "").c_str());*/
+
+
+        if (current_directory.empty()) {
+            
+            // Start the column layout (2 columns, no border)
+            ImGui::Columns(8, 0, false);
+
+            if (ImGui::Button("Add Folder")) {
+                // Logic to add folder
+            }
+
+            ImGui::NextColumn();
+
+            if (ImGui::Button("Delete Folder")) {
+                // Logic to delete folder
+            }
+        }
 
         ImGui::Columns(7, 0, false);
 
@@ -1556,6 +1558,8 @@ namespace lof {
             //if the current directory is empty
             if (current_directory.empty()) {
 
+                ImGui::Separator(); // Adds a separator between the columns and other widgets
+
                 try { 
 
                     //accessing each file in assets directory
@@ -1564,15 +1568,10 @@ namespace lof {
                         //if directory is selected
                         if (entry.is_directory()) {
                             if (ImGui::Button(entry.path().filename().string().c_str(), {128, 128})) {
-
-                                //current directory goes to that directory
-                                //current_directory = entry.path().string();
-
                                 current_directory = ASM.get_full_path(entry.path().filename().string(), "").c_str();
                             }
                             ImGui::Text(entry.path().filename().string().c_str());
                         }
-
                         ImGui::NextColumn();
                     }
                 }
@@ -1582,10 +1581,25 @@ namespace lof {
             }
             else { //if current directory isn't empty, its in a new directory
 
-                //Back button that goes back to the assets directory (when current_directory is empty)
+                //Back button that goes back to the assets directory (when current_directory is empty
+                
+                if (ImGui::Button("Add File")) {
+                    // Logic to add folder
+                }
+
+                ImGui::NextColumn();
+
+                if (ImGui::Button("Delete File")) {
+                    // Logic to delete folder
+                }
+                
+                ImGui::Columns(8, 0, false);
+
                 if (ImGui::Button("<- Back")) {
                     current_directory.clear();
                 }
+
+                //Edit
 
                 ImGui::Separator();
 
@@ -1598,95 +1612,15 @@ namespace lof {
 
                             if (folder_entry.is_regular_file()) {
 
-                                //if (current_directory == ASM.get_full_path("Audio", "")) {
-                                //   
-                                //    std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
-                                //    //ASM.load_audio_file(folder_entry.path().filename().string());
-                                //    ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Config", "")) {
-                                //    
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Fonts", "")) {
-                                //    /*FT_Library font_type;
-                                //    FT_Face face;
-                                //    ASM.load_fonts(folder_entry.path().filename().string(), font_type, face);*/
-                                //    ImGui::Text("Loaded Font: %s", folder_entry.path().filename().string().c_str());
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Level_Design", "")) {
-                                //    
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Models", "")) {
-                                //    //ASM.load_model_data(folder_entry.path().filename().string());
-                                //    ImGui::Text("Loaded Model: %s", folder_entry.path().filename().string().c_str());
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Prefab", "")) {
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Scenes", "")) {
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Shaders", "")) {
-                                //    //ASM.load_shader_programs()
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Textures", "")) {
-                                //}
+                                ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 });
 
-                                if (ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 })) {
-
-                                    /*if (current_directory == ASM.get_full_path("Audio", "")) {
-                                        std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
-                                        //std::string filename = folder_entry.path().filename().string().substr(0, folder_entry.path().filename().string().length() - 4);
-                                        //std::cout << "loading: " << filename << std::endl;
-                                        if (!ASM.load_audio_file(filename)) {
-                                            std::cout << "fail to load audio file " << filename << std::endl;
-                                        }
-                                        else {
-                                            std::cout << "loaded file " << filename << std::endl;
-                                        }
-                                    }
-                                    else {
-                                        std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
-                                    }*/
-                                }
-
-                                //if (current_directory == ASM.get_full_path("Audio", "")) {
-                                //   
-                                //    std::cout << "clicked: " << folder_entry.path().filename().string() << std::endl;
-                                //    //ASM.load_audio_file(folder_entry.path().filename().string());
-                                //    ImGui::Text("Loaded Audio File: %s", folder_entry.path().filename().string().c_str());
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Config", "")) {
-                                //    
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Fonts", "")) {
-                                //    /*FT_Library font_type;
-                                //    FT_Face face;
-                                //    ASM.load_fonts(folder_entry.path().filename().string(), font_type, face);*/
-                                //    ImGui::Text("Loaded Font: %s", folder_entry.path().filename().string().c_str());
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Level_Design", "")) {
-                                //    
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Models", "")) {
-                                //    //ASM.load_model_data(folder_entry.path().filename().string());
-                                //    ImGui::Text("Loaded Model: %s", folder_entry.path().filename().string().c_str());
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Prefab", "")) {
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Scenes", "")) {
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Shaders", "")) {
-                                //    //ASM.load_shader_programs()
-                                //}
-                                //else if (current_directory == ASM.get_full_path("Textures", "")) {
-                                //}
+                                //set_drag_drop_source(current_directory, "Textures", folder_entry.path().string(), "TEXTURE_ITEM");
 
                                 if (current_directory == ASM.get_full_path("Textures", "")) {
                                     if (ImGui::BeginDragDropSource()) {
 
-                                        //std::cout << "Starting drag for: " << folder_entry.path().filename().string() << std::endl;
                                         std::string file_path = folder_entry.path().string();
                                         ImGui::SetDragDropPayload("TEXTURE_ITEM", file_path.c_str(), file_path.length() + 1);
-                                        //std::cout << "Payload set for: " << file_path << "\n---------------------------------------" << std::endl; // Additional debug
                                         ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
                                         ImGui::EndDragDropSource();
 
@@ -1696,15 +1630,53 @@ namespace lof {
                                 if (current_directory == ASM.get_full_path("Audio", "")) {
                                     if (ImGui::BeginDragDropSource()) {
 
-                                        //std::cout << "Starting drag for: " << folder_entry.path().filename().string() << std::endl;
                                         std::string file_path = folder_entry.path().string();
                                         ImGui::SetDragDropPayload("AUDIO_ITEM", file_path.c_str(), file_path.length() + 1);
-                                        //std::cout << "Payload set for: " << file_path << "\n---------------------------------------" << std::endl; // Additional debug
                                         ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
                                         ImGui::EndDragDropSource();
 
                                     }
                                 }
+
+                                //Manually done to account for File
+                                if (current_directory == ASM.get_full_path("Fonts", "")) {
+                                    
+                                    std::string file_path = folder_entry.path().string();
+                                    if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
+                                        if (ImGui::BeginDragDropSource()) {
+
+                                            std::string file_path = folder_entry.path().string();
+                                            ImGui::SetDragDropPayload("FONT_ITEM", file_path.c_str(), file_path.length() + 1);
+                                            ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                            ImGui::EndDragDropSource();
+
+                                        }
+                                    }
+                                    
+                                }
+
+                                if (current_directory == ASM.get_full_path("Scenes", "")) {
+
+                                    std::string file_path = folder_entry.path().string();
+                                    if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
+                                        if (ImGui::BeginDragDropSource()) {
+
+                                            std::string file_path = folder_entry.path().string();
+                                            ImGui::SetDragDropPayload("FONT_ITEM", file_path.c_str(), file_path.length() + 1);
+                                            ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                            ImGui::EndDragDropSource();
+
+                                        }
+                                    }
+
+                                }
+
+                                //Scenes
+                                //Config
+                                //Level Design
+                                //Models (Specify)
+                                //Prefab
+                                //Shaders
 
                                 ImGui::Text(folder_entry.path().filename().string().c_str());
                             }
@@ -1724,9 +1696,10 @@ namespace lof {
 
         ImGui::End();
 
-
     }
 
+    // ------------------------------------- Functions for Functionality and Optimisation -------------------------------------//
+    //Function that toggles the button
     bool IMGUI_Manager::button_toggle(const std::string& boolean_name, bool* state) {
 
         bool clicked = ImGui::Button(boolean_name.c_str());
@@ -1737,6 +1710,7 @@ namespace lof {
         return clicked;
     }
 
+    //Function to add game objects
     void IMGUI_Manager::add_game_objects() {
 
         ImGui::Begin("Add Game Object", &create_game_obj);
@@ -1780,6 +1754,7 @@ namespace lof {
         ImGui::End();
     }
 
+    //Function to remove game objects
     void IMGUI_Manager::remove_game_objects(int index) {
 
         const auto& entities = ecs.get_entities();
@@ -1792,11 +1767,9 @@ namespace lof {
             remove_game_obj = !remove_game_obj;
             return;
         }
-
-
     }
 
-    //For all text input
+    //For all text input (includes buffer)
     void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
 
         char Buffer[128];
@@ -1811,33 +1784,60 @@ namespace lof {
         }
     }
 
+    //to fill prefab names
     void IMGUI_Manager::fill_prefab_names(const char* prefab_name) {
         prefab_names.push_back(prefab_name);
     }
 
-    void IMGUI_Manager::fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name) {
+    //to fill up audio file names
+    /*void IMGUI_Manager::fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name) {
         audio_file_names.push_back(std::make_pair(audio_file_name, audio_filepath_name));
-    }
+    }*/
 
-
+    //set scene loaded
     void IMGUI_Manager::set_current_file_shown(std::string current_file) {
         current_file_shown = current_file;
     }
 
+
+    //To set the payload (Update once extract filename)
+    void IMGUI_Manager::set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name) {
+        
+        if (current_directory == ASM.get_full_path(folder_name, "")) {
+            if (ImGui::BeginDragDropSource()) {
+                ImGui::SetDragDropPayload(payload_name.c_str(), file_path.c_str(), file_path.length() + 1);
+                std::string file_name = get_filename_from_filepath(file_path, folder_name);
+                ImGui::Text("Dragging: %s", file_name.c_str());
+                ImGui::EndDragDropSource();
+            }
+        }
+    }
+
+    std::string IMGUI_Manager::get_filename_from_filepath(std::string file_path, std::string folder_name) {
+        file_path.erase(0, ASM.get_full_path(folder_name, "").length());
+        std::string file_name = file_path.substr(0, file_path.find_last_of('.'));
+        return file_name;
+    }
+
+    //gets the scene loaded
     std::string IMGUI_Manager::get_current_file_shown() {
         return current_file_shown;
     }
 
+    //render
     void IMGUI_Manager::render() {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    //shut down
     void IMGUI_Manager::shut_down() {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
         LM.write_log("IMGUI_Manager::shut_down(): IMGUI_Manager shut down successfully.");
     }
+
+    
 
 } // namespace lof
