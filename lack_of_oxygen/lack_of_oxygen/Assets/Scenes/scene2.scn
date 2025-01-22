@@ -667,7 +667,44 @@
         }
       }
     },
-
+    {
+      "name": "top_ui_oxygen_meter_fill",
+      "components": {
+        "Transform2D": {
+          "position": [
+            800.0,
+            -100.0
+          ],
+          "prev_position": [
+            800.0,
+            -100.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            200.0,
+            30.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "texture_name": "top_ui_o2_meter_fill_blue_batch_7",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        }
+      }
+    },
     {
       "name": "top_ui_oxygen_meter",
       "components": {
@@ -820,6 +857,60 @@
         }
       }
     },
+    {
+      "name": "top_ui_timer",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "!",
+          "color": [ 1.0, 0.0, 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        }
+      }
+    },
+    {
+      "name": "top_ui_goal_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Goal:",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 0.5, 0.5 ]
+        }
+      }
+    },
 
     {
       "name": "top_ui_oxygen_text",
@@ -842,9 +933,36 @@
         },
         "Text_Component": {
           "font_name": "PressStart2P",
-          "text": "O2",
+          "text": "Oxygen",
           "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 0.5, 0.5 ]
+        }
+      }
+    },
+    {
+      "name": "top_ui_oxygen_percentage_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 30.0 ],
           "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "100%",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 0.5, 0.5 ]
         }
       }
     },
@@ -871,7 +989,7 @@
           "font_name": "PressStart2P",
           "text": "Panic",
           "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "scale": [ 0.5, 0.5 ]
         }
       }
     },
@@ -898,7 +1016,61 @@
           "font_name": "PressStart2P",
           "text": "0",
           "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 0.5, 0.5 ]
+        }
+      }
+    },
+    {
+      "name": "top_ui_timer_count_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "300s",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 0.5, 0.5 ]
+        }
+      }
+    },
+    {
+      "name": "top_ui_goal_percentage_text",
+      "components": {
+        "Transform2D": {
+          "position": [ 0.0, 0.0 ],
+          "prev_position": [ 0.0, 0.0 ],
+          "orientation": [ 0.0, 0.0 ],
+          "scale": [ 1.0, 1.0 ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "0%",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "scale": [ 0.5, 0.5 ]
         }
       }
     }

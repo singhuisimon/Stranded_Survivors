@@ -171,6 +171,9 @@
     <Image Include="Assets\Textures\top_ui_panik_meter_batch_4.png" />
     <Image Include="Assets\Textures\vent.png" />
     <Image Include="Assets\Textures\wormhole.png" />
+    <Image Include="Assets\Textures\top_ui_o2_meter_fill_blue_batch_7.png" />
+    <Image Include="Assets\Textures\top_ui_o2_meter_fill_purple_batch_7.png" />
+    <Image Include="Assets\Textures\top_ui_o2_meter_fill_red_batch_7.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />
