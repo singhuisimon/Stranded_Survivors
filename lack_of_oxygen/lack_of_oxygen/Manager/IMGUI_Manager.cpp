@@ -926,7 +926,23 @@ namespace lof {
 
                         auto& texture_name = graphics.texture_name;
                         std::string condition_name_texture = "texture_name";
-                        text_input(texture_name, condition_name_texture);
+
+                        char Buffer[128];
+                        //strncpy_s is safer
+                        strncpy_s(Buffer, texture_name.c_str(), sizeof(Buffer));
+                        Buffer[sizeof(Buffer) - 1] = '\0';
+
+                        if (ImGui::InputText(condition_name_texture.c_str(), Buffer, sizeof(Buffer))) {
+
+                            std::string buffer_string = std::string(Buffer);
+
+                            std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), ::tolower);
+                            //replaces the data with the input
+                            texture_name = buffer_string;
+                        }
+
+                        //text_input(texture_name, condition_name_texture);
+                        //std::transform(texture_name.begin(), texture_name.end(), texture_name.begin(), ::tolower);
 
                         if (ImGui::BeginDragDropTarget()) {
 
@@ -935,6 +951,7 @@ namespace lof {
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Textures", "").length());
                                 file_name = file_name.substr(0, file_name.size()-4);
+                                std::transform(file_name.begin(), file_name.end(), file_name.begin(), ::tolower);
                                 texture_name = file_name;
                             }
 
@@ -1537,11 +1554,44 @@ namespace lof {
 
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
             if (ImGui::Button("DELETE FILE")) {
+
+                std::cout << "Checking First Texture Storage: " << std::endl;
+                auto& texture_storage = GFXM.get_texture_storage();
+                for (auto& texture : texture_storage) {
+                    std::cout << texture.first << std::endl;
+                }
+
                 try {
 
                     std::string temp = selected_filepath;
                     selected_filepath.clear();
                     std::filesystem::remove(temp);
+                   
+
+                    temp.erase(0, ASM.get_full_path("Textures", "").length());
+                    temp = temp.substr(0, temp.find_last_of('.'));
+
+                    std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+                    std::cout << "temp: " << temp << std::endl << "Checking Texture Storage: " << std::endl;
+
+                    auto& texture_storage = GFXM.get_texture_storage();
+                    for (auto& texture : texture_storage) {
+
+                        std::cout << texture.first << std::endl;
+
+                        auto it = texture_storage.find(temp);
+                        if (it != texture_storage.end()) {
+                            std::cout << temp << " is deleted. please delete from storage" << std::endl;
+                            
+                            texture_storage.erase(temp);
+                            //after erasing need a way to know which components have so can delete graphics component
+                        }
+                    }
+
+                    std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
+                    for (auto& texture : texture_storage) {
+                        std::cout << texture.first << std::endl;
+                    }
 
                     is_file_selected = false;
                 }
@@ -1868,6 +1918,13 @@ namespace lof {
     std::string IMGUI_Manager::get_current_file_shown() {
         return current_file_shown;
     }
+
+    /*void IMGUI_Manager::drop_callback(GLFWwindow* window, int count, const char** paths) {
+        for (int i = 0; i < count; ++i) {
+            std::cout << paths[i] << std::endl;
+        }
+    }*/
+
 
     //render
     void IMGUI_Manager::render() {

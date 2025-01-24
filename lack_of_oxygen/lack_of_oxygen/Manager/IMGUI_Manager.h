@@ -166,7 +166,7 @@ namespace lof {
         //void fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name);
 
 
-
+        //void drop_callback(GLFWwindow* window, int count, const char** paths);
 
         void set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name);
 
