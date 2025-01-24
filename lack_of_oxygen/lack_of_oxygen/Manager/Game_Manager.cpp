@@ -992,20 +992,28 @@ namespace lof {
         }
 
         // Getting delta time for Input Manager
-        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        auto start_time = std::chrono::steady_clock::now();
+
         // Update Input_Manager
         IM.update();
-        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - IM.get_time());
 
-        // Getting delta time for Graphics Manager
-        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
+        auto end_time = std::chrono::steady_clock::now();
+        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
+
+        //No Graphics Manager Update
+        //// Getting delta time for Graphics Manager
+        //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
         // Getting delta time for ECS Manager
-        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        start_time = std::chrono::steady_clock::now();
+
         // Update game world state
         ECSM.update(delta_time);
-        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
+        end_time = std::chrono::steady_clock::now();
+        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         m_step_count++;
     }

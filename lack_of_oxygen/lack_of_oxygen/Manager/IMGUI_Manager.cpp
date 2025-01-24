@@ -142,6 +142,21 @@ namespace lof {
 
         }
 
+        //ImGui::Text("Files: ");
+        //if (ImGui::BeginDragDropTarget()) {
+
+        //    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
+        //        const char* droppedFilePath = (const char*)payload->Data;
+
+        //        std::string file_name = droppedFilePath;
+        //        file_name.erase(0, level_path.length());
+        //        //file_name = file_name.substr(0, file_name.find_last_of('.'));
+        //        file_names.push_back(file_name);
+        //    }
+
+        //    ImGui::EndDragDropTarget();
+        //}
+
         //Indexes for files
         int current_file_index = 0;
         int shown_file_index = -1;
@@ -1513,6 +1528,31 @@ namespace lof {
         ImGui::End();
     }
 
+    static std::string selected_filepath = "";
+    static bool is_file_selected = false;
+
+    void remove_button() {
+
+        if (is_file_selected == true) {
+
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
+            if (ImGui::Button("DELETE FILE")) {
+                try {
+
+                    std::string temp = selected_filepath;
+                    selected_filepath.clear();
+                    std::filesystem::remove(temp);
+
+                    is_file_selected = false;
+                }
+                catch (std::filesystem::filesystem_error& e) {
+                    ImGui::Text("Error in Deletion");
+                }
+            }
+            ImGui::PopStyleColor();
+        }
+    }
+
     //asset browser
     void IMGUI_Manager::asset_browser() {
         
@@ -1525,15 +1565,9 @@ namespace lof {
         const std::string ASSETS = "";
         std::string assets_path = ASM.get_full_path(ASSETS, "");
 
-        /*ImGui::Text("Current Directory: %s", current_directory.c_str());
-        ImGui::Text("Assets Directory: %s", ASM.get_full_path(ASSETS, "").c_str());
-        const std::string AUDIO = "Audio";
-        ImGui::Text("Audio Directory: %s", ASM.get_full_path(AUDIO, "").c_str());*/
-
-
-        if (current_directory.empty()) {
+        /*if (current_directory.empty()) {
             
-            // Start the column layout (2 columns, no border)
+            //Start the column layout (2 columns, no border)
             ImGui::Columns(8, 0, false);
 
             if (ImGui::Button("Add Folder")) {
@@ -1543,9 +1577,9 @@ namespace lof {
             ImGui::NextColumn();
 
             if (ImGui::Button("Delete Folder")) {
-                // Logic to delete folder
+                selection_mode = true;
             }
-        }
+        }*/
 
         ImGui::Columns(7, 0, false);
 
@@ -1583,15 +1617,15 @@ namespace lof {
 
                 //Back button that goes back to the assets directory (when current_directory is empty
                 
-                if (ImGui::Button("Add File")) {
+                /*if (ImGui::Button("Add File")) {
                     // Logic to add folder
                 }
 
                 ImGui::NextColumn();
 
                 if (ImGui::Button("Delete File")) {
-                    // Logic to delete folder
-                }
+                    ;
+                }*/
                 
                 ImGui::Columns(8, 0, false);
 
@@ -1599,7 +1633,7 @@ namespace lof {
                     current_directory.clear();
                 }
 
-                //Edit
+                remove_button();
 
                 ImGui::Separator();
 
@@ -1607,12 +1641,27 @@ namespace lof {
                     try {
 
                         //accessing each file in the current directory
-
                         for (const auto& folder_entry : std::filesystem::directory_iterator(current_directory)) {
 
                             if (folder_entry.is_regular_file()) {
 
-                                ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 });
+                                if (ImGui::Button(folder_entry.path().filename().string().c_str(), { 128, 128 })) {
+                                    selected_filepath = folder_entry.path().string();
+                                    is_file_selected = true;
+                                }
+
+                                if (selected_filepath == folder_entry.path().string()) {
+                                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 1.0, 0.0, 1.0));
+                                    ImGui::Text("SELECTED");
+                                    ImGui::PopStyleColor();
+
+                                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
+                                    if (ImGui::Button("Remove Selection")) {
+                                        selected_filepath.clear();
+                                        is_file_selected = false;
+                                    }
+                                    ImGui::PopStyleColor();
+                                }
 
                                 //set_drag_drop_source(current_directory, "Textures", folder_entry.path().string(), "TEXTURE_ITEM");
 
@@ -1652,31 +1701,27 @@ namespace lof {
 
                                         }
                                     }
+                                    else {
+                                        ImGui::Text("Dragging Not Available");
+                                    }
                                     
+                                }
+
+                                if (current_directory == ASM.get_full_path("Models", "") || current_directory == ASM.get_full_path("Shaders", "")) {
+                                    ImGui::Text("Dragging Not Available");
                                 }
 
                                 if (current_directory == ASM.get_full_path("Scenes", "")) {
 
-                                    std::string file_path = folder_entry.path().string();
-                                    if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
-                                        if (ImGui::BeginDragDropSource()) {
+                                    if (ImGui::BeginDragDropSource()) {
 
-                                            std::string file_path = folder_entry.path().string();
-                                            ImGui::SetDragDropPayload("FONT_ITEM", file_path.c_str(), file_path.length() + 1);
-                                            ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
-                                            ImGui::EndDragDropSource();
+                                        std::string file_path = folder_entry.path().string();
+                                        ImGui::SetDragDropPayload("SCENES_ITEM", file_path.c_str(), file_path.length() + 1);
+                                        ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
+                                        ImGui::EndDragDropSource();
 
-                                        }
                                     }
-
                                 }
-
-                                //Scenes
-                                //Config
-                                //Level Design
-                                //Models (Specify)
-                                //Prefab
-                                //Shaders
 
                                 ImGui::Text(folder_entry.path().filename().string().c_str());
                             }
