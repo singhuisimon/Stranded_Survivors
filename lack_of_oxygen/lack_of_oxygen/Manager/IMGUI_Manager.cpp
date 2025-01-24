@@ -61,7 +61,11 @@ namespace lof {
     static bool mouse_was_down = false;
     static ImVec2 mouse_pos_before_press;
     
-    
+    char to_lower(char c) {
+        return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+
+
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
     IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager){
@@ -829,13 +833,13 @@ namespace lof {
                 std::string condition_name_model = "Name of Entity";
 
                 //Not using function due to disabling it
-                char Buffer[128];
-                strncpy_s(Buffer, Name.c_str(), sizeof(Buffer));
-                Buffer[sizeof(Buffer) - 1] = '\0';
+                char buffer_disabled[128];
+                strncpy_s(buffer_disabled, Name.c_str(), sizeof(buffer_disabled));
+                buffer_disabled[sizeof(buffer_disabled) - 1] = '\0';
 
                 ImGui::BeginDisabled();
-                if (ImGui::InputText(condition_name_model.c_str(), Buffer, sizeof(Buffer))) {
-                    std::string name = std::string(Buffer);
+                if (ImGui::InputText(condition_name_model.c_str(), buffer_disabled, sizeof(buffer_disabled))) {
+                    std::string name = std::string(buffer_disabled);
                     entities[selected_object_index]->set_name(name);
                 }
                 ImGui::EndDisabled();
@@ -927,16 +931,17 @@ namespace lof {
                         auto& texture_name = graphics.texture_name;
                         std::string condition_name_texture = "texture_name";
 
-                        char Buffer[128];
+                        char buffer_graphics[128];
                         //strncpy_s is safer
-                        strncpy_s(Buffer, texture_name.c_str(), sizeof(Buffer));
-                        Buffer[sizeof(Buffer) - 1] = '\0';
+                        strncpy_s(buffer_graphics, texture_name.c_str(), sizeof(buffer_graphics));
+                        buffer_graphics[sizeof(buffer_graphics) - 1] = '\0';
 
-                        if (ImGui::InputText(condition_name_texture.c_str(), Buffer, sizeof(Buffer))) {
+                        if (ImGui::InputText(condition_name_texture.c_str(), buffer_graphics, sizeof(buffer_graphics))) {
 
-                            std::string buffer_string = std::string(Buffer);
+                            std::string buffer_string = std::string(buffer_graphics);
 
-                            std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), ::tolower);
+                            std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), to_lower);
+
                             //replaces the data with the input
                             texture_name = buffer_string;
                         }
@@ -951,7 +956,8 @@ namespace lof {
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Textures", "").length());
                                 file_name = file_name.substr(0, file_name.size()-4);
-                                std::transform(file_name.begin(), file_name.end(), file_name.begin(), ::tolower);
+
+                                std::transform(file_name.begin(), file_name.end(), file_name.begin(), to_lower);
                                 texture_name = file_name;
                             }
 
@@ -1571,10 +1577,10 @@ namespace lof {
                     temp.erase(0, ASM.get_full_path("Textures", "").length());
                     temp = temp.substr(0, temp.find_last_of('.'));
 
-                    std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+                    std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+
                     std::cout << "temp: " << temp << std::endl << "Checking Texture Storage: " << std::endl;
 
-                    auto& texture_storage = GFXM.get_texture_storage();
                     for (auto& texture : texture_storage) {
 
                         std::cout << texture.first << std::endl;
@@ -1596,7 +1602,14 @@ namespace lof {
                     is_file_selected = false;
                 }
                 catch (std::filesystem::filesystem_error& e) {
-                    ImGui::Text("Error in Deletion");
+
+                    const char* error_msg = e.what();
+                    if (error_msg) {
+                        ImGui::Text("Error in Deletion: %s", error_msg);
+                    }
+                    else {
+                        ImGui::Text("Error in Deletion");
+                    }
                 }
             }
             ImGui::PopStyleColor();
@@ -1744,7 +1757,6 @@ namespace lof {
                                     if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
                                         if (ImGui::BeginDragDropSource()) {
 
-                                            std::string file_path = folder_entry.path().string();
                                             ImGui::SetDragDropPayload("FONT_ITEM", file_path.c_str(), file_path.length() + 1);
                                             ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
                                             ImGui::EndDragDropSource();
