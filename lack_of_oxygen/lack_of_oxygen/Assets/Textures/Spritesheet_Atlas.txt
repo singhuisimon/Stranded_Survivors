@@ -183,13 +183,19 @@ EF
 EA
 name lava
 texture Spritesheet_Map
+frame_no 25
+time_delay 0.0
+EF
+EA
+name lava_animate
+texture Spritesheet_Map
 frame_no 23
-time_delay 100.0
+time_delay 1000.0
 EF
 frame_no 24
-time_delay 100.0
+time_delay 1000.0
 EF
 frame_no 25
-time_delay 100.0
+time_delay 1000.0
 EF
 EA

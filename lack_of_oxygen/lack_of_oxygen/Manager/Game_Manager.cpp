@@ -216,13 +216,19 @@ namespace lof {
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+            EntityID oxygen_meter_fill_id = ECSM.find_entity_by_name("top_ui_oxygen_meter_fill");
             EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
             EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
+            EntityID timer_icon_id = ECSM.find_entity_by_name("top_ui_timer");
+            EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
 
             EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
+            EntityID oxygen_percentage_text_id = ECSM.find_entity_by_name("top_ui_oxygen_percentage_text");
             EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
             EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+            EntityID timer_count_text_id = ECSM.find_entity_by_name("top_ui_timer_count_text");
+            EntityID goal_percentage_count_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
 
             if (ui_overlay_id != INVALID_ENTITY_ID) {
                 auto& player_transform = ECSM.get_component<Transform2D>(player_id);
@@ -245,32 +251,48 @@ namespace lof {
                 ui_transform.position = base_position;
                 ui_transform.prev_position = ui_transform.position;
 
-                // Position oxygen meter (top meter)
+                // Position oxygen meter and fill (top meter)
                 if (oxygen_meter_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(oxygen_meter_id)) {
+                    ECSM.has_component<Transform2D>(oxygen_meter_id) &&
+                    ECSM.has_component<Transform2D>(oxygen_meter_fill_id)) {
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
+                    auto& oxygen_fill_transform = ECSM.get_component<Transform2D>(oxygen_meter_fill_id);
 
                     // Set position and scale for oxygen meter
                     oxygen_transform.position = {
-                        base_position.x - METER_WIDTH,  // Left of UI overlay
+                        base_position.x - 575.0f,  // Left of UI overlay
                         base_position.y                 // Top position
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     oxygen_transform.prev_position = oxygen_transform.position;
+
+                    // Set position and scale for oxygen meter fill
+                    oxygen_fill_transform.position = oxygen_transform.position;
+                    oxygen_fill_transform.scale = oxygen_transform.scale;
+                    oxygen_fill_transform.prev_position = oxygen_fill_transform.position;
                 }
 
-                // Position oxygen text
-                if (oxygen_text_id != INVALID_ENTITY_ID && 
-                    ECSM.has_component<Transform2D>(oxygen_text_id)) { 
-                    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id); 
+                // Position oxygen text and oxygen percentage
+                if (oxygen_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(oxygen_text_id) &&
+                    ECSM.has_component<Transform2D>(oxygen_percentage_text_id)) {
+                    auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id);
+                    auto& oxygen_percentage_text_transform = ECSM.get_component<Transform2D>(oxygen_percentage_text_id);
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
 
-                    // Position text to the left of the oxygen meter
+                    // Position oxygen text to the left of the oxygen meter
                     oxygen_text_transform.position = {
-                        (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
-                        oxygen_transform.position.y                                                         // Vertically centered with oxygen meter
+                        (oxygen_transform.position.x - 288.0f), // Left of meter
+                        oxygen_transform.position.y             // Vertically centered with oxygen meter
                     };
                     oxygen_text_transform.prev_position = oxygen_text_transform.position;
+
+                    // Position oxygen percentage to the middle of oxygen meter
+                    oxygen_percentage_text_transform.position = {
+                        oxygen_transform.position.x,
+                        oxygen_text_transform.position.y
+                    };
+                    oxygen_percentage_text_transform.prev_position = oxygen_percentage_text_transform.position;
                 }
 
                 // Position panic meter (bottom meter)
@@ -280,7 +302,7 @@ namespace lof {
 
                     // Set position and scale for panic meter
                     panic_transform.position = {
-                        base_position.x - METER_WIDTH,          // Left of UI overlay
+                        base_position.x - 575.0f,          // Left of UI overlay
                         base_position.y - METER_SPACING         // Below oxygen meter
                     };
                     panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
@@ -291,12 +313,12 @@ namespace lof {
                 if (panic_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(panic_text_id)) {
                     auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
-                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id); 
+                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
 
                     // Position text to the left of the panic meter
                     panic_text_transform.position = {
-                        (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
-                        panic_transform.position.y                                                         // Vertically centered with panic meter
+                        (panic_transform.position.x - 300.0f),  // Left of meter
+                        panic_transform.position.y              // Vertically centered with panic meter
                     };
                     panic_text_transform.prev_position = panic_text_transform.position;
                 }
@@ -307,7 +329,7 @@ namespace lof {
                     auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
 
                     mineral_transform.position = {
-                        base_position.x,                         // Center position
+                        base_position.x + 450.0f,                         // Center position
                         base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
                     };
                     mineral_transform.prev_position = mineral_transform.position;
@@ -315,18 +337,73 @@ namespace lof {
 
                 // Position mineral count text
                 if (mineral_count_text_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(mineral_count_text_id) && 
-                    ECSM.has_component<Transform2D>(mineral_texture_id)) { 
-                    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id); 
-                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id); 
+                    ECSM.has_component<Transform2D>(mineral_count_text_id) &&
+                    ECSM.has_component<Transform2D>(mineral_texture_id)) {
+                    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
+                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
 
                     // Position text to the right of the mineral texture
                     mineral_count_text_transform.position = {
-                        (mineral_transform.position.x + (mineral_transform.scale.x * 3.0f)) ,  // Right of icon
-                        mineral_transform.position.y  - TEXT_OFFSET_Y                          // Vertically centered with mineral icon
+                        (mineral_transform.position.x + (mineral_transform.scale.x * 2.0f)) ,  // Right of icon
+                        mineral_transform.position.y                        // Vertically centered with mineral icon
                     };
                     mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
                 }
+
+                // Position timer icon on the left side
+                if (timer_icon_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(timer_icon_id)) {
+                    auto& timer_icon_transform = ECSM.get_component<Transform2D>(timer_icon_id);
+
+                    timer_icon_transform.position = {
+                        base_position.x,                         // Center position
+                        base_position.y - METER_SPACING / 1.5f   // Vertically centered between meters
+                    };
+                    timer_icon_transform.prev_position = timer_icon_transform.position;
+                }
+
+                // Position timer count text
+                if (timer_count_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(timer_count_text_id) &&
+                    ECSM.has_component<Transform2D>(timer_icon_id)) {
+                    auto& timer_count_text_transform = ECSM.get_component<Transform2D>(timer_count_text_id);
+                    auto& timer_icon_transform = ECSM.get_component<Transform2D>(timer_icon_id);
+
+                    // Position text to the right of the timer 
+                    timer_count_text_transform.position = {
+                        (timer_icon_transform.position.x + (timer_icon_transform.scale.x * 1.5f)) ,  // Right of icon
+                        base_position.y - METER_SPACING / 2.0f                              // Vertically centered with mineral icon
+                    };
+                    timer_count_text_transform.prev_position = timer_count_text_transform.position;
+                }
+
+                // Position goal text on the right side
+                if (goal_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(goal_text_id)) {
+                    auto& goal_text_transform = ECSM.get_component<Transform2D>(goal_text_id);
+
+                    goal_text_transform.position = {
+                        base_position.x + 775.0f,                         // Center position
+                        base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
+                    };
+                    goal_text_transform.prev_position = goal_text_transform.position;
+                }
+
+                // Position goal percentage count text
+                if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
+                    ECSM.has_component<Transform2D>(goal_percentage_count_text_id) &&
+                    ECSM.has_component<Transform2D>(goal_text_id)) {
+                    auto& goal_percentage_count_transform = ECSM.get_component<Transform2D>(goal_percentage_count_text_id);
+                    auto& goal_text_transform = ECSM.get_component<Transform2D>(goal_text_id);
+
+                    // Position text to the right of the timer 
+                    goal_percentage_count_transform.position = {
+                        goal_text_transform.position.x + 150.0f ,  // Right of icon
+                        goal_text_transform.position.y                              // Vertically centered with mineral icon
+                    };
+                    goal_percentage_count_transform.prev_position = goal_percentage_count_transform.position;
+                }
+
             }
 
             //cheat code in mining
@@ -915,20 +992,28 @@ namespace lof {
         }
 
         // Getting delta time for Input Manager
-        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        auto start_time = std::chrono::steady_clock::now();
+
         // Update Input_Manager
         IM.update();
-        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - IM.get_time());
 
-        // Getting delta time for Graphics Manager
-        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-        GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
+        auto end_time = std::chrono::steady_clock::now();
+        IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
+
+        //No Graphics Manager Update
+        //// Getting delta time for Graphics Manager
+        //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
         // Getting delta time for ECS Manager
-        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        start_time = std::chrono::steady_clock::now();
+
         // Update game world state
         ECSM.update(delta_time);
-        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - ECSM.get_time());
+        end_time = std::chrono::steady_clock::now();
+        ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         m_step_count++;
     }

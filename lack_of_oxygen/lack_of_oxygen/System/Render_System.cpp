@@ -146,8 +146,8 @@ namespace lof {
                 auto& text = ECSM.get_component<Text_Component>(entity_id);
                 scale_x = text.scale.x;
                 scale_y = text.scale.y;
-                translate_x = 1.0f;
-                translate_y = 1.0f;
+                translate_x = transform.position.x - (transform.position.x * text.scale.x);  // Translate text back to original position based on scale
+                translate_y = transform.position.y - (transform.position.y * text.scale.y);
             }
             else {
                 scale_x = transform.scale.x;
@@ -395,7 +395,7 @@ namespace lof {
                     // Pass frame number of current frame
                     GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
                     if (frame_no_loc >= 0) {
-                        if (curr_animation_name == "vent_strip" || curr_animation_name == "lava") {
+                        if (curr_animation_name == "vent_strip" || curr_animation_name == "lava_animate") {
                             glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animations[curr_animation_name].curr_frame_index].frame_number);
                         }
                         else {
