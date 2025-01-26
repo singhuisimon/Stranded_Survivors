@@ -234,16 +234,16 @@ namespace lof {
 
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
-            auto& models = GFXM.get_model_storage();
-            auto& textures = GFXM.get_texture_storage();
-            auto& animations = GFXM.get_animation_storage();
+            auto& models = GFXM.get_models();
+            auto& textures = ASM.get_texture_storage();
+            auto& animations = ASM.get_animation_storage();
 
             // Check for text objects to render 
             bool is_text = ECSM.has_component<Text_Component>(entity_id);
             if (is_text == true) {
 
                 auto& text_comp = ECSM.get_component<Text_Component>(entity_id);
-                auto& fonts = GFXM.get_font_storage();
+                auto& fonts = ASM.get_font_storage();
 
                 // Start the shader program used for text rendering
                 GFXM.program_use(shader->program_handle);
@@ -342,6 +342,7 @@ namespace lof {
             // Check if entity has a texture
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
 
+                ASM.track_entity_asset(entity_id, "Graphics_Component", graphics.texture_name);
                 // Look for texture in texture storage. If not found, load texture 
                 if (textures.find(graphics.texture_name) == textures.end()) {
                     GFXM.load_texture(graphics.texture_name);

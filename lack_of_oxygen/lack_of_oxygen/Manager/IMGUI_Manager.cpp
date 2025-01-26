@@ -1554,6 +1554,7 @@ namespace lof {
     static std::string selected_filepath = "";
     static bool is_file_selected = false;
 
+#if 0
     void remove_button() {
 
         if (is_file_selected == true) {
@@ -1562,7 +1563,7 @@ namespace lof {
             if (ImGui::Button("DELETE FILE")) {
 
                 std::cout << "Checking First Texture Storage: " << std::endl;
-                auto& texture_storage = GFXM.get_texture_storage();
+                auto& texture_storage = ASM.get_texture_storage();
                 for (auto& texture : texture_storage) {
                     std::cout << texture.first << std::endl;
                 }
@@ -1615,6 +1616,115 @@ namespace lof {
             ImGui::PopStyleColor();
         }
     }
+#endif
+
+    void remove_button() {
+        if (is_file_selected == true) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
+            if (ImGui::Button("DELETE FILE")) {
+                std::cout << "Checking First Texture Storage: " << std::endl;
+                auto& texture_storage = ASM.get_texture_storage();
+
+                // Log all current textures
+                for (auto& texture : texture_storage) {
+                    std::cout << texture.first << std::endl;
+                }
+
+                try {
+                    // Step 1: Remove the file
+                    std::string temp = selected_filepath;
+                    selected_filepath.clear();
+                    std::filesystem::remove(temp);
+
+                    // Step 2: Prepare the texture name for removal
+                    temp.erase(0, ASM.get_full_path("Textures", "").length());
+                    temp = temp.substr(0, temp.find_last_of('.'));
+                    std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+
+                    std::cout << "temp: " << temp << std::endl << "Checking Texture Storage: " << std::endl;
+
+                    // Step 3: Call the Assets_Manager's delete_texture function to delete the texture and remove associated components
+                    ASM.delete_texture(temp);
+
+                    // Final checking of texture storage
+                    std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
+                    for (auto& texture : texture_storage) {
+                        std::cout << texture.first << std::endl;
+                    }
+
+                    is_file_selected = false;
+                }
+                catch (std::filesystem::filesystem_error& e) {
+                    const char* error_msg = e.what();
+                    if (error_msg) {
+                        ImGui::Text("Error in Deletion: %s", error_msg);
+                    }
+                    else {
+                        ImGui::Text("Error in Deletion");
+                    }
+                }
+            }
+            ImGui::PopStyleColor();
+        }
+    }
+
+#if 0
+    void IMGUI_Manager::render_asset_browser() {
+        
+        // Directory to load files from
+        std::string tex_directory = ASM.get_full_path("Textures", "");
+
+        if (!std::filesystem::exists(tex_directory)) {
+            return;
+        }
+
+        if (ImGui::Begin("Asset Browser")) {
+            // Button to open the file browser
+            if (ImGui::Button("Add Asset")) {
+                // You can call your custom file selection logic here
+                std::string selected_file = open_file_explorer();  // Your file explorer function
+
+                if (!selected_file.empty()) {
+                    // Register the selected asset
+                    ASM.register_assets_from_file(selected_file);
+                }
+            }
+
+            auto& all_assets = ASM.get_all_assets();
+            // Display all registered assets
+            for (const auto& asset_name : all_assets) {
+                if (ImGui::Selectable(asset_name.c_str())) {
+                    // Handle asset selection (e.g., load the asset or preview it)
+                }
+            }
+
+            ImGui::End();
+        }
+    }
+
+    std::string IMGUI_Manager::open_file_explorer() {
+        // Display the files in the directory for selection
+        std::string tex_directory = ASM.get_full_path("Textures", "");
+
+        // Here we simulate opening the file explorer
+        // Loop through the files and list them in the ImGui UI (the file selection itself happens in the render loop)
+        for (const auto& entry : std::filesystem::directory_iterator(tex_directory)) {
+            if (entry.is_regular_file()) {
+                std::string file_name = entry.path().stem().string(); // Get the file name without extension
+
+                // Show the file name as a selectable item in ImGui
+                if (ImGui::Selectable(file_name.c_str())) {
+                    // Return the selected file path for registration
+                    return entry.path().string();  // Return full path of the selected file
+                }
+            }
+        }
+
+        return "";  // Return an empty string if no file is selected
+    }
+
+
+#endif 
 
     //asset browser
     void IMGUI_Manager::asset_browser() {
@@ -1712,6 +1822,8 @@ namespace lof {
                                     selected_filepath = folder_entry.path().string();
                                     is_file_selected = true;
                                 }
+
+
 
                                 if (selected_filepath == folder_entry.path().string()) {
                                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 1.0, 0.0, 1.0));
@@ -1937,12 +2049,15 @@ namespace lof {
         }
     }*/
 
-
+#if 1
     //render
     void IMGUI_Manager::render() {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+#endif
+
+   
 
     //shut down
     void IMGUI_Manager::shut_down() {

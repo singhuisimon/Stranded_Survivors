@@ -18,10 +18,12 @@
 
 // Include standard headers
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <string>
 #include <vector>
 #include <mutex>
+#include <map>
 
 // Include header
 #include "Manager.h"
@@ -57,6 +59,43 @@ namespace lof {
             glm::vec2 tex{};
         };
 
+        // Struct of data to create a model
+        struct Model {
+            GLenum primitive_type;
+            GLuint vaoid;
+            GLuint draw_cnt;
+        };
+
+         // Struct of a character
+        struct Character {
+            unsigned int TextureID; // ID handle of the glyph texture
+            glm::ivec2   Size;      // Size of glyph
+            glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
+            unsigned int Advance;   // Horizontal offset to advance to next glyph
+        };
+
+        // Struct of a font
+        struct Font {
+            GLuint vaoid{ 0 };
+            GLuint vboid{ 0 };
+            std::map<GLchar, Character> characters; // Store the full range of characters
+        };
+
+        // Struct of a frame for animation
+        struct Frame {
+            unsigned int frame_number;
+            float time_delay;
+        };
+
+        // Struct of an animation
+        struct Animation {
+            std::vector<Frame> frames;  // Collection of frames time_delay 
+            std::string texture_name;
+            unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
+            float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
+            bool is_updated{ false };
+        };
+
         
         struct ModelData {
             std::vector<TexVtxData> texVtxArr;  // For textured vertices
@@ -65,7 +104,16 @@ namespace lof {
             GLenum primitiveType{};             // OpenGL primitive type (Triangle, Lines, Square etc
             bool isModelExist = false;          // Is model exist 
             std::string modelName;              // Name of the model
+
+            //GLuint vaoid = 0;                  // Vertex Array Object ID
+            //GLuint draw_cnt = 0;               // Number of elements to draw
         };
+
+     /*   struct Model {
+            GLenum primitive_type;
+            GLuint vaoid;
+            GLuint draw_cnt;
+        };*/
 
         /**
         * @brief Virtual destrucctor for the Assets Manager 
@@ -197,8 +245,65 @@ namespace lof {
         *    A `std::string` containing the absolute path to the executable's directory.
         */
         std::string get_executable_directory();
+
+        ///////////////////////////////////////////////////////////////////////////////////////
+        std::map<std::string, Font>& get_font_storage() {
+            return font_storage;
+        }
+
+        void unload_fonts();
+
+        void unload_models();
+
+        void unload_textures();
+
+        void unload_animations();
+
+        void store_font(const std::string& font_name, const Font& font);
+
+        std::unordered_map<std::string, Animation>& get_animation_storage() {
+            return animation_storage;
+        };
+
+        std::unordered_map<std::string, GLuint>& get_texture_storage() {
+            return texture_storage;
+        }
+
+        std::unordered_map<std::string, ModelData>& get_model_storage() {
+            return model_storage;
+        }
+
+        //void unload_models();
+
+        void track_entity_asset(EntityID entity_id, const std::string& component_name, const std::string& asset_name);
+
+        void register_asset(const std::string& asset_name);
+
+        void all_assets_in_file();
+
+        void shut_down() override;
+        void delete_texture(const std::string& texture_name);
+
+        void register_assets_from_file(const std::string& file_path);
+
+        //std::string open_file_explorer();
+
+        //void delete_audio(const std::string& audio_name);
+     
+        std::unordered_set<std::string>& get_all_assets() { return all_assets; };
+
     private:
 
+        ////std::unordered_map<EntityID, std::unordered_set<std::string>> tracked_assets;
+        std::unordered_map<EntityID, std::unordered_map<std::string, std::unordered_set<std::string>>> tracked_assets;
+        std::unordered_set<std::string> all_assets;
+        std::unordered_set<std::string> loaded_assets;
+        std::unordered_set<std::string> unused_assets;
+
+        std::map<std::string, Font> font_storage;
+        std::unordered_map<std::string, GLuint> texture_storage;
+        std::unordered_map<std::string, Animation> animation_storage;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // A unique_ptr to the single instance of Assets_Manager
         static std::unique_ptr<Assets_Manager> instance;
         // Used with std::call_once to initialize the singleton instance safely in a multithreaded environment.
