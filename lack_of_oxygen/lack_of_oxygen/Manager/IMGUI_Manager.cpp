@@ -1573,33 +1573,50 @@ namespace lof {
                     selected_filepath.clear();
                     std::filesystem::remove(temp);
                    
+                    size_t start_pos_of_folder_filepath;
 
-                    temp.erase(0, ASM.get_full_path("Textures", "").length());
-                    temp = temp.substr(0, temp.find_last_of('.'));
+                    //Deleting Textures from Associated Entities
+                    if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Textures", ""))) != std::string::npos) {
+                        
+                        temp.erase(0, ASM.get_full_path("Textures", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
 
-                    std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
-
-                    std::cout << "temp: " << temp << std::endl << "Checking Texture Storage: " << std::endl;
-
-                    for (auto& texture : texture_storage) {
-
-                        std::cout << texture.first << std::endl;
-
-                        auto it = texture_storage.find(temp);
-                        if (it != texture_storage.end()) {
-                            std::cout << temp << " is deleted. please delete from storage" << std::endl;
-                            
-                            texture_storage.erase(temp);
-                            //after erasing need a way to know which components have so can delete graphics component
+                        auto texture = texture_storage.begin();
+                        while (texture != texture_storage.end()) {
+                            std::cout << texture->first << std::endl;
+                            if (texture->first == temp) {
+                                std::cout << temp << " is deleted. please delete from storage" << std::endl;
+                                texture = texture_storage.erase(texture);
+                            }
+                            else {
+                                ++texture;
+                            }
                         }
-                    }
 
-                    std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
-                    for (auto& texture : texture_storage) {
-                        std::cout << texture.first << std::endl;
-                    }
+                        /*std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
+                        for (auto& texture : texture_storage) {
+                            std::cout << texture.first << std::endl;
+                        }*/
 
-                    is_file_selected = false;
+                        is_file_selected = false;
+                    }
+                    //TODO: FOR AUDIO (Actual Deletion Also) AND FONTS
+                    else {
+                        ImGui::Text("Deletion Not Available For Asset Type");
+                    }
+                    
+                    //for (auto& texture : texture_storage) {
+                    //    std::cout << texture.first << std::endl;
+                    //    auto it = texture_storage.find(temp);
+                    //    if (it != texture_storage.end()) {
+                    //        std::cout << temp << " is deleted. please delete from storage" << std::endl;
+                    //        
+                    //        texture_storage.erase(temp);
+                    //        //after erasing need a way to know which components have so can delete graphics component
+                    //    }
+                    //}
+        
                 }
                 catch (std::filesystem::filesystem_error& e) {
 
