@@ -222,6 +222,10 @@ namespace lof {
         void disable_GUI();
 
         void asset_browser();
+
+        void render_asset_browser();
+
+        std::string open_file_explorer();
     };
 
 } // namespace lof

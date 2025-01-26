@@ -27,6 +27,7 @@ namespace lof {
     Assets_Manager::Assets_Manager() {
         set_type("Assets_Manager");
         initialize_paths();
+        all_assets_in_file();
     }
 
      std::string Assets_Manager::get_executable_directory() {
@@ -263,8 +264,8 @@ namespace lof {
 
         std::string file_line, prefix;
         std::string anim_name;
-        Graphics_Manager::Animation animation{};
-        Graphics_Manager::Frame frame{};
+        Assets_Manager::Animation animation{};
+        Assets_Manager::Frame frame{};
 
         while (getline(input_file, file_line)) {
             std::istringstream file_line_ss{ file_line };
@@ -289,7 +290,7 @@ namespace lof {
             else if (prefix == "EA") {
            
                 animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
-                GFXM.animation_storage[anim_name] = animation;
+                ASM.animation_storage[anim_name] = animation;
                 animation = {};
                 //LM.write_log("Assets_Manager: %s animation loaded", anim_name.c_str());
             }
@@ -333,6 +334,15 @@ namespace lof {
         return true;
     }
 
+    void Assets_Manager::unload_fonts()
+    {
+        font_storage.clear();
+    }
+
+    void Assets_Manager::store_font(const std::string& font_name, const Font& font) {
+        font_storage[font_name] = font;
+    }
+
     // Read and store names of fonts 
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
         std::ifstream input_file{ file_name, std::ios::in };
@@ -370,7 +380,118 @@ namespace lof {
     }
 
 
-  
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void Assets_Manager::shut_down() {
+        // Unload assets
+        unload_textures();
+        unload_shader_programs();
+        unload_models();
+        unload_animations();
+        unload_fonts();
+
+        LM.write_log("Assets Manager and other resources have been shut down.");
+    }
+
+
+    void Assets_Manager::unload_models()
+    {
+        model_storage.clear();
+    }
+
+
+    void Assets_Manager::unload_textures() {
+        /*for (auto& pair : texture_storage) {
+            glDeleteTextures(1, &pair.second);
+        }*/
+        texture_storage.clear();
+        std::cout << "Assets_Manager: All textures have been unloaded." << std::endl;
+    }
+
+    void Assets_Manager::unload_animations()
+    {
+        animation_storage.clear();
+    }
+
+    void Assets_Manager::track_entity_asset(EntityID entity_id, const std::string& component_name, const std::string& asset_name) {
+        tracked_assets[entity_id][component_name].emplace(asset_name);
+
+        LM.write_log("Tracking asset: Entity ID: %u, Component: %s, Asset: %s",
+                 entity_id, component_name.c_str(), asset_name.c_str());
+
+    }
+
+    void Assets_Manager::register_asset(const std::string& asset_name) {
+        all_assets.emplace(asset_name);
+        //LM.write_log("Registered asset: %s", asset_name.c_str());
+    }
+
+    // to register new assets
+    void Assets_Manager::register_assets_from_file(const std::string& file_path)
+    {
+        std::string asset_name = std::filesystem::path(file_path).stem().string();
+        register_asset(asset_name);
+        LM.write_log("Registered new asset: %s", asset_name.c_str());
+    }
+
+    // to get the items in the texture folder
+    void Assets_Manager::all_assets_in_file()
+    {
+        std::string tex_directory = get_full_path(TEXTURE_PATH, "");
+
+        if (!std::filesystem::exists(tex_directory))
+        {
+            return;
+        }
+
+        for (const auto& entry : std::filesystem::directory_iterator(tex_directory))
+        {
+            if (entry.is_regular_file())
+            {
+                std::string texture_name = entry.path().stem().string(); //get file name 
+                register_asset(texture_name);
+                LM.write_log("Registered texture asset: %s", texture_name.c_str());
+            }
+
+
+        }
+    }
+
+    void Assets_Manager::delete_texture(const std::string& texture_name) {
+        // Check if texture exists in storage
+        auto it = texture_storage.find(texture_name);
+        if (it != texture_storage.end()) {
+            // Delete the OpenGL texture
+            GLuint tex_id = it->second;
+            glDeleteTextures(1, &tex_id);
+            texture_storage.erase(it);
+
+            // Log the deletion
+            LM.write_log("Assets_Manager: Deleted texture asset: %s", texture_name.c_str());
+        }
+        else {
+            LM.write_log("Assets_Manager: Texture %s not found in storage", texture_name.c_str());
+            return;
+        }
+
+        // remove Graphics Components
+        for (auto& entity : ECSM.get_entities()) {
+            if (entity && ECSM.has_component<Graphics_Component>(entity->get_id())) {
+                Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity->get_id());
+
+                if (graphics.texture_name == texture_name) {
+                    // If the component is using the deleted texture, remove it
+                    ECSM.remove_component<Graphics_Component>(entity->get_id());
+                    LM.write_log("Assets_Manager: Removed Graphics Component from Entity %u due to texture deletion: %s",
+                        entity->get_id(), texture_name.c_str());
+                }
+            }
+        }
+    }
+
+ 
+    
+   
 
 
     
