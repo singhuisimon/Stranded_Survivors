@@ -34,9 +34,7 @@
 #include "../Utility/Component_Parser.h" // Adding components from JSON
 #include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
-//#include "../Utility/Path_Helper.h"
 #include "../Utility/Force_Helper.h"
-// #include "../Utility/Path_Helper.h"
 
 // Include standard headers
 #include <fstream>

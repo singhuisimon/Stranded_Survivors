@@ -24,8 +24,6 @@
 #include "../Utility/Vector2D.h"
 #include "../Utility/Vector3D.h"
 #include "../Utility/Constant.h"
-//#include "../Utility/Path_Helper.h"
-// #include "../Utility/Path_Helper.h"
 #include "../Utility/Force_Helper.h"
 #include "../Manager/Log_Manager.h"
 
@@ -427,15 +425,17 @@ namespace lof {
             return nullptr;
         }
 
-        
+        /**
+        * @brief Setter for the key in soundconfig, using old key to identify which sound it is.
+        * @param old_key The old unique identifier of soundconfig to be repalced.
+        * @param new_key The new unique identifier of soundconfig to replace the old one.
+        */
         void set_key(const std::string& old_key, std::string& new_key) {
-
-            std::cout << "checking: old_key = " << old_key << "; new_key = " << new_key << std::endl;
+            
             for (auto& sound : sounds) {
-                if (sound.key == old_key) {
-                    std::cout << "sound.key before: " << sound.key << std::endl;
+                if (sound.key == old_key) { 
                     sound.key = new_key;
-                    std::cout << "sound.key after: " << sound.key << std::endl;
+                    
                 }
             }
         }

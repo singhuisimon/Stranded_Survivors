@@ -408,26 +408,37 @@ namespace lof {
 
         for (auto& system : systems) {
 
-            if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System") {
-
-                if (!level_editor_mode) {
-                    // Getting delta time for each system
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-                    // Updating each system
-                    system->update(delta_time);
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
-                }
-
+            if (level_editor_mode && (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System")) {
+                system->set_time(0);
+                continue;
             }
-            else {
-                // Getting delta time for each system
-                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-                // Updating each system
-                system->update(delta_time);
-                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
-            }
-            
-            
+
+            auto start_time = std::chrono::steady_clock::now();
+            system->update(delta_time);
+            auto end_time = std::chrono::steady_clock::now();
+            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
+
+            ////Stops movement, collision and audio system in level editor
+            //if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System") {
+            //    if (!level_editor_mode) {
+            //        // Getting delta time for each system
+            //        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+            //        // Updating each system
+            //        system->update(delta_time);
+            //        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            //    }
+            //    else {
+            //        system->set_time(0);
+            //    }
+            //}
+            //else {
+            //    // Getting delta time for each system
+            //    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+            //    // Updating each system
+            //    system->update(delta_time);
+            //    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            //}
+                
         }
 #endif 
     }

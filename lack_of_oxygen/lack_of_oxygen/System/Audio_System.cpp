@@ -1,7 +1,7 @@
 /**
  * @file Audio_System.cpp
  * @brief Define of the Audio_System class for managing audio playback using FMOD.
- * @author Amanda Leow Boon Suan (100%)
+ * @author Amanda Leow Boon Suan (98%), Saw Hui Shan (2%)
  * @date September 27, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -96,6 +96,15 @@ namespace lof {
 				std::string audio_key = sound.key;
 				std::string key_id = audio.get_filepath(audio_key) + std::to_string(entityID) + audio_key;
 				PlayState state = audio.get_audio_state(audio_key);
+
+				//check if sound has already been loaded.
+				if (sound_map.find(audio.get_filepath(audio_key)) == sound_map.end()) {
+					load_sound(audio.get_filepath(audio_key), audio.get_audio_type(audio_key));
+					if (sound_map.find(audio.get_filepath(audio_key)) == sound_map.end()) {
+						LM.write_log("audiosystem play_sound fail to load sound %s.", audio.get_filepath(audio_key).c_str());
+						return;
+					}
+				}
 
 				//check if audio file still exist
 				if (!ASM.load_audio_file(audio.get_filepath(audio_key))) {
@@ -238,7 +247,7 @@ namespace lof {
 
 		//check if sound has already been loaded.
 		if (sound_map.find(file_path) == sound_map.end()) {
-			load_sound(file_path);
+			load_sound(file_path, audio.get_audio_type(audio_key));
 			if (sound_map.find(file_path) == sound_map.end()) {
 				LM.write_log("audiosystem play_sound fail to load sound %s.", file_path.c_str());
 				return;
@@ -300,7 +309,7 @@ namespace lof {
 		LM.write_log("Audio_System::play_sound: sound %s is playing", cskey.c_str());
 	}
 
-	void Audio_System::load_sound(const std::string& file_path) {
+	void Audio_System::load_sound(const std::string& file_path, AudioType audio_type) {
 		if (sound_map.find(file_path) != sound_map.end()) {
 			return; // Sound already loaded
 		}
@@ -315,7 +324,8 @@ namespace lof {
 		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
 
 		FMOD::Sound* sound = nullptr;
-		FMOD_MODE mode = FMOD_DEFAULT;
+		//FMOD_MODE mode = FMOD_DEFAULT;
+		FMOD_MODE mode = (audio_type == BGM) ? FMOD_CREATESTREAM : FMOD_DEFAULT;
 		FMOD_RESULT result = core_system->createSound(full_path.c_str(), mode, 0, &sound);
 		if (errorcheck(result, "Audio_System::load_sound", "create sound") != 0) {
 			return;
@@ -537,6 +547,16 @@ namespace lof {
 
 	FMOD::ChannelGroup* Audio_System::get_mastergroup() {
 		return mastergroup;
+	}
+
+	std::vector<std::string> Audio_System::get_sound_map_filename() {
+		std::vector<std::string> filenames;
+
+		for (const auto& sound : sound_map) {
+			filenames.push_back(sound.first);
+		}
+
+		return filenames;
 	}
 }
 

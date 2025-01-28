@@ -52,13 +52,17 @@ namespace lof {
 
     void system_performance(int64_t gm_time, int64_t system_time, std::string name) {
 
-        // Calculates % of system's time consumption per game loop compared to overall game loop time (game manager's consumption time) 
-        float percent = static_cast<float>(system_time) / static_cast<float>(gm_time) * UPON_PERCENTAGE;
+        if (gm_time == 0) {
+            ImGui::Text("%s : N/A\n", name.c_str());
+        }
+        else {
 
-        // Prints calculated value for system in console
-        //std::cout << std::left << std::setw(DEBUG_LEFT_WIDTH) << name << ": "  << std::right << std::setprecision(DEBUG_RIGHT_WIDTH) << percent << "%"  << " of total game loop" << std::endl;
+            //Calculates % of system's time consumption per game loop compared to overall game loop time (game manager's consumption time) 
+            float percent = static_cast<float>(system_time) / static_cast<float>(gm_time) * UPON_PERCENTAGE;
 
-        ImGui::Text("%s : %.3f%%\n", name.c_str(), percent);
+            //Prints calculated value for system in IMGUI window
+            ImGui::Text("%s : %.3f%%\n", name.c_str(), percent);
+        }
 
     }
 
