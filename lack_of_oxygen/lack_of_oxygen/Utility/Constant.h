@@ -89,7 +89,8 @@ namespace lof {
 	enum AudioType {
 		BGM = 0,    ///<background music
 		SFX = 1,		///<Sound Effect
-		NIL = 2
+		UI = 2,
+		NIL = 3
 	};
 
 	/*enum PlayState {
