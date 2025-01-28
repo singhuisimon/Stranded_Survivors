@@ -9,15 +9,25 @@
  */
 
 #if 1
+
+//SYSTEM FILE HEADERS
 #include "Movement_System.h"
-#include "../Utility/Force_Helper.h"
-#include "../Utility/Constant.h"
-#include "../Manager/ECS_Manager.h"
-#include "../Component/Component.h"
-#include "../Manager/Input_Manager.h"
-#include "../Manager/Game_Manager.h"
 #include "../System/Render_System.h"
 #include "Collision_System.h"
+
+//MANAGER FILE HEADERS
+#include "../Manager/ECS_Manager.h"
+#include "../Manager/Input_Manager.h"
+#include "../Manager/Game_Manager.h"
+#include "../Manager/FPS_Manager.h"
+
+//UTILITY FILE HEADERS
+#include "../Utility/Force_Helper.h"
+#include "../Utility/Constant.h"
+#include "../Component/Component.h"
+
+
+
 
 namespace lof {
 
@@ -32,19 +42,65 @@ namespace lof {
         signature.set(ECSM.get_component_id<Transform2D>());
         signature.set(ECSM.get_component_id<Velocity_Component>());
         signature.set(ECSM.get_component_id<Physics_Component>());
+
+        //reserve space for max number of dynamic entities 
+        dynamic_entities.reserve(MAX_DYNAMIC_ENTITIES); 
     }
+
+#if 1
+    void Movement_System::add_entity(EntityID entity) {
+        System::add_entity(entity); 
+
+        // Check if entity has all required components first
+        if (!ECSM.has_component<Physics_Component>(entity) ||
+            !ECSM.has_component<Transform2D>(entity) ||
+            !ECSM.has_component<Velocity_Component>(entity)) {
+            return;
+        }
+        //get the physics component
+        auto& physics = ECSM.get_component<Physics_Component>(entity); 
+
+        if (!physics.get_is_static() && (dynamic_entities.size() < MAX_DYNAMIC_ENTITIES)) {
+            dynamic_entities.push_back(entity); 
+            LM.write_log("Movement_System: Added Dynamic Entity %u. Total %zu/%zu",
+                entity, dynamic_entities.size(), MAX_DYNAMIC_ENTITIES); 
+        }
+        else if (!physics.get_is_static()) {
+            LM.write_log("Movement_System: Could not add Entity %u - MAX DYNAMIC ENTITIES REACHED (%zu)",
+                entity, MAX_DYNAMIC_ENTITIES);
+        }
+    }
+
+    void Movement_System::remove_entity(EntityID entity) {
+        System::remove_entity(entity); 
+        auto it = std::find(dynamic_entities.begin(), dynamic_entities.end(), entity); 
+        if (it != dynamic_entities.end()) {
+            dynamic_entities.erase(it); 
+            LM.write_log("Movement_System: Removed Dynamic Entity %u. Total %zu/%zu, ",
+                entity, dynamic_entities.size(), MAX_DYNAMIC_ENTITIES);
+        }
+    }
+
+    void Movement_System::clear_dynamic_entities() {
+        dynamic_entities.clear(); 
+    }
+#endif
+
     /**
      * @brief Integrates physics calculations for movement, applying forces and updating positions.
      * @param delta_time The time increment for updating entity positions and velocities.
      */
-    void Movement_System::integrate(float delta_time) {
+    void Movement_System::integrate(float fixed_dt) {
 
         // Iterate through entities matching the system's signature
 
         //LM.write_log("Movement system start update");
 
-        for (EntityID entity_id : get_entities()) {
-            // std::cout << entity_id << "in physic \n\n";
+        int counter{ 0 };
+
+        for (EntityID entity_id : dynamic_entities) {
+             std::cout << entity_id << "in physic \n\n";
+            ++counter; 
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);
@@ -83,7 +139,7 @@ namespace lof {
             }
 
             //update forces based on time
-            physics.force_helper.update_force(delta_time);
+            physics.force_helper.update_force(fixed_dt);
 
             //get resultant force 
             Vec2D sum_force = physics.force_helper.get_resultant_Force();
@@ -103,13 +159,13 @@ namespace lof {
 
 
             // Update velocity according to the acceleration
-            velocity.velocity += physics.get_acceleration() * delta_time;
+            velocity.velocity += physics.get_acceleration() * fixed_dt;
 
             // Dampen velocity
             velocity.velocity *= physics.get_damping_factor();
 
             // Update the position based on velocity
-            transform.position += velocity.velocity * delta_time;
+            transform.position += velocity.velocity * fixed_dt;
 
             // Clamp velocity to max velocity
             float squared_velocity = square_length_vec2d(velocity.velocity);
@@ -126,16 +182,18 @@ namespace lof {
             physics.reset_forces();
         }
 
+        std::cout << "Movement_System: Number of Entities " << counter << std::endl;
     }
 
     /**
      * @brief Updates the system.
      * @param delta_time The time elapsed since the last update.
      */
-    void Movement_System::update(float delta_time) {
+    void Movement_System::update(float fixed_dt) {
 
-        Movement_System::integrate(delta_time);
-
+        std::cout << "Movement System START \N"; 
+            Movement_System::integrate(fixed_dt);
+            std::cout << "Movement System END \N";
     }
 
     std::string Movement_System::get_type() const {

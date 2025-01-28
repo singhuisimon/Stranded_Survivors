@@ -36,13 +36,18 @@ namespace lof {
 
 	// ----------------------------- FPS_Manager.cpp -------------------------------------------
 	// FPS_Manager Constants
-	constexpr int DEFAULT_TARGET_FPS = 120;
+	constexpr int DEFAULT_TARGET_FPS = 60;
 	constexpr int64_t DEFAULT_MICROSECONDS_PER_SECOND = 1000000;
 	constexpr int64_t DEFAULT_TARGET_TIME = DEFAULT_MICROSECONDS_PER_SECOND / DEFAULT_TARGET_FPS;
 
 	constexpr int64_t DEFAULT_ADJUST_TIME = 0;
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
+
+	constexpr float DEFAULT_FIXED_DELTA_TIME = 1.0f / 60.f;
+	constexpr float DEFAULT_ACCUMULATED_TIME = 0.0f; 
+	constexpr int DEFAULT_NUMBER_OF_STEPS = 0; 
+	constexpr int DEFAULT_MAX_STEPS = 3;
 
 	// ------------------------- System.cpp and Manager.cpp Files -------------------------------
 	// System Performance Constants
@@ -104,6 +109,7 @@ namespace lof {
 
 	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
+	constexpr size_t MAX_DYNAMIC_ENTITIES = 20; 
 
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
 	// File
