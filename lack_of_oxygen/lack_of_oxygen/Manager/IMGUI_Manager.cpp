@@ -1562,12 +1562,6 @@ namespace lof {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
             if (ImGui::Button("DELETE FILE")) {
 
-                std::cout << "Checking First Texture Storage: " << std::endl;
-                auto& texture_storage = ASM.get_texture_storage();
-                for (auto& texture : texture_storage) {
-                    std::cout << texture.first << std::endl;
-                }
-
                 try {
 
                     std::string temp = selected_filepath;
@@ -1583,7 +1577,9 @@ namespace lof {
                         temp = temp.substr(0, temp.find_last_of('.'));
                         std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
 
+                        auto& texture_storage = ASM.get_texture_storage();
                         auto texture = texture_storage.begin();
+
                         while (texture != texture_storage.end()) {
                             std::cout << texture->first << std::endl;
                             if (texture->first == temp) {
@@ -1595,29 +1591,26 @@ namespace lof {
                             }
                         }
 
-                        /*std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
-                        for (auto& texture : texture_storage) {
-                            std::cout << texture.first << std::endl;
-                        }*/
+                        is_file_selected = false;
+                    }
+                    
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Fonts", ""))) != std::string::npos) {
+
+                        temp.erase(0, ASM.get_full_path("Fonts", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+
+                        auto& font_storage = ASM.get_font_storage();
+                        auto font = font_storage.begin();
+                        while (font != font_storage.end()) {
+                            std::cout << font->first << std::endl;
+                        }
 
                         is_file_selected = false;
                     }
-                    //TODO: FOR AUDIO (Actual Deletion Also) AND FONTS
-                    else {
+                    else 
+                    {
                         ImGui::Text("Deletion Not Available For Asset Type");
                     }
-                    
-                    //for (auto& texture : texture_storage) {
-                    //    std::cout << texture.first << std::endl;
-                    //    auto it = texture_storage.find(temp);
-                    //    if (it != texture_storage.end()) {
-                    //        std::cout << temp << " is deleted. please delete from storage" << std::endl;
-                    //        
-                    //        texture_storage.erase(temp);
-                    //        //after erasing need a way to know which components have so can delete graphics component
-                    //    }
-                    //}
-        
                 }
                 catch (std::filesystem::filesystem_error& e) {
 
@@ -1637,39 +1630,70 @@ namespace lof {
 
     void remove_button() {
         if (is_file_selected == true) {
+
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
             if (ImGui::Button("DELETE FILE")) {
-                std::cout << "Checking First Texture Storage: " << std::endl;
-                auto& texture_storage = ASM.get_texture_storage();
-
-                // Log all current textures
-                for (auto& texture : texture_storage) {
-                    std::cout << texture.first << std::endl;
-                }
 
                 try {
-                    // Step 1: Remove the file
+               
                     std::string temp = selected_filepath;
                     selected_filepath.clear();
-                    std::filesystem::remove(temp);
 
-                    // Step 2: Prepare the texture name for removal
-                    temp.erase(0, ASM.get_full_path("Textures", "").length());
-                    temp = temp.substr(0, temp.find_last_of('.'));
-                    std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+                    size_t start_pos_of_folder_filepath;
 
-                    std::cout << "temp: " << temp << std::endl << "Checking Texture Storage: " << std::endl;
+                    //Deleting Textures from Associated Entities
+                    if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Textures", ""))) != std::string::npos) {
 
-                    // Step 3: Call the Assets_Manager's delete_texture function to delete the texture and remove associated components
-                    ASM.delete_texture(temp);
+                        std::filesystem::remove(temp);
+                        
+                        auto& texture_storage = ASM.get_texture_storage();
 
-                    // Final checking of texture storage
-                    std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
-                    for (auto& texture : texture_storage) {
-                        std::cout << texture.first << std::endl;
+                        //Prepare the texture name for removal
+                        temp.erase(0, ASM.get_full_path("Textures", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+
+                        // Step 3: Call the Assets_Manager's delete_texture function to delete the texture and remove associated components
+                        ASM.delete_texture(temp);
+
+                        is_file_selected = false;
+                    }
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Fonts", ""))) != std::string::npos) {
+                        
+                        std::filesystem::remove(temp);
+
+                        temp.erase(0, ASM.get_full_path("Fonts", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+
+                        auto& font_storage = ASM.get_font_storage();
+
+                        //To Change to Asset Manager
+                        auto font = font_storage.begin();
+
+                        while (font != font_storage.end()) {
+                            std::cout << font->first << std::endl;
+                            if (font->first == temp) {
+                                font = font_storage.erase(font);
+                            }
+                            else {
+                                ++font;
+                            }
+                        }
+                        is_file_selected = false;
+                    }
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
+
+                        temp.erase(0, ASM.get_full_path("Audio", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+
+                    }
+                    else {
+
+                        //Make to A Pop-Up Later
+                        ImGui::Text("Deletion Not Available For Asset Type");
                     }
 
-                    is_file_selected = false;
+                    
                 }
                 catch (std::filesystem::filesystem_error& e) {
                     const char* error_msg = e.what();
