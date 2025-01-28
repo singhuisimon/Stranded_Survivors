@@ -953,6 +953,13 @@ namespace lof {
             // Toggle between scenes
             current_scene = (current_scene == 1) ? 2 : 1;
 
+            for (auto& system : ECSM.get_systems()) {
+                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                    movement_system->clear_dynamic_entities();
+                    break;
+                }
+            }
+
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
             std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");

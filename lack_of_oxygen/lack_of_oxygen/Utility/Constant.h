@@ -44,6 +44,11 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
+	constexpr float DEFAULT_FIXED_DELTA_TIME = 1.0f / DEFAULT_TARGET_FPS;
+	constexpr float DEFAULT_ACCUMULATED_TIME = 0.0f; 
+	constexpr int DEFAULT_NUMBER_OF_STEPS = 0; 
+	constexpr int DEFAULT_MAX_STEPS = 3;
+
 	// ------------------------- System.cpp and Manager.cpp Files -------------------------------
 	// System Performance Constants
 	constexpr int64_t DEFAULT_START_TIME = 0;
@@ -119,6 +124,7 @@ namespace lof {
 
 	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
+	constexpr size_t MAX_DYNAMIC_ENTITIES = 20; 
 
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
 	// File

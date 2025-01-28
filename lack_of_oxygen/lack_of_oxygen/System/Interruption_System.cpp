@@ -52,7 +52,7 @@ namespace lof {
         check_key_combinations();
 
         // Check current window state
-        check_window_state();
+       check_window_state();
 
     }
 
