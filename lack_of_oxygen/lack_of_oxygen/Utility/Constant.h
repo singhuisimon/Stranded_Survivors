@@ -92,13 +92,27 @@ namespace lof {
 		NIL = 2
 	};
 
-	enum PlayState {
+	/*enum PlayState {
 		PLAYING = 0,    ///<Audio is to be played
 		STOPPED = 1,    ///<Audio is to be stopped
 		PAUSED = 2,     ///<Audio is to be paused
 		RESUMED = 3,	///<Audio is to be resumed
 		NONE = 4		///<Audio is not played at all nor need to stop
+	};*/
+
+	// ------------------------- Audio_Manager.cpp constants ---------------------------
+	enum GroupType {
+		TYPE_NONE,
+		TYPE_MASTER,
+		TYPE_BGM,
+		TYPE_SFX,
+		TYPE_UI
 	};
+
+	// ------------------------ Audio_System.cpp constants ----------------------------
+
+	constexpr unsigned int MIN_SIMULTANEOUS = 1;
+	constexpr unsigned int MAX_SIMULTANEOUS = 3;
 
 	// ------------------------- Movement_System.cpp constants ------------------------- 
 

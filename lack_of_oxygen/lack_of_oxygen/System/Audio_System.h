@@ -19,13 +19,17 @@
 // Include standard headers
 #include <string>
 #include <iostream>
-#include <vector>
 
 //Include other necessary header
+#include "../Manager/Game_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Input_Manager.h"
+#include "../Manager/Audio_Manager.h"
+#include "../Manager/Assets_Manager.h"
+#include "../Utility/Constant.h"
+#include "../Utility/globals.h"
 #include "../System/System.h"
 
 namespace lof {
@@ -43,14 +47,7 @@ namespace lof {
 		*/
 		~Audio_System();
 
-		/**
-		* @brief Prints out error or successful message depending on result.
-		* @param result FMOD will detect if action is successful.
-		* @function_name Function name where errrorcheck is being called from
-		* @function_purpose The purpose of the function / The purpose of checking if there is any error
-		*/
-		int errorcheck(FMOD_RESULT result, const std::string& function_name = "", const std::string& function_purpose = "");
-
+		//void debug_compressor_activity();
 		/**
 		* @brief Initializer for the Audio System
 		*/
@@ -67,11 +64,7 @@ namespace lof {
 		*/
 		void shutdown();
 
-		/**
-		 * @brief Loads a sound from the specified file_path into the FMOD system
-		 * @param file_path The path to the audio file (current format .wav)
-		 */
-		void load_sound(const std::string& file_path, AudioType audio_type);
+		static std::string generate_channel_key(EntityID entity_id, const std::string& file_path, const std::string& audio_key);
 
 		/**
 		 * @brief Plays the provided FMOD::Sound object.
@@ -80,7 +73,18 @@ namespace lof {
 		 * @param audio_key The unique identifier of the soundconfig
 		 * @param entity A reference to a Audio Component.
 		 */
-		void play_sound(const std::string& file_path, std::string& cskey, std::string& audio_key, Audio_Component& entity);
+		void play_sfx_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio);
+
+		/**
+		 * @brief Plays the provided FMOD::Sound object.
+		 * @param filepath The filepath to the audio
+		 * @param cskey The unique id of filepath + entity id to be used as the channel key
+		 * @param audio_key The unique identifier of the soundconfig
+		 * @param entity A reference to a Audio Component.
+		 */
+		void play_bgm_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio);
+
+		//void update_bgm(); //for future when using it to do layering & detecting oxygen level
 
 		/**
 		* @brief Pause and Resume sound
@@ -96,12 +100,6 @@ namespace lof {
 		void stop_sound(const std::string& channel_key);
 
 		/**
-		* @brief Unload the sound
-		* @param filepath The filepath and the key to find the sound in soundmap
-		*/
-		void unload_sound(const std::string& filepath);
-
-		/**
 		* @brief Setter for the channel pitch
 		* @param channel_key The unique identifier of the channel in the map
 		* @param pitch The new pitch value
@@ -114,121 +112,24 @@ namespace lof {
 		* @param volume The new volume value
 		*/
 		void set_channel_volume(const std::string& channel_key, float volume);
-		/**
-		* @brief Pause the channels under the bgm channelgroup
-		*/
-		void pause_bgm_group();
 
-		/**
-		* @brief Resume the channels under the bgm channelgroup
-		*/
-		void resume_bgm_group();
+		//retrive the core_system
+		FMOD::System* get_core_system();
 
-		/**
-		* @brief Pause the channels under the sfx channelgroup
-		*/
-		void pause_sfx_group();
+		//TODO::APPLY CONST ON NON-EDITABLE DATA!!
+		void apply_dist_effect(const std::string& channel_key, const Vec3D& listener_pos, const Vec3D& sound_pos);
 
-		/**
-		* @brief Resume the channels under the sfx channelgroup
-		*/
-		void resume_sfx_group();
+		Vec3D get_channel_pos(const std::string& channel_key);
+		Vec3D get_listener_pos();
+		void update_audio_for_listener(Vec3D& listener_pos);
+		void set_sound_position(const std::string& channel_key, const Vec3D position);
 
-		/**
-		* @brief Stop all the channel in the master channelgroup
-		*/
-		void stop_mastergroup();
+		void get_active_channels();
+		bool is_sound_playing(std::string& channel_key);
 
-		/**
-		* @brief Pause and Resume the mastergroup
-		*/
-		void pause_resume_mastergroup();
+		void fade_in(const std::string& channel_key, float duration);
+		void fade_out(const std::string& channel_key, float duration);
 
-		/**
-		* @brief Getter for the bgm channelgroup volume
-		*/
-		float get_bgmgroup_volume() const;
-
-		/**
-		* @brief Setter for the bgm channelgroup volume
-		* @param volume The new volume value
-		*/
-		void set_bgmgroup_volume(float volume);
-
-		/**
-		* @brief Getter for the bgm channelgroup pitch
-		*/
-		float get_bgmgroup_pitch() const;
-
-		/**
-		* @brief Setter for the bgm channelgroup pitch
-		* @param pitch The new pitch value
-		*/
-		void set_bgmgroup_pitch(float pitch);
-
-		/**
-		* @brief Getter for the sfx channelgroup volume
-		*/
-		float get_sfxgroup_volume() const;
-
-		/**
-		* @brief Setter for the sfx channelgroup volume
-		* @param volume The new volume value
-		*/
-		void set_sfxgroup_volume(float volume);
-
-		/**
-		* @brief Getter for the sfx channelgroup pitch
-		*/
-		float get_sfxgroup_pitch() const;
-
-		/**
-		* @brief Setter for the sfx channelgroup pitch
-		* @param pitch The new pitch value
-		*/
-		void set_sfxgroup_pitch(float pitch);
-
-		/**
-		* @brief Getter for the mastergroup volume
-		*/
-		float get_mastergroup_volume() const;
-
-		/**
-		* @brief Setter for the mastergroup volume
-		* @param volume The new volume value
-		*/
-		void set_mastergroup_volume(float volume);
-
-		/**
-		* @brief Getter for the mastergroup volume
-		*/
-		float get_mastergroup_pitch() const;
-
-		/**
-		* @brief Setter for the mastergroup pitch
-		* @param pitch The new pitch value
-		*/
-		void set_mastergroup_pitch(float pitch);
-
-		/**
-		* @brief Getters for the bgmgroup
-		*/
-		FMOD::ChannelGroup* get_bgmgroup();
-
-		/**
-		* @brief Getters for the sfxgroup
-		*/
-		FMOD::ChannelGroup* get_sfxgroup();
-
-		/**
-		* @brief Getters for the mastergroup
-		*/
-		FMOD::ChannelGroup* get_mastergroup();
-
-		//3D related
-		//FMOD_VECTOR 
-		//void set_listener_position(const Vec3D& pos);
-		//void set_channel3D_pos(const std::string& channel_key, Vec3D& pos);
 
 		/**
 		* @brief Returns the type of the audio system
@@ -236,24 +137,14 @@ namespace lof {
 		*/
 		std::string get_type() const override;
 
-		std::vector<std::string> get_sound_map_filename();
-
 	private:
 
 		FMOD::System* core_system;	///<Core audio system
 
-		/**
-		* @brief Initializes all the channel group as well as to add them under the master channel group
-		*/
-		void initializegroups();
-
-		FMOD::ChannelGroup* bgmgroup;		///< Handles all the channel classified as background music
-		FMOD::ChannelGroup* sfxgroup;		///< Handles all the channel classified as sound effect
-		FMOD::ChannelGroup* mastergroup;	///< Handles all the channel that is running in the system.
-
-		std::unordered_map<std::string, FMOD::Sound*> sound_map;		///< Map of Sound with the filepath as the key
-		std::unordered_map<std::string, FMOD::Channel*> channel_map;	///< Map of Channel with the filepath + entityid as the key
+		std::unordered_map<std::string, std::vector<FMOD::Channel*>> channel_map;	///< Map of Channel with the filepath + entityid as the key
 		std::unordered_map<std::string, std::string> all_prev_filepath_map;	///< Map of String with audio key as key and filepath as data
+
+		//friend class Audio_Manager;
 	};
 }
 

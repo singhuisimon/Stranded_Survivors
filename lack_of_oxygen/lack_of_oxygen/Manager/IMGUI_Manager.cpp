@@ -1145,10 +1145,10 @@ namespace lof {
                                 if (system->get_type() == "Audio_System") {
                                     auto* audio_system = static_cast<Audio_System*>(system.get());
                                     if (audio_system) {
-                                        sound_map_filenames = audio_system->get_sound_map_filename();
-                                        for (const auto& name : sound_map_filenames) {
+                                        //sound_map_filenames = audio_system->get_sound_map_filename();
+                                        /*for (const auto& name : sound_map_filenames) {
                                             file_name_cstr.push_back(name.c_str());
-                                        }
+                                        }*/
                                     }
                                 }
                             }
@@ -1205,7 +1205,7 @@ namespace lof {
                                         for (auto& system : ECSM.get_systems()) {
                                             if (system->get_type() == "Audio_System") {
                                                 auto* audio_system = static_cast<Audio_System*>(system.get());
-                                                audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
+                                                //audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
                                                 //fill_audio_file_names(file_name, file_path);
 
                                                 audio.set_filepath(sounds[i].key, file_name);

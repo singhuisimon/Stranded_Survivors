@@ -567,12 +567,13 @@ namespace lof {
             sound_obj.AddMember("filepath", rapidjson::Value(filename.c_str(), allocator), allocator);
 
             // Add other sound properties
-            sound_obj.AddMember("audio_state", static_cast<int>(sound.audio_state), allocator);
             sound_obj.AddMember("audio_type", static_cast<int>(sound.audio_type), allocator);
+            sound_obj.AddMember("max_simultaneous", sound.max_simultaneous, allocator);
             sound_obj.AddMember("volume", sound.volume, allocator);
             sound_obj.AddMember("pitch", sound.pitch, allocator);
             // Use "islooping" to match original format
             sound_obj.AddMember("islooping", sound.islooping, allocator);
+            sound_obj.AddMember("is3d", sound.is3d, allocator);
 
             // Add the serialized sound object to the sounds array
             sounds_array.PushBack(sound_obj, allocator);
@@ -581,7 +582,7 @@ namespace lof {
         comp_obj.AddMember("sounds", sounds_array, allocator);
 
         // Add other audio component properties
-        comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
+        //comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
 
         rapidjson::Value position(rapidjson::kArrayType);
         Vec3D pos = component.get_position();

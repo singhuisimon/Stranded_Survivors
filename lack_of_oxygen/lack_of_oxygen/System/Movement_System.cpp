@@ -71,14 +71,14 @@ namespace lof {
                 physics.reset_jump_request();
                 physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
                 
-                if (GM.get_current_scene() == 1) {
+                /*if (GM.get_current_scene() == 1) {
                     ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping", PLAYING);
 
                 }
                 else {
                     ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping1", PLAYING);
                     ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping2", PLAYING);
-                }
+                }*/
                 
             }
 

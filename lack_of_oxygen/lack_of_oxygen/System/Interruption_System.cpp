@@ -110,13 +110,13 @@ namespace lof {
             IM.reset();
 
             // Pause audio
-            for (auto const& system : ECSM.get_systems()) {
+            /*for (auto const& system : ECSM.get_systems()) {
                 if (auto* audio_system = dynamic_cast<Audio_System*>(system.get())) {
                     audio_system->pause_resume_mastergroup();
                     LM.write_log("Interruption_System: Audio paused");
                     break;
                 }
-            }
+            }*/
 
             LM.write_log("Interruption_System: Game interrupted - Input reset, Audio paused");
         }
@@ -139,13 +139,13 @@ namespace lof {
             }
 
             // Resume audio
-            for (auto const& system : ECSM.get_systems()) {
+            /*for (auto const& system : ECSM.get_systems()) {
                 if (auto* audio_system = dynamic_cast<Audio_System*>(system.get())) {
                     audio_system->pause_resume_mastergroup();
                     LM.write_log("Interruption_System: Audio resumed");
                     break;
                 }
-            }
+            }*/
         // Reset input states again to ensure clean state
         IM.reset();
 
