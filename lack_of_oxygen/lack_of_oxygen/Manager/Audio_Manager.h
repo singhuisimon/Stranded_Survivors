@@ -61,7 +61,7 @@ namespace lof {
 		 * @brief Loads a sound from the specified file_path into the FMOD system
 		 * @param file_path The path to the audio file (current format .wav)
 		 */
-		void load_sound(const std::string& file_path, const AudioType audio_type, bool is3d);
+		void load_sound(const std::string& file_path, const AudioType audio_type, bool is3d = false);
 
 		/**
 		* @brief Unload the sound
