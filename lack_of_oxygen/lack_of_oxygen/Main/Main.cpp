@@ -194,8 +194,8 @@ int main(void) {
 //#endif
         glfwSetWindowTitle(window, ss.str().c_str());
 
-        const GLubyte* renderer = glGetString(GL_RENDERER);
-        printf("GL Renderer  : %s\n", renderer);
+       /* const GLubyte* renderer = glGetString(GL_RENDERER);
+        printf("GL Renderer  : %s\n", renderer);*/
 
         // Update FPS timer
         fps_timer += delta_time;

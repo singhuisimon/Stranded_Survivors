@@ -191,9 +191,9 @@ namespace lof {
      */
     void Movement_System::update(float fixed_dt) {
 
-        std::cout << "Movement System START \N"; 
+        //std::cout << "Movement System START \N"; 
             Movement_System::integrate(fixed_dt);
-            std::cout << "Movement System END \N";
+        //    std::cout << "Movement System END \N";
     }
 
     std::string Movement_System::get_type() const {
