@@ -67,7 +67,7 @@
               "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": false,
+              "islooping": true,
               "is3d": false
             }
           ],

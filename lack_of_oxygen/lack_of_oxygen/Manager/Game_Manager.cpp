@@ -207,7 +207,8 @@ namespace lof {
             ADM.pause_resume_mastergroup();
         }
 
-        if (IM.is_key_pressed(GLFW_KEY_J)) {
+        //commented out this is for me to test - Amanda
+        /*if (IM.is_key_pressed(GLFW_KEY_J)) {
             oxygen_level--;
             std::cout << "current oxygen level " << oxygen_level << std::endl;
         }
@@ -216,8 +217,8 @@ namespace lof {
             oxygen_level++;
             std::cout << "current oxygen level " << oxygen_level << std::endl;
         }
-        std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
-        ADM.update_bgm_layering(current_scene, oxygen_level);
+        std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;*/
+        ADM.update_bgm_layering(current_scene);// , oxygen_level);
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);

@@ -58,8 +58,8 @@ namespace lof {
         // Flag for scn file
         int current_scene = 1;
 
-        //temporary flag for bgm
-        int oxygen_level = 100;
+        //temporary value for bgm
+        //int oxygen_level = 100;
 
         /**
          * @brief Determines the mineral value based on the block entity type
