@@ -51,16 +51,46 @@
         "Audio_Component": {
           "sounds": [
             {
-              "key": "bgm1",
+              "key": "bgm surface",
               "filepath": "bgm_surface_music",
-              "audio_state": 0,
               "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.8,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm base1",
+              "filepath": "bgm_100_base_pulse",
+              "audio_type": 0,
+              "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": true
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm base2",
+              "filepath": "bgm_100_chords",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm base3",
+              "filepath": "bgm_100_melody",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
             }
           ],
-          "is_3d": false,
           "position": [
             0.0,
             0.0,
@@ -385,52 +415,46 @@
         "Audio_Component": {
           "sounds": [
             {
-              "key": "jumping1",
-              "filepath": "player_jumping_Fx01",
-              "audio_state": 4,
+              "key": "jumping",
+              "filepath": "sfx_jumping",
               "audio_type": 1,
-              "volume": 0.1,
-              "pitch": 2.0,
-              "islooping": false
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
             },
             {
-              "key": "jumping2",
-              "filepath": "player_jumping_Fx04",
-              "audio_state": 4,
+              "key": "moving",
+              "filepath": "sfx_walking",
               "audio_type": 1,
-              "volume": 0.178,
+              "max_simultaneous": 1,
+              "volume": 1.0,
               "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             },
             {
-              "key": "moving 1",
-              "filepath": "player_walking_01",
-              "audio_state": 4,
+              "key": "mining normal",
+              "filepath": "sfx_general_block_hit",
               "audio_type": 1,
-              "volume": 0.178,
+              "max_simultaneous": 10,
+              "volume": 1.0,
               "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             },
             {
-              "key": "moving 2",
-              "filepath": "player_walking_02",
-              "audio_state": 4,
+              "key": "mining mineral",
+              "filepath": "sfx_mineral_block_hit",
               "audio_type": 1,
-              "volume": 0.178,
+              "max_simultaneous": 10,
+              "volume": 1.0,
               "pitch": 1.0,
-              "islooping": false
-            },
-            {
-              "key": "moving 3",
-              "filepath": "player_walking_03",
-              "audio_state": 4,
-              "audio_type": 1,
-              "volume": 0.178,
-              "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             }
           ],
-          "is_3d": false,
           "position": [
             0.0,
             0.0,

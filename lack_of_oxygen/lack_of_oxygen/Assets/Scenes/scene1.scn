@@ -53,23 +53,24 @@
             {
               "key": "bgm1",
               "filepath": "audio_test_1",
-              "audio_state": 0,
               "audio_type": 0,
+              "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": true
+              "islooping": true,
+              "is3d": false
             },
             {
               "key": "bgm2",
               "filepath": "audio_test_2",
-              "audio_state": 4,
               "audio_type": 0,
+              "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             }
           ],
-          "is_3d": false,
           "position": [
             0.0,
             0.0,
@@ -535,32 +536,34 @@
             {
               "key": "jumping",
               "filepath": "audio_test_Fx16_2",
-              "audio_state": 4,
               "audio_type": 1,
+              "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             },
             {
               "key": "moving left",
               "filepath": "audio_test_Fx28",
-              "audio_state": 4,
               "audio_type": 1,
+              "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             },
             {
               "key": "moving right",
               "filepath": "audio_test_Fx27",
-              "audio_state": 4,
               "audio_type": 1,
+              "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
-              "islooping": false
+              "islooping": false,
+              "is3d": false
             }
           ],
-          "is_3d": false,
           "position": [
             0.0,
             0.0,
