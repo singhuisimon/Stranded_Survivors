@@ -11,6 +11,7 @@
 
 #include "Interruption_System.h"
 #include "../Manager/Input_Manager.h"
+#include "../Manager/Audio_Manager.h"
 #include "Audio_System.h"
 
 namespace lof {
@@ -118,6 +119,8 @@ namespace lof {
                 }
             }*/
 
+            ADM.pause_resume_mastergroup();
+
             LM.write_log("Interruption_System: Game interrupted - Input reset, Audio paused");
         }
     }
@@ -146,6 +149,9 @@ namespace lof {
                     break;
                 }
             }*/
+
+            ADM.pause_resume_mastergroup();
+
         // Reset input states again to ensure clean state
         IM.reset();
 
