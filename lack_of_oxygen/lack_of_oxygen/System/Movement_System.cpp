@@ -96,11 +96,11 @@ namespace lof {
 
         //LM.write_log("Movement system start update");
 
-        int counter{ 0 };
+       // int counter{ 0 };
 
         for (EntityID entity_id : dynamic_entities) {
-             std::cout << entity_id << "in physic \n\n";
-            ++counter; 
+            // std::cout << entity_id << "in physic \n\n";
+           // ++counter; 
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);
@@ -182,7 +182,7 @@ namespace lof {
             physics.reset_forces();
         }
 
-        std::cout << "Movement_System: Number of Entities " << counter << std::endl;
+        //std::cout << "Movement_System: Number of Entities " << counter << std::endl;
     }
 
     /**

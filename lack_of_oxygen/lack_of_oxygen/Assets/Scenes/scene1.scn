@@ -1,1209 +1,592 @@
 {
-    "objects": [
-        {
-            "name": "background",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        -4450.0
-                    ],
-                    "prev_position": [
-                        0.0,
-                        -4450.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        1920.0,
-                        16128.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.5,
-                        0.5,
-                        0.5
-                    ],
-                    "texture_name": "skybox_batch_4",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            2.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            29.866666793823242,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            -8.065731048583984,
-                            1.0
-                        ]
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "bgm1",
-                            "filepath": "audio_test_1",
-                            "audio_state": 0,
-                            "audio_type": 0,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true
-                        },
-                        {
-                            "key": "bgm2",
-                            "filepath": "audio_test_2",
-                            "audio_state": 4,
-                            "audio_type": 0,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": false
-                        }
-                    ],
-                    "is_3d": false,
-                    "position": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "min_distance": 1.0,
-                    "max_distance": 100.0
-                }
-            }
+  "objects": [
+    {
+      "name": "background",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            -4450.0
+          ],
+          "prev_position": [
+            0.0,
+            -4450.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            16128.0
+          ]
         },
-        {
-            "name": "platform1",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        -180.39999389648438
-                    ],
-                    "prev_position": [
-                        0.0,
-                        -180.39999389648438
-                    ],
-                    "orientation": [
-                        0.0,
-                        30.0
-                    ],
-                    "scale": [
-                        512.0,
-                        76.80000305175781
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "texture_name": "dirt",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.5333333611488342,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14222222566604614,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            -0.15906475484371185,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 512.0,
-                    "height": 76.80000305175781,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        -0.0
-                    ],
-                    "damping_factor": 0.0,
-                    "max_velocity": 0.0,
-                    "mass": 0.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            }
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "texture_name": "skybox_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              4.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              42.0,
+              0.0
+            ],
+            [
+              0.0,
+              -18.908308029174805,
+              1.0
+            ]
+          ]
         },
-        {
-            "name": "platform2",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        600.0,
-                        -614.4000244140625
-                    ],
-                    "prev_position": [
-                        600.0,
-                        -614.4000244140625
-                    ],
-                    "orientation": [
-                        0.0,
-                        30.0
-                    ],
-                    "scale": [
-                        512.0,
-                        76.80000305175781
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "texture_name": "rock",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.5333333611488342,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14222222566604614,
-                            0.0
-                        ],
-                        [
-                            0.6250000596046448,
-                            -0.9627684950828552,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 512.0,
-                    "height": 76.80000305175781,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        -0.0
-                    ],
-                    "damping_factor": 0.0,
-                    "max_velocity": 0.0,
-                    "mass": 0.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "bgm1",
+              "filepath": "audio_test_1",
+              "audio_state": 0,
+              "audio_type": 0,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true
+            },
+            {
+              "key": "bgm2",
+              "filepath": "audio_test_2",
+              "audio_state": 4,
+              "audio_type": 0,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": false
             }
-        },
-        {
-            "name": "platform3",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -512.0,
-                        100.0
-                    ],
-                    "prev_position": [
-                        -512.0,
-                        100.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        30.0
-                    ],
-                    "scale": [
-                        512.0,
-                        76.80000305175781
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "texture_name": "NoTexture",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.5333333611488342,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14222222566604614,
-                            0.0
-                        ],
-                        [
-                            -0.5333333611488342,
-                            0.36019447445869446,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 512.0,
-                    "height": 76.80000305175781,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        -0.0
-                    ],
-                    "damping_factor": 0.0,
-                    "max_velocity": 0.0,
-                    "mass": 0.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                }
-            }
-        },
-        {
-            "name": "air vent display",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        800.0,
-                        -499.20001220703125
-                    ],
-                    "prev_position": [
-                        800.0,
-                        -499.20001220703125
-                    ],
-                    "orientation": [
-                        0.0,
-                        30.0
-                    ],
-                    "scale": [
-                        102.4000015258789,
-                        153.60000610351563
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "texture_name": "spritesheet_map",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.1066666767001152,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.2844444513320923,
-                            0.0
-                        ],
-                        [
-                            0.8333333730697632,
-                            -0.7494351267814636,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 102.4000015258789,
-                    "height": 153.60000610351563,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        -0.0
-                    ],
-                    "damping_factor": 0.0,
-                    "max_velocity": 0.0,
-                    "mass": 0.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Animation_Component": {
-                    "animations": [
-                        [
-                            "0",
-                            "vent_strip"
-                        ]
-                    ],
-                    "curr_animation_idx": 0,
-                    "start_animation_idx": 0,
-                    "curr_frame_index": 0,
-                    "start_tile_health": 2,
-                    "curr_tile_health": 2
-                }
-            }
-        },
-        {
-            "name": "player1",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -114.92939758300781,
-                        -94.50502014160156
-                    ],
-                    "prev_position": [
-                        -114.92939758300781,
-                        -94.50502014160156
-                    ],
-                    "orientation": [
-                        0.0,
-                        30.0
-                    ],
-                    "scale": [
-                        95.0,
-                        95.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        1.0,
-                        0.0
-                    ],
-                    "texture_name": "spritesheet_player",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0989583358168602,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.17592592537403107,
-                            0.0
-                        ],
-                        [
-                            -0.11971812695264816,
-                            0.0,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 85.0,
-                    "height": 95.0,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        0.0
-                    ],
-                    "damping_factor": 0.949999988079071,
-                    "max_velocity": 20000.0,
-                    "mass": 10.0,
-                    "jump_force": 1000.0,
-                    "is_static": false,
-                    "is_grounded": true,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": [
-                            {
-                                "direction": [
-                                    -1.0,
-                                    0.0
-                                ],
-                                "type": "MOVE_LEFT",
-                                "magnitude": 4800.0,
-                                "lifetime": 0.0,
-                                "is_active": false
-                            },
-                            {
-                                "direction": [
-                                    1.0,
-                                    0.0
-                                ],
-                                "type": "MOVE_RIGHT",
-                                "magnitude": 4800.0,
-                                "lifetime": 0.0,
-                                "is_active": false
-                            },
-                            {
-                                "direction": [
-                                    0.0,
-                                    1.0
-                                ],
-                                "type": "JUMP_UP",
-                                "magnitude": 4438.0,
-                                "lifetime": 0.0,
-                                "is_active": false
-                            }
-                        ]
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        5.717761216059882e-26,
-                        0.0
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "jumping",
-                            "filepath": "audio_test_Fx16_2",
-                            "audio_state": 4,
-                            "audio_type": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": false
-                        },
-                        {
-                            "key": "moving left",
-                            "filepath": "audio_test_Fx28",
-                            "audio_state": 4,
-                            "audio_type": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": false
-                        },
-                        {
-                            "key": "moving right",
-                            "filepath": "audio_test_Fx27",
-                            "audio_state": 4,
-                            "audio_type": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": false
-                        }
-                    ],
-                    "is_3d": false,
-                    "position": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "min_distance": 1.0,
-                    "max_distance": 100.0
-                },
-                "Animation_Component": {
-                    "animations": [
-                        [
-                            "0",
-                            "prisoner_idle_left"
-                        ],
-                        [
-                            "1",
-                            "prisoner_idle_right"
-                        ],
-                        [
-                            "2",
-                            "prisoner_running_left"
-                        ],
-                        [
-                            "3",
-                            "prisoner_running_right"
-                        ],
-                        [
-                            "4",
-                            "prisoner_mining_left"
-                        ],
-                        [
-                            "5",
-                            "prisoner_mining_right"
-                        ],
-                        [
-                            "6",
-                            "prisoner_mining_up_left"
-                        ],
-                        [
-                            "7",
-                            "prisoner_mining_up_right"
-                        ],
-                        [
-                            "8",
-                            "prisoner_mining_down_left"
-                        ],
-                        [
-                            "9",
-                            "prisoner_mining_down_right"
-                        ]
-                    ],
-                    "curr_animation_idx": 0,
-                    "start_animation_idx": 0,
-                    "curr_frame_index": 0,
-                    "start_tile_health": 2,
-                    "curr_tile_health": 2
-                }
-            }
-        },
-        {
-            "name": "moving_sun_horizontal",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -208.90087890625,
-                        600.0
-                    ],
-                    "prev_position": [
-                        -208.90087890625,
-                        600.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        100.0,
-                        100.80000305175781
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.800000011920929,
-                        0.20000000298023224
-                    ],
-                    "texture_name": "sun",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.1041666716337204,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.18666666746139526,
-                            0.0
-                        ],
-                        [
-                            -0.2176050990819931,
-                            1.2861202955245972,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 512.0,
-                    "height": 76.80000305175781,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        0.0
-                    ],
-                    "damping_factor": 0.0,
-                    "max_velocity": 0.0,
-                    "mass": 0.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Logic_Component": {
-                    "logic_type": 0,
-                    "movement_pattern": 0,
-                    "is_active": true,
-                    "movement_speed": 1.100000023841858,
-                    "movement_range": 300.0,
-                    "reverse_direction": false,
-                    "rotate_with_motion": false,
-                    "origin_pos": [
-                        -500.0,
-                        600.0
-                    ]
-                }
-            }
-        },
-        {
-            "name": "moving_sun_circular",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -515.8240356445313,
-                        749.373046875
-                    ],
-                    "prev_position": [
-                        -515.8240356445313,
-                        749.373046875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        50.0,
-                        50.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.800000011920929,
-                        0.20000000298023224,
-                        0.0
-                    ],
-                    "texture_name": "snowflake",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0520833358168602,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.09259258955717087,
-                            0.0
-                        ],
-                        [
-                            -0.5373167395591736,
-                            1.5627371072769165,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 512.0,
-                    "height": 76.80000305175781,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        0.0
-                    ],
-                    "damping_factor": 0.0,
-                    "max_velocity": 0.0,
-                    "mass": 0.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Logic_Component": {
-                    "logic_type": 0,
-                    "movement_pattern": 1,
-                    "is_active": true,
-                    "movement_speed": 1.0,
-                    "movement_range": 200.0,
-                    "reverse_direction": false,
-                    "rotate_with_motion": true,
-                    "origin_pos": [
-                        -500.0,
-                        550.0
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_overlay",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        405.4949951171875
-                    ],
-                    "prev_position": [
-                        0.0,
-                        405.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        1920.0,
-                        175.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "texture_name": "NoTexture",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            2.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.32407405972480774,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.9259259700775146,
-                            1.0
-                        ]
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_oxygen_meter",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -400.0,
-                        405.4949951171875
-                    ],
-                    "prev_position": [
-                        -400.0,
-                        405.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        400.0,
-                        40.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.800000011920929,
-                        0.20000000298023224
-                    ],
-                    "texture_name": "top_ui_o2_meter_batch_4",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.4166666865348816,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.07407407462596893,
-                            0.0
-                        ],
-                        [
-                            -0.4166666865348816,
-                            0.9259259700775146,
-                            1.0
-                        ]
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_panik_meter",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -400.0,
-                        355.4949951171875
-                    ],
-                    "prev_position": [
-                        -400.0,
-                        355.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        400.0,
-                        40.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.800000011920929,
-                        0.20000000298023224
-                    ],
-                    "texture_name": "top_ui_panik_meter_batch_4",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.4166666865348816,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.07407407462596893,
-                            0.0
-                        ],
-                        [
-                            -0.4166666865348816,
-                            0.8333333730697632,
-                            1.0
-                        ]
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_mineral_texture",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        380.4949951171875
-                    ],
-                    "prev_position": [
-                        0.0,
-                        380.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        80.0,
-                        80.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        0.0,
-                        0.800000011920929,
-                        0.20000000298023224
-                    ],
-                    "texture_name": "top_ui_minerals_batch_4",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0833333358168602,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14814814925193787,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.8796296715736389,
-                            1.0
-                        ]
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_oxygen_text",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -648.0,
-                        405.4949951171875
-                    ],
-                    "prev_position": [
-                        -648.0,
-                        405.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        30.0
-                    ],
-                    "scale": [
-                        96.0,
-                        42.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "NoTexture",
-                    "shd_ref": 2,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0010416667209938169,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0018518518190830946,
-                            0.0
-                        ],
-                        [
-                            0.0010416667209938169,
-                            0.17686115205287933,
-                            1.0
-                        ]
-                    ]
-                },
-                "Text_Component": {
-                    "font_name": "PressStart2P",
-                    "text": "O2",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "scale": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_panic_text",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -720.0,
-                        355.4949951171875
-                    ],
-                    "prev_position": [
-                        -720.0,
-                        355.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        240.0,
-                        42.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "NoTexture",
-                    "shd_ref": 2,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0010416667209938169,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0018518518190830946,
-                            0.0
-                        ],
-                        [
-                            0.0010416667209938169,
-                            0.17686115205287933,
-                            1.0
-                        ]
-                    ]
-                },
-                "Text_Component": {
-                    "font_name": "PressStart2P",
-                    "text": "Panic",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "scale": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            }
-        },
-        {
-            "name": "top_ui_mineral_count_text",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        240.0,
-                        370.4949951171875
-                    ],
-                    "prev_position": [
-                        240.0,
-                        370.4949951171875
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        48.0,
-                        42.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "NoTexture",
-                    "shd_ref": 2,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0010416667209938169,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0018518518190830946,
-                            0.0
-                        ],
-                        [
-                            0.0010416667209938169,
-                            0.17686115205287933,
-                            1.0
-                        ]
-                    ]
-                },
-                "Text_Component": {
-                    "font_name": "PressStart2P",
-                    "text": "0",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "scale": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            }
-        
+          ],
+          "is_3d": false,
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
+        }
       }
-    ]
-    
+    },
+    {
+      "name": "platform1",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            -180.39999389648438
+          ],
+          "prev_position": [
+            0.0,
+            -180.39999389648438
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            512.0,
+            76.80000305175781
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "dirt",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.20000001788139343,
+              0.0
+            ],
+            [
+              0.0,
+              -0.2999739646911621,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 512.0,
+          "height": 76.80000305175781,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            -0.0
+          ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "platform2",
+      "components": {
+        "Transform2D": {
+          "position": [
+            600.0,
+            -614.4000244140625
+          ],
+          "prev_position": [
+            600.0,
+            -614.4000244140625
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            512.0,
+            76.80000305175781
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "rock",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.20000001788139343,
+              0.0
+            ],
+            [
+              1.171875,
+              -1.5083074569702148,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 512.0,
+          "height": 76.80000305175781,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            -0.0
+          ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "platform3",
+      "components": {
+        "Transform2D": {
+          "position": [
+            -512.0,
+            100.0
+          ],
+          "prev_position": [
+            -512.0,
+            100.0
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            512.0,
+            76.80000305175781
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.20000001788139343,
+              0.0
+            ],
+            [
+              -1.0,
+              0.3521093726158142,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 512.0,
+          "height": 76.80000305175781,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            -0.0
+          ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "air vent display",
+      "components": {
+        "Transform2D": {
+          "position": [
+            800.0,
+            -499.20001220703125
+          ],
+          "prev_position": [
+            800.0,
+            -499.20001220703125
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            102.4000015258789,
+            153.60000610351563
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "spritesheet_map",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.20000000298023224,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.40000003576278687,
+              0.0
+            ],
+            [
+              1.5625,
+              -1.2083073854446411,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 102.4000015258789,
+          "height": 153.60000610351563,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            -0.0
+          ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            0.0,
+            0.0
+          ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "vent_strip"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0
+        }
+      }
+    },
+    {
+      "name": "player1",
+      "components": {
+        "Transform2D": {
+          "position": [
+            -110.5577392578125,
+            -35.20999526977539
+          ],
+          "prev_position": [
+            -110.5577392578125,
+            -35.20999526977539
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            95,
+            95
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "texture_name": "spritesheet_player",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.20000000298023224,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.40000003576278687,
+              0.0
+            ],
+            [
+              -0.21593308448791504,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 95,
+          "height": 95,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            0.0
+          ],
+          "damping_factor": 0.949999988079071,
+          "max_velocity": 20000.0,
+          "mass": 10.0,
+          "jump_force": 2000.0,
+          "is_static": false,
+          "is_grounded": true,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": [
+              {
+                "direction": [
+                  -1.0,
+                  0.0
+                ],
+                "type": "MOVE_LEFT",
+                "magnitude": 10000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [
+                  1.0,
+                  0.0
+                ],
+                "type": "MOVE_RIGHT",
+                "magnitude": 10000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [
+                  0.0,
+                  1.0
+                ],
+                "type": "JUMP_UP",
+                "magnitude": 20000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              }
+            ]
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            11.195076942443848,
+            0.0
+          ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "jumping",
+              "filepath": "audio_test_Fx16_2",
+              "audio_state": 4,
+              "audio_type": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": false
+            },
+            {
+              "key": "moving left",
+              "filepath": "audio_test_Fx28",
+              "audio_state": 4,
+              "audio_type": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": false
+            },
+            {
+              "key": "moving right",
+              "filepath": "audio_test_Fx27",
+              "audio_state": 4,
+              "audio_type": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": false
+            }
+          ],
+          "is_3d": false,
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
+        },
+        "Animation_Component": {
+          "animations": [
+            [ "0", "prisoner_idle_left" ],
+            [ "1", "prisoner_idle_right" ],
+            [ "2", "prisoner_running_left" ],
+            [ "3", "prisoner_running_right" ],
+            [ "4", "prisoner_mining_left" ],
+            [ "5", "prisoner_mining_right" ],
+            [ "6", "prisoner_mining_up_left" ],
+            [ "7", "prisoner_mining_up_right" ],
+            [ "8", "prisoner_mining_down_left" ],
+            [ "9", "prisoner_mining_down_right" ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0
+        }
+      }
     },
     {
       "name": "moving_sun_horizontal",
