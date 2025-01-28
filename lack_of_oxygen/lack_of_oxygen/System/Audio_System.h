@@ -113,6 +113,8 @@ namespace lof {
 		*/
 		void set_channel_volume(const std::string& channel_key, float volume);
 
+		void set_channel_mute(const std::string& channel_key, bool mute);
+
 		//retrive the core_system
 		FMOD::System* get_core_system();
 

@@ -159,14 +159,20 @@ namespace lof {
 		return nullptr;
 	}
 
-	void Audio_Manager::play_now(EntityID entity_id, const std::string& audio_key, const Audio_Component& audio_component) {
+	void Audio_Manager::play_now(EntityID entity_id, const std::string& audio_key, const Audio_Component& audio_component, bool bgm) {
 		std::string file_path = audio_component.get_filepath(audio_key);
 		std::string channel_key = file_path + std::to_string(entity_id) + audio_key;
 
 		for (auto& system : ECSM.get_systems()) {
 			if (system->get_type() == "Audio_System") {
 				auto* audio_system = static_cast<Audio_System*>(system.get());
-				audio_system->play_sfx_sound(file_path, channel_key, audio_key, audio_component);
+				if (!bgm) {
+					audio_system->play_sfx_sound(file_path, channel_key, audio_key, audio_component);
+				}
+				else {
+					audio_system->play_bgm_sound(file_path, channel_key, audio_key, audio_component);
+				}
+				
 				LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
 			}
 			else {
@@ -174,6 +180,36 @@ namespace lof {
 				continue;
 			}
 		}
+	}
+
+	void Audio_Manager::mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
+		//TODO IMPLEMENT A MUTE FUNCTION/FADE OUT FUNCTION INSIDE THE AUDIO SYSTEM AND USE IT TO ADJUST THE AUDIO TO MINIMUM.
+		
+		for (auto& system : ECSM.get_systems()) {
+			if (system->get_type() == "Audio_System") {
+				auto* audio_system = static_cast<Audio_System*>(system.get());
+				std::string channel_key = audio_system->generate_channel_key(entity_id, file_path, audio_key);
+
+				audio_system->set_channel_mute(channel_key, true);
+
+			}
+		}
+
+	}
+
+	void Audio_Manager::unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
+		//TODO IMPLEMENT A MUTE FUNCTION/FADE OUT FUNCTION INSIDE THE AUDIO SYSTEM AND USE IT TO ADJUST THE AUDIO TO MINIMUM.
+
+		for (auto& system : ECSM.get_systems()) {
+			if (system->get_type() == "Audio_System") {
+				auto* audio_system = static_cast<Audio_System*>(system.get());
+				std::string channel_key = audio_system->generate_channel_key(entity_id, file_path, audio_key);
+
+				audio_system->set_channel_mute(channel_key, false);
+
+			}
+		}
+
 	}
 
 	void Audio_Manager::stop_now(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
@@ -189,6 +225,54 @@ namespace lof {
 				LM.write_log("Audio_Manager::play_now: looping though system currently %s", system->get_type().c_str());
 			}
 		}
+	}
+
+	void Audio_Manager::update_bgm_layering(const int current_scene, const int oxygen_level) {
+		
+		EntityID background_id = ECSM.find_entity_by_name("background");
+		
+		if (background_id != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(background_id)) {
+
+			auto& audio_background = ECSM.get_component<Audio_Component>(background_id);
+			if (current_scene == 1) {
+				//play_now(background_id, "bgm1", audio_background, true);
+				//std::cout << "file detected for bgm1 in scene 1: " << audio_background.get_filepath("bgm1") << std::endl;
+			}
+			else if (current_scene == 2) {
+
+				if (oxygen_level <= 100) {
+					play_now(background_id, "bgm surface", audio_background, true);
+					play_now(background_id, "bgm base_1", audio_background, true);
+					play_now(background_id, "bgm base_2", audio_background, true);
+					play_now(background_id, "bgm base_3", audio_background, true);
+					//play_now(background_id, "bgm 80", audio_background, true);
+					//play_now(background_id, "bgm 50_1", audio_background, true);
+					//play_now(background_id, "bgm 50_2", audio_background, true);
+					//play_now(background_id, "bgm 35", audio_background, true);
+					//play_now(background_id, "bgm 25", audio_background, true);
+					//play_now(background_id, "bgm 20", audio_background, true);
+				}
+				//else if (oxygen_level <= 80) {
+				//	play_now(background_id, "bgm 80", audio_background, true);
+				//}
+				//else if (oxygen_level <= 50) {
+				//	play_now(background_id, "bgm 50_1", audio_background, true);
+				//	play_now(background_id, "bgm 50_2", audio_background, true);
+				//}
+				//else if (oxygen_level <= 35) {
+				//	play_now(background_id, "bgm 35", audio_background, true);
+				//}
+				//else if (oxygen_level <= 25) {
+				//	play_now(background_id, "bgm 25", audio_background, true);
+				//}
+				//else {
+				//	play_now(background_id, "bgm 20", audio_background, true);
+				//	//TODO ? THINK ABOUT THE LOGIC AGAIN WHEN TO MUTE OR PAUSE EVEN. ALSO ADD ANOTHER 
+				//	//PARAMETER INSIDE PLAYNOW THAT IS DEFAULT FALSE BUT TRUE FOR BGM
+				//}
+			}
+		}
+		return;
 	}
 
 	FMOD::ChannelGroup* Audio_Manager::get_mastergroup() const {
@@ -339,29 +423,3 @@ namespace lof {
 		return filenames;
 	}
 }
-
-//for personal reference
-
-//
-//void Game_Manager::request_play_sound(EntityID entity_id, const std::string& file_path, const std::string& audio_key) {
-//	lof::Audio_Manager::get_instance().play_sound_for_entity(entity_id, file_path, audio_key);
-//}
-//
-//void Game_Manager::request_stop_sound(EntityID entity_id, const std::string& file_path, const std::string& audio_key) {
-//	lof::Audio_Manager::get_instance().stop_sound_for_entity(entity_id, file_path, audio_key);
-//}
-//
-//// Example usage inside Game_Manager::update
-//if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
-//	if (CS.has_left_collide_detect()) {
-//		EntityID block_to_remove = CS.get_left_collide_entity();
-//		if (block_to_remove != INVALID_ENTITY_ID) {
-//			std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining_mineral" : "mining_normal";
-//			request_play_sound(player_id, "mining.wav", sound_key);
-//		}
-//	}
-//}
-//
-//if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
-//	request_stop_sound(player_id, "mining.wav", "mining_normal");
-//}

@@ -71,13 +71,15 @@ namespace lof {
 
 		FMOD::Sound* get_sound(const std::string& file_path, AudioType audio_type, bool is3d = false);
 
-		void play_now(EntityID entity_id, const std::string& audio_key, const Audio_Component& audio_component);
+		void play_now(EntityID entity_id, const std::string& audio_key, const Audio_Component& audio_component, bool bgm = false);
 
 		void stop_now(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
-		//void queue_sound(EntityID entityid, const std::string& audio_key, const Audio_Component& audio_component, bool play);
+		void mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
-		//void clear_audio_events();
+		void unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
+
+		void update_bgm_layering(const int current_scene, const int oxygen_level = 100);
 
 		//getters for channelgroup
 		FMOD::ChannelGroup* get_mastergroup() const;

@@ -61,7 +61,7 @@
               "is3d": false
             },
             {
-              "key": "bgm base1",
+              "key": "bgm base_1",
               "filepath": "bgm_100_base_pulse",
               "audio_type": 0,
               "max_simultaneous": 1,
@@ -71,7 +71,7 @@
               "is3d": false
             },
             {
-              "key": "bgm base2",
+              "key": "bgm base_2",
               "filepath": "bgm_100_chords",
               "audio_type": 0,
               "max_simultaneous": 1,
@@ -81,8 +81,68 @@
               "is3d": false
             },
             {
-              "key": "bgm base3",
+              "key": "bgm base_3",
               "filepath": "bgm_100_melody",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 80",
+              "filepath": "bgm_80_clock_ticking",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 50_1",
+              "filepath": "bgm_50_digging_pulse",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 50_2",
+              "filepath": "bgm_50_roll",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 35",
+              "filepath": "bgm_35_stinger",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 25",
+              "filepath": "bgm_25_sprint",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 20",
+              "filepath": "bgm_20_tension_melody",
               "audio_type": 0,
               "max_simultaneous": 1,
               "volume": 0.5,

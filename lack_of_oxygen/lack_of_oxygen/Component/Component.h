@@ -351,7 +351,7 @@ namespace lof {
             float volume = 0.0f;
             float pitch = 1.0f;
             bool islooping = false;
-            bool is3d;
+            bool is3d = false;
         };
 
         std::vector<SoundConfig> sounds; ///< vectors of sound details

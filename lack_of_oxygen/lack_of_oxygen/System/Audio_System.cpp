@@ -71,20 +71,20 @@ namespace lof {
 				}
 
 				//check if the filepath for the specific sound/audio key has been changed
-				auto it = all_prev_filepath_map.find(audio_key);
+				auto it1 = all_prev_filepath_map.find(audio_key);
 				//if it cannot be find means it have yet to be initialize in the filepath and its the first instance of it
-				if (it == all_prev_filepath_map.end()) {
+				if (it1 == all_prev_filepath_map.end()) {
 					all_prev_filepath_map[audio_key] = file_path;
 				}
 				else {
 					//checking if filepath name aligns
-					if (it->second != file_path) {
-						LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it->second, audio_key.c_str());
+					if (it1->second != file_path) {
+						LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
 
-						std::string old_channel_key = it->second + std::to_string(entityID) + audio_key;
+						std::string old_channel_key = it1->second + std::to_string(entityID) + audio_key;
 
 						stop_sound(old_channel_key);
-						it->second = file_path; //ensure to keep the map updated
+						it1->second = file_path; //ensure to keep the map updated
 					}
 				}
 
@@ -99,12 +99,12 @@ namespace lof {
 				auto& channels = channel_map.find(channel_key)->second;
 
 				//loop through to check if channel is playing. if it is update if needed and if it isn't add it to the remove vector
-				for (auto it = channels.begin(); it != channels.end(); it++) {
+				for (auto it2 = channels.begin(); it2 != channels.end(); it2++) {
 					bool is_playing = false;
-					ADM.errorcheck((*it)->isPlaying(&is_playing), "Audio_System::update", "check if channel is playing");
+					ADM.errorcheck((*it2)->isPlaying(&is_playing), "Audio_System::update", "check if channel is playing");
 
 					if (!is_playing) {
-						to_remove.push_back(*it);
+						to_remove.push_back(*it2);
 					}
 					else {
 						float base_volume = audio.get_volume(audio_key);
@@ -195,7 +195,7 @@ namespace lof {
 		// seek help from prof elie if can't solve by today.
 
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
-		//get_active_channels();
+		get_active_channels();
 	}
 
 	void Audio_System::shutdown() {
@@ -226,7 +226,7 @@ namespace lof {
 		}
 		else {
 			if (it1->second != file_path) {
-				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second, audio_key.c_str());
+				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
 
 				std::string entityID = cskey.substr(file_path.length(), cskey.length() - file_path.length() - audio_key.length());
 
@@ -242,6 +242,8 @@ namespace lof {
 
 
 		if (it2 != channel_map.end() && !it2->second.empty()) {
+			//only check if the size of the vector is at max as well as its the min simultaneous aka 1.
+			//sounds affected: walking, airvent in, (to be added on)
 			if (it2->second.size() == audio.get_max_simultaneous(audio_key) && audio.get_max_simultaneous(audio_key) == MIN_SIMULTANEOUS) {
 				FMOD::Channel* existing_channel = it2->second.front();
 
@@ -254,12 +256,15 @@ namespace lof {
 					LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
 					return;
 				}
+				else {
+					//if it is not playing but channel still in the vector, remove (erase) it from the vector so it can be played again alter on
+					it2->second.erase(it2->second.begin());
+				}
 
 				//else? need to stop/erase it then play again i am guessing. but the play part is handled later				
 			}
 		}
 
-		//TODO: ESSENTIALLY MAKE SURE TO ADD LOOP COUNT FOR SOUND THAT MAX PLAY ONCE AND HAVE THE AUDIO PLAYING RN. ESSENTIALLY BY RIGHT THERE SHOULD BE AUDIO PLAYING BUT JUST INCASE CHECK AS WELL.
 
 		//BY HERE USUALLY ITS EITHER 1. ITS A SOUND THAT CAN STACK/PLAY MULTIPLE SIMULTANEOUSLY 2. ITS NOT A SOUND FOR SIMULTANEOUS PLAYING BUT HAS ALREADY STOPPED PLAYING AND IS NO LONGER IN THE MAP.
 
@@ -311,14 +316,34 @@ namespace lof {
 	}
 
 	void Audio_System::play_bgm_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio) {
-		auto it = channel_map.find(cskey);
-		if (it != channel_map.end() && !it->second.empty()) {
-			LM.write_log("BGM %s is already playing", cskey);
+		
+		//check has the sound filepath has been changed
+		auto it1 = all_prev_filepath_map.find(audio_key);
+		if (it1 == all_prev_filepath_map.end()) {
+			all_prev_filepath_map[audio_key] = file_path;
+		}
+		else {
+			if (it1->second != file_path) {
+				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
+
+				std::string entityID = cskey.substr(file_path.length(), cskey.length() - file_path.length() - audio_key.length());
+
+				std::string old_key_id = it1->second + entityID + audio_key;
+
+				stop_sound(old_key_id);
+
+				it1->second = file_path; //update the file_path.
+			}
+		}
+		
+		auto it2 = channel_map.find(cskey);
+		if (it2 != channel_map.end() && !it2->second.empty()) {
+			LM.write_log("BGM %s is already playing", cskey.c_str());
 			return;
 		}
 
 		auto& channels = channel_map[cskey];
-		if (channels.size() <= MIN_SIMULTANEOUS) {
+		if (channels.empty() && channels.size() <= audio.get_max_simultaneous(audio_key)) {
 			//check if sound exist in soundmap
 			FMOD::Sound* sound = ADM.get_sound(file_path, audio.get_audio_type(audio_key));
 
@@ -339,6 +364,7 @@ namespace lof {
 				channel->setLoopCount(-1);	//<-1 for indefinite playing of sound in channel
 			}
 			else {
+				//by right bgm should be looping but just incase
 				channel->setLoopCount(0);	//set it to 0 to play sound once.
 			}
 
@@ -457,6 +483,38 @@ namespace lof {
 		}
 	}
 
+	void Audio_System::set_channel_mute(const std::string& channel_key, bool mute) {
+		if (channel_map.find(channel_key) == channel_map.end()) {
+			LM.write_log("Audio_System::set_channel_mute: failed to set channel mute as channel is not in channel map.");
+			return;
+		}
+
+		auto it = channel_map.find(channel_key);
+		auto channels = it->second;
+
+		bool muted = false;
+
+		for (FMOD::Channel* channel : channels) {
+			channel->getMute(&muted);
+			if (mute) {
+				if (!muted) {
+					channel->setMute(true);
+				}
+				else {
+					continue;
+				}
+			}
+			else {
+				if (!muted) {
+					continue;
+				}
+				else {
+					channel->setMute(false);
+				}
+			}
+		}
+	}
+
 	FMOD::System* Audio_System::get_core_system() {
 		LM.write_log("Audio_System::get_core_system: retrieveing core_system");
 		return core_system;
@@ -485,7 +543,7 @@ namespace lof {
 			return Vec3D(); //there is no position by right if channel doesn't exist for now standard is return as default.
 		}
 
-		FMOD_VECTOR pos;
+		//FMOD_VECTOR pos;
 
 		auto channels = it->second;
 
@@ -531,6 +589,8 @@ namespace lof {
 					LM.write_log("Active channel %s", key.c_str());
 				}
 			}
+
+			//std::cout << key << " channel size: " << channels.size() << std::endl;
 		}
 	}
 
@@ -552,11 +612,11 @@ namespace lof {
 	}
 
 	void Audio_System::fade_in(const std::string& channel_key, float duration) {
-
+		//TODO
 	}
 
 	void Audio_System::fade_out(const std::string& channel_key, float duration) {
-
+		//TODO
 	}
 
 	std::string Audio_System::get_type() const {
