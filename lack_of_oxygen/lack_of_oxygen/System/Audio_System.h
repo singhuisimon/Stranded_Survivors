@@ -139,6 +139,8 @@ namespace lof {
 		*/
 		std::string get_type() const override;
 
+		std::unordered_map<std::string, std::vector<FMOD::Channel*>>& get_channel_map() { return channel_map; }
+
 	private:
 
 		FMOD::System* core_system;	///<Core audio system

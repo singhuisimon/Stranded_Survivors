@@ -102,6 +102,8 @@ namespace lof {
 		float get_group_volume(GroupType grouptype);
 
 		std::vector<std::string> get_sound_map_filename() const;
+		std::unordered_map<std::string, FMOD::Sound*>& get_sound_map() { return sound_map; }
+
 	private:
 
 		Audio_Manager();

@@ -1148,7 +1148,6 @@ namespace lof {
                                 file_name_cstr.push_back(name.c_str());
                             }
 
-
                             //Retrieve the sound map filenames from Audio_System
                             //for (auto& system : ECSM.get_systems()) {
                             //    if (system->get_type() == "Audio_System") {
@@ -1227,22 +1226,19 @@ namespace lof {
                                         //}
                                     }
                                    
-                                    std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
-
-                                    
-
-                                    for (auto& system : ECSM.get_systems()) {
-                                        if (system->get_type() == "Audio_System") {
-                                            auto* audio_system = static_cast<Audio_System*>(system.get());
-                                            if (audio_system) {
-                                                /*std::vector<std::string> names = audio_system->get_sound_map_filename();
-                                                for (int k = 0; k < names.size(); ++k) {
-                                                    std::cout << names[k] << std::endl;
-                                                }*/
-                                            }
-                                        }
-                                    }
-                                    std::cout << "-------------------------------------------------" << std::endl;
+                                    //std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
+                                    //for (auto& system : ECSM.get_systems()) {
+                                    //    if (system->get_type() == "Audio_System") {
+                                    //        auto* audio_system = static_cast<Audio_System*>(system.get());
+                                    //        if (audio_system) {
+                                    //            /*std::vector<std::string> names = audio_system->get_sound_map_filename();
+                                    //            for (int k = 0; k < names.size(); ++k) {
+                                    //                std::cout << names[k] << std::endl;
+                                    //            }*/
+                                    //        }
+                                    //    }
+                                    //}
+                                    //std::cout << "-------------------------------------------------" << std::endl;
                                 }
                                 ImGui::EndDragDropTarget();
                             }
@@ -1655,7 +1651,6 @@ namespace lof {
                
                     std::string temp = selected_filepath;
                     selected_filepath.clear();
-
                     size_t start_pos_of_folder_filepath;
 
                     //Deleting Textures from Associated Entities
@@ -1700,8 +1695,141 @@ namespace lof {
                     }
                     else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
 
+                        //AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
+                        /*std::cout << "------------------------------------" << std::endl;
+                        std::cout << "BEFORE DELETION" << std::endl;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                                for (auto& channel : audio_system->get_channel_map()) {
+                                    std::cout << channel.first << std::endl;
+                                }
+                            }
+                        }
+                        std::cout << "CHECKING SOUND MAP" << std::endl;
+                        auto& sound_map = ADM.get_sound_map();
+                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                            std::cout << it->first << std::endl;
+                        }
+                        std::cout << "------------------------------------" << std::endl;*/
+
+                        //Get the filepath
+                        std::string filepath = temp;
+
+                        //Get the filename
                         temp.erase(0, ASM.get_full_path("Audio", "").length());
                         temp = temp.substr(0, temp.find_last_of('.'));
+                        std::string filename = temp;
+
+                        //TODO: Identify entity with selected sound
+                        EntityID entity_with_sound = 5;
+
+                        //Get sound key from Audio Component
+                        Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_with_sound);
+                        auto& sounds = audio.get_sounds();
+                        std::string sound_key;
+                        std::cout << "sound_key:" << std::endl;
+                        for (auto& sound : sounds) {
+                            std::cout << sound.filepath << std::endl;
+                            if (sound.filepath == filename) {
+                                sound_key = sound.key;
+                            }
+                        }
+
+                        std::cout << "sound_key: " << sound_key << std::endl;
+                        //If sound key is found
+                        if (!sound_key.empty()) {
+
+                            //audio.set_audio_state(sound_key, PlayState::NONE);
+
+                            //Combine to get key for channel map
+                            std::string key_for_channel_map = filename + std::to_string(entity_with_sound) + sound_key;
+
+                            //Stop sound, erase from channel map
+                            for (auto& system : ECSM.get_systems()) {
+                                if (system->get_type() == "Audio_System") {
+                                    auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                    //In audio System
+                                    if (audio_system) {
+                                        audio_system->stop_sound(key_for_channel_map);
+
+                                        //Plausible Fix
+                                        //audio_system->get_channel_map().erase(key_for_channel_map);
+
+                                        std::cout << "deleted "<< key_for_channel_map << " from channel map\n";
+                                    }
+
+                                    auto& sound_map = ADM.get_sound_map();
+
+                                    /*for (auto it = sound_map.begin(); it != sound_map.end(); ) {
+                                        if (it->first == filename) {
+                                            it = sound_map.erase(it);
+                                            std::cout << "Deleted from sound map" << std::endl;
+                                        }
+                                        else {
+                                            ++it;
+                                        }
+                                    }*/
+
+                                    if (sound_map.find(filename) != sound_map.end()) {
+                                        sound_map.erase(filename);  //Remove from the map
+                                        std::cout << "Successfully removed from sound_map." << std::endl;
+                                    }
+                                    else {
+                                        std::cout << "Sound was not found in sound_map." << std::endl;
+                                    }
+
+                                }
+                            }
+
+                            //Small delay to ensure system releases file
+                            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                        }
+
+                        std::cout << "Attempting to remove: " << filename << std::endl;
+                        if (std::filesystem::exists(filepath)) {
+                            std::cout << "File exists before removal." << std::endl;
+
+                            //Attempt to close any open streams (precautionary)
+                            std::ifstream file(filepath);
+                            if (file.is_open()) {
+                                file.close();
+                                std::cout << "Closed any open file stream.\n";
+                            }
+
+                            // Attempt deletion
+                            if (std::filesystem::remove(filepath)) {
+                                std::cout << "File successfully removed.\n";
+                            }
+                            else {
+                                std::cerr << "Failed to remove file: " << filename << std::endl;
+                            }
+                        }
+                        else {
+                            std::cerr << "File does not exist.\n";
+                        }
+
+                        /*std::cout << "------------------------------------" << std::endl;
+                        std::cout << "AFTER DELETION" << std::endl;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                                for (auto& channel : audio_system->get_channel_map()) {
+                                    std::cout << channel.first << std::endl;
+                                }
+                            }
+                        }
+                        std::cout << "CHECKING SOUND MAP" << std::endl;
+                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                            std::cout << it->first << std::endl;
+                        }
+                        std::cout << "------------------------------------" << std::endl;*/
 
                     }
                     else {
@@ -1710,12 +1838,11 @@ namespace lof {
                         ImGui::Text("Deletion Not Available For Asset Type");
                     }
 
-                    
                 }
                 catch (std::filesystem::filesystem_error& e) {
                     const char* error_msg = e.what();
                     if (error_msg) {
-                        ImGui::Text("Error in Deletion: %s", error_msg);
+                        std::cout << "Error in Deletion: " << error_msg << std::endl;
                     }
                     else {
                         ImGui::Text("Error in Deletion");
