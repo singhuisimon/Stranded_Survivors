@@ -17,6 +17,7 @@
 #include "Game_Manager.h"
 #include "Graphics_Manager.h"
 #include "Assets_Manager.h"
+#include "Audio_Manager.h"
 
 // Include utility functions
 #include "../Utility/Constant.h"
@@ -1140,18 +1141,26 @@ namespace lof {
                             std::vector<const char*> file_name_cstr;
                             std::vector<std::string> sound_map_filenames;
 
+
                             //Retrieve the sound map filenames from Audio_System
-                            for (auto& system : ECSM.get_systems()) {
-                                if (system->get_type() == "Audio_System") {
-                                    auto* audio_system = static_cast<Audio_System*>(system.get());
-                                    if (audio_system) {
-                                        sound_map_filenames = audio_system->get_sound_map_filename();
-                                        for (const auto& name : sound_map_filenames) {
-                                            file_name_cstr.push_back(name.c_str());
-                                        }
-                                    }
-                                }
+                            sound_map_filenames = ADM.get_sound_map_filename();
+                            for (const auto& name : sound_map_filenames) {
+                                file_name_cstr.push_back(name.c_str());
                             }
+
+
+                            //Retrieve the sound map filenames from Audio_System
+                            //for (auto& system : ECSM.get_systems()) {
+                            //    if (system->get_type() == "Audio_System") {
+                            //        auto* audio_system = static_cast<Audio_System*>(system.get());
+                            //        if (audio_system) {
+                            //            //sound_map_filenames = audio_system->get_sound_map_filename();
+                            //            for (const auto& name : sound_map_filenames) {
+                            //                file_name_cstr.push_back(name.c_str());
+                            //            }
+                            //        }
+                            //    }
+                            //}
 
                             //Find the current sound's representative string in the sound map
                             auto its = std::find(sound_map_filenames.begin(), sound_map_filenames.end(), sound_filepath);
@@ -1202,30 +1211,38 @@ namespace lof {
                                     }
 
                                     if (!file_in_dropdown) {
-                                        for (auto& system : ECSM.get_systems()) {
-                                            if (system->get_type() == "Audio_System") {
-                                                auto* audio_system = static_cast<Audio_System*>(system.get());
-                                                audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
-                                                //fill_audio_file_names(file_name, file_path);
 
-                                                audio.set_filepath(sounds[i].key, file_name);
-                                            }
-                                        }
+                                        ADM.load_sound(file_name, audio.get_audio_type(sounds[i].key));
+                                        audio.set_filepath(sounds[i].key, file_name);
+
+                                        //for (auto& system : ECSM.get_systems()) {
+                                        //    if (system->get_type() == "Audio_System") {
+                                        //        auto* audio_system = static_cast<Audio_System*>(system.get());
+                                        //        //audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
+                                        //        
+                                        //        //fill_audio_file_names(file_name, file_path);
+
+                                        //        audio.set_filepath(sounds[i].key, file_name);
+                                        //    }
+                                        //}
                                     }
                                    
-                                    /*std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
+                                    std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
+
+                                    
+
                                     for (auto& system : ECSM.get_systems()) {
                                         if (system->get_type() == "Audio_System") {
                                             auto* audio_system = static_cast<Audio_System*>(system.get());
                                             if (audio_system) {
-                                                std::vector<std::string> names = audio_system->get_sound_map_filename();
+                                                /*std::vector<std::string> names = audio_system->get_sound_map_filename();
                                                 for (int k = 0; k < names.size(); ++k) {
                                                     std::cout << names[k] << std::endl;
-                                                }
+                                                }*/
                                             }
                                         }
                                     }
-                                    std::cout << "-------------------------------------------------" << std::endl;*/
+                                    std::cout << "-------------------------------------------------" << std::endl;
                                 }
                                 ImGui::EndDragDropTarget();
                             }

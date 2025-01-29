@@ -18,6 +18,7 @@
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
 #include "Graphics_Manager.h"
+#include "Audio_Manager.h"
 
 // Include utility
 #include "../Utility/Constant.h"
@@ -110,10 +111,20 @@ namespace lof {
         else {
             LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
-
+        // ---------------------------- Audio Manager Start Up ---------------------------
+        if (ADM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+            IM.shut_down();
+            FPSM.shut_down();
+            SM.shut_down();
+            ECSM.shut_down();
+            LM.shut_down();
+            return -6;
+        }
         // -------------------------- Graphics Manager Start Up --------------------------
         if (GFXM.start_up() != 0) {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
+            ADM.shut_down();
             IM.shut_down();
             FPSM.shut_down();
             SM.shut_down();
@@ -139,6 +150,7 @@ namespace lof {
 
         // Shut down managers in reverse order of startup
         GFXM.shut_down(); // Graphics_Manager
+        ADM.shut_down();  // Audio_Manager
         IM.shut_down();   // Input_Manager
         FPSM.shut_down(); // FPS_Manager
         SM.shut_down();   // Serialization_Manager
@@ -187,27 +199,26 @@ namespace lof {
 
         //to pause all the sound that is playing
         if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "Audio_System") {
-                    auto* audio_system = static_cast<Audio_System*>(system.get());
-                    if (audio_system) {
-                        audio_system->pause_resume_mastergroup();
-                    }
-                }
-            }
+            ADM.pause_resume_mastergroup();
         }
 
         //to ensure sound pause during level_editor_mode
         if (IM.is_key_pressed(GLFW_KEY_TAB)) {
-            for (auto& system : ECSM.get_systems()) {
-                if (system->get_type() == "Audio_System") {
-                    auto* audio_system = static_cast<Audio_System*>(system.get());
-                    if (audio_system) {
-                        audio_system->pause_resume_mastergroup();
-                    }
-                }
-            }
+            ADM.pause_resume_mastergroup();
         }
+
+        //commented out this is for me to test - Amanda
+        /*if (IM.is_key_pressed(GLFW_KEY_J)) {
+            oxygen_level--;
+            std::cout << "current oxygen level " << oxygen_level << std::endl;
+        }
+
+        if (IM.is_key_pressed(GLFW_KEY_K)) {
+            oxygen_level++;
+            std::cout << "current oxygen level " << oxygen_level << std::endl;
+        }
+        std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;*/
+        ADM.update_bgm_layering(current_scene);// , oxygen_level);
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -417,10 +428,11 @@ namespace lof {
                 std::cout << "mining strength: " << mining_strength << std::endl;
             }
 
-            if (ECSM.has_component<Physics_Component>(player_id)) {
+            if (ECSM.has_component<Physics_Component>(player_id) && ECSM.has_component<Audio_Component>(player_id)) {
 
                 auto& physics = ECSM.get_component<Physics_Component>(player_id);
 
+                auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
                 if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
                     if (CS.has_left_collide_detect()) {
                         EntityID block_to_remove = CS.get_left_collide_entity();
@@ -451,6 +463,11 @@ namespace lof {
                                 LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
                                     block_to_remove, mineral_value);
                             }
+
+                            // Determine sound based on mineral value
+                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                            ADM.play_now(player_id, sound_key, audio_player);
+
                         }
                     }
                 }
@@ -484,6 +501,10 @@ namespace lof {
                                 LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
                                     block_to_remove, mineral_value);
                             }
+
+                            // Determine sound based on mineral value
+                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                            ADM.play_now(player_id, sound_key, audio_player);
                         }
                     }
                 }
@@ -517,6 +538,10 @@ namespace lof {
                                 LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
                                     block_to_remove, mineral_value);
                             }
+
+                            // Determine sound based on mineral value
+                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                            ADM.play_now(player_id, sound_key, audio_player);
                         }
                     }
                 }
@@ -550,6 +575,10 @@ namespace lof {
                                 LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
                                     block_to_remove, mineral_value);
                             }
+
+                            // Determine sound based on mineral value
+                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                            ADM.play_now(player_id, sound_key, audio_player);
                         }
                     }
                 }
@@ -614,16 +643,10 @@ namespace lof {
                     // Update sound effect for player moving left
                     if (physics.get_is_grounded()) {
                         if (current_scene == 1) {
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
-                        } else if (current_scene == 2) {
-                            // Generate a random number between 1 and 3
-                            int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
-
-                            // Create the file path by appending the random number to "Walking_0"
-                            std::string key = "moving " + std::to_string(randomNumber);
-                            LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
-                            //play walking sound
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
+                            ADM.play_now(player_id, "moving left", audio_player);
+                        }
+                        else if (current_scene == 2) {
+                            ADM.play_now(player_id, "moving", audio_player);
                         }
                     }
                     //std::cout << "moving left current scene number is " << current_scene << std::endl;
@@ -640,19 +663,12 @@ namespace lof {
                     int& moving_status = GFXM.get_moving_status();
                     moving_status = RUN_RIGHT;
 
-                    // Update sound effect for player moving right
                     if (physics.get_is_grounded()) {
                         if (current_scene == 1) {
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
-                        } else if (current_scene == 2) {
-                            // Generate a random number between 1 and 3
-                            int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
-
-                            // Create the file path by appending the random number to "Walking_0"
-                            std::string key = "moving " + std::to_string(randomNumber);
-                            LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
-                            //play walking sound
-                            ECSM.get_component<Audio_Component>(player_id).set_audio_state(key.c_str(), PLAYING);
+                            ADM.play_now(player_id, "moving right", audio_player);
+                        }
+                        else if (current_scene == 2) {
+                            ADM.play_now(player_id, "moving", audio_player);
                         }
                     }
                 }
@@ -669,21 +685,11 @@ namespace lof {
                         moving_status = RUN_LEFT;
 
                         // Update sound effect for player moving left
-                        if (physics.get_is_grounded()) {
+                        /*if (physics.get_is_grounded()) {
                             if (current_scene == 1) {
-                                ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving left", PLAYING);
+                                
                             }
-                            else if (current_scene == 2) {
-                                // Generate a random number between 1 and 3
-                                int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
-
-                                // Create the file path by appending the random number to "Walking_0"
-                                std::string key = "moving " + std::to_string(randomNumber);
-                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
-                                //play walking sound
-                                ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
-                            }
-                        }
+                        }*/
                     }
                     else {
                         // Update forces
@@ -698,21 +704,9 @@ namespace lof {
                         moving_status = RUN_RIGHT;
 
                         // Update sound effect for player moving right
-                        if (physics.get_is_grounded()) {
-                            if (current_scene == 1) {
-                                ECSM.get_component<Audio_Component>(player_id).set_audio_state("moving right", PLAYING);
-                            }
-                            else if (current_scene == 2) {
-                                // Generate a random number between 1 and 3
-                                int randomNumber = std::rand() % 3 + 1; // rand() % 3 gives 0, 1, or 2, so we add 1 to get 1, 2, or 3
-
-                                // Create the file path by appending the random number to "Walking_0"
-                                std::string key = "moving " + std::to_string(randomNumber);
-                                LM.write_log("TESTING MOVEMENT SCENE 2 Walking Audio: %s", key.c_str());
-                                //play walking sound
-                                ECSM.get_component<Audio_Component>(player_id).set_audio_state(key, PLAYING);
-                            }
-                        }
+                        /*if (physics.get_is_grounded()) {
+                            
+                        }*/
                     }
                 }
                 else {
@@ -723,6 +717,14 @@ namespace lof {
 
                     int& moving_status = GFXM.get_moving_status();
                     moving_status = NO_ACTION;
+
+                    if (current_scene == 1) {
+                        ADM.stop_now(player_id, "moving right", audio_player.get_filepath("moving right"));
+                        ADM.stop_now(player_id, "moving left", audio_player.get_filepath("moving left"));
+                    }
+                    else if (current_scene == 2) {
+                        ADM.stop_now(player_id, "moving", audio_player.get_filepath("moving"));
+                    }
                 }
 
             }
@@ -952,6 +954,13 @@ namespace lof {
             // Toggle between scenes
             current_scene = (current_scene == 1) ? 2 : 1;
 
+            for (auto& system : ECSM.get_systems()) {
+                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                    movement_system->clear_dynamic_entities();
+                    break;
+                }
+            }
+
             // Create full path to the scene file
             const std::string SCENES = "Scenes";
             std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
@@ -964,6 +973,9 @@ namespace lof {
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Stop all the audio that is currently playing
+                ADM.stop_mastergroup();
 
                 // Reset player position if exists
                 EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);

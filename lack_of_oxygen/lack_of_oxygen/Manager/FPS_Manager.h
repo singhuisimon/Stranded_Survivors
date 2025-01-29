@@ -53,6 +53,12 @@ namespace lof {
         // FPS calculator from FPS.cpp
         FPS fps_calculator;
 
+        // Fixed time step 
+
+        float accumulated_time;                    //Accumulator for fixed timestep 
+        int current_number_of_steps;                //Number of steps
+        const float FIXED_DELTA_TIME;              //fixed timestep duration
+
     public:
         /**
          * @brief Get the singleton instance of the FPS_Manager.
@@ -101,6 +107,15 @@ namespace lof {
          * @brief Reset the FPS calculator.
          */
         void reset_fps();
+
+        /*
+        @brief get the fixed delta time
+        */
+        float get_fixed_delta_time() const; 
+
+        int get_current_number_of_steps() const;
+
+        void calculate_steps();
     };
 
 } // end of namespace lof

@@ -61,6 +61,57 @@
           "height": 95,
           "collidable": true
         },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "jumping",
+              "filepath": "sfx_jumping",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "moving",
+              "filepath": "sfx_walking",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "mining normal",
+              "filepath": "sfx_general_block_hit",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "mining mineral",
+              "filepath": "sfx_mineral_block_hit",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            }
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
+        },
         "Animation_Component": {
           "animations": [
             [ "0", "prisoner_idle_left" ],

@@ -72,7 +72,7 @@ namespace lof {
          * @brief Add an entity to the system's entity list.
          * @param entity The ID of the entity to add.
          */
-        void add_entity(EntityID entity) {
+        virtual void add_entity(EntityID entity) {
             entities.insert(entity);
         }
 
@@ -80,7 +80,7 @@ namespace lof {
          * @brief Remove an entity from the system's entity list.
          * @param entity The ID of the entity to remove.
          */
-        void remove_entity(EntityID entity) {
+        virtual void remove_entity(EntityID entity) {
             entities.erase(entity);
         }
 

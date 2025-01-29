@@ -43,6 +43,7 @@
     <ClCompile Include="IMGUI\imstb_truetype.h" />
     <ClCompile Include="Main\Main.cpp" />
     <ClCompile Include="Manager\Assets_Manager.cpp" />
+    <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="Manager\ECS_Manager.cpp" />
     <ClCompile Include="Manager\FPS_Manager.cpp" />
     <ClCompile Include="Manager\Game_Manager.cpp" />
@@ -80,6 +81,7 @@
     <ClInclude Include="IMGUI\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="Main\Main.h" />
     <ClInclude Include="Manager\Assets_Manager.h" />
+    <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
@@ -125,15 +127,17 @@
   <ItemGroup>
     <Media Include="Assets\Audio\audio_test_1.wav" />
     <Media Include="Assets\Audio\audio_test_2.wav" />
-    <Media Include="Assets\Audio\player_jumping_Fx01.wav" />
-    <Media Include="Assets\Audio\player_jumping_Fx04.wav" />
     <Media Include="Assets\Audio\audio_test_Fx16_2.wav" />
     <Media Include="Assets\Audio\audio_test_Fx27.wav" />
     <Media Include="Assets\Audio\audio_test_Fx28.wav" />
+    <Media Include="Assets\Audio\bgm_100_base_pulse.wav" />
+    <Media Include="Assets\Audio\bgm_100_chords.wav" />
+    <Media Include="Assets\Audio\bgm_100_melody.wav" />
     <Media Include="Assets\Audio\bgm_surface_music.wav" />
-    <Media Include="Assets\Audio\player_walking_01.wav" />
-    <Media Include="Assets\Audio\player_walking_02.wav" />
-    <Media Include="Assets\Audio\player_walking_03.wav" />
+    <Media Include="Assets\Audio\sfx_general_block_hit.wav" />
+    <Media Include="Assets\Audio\sfx_jumping.wav" />
+    <Media Include="Assets\Audio\sfx_mineral_block_hit.wav" />
+    <Media Include="Assets\Audio\sfx_walking.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />

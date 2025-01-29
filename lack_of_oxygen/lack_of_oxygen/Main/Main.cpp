@@ -189,10 +189,13 @@ int main(void) {
         // Update window title with FPS
         std::stringstream ss;
         ss << "Lack Of Oxygen"; 
-#ifndef NDEBUG
+//#ifndef NDEBUG
         ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
-#endif
+//#endif
         glfwSetWindowTitle(window, ss.str().c_str());
+
+       /* const GLubyte* renderer = glGetString(GL_RENDERER);
+        printf("GL Renderer  : %s\n", renderer);*/
 
         // Update FPS timer
         fps_timer += delta_time;
@@ -312,6 +315,8 @@ int main(void) {
 
     // Application exit
     std::cout << "Application exited successfully." << std::endl;
+
+
 
     return 0;
 }
