@@ -28,6 +28,7 @@
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Audio_Manager.h"
 #include "../Manager/Assets_Manager.h"
+#include "../Manager/FPS_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Utility/globals.h"
 #include "../System/System.h"
@@ -84,8 +85,6 @@ namespace lof {
 		 */
 		void play_bgm_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio);
 
-		//void update_bgm(); //for future when using it to do layering & detecting oxygen level
-
 		/**
 		* @brief Pause and Resume sound
 		* @param channel_key The unique identifier of the channel in the map
@@ -115,6 +114,8 @@ namespace lof {
 
 		void set_channel_mute(const std::string& channel_key, bool mute);
 
+		void get_channel_mute(const std::string& channel_key, bool& muted);
+
 		//retrive the core_system
 		FMOD::System* get_core_system();
 
@@ -127,10 +128,13 @@ namespace lof {
 		void set_sound_position(const std::string& channel_key, const Vec3D position);
 
 		void get_active_channels();
+		void get_muted_channels();
+		void debug_list_active_sounds();
+
 		bool is_sound_playing(std::string& channel_key);
 
-		void fade_in(const std::string& channel_key, float duration);
-		void fade_out(const std::string& channel_key, float duration);
+		//void fade_in(const std::string& channel_key, float duration, float target_volume);
+		//void fade_out(const std::string& channel_key, float duration, float target_volume = 0.0f);
 
 
 		/**
@@ -145,8 +149,6 @@ namespace lof {
 
 		std::unordered_map<std::string, std::vector<FMOD::Channel*>> channel_map;	///< Map of Channel with the filepath + entityid as the key
 		std::unordered_map<std::string, std::string> all_prev_filepath_map;	///< Map of String with audio key as key and filepath as data
-
-		//friend class Audio_Manager;
 	};
 }
 

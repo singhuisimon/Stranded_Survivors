@@ -513,6 +513,36 @@
               "pitch": 1.0,
               "islooping": false,
               "is3d": false
+            },
+            {
+              "key": "deposit mineral",
+              "filepath": "sfx_mineral_deposit",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "refilling oxygen",
+              "filepath": "sfx_oxygen_refill",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "lava siren",
+              "filepath": "sfx_lava_siren",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
             }
           ],
           "position": [

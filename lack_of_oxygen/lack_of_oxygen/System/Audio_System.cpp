@@ -70,6 +70,9 @@ namespace lof {
 					continue;
 				}
 
+				//NEED RETHINK LOGIC AS IT GETS CALLED REPEATEDLY INSIDE. MAYBE I NEED ADD ACCESSOR SUCH THAT IF ITS PLAYED 
+				// THE FILE GETS UPDATED OR SMTH :">
+				// essentially ensure when sound is loaded it gets checked. if its not loaded then skip the check
 				//check if the filepath for the specific sound/audio key has been changed
 				auto it1 = all_prev_filepath_map.find(audio_key);
 				//if it cannot be find means it have yet to be initialize in the filepath and its the first instance of it
@@ -80,9 +83,9 @@ namespace lof {
 					//checking if filepath name aligns
 					if (it1->second != file_path) {
 						LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
-
+				
 						std::string old_channel_key = it1->second + std::to_string(entityID) + audio_key;
-
+				
 						stop_sound(old_channel_key);
 						it1->second = file_path; //ensure to keep the map updated
 					}
@@ -122,11 +125,11 @@ namespace lof {
 						}
 						else {
 							//if it is 2d there isn't a need to change the audio that has been played
-							set_channel_volume(channel_key, audio.get_volume(audio_key));
+							//set_channel_volume(channel_key, audio.get_volume(audio_key));
 						}
 
 						//pitch isn't affected in our game for is3d or not so it stays here - amanda
-						set_channel_pitch(channel_key, audio.get_volume(audio_key));
+						set_channel_pitch(channel_key, audio.get_pitch(audio_key));
 					}
 				}
 
@@ -161,33 +164,14 @@ namespace lof {
 			}
 		}
 
+		//FMOD_VECTOR player_pos = {player_x, player_y, 0.0f};
+		//FMOD_VECTOR forawrd = {1.0f, 0.0f, 0.0f};
+		//FMOD_VECTOR up = {0.0f, 1.0f, 0.0f};
+		//x, y, z.
+		//(left or right direction) - forward
+		//(up or down) - up
+
 		core_system->update();
-
-
-		//updatechannel function perhaps for the following below if i want to split - amanda
-		//if still playing adjust its values if needed
-		//if (channel) {
-		//	float base_volume = audio.get_volume(audio_key);
-
-		//	if (audio.get_is3d(audio_key)) {
-		//		Vec3D position = audio.get_position();
-		//		set_sound_position(channel_key, position);
-
-		//		//not sure if this part is needed based on chatgpt only to be reconsidered
-		//		//float distance = listener_pos.distance(position);
-		//		//float new_volume = audio.get_volume() / (1.0f + distance * 0.1f);
-		//		//set_channel_volume(channel_key, new_volume)
-
-		//		//anything need update here just update here
-		//	}
-		//	else {
-		//		//if it is 2d there isn't a need to change the audio that has been played
-		//		set_channel_volume(channel_key, audio.get_volume(audio_key));
-		//	}
-
-		//	//pitch isn't affected in our game for is3d or not so it stays here - amanda
-		//	set_channel_pitch(channel_key, audio.get_volume(audio_key));
-		//}
 
 		//to be implemented later
 		// 
@@ -196,6 +180,7 @@ namespace lof {
 
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
 		get_active_channels();
+		get_muted_channels();
 	}
 
 	void Audio_System::shutdown() {
@@ -317,6 +302,26 @@ namespace lof {
 
 	void Audio_System::play_bgm_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio) {
 		
+		auto it2 = channel_map.find(cskey);
+		if (it2 != channel_map.end() && !it2->second.empty()) {
+
+			FMOD::Channel* existing_channel = it2->second.front();
+			bool is_playing = false;
+
+			existing_channel->isPlaying(&is_playing);
+			if (is_playing) {
+				LM.write_log("BGM %s is already playing, skipping restart.", cskey.c_str());
+				return;
+			}
+			else {
+				LM.write_log("BGM %s was in channel_map but is NOT playing, restarting.", cskey.c_str());
+				stop_sound(cskey);
+			}
+
+			LM.write_log("BGM %s is already playing", cskey.c_str());
+			return;
+		}
+
 		//check has the sound filepath has been changed
 		auto it1 = all_prev_filepath_map.find(audio_key);
 		if (it1 == all_prev_filepath_map.end()) {
@@ -335,18 +340,14 @@ namespace lof {
 				it1->second = file_path; //update the file_path.
 			}
 		}
-		
-		auto it2 = channel_map.find(cskey);
-		if (it2 != channel_map.end() && !it2->second.empty()) {
-			LM.write_log("BGM %s is already playing", cskey.c_str());
-			return;
-		}
+
+		debug_list_active_sounds();
 
 		auto& channels = channel_map[cskey];
 		if (channels.empty() && channels.size() <= audio.get_max_simultaneous(audio_key)) {
 			//check if sound exist in soundmap
 			FMOD::Sound* sound = ADM.get_sound(file_path, audio.get_audio_type(audio_key));
-
+			//sound->setMode(FMOD_2D);
 			FMOD::Channel* channel = nullptr;
 
 			FMOD_RESULT result = core_system->playSound(sound, nullptr, false, &channel);
@@ -354,6 +355,18 @@ namespace lof {
 				LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 				return;
 			}
+
+			//chatgpt debug
+			/*FMOD::Sound* check_sound = nullptr;
+			channel->getCurrentSound(&check_sound);
+			if (check_sound) {
+				char check_sound_name[512];
+				check_sound->getName(check_sound_name, sizeof(check_sound_name));
+				LM.write_log("FMOD is playing (expected: %s) -> (actual: %s)", file_path.c_str(), check_sound_name);
+			}
+			else {
+				LM.write_log("FMOD does not have a valid sound assigned!");
+			}*/
 
 			channels.push_back(channel);
 
@@ -371,15 +384,18 @@ namespace lof {
 			//set channel pitch and volume
 			channel->setPitch(audio.get_pitch(audio_key));
 			channel->setVolume(audio.get_volume(audio_key));
+
+			//get_active_channels();
+			//get_muted_channels();
+
+			std::cout << "bgm is playing" << std::endl;
+
+			//debug_list_active_sounds();
 		}
 		else {
 			return;	//sound already is playing need not play anymore
 		}
 	}
-
-	/*void Audio_System::update_bgm() {
-		//to be implemented later this is for the layering of bgm music
-	}*/
 
 	//need reconsider how will we be using this function
 	void Audio_System::pause_resume_sound(const std::string& channel_key, bool pause) {
@@ -414,7 +430,7 @@ namespace lof {
 		//check if the channel key even exist in the map
 		auto it = channel_map.find(channel_key);
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::stop_sound: failed to stop sound as %s isn't even playing in the channel.", channel_key.c_str());
+			LM.write_log("Audio_System::stop_sound: %s isn't found in the channelmap.", channel_key.c_str());
 			return;
 		}
 
@@ -465,11 +481,14 @@ namespace lof {
 	}
 
 	void Audio_System::set_channel_volume(const std::string& channel_key, float volume) {
-		if (channel_map.find(channel_key) == channel_map.end()) {
+		
+		auto it = channel_map.find(channel_key);
+		
+		if (it == channel_map.end()) {
 			LM.write_log("Audio_System::set_channel_volume: failed to set channel volume as channel is not in channel map.");
 			return;
 		}
-		auto it = channel_map.find(channel_key);
+
 		auto channels = it->second;
 
 		float ori_volume = 0.0f;
@@ -484,12 +503,13 @@ namespace lof {
 	}
 
 	void Audio_System::set_channel_mute(const std::string& channel_key, bool mute) {
-		if (channel_map.find(channel_key) == channel_map.end()) {
+		auto it = channel_map.find(channel_key);
+		
+		if (it == channel_map.end()) {
 			LM.write_log("Audio_System::set_channel_mute: failed to set channel mute as channel is not in channel map.");
 			return;
 		}
 
-		auto it = channel_map.find(channel_key);
 		auto channels = it->second;
 
 		bool muted = false;
@@ -513,6 +533,21 @@ namespace lof {
 				}
 			}
 		}
+	}
+
+	void Audio_System::get_channel_mute(const std::string& channel_key, bool& muted) {
+		auto it = channel_map.find(channel_key);
+
+		if (it == channel_map.end()) {
+			LM.write_log("Audio_System::get_channel_mute: failed to get mute status of channel as channel is not in the map");
+			return;
+		}
+
+		auto channels = it->second;
+		FMOD::Channel* channel = it->second.front();
+		channel->getMute(&muted);
+
+		return;
 	}
 
 	FMOD::System* Audio_System::get_core_system() {
@@ -543,13 +578,12 @@ namespace lof {
 			return Vec3D(); //there is no position by right if channel doesn't exist for now standard is return as default.
 		}
 
-		//FMOD_VECTOR pos;
+		FMOD_VECTOR pos;
+		for (FMOD::Channel* channel : it->second) {
+			channel->get3DAttributes(&pos, nullptr);
+			return Vec3D(pos.x, pos.y, pos.z);
+		}
 
-		auto channels = it->second;
-
-
-		//it->second->get3DAttributes(&pos, nullptr);
-		//return Vec3D(pos.x, pos.y, pos.z);
 		return Vec3D();
 	}
 
@@ -560,7 +594,11 @@ namespace lof {
 	}
 
 	void Audio_System::update_audio_for_listener(Vec3D& listener_pos) {
+		FMOD_VECTOR fmod_listener_pos = { listener_pos.x, listener_pos.y, listener_pos.z };
+		FMOD_VECTOR fmod_forward = { 0.0f, 0.0f, 1.0f };
+		FMOD_VECTOR fmod_up = { 0.0f, 1.0f, 0.0f };
 
+		core_system->set3DListenerAttributes(0, &fmod_listener_pos, nullptr, &fmod_forward, &fmod_up);
 	}
 
 	void Audio_System::set_sound_position(const std::string& channel_key, const Vec3D position) {
@@ -587,10 +625,41 @@ namespace lof {
 				channel->isPlaying(&playing);
 				if (playing) {
 					LM.write_log("Active channel %s", key.c_str());
-				}
+				}				
 			}
 
 			//std::cout << key << " channel size: " << channels.size() << std::endl;
+		}
+	}
+
+	//this is for debug purpose to see what channels are actually playing
+	void Audio_System::get_muted_channels() {
+		for (const auto& [key, channels] : channel_map) {
+			bool muted = false;
+
+			for (FMOD::Channel* channel : channels) {
+				channel->getMute(&muted);
+				if (muted) {
+					LM.write_log("Current channek %s is muted", key.c_str());
+				}
+
+			}
+
+			//std::cout << key << " channel size: " << channels.size() << std::endl;
+		}
+	}
+
+	void Audio_System::debug_list_active_sounds() {
+		for (const auto& [key, channels] : channel_map) {
+			for (FMOD::Channel* channel : channels) {
+				FMOD::Sound* sound = nullptr;
+				channel->getCurrentSound(&sound);
+				if (sound) {
+					char sound_name[512];
+					sound->getName(sound_name, sizeof(sound_name));
+					LM.write_log("Active Sound: %s (key: %s)", sound_name, key.c_str());
+				}
+			}
 		}
 	}
 
@@ -605,18 +674,14 @@ namespace lof {
 
 		bool isplaying = false;
 
-		//gets the playing status if it is in the map
-		//ADM.errorcheck(it->second->isPlaying(&isplaying), "Audio_System::is_sound_playing", "checking if channel is playing");
+		for (FMOD::Channel* channel : it->second) {
+			channel->isPlaying(&isplaying);
+			if (isplaying) {
+				return true;
+			}
+		}
 
-		return isplaying;
-	}
-
-	void Audio_System::fade_in(const std::string& channel_key, float duration) {
-		//TODO
-	}
-
-	void Audio_System::fade_out(const std::string& channel_key, float duration) {
-		//TODO
+		return false;
 	}
 
 	std::string Audio_System::get_type() const {
