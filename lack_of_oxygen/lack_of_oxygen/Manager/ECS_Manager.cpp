@@ -11,6 +11,9 @@
  // Include header file
 #include "ECS_Manager.h"
 
+// Include FPS Manager
+#include "FPS_Manager.h"
+
 // Include for components
 #include "../Component/Component.h"
 
@@ -356,6 +359,53 @@ namespace lof {
     }
 
     void ECS_Manager::update(float delta_time) {
+
+        //get the fixed time and step count
+        int steps = FPSM.get_current_number_of_steps(); 
+        float fixed_dt = FPSM.get_fixed_delta_time(); 
+
+        //limit the maximum number of steps 
+        steps = std::min(steps, DEFAULT_MAX_STEPS);
+
+            for (auto& system : systems) {
+                //system that use time in the update
+                if(system->get_type() == "Movement_System" ||
+                    system->get_type() == "Collision_System" || 
+                    system->get_type() == "Logic_System" || 
+                    system->get_type() == "Animation_System" ||
+                    system->get_type() == "Render_System" ) {
+
+                    //skip movement and collision in editor mode 
+                    if ((system->get_type() == "Movement_System" || system->get_type() == "Collision_System") &&
+                        level_editor_mode) {
+                        continue; 
+                    }
+
+                    for (int i = 0; i < steps; ++i) {
+                        // Getting delta time for each system
+                        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                        // Updating each system 
+                        system->update(fixed_dt);
+                        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+
+                    }
+                    
+                }
+                else { //systems that do not use time in calculations
+                    if (system->get_type() == "Audio_System" && level_editor_mode) {
+                        continue; //skip audio in the level editor mode
+                    }
+                    // Getting delta time for each system
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                    // Updating each system
+                    system->update(delta_time);
+                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+
+                }
+               
+            }
+#if 0
+
         for (auto& system : systems) {
 
             if (level_editor_mode && (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System")) {
@@ -390,6 +440,7 @@ namespace lof {
             //}
                 
         }
+#endif 
     }
 
     Entity* ECS_Manager::get_entity(EntityID entity_id) {

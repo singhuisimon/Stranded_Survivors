@@ -142,9 +142,9 @@ namespace lof {
 		for (const auto& force : forces) {
 			if (force.is_active) {
 				resultant += force.direction * force.magnitude;
-				std::cout << "Activate force type: " << Force::ftype_to_string(force.type)
+				/*std::cout << "Activate force type: " << Force::ftype_to_string(force.type)
 					<< " Direction: " << force.direction.x << "," << force.direction.y
-					<< " Magnitude: " << force.magnitude << std::endl;
+					<< " Magnitude: " << force.magnitude << std::endl;*/
 			}
 		}
 

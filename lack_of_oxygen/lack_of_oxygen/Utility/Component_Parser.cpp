@@ -315,14 +315,19 @@ namespace lof {
                             std::string full_filepath = ASM.get_audio_path(filepath);
 
                             // Get other properties with defaults
-                            PlayState play_state = NONE;
+                            /*PlayState play_state = NONE;
                             if (sound.HasMember("audio_state") && sound["audio_state"].IsInt()) {
                                 play_state = static_cast<PlayState>(sound["audio_state"].GetInt());
-                            }
+                            }*/
 
                             AudioType audio_type = SFX;
                             if (sound.HasMember("audio_type") && sound["audio_type"].IsInt()) {
                                 audio_type = static_cast<AudioType>(sound["audio_type"].GetInt());
+                            }
+
+                            int max_simultaneous = MIN_SIMULTANEOUS;
+                            if (sound.HasMember("max_simultaneous") && sound["max_simultaneous"].IsInt()) {
+                                max_simultaneous = sound["max_simultaneous"].GetInt();
                             }
 
                             float volume = 1.0f;
@@ -339,15 +344,23 @@ namespace lof {
                             if (sound.HasMember("islooping") && sound["islooping"].IsBool()) {
                                 islooping = sound["islooping"].GetBool();
                             }
-                            else if (sound.HasMember("is_looping") && sound["is_looping"].IsBool()) {
-                                islooping = sound["is_looping"].GetBool();
+                            //else if (sound.HasMember("is_looping") && sound["is_looping"].IsBool()) {
+                            //    islooping = sound["is_looping"].GetBool();
+                            //}
+
+                            bool is3d = false;
+                            if (sound.HasMember("is3d") && sound["is3d"].IsBool()) {
+                                is3d = sound["is3d"].GetBool();
                             }
 
                             // Add sound to component
-                            audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
+                            //audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
+                            audio_component.add_sound(key, filepath, audio_type, max_simultaneous, volume, pitch, islooping, is3d);
 
-                            LM.write_log("Added sound - Key: %s, Path: %s, State: %d, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d",
-                                key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            //LM.write_log("Added sound - Key: %s, Path: %s, State: %d, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d",
+                            //    key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
+                            LM.write_log("Added sound - Key: %s, Path: %s, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d, is3D: %d",
+                                key.c_str(), filepath.c_str(), audio_type, volume, pitch, islooping, is3d);
                         }
                         else {
                             LM.write_log("Warning: Sound missing required key or filepath properties");
@@ -356,9 +369,9 @@ namespace lof {
                 }
 
                 // Handle 3D audio properties
-                if (component_data.HasMember("is_3d")) {
+                /*if (component_data.HasMember("is_3d")) {
                     audio_component.set_is3d(component_data["is_3d"].GetBool());
-                }
+                }*/
 
                 if (component_data.HasMember("position") && component_data["position"].IsArray()) {
                     const auto& pos = component_data["position"];

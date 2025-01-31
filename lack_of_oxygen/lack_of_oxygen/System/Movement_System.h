@@ -13,6 +13,7 @@
 
 #include "System.h"
 #include "../Manager/ECS_Manager.h"
+#include "../Entity/Entity.h"
 #include <vector>
 
 namespace lof {
@@ -43,11 +44,30 @@ namespace lof {
          * @return The string "Movement_System".
          */
         std::string get_type() const override;
+        
+        /**
+        *@brief add the entity in the physics system's list of entities 
+        * 
+        */
+
+#if 1
+        void add_entity(EntityID entity) override;
+
+        void remove_entity(EntityID entity) override;
+
+        void clear_dynamic_entities(); 
+#endif
 
         void reset_jump_timer() { jump_timer = 0.0f; };
         float get_max_jump_time() const { return MAX_JUMP_TIME; };
 
+
+
     private:
+
+        //track only entities that need physics updates 
+        std::vector<EntityID> dynamic_entities;
+
         /**
          * @brief Integrates physics calculations for movement, applying forces and updating positions.
          * @param delta_time The time increment for updating entity positions and velocities.
