@@ -677,12 +677,7 @@ namespace lof {
                                             text_comp.text = "0";
 
                                             // Play deposit sound if in scene 2
-                                            if (ECSM.has_component<Audio_Component>(player_ID)) {
-                                                auto& audio = ECSM.get_component<Audio_Component>(player_ID);
-                                                if (GM.get_current_scene() == 2) {
-                                                    audio.set_audio_state("deposit1", PLAYING);
-                                                }
-                                            }
+
 
                                             LM.write_log("Minerals deposited into hopper: %d, Progress: %.2f%%",
                                                 current_minerals, current_percentage * 100.0f);
