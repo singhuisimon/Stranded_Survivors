@@ -369,7 +369,7 @@ namespace lof {
 
 
         // All the necessary file path 
-        const std::string AUDIO_PATH = "Audios";
+        const std::string AUDIO_PATH = "Audio";
         const std::string TEXTURE_PATH = "Textures";
         const std::string MODEL_PATH = "Models";
         const std::string SHADER_PATH = "Shaders";
