@@ -345,18 +345,20 @@ namespace lof {
         struct SoundConfig {
             std::string key = "";
             std::string filepath = "";
-            PlayState audio_state = NONE;
+            //PlayState audio_state = NONE;
             AudioType audio_type = NIL;
+            int max_simultaneous = 0;
             float volume = 0.0f;
             float pitch = 1.0f;
             bool islooping = false;
+            bool is3d = false;
         };
 
         std::vector<SoundConfig> sounds; ///< vectors of sound details
 
 
         //for future implementation
-        bool is3d;      ///<check if the sound is 3D or 2D.
+        //bool is3d;      ///<check if the sound is 3D or 2D.
 
         Vec3D position; ///<position of where the sound is emitting from
         float mindist;  ///<the min range for listener to be in to hear the sound (closer)
@@ -368,7 +370,7 @@ namespace lof {
          * @brief Constructor for Audio_Component.
          *        initializes the member values of Audio_Component
          */
-        Audio_Component() : sounds(), is3d(false), position(), mindist(1.0f), maxdist(100.0f) {}
+        Audio_Component() : sounds(), position(), mindist(1.0f), maxdist(100.0f) {}
 
         /**
          * @brief Constructor for SoundConfig.
@@ -380,17 +382,21 @@ namespace lof {
          * @param pitch Contains the pitch level for the sound.
          * @param islooping Contains the loop state of the sound
          */
-        void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
-            float volume, float pitch, bool islooping) {
+        /*void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
+            float volume, float pitch, bool islooping) {*/
+        void add_sound(const std::string & key, const std::string & filepath, AudioType type, int num,
+            float volume, float pitch, bool islooping, bool is3d) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
                     //if key already exist update properties
                     sound.filepath = filepath;
-                    sound.audio_state = state;
+                    //sound.audio_state = state;
                     sound.audio_type = type;
+                    sound.max_simultaneous = num;
                     sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
                     sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
                     sound.islooping = islooping;
+                    sound.is3d = is3d;
                     return;
                 }
             }
@@ -398,11 +404,13 @@ namespace lof {
             SoundConfig new_sound;
             new_sound.key = key;
             new_sound.filepath = filepath;
-            new_sound.audio_state = state;
+            //new_sound.audio_state = state;
             new_sound.audio_type = type;
+            new_sound.max_simultaneous = num;
             new_sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
             new_sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
             new_sound.islooping = islooping;
+            new_sound.is3d = is3d;
 
             sounds.push_back(new_sound);
         }
@@ -431,11 +439,11 @@ namespace lof {
         * @param new_key The new unique identifier of soundconfig to replace the old one.
         */
         void set_key(const std::string& old_key, std::string& new_key) {
-            
+
             for (auto& sound : sounds) {
-                if (sound.key == old_key) { 
+                if (sound.key == old_key) {
                     sound.key = new_key;
-                    
+
                 }
             }
         }
@@ -462,27 +470,6 @@ namespace lof {
         }
 
         /**
-        * @brief Setter for audio state in soundconfig
-        * @param key The unique idenitifier for soundconfig
-        * @param state The new state
-        */
-        void set_audio_state(const std::string& key, PlayState state) {
-            for (auto& sound : sounds) {
-                if (sound.key == key) {
-                    sound.audio_state = state;
-                }
-            }
-        }
-
-        /**
-        * @brief Getter for audio state in soundconfig using param key
-        * @param key The unique identifier for soundconfig
-        */
-        PlayState get_audio_state(const std::string& key) const {
-            return get_sound_by_key(key)->audio_state;
-        }
-
-        /**
         * @brief Setter for audio type in soundconfig
         * @param key The unique identifier of soundconfig
         * @param type The new type
@@ -501,6 +488,27 @@ namespace lof {
         */
         AudioType get_audio_type(const std::string& key) const {
             return get_sound_by_key(key)->audio_type;
+        }
+
+        /**
+        * @brief Setter for max simultaneous in soundconfig
+        * @param key The unique idenitifier for soundconfig
+        * @param num The new max simultaneous number
+        */
+        void set_max_simultaneous(const std::string& key, const int num) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.max_simultaneous = num;
+                }
+            }
+        }
+
+        /**
+        * @brief Getter for max simultaneous in soundconfig using param key
+        * @param key The unique identifier for soundconfig
+        */
+        int get_max_simultaneous(const std::string& key) const {
+            return get_sound_by_key(key)->max_simultaneous;
         }
 
         /**
@@ -571,12 +579,20 @@ namespace lof {
         * @brief Setter for is 3D
         * @param is_3d The new boolean value for 3D
         */
-        void set_is3d(bool is_3d) { this->is3d = is_3d; }
+        void set_is3d(const std::string& key, bool is_3d) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.is3d = is_3d;
+                }
+            }
+        }
 
         /**
         * @brief Getter for is 3D
         */
-        bool get_is3d() const { return is3d; }
+        bool get_is3d(const std::string& key) const {
+            return get_sound_by_key(key)->is3d;
+        }
 
         /**
         * @brief Setter for position
@@ -610,6 +626,7 @@ namespace lof {
         * @brief Getter for max distance
         */
         float get_max_distance() const { return maxdist; }
+
 
     };
 

@@ -28,6 +28,7 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <filesystem>
 
 namespace lof {
 
@@ -104,6 +105,9 @@ namespace lof {
          */
         void start_frame();
 
+        /**
+         * @brief Renders the IMGUI dockspace, calls the IMGUI windows, displays the game world in the Game World Viewport and handles the mouse cursor actions in it.
+         */
         void render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT);
 
         /**
@@ -153,11 +157,21 @@ namespace lof {
          */
         void fill_prefab_names(const char* prefab_name);
 
+
+        //TO DELETE
         /**
          * @brief Pushes back the prefab_name string to the prefab_names vector.
          * @param prefab_name Const char* string containing the prefab name
          */
-        void fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name);
+        //void fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name);
+
+
+        //void drop_callback(GLFWwindow* window, int count, const char** paths);
+
+        void set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name);
+
+        std::string get_filename_from_filepath(std::string file_path, std::string folder_name);
+
 
         /**
          * @brief Calls functions from IMGUI that renders the level editor in an OpenGL and GLFW context
@@ -206,6 +220,8 @@ namespace lof {
          * @brief Function to turn off in-game GUI.
          */
         void disable_GUI();
+
+        void asset_browser();
     };
 
 } // namespace lof

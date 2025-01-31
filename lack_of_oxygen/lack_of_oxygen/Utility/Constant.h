@@ -44,6 +44,11 @@ namespace lof {
 	constexpr float DEFAULT_DELTA_TIME = 0.0f;
 	constexpr int64_t DEFAULT_LAST_FRAME_START_TIME = 0;
 
+	constexpr float DEFAULT_FIXED_DELTA_TIME = 1.0f / DEFAULT_TARGET_FPS;
+	constexpr float DEFAULT_ACCUMULATED_TIME = 0.0f; 
+	constexpr int DEFAULT_NUMBER_OF_STEPS = 0; 
+	constexpr int DEFAULT_MAX_STEPS = 3;
+
 	// ------------------------- System.cpp and Manager.cpp Files -------------------------------
 	// System Performance Constants
 	constexpr int64_t DEFAULT_START_TIME = 0;
@@ -89,21 +94,37 @@ namespace lof {
 	enum AudioType {
 		BGM = 0,    ///<background music
 		SFX = 1,		///<Sound Effect
-		NIL = 2
+		UI = 2,
+		NIL = 3
 	};
 
-	enum PlayState {
+	/*enum PlayState {
 		PLAYING = 0,    ///<Audio is to be played
 		STOPPED = 1,    ///<Audio is to be stopped
 		PAUSED = 2,     ///<Audio is to be paused
 		RESUMED = 3,	///<Audio is to be resumed
 		NONE = 4		///<Audio is not played at all nor need to stop
+	};*/
+
+	// ------------------------- Audio_Manager.cpp constants ---------------------------
+	enum GroupType {
+		TYPE_NONE,
+		TYPE_MASTER,
+		TYPE_BGM,
+		TYPE_SFX,
+		TYPE_UI
 	};
+
+	// ------------------------ Audio_System.cpp constants ----------------------------
+
+	constexpr unsigned int MIN_SIMULTANEOUS = 1;
+	constexpr unsigned int MAX_SIMULTANEOUS = 3;
 
 	// ------------------------- Movement_System.cpp constants ------------------------- 
 
 	constexpr float DEFAULT_SPEED = 400.0f;
 	constexpr float GRAVITY_ACCELERATOR = 10.0f;
+	constexpr size_t MAX_DYNAMIC_ENTITIES = 20; 
 
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
 	// File

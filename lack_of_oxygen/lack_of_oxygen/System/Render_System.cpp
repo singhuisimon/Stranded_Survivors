@@ -395,7 +395,7 @@ namespace lof {
                     // Pass frame number of current frame
                     GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
                     if (frame_no_loc >= 0) {
-                        if (curr_animation_name == "vent_strip" || curr_animation_name == "lava") {
+                        if (curr_animation_name == "vent_strip" || curr_animation_name == "lava_animate") {
                             glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animations[curr_animation_name].curr_frame_index].frame_number);
                         }
                         else {

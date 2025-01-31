@@ -284,7 +284,7 @@ namespace lof {
                 
                 // Shared animations v.s. individual animations
                 float delay = 0;
-                if (curr_animation_name == "vent_strip" || curr_animation_name == "lava") {
+                if (curr_animation_name == "vent_strip" || curr_animation_name == "lava_animate") {
                     delay = animations_storage[curr_animation_name].frames[curr_frame_idx].time_delay;
                 } else {
                     delay = animations_storage[curr_animation_name].frames[animation_comp.curr_frame_index].time_delay;

@@ -11,6 +11,7 @@
 
 #include "Interruption_System.h"
 #include "../Manager/Input_Manager.h"
+#include "../Manager/Audio_Manager.h"
 #include "Audio_System.h"
 
 namespace lof {
@@ -51,7 +52,7 @@ namespace lof {
         check_key_combinations();
 
         // Check current window state
-        check_window_state();
+       check_window_state();
 
     }
 
@@ -110,13 +111,15 @@ namespace lof {
             IM.reset();
 
             // Pause audio
-            for (auto const& system : ECSM.get_systems()) {
+            /*for (auto const& system : ECSM.get_systems()) {
                 if (auto* audio_system = dynamic_cast<Audio_System*>(system.get())) {
                     audio_system->pause_resume_mastergroup();
                     LM.write_log("Interruption_System: Audio paused");
                     break;
                 }
-            }
+            }*/
+
+            ADM.pause_resume_mastergroup();
 
             LM.write_log("Interruption_System: Game interrupted - Input reset, Audio paused");
         }
@@ -139,13 +142,16 @@ namespace lof {
             }
 
             // Resume audio
-            for (auto const& system : ECSM.get_systems()) {
+            /*for (auto const& system : ECSM.get_systems()) {
                 if (auto* audio_system = dynamic_cast<Audio_System*>(system.get())) {
                     audio_system->pause_resume_mastergroup();
                     LM.write_log("Interruption_System: Audio resumed");
                     break;
                 }
-            }
+            }*/
+
+            ADM.pause_resume_mastergroup();
+
         // Reset input states again to ensure clean state
         IM.reset();
 

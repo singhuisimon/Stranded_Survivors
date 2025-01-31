@@ -190,10 +190,13 @@ int main(void) {
         // Update window title with FPS
         std::stringstream ss;
         ss << "Lack Of Oxygen"; 
-#ifndef NDEBUG
+//#ifndef NDEBUG
         ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
-#endif
+//#endif
         glfwSetWindowTitle(window, ss.str().c_str());
+
+       /* const GLubyte* renderer = glGetString(GL_RENDERER);
+        printf("GL Renderer  : %s\n", renderer);*/
 
         // Update FPS timer
         fps_timer += delta_time;
@@ -222,10 +225,15 @@ int main(void) {
         enter_key_was_pressed_last_frame = is_ENTER_pressed;
 
         //Getting delta time for Game Manager/game loop for system performance viewer
-        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        //GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+        auto start_time = std::chrono::steady_clock::now();
         // Update game world state
         GM.update(delta_time);
-        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GM.get_time());
+
+        auto end_time = std::chrono::steady_clock::now();
+
+        //GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time.time_since_epoch()).count() - GM.get_time());
+        GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         // Start the Dear ImGui frame
         IMGUIM.start_frame();
@@ -235,8 +243,9 @@ int main(void) {
 
         //Dispalys the % of the manager and system's time in the game loop in an IMGUI window
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-        system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+        //system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
+        ImGui::Separator();
         ImGui::Text("In ECS Manager: \n");
         for (auto& system : ECSM.get_systems()) {
             system_performance(GM.get_time(), system->get_time(), system->get_type());
@@ -307,6 +316,8 @@ int main(void) {
 
     // Application exit
     std::cout << "Application exited successfully." << std::endl;
+
+
 
     return 0;
 }

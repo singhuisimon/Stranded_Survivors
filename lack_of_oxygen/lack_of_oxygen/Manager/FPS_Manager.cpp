@@ -28,7 +28,10 @@ namespace lof {
         adjust_time(DEFAULT_ADJUST_TIME),
         delta_time(DEFAULT_DELTA_TIME),
         last_frame_start_time(DEFAULT_LAST_FRAME_START_TIME),
-        fps_calculator(DEFAULT_TARGET_FPS) { // Initialize with TARGET_FPS
+        fps_calculator(DEFAULT_TARGET_FPS), // Initialize with TARGET_FPS
+        accumulated_time(DEFAULT_ACCUMULATED_TIME),
+        current_number_of_steps(DEFAULT_NUMBER_OF_STEPS),
+        FIXED_DELTA_TIME(DEFAULT_FIXED_DELTA_TIME) {
         set_type("FPS_Manager");
         LM.write_log("FPS_Manager::FPS_Manager(): Initialized with TARGET_FPS = %d.", TARGET_FPS);
     }
@@ -78,6 +81,9 @@ namespace lof {
             int64_t frame_duration = current_time - last_frame_start_time;
             delta_time = static_cast<float>(frame_duration) / MICROSECONDS_PER_SECOND;
             //LM.write_log("FPS_Manager::frame_start(): Calculated delta_time = %.6f seconds.", delta_time);
+
+            //calculate fixed delta_time stpes
+            calculate_steps();
         }
 
         // Update last_frame_start_time
@@ -129,4 +135,20 @@ namespace lof {
         fps_calculator.reset();
     }
 
+    void FPS_Manager::calculate_steps() {
+        current_number_of_steps = 0; //reset
+        accumulated_time += delta_time;
+        while (accumulated_time >= FIXED_DELTA_TIME) {
+            accumulated_time -= FIXED_DELTA_TIME;
+            current_number_of_steps++;
+        }
+    }
+
+    int FPS_Manager::get_current_number_of_steps() const {
+        return current_number_of_steps;
+    }
+
+    float FPS_Manager::get_fixed_delta_time() const {
+        return FIXED_DELTA_TIME;
+    }
 } // namespace lof
