@@ -2140,4 +2140,45 @@ namespace lof {
         LM.write_log("IMGUI_Manager::shut_down(): IMGUI_Manager shut down successfully.");
     }
 
+    //// for drag file explore 
+    //void IMGUI_Manager::drop_callback(GLFWwindow* window, int count, const char** paths)
+    //{
+    //    
+    //    for (int i = 0; i < count; ++i)
+    //    {
+    //        const char* filePath = paths[i];
+
+    //        printf("Dropped file: %s\n", filePath);
+    //        //add logic 
+    //        //glfwSetDropCallback(window, DropCallback); // register it after creating GLFWwindow 
+
+    //    }
+    //}
+
+    std::vector<std::string> assetFiles;
+    void IMGUI_Manager::Handle_Dropped_File(const std::string filePath)
+    {
+        std::string extension = filePath.substr(filePath.find_last_of(".") + 1); // find the type of file 
+
+        if (extension == "png")
+        {
+            assetFiles.push_back(filePath);
+            std::cout << "Added Asset: " << filePath << "\n";
+        }
+
+    }
+
+    void IMGUI_Manager::render_asset_browser()
+    {
+        ImGui::Begin("Asset Broswer");
+        for (const auto& path : assetFiles) {
+            ImGui::Text("%s", path.c_str());
+        }
+        ImGui::End();
+    }
+
+
+
+    
+
 } // namespace lof

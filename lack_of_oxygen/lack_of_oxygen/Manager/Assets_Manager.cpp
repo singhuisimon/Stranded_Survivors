@@ -489,6 +489,69 @@ namespace lof {
         }
     }
 
+    void Assets_Manager::AddAsset(const std::string& filePath) {
+        // Extract the file extension
+        std::string extension = filePath.substr(filePath.find_last_of('.') + 1);
+        std::string fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
+
+        // Determine the destination subfolder within Assets
+        std::string destinationSubfolder;
+
+        if (extension == "png") {
+            destinationSubfolder = TEXTURE_PATH;
+        }
+        else if (extension == "obj") {
+            destinationSubfolder = MODEL_PATH;
+        }
+        else if (extension == "mp3" || extension == "wav") {
+            destinationSubfolder = AUDIO_PATH;
+        }
+        else if (extension == "vert" || extension == "frag") {  
+            destinationSubfolder = SHADER_PATH;
+        }
+        else if (extension == "ttf" || extension == "otf") {
+            destinationSubfolder = FONT_PATH;
+        }
+        else {
+            std::cout << "Unsupported asset type: " << filePath << std::endl;
+            return;
+        }
+
+        // Build the target file path within the Assets directory
+        std::string targetPath = get_full_path(destinationSubfolder, fileName);;
+
+        // Ensure the directory exists and copy the file
+        if (CopyFileTo(targetPath, filePath)) {
+            std::cout << "File successfully added to: " << targetPath << std::endl;
+        }
+        else {
+            std::cout << "Failed to add file: " << filePath << std::endl;
+        }
+    }
+
+    bool Assets_Manager::CopyFileTo(const std::string& destinationPath, const std::string& sourcePath) {
+        try {
+            
+            std::filesystem::create_directories(std::filesystem::path(destinationPath).parent_path());
+
+            // Open the source file and destination file in binary mode
+            std::ifstream src(sourcePath, std::ios::binary);
+            std::ofstream dst(destinationPath, std::ios::binary);
+
+            if (!src.is_open() || !dst.is_open()) {
+                std::cerr << "Error opening source or destination file.\n";
+                return false;
+            }
+
+            dst << src.rdbuf();  // Copy the file content
+            return true;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error copying file: " << e.what() << std::endl;
+            return false;
+        }
+    }
+
  
     
    
