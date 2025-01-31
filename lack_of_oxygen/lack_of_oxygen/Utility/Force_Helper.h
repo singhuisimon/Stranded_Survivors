@@ -29,7 +29,8 @@ namespace lof {
 		MOVE_RIGHT,
 		JUMP_UP,
 		DRAG,
-		IMPULSE //for future purposes
+		IMPULSE,
+		VENT_FORCE//for future purposes
 	};
 
 	class Force {

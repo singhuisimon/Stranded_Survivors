@@ -385,6 +385,8 @@ namespace lof {
     EntityID Collision_System::top_collision_entity = static_cast<EntityID>(-1);
     bool Collision_System::has_top_collision = false;
 
+
+#if 0
     void Collision_System::collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time) {
 
         // initialize value 
@@ -597,6 +599,230 @@ namespace lof {
             has_top_collision = false;
         }
     }
+#endif
+
+#if 1
+    void Collision_System::collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time) {
+        // Initialize collision detection flags
+        bool found_bottom_collision = false;
+        bool found_left_collision = false;
+        bool found_right_collision = false;
+        bool found_top_collision = false;
+
+        const auto& collision_entities = get_entities();
+        bool is_grounded = false;
+        frame_counter++;
+
+        EntityID current_bottom_entity = static_cast<EntityID>(-1);
+        EntityID current_left_entity = static_cast<EntityID>(-1);
+        EntityID current_right_entity = static_cast<EntityID>(-1);
+        EntityID current_top_entity = static_cast<EntityID>(-1);
+
+        // Level grid constants
+        const float LEFT_BOUND = -960.0f;
+        const float RIGHT_BOUND = 960.0f;
+        const float START_Y = -150.0f;
+        const int TOTAL_ROWS = static_cast<int>(SM.get_level_rows());
+        const int TOTAL_COLS = static_cast<int>(SM.get_level_cols());
+
+        // Calculate cell dimensions based on level size
+        const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
+        const float CELL_HEIGHT = CELL_WIDTH;
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
+            EntityID entity_ID1 = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
+
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
+            auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
+            auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
+
+            // Convert world coordinate to grid coordinate
+            int player_col = static_cast<int>((transform1.position.x - LEFT_BOUND) / CELL_WIDTH);
+            int player_row = static_cast<int>((START_Y - transform1.position.y) / CELL_HEIGHT);
+
+            // Ensure coordinate is within the range
+            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1);
+            player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
+
+            const int CHECK_RADIUS = 1; // Check 1 cell away from player
+            int start_row = std::max(0, player_row - CHECK_RADIUS);
+            int end_row = std::min(TOTAL_ROWS - 1, player_row + CHECK_RADIUS);
+            int start_col = std::max(0, player_col - CHECK_RADIUS);
+            int end_col = std::min(TOTAL_COLS - 1, player_col + CHECK_RADIUS);
+
+            AABB aabb1 = AABB::from_transform(transform1, collision1);
+
+            // Only check collisions when player is near the level design map
+            if (transform1.position.y <= (START_Y + (collision1.height / 2.0f))) {
+
+                for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                    EntityID entity_ID2 = *iter2;
+
+                    if (entity_ID1 == entity_ID2) {
+                        continue;
+                    }
+
+                    auto* entity2 = ECSM.get_entity(entity_ID2);
+                    if (!entity2) continue;
+
+                    // Check if this is a vent tile
+                    bool is_vent = entity2->get_name().find("vent") != std::string::npos;
+
+                    auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
+
+                    // Calculate entity2's grid position
+                    int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
+                    int entity2_row = static_cast<int>((START_Y - transform2.position.y) / CELL_HEIGHT);
+
+                    // Skip if entity2 is outside check area
+                    if (entity2_row < start_row || entity2_row > end_row ||
+                        entity2_col < start_col || entity2_col > end_col) {
+                        continue;
+                    }
+
+                    auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
+                    auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
+
+                    if (!collision2.collidable && !is_vent) continue;
+
+                    AABB aabb2 = AABB::from_transform(transform2, collision2);
+
+                    float collision_time = delta_time;
+                    if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
+                        CollisionSide side = compute_collision_side(aabb1, aabb2);
+
+                        if (is_vent) {
+                            // Calculate overlap percentage with vent
+                            Vec2D overlap = compute_overlap(aabb1, aabb2);
+                            float vent_width = collision2.width;
+                            float overlap_percentage = overlap.x / vent_width;
+
+                            // Only apply vent force if significantly overlapping with vent center
+                            if (overlap_percentage > 0.3f && overlap_percentage < 0.7f) {
+                                // Add or update vent force
+                                physic1.force_helper.activate_force(VENT_FORCE);
+                                // Remove gravity while in vent
+                                physic1.set_gravity(Vec2D(0.0f, 0.0f));
+                                // Set upward velocity
+                                velocity1.velocity.y = 400.0f;
+                            }
+                        }
+                        else {
+                            if (side == CollisionSide::BOTTOM && !is_grounded) {
+                                is_grounded = true;
+                                physic1.set_gravity(Vec2D(0.0f, 0.0f));
+                                found_bottom_collision = true;
+                                current_bottom_entity = entity_ID2;
+                            }
+
+                            collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side, static_cast<float>(frame_counter) });
+                        }
+                    }
+                    else if (is_vent) {
+                        // If no longer colliding with vent, deactivate vent force
+                        physic1.force_helper.deactivate_force(VENT_FORCE);
+                        // Restore gravity if not in vent
+                        if (!is_grounded) {
+                            physic1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                        }
+                    }
+
+                    // Check for left collision
+                    if (!found_left_collision &&
+                        entity2_col == player_col - 1 &&
+                        entity2_row == player_row &&
+                        transform2.position.x < transform1.position.x &&
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) {
+                        found_left_collision = true;
+                        current_left_entity = entity_ID2;
+                    }
+
+                    // Check for right collision
+                    if (!found_right_collision &&
+                        entity2_col == player_col + 1 &&
+                        entity2_row == player_row &&
+                        transform2.position.x > transform1.position.x &&
+                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) {
+                        found_right_collision = true;
+                        current_right_entity = entity_ID2;
+                    }
+
+                    // Check for top collision
+                    if (!found_top_collision &&
+                        entity2_row == player_row - 1 &&
+                        entity2_col == player_col &&
+                        std::abs(transform2.position.y - transform1.position.y) < (CELL_HEIGHT * 1.2f)) {
+                        found_top_collision = true;
+                        current_top_entity = entity_ID2;
+                    }
+
+                    // Handle level boundaries
+                    if (player_col <= 0 || player_col >= TOTAL_COLS - 1) {
+                        float leftmost_tile_center = LEFT_BOUND + (CELL_WIDTH * 0.5f);
+                        float rightmost_tile_center = RIGHT_BOUND - (CELL_WIDTH * 0.5f);
+
+                        if (transform1.position.x <= leftmost_tile_center) {
+                            velocity1.velocity.x = 0.0f;
+                            transform1.position.x = leftmost_tile_center;
+                        }
+                        else if (transform1.position.x >= rightmost_tile_center) {
+                            velocity1.velocity.x = 0.0f;
+                            transform1.position.x = rightmost_tile_center;
+                        }
+                    }
+                }
+            }
+
+            // Update physics state based on collisions
+            physic1.set_is_grounded(is_grounded);
+            if (!is_grounded) {
+                physic1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            }
+        }
+
+        // Update collision detection state
+        if (found_bottom_collision) {
+            bottom_collision_entity = current_bottom_entity;
+            has_bottom_collision = true;
+        }
+        else {
+            bottom_collision_entity = static_cast<EntityID>(-1);
+            has_bottom_collision = false;
+        }
+
+        if (found_left_collision) {
+            left_collision_entity = current_left_entity;
+            has_left_collision = true;
+        }
+        else {
+            left_collision_entity = static_cast<EntityID>(-1);
+            has_left_collision = false;
+        }
+
+        if (found_right_collision) {
+            right_collision_entity = current_right_entity;
+            has_right_collision = true;
+        }
+        else {
+            right_collision_entity = static_cast<EntityID>(-1);
+            has_right_collision = false;
+        }
+
+        if (found_top_collision) {
+            top_collision_entity = current_top_entity;
+            has_top_collision = true;
+        }
+        else {
+            top_collision_entity = static_cast<EntityID>(-1);
+            has_top_collision = false;
+        }
+    }
+#endif
 
     EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
     EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
@@ -712,7 +938,7 @@ namespace lof {
     * @param collisions A vector of `CollisionPair` objects representing collisions between entities.
     */
 
-
+#if 0
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         // Store the last frame's collision states
         static bool had_left_collision = false;
@@ -825,6 +1051,108 @@ namespace lof {
         }
     }
 
+#endif
+
+#if 1
+    void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
+        // Constants for collision response
+        const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
+        const float MIN_PENETRATION = 0.001f; // Minimum penetration to respond to
+        const float POSITION_CORRECTION = 0.8f; // Strength of position correction
+
+        for (const auto& collision : collisions) {
+            EntityID entity1 = collision.entity1;
+            EntityID entity2 = collision.entity2;
+
+            auto& transform1 = ECSM.get_component<Transform2D>(entity1);
+            auto& velocity1 = ECSM.get_component<Velocity_Component>(entity1);
+            auto& physics1 = ECSM.get_component<Physics_Component>(entity1);
+
+            // Skip if entity is static
+            if (physics1.get_is_static()) continue;
+
+            // Get collision normal based on collision side
+            Vec2D normal(0.0f, 0.0f);
+            switch (collision.side) {
+            case CollisionSide::LEFT:   normal = Vec2D(1.0f, 0.0f); break;
+            case CollisionSide::RIGHT:  normal = Vec2D(-1.0f, 0.0f); break;
+            case CollisionSide::TOP:    normal = Vec2D(0.0f, -1.0f); break;
+            case CollisionSide::BOTTOM: normal = Vec2D(0.0f, 1.0f); break;
+            default: continue;
+            }
+
+            // Calculate relative velocity
+            Vec2D relative_velocity = velocity1.velocity;  // Since entity2 is static
+
+            // Calculate impulse using Newton's law
+            float velocity_along_normal = dot_product_vec2d(relative_velocity, normal);
+
+            // Only resolve if objects are moving towards each other
+            if (velocity_along_normal > 0) continue;
+
+            float j = -(1.0f + RESTITUTION) * velocity_along_normal;
+            j /= physics1.get_inv_mass();  // Divide by inverse mass since entity2 is static
+
+            // Apply impulse
+            Vec2D impulse = normal * j;
+            velocity1.velocity = velocity1.velocity + (impulse * physics1.get_inv_mass());
+
+            // Handle special cases for each collision side
+            if (collision.side == CollisionSide::BOTTOM) {
+                // Ground collision
+                physics1.set_is_grounded(true);
+                physics1.set_has_jumped(false);
+                physics1.set_gravity(Vec2D(0.0f, 0.0f));
+                velocity1.velocity.y = 0.0f;  // Zero out vertical velocity
+
+                // Position correction to prevent sinking
+                if (collision.overlap.y > MIN_PENETRATION) {
+                    float correction = (collision.overlap.y - MIN_PENETRATION) * POSITION_CORRECTION;
+                    transform1.position.y += correction;
+                }
+            }
+            else if (collision.side == CollisionSide::TOP) {
+                // Ceiling collision
+                velocity1.velocity.y = 0.0f;  // Zero out upward velocity
+                physics1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+
+                // Position correction to prevent sticking to ceiling
+                if (collision.overlap.y > MIN_PENETRATION) {
+                    float correction = (collision.overlap.y - MIN_PENETRATION) * POSITION_CORRECTION;
+                    transform1.position.y -= correction;
+                }
+            }
+            else {
+                // Side collisions (LEFT/RIGHT)
+                velocity1.velocity.x = 0.0f;  // Zero out horizontal velocity
+
+                // Position correction to prevent wall penetration
+                if (collision.overlap.x > MIN_PENETRATION) {
+                    float correction = (collision.overlap.x - MIN_PENETRATION) * POSITION_CORRECTION;
+                    if (collision.side == CollisionSide::LEFT) {
+                        transform1.position.x += correction;
+                    }
+                    else {
+                        transform1.position.x -= correction;
+                    }
+                }
+
+                // Cancel horizontal forces
+                Vec2D accumulated_force = physics1.get_accumulated_force();
+                if (collision.side == CollisionSide::LEFT && accumulated_force.x < 0) {
+                    accumulated_force.x = 0;
+                }
+                else if (collision.side == CollisionSide::RIGHT && accumulated_force.x > 0) {
+                    accumulated_force.x = 0;
+                }
+                physics1.set_accumulated_force(accumulated_force);
+            }
+
+            // Update previous position to match corrected position
+            transform1.prev_position = transform1.position;
+        }
+    }
+#endif
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;

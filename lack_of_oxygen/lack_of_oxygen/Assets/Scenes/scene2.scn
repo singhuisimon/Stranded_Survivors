@@ -462,6 +462,13 @@
                 "magnitude": 2000.0,
                 "lifetime": 0.0,
                 "is_active": false
+              },
+              {
+                "direction": [ 0.0, 1.0 ],
+                "type": "VENT_FORCE",
+                "magnitude": 1000.0,
+                "lifetime": 0.0,
+                "is_active": false
               }
             ]
           }
