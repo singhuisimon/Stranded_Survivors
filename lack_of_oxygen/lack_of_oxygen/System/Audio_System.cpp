@@ -388,7 +388,7 @@ namespace lof {
 			//get_active_channels();
 			//get_muted_channels();
 
-			std::cout << "bgm is playing" << std::endl;
+			std::cout << "bgm is playing at " << audio.get_volume(audio_key) << std::endl;
 
 			//debug_list_active_sounds();
 		}

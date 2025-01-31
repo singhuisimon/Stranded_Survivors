@@ -281,7 +281,7 @@ namespace lof {
 				return;
 			}
 
-			//play_now(background_id, "bgm1", audio_background, true);
+			play_now(background_id, "bgm1", audio_background, true);
 			new_scene = false;
 			//std::cout << "file detected for bgm1 in scene 1: " << audio_background.get_filepath("bgm1") << std::endl;
 		}
@@ -291,14 +291,14 @@ namespace lof {
 				std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3" };
 				for (const auto& layer : base_layers) {
 					if (!is_layer_playing(background_id, layer)) {
-						//play_now(background_id, layer, audio_background, true);
+						play_now(background_id, layer, audio_background, true);
 					}
 				}
 
 				std::vector<std::string> other_layers = { "bgm 80", "bgm 50_1", "bgm 50_2", "bgm 35", "bgm 25", "bgm 20" };
 				for (const auto& layer : other_layers) {
 					if (!is_layer_playing(background_id, layer)) {
-						//mute_layer(background_id, layer, audio_background.get_filepath(layer));
+						mute_layer(background_id, layer, audio_background.get_filepath(layer));
 					}
 				}
 
@@ -315,11 +315,11 @@ namespace lof {
 				const std::string& filepath = audio_background.get_filepath(audio_key);
 				//if oxygen is increasing and oxygen level is above certain condition mute the bgm layers affected
 				if (increasing && oxygen_level >= condition) {
-					//mute_layer(background_id, audio_key, filepath);
+					mute_layer(background_id, audio_key, filepath);
 				}
 				//if oxygen is decreasing and oxygen level is below certain condition unmute the bgm layers affected
 				else if (!increasing && oxygen_level <= condition) {
-					//unmute_layer(background_id, audio_key, filepath);
+					unmute_layer(background_id, audio_key, filepath);
 				}
 			}
 

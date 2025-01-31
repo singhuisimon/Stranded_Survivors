@@ -208,13 +208,13 @@ namespace lof {
         }
 
         //commented out this is for me to test - Amanda
-        if (IM.is_key_pressed(GLFW_KEY_J)) {
+        if (IM.is_key_held(GLFW_KEY_J)) {
             oxygen_level--;
             std::cout << "current oxygen level " << oxygen_level << std::endl;
             increasing = false;
         }
 
-        if (IM.is_key_pressed(GLFW_KEY_K)) {
+        if (IM.is_key_held(GLFW_KEY_K)) {
             oxygen_level++;
             std::cout << "current oxygen level " << oxygen_level << std::endl;
             increasing = true;
@@ -592,17 +592,17 @@ namespace lof {
                 }
 
                 //just for testing
-                if (IM.is_key_held(GLFW_KEY_F)) {
+                /*if (IM.is_key_held(GLFW_KEY_F)) {
                     int val_to_deduct = -20;
                     if (std::stoi(ECSM.get_component<Text_Component>(mineral_count_text_id).text) >= -val_to_deduct) {
                         update_mineral_count_text(val_to_deduct);
                         ADM.play_now(player_id, "deposit mineral", audio_player);
                     }
-                }
+                }*/
 
                 //just for testing
                 //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
-                if (IM.is_key_held(GLFW_KEY_T)) {
+                /*if (IM.is_key_held(GLFW_KEY_T)) {
                     int oxygen_to_add = 2;
             
                     if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
@@ -612,11 +612,11 @@ namespace lof {
                         oxygen_text.text = std::to_string(current_value);
                         ADM.play_now(player_id, "refilling oxygen", audio_player);
                     }
-                }
+                }*/
 
                 //just for testing
                 //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
-                if (IM.is_key_held(GLFW_KEY_Y)) {
+                /*if (IM.is_key_held(GLFW_KEY_Y)) {
                     int oxygen_to_deduct = -1;
                     if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
                         auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
@@ -627,36 +627,43 @@ namespace lof {
                             ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
                         }
                     }
-                }
+                }*/
 
                 //just for testing
-                if (IM.is_key_released(GLFW_KEY_F)) {
+                /*if (IM.is_key_released(GLFW_KEY_F)) {
                     ADM.stop_now(player_id, "deposit mineral", audio_player.get_filepath("deposit mineral"));
-                }
+                }*/
 
                 //just for testing
                 //remember to remove the s inside the top_ui_timer_count_text for scene 1 & 2
-                if (IM.is_key_held(GLFW_KEY_U)) {
-                    int time_deduction = -1;
-                    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                        auto& oxygen_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                        if (std::stoi(oxygen_text.text) > 0) {
-                            int current_value = std::stoi(oxygen_text.text);
-                            current_value += time_deduction;
-                            oxygen_text.text = std::to_string(current_value);
-                            //ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
-                        }
-                    }
-                }
+                //if (IM.is_key_held(GLFW_KEY_U)) {
+                //    int time_deduction = -1;
+                //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                //        auto& oxygen_text = ECSM.get_component<Text_Component>(timer_count_text_id);
+                //        if (std::stoi(oxygen_text.text) > 0) {
+                //            int current_value = std::stoi(oxygen_text.text);
+                //            current_value += time_deduction;
+                //            oxygen_text.text = std::to_string(current_value);
+                //            //ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
+                //        }
+                //    }
+                //}
 
                 if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
                     auto& timer_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                    if (std::stoi(timer_text.text) == 1) {
+                    if (std::stoi(timer_text.text) == 0) {
                         ADM.play_now(player_id, "lava siren", audio_player);
                     }
+                }                
+
+                if (IM.is_key_held(GLFW_KEY_I)) {
+                    game_over = true;
+                    
                 }
 
-                
+                if (game_over) {
+                    ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
+                }
 
                 // Get and set mining status for animation
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
@@ -1204,6 +1211,10 @@ namespace lof {
 
         LM.write_log("Block isn't %s but %s", block_name.c_str(), name.c_str());
         return false;
+    }
+
+    bool Game_Manager::get_game_over() {
+        return game_over;
     }
 
 } // namespace lof
