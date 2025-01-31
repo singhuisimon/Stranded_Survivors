@@ -157,15 +157,6 @@ namespace lof {
          */
         void fill_prefab_names(const char* prefab_name);
 
-
-        //TO DELETE
-        /**
-         * @brief Pushes back the prefab_name string to the prefab_names vector.
-         * @param prefab_name Const char* string containing the prefab name
-         */
-        //void fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name);
-
-
         //void drop_callback(GLFWwindow* window, int count, const char** paths);
 
         void set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name);
@@ -226,6 +217,8 @@ namespace lof {
         void render_asset_browser();
 
         std::string open_file_explorer();
+
+        void asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message);
     };
 
 } // namespace lof
