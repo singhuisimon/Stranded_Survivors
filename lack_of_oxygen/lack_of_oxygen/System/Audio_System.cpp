@@ -432,17 +432,15 @@ namespace lof {
 				ADM.errorcheck(channel->stop(), "Audio_System::stop_sound", "stop channel" + channel_key); //if the channel is playing stop it
 			}
 			else {
-				return;	//nothing to do as channel has already finish playing music
+				continue;	//nothing to do as channel has already finish playing music
 
 			}
-
-			channels.clear(); //clear the vector as no channels should remain after stopping
-
-			//technically once function reaches here it means all channel in the channel key data vector has been stopped
-			//so removal shouldn't cause an issues
-			channel_map.erase(channel_key);
-
 		}
+		channels.clear(); //clear the vector as no channels should remain after stopping
+
+		//technically once function reaches here it means all channel in the channel key data vector has been stopped
+		//so removal shouldn't cause an issues
+		channel_map.erase(channel_key);
 	}
 
 	void Audio_System::set_channel_pitch(const std::string& channel_key, float pitch) {

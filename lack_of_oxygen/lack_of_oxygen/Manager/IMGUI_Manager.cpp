@@ -1583,6 +1583,9 @@ namespace lof {
                                 for (auto& channel : audio_system->get_channel_map()) {
                                     std::cout << channel.first << std::endl;
                                 }
+
+                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                                audio_system->get_active_channels();
                             }
                         }
                         std::cout << "CHECKING SOUND MAP" << std::endl;
@@ -1700,6 +1703,9 @@ namespace lof {
                                 for (auto& channel : audio_system->get_channel_map()) {
                                     std::cout << channel.first << std::endl;
                                 }
+
+                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                                audio_system->get_active_channels();
                             }
                         }
                         std::cout << "CHECKING SOUND MAP" << std::endl;
