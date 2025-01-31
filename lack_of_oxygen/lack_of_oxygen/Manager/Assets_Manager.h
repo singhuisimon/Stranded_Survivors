@@ -292,6 +292,9 @@ namespace lof {
      
         std::unordered_set<std::string>& get_all_assets() { return all_assets; };
 
+        void AddAsset(const std::string& filePath);
+        bool CopyFileTo(const std::string& destinationPath, const std::string& sourcePath);;
+
     private:
 
         ////std::unordered_map<EntityID, std::unordered_set<std::string>> tracked_assets;

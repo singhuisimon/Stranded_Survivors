@@ -226,6 +226,10 @@ namespace lof {
         void render_asset_browser();
 
         std::string open_file_explorer();
+
+        //void drop_callback(GLFWwindow* window, int count, const char** paths);
+        void Handle_Dropped_File(const std::string filePath);
+        //void render_asset_browser();
     };
 
 } // namespace lof
