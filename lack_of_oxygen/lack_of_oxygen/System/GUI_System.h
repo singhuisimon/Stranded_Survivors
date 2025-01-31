@@ -30,13 +30,11 @@ namespace lof {
         float last_progress_value = 0.0f;  // Store last progress value
 
         EntityID mineral_interaction_container = INVALID_ENTITY_ID;
-        EntityID mineral_text_overlay = INVALID_ENTITY_ID;
+        EntityID mineral_background_bar = INVALID_ENTITY_ID;
+        EntityID mineral_progress_bar = INVALID_ENTITY_ID;
+        EntityID mineral_percentage_text = INVALID_ENTITY_ID;
 
         EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
-        EntityID oxygen_text_overlay = INVALID_ENTITY_ID;
-        EntityID red_circle_overlay = INVALID_ENTITY_ID;
-        EntityID green_circle_overlay = INVALID_ENTITY_ID;
-
 
         float current_oxygen_level = 100.0f; // Track oxygen level
         float current_mineral_count = 0.0f;  // Track mineral count
@@ -130,13 +128,42 @@ namespace lof {
         std::string get_type() const override { return "GUI_System"; }
 
         /**
-         * @brief Gets the current progress value of the loading bar.
-         * @return Current progress value between 0.0 and 1.0, or 0.0 if no progress bar exists.
-         */
-        float get_progress() const {
-            if (progress_bar_id == INVALID_ENTITY_ID) return 0.0f;
-            const auto* gui = get_component_safe<GUI_Component>(progress_bar_id);
-            return gui ? gui->progress : 0.0f;
+		 * @brief Updates the mineral progress bar with the given percentage.
+		 * @return Void.
+		 */
+        void update_mineral_progress(float percentage) {
+            if (mineral_progress_bar != INVALID_ENTITY_ID) {
+                if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+                    gui->progress = percentage;
+
+                    // Update the fill bar width based on progress
+                    if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
+                        transform->scale.x = 430.0f * percentage; // Use the full width of background bar
+                    }
+                }
+
+                // Update the percentage text
+                if (mineral_percentage_text != INVALID_ENTITY_ID) {
+                    if (auto* text = get_component_safe<Text_Component>(mineral_percentage_text)) {
+                        int percent = static_cast<int>(percentage * 100.0f);
+                        text->text = std::to_string(percent) + "%";
+                    }
+                }
+            }
+        }
+
+
+        /**
+		 * @brief Get the mineral hopper progress bar with the given percentage.
+		 * @return Void.
+		 */
+        float get_current_hopper_percentage() const {
+            if (mineral_progress_bar != INVALID_ENTITY_ID) {
+                if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+                    return gui->progress;
+                }
+            }
+            return 0.0f;
         }
 
         /**

@@ -162,8 +162,6 @@ namespace lof {
             return;
         }
 
-
-
         //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
         try {
             // Simulate a crash when the 'P' key is pressed
@@ -342,7 +340,7 @@ namespace lof {
                     panic_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
                     // Anchor to left side by offsetting position based on the current width
                     panic_fill_transform.position = {
-                        panic_transform.position.x + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
+                        panic_transform.position.x + 3.0f + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
                         panic_transform.position.y
                     };
                     panic_fill_transform.prev_position = panic_fill_transform.position;

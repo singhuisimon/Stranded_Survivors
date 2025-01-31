@@ -204,6 +204,7 @@
   <ItemGroup>
     <Text Include="Assets\Textures\spritesheet_atlas.txt" />
     <Text Include="Assets\Textures\Texture_Names.txt" />
+    <Text Include="Lack_Of_Oxygen.log" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

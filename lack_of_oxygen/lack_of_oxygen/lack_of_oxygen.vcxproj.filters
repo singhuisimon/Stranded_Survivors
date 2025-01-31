@@ -178,5 +178,6 @@
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />
     <Text Include="Assets\Textures\spritesheet_atlas.txt" />
+    <Text Include="Lack_Of_Oxygen.log" />
   </ItemGroup>
 </Project>

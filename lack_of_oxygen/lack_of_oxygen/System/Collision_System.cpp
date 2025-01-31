@@ -650,8 +650,52 @@ namespace lof {
                 float collision_time = delta_time;
                 if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
                     check_non_collidable_entities = entities_ID;
-
                     entites_detect = true;
+
+                    // Add mineral deposit logic here
+                    if (entities_ID == 2 && IM.is_key_pressed(GLFW_KEY_E)) {  // 2 is mineral tank ID
+                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+
+                            try {
+                                // Get current minerals from UI text
+                                int current_minerals = std::stoi(text_comp.text);
+
+                                if (current_minerals > 0) {
+                                    for (auto& system : ECSM.get_systems()) {
+                                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                            // Calculate progress percentage
+                                            float current_percentage = current_minerals / 50000.0f;
+                                            current_percentage = std::min(current_percentage, 1.0f);
+
+                                            // Update progress bar and its text
+                                            gui_system->update_mineral_progress(current_percentage);
+
+                                            // Reset the mineral count to 0
+                                            text_comp.text = "0";
+
+                                            // Play deposit sound if in scene 2
+                                            if (ECSM.has_component<Audio_Component>(player_ID)) {
+                                                auto& audio = ECSM.get_component<Audio_Component>(player_ID);
+                                                if (GM.get_current_scene() == 2) {
+                                                    audio.set_audio_state("deposit1", PLAYING);
+                                                }
+                                            }
+
+                                            LM.write_log("Minerals deposited into hopper: %d, Progress: %.2f%%",
+                                                current_minerals, current_percentage * 100.0f);
+                                        }
+                                    }
+                                }
+                            }
+                            catch (const std::exception& e) {
+                                LM.write_log("Error processing mineral deposit: %s", e.what());
+                            }
+                        }
+                    }
+
                     break;
                 }
                 else
