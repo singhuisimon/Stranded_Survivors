@@ -1559,7 +1559,8 @@ namespace lof {
                         //To Change to Asset Manager
                         auto font = font_storage.begin();
 
-                        while (font != font_storage.end()) {
+                        ASM.delete_font(temp);
+                     /*   while (font != font_storage.end()) {
                             std::cout << font->first << std::endl;
                             if (font->first == temp) {
                                 font = font_storage.erase(font);
@@ -1567,9 +1568,86 @@ namespace lof {
                             else {
                                 ++font;
                             }
-                        }
+                        }*/
                         is_file_selected = false;
                     }
+#if 0
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
+                        // Get the filepath and filename
+                        std::string filepath = temp;
+                        temp.erase(0, ASM.get_full_path("Audio", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::string filename = temp;
+
+                        // Find the entity using the sound
+                        EntityID entity_with_sound = INVALID_ENTITY_ID;
+                        std::string sound_key;
+                        for (const auto& entity_ptr : ECSM.get_entities()) {
+                            EntityID entity = entity_ptr->get_id();
+                            if (ECSM.has_component<Audio_Component>(entity)) {
+                                Audio_Component& audio = ECSM.get_component<Audio_Component>(entity);
+                                auto& sounds = audio.get_sounds();
+                                
+                                for (const auto& sound : sounds) {
+                                    if (sound.filepath == filename) {
+                                        entity_with_sound = entity;
+                                        sound_key = sound.key;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (entity_with_sound != INVALID_ENTITY_ID) {
+                                break;
+                            }
+                        }
+
+                        if (entity_with_sound == INVALID_ENTITY_ID) {
+                            std::cerr << "No entity found using the sound: " << filename << std::endl;
+                            return;
+                        }
+
+                        // Combine to get key for channel map
+                        std::string key_for_channel_map = filename + std::to_string(entity_with_sound) + sound_key;
+
+                        // Stop sound, erase from channel map, and clean up sound map
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+                                if (audio_system) {
+                                    audio_system->stop_sound(key_for_channel_map);
+                                    audio_system->get_channel_map().erase(key_for_channel_map);
+                                    std::cout << "Deleted " << key_for_channel_map << " from channel map\n";
+                                }
+
+                                auto& sound_map = ADM.get_sound_map();
+                                if (sound_map.erase(filename) > 0) {
+                                    std::cout << "Successfully removed from sound_map.\n";
+                                }
+                                else {
+                                    std::cout << "Sound was not found in sound_map.\n";
+                                }
+                            }
+                        }
+
+                        // Small delay to ensure system releases file
+                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                        // Attempt to delete the file
+                        if (std::filesystem::exists(filepath)) {
+                            std::cout << "File exists before removal.\n";
+                            if (std::filesystem::remove(filepath)) {
+                                std::cout << "File successfully removed.\n";
+                            }
+                            else {
+                                std::cerr << "Failed to remove file: " << filename << std::endl;
+                            }
+                        }
+                        else {
+                            std::cerr << "File does not exist.\n";
+                        }
+                    }
+#endif
+#if 0
                     else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
 
                         //AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
@@ -1601,7 +1679,7 @@ namespace lof {
                         std::string filename = temp;
 
                         //TODO: Identify entity with selected sound
-                        EntityID entity_with_sound = 5;
+                        EntityID entity_with_sound = 5; 
 
                         //Get sound key from Audio Component
                         Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_with_sound);
@@ -1708,6 +1786,56 @@ namespace lof {
                         }
                         std::cout << "------------------------------------" << std::endl;*/
 
+                    }
+                    
+#endif 
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos)
+                    {
+                        //get the file path
+                        std::string filepath = temp;
+
+                        // get the filename
+                        temp.erase(0, ASM.get_full_path("Audio", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::string filename = temp;
+                        // Print all entities with audio components before deleting
+                        std::vector<EntityID> entities_with_audio = ASM.get_all_entities_with_audio();
+                        std::cout << "Entities with Audio Components:\n";
+                        for (EntityID entity : entities_with_audio) {
+                            std::cout << "Entity ID: " << entity << " has the following audio files:\n";
+
+                            // Get the audio component for this entity
+                            if (ECSM.has_component<Audio_Component>(entity)) {
+                                Audio_Component& audio_component = ECSM.get_component<Audio_Component>(entity);
+                                const auto& sounds = audio_component.get_sounds();
+
+                                // Print each sound's file path associated with this entity
+                                for (const auto& sound : sounds) {
+                                    std::cout << "  - " << sound.filepath << "\n";
+                                }
+                            }
+                        }
+
+                        //try to find and remove audio
+                        ASM.find_and_remove_audio(filename);
+
+                        if (std::filesystem::exists(filepath))
+                        {
+                            std::ifstream file(filepath);
+                            if (file.is_open())
+                            {
+                                file.close();
+                            }
+                        }
+
+                        if (std::filesystem::remove(filepath))
+                        {
+                            std::cout << "File successfully removed.\n";
+                        }
+                        else {
+                            std::cerr << "Failed to remove file: " << filename << std::endl;
+                        }
+                        
                     }
                     /*else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Scenes", ""))) != std::string::npos) {
                         std::filesystem::remove(temp);

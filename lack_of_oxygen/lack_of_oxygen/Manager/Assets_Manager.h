@@ -293,7 +293,32 @@ namespace lof {
         std::unordered_set<std::string>& get_all_assets() { return all_assets; };
 
         void AddAsset(const std::string& filePath);
-        bool CopyFileTo(const std::string& destinationPath, const std::string& sourcePath);;
+        bool CopyFileTo(const std::string& destinationPath, const std::string& sourcePath);
+
+        bool has_audio_component(const EntityID& entity);
+
+       bool is_entity_using_audio(const EntityID& entity, const std::string target_audio);
+
+        //void print_track_audio();
+        //EntityID is_entity_using_audio(const std::string target_audio);
+
+       // std::vector<EntityID>get_entities_using_audio(const std::string target_audio);
+        //bool is_entity_using_audio(const std::string& target_audio);
+
+        //std::vector<EntityID>get_entity_audio();
+
+
+        // EntityID find_entity_with_audio(const std::string& audio_filename);
+
+        bool find_and_remove_audio(const std::string& target_audio);
+
+        void delete_font(const std::string& text_name);
+
+        EntityID get_entity_with_audio(const std::string& target_audio);
+
+        std::vector<EntityID> get_all_entities_with_audio();
+
+
 
     private:
 
@@ -306,6 +331,10 @@ namespace lof {
         std::map<std::string, Font> font_storage;
         std::unordered_map<std::string, GLuint> texture_storage;
         std::unordered_map<std::string, Animation> animation_storage;
+
+        std::unordered_map<EntityID, std::string> track_audio_usage;
+
+        //std::unordered_map<EntityID, Audio_Component> asset_audio_component;
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // A unique_ptr to the single instance of Assets_Manager
         static std::unique_ptr<Assets_Manager> instance;
@@ -327,6 +356,12 @@ namespace lof {
 
         // A list of ShaderProgram objects, likely to manage all loaded shader programs
         std::vector<ShaderProgram> shader_programs;
+
+        std::vector<EntityID> entities_with_audio;
+
+        
+
+        
        
        /**
        * @brief See if the file is valid 
@@ -366,6 +401,10 @@ namespace lof {
        * @brief Prevents assignment between Assets_Manager instances.
        */
         Assets_Manager& operator=(const Assets_Manager&) = delete;
+
+
+
+
 
 
         // All the necessary file path 
