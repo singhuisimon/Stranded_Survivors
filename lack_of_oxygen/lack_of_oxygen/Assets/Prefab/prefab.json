@@ -64,8 +64,8 @@
           ]
         },
         "Collision_Component": {
-          "width": 90,
-          "height": 95,
+          "width": 70,
+          "height": 90,
           "collidable": true
         },
         "Audio_Component": {
@@ -989,9 +989,9 @@
           ]
         },
         "Collision_Component": {
-          "width": 20.0,
+          "width": 0.03,
           "height": 96.0,
-          "collidable": true
+          "collidable": false
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
@@ -1044,9 +1044,9 @@
           ]
         },
         "Collision_Component": {
-          "width": 1.0,
-          "height": 1.0,
-          "collidable": true
+          "width": 0.03,
+          "height": 96.0,
+          "collidable": false
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],
