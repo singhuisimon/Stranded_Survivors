@@ -195,7 +195,7 @@ namespace lof {
 		// seek help from prof elie if can't solve by today.
 
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
-		get_active_channels();
+		//get_active_channels();
 	}
 
 	void Audio_System::shutdown() {
@@ -253,7 +253,7 @@ namespace lof {
 					int get_current_loop_count;
 					existing_channel->getLoopCount(&get_current_loop_count);
 					existing_channel->setLoopCount(get_current_loop_count + 1);
-					LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
+					//LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
 					return;
 				}
 				else {
@@ -324,7 +324,7 @@ namespace lof {
 		}
 		else {
 			if (it1->second != file_path) {
-				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
+				//LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
 
 				std::string entityID = cskey.substr(file_path.length(), cskey.length() - file_path.length() - audio_key.length());
 
@@ -338,7 +338,7 @@ namespace lof {
 		
 		auto it2 = channel_map.find(cskey);
 		if (it2 != channel_map.end() && !it2->second.empty()) {
-			LM.write_log("BGM %s is already playing", cskey.c_str());
+			//LM.write_log("BGM %s is already playing", cskey.c_str());
 			return;
 		}
 
@@ -351,7 +351,7 @@ namespace lof {
 
 			FMOD_RESULT result = core_system->playSound(sound, nullptr, false, &channel);
 			if (ADM.errorcheck(result) != 0 || !channel) {
-				LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
+				//LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 				return;
 			}
 
@@ -385,7 +385,7 @@ namespace lof {
 	void Audio_System::pause_resume_sound(const std::string& channel_key, bool pause) {
 		auto it = channel_map.find(channel_key);
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::pause_resume_sound: failed to pause/resume sound as sound isn't even playing in the channel.");
+			//LM.write_log("Audio_System::pause_resume_sound: failed to pause/resume sound as sound isn't even playing in the channel.");
 			return;
 		}
 
@@ -414,7 +414,7 @@ namespace lof {
 		//check if the channel key even exist in the map
 		auto it = channel_map.find(channel_key);
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::stop_sound: failed to stop sound as %s isn't even playing in the channel.", channel_key.c_str());
+			//LM.write_log("Audio_System::stop_sound: failed to stop sound as %s isn't even playing in the channel.", channel_key.c_str());
 			return;
 		}
 
@@ -422,7 +422,7 @@ namespace lof {
 
 		for (FMOD::Channel* channel : channels) {
 			if (channel == nullptr) {
-				LM.write_log("Audio_System::stop_sound: failed to stop sound as %s is a nullptr.", channel_key.c_str());
+				//LM.write_log("Audio_System::stop_sound: failed to stop sound as %s is a nullptr.", channel_key.c_str());
 				return;
 			}
 

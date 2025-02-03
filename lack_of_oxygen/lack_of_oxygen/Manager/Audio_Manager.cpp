@@ -173,10 +173,10 @@ namespace lof {
 					audio_system->play_bgm_sound(file_path, channel_key, audio_key, audio_component);
 				}
 				
-				LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
 			}
 			else {
-				LM.write_log("Audio_Manager::play_now: looping though system currently %s", system->get_type().c_str());
+				//LM.write_log("Audio_Manager::play_now: looping though system currently %s", system->get_type().c_str());
 				continue;
 			}
 		}
@@ -219,10 +219,10 @@ namespace lof {
 			if (system->get_type() == "Audio_System") {
 				auto* audio_system = static_cast<Audio_System*>(system.get());
 				audio_system->stop_sound(channel_key);
-				LM.write_log("Audio_Manager::play_now: has successfully stop sound %s in enstity %u", file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::play_now: has successfully stop sound %s in enstity %u", file_path.c_str(), entity_id);
 			}
 			else {
-				LM.write_log("Audio_Manager::play_now: looping though system currently %s", system->get_type().c_str());
+				//LM.write_log("Audio_Manager::play_now: looping though system currently %s", system->get_type().c_str());
 			}
 		}
 	}

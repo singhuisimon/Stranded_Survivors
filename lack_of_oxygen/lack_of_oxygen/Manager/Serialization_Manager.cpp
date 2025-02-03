@@ -86,7 +86,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_Small.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -266,6 +266,10 @@ namespace lof {
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
+        if (path.find("main_menu.scn") != std::string::npos) {
+            scene_no = 0;
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Main Menu");
+        }
         if (path.find("scene1.scn") != std::string::npos) {
             scene_no = 1;
             LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");

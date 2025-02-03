@@ -603,9 +603,13 @@ namespace lof {
     EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
     bool Collision_System::entites_detect = false;
 
+
     void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
     {
         const auto& collision_entities = get_entities();
+
+        // Introduce a static variable to track total deposited minerals
+        static int total_deposited_minerals = 0;
 
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
         {
@@ -619,13 +623,10 @@ namespace lof {
             auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
             auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
             auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
-            // std::cout << "Entity " << entity_ID1 << " Position: (" << transform1.position.x << ", " << transform1.position.y << ")\n";
-             // Create AABB for object 1
+
             AABB aabb_player = AABB::from_transform(player_transform, player_collision1);
 
-            //bool is_grounded = false; // Track if entity is grounded
-
-            auto it_2 = std::next(iter1); // Start from the next entity
+            auto it_2 = std::next(iter1);
 
             // Check for collisions with other entities
             for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
@@ -651,46 +652,6 @@ namespace lof {
                 if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
                     check_non_collidable_entities = entities_ID;
                     entites_detect = true;
-
-                    // Add mineral deposit logic here
-                    if (entities_ID == 2 && IM.is_key_pressed(GLFW_KEY_E)) {  // 2 is mineral tank ID
-                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-
-                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
-                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
-
-                            try {
-                                // Get current minerals from UI text
-                                int current_minerals = std::stoi(text_comp.text);
-
-                                if (current_minerals > 0) {
-                                    for (auto& system : ECSM.get_systems()) {
-                                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                                            // Calculate progress percentage
-                                            float current_percentage = current_minerals / 50000.0f;
-                                            current_percentage = std::min(current_percentage, 1.0f);
-
-                                            // Update progress bar and its text
-                                            gui_system->update_mineral_progress(current_percentage);
-
-                                            // Reset the mineral count to 0
-                                            text_comp.text = "0";
-
-                                            // Play deposit sound if in scene 2
-
-
-                                            LM.write_log("Minerals deposited into hopper: %d, Progress: %.2f%%",
-                                                current_minerals, current_percentage * 100.0f);
-                                        }
-                                    }
-                                }
-                            }
-                            catch (const std::exception& e) {
-                                LM.write_log("Error processing mineral deposit: %s", e.what());
-                            }
-                        }
-                    }
-
                     break;
                 }
                 else
@@ -712,24 +673,97 @@ namespace lof {
                 oxygen_tank = static_cast<EntityID>(-1);
                 mineral_tank = static_cast<EntityID>(-1);
             }
-
-
         }
 
-        // Find GUI System to trigger interface
+        // Find GUI System to trigger interface and handle mineral deposit
         for (auto& system : ECSM.get_systems()) {
             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                // Check mineral tank collision
+                // Check mineral tank collision and handle deposit
                 if (mineral_tank_detected() != -1) {
                     gui_system->show_mineral_tank_gui();
+
+                    // Debug the key state
+                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+
+                    // Try both pressed and held states
+                    if (is_e_pressed || is_e_held) {
+                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+
+                            try {
+                                // Get current minerals from UI text
+                                int current_minerals = std::stoi(text_comp.text);
+
+                                if (current_minerals > 0) {
+                                    // Add current minerals to the total deposited minerals
+                                    total_deposited_minerals += current_minerals;
+
+                                    // Calculate progress percentage based on total deposited minerals
+                                    float current_percentage = total_deposited_minerals / 50000.0f;
+                                    current_percentage = std::min(current_percentage, 1.0f);
+
+                                    // Update progress bar and its text
+                                    gui_system->update_mineral_progress(current_percentage);
+
+                                    // Reset the mineral count to 0 (optional, depending on your game logic)
+                                    text_comp.text = "0";
+                                }
+                            }
+                            catch (const std::exception& e) {
+                                // Handle exception
+                            }
+                        }
+                    }
                 }
                 else {
                     gui_system->hide_mineral_tank_gui();
                 }
 
                 // Check oxygen tank collision
-                if (oxygen_tank_detected() != -1) {
+                if (oxygen_tank_detected() != -1)
+                {
                     gui_system->show_oxygen_tank_gui();
+
+                    // If E is pressed or held
+                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+
+                    if (is_e_pressed || is_e_held)
+                    {
+                        // (1) Player oxygen / Ship oxygen
+                        float playerOxy = GM.get_current_oxygen_level(); // [0..100]
+                        float shipOxy = GM.get_ship_oxygen_level();    // [0..400]
+
+                        // (2) If player not full and ship has some oxygen
+                        if (playerOxy < 100.0f && shipOxy > 0.0f)
+                        {
+                            // (3) Figure out how much the player needs
+                            float needed = 100.0f - playerOxy;
+
+                            // The ship can only give up to 'shipOxy' it has:
+                            float transfer = std::min(needed, shipOxy);
+
+                            // Transfer
+                            playerOxy += transfer;  // player goes up
+                            shipOxy -= transfer;  // ship goes down
+
+                            // (4) Store them back
+                            GM.set_current_oxygen_level(playerOxy);
+                            GM.set_ship_oxygen_level(shipOxy);
+
+                            // (5) Update the GUI bars
+                            //    - Player fraction = playerOxy / 100
+                            float playerFraction = playerOxy / 100.0f;
+                            gui_system->update_oxygen_progress1(playerFraction);
+
+                            
+                            float usedFraction = (400.0f - shipOxy) / 400.0f;
+                            gui_system->update_oxygen_progress2(usedFraction);
+                        }
+                    }
                 }
                 else {
                     gui_system->hide_oxygen_tank_gui();
@@ -739,6 +773,8 @@ namespace lof {
             }
         }
     }
+
+
     /**
     * @brief Resolves collisions between entities based on the provided collision pairs.
     *
@@ -750,8 +786,6 @@ namespace lof {
     *
     * @param collisions A vector of `CollisionPair` objects representing collisions between entities.
     */
-
-
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         // Store the last frame's collision states
         static bool had_left_collision = false;

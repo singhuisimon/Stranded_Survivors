@@ -678,7 +678,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "top_ui_o2_meter_fill_red_batch_7",
+          "texture_name": "top_ui_Panik_Fill_full_red_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -729,7 +729,7 @@
             0.800000011920929,
             0.20000000298023224
           ],
-          "texture_name": "top_ui_panik_meter_batch_4",
+          "texture_name": "Panik_meter_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -959,7 +959,7 @@
         },
         "Text_Component": {
           "font_name": "PressStart2P",
-          "text": "0",
+          "text": "000000",
           "color": [ 1.0, 1.0, 1.0 ],
           "scale": [ 0.5, 0.5 ]
         }
@@ -1013,7 +1013,7 @@
         },
         "Text_Component": {
           "font_name": "PressStart2P",
-          "text": "0%",
+          "text": "00%",
           "color": [ 1.0, 1.0, 1.0 ],
           "scale": [ 0.5, 0.5 ]
         }

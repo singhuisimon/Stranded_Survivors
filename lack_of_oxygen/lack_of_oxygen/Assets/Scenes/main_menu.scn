@@ -1,0 +1,151 @@
+{
+  "objects": [
+    {
+      "name": "main_menu_background",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, 0.0],
+          "prev_position": [0.0, 0.0],
+          "orientation": [0.0, 0.0],
+          "scale": [1920.0, 1080.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "Main_Menu_BG_Batch_14",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        }
+      }
+    },
+    {
+      "name": "play_button",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, 100.0],
+          "prev_position": [0.0, 100.0],
+          "orientation": [0.0, 0.0],
+          "scale": [300.0, 80.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "Play_01_Batch_14_NORMAL",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        }
+      }
+    },
+    {
+      "name": "play_text",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, 100.0],
+          "prev_position": [0.0, 100.0],
+          "orientation": [0.0, 0.0],
+          "scale": [1.0, 1.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "NoTexture",
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Play",
+          "color": [0.0, 0.0, 0.0],
+          "scale": [0.4, 0.4]
+        }
+      }
+    },
+    {
+      "name": "credits_button",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, 0.0],
+          "prev_position": [0.0, 0.0],
+          "orientation": [0.0, 0.0],
+          "scale": [300.0, 80.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "Credits_01_Batch_14_NORMAL",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        }
+      }
+    },
+    {
+      "name": "credits_text",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, 0.0],
+          "prev_position": [0.0, 0.0],
+          "orientation": [0.0, 0.0],
+          "scale": [1.0, 1.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "NoTexture",
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Credits",
+          "color": [0.0, 0.0, 0.0],
+          "scale": [0.4, 0.4]
+        }
+      }
+    },
+    {
+      "name": "quit_button",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, -100.0],
+          "prev_position": [0.0, -100.0],
+          "orientation": [0.0, 0.0],
+          "scale": [300.0, 80.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "Quit_01_Batch_14_NORMAL",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        }
+      }
+    },
+    {
+      "name": "quit_text",
+      "prefab": "text_object",
+      "components": {
+        "Transform2D": {
+          "position": [0.0, -100.0],
+          "prev_position": [0.0, -100.0],
+          "orientation": [0.0, 0.0],
+          "scale": [1.0, 1.0]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [1.0, 1.0, 1.0],
+          "texture_name": "NoTexture",
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "Quit",
+          "color": [0.0, 0.0, 0.0],
+          "scale": [0.4, 0.4]
+        }
+      }
+    }
+  ]
+}

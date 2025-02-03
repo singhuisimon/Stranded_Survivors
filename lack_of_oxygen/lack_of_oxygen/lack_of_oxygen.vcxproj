@@ -119,6 +119,7 @@
     <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Level_Design\Level_Design_Small.csv" />
     <None Include="Assets\Prefab\prefab.json" />
+    <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Data\square.msh" />
@@ -143,6 +144,7 @@
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Users\shsim\Downloads\ART - ALL UI ASSETS FROM UNITY - 31 Jan 2025\ALL UI ASSETS FROM UNITY - 31 Jan 2025\GAME UI\Pop Up Stations - GAME_UI\Minerals Station\Mineral Deposit UI_BG_Batch 14.png" />
     <Image Include="Assets\Textures\Air_1.png" />
     <Image Include="Assets\Textures\Air_2.png" />
     <Image Include="Assets\Textures\Air_3.png" />

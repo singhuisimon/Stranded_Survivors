@@ -36,6 +36,8 @@
 #include <iostream>
 #include <random>
 #include <chrono>
+#include <iomanip>  // for std::setw and std::setfill
+#include <sstream>  // for std::stringstream
 
 namespace lof {
 
@@ -278,10 +280,11 @@ namespace lof {
                     ECSM.has_component<Transform2D>(oxygen_meter_fill_id)) {
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
                     auto& oxygen_fill_transform = ECSM.get_component<Transform2D>(oxygen_meter_fill_id);
+                    auto& oxygen_fill_graphics = ECSM.get_component<Graphics_Component>(oxygen_meter_fill_id);
 
                     // Position and scale for meter stays the same
                     oxygen_transform.position = {
-                        base_position.x - 575.0f,
+                        base_position.x - 573.0f,
                         base_position.y
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
@@ -292,12 +295,27 @@ namespace lof {
 
                     // Update fill position and scale
                     oxygen_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+
                     // Anchor to left side by offsetting position based on the current width
                     oxygen_fill_transform.position = {
-                        oxygen_transform.position.x + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
+                        oxygen_transform.position.x + 3.0f + (new_width - METER_WIDTH) / 2.0f,
                         oxygen_transform.position.y
                     };
                     oxygen_fill_transform.prev_position = oxygen_fill_transform.position;
+
+                    // Update the fill bar texture based on oxygen level
+                    if (current_oxygen_level > 50.0f) {
+                        // Blue bar for 100-50%
+                        oxygen_fill_graphics.texture_name = "O2_Fill_full_blue_Batch_7";
+                    }
+                    else if (current_oxygen_level > 20.0f) {
+                        // Purple bar for 50-20%
+                        oxygen_fill_graphics.texture_name = "O2_Fill_full_purple_Batch_7";
+                    }
+                    else {
+                        // Red bar for 20-0%
+                        oxygen_fill_graphics.texture_name = "O2_Fill_full_red_Batch_7";
+                    }
                 }
 
                 // Position oxygen text and oxygen percentage
@@ -392,7 +410,7 @@ namespace lof {
 
                     // Position text to the right of the mineral texture
                     mineral_count_text_transform.position = {
-                        (mineral_transform.position.x + (mineral_transform.scale.x * 2.0f)) ,  // Right of icon
+                        (mineral_transform.position.x + (mineral_transform.scale.x * 2.0f) - 20.0f) ,  // Right of icon
                         mineral_transform.position.y                        // Vertically centered with mineral icon
                     };
                     mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
@@ -410,20 +428,40 @@ namespace lof {
                     timer_icon_transform.prev_position = timer_icon_transform.position;
                 }
 
-                // Position timer count text
+                // ------------------------- TIMER UPDATE CHANGES -------------------------
+                // 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
+                static float timer_accumulator = 0.0f; // You can make this a class member if you like
+                timer_accumulator += delta_time;
+                if (timer_accumulator >= 1.0f) {
+                    timer_accumulator = 0.0f;
+
+                    // Only decrease if you haven't hit zero
+                    if (timer_remaining > 0) {
+                        timer_remaining -= 1;
+                    }
+                }
+
                 if (timer_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(timer_count_text_id) &&
-                    ECSM.has_component<Transform2D>(timer_icon_id)) {
+                    ECSM.has_component<Transform2D>(timer_icon_id))
+                {
                     auto& timer_count_text_transform = ECSM.get_component<Transform2D>(timer_count_text_id);
                     auto& timer_icon_transform = ECSM.get_component<Transform2D>(timer_icon_id);
 
-                    // Position text to the right of the timer 
+                    // Position the timer text
                     timer_count_text_transform.position = {
-                        (timer_icon_transform.position.x + (timer_icon_transform.scale.x * 1.5f)) ,  // Right of icon
-                        base_position.y - METER_SPACING / 2.0f                              // Vertically centered with mineral icon
+                        timer_icon_transform.position.x + (timer_icon_transform.scale.x * 1.5f), // Right of icon
+                        base_position.y - METER_SPACING / 2.0f                                   // Vertically centered
                     };
                     timer_count_text_transform.prev_position = timer_count_text_transform.position;
+
+                    // If it has a Text_Component, update the visible text to show the integer countdown
+                    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
+                        timer_text_comp.text = std::to_string(timer_remaining);
+                    }
                 }
+                // ------------------------- END TIMER UPDATE CHANGES -------------------------
 
                 // Position goal text on the right side
                 if (goal_text_id != INVALID_ENTITY_ID &&
@@ -437,21 +475,42 @@ namespace lof {
                     goal_text_transform.prev_position = goal_text_transform.position;
                 }
 
-                // Position goal percentage count text
+                
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(goal_percentage_count_text_id) &&
-                    ECSM.has_component<Transform2D>(goal_text_id)) {
+                    ECSM.has_component<Text_Component>(goal_percentage_count_text_id)) {
+
+                    // Get the goal percentage transform
                     auto& goal_percentage_count_transform = ECSM.get_component<Transform2D>(goal_percentage_count_text_id);
                     auto& goal_text_transform = ECSM.get_component<Transform2D>(goal_text_id);
 
-                    // Position text to the right of the timer 
+                    // Position text
                     goal_percentage_count_transform.position = {
-                        goal_text_transform.position.x + 150.0f ,  // Right of icon
-                        goal_text_transform.position.y                              // Vertically centered with mineral icon
+                        goal_text_transform.position.x + 120.0f,  // Right of icon
+                        goal_text_transform.position.y           // Vertically centered with goal text
                     };
                     goal_percentage_count_transform.prev_position = goal_percentage_count_transform.position;
-                }
 
+                    // Update the text value based on mineral progress
+                    auto& text_comp = ECSM.get_component<Text_Component>(goal_percentage_count_text_id);
+
+                    // Find the GUI system to get the current stored mineral progress
+                    for (auto& system : ECSM.get_systems()) {
+                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                            // Calculate new percentage only if interacting with hopper
+                            if (gui_system->get_current_hopper_percentage() > 0.0f) {
+                                // Update stored percentage
+                                stored_goal_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
+                            }
+
+                            // Always use the stored percentage for display
+                            std::stringstream ss;
+                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(stored_goal_percentage) << "%";
+                            text_comp.text = ss.str();
+                            break;
+                        }
+                    }
+                }
             }
 
             //cheat code in mining
@@ -1141,9 +1200,13 @@ namespace lof {
             // Convert current text to integer, add new value
             int current_value = std::stoi(text_comp.text);
             current_value += value_to_add;
-            // Convert back to string and update text
-            text_comp.text = std::to_string(current_value);
-            LM.write_log("Updated mineral count to: %d", current_value);
+
+            // Format the number with leading zeros (6 digits)
+            std::stringstream ss;
+            ss << std::setw(6) << std::setfill('0') << current_value;
+            text_comp.text = ss.str();
+
+            LM.write_log("Updated mineral count to: %06d", current_value);
         }
         catch (const std::exception& e) {
             LM.write_log("Error updating mineral count: %s", e.what());
