@@ -194,19 +194,25 @@ namespace lof
 #if 1
     bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        
-        unsigned int current_width =  WC.get_win_width();
-        unsigned int current_height = WC.get_win_height();
+        if (level_editor_mode) {
+            
+            return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
+                mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
+        }
+        else {
 
-        //printf("window width, height (%.f, %.f)\n", current_width, current_height);
-        float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
-        float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
+            unsigned int current_width = WC.get_win_width();
+            unsigned int current_height = WC.get_win_height();
 
-        float adjustX = (mouseX /scaleX);
-        float adjustY = (mouseY / scaleY);
+            float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
+            float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
 
-        return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
-            adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
+            float adjustX = (mouseX / scaleX);
+            float adjustY = (mouseY / scaleY);
+
+            return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
+                adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
+        }
     }
 #endif
 
