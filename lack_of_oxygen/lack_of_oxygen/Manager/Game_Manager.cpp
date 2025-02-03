@@ -657,10 +657,10 @@ namespace lof {
                     }
                 }*/                
 
-                if (IM.is_key_held(GLFW_KEY_I)) {
+                /*if (IM.is_key_held(GLFW_KEY_I)) {
                     game_over = true;
                     
-                }
+                }*/
 
                 /*if (game_over) {
                     ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
@@ -1212,10 +1212,6 @@ namespace lof {
 
         LM.write_log("Block isn't %s but %s", block_name.c_str(), name.c_str());
         return false;
-    }
-
-    bool Game_Manager::get_game_over() {
-        return game_over;
     }
 
 } // namespace lof
