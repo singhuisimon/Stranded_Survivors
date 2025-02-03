@@ -149,6 +149,16 @@
               "pitch": 1.0,
               "islooping": true,
               "is3d": false
+            },
+            {
+              "key": "game over",
+              "filepath": "bgm_game_over",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
             }
           ],
           "position": [
@@ -410,7 +420,7 @@
           ]
         },
         "Collision_Component": {
-          "width": 95.0,
+          "width": 75.0,
           "height": 96.0,
           "collidable": true
         },
@@ -460,6 +470,13 @@
                 ],
                 "type": "JUMP_UP",
                 "magnitude": 2000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [ 0.0, 1.0 ],
+                "type": "VENT_FORCE",
+                "magnitude": 1000.0,
                 "lifetime": 0.0,
                 "is_active": false
               }
@@ -512,6 +529,66 @@
               "volume": 1.0,
               "pitch": 1.0,
               "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "deposit mineral",
+              "filepath": "sfx_mineral_deposit",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "refilling oxygen",
+              "filepath": "sfx_oxygen_refill",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "air vent in",
+              "filepath": "sfx_air_vent_in",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "air vent out",
+              "filepath": "sfx_air_vent_out",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "tunneling",
+              "filepath": "sfx_tunneling",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "lava siren",
+              "filepath": "sfx_lava_siren",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": true,
               "is3d": false
             }
           ],

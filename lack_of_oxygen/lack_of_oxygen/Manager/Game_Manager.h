@@ -59,8 +59,9 @@ namespace lof {
         int current_scene = 1;
 
         //temporary value for bgm
-        //int oxygen_level = 100;
-
+        int oxygen_level = 100;
+        bool increasing = false;
+        bool game_over = false;
         /**
          * @brief Determines the mineral value based on the block entity type
          * @param block_id The EntityID of the block being destroyed
@@ -73,6 +74,8 @@ namespace lof {
          * @param value_to_add The value to add to the current mineral count
          */
         void update_mineral_count_text(int value_to_add);
+
+        bool check_non_mineral(EntityID block_id, std::string block_name) const;
 
     public:
         /**
@@ -139,6 +142,7 @@ namespace lof {
          * @return The index of the current scene file in its name.
          */
         int get_current_scene();
+
     };
 
 } // namespace lof

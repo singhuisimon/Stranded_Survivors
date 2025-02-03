@@ -43,6 +43,7 @@
     <ClCompile Include="System\Interruption_System.cpp" />
     <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
     <ClCompile Include="Utility\Win_Control.cpp" />
+    <ClCompile Include="Manager\Audio_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -85,6 +86,7 @@
     <ClInclude Include="System\Header.h" />
     <ClInclude Include="Utility\Entity_Selector_Helper.h" />
     <ClInclude Include="Utility\Win_Control.h" />
+    <ClInclude Include="Manager\Audio_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -100,17 +102,27 @@
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />
-    <Media Include="Assets\Audio\player_jumping_Fx01.wav" />
-    <Media Include="Assets\Audio\player_jumping_Fx04.wav" />
     <Media Include="Assets\Audio\bgm_surface_music.wav" />
-    <Media Include="Assets\Audio\player_walking_01.wav" />
-    <Media Include="Assets\Audio\player_walking_02.wav" />
-    <Media Include="Assets\Audio\player_walking_03.wav" />
     <Media Include="Assets\Audio\audio_test_1.wav" />
     <Media Include="Assets\Audio\audio_test_2.wav" />
     <Media Include="Assets\Audio\audio_test_Fx16_2.wav" />
     <Media Include="Assets\Audio\audio_test_Fx27.wav" />
     <Media Include="Assets\Audio\audio_test_Fx28.wav" />
+    <Media Include="Assets\Audio\bgm_100_base_pulse.wav" />
+    <Media Include="Assets\Audio\bgm_100_chords.wav" />
+    <Media Include="Assets\Audio\bgm_100_melody.wav" />
+    <Media Include="Assets\Audio\sfx_general_block_hit.wav" />
+    <Media Include="Assets\Audio\sfx_jumping.wav" />
+    <Media Include="Assets\Audio\bgm_20_tension_melody.wav" />
+    <Media Include="Assets\Audio\sfx_walking.wav" />
+    <Media Include="Assets\Audio\bgm_25_sprint.wav" />
+    <Media Include="Assets\Audio\bgm_35_stinger.wav" />
+    <Media Include="Assets\Audio\bgm_50_digging_pulse.wav" />
+    <Media Include="Assets\Audio\bgm_50_roll.wav" />
+    <Media Include="Assets\Audio\bgm_80_clock_ticking.wav" />
+    <Media Include="Assets\Audio\sfx_mineral_block_hit.wav" />
+    <Media Include="Assets\Audio\sfx_mineral_deposit.wav" />
+    <Media Include="Assets\Audio\sfx_oxygen_refill.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />

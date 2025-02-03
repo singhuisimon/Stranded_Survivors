@@ -161,6 +161,8 @@ namespace lof {
             physics.set_acceleration(resulting_acceleration);
 
 
+
+#if 1
             // Update velocity according to the acceleration
             velocity.velocity += physics.get_acceleration() * fixed_dt;
 
@@ -169,6 +171,8 @@ namespace lof {
 
             // Update the position based on velocity
             transform.position += velocity.velocity * fixed_dt;
+#endif
+
 
             // Clamp velocity to max velocity
             float squared_velocity = square_length_vec2d(velocity.velocity);
@@ -185,7 +189,6 @@ namespace lof {
             physics.reset_forces();
         }
 
-        //std::cout << "Movement_System: Number of Entities " << counter << std::endl;
     }
 
     /**
@@ -194,9 +197,7 @@ namespace lof {
      */
     void Movement_System::update(float fixed_dt) {
 
-        //std::cout << "Movement System START \N"; 
             Movement_System::integrate(fixed_dt);
-        //    std::cout << "Movement System END \N";
     }
 
     std::string Movement_System::get_type() const {
