@@ -143,7 +143,6 @@ namespace lof {
          */
         int get_current_scene();
 
-        bool get_game_over();
     };
 
 } // namespace lof
