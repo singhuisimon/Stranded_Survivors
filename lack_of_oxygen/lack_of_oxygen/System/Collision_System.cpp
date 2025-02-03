@@ -350,10 +350,10 @@ namespace lof {
                 e_velocity.velocity.y = 300.0f;
             }
             else {
-                e_physics.force_helper.deactivate_force(VENT_FORCE);
-                if (!is_grounded) {
-                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-                }
+                //e_physics.force_helper.deactivate_force(VENT_FORCE);
+                //if (!is_grounded) {
+                //    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                //}
             }
 
 
