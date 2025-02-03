@@ -21,6 +21,7 @@
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
 #include "../System/GUI_System.h"
+#include "../Manager/Audio_Manager.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Manager/Input_Manager.h"
@@ -327,6 +328,7 @@ namespace lof {
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
             collision_time, delta_time)) {
 
+            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
             // Calculate horizontal center distance between player and vent
             float vent_center_x = av_transform.position.x;
@@ -348,11 +350,27 @@ namespace lof {
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
                 // Set upward velocity
                 e_velocity.velocity.y = 300.0f;
+                
+                if (playerId != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Audio_Component>(playerId)) {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                    }
+                }
+                
             }
             else {
                 e_physics.force_helper.deactivate_force(VENT_FORCE);
                 if (!is_grounded) {
                     e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                }
+
+                if (playerId != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Audio_Component>(playerId)) {
+                        ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                        //ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+                        //TODO FIGURE OUT A WAY TO DETECT IT WHEN ITS ABV THE VENT STRIP TO STOP PLAYING AIRVENT IN AND PLAY AIRVENT OUT
+                        //AS WELL AS TO STOP AIR VENT OUT WHEN ONE FLY OUT AKA MOVE AWAY FROM THE AIRVENT TOP.
+                    }
                 }
             }
 
