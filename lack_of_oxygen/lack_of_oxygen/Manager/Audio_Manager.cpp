@@ -114,14 +114,23 @@ namespace lof {
 		std::string full_path = ASM.get_audio_path(file_path);
 		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
 
+
 		FMOD::Sound* sound = nullptr;
 		FMOD_MODE mode1 = (audio_type == BGM) ? FMOD_CREATESAMPLE : FMOD_DEFAULT;
-		FMOD_MODE mode2 = is3d ? FMOD_3D | FMOD_3D_LINEARROLLOFF : FMOD_2D;
+		FMOD_MODE mode2 = is3d ? (FMOD_3D | FMOD_3D_LINEARROLLOFF) : FMOD_2D;
 		if (core_system) {
 			FMOD_RESULT result = core_system->createSound(full_path.c_str(), mode1 | mode2, 0, &sound);
 			if (errorcheck(result, "Audio_System::load_sound", "create sound") != 0) {
 				return;
 			}
+
+			// Log the sound's mode after loading
+			FMOD_MODE loaded_mode;
+			sound->getMode(&loaded_mode);
+			LM.write_log("Sound %s loaded with requested mode: %s, actual mode: %s",
+				file_path.c_str(),
+				modeToString(mode1 | mode2).c_str(),
+				modeToString(loaded_mode).c_str());
 		}
 
 		LM.write_log("Loading sound: %s (Resolved Path: %s)", file_path.c_str(), full_path.c_str());
@@ -161,7 +170,7 @@ namespace lof {
 		return nullptr;
 	}
 
-	void Audio_Manager::play_now(EntityID entity_id, const std::string& audio_key, const Audio_Component& audio_component, bool bgm) {
+	void Audio_Manager::play_now(EntityID entity_id, const std::string& audio_key, Audio_Component& audio_component, bool bgm) {
 		std::string file_path = audio_component.get_filepath(audio_key);
 		std::string channel_key = file_path + std::to_string(entity_id) + audio_key;
 
@@ -170,6 +179,16 @@ namespace lof {
 				auto* audio_system = static_cast<Audio_System*>(system.get());
 
 				if (!bgm) {
+					if (audio_component.get_is3d(audio_key)) {
+						//they should have transform component. all entity should have!
+						if (!ECSM.has_component<Transform2D>(entity_id)) {
+							LM.write_log("Audio_Manager. play now detected 3d sound but no transform component");
+							continue;
+						}
+
+						Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
+						audio_component.set_position(vec2d_to_vec3d(transform.position));
+					}
 					audio_system->play_sfx_sound(file_path, channel_key, audio_key, audio_component);
 				}
 				else {
@@ -184,6 +203,7 @@ namespace lof {
 				}
 				
 				LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
+				break; //need not update other system just skip to the next command. can choose to return instead if needed
 			}
 			else {
 				//LM.write_log("Audio_Manager::play_now: looping though system currently %s", system->get_type().c_str());
@@ -485,5 +505,42 @@ namespace lof {
 			filenames.push_back(pair.first);
 		}
 		return filenames;
+	}
+
+	std::string Audio_Manager::modeToString(FMOD_MODE mode) {
+		// List of FMOD_MODE flags with corresponding string names.
+		static const struct {
+			FMOD_MODE flag;
+			const char* name;
+		} modeFlags[] = {
+			{ FMOD_DEFAULT, "FMOD_DEFAULT" },
+			{ FMOD_LOOP_OFF, "FMOD_LOOP_OFF" },
+			{ FMOD_LOOP_NORMAL, "FMOD_LOOP_NORMAL" },
+			{ FMOD_3D, "FMOD_3D" },
+			{ FMOD_2D, "FMOD_2D" },
+			{ FMOD_CREATESTREAM, "FMOD_CREATESTREAM" },
+			{ FMOD_CREATESAMPLE, "FMOD_CREATESAMPLE" },
+			{ FMOD_3D_LINEARROLLOFF, "FMOD_3D_LINEARROLLOFF" },
+			{ FMOD_3D_CUSTOMROLLOFF, "FMOD_3D_CUSTOMROLLOFF" },
+			{ FMOD_MPEGSEARCH, "FMOD_MPEGSEARCH" },
+			{ FMOD_3D_HEADRELATIVE, "FMOD_3D_HEADRELATIVE" },
+			{ FMOD_3D_WORLDRELATIVE, "FMOD_3D_WORLDRELATIVE" },
+			{ FMOD_3D_INVERSEROLLOFF, "FMOD_3D_INVERSEROLLOFF" },
+			{ FMOD_3D_LINEARSQUAREROLLOFF, "FMOD_3D_LINEARSQUAREROLLOFF" },
+			{ FMOD_3D_INVERSETAPEREDROLLOFF, "FMOD_3D_INVERSETAPEREDROLLOFF" },
+			{ FMOD_3D_CUSTOMROLLOFF, "FMOD_3D_CUSTOMROLLOFF" },
+
+		};
+
+		std::string result = "Mode Flags: ";
+
+		for (const auto& modeFlag : modeFlags) {
+			if (mode & modeFlag.flag) {
+				result += modeFlag.name;
+				result += " ";
+			}
+		}
+
+		return result.empty() ? "Unknown Mode" : result;
 	}
 }

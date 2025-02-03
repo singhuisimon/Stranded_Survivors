@@ -70,9 +70,9 @@ namespace lof {
 		*/
 		void unload_sound(const std::string& file_path);
 
-		FMOD::Sound* get_sound(const std::string& file_path, AudioType audio_type, bool is3d = false);
+		FMOD::Sound* get_sound(const std::string& file_path, AudioType audio_type, bool is3d);
 
-		void play_now(EntityID entity_id, const std::string& audio_key, const Audio_Component& audio_component, bool bgm = false);
+		void play_now(EntityID entity_id, const std::string& audio_key, Audio_Component& audio_component, bool bgm = false);
 
 		void stop_now(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
@@ -105,6 +105,9 @@ namespace lof {
 		float get_group_volume(GroupType grouptype);
 
 		std::vector<std::string> get_sound_map_filename() const;
+		std::string modeToString(FMOD_MODE mode);
+
+
 	private:
 
 		Audio_Manager();

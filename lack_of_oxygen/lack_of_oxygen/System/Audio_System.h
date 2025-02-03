@@ -31,6 +31,7 @@
 #include "../Manager/FPS_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Utility/globals.h"
+#include "../Utility/Vector3D.h"
 #include "../System/System.h"
 
 namespace lof {
@@ -120,11 +121,9 @@ namespace lof {
 		FMOD::System* get_core_system();
 
 		//TODO::APPLY CONST ON NON-EDITABLE DATA!!
-		void apply_dist_effect(const std::string& channel_key, const Vec3D& listener_pos, const Vec3D& sound_pos);
-
 		Vec3D get_channel_pos(const std::string& channel_key);
 		Vec3D get_listener_pos();
-		void update_audio_for_listener(Vec3D& listener_pos);
+		void update_audio_for_listener(const Vec3D& listener_pos);
 		void set_sound_position(const std::string& channel_key, const Vec3D position);
 
 		void get_active_channels();
@@ -133,15 +132,14 @@ namespace lof {
 
 		bool is_sound_playing(std::string& channel_key);
 
-		//void fade_in(const std::string& channel_key, float duration, float target_volume);
-		//void fade_out(const std::string& channel_key, float duration, float target_volume = 0.0f);
-
-
 		/**
 		* @brief Returns the type of the audio system
 		* @return string representing the type
 		*/
 		std::string get_type() const override;
+
+		void debugAudioPosition(const Vec3D& sound_pos, FMOD::Channel* channel);
+		
 
 	private:
 

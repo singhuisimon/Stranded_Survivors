@@ -208,7 +208,7 @@ namespace lof {
         }
 
         //commented out this is for me to test - Amanda
-        if (IM.is_key_held(GLFW_KEY_J)) {
+        /*if (IM.is_key_held(GLFW_KEY_J)) {
             oxygen_level--;
             std::cout << "current oxygen level " << oxygen_level << std::endl;
             increasing = false;
@@ -219,7 +219,7 @@ namespace lof {
             std::cout << "current oxygen level " << oxygen_level << std::endl;
             increasing = true;
         }
-        std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
+        std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;*/
         ADM.update_bgm_layering(current_scene, oxygen_level, increasing);
 
         // Handle player movement and physics input
@@ -649,21 +649,22 @@ namespace lof {
                 //    }
                 //}
 
-                if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                /*if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
                     auto& timer_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                    if (std::stoi(timer_text.text) == 0) {
+                    if (std::stoi(timer_text.text) <= 0) {
+                        std::cout << "playing siren" << std::endl;
                         ADM.play_now(player_id, "lava siren", audio_player);
                     }
-                }                
+                }*/                
 
                 if (IM.is_key_held(GLFW_KEY_I)) {
                     game_over = true;
                     
                 }
 
-                if (game_over) {
+                /*if (game_over) {
                     ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
-                }
+                }*/
 
                 // Get and set mining status for animation
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {

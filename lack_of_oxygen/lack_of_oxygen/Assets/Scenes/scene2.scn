@@ -545,6 +545,36 @@
               "is3d": false
             },
             {
+              "key": "air vent in",
+              "filepath": "sfx_air_vent_in",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "air vent out",
+              "filepath": "sfx_air_vent_out",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "tunneling",
+              "filepath": "sfx_tunneling",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
               "key": "lava siren",
               "filepath": "sfx_lava_siren",
               "audio_type": 1,
