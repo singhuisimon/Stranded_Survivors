@@ -184,7 +184,6 @@ namespace lof {
                 velocity.velocity = normalize_result * physics.get_max_velocity();
 
             }
-            std::cout << "Playyer's Y-POS:  " << transform.position.y << std::endl;
 
             // Reset the accumulated force
             physics.reset_forces();
@@ -198,9 +197,7 @@ namespace lof {
      */
     void Movement_System::update(float fixed_dt) {
 
-        std::cout << "Movement System START\n"; 
             Movement_System::integrate(fixed_dt);
-        std::cout << "Movement System END\n";
     }
 
     std::string Movement_System::get_type() const {

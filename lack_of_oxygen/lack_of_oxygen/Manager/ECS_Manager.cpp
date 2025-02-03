@@ -378,6 +378,7 @@ namespace lof {
                     //skip movement and collision in editor mode 
                     if ((system->get_type() == "Movement_System" || system->get_type() == "Collision_System") &&
                         level_editor_mode) {
+                        system->set_time(0);
                         continue; 
                     }
 
@@ -393,6 +394,7 @@ namespace lof {
                 }
                 else { //systems that do not use time in calculations
                     if (system->get_type() == "Audio_System" && level_editor_mode) {
+                        system->set_time(0);
                         continue; //skip audio in the level editor mode
                     }
                     // Getting delta time for each system
