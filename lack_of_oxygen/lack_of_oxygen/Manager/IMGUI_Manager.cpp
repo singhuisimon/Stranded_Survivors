@@ -67,6 +67,48 @@ namespace lof {
         return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
+    std::vector<std::tuple<const char*, ComponentID, std::function<void()>, std::function<void()>>> component_checks;
+
+    void fill_component_checks() {
+        auto& entities = ECSM.get_entities();
+        component_checks = {
+            {"Transform Component", static_cast<ComponentID>(ECSM.get_component_id<Transform2D>()),
+                [&]() { ECSM.add_component<Transform2D>(entities[selected_object_index]->get_id(), Transform2D()); },
+                [&]() { ECSM.remove_component<Transform2D>(entities[selected_object_index]->get_id()); }},
+
+            {"Velocity Component", static_cast<ComponentID>(ECSM.get_component_id<Velocity_Component>()),
+                [&]() { ECSM.add_component<Velocity_Component>(entities[selected_object_index]->get_id(), Velocity_Component()); },
+                [&]() { ECSM.remove_component<Velocity_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Physics Component", static_cast<ComponentID>(ECSM.get_component_id<Physics_Component>()),
+                [&]() { ECSM.add_component<Physics_Component>(entities[selected_object_index]->get_id(), Physics_Component()); },
+                [&]() { ECSM.remove_component<Physics_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Graphics Component", static_cast<ComponentID>(ECSM.get_component_id<Graphics_Component>()),
+                [&]() { ECSM.add_component<Graphics_Component>(entities[selected_object_index]->get_id(), Graphics_Component()); },
+                [&]() { ECSM.remove_component<Graphics_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Collision Component", static_cast<ComponentID>(ECSM.get_component_id<Collision_Component>()),
+                [&]() { ECSM.add_component<Collision_Component>(entities[selected_object_index]->get_id(), Collision_Component()); },
+                [&]() { ECSM.remove_component<Collision_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Animation Component", static_cast<ComponentID>(ECSM.get_component_id<Animation_Component>()),
+                [&]() { ECSM.add_component<Animation_Component>(entities[selected_object_index]->get_id(), Animation_Component()); },
+                [&]() { ECSM.remove_component<Animation_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
+                [&]() { ECSM.add_component<Logic_Component>(entities[selected_object_index]->get_id(), Logic_Component()); },
+                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Audio Component", static_cast<ComponentID>(ECSM.get_component_id<Audio_Component>()),
+                [&]() { ECSM.add_component<Audio_Component>(entities[selected_object_index]->get_id(), Audio_Component()); },
+                [&]() { ECSM.remove_component<Audio_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Text Component", static_cast<ComponentID>(ECSM.get_component_id<Text_Component>()),
+                [&]() { ECSM.add_component<Text_Component>(entities[selected_object_index]->get_id(), Text_Component()); },
+                [&]() { ECSM.remove_component<Text_Component>(entities[selected_object_index]->get_id()); }},
+        };
+    }
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
@@ -98,6 +140,7 @@ namespace lof {
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
         fill_up_sound_names();
+        fill_component_checks();
 
         return 0;
     }
@@ -1356,44 +1399,6 @@ namespace lof {
                 //populate the vector (done before rendering ImGui)
                 missing_components.clear(); //clear previous data
                 missing_components.push_back("None");
-
-                std::vector<std::tuple<const char*, ComponentID, std::function<void()>, std::function<void()>>> component_checks = {
-                    {"Transform Component", static_cast<ComponentID>(ecs.get_component_id<Transform2D>()),
-                        [&]() { ecs.add_component<Transform2D>(entities[selected_object_index]->get_id(), Transform2D()); },
-                        [&]() { ecs.remove_component<Transform2D>(entities[selected_object_index]->get_id()); }},
-
-                    {"Velocity Component", static_cast<ComponentID>(ecs.get_component_id<Velocity_Component>()),
-                        [&]() { ecs.add_component<Velocity_Component>(entities[selected_object_index]->get_id(), Velocity_Component()); },
-                        [&]() { ecs.remove_component<Velocity_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Physics Component", static_cast<ComponentID>(ecs.get_component_id<Physics_Component>()),
-                        [&]() { ecs.add_component<Physics_Component>(entities[selected_object_index]->get_id(), Physics_Component()); },
-                        [&]() { ecs.remove_component<Physics_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Graphics Component", static_cast<ComponentID>(ecs.get_component_id<Graphics_Component>()),
-                        [&]() { ecs.add_component<Graphics_Component>(entities[selected_object_index]->get_id(), Graphics_Component()); },
-                        [&]() { ecs.remove_component<Graphics_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Collision Component", static_cast<ComponentID>(ecs.get_component_id<Collision_Component>()),
-                        [&]() { ecs.add_component<Collision_Component>(entities[selected_object_index]->get_id(), Collision_Component()); },
-                        [&]() { ecs.remove_component<Collision_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Animation Component", static_cast<ComponentID>(ecs.get_component_id<Animation_Component>()),
-                        [&]() { ecs.add_component<Animation_Component>(entities[selected_object_index]->get_id(), Animation_Component()); },
-                        [&]() { ecs.remove_component<Animation_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Logic Component", static_cast<ComponentID>(ecs.get_component_id<Logic_Component>()),
-                        [&]() { ecs.add_component<Logic_Component>(entities[selected_object_index]->get_id(), Logic_Component()); },
-                        [&]() { ecs.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Audio Component", static_cast<ComponentID>(ecs.get_component_id<Audio_Component>()),
-                        [&]() { ecs.add_component<Audio_Component>(entities[selected_object_index]->get_id(), Audio_Component()); },
-                        [&]() { ecs.remove_component<Audio_Component>(entities[selected_object_index]->get_id()); }},
-
-                    {"Text Component", static_cast<ComponentID>(ecs.get_component_id<Text_Component>()),
-                        [&]() { ecs.add_component<Text_Component>(entities[selected_object_index]->get_id(), Text_Component()); },
-                        [&]() { ecs.remove_component<Text_Component>(entities[selected_object_index]->get_id()); }},
-                };
 
                 for (const auto& [name, id, add_func, remove_func] : component_checks) {
                     if (!entities[selected_object_index]->has_component(id)) {
