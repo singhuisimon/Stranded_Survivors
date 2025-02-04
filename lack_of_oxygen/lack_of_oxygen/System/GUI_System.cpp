@@ -1,31 +1,26 @@
 /**
  * @file GUI_System.cpp
  * @brief Defines the definition for GUI systems.
- * @author Simon Chan (100%)
- * @date November 07, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
- * Reproduction or disclosure of this file or its contents without the
- * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
-// Include header file
 #include "GUI_System.h"
 
-// Include necessary headers
+ // Include necessary headers
 #include "../Component/Component.h"
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Log_Manager.h"
+#include "../Manager/Game_Manager.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
 
 namespace lof {
-    GUI_System::GUI_System(ECS_Manager& ecs_manager) : ecs_manager(ecs_manager) {
+    GUI_System::GUI_System(ECS_Manager& ecs_manager)
+        : ecs_manager(ecs_manager)
+    {
         container_id = INVALID_ENTITY_ID;
         background_bar_id = INVALID_ENTITY_ID;
         progress_bar_id = INVALID_ENTITY_ID;
-        left_image_id = INVALID_ENTITY_ID;
-        right_image_id = INVALID_ENTITY_ID;
 
         // Set up the required components
         signature.set(ecs_manager.get_component_id<Transform2D>());
@@ -33,272 +28,95 @@ namespace lof {
         signature.set(ecs_manager.get_component_id<GUI_Component>());
     }
 
-    void GUI_System::show_loading_screen() {
-        if (is_visible()) {
-            LM.write_log("GUI_System::show_loading_screen(): Loading screen already shown");
-            return;
-        }
-
-        // Create container box
-        container_id = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (container_id != INVALID_ENTITY_ID) {
-            auto* container_gui = get_component_safe<GUI_Component>(container_id);
-            if (!container_gui) {
-                hide_loading_screen();
-                return;
-            }
-            container_gui->is_container = true;
-
-            // Create circular images FIRST (on top)
-            left_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
-            if (left_image_id != INVALID_ENTITY_ID) {
-                if (auto* transform = get_component_safe<Transform2D>(left_image_id)) {
-                    transform->position = Vec2D(-DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
-                    transform->scale = Vec2D(DEFAULT_GUI_IMAGE_SIZE, DEFAULT_GUI_IMAGE_SIZE);
-                }
-                if (auto* graphics = get_component_safe<Graphics_Component>(left_image_id)) {
-                    graphics->texture_name = "Oxygen_Refill_Red_circle";
-                    graphics->color = glm::vec3(1.0f); // White color to show texture
-                }
-            }
-
-            right_image_id = ecs_manager.clone_entity_from_prefab("gui_image");
-            if (right_image_id != INVALID_ENTITY_ID) {
-                if (auto* transform = get_component_safe<Transform2D>(right_image_id)) {
-                    transform->position = Vec2D(DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
-                    transform->scale = Vec2D(DEFAULT_GUI_IMAGE_SIZE, DEFAULT_GUI_IMAGE_SIZE);
-                }
-                if (auto* graphics = get_component_safe<Graphics_Component>(right_image_id)) {
-                    graphics->texture_name = "Oxygen_Refill_Green_circle";
-                    graphics->color = glm::vec3(1.0f); // White color to show texture
-                }
-            }
-
-            // Create background bar (below images)
-            background_bar_id = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
-            if (background_bar_id != INVALID_ENTITY_ID) {
-                if (auto* bg_gui = get_component_safe<GUI_Component>(background_bar_id)) {
-                    bg_gui->is_progress_bar = true;
-                    bg_gui->progress = 1.0f;
-                }
-                if (auto* bg_graphics = get_component_safe<Graphics_Component>(background_bar_id)) {
-                    bg_graphics->color = glm::vec3(1.f); // White for background
-                }
-                if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
-                    bg_transform->scale = Vec2D(DEFAULT_GUI_PROGRESS_BAR_WIDTH, DEFAULT_GUI_PROGRESS_BAR_HEIGHT);
-                    bg_transform->position.y = -DEFAULT_GUI_VERTICAL_SPACING;
-                }
-            }
-
-            // Create progress bar with stored value
-            progress_bar_id = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
-            if (progress_bar_id != INVALID_ENTITY_ID) {
-                if (auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id)) {
-                    progress_gui->is_progress_bar = true;
-                    progress_gui->progress = last_progress_value;  // Use stored value
-                }
-                if (auto* progress_graphics = get_component_safe<Graphics_Component>(progress_bar_id)) {
-                    progress_graphics->color = glm::vec3(0.2f, 0.6f, 1.0f);
-                }
-                if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
-                    progress_transform->scale = Vec2D(DEFAULT_GUI_PROGRESS_BAR_WIDTH * last_progress_value, DEFAULT_GUI_PROGRESS_BAR_HEIGHT);
-                    progress_transform->position = Vec2D(-DEFAULT_GUI_PROGRESS_BAR_WIDTH / 2.0f + (progress_transform->scale.x / 2.0f), -DEFAULT_GUI_VERTICAL_SPACING);
-                }
-                LM.write_log("Progress bar created with stored value: %.2f", last_progress_value);
-            }
-        }
-    }
-
-    void GUI_System::hide_loading_screen() {
-        LM.write_log("=== Starting GUI cleanup ===");
-        validate_gui_state();
-
-        // Store current progress value before cleanup if progress bar exists
-        if (progress_bar_id != INVALID_ENTITY_ID) {
-            if (auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id)) {
-                last_progress_value = progress_gui->progress;
-                LM.write_log("Stored progress value before cleanup: %.2f", last_progress_value);
+    void GUI_System::update(float delta_time)
+    {
+        // == Mineral E prompt bobbing ==
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            e_prompt_animation_timer += delta_time;
+            if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
+                float offset = std::sin(e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                transform->position.y = original_e_prompt_y + offset;
+                transform->position.x = mineral_e_prompt_x; // keep X constant
             }
         }
 
-        // First reset progress bar state if it exists
-        if (progress_bar_id != INVALID_ENTITY_ID) {
-            if (auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id)) {
-                progress_gui->progress = 0.0f;
-            }
-            if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
-                progress_transform->scale = Vec2D(0.0f, DEFAULT_GUI_PROGRESS_BAR_HEIGHT);
-                progress_transform->position = Vec2D(-DEFAULT_GUI_PROGRESS_BAR_WIDTH / 2.0f, -DEFAULT_GUI_VERTICAL_SPACING);
-                LM.write_log("Reset progress bar scale and position");
+        // == Oxygen E prompt bobbing ==
+        if (oxygen_e_prompt != INVALID_ENTITY_ID) {
+            oxygen_e_prompt_animation_timer += delta_time;
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
+                float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                transform->position.y = original_e_prompt_y + offset;
+                transform->position.x = oxygen_e_prompt_x; // keep X constant
             }
         }
 
-        // Log current state of background bar specifically
-        if (background_bar_id != INVALID_ENTITY_ID) {
-            auto* entity = ecs_manager.get_entity(background_bar_id);
-            if (entity) {
-                LM.write_log("Background bar before deletion - ID: %u, Name: %s",
-                    background_bar_id, entity->get_name().c_str());
+        // --------------------------------------------------------
+        // Update oxygen bars automatically every second
+        // --------------------------------------------------------
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            // Update once per second if you want, or every frame
+            oxygen_update_accumulator += delta_time;
+            if (oxygen_update_accumulator >= 1.0f) {
+                oxygen_update_accumulator = 0.0f;
 
-                if (ecs_manager.has_component<Graphics_Component>(background_bar_id)) {
-                    auto& graphics = ecs_manager.get_component<Graphics_Component>(background_bar_id);
-                    LM.write_log("  Graphics component - Color: (%.2f, %.2f, %.2f)",
-                        graphics.color.x, graphics.color.y, graphics.color.z);
-                }
+                // Just read the current oxygen
+                float player_oxygen = GM.get_current_oxygen_level();
+                float fractionPlayer = player_oxygen / 100.0f;
+                update_oxygen_progress1(fractionPlayer);
+            }
+        }
+        // --------------------------------------------------------
+
+        // Check oxygen level and update warnings
+        float current_oxygen = GM.get_current_oxygen_level();
+
+        // Handle 50% warning
+        if (current_oxygen == 50.0f && !warning_50_active) {
+            show_oxygen_warning(50.0f);
+            warning_50_display_time = 0.0f;
+        }
+        if (warning_50_shown) {
+            warning_50_display_time += delta_time;
+            if (warning_50_display_time >= WARNING_DURATION) {
+                hide_oxygen_warning(50.0f);
+                warning_50_active = false;  // Allow the warning to trigger again
+                warning_50_shown = false;
             }
         }
 
-        // Store current valid IDs in destruction order
-        std::vector<std::pair<EntityID, const char*>> entities_to_destroy;
-
-        // Add entities in specific order: progress first, then others
-        if (progress_bar_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ progress_bar_id, "Progress Bar" });
-        if (background_bar_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ background_bar_id, "Background Bar" });
-        if (right_image_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ right_image_id, "Right Image" });
-        if (left_image_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ left_image_id, "Left Image" });
-        if (container_id != INVALID_ENTITY_ID) entities_to_destroy.push_back({ container_id, "Container" });
-
-        // Destroy each entity with extra validation
-        for (const auto& [id, name] : entities_to_destroy) {
-            LM.write_log("Attempting to destroy %s (ID: %u)", name, id);
-
-            bool was_in_system = false;
-            bool was_in_ecs = false;
-
-            // Check initial state
-            if (entities.find(id) != entities.end()) {
-                was_in_system = true;
-                LM.write_log("%s found in GUI system", name);
-            }
-
-            if (auto* entity = ecs_manager.get_entity(id)) {
-                was_in_ecs = true;
-                LM.write_log("%s found in ECS", name);
-
-                // First reset any accumulated state for progress bar
-                if (id == progress_bar_id &&
-                    ecs_manager.has_component<GUI_Component>(id) &&
-                    ecs_manager.has_component<Transform2D>(id)) {
-                    auto& gui = ecs_manager.get_component<GUI_Component>(id);
-                    auto& transform = ecs_manager.get_component<Transform2D>(id);
-                    gui.progress = 0.0f;
-                    transform.scale.x = 0.0f;
-                    LM.write_log("Reset progress bar state before destruction");
-                }
-
-                // MUST Remove from this system first 
-                if (was_in_system) {
-                    remove_entity(id);
-                    LM.write_log("%s removed from GUI system", name);
-
-                    // Validate removal from system
-                    if (entities.find(id) == entities.end()) {
-                        LM.write_log("%s successfully removed from GUI system", name);
-                    }
-                    else {
-                        LM.write_log("WARNING: %s still in GUI system after removal attempt", name);
-                    }
-                }
-
-                // Then destroy in ECS
-                LM.write_log("Calling destroy_entity on %s (ID: %u)", name, id);
-                ecs_manager.destroy_entity(id);
-
-                // Validate destruction
-                if (ecs_manager.get_entity(id) == nullptr) {
-                    LM.write_log("%s successfully destroyed in ECS", name);
-                }
-                else {
-                    LM.write_log("WARNING: %s still exists in ECS after destruction attempt", name);
-                }
-            }
-            else {
-                LM.write_log("Warning: %s (ID: %u) not found in ECS", name, id);
-            }
-
-            // Final validation for this entity
-            if (was_in_system && entities.find(id) != entities.end()) {
-                LM.write_log("ERROR: Failed to remove %s from GUI system", name);
-            }
-            if (was_in_ecs && ecs_manager.get_entity(id) != nullptr) {
-                LM.write_log("ERROR: Failed to destroy %s in ECS", name);
+        // Handle 20% warning
+        if (current_oxygen == 20.0f && !warning_20_active) {
+            show_oxygen_warning(20.0f);
+            warning_20_display_time = 0.0f;
+        }
+        if (warning_20_shown) {
+            warning_20_display_time += delta_time;
+            if (warning_20_display_time >= WARNING_DURATION) {
+                hide_oxygen_warning(20.0f);
+                warning_20_active = false;  // Allow the warning to trigger again
+                warning_20_shown = false;
             }
         }
 
-        // Reset IDs
-        progress_bar_id = INVALID_ENTITY_ID;  // Reset progress bar ID first
-        background_bar_id = INVALID_ENTITY_ID;
-        right_image_id = INVALID_ENTITY_ID;
-        left_image_id = INVALID_ENTITY_ID;
-        container_id = INVALID_ENTITY_ID;
-
-        // Final validation
-        validate_gui_state();
-
-        // Specific check for background bar
-        if (auto* entity = ecs_manager.get_entity(background_bar_id)) {
-            LM.write_log("ERROR: Background bar still exists after cleanup!");
-            debug_entity("Lingering Background Bar", background_bar_id);
+        // Handle 5% warning
+        if (current_oxygen == 5.0f && !warning_5_active) {
+            show_oxygen_warning(5.0f);
+            warning_5_display_time = 0.0f;
         }
-
-        LM.write_log("=== GUI cleanup completed ===");
-
-        // Double check system state
-        const auto& remaining_entities = get_entities();
-        if (!remaining_entities.empty()) {
-            LM.write_log("WARNING: %zu entities still in GUI system after cleanup", remaining_entities.size());
-            for (EntityID id : remaining_entities) {
-                debug_entity("Remaining", id);
+        if (warning_5_shown) {
+            warning_5_display_time += delta_time;
+            if (warning_5_display_time >= WARNING_DURATION) {
+                hide_oxygen_warning(5.0f);
+                warning_5_active = false;  // Allow the warning to trigger again
+                warning_5_shown = false;
             }
         }
-    }
 
-    void GUI_System::set_progress(float progress) {
-        // Store the new progress value first
-        last_progress_value = clamp(progress, 0.0f, 1.0f);
-
-        auto* progress_gui = get_component_safe<GUI_Component>(progress_bar_id);
-        auto* transform = get_component_safe<Transform2D>(progress_bar_id);
-
-        if (!progress_gui || !transform) return;
-
-        // Update progress value and bar width
-        progress_gui->progress = last_progress_value;
-        transform->scale.x = DEFAULT_GUI_PROGRESS_BAR_WIDTH * last_progress_value;
-
-        // Keep the progress bar anchored to the left side and grow rightward
-        transform->position.x = -DEFAULT_GUI_PROGRESS_BAR_WIDTH / 2.0f + (transform->scale.x / 2.0f);
-
-        LM.write_log("GUI_System::set_progress(): Progress updated to %.2f", last_progress_value);
-    }
-
-    void GUI_System::update(float delta_time) {
-        (void)delta_time;
         auto* container_transform = get_component_safe<Transform2D>(container_id);
-        if (!container_transform) return;
-
+        if (!container_transform) {
+            return; // No container? done
+        }
         Vec2D container_pos = container_transform->position;
-
-        // Update circular images positions (on top)
-        if (auto* left_transform = get_component_safe<Transform2D>(left_image_id)) {
-            left_transform->position = container_pos + Vec2D(-DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
-        }
-
-        if (auto* right_transform = get_component_safe<Transform2D>(right_image_id)) {
-            right_transform->position = container_pos + Vec2D(DEFAULT_GUI_IMAGE_OFFSET, DEFAULT_GUI_VERTICAL_SPACING);
-        }
-
-        // Update background bar position (below images)
-        if (auto* bg_transform = get_component_safe<Transform2D>(background_bar_id)) {
-            bg_transform->position = container_pos + Vec2D(0.0f, -DEFAULT_GUI_VERTICAL_SPACING);
-        }
-
-        // Update progress bar position
-        if (auto* progress_transform = get_component_safe<Transform2D>(progress_bar_id)) {
-            // Keep X position for progress animation, update Y position only
-            float current_x = progress_transform->position.x;
-            progress_transform->position = Vec2D(current_x, container_pos.y - DEFAULT_GUI_VERTICAL_SPACING);
-        }
     }
 
     void GUI_System::debug_entity(const char* prefix, EntityID id) {
@@ -345,8 +163,6 @@ namespace lof {
         debug_entity("Container", container_id);
         debug_entity("Background Bar", background_bar_id);
         debug_entity("Progress Bar", progress_bar_id);
-        debug_entity("Left Image", left_image_id);
-        debug_entity("Right Image", right_image_id);
 
         // List all entities in this system
         LM.write_log("Entities in GUI_System:");
@@ -359,12 +175,31 @@ namespace lof {
         LM.write_log("=== End GUI State Validation ===");
     }
 
-    void GUI_System::show_mineral_tank_gui() {
+    // ---------------------------------------------------------
+    // MINERAL TANK GUI
+    // ---------------------------------------------------------
+    void GUI_System::show_mineral_tank_gui()
+    {
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             return; // GUI already shown
         }
 
-        // First create main container with the background texture
+        // 1) Create E prompt
+        mineral_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_e_prompt)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "E_Gold_02_Batch_14";  // E key icon
+                graphics->color = glm::vec3(1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
+                transform->position = Vec2D(mineral_e_prompt_x, original_e_prompt_y);
+                transform->scale = Vec2D(50.0f, 50.0f);
+                e_prompt_animation_timer = 0.0f;
+            }
+        }
+
+        // 2) Main container with background texture
         mineral_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             auto* container_gui = get_component_safe<GUI_Component>(mineral_interaction_container);
@@ -373,41 +208,179 @@ namespace lof {
                 return;
             }
             container_gui->is_container = true;
-            // Set background texture and properties
+
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "mineral_deposit_ui_bg_batch_4";
+                graphics->texture_name = "Mineral_Deposit UI_BG_Batch_14";
                 graphics->color = glm::vec3(1.0f);
             }
-            // Position and scale the container
             if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 180.0f);
+                transform->position = Vec2D(-350.0f, 120.0f);
                 transform->scale = Vec2D(500.0f, 300.0f);
             }
         }
 
-        // Then add GUI overlay image containing all text 
-        mineral_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (mineral_text_overlay != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_text_overlay)) {
+        // 3) Single progress bar
+        mineral_progress_bar = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
+        if (mineral_progress_bar != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_progress_bar)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "mineral_deposit_ui_text_batch_4";
-                graphics->color = glm::vec3(1.0f);
+                graphics->texture_name = "NoTexture";
+                // White or Gold color for minerals
+                graphics->color = glm::vec3(1.0f, 1.0f, 1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_text_overlay)) {
-                transform->position = Vec2D(-350.0f, 180.0f);
-                transform->scale = Vec2D(420.0f, 215.0f);
+            if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
+                float max_width = 435.0f;
+                float current_width = max_width * stored_mineral_progress;
+                transform->position = Vec2D(-569.5f + (current_width / 2.0f), 110.0f);
+                transform->scale = Vec2D(current_width, 52.0f);
+            }
+            if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+                gui->is_progress_bar = true;
+                gui->progress = stored_mineral_progress;
             }
         }
 
+        // 4) Percentage text (xx%)
+        mineral_percentage_text = ecs_manager.clone_entity_from_prefab("text_object");
+        if (mineral_percentage_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(mineral_percentage_text)) {
+                text->font_name = DEFAULT_FONT_NAME;
+                int percentage = static_cast<int>(stored_mineral_progress * 100);
+                text->text = std::to_string(percentage) + "%";
+                text->color = glm::vec3(1.0f);
+                text->scale = glm::vec2(0.5f, 0.5f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(mineral_percentage_text)) {
+                transform->position = Vec2D(-350.0f, 40.0f);
+                transform->scale = Vec2D(1.0f, 1.0f);
+            }
+        }
+
+        // 5) Mineral count text: "currentAmount / 50000"
+        mineral_deposit_count_text = ecs_manager.clone_entity_from_prefab("text_object");
+        if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
+                text->font_name = DEFAULT_FONT_NAME;
+
+                // depositCount = progress * 50000
+                int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
+
+                // Construct the string "1234 / 50000"
+                text->text = std::to_string(depositCount) + " / 50000";
+                text->color = glm::vec3(0.0f, 0.0f, 0.0f);
+                text->scale = glm::vec2(0.38f, 0.38f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(mineral_deposit_count_text)) {
+                transform->position = Vec2D(-350.0f, 110.0f);
+                transform->scale = Vec2D(0.38f, 0.38f);
+            }
+        }
     }
 
-    void GUI_System::show_oxygen_tank_gui() {
-        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            return; // GUI already shown
+
+    void GUI_System::hide_mineral_tank_gui() {
+        // (5) Destroy deposit count text
+        if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
+            ecs_manager.destroy_entity(mineral_deposit_count_text);
+            mineral_deposit_count_text = INVALID_ENTITY_ID;
         }
 
-        // First  create main container with the background texture
+        // (4) Destroy percentage text
+        if (mineral_percentage_text != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
+            ecs_manager.destroy_entity(mineral_percentage_text);
+            mineral_percentage_text = INVALID_ENTITY_ID;
+        }
+
+        // (3) Destroy progress bar
+        if (mineral_progress_bar != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
+            ecs_manager.destroy_entity(mineral_progress_bar);
+            mineral_progress_bar = INVALID_ENTITY_ID;
+        }
+
+        // (2) Destroy container
+        if (mineral_interaction_container != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
+            ecs_manager.destroy_entity(mineral_interaction_container);
+            mineral_interaction_container = INVALID_ENTITY_ID;
+        }
+
+        // (1) Finally, destroy the E prompt
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
+            ecs_manager.destroy_entity(mineral_e_prompt);
+            mineral_e_prompt = INVALID_ENTITY_ID;
+        }
+    }
+
+    void GUI_System::update_mineral_progress(float progress)
+    {
+        // 1) Clamp and store the new progress
+        stored_mineral_progress = std::clamp(progress, 0.0f, 1.0f);
+
+        // 2) Update the progress bar width/position
+        if (mineral_progress_bar != INVALID_ENTITY_ID) {
+            if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
+                float max_width = 435.0f;
+                float new_width = max_width * stored_mineral_progress;
+
+                transform->scale.x = new_width;
+                transform->position.x = -569.5f + (new_width / 2.0f);
+            }
+
+            if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+                gui->progress = stored_mineral_progress;
+            }
+        }
+
+        // 3) Update the percentage text ("xx%")
+        if (mineral_percentage_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(mineral_percentage_text)) {
+                int percentage = static_cast<int>(stored_mineral_progress * 100);
+                text->text = std::to_string(percentage) + "%";
+            }
+        }
+
+        // 4) Update the deposit count text ("X / 50000")
+        if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
+                // Example calculation: depositCount = stored_mineral_progress * 50000
+                int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
+                text->text = std::to_string(depositCount) + " / 50000";
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // OXYGEN TANK GUI
+    // ---------------------------------------------------------
+    void GUI_System::show_oxygen_tank_gui()
+    {
+        // If the oxygen GUI is already shown, do nothing
+        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+            return;
+        }
+
+        // 1) Create E prompt
+        oxygen_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (oxygen_e_prompt != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_e_prompt)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "E_Gold_02_Batch_14"; // E key icon
+                graphics->color = glm::vec3(1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
+                transform->position = Vec2D(oxygen_e_prompt_x, original_e_prompt_y);
+                transform->scale = Vec2D(50.0f, 50.0f);
+            }
+            // Reset its animation timer
+            oxygen_e_prompt_animation_timer = 0.0f;
+        }
+
+        // 2) Main container
         oxygen_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
             auto* container_gui = get_component_safe<GUI_Component>(oxygen_interaction_container);
@@ -416,133 +389,362 @@ namespace lof {
                 return;
             }
             container_gui->is_container = true;
-            // Set background texture and properties
+
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "oxygen_refill_ui_bg_batch_4";
+                graphics->texture_name = "Oxygen_Refill UI_BG_Batch_14";
                 graphics->color = glm::vec3(1.0f);
             }
-            // Position and scale the container
             if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 180.0f);
+                transform->position = Vec2D(-350.0f, 120.0f);
                 transform->scale = Vec2D(500.0f, 300.0f);
             }
         }
 
-        // Add red circle
-        red_circle_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (red_circle_overlay != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(red_circle_overlay)) {
+        //
+        // == Player Oxygen Bar ==
+        // Use current_oxygen_level directly from Game_Manager, convert [0..100] -> [0..1]
+        //
+        float playerOxygen = GM.get_current_oxygen_level(); // 0..100
+        float playerFraction = playerOxygen / 100.0f;       // 0..1
+        stored_oxygen_progress1 = playerFraction;
+
+        // We'll set a consistent bar width & height for both bars
+        const float BAR_MAX_WIDTH = 437.0f; // same as ship bar
+        const float BAR_HEIGHT = 18.0f;
+        constexpr float SHIP_MAX = 400.0f;
+        // Anchor them similarly in X and just offset Y for the top bar
+
+        //
+        // 3) First progress bar (Player Oxygen)
+        //
+        oxygen_progress_bar1 = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
+        if (oxygen_progress_bar1 != INVALID_ENTITY_ID)
+        {
+            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar1)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "oxygen_refill_ui_red_circle_flattened_batch_4";
-                graphics->color = glm::vec3(1.0f);
+                graphics->texture_name = "NoTexture";
+                graphics->color = glm::vec3(0.0f, 0.68f, 1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(red_circle_overlay)) {
-                transform->position = Vec2D(-475.0f, 190.0f);
-                transform->scale = Vec2D(150.0f, 150.0f);
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
+                float current_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
+                float bar_y = 134.0f; // Some Y offset
+
+                transform->position = Vec2D(-570.0f + (current_width / 2.0f), bar_y);
+                transform->scale = Vec2D(current_width, BAR_HEIGHT);
+            }
+            if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar1)) {
+                gui->is_progress_bar = true;
+                gui->progress = stored_oxygen_progress1;
             }
         }
 
-        // Add green circle
-        green_circle_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (green_circle_overlay != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(green_circle_overlay)) {
-                graphics->model_name = "square";
-                graphics->texture_name = "oxygen_refill_UI_green_circle_batch_4";
-                graphics->color = glm::vec3(1.0f);
+        //
+        // 4) Text for first bar (Player Oxygen %)
+        //
+        oxygen_percentage_text1 = ecs_manager.clone_entity_from_prefab("text_object");
+        if (oxygen_percentage_text1 != INVALID_ENTITY_ID)
+        {
+            if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text1)) {
+                text->font_name = DEFAULT_FONT_NAME;
+
+                // stored_oxygen_progress1 = 1.0 => "100%"
+                int percentage = static_cast<int>(stored_oxygen_progress1 * 100);
+                text->text = std::to_string(percentage) + "%";
+                text->color = glm::vec3(1.0f);
+                text->scale = glm::vec2(0.4f, 0.4f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(green_circle_overlay)) {
-                transform->position = Vec2D(-225.0f, 190.0f);
-                transform->scale = Vec2D(150.0f, 150.0f);
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text1)) {
+                transform->position = Vec2D(-540.0f, 157.0f);
+                transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
 
-        // Finally text overlay
-        oxygen_text_overlay = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_text_overlay)) {
-                graphics->model_name = "square";
-                graphics->texture_name = "oxygen_refill_ui_text_batch_4";
-                graphics->color = glm::vec3(1.0f);
+        // 5) Second progress bar (Ship Oxygen) in YELLOW
+        {
+            float currentShipOxy = GM.get_ship_oxygen_level(); // e.g. 400 => full
+            // "Used fraction" => how much we've consumed.
+            // If ship is still at 400 => used fraction=0 => bar is full
+            float usedFraction = (SHIP_MAX - currentShipOxy) / SHIP_MAX;
+            // Then "reversed_value" for the fill:
+            float reversed_value = 1.0f - usedFraction; // if usedFraction=0 => reversed_value=1 => 100% fill
+            float current_width = BAR_MAX_WIDTH * reversed_value;
+
+            // Create the bar
+            oxygen_progress_bar2 = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
+            if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
+                if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar2)) {
+                    graphics->model_name = "square";
+                    graphics->texture_name = "NoTexture";
+                    graphics->color = glm::vec3(1.0f, 1.0f, 0.0f); // Yellow
+                }
+                if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
+                    // Anchor left at -570.0f, same as your code
+                    float bar_y_ship = 106.0f;
+                    transform->position = Vec2D(-570.0f + (current_width / 2.0f), bar_y_ship);
+                    transform->scale = Vec2D(current_width, BAR_HEIGHT);
+                }
+                if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar2)) {
+                    gui->is_progress_bar = true;
+                    // You could store the "usedFraction" or something else if needed,
+                    // but it's not strictly required for just drawing the bar.
+                }
             }
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_text_overlay)) {
-                transform->position = Vec2D(-362.0f, 175.0f);
-                transform->scale = Vec2D(400.0f, 250.0f);
+
+            // 6) Text for second bar (Ship Oxygen %)
+            // If you want 400 => "100%" on first show, do the same reversed approach:
+            oxygen_percentage_text2 = ecs_manager.clone_entity_from_prefab("text_object");
+            if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
+                if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text2)) {
+                    text->font_name = DEFAULT_FONT_NAME;
+
+                    // reversed_value in [0..1], so reversed_value=1 => 100%
+                    int reversed_pct = static_cast<int>(reversed_value * 100);
+                    text->text = std::to_string(reversed_pct) + "%";
+                    text->color = glm::vec3(1.0f);
+                    text->scale = glm::vec2(0.4f, 0.4f);
+                }
+                if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text2)) {
+                    transform->position = Vec2D(-540.0f, 78.0f);
+                    transform->scale = Vec2D(0.4f, 0.4f);
+                }
             }
         }
     }
 
-    void GUI_System::hide_mineral_tank_gui() {
-        //LM.write_log("Starting to hide mineral tank GUI");
+    void GUI_System::hide_oxygen_tank_gui()
+    {
+        // The creation order:
+        //   1) oxygen_e_prompt
+        //   2) oxygen_interaction_container
+        //   3) oxygen_progress_bar1
+        //   4) oxygen_percentage_text1
+        //   5) oxygen_progress_bar2
+        //   6) oxygen_percentage_text2
+        // So remove in reverse (LIFO):
 
-        // Check and destroy text overlay first since it was created last
-        if (mineral_text_overlay != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy text overlay entity: %d", mineral_text_overlay);
-            ecs_manager.destroy_entity(mineral_text_overlay);
-            mineral_text_overlay = INVALID_ENTITY_ID;
+        // (6) Second bar text
+        if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
+            ecs_manager.destroy_entity(oxygen_percentage_text2);
+            oxygen_percentage_text2 = INVALID_ENTITY_ID;
         }
 
-        // Then destroy container
-        if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy container entity: %d", mineral_interaction_container);
-            ecs_manager.destroy_entity(mineral_interaction_container);
-            mineral_interaction_container = INVALID_ENTITY_ID;
+        // (5) Second progress bar
+        if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
+            ecs_manager.destroy_entity(oxygen_progress_bar2);
+            oxygen_progress_bar2 = INVALID_ENTITY_ID;
         }
 
-        // Verify destruction
-        auto verify_container = ecs_manager.get_entity(mineral_interaction_container);
-        auto verify_overlay = ecs_manager.get_entity(mineral_text_overlay);
-
-        if (verify_container || verify_overlay) {
-            LM.write_log("Warning: Some entities still exist after destruction attempt");
-        }
-        else {
-            //LM.write_log("All mineral tank GUI entities successfully destroyed");
-        }
-    }
-
-    void GUI_System::hide_oxygen_tank_gui() {
-        //LM.write_log("Starting to hide oxygen tank GUI");
-
-        // Destroy text overlay first since it was created last
-        if (oxygen_text_overlay != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy text overlay entity: %d", oxygen_text_overlay);
-            ecs_manager.destroy_entity(oxygen_text_overlay);
-            oxygen_text_overlay = INVALID_ENTITY_ID;
+        // (4) First bar text
+        if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
+            ecs_manager.destroy_entity(oxygen_percentage_text1);
+            oxygen_percentage_text1 = INVALID_ENTITY_ID;
         }
 
-        // Then green circle
-        if (green_circle_overlay != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy green circle entity: %d", green_circle_overlay);
-            ecs_manager.destroy_entity(green_circle_overlay);
-            green_circle_overlay = INVALID_ENTITY_ID;
+        // (3) First progress bar
+        if (oxygen_progress_bar1 != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
+            ecs_manager.destroy_entity(oxygen_progress_bar1);
+            oxygen_progress_bar1 = INVALID_ENTITY_ID;
         }
 
-        // Then red circle
-        if (red_circle_overlay != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy red circle entity: %d", red_circle_overlay);
-            ecs_manager.destroy_entity(red_circle_overlay);
-            red_circle_overlay = INVALID_ENTITY_ID;
-        }
-
-        // Finally destroy container
+        // (2) Main container
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Attempting to destroy container entity: %d", oxygen_interaction_container);
+            LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
             ecs_manager.destroy_entity(oxygen_interaction_container);
             oxygen_interaction_container = INVALID_ENTITY_ID;
         }
 
-        // Verify destruction
-        auto verify_container = ecs_manager.get_entity(oxygen_interaction_container);
-        auto verify_green = ecs_manager.get_entity(green_circle_overlay);
-        auto verify_red = ecs_manager.get_entity(red_circle_overlay);
-        auto verify_text = ecs_manager.get_entity(oxygen_text_overlay);
-
-        if (verify_container || verify_green || verify_red || verify_text) {
-            LM.write_log("Warning: Some entities still exist after destruction attempt");
-        }
-        else {
-            //LM.write_log("All oxygen tank GUI entities successfully destroyed");
+        // (1) E prompt
+        if (oxygen_e_prompt != INVALID_ENTITY_ID) {
+            LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
+            ecs_manager.destroy_entity(oxygen_e_prompt);
+            oxygen_e_prompt = INVALID_ENTITY_ID;
         }
     }
-}
+
+    //
+    // Player Oxygen (#1) - same anchor, same width as in show_oxygen_tank_gui()
+    //
+    void GUI_System::update_oxygen_progress1(float progress)
+    {
+        // 'progress' in [0..1]
+        stored_oxygen_progress1 = std::clamp(progress, 0.0f, 1.0f);
+
+        if (oxygen_progress_bar1 != INVALID_ENTITY_ID)
+        {
+            // MATCH the logic/anchors from show_oxygen_tank_gui()
+            float BAR_MAX_WIDTH = 437.0f;
+            float bar_y = 134.0f;         // e.g. from show_oxygen_tank_gui() for the player bar
+            float new_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
+
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
+                transform->scale.x = new_width;
+                transform->position.x = -570.0f + (new_width / 2.0f);
+                transform->position.y = bar_y;
+            }
+
+            if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar1)) {
+                gui->progress = stored_oxygen_progress1;
+            }
+
+            // Update text for the player bar #1
+            if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
+                if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text1)) {
+                    int percentage = static_cast<int>(stored_oxygen_progress1 * 100);
+                    text->text = std::to_string(percentage) + "%";
+                }
+            }
+        }
+    }
+
+
+    //
+    // Ship Oxygen (#2) - same anchor / width as in show_oxygen_tank_gui()
+    //
+    void GUI_System::update_oxygen_progress2(float usedFraction)
+    {
+        // usedFraction in [0..1], 0 => 0% used => bar is 100% left
+        // 1 => 100% used => bar is 0% left
+        stored_oxygen_progress2 = std::clamp(usedFraction, 0.0f, 1.0f);
+
+        if (oxygen_progress_bar2 != INVALID_ENTITY_ID)
+        {
+            float BAR_MAX_WIDTH = 437.0f;
+            float bar_y = 106.0f;
+
+            // Reversed fill => 1 - usedFraction
+            float reversed_value = 1.0f - stored_oxygen_progress2;
+            float new_width = BAR_MAX_WIDTH * reversed_value;
+
+            if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
+                transform->scale.x = new_width;
+                transform->position.x = -570.0f + (new_width / 2.0f);
+                transform->position.y = bar_y;
+            }
+
+            // Update text (#2)
+            if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
+                if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text2)) {
+                    int reversed_pct = static_cast<int>(reversed_value * 100);
+                    text->text = std::to_string(reversed_pct) + "%";
+                }
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // OXYGEN WARNING GUI
+    // ---------------------------------------------------------
+    void GUI_System::show_oxygen_warning(float percent) {
+        // Determine which warning flags to use
+        bool& warning_active = (percent == 50.0f) ? warning_50_active :
+            (percent == 20.0f) ? warning_20_active :
+            warning_5_active;
+        bool& warning_shown = (percent == 50.0f) ? warning_50_shown :
+            (percent == 20.0f) ? warning_20_shown :
+            warning_5_shown;
+
+        // If warning is already active, don't restart it
+        if (warning_active) {
+            return;
+        }
+
+        warning_active = true;
+        warning_shown = true;
+
+        EntityID& container_id = (percent == 50.0f) ? warning_container_50 :
+            (percent == 20.0f) ? warning_container_20 :
+            warning_container_5;
+
+        EntityID& text_id = (percent == 50.0f) ? warning_text_50 :
+            (percent == 20.0f) ? warning_text_20 :
+            warning_text_5;
+
+        // Get the appropriate texture and message based on warning level
+        std::string texture_name;
+        std::string warning_message;
+        glm::vec3 text_color;
+
+        if (percent == 50.0f) {
+            texture_name = "Purple_Oxy_Warning_Batch_14";
+            warning_message = "WARNING: OXYGEN LEVEL 50%";
+            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+        }
+        else if (percent == 20.0f) {
+            texture_name = "Red_Oxy_Warning_Batch_14";
+            warning_message = "WARNING: OXYGEN CRITICAL! REFILL OXYGEN!";
+            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+        }
+        else { // 5%
+            texture_name = "Black Oxy Warning_Batch 14";
+            warning_message = "WARNING: OXYGEN CRTICAL!";
+            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+        }
+
+        // Create warning container
+        container_id = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (container_id != INVALID_ENTITY_ID) {
+            auto* container_gui = get_component_safe<GUI_Component>(container_id);
+            if (!container_gui) {
+                hide_oxygen_warning(percent);
+                return;
+            }
+            container_gui->is_container = true;
+
+            if (auto* graphics = get_component_safe<Graphics_Component>(container_id)) {
+                graphics->model_name = "square";
+                graphics->texture_name = texture_name;
+                graphics->color = glm::vec3(1.0f);
+            }
+
+            // Position warning - same for all levels
+            if (auto* transform = get_component_safe<Transform2D>(container_id)) {
+                transform->position = Vec2D(0.0f, 200.0f);
+                transform->scale = Vec2D(2000.0f, 50.0f);
+            }
+        }
+
+        // Create warning text
+        text_id = ecs_manager.clone_entity_from_prefab("text_object");
+        if (text_id != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(text_id)) {
+                text->font_name = DEFAULT_FONT_NAME;  // Added font name
+                text->text = warning_message;
+                text->color = text_color;
+                text->scale = glm::vec2(0.7f, 0.7f);  // Matched scale style
+            }
+            if (auto* transform = get_component_safe<Transform2D>(text_id)) {
+                transform->position = Vec2D(0.0f, 195.0f);
+                transform->scale = Vec2D(0.7f, 0.7f);  // Matched transform scale
+            }
+        }
+
+        if (percent == 50.0f) warning_50_shown = true;
+        else if (percent == 20.0f) warning_20_shown = true;
+        else if (percent == 5.0f) warning_5_shown = true;
+    }
+
+    void GUI_System::hide_oxygen_warning(float percent) {
+        EntityID& text_id = (percent == 50.0f) ? warning_text_50 :
+            (percent == 20.0f) ? warning_text_20 :
+            warning_text_5;
+
+        EntityID& container_id = (percent == 50.0f) ? warning_container_50 :
+            (percent == 20.0f) ? warning_container_20 :
+            warning_container_5;
+
+        if (text_id != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(text_id);
+            text_id = INVALID_ENTITY_ID;
+        }
+        if (container_id != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(container_id);
+            container_id = INVALID_ENTITY_ID;
+        }
+    }
+
+} // namespace lof

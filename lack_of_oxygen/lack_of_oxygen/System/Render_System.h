@@ -19,6 +19,7 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Graphics_Manager.h" // For OpenGL API and access to shaders and models
+#include "../System/Particle_System.h"   // To access particles storage
 
 // Include Utility headers
 #include "../Utility/constant.h"         // To access constants 

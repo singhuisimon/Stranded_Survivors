@@ -1,12 +1,8 @@
 /**
  * @file GUI_System.h
  * @brief Defines the declaration for GUI systems.
- * @author Simon Chan (100%)
- * @date November 07, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
- * Reproduction or disclosure of this file or its contents without the
- * prior written consent of DigiPen Institute of Technology is prohibited.
  */
+
 #pragma once
 #ifndef LOF_GUI_SYSTEM_H
 #define LOF_GUI_SYSTEM_H
@@ -22,31 +18,72 @@ namespace lof {
     class GUI_System : public System {
     private:
         ECS_Manager& ecs_manager;
-        EntityID container_id;      // Main container entity
-        EntityID background_bar_id; // Background/empty progress bar
-        EntityID progress_bar_id;   // Filling progress bar
-        EntityID left_image_id;     // Left image entity
-        EntityID right_image_id;    // Right image entity
-        float last_progress_value = 0.0f;  // Store last progress value
+        EntityID container_id;      // Example container entity for a general GUI
+        EntityID background_bar_id; // Example background/empty progress bar for a general GUI
+        EntityID progress_bar_id;   // Example filling progress for a general GUI
 
+        // == MINERAL HOPPER MEMBERS ==
+        EntityID mineral_e_prompt = INVALID_ENTITY_ID;  // 'E' prompt entity
         EntityID mineral_interaction_container = INVALID_ENTITY_ID;
-        EntityID mineral_text_overlay = INVALID_ENTITY_ID;
+        EntityID mineral_background_bar = INVALID_ENTITY_ID;
+        EntityID mineral_progress_bar = INVALID_ENTITY_ID;
+        EntityID mineral_percentage_text = INVALID_ENTITY_ID;
+        EntityID mineral_deposit_count_text = INVALID_ENTITY_ID;
+        float mineral_e_prompt_x = 550.0f;  // X position for 'E' prompt
+        float stored_mineral_progress = 0.0f;  // Store progress between [0.0f ... 1.0f]
 
+        // == OXYGEN TANK MEMBERS ==
+        EntityID oxygen_e_prompt = INVALID_ENTITY_ID;  // 'E' prompt entity for Oxygen tank
         EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
-        EntityID oxygen_text_overlay = INVALID_ENTITY_ID;
-        EntityID red_circle_overlay = INVALID_ENTITY_ID;
-        EntityID green_circle_overlay = INVALID_ENTITY_ID;
+        float oxygen_e_prompt_x = 800.0f;  // X position for 'E' prompt
+        // 1st bar
+        EntityID oxygen_percentage_text1 = INVALID_ENTITY_ID;
+        EntityID oxygen_progress_bar1 = INVALID_ENTITY_ID;
+        float stored_oxygen_progress1 = 0.0f;
+        // 2nd bar
+        EntityID oxygen_percentage_text2 = INVALID_ENTITY_ID;
+        EntityID oxygen_progress_bar2 = INVALID_ENTITY_ID;
+        float stored_oxygen_progress2 = 0.0f;
 
+        // == WARNING POPUP MEMBERS ==
+        // Warning states
+        bool warning_50_active = false;
+        bool warning_20_active = false;
+        bool warning_5_active = false;
+        bool warning_50_shown = false;
+        bool warning_20_shown = false;
+        bool warning_5_shown = false;
+        static constexpr float WARNING_DURATION = 3.0f; // 3 seconds display time
+
+        // Warning display timers
+        float warning_50_display_time = 0.0f;
+        float warning_20_display_time = 0.0f;
+        float warning_5_display_time = 0.0f;
+
+        // Entity IDs for each warning
+        EntityID warning_container_50 = INVALID_ENTITY_ID;
+        EntityID warning_text_50 = INVALID_ENTITY_ID;
+        EntityID warning_container_20 = INVALID_ENTITY_ID;
+        EntityID warning_text_20 = INVALID_ENTITY_ID;
+        EntityID warning_container_5 = INVALID_ENTITY_ID;
+        EntityID warning_text_5 = INVALID_ENTITY_ID;
+
+        // Timers, positions, etc.
+        float e_prompt_animation_timer = 0.0f;
+        float original_e_prompt_y = 30.0f;   // The base Y position for 'E' prompt
+        float oxygen_e_prompt_animation_timer = 0.0f; // Separate timer if you want separate animation
+        const float E_PROMPT_AMPLITUDE = 10.0f;  // How far it moves up/down
+        const float E_PROMPT_SPEED = 2.0f;       // How fast it bobs
+
+        float oxygen_update_accumulator = 0.0f;  // Accumulates time to update oxygen bars once per second
+
+        float last_progress_value = 0.0f;  // Store last progress value for something else if needed
 
         float current_oxygen_level = 100.0f; // Track oxygen level
         float current_mineral_count = 0.0f;  // Track mineral count
 
         /**
          * @brief Clamps a value between a minimum and maximum range.
-         * @param value The value to be clamped.
-         * @param min The minimum allowed value.
-         * @param max The maximum allowed value.
-         * @return The clamped value within the specified range.
          */
         float clamp(float value, float min, float max) const {
             if (value < min) return min;
@@ -56,9 +93,6 @@ namespace lof {
 
         /**
          * @brief Safely retrieves a constant component from an entity.
-         * @tparam T The type of component to retrieve.
-         * @param entity_id The ID of the entity to get the component from.
-         * @return Pointer to the component if it exists, nullptr otherwise.
          */
         template<typename T>
         const T* get_component_safe(EntityID entity_id) const {
@@ -69,9 +103,6 @@ namespace lof {
 
         /**
          * @brief Safely retrieves a mutable component from an entity.
-         * @tparam T The type of component to retrieve.
-         * @param entity_id The ID of the entity to get the component from.
-         * @return Pointer to the component if it exists, nullptr otherwise.
          */
         template<typename T>
         T* get_component_safe(EntityID entity_id) {
@@ -82,8 +113,6 @@ namespace lof {
 
         /**
          * @brief Logs debug information about a specified entity.
-         * @param prefix The prefix to use in the debug log message.
-         * @param id The ID of the entity to debug.
          */
         void debug_entity(const char* prefix, EntityID id);
 
@@ -95,56 +124,52 @@ namespace lof {
     public:
         /**
          * @brief Constructor for the GUI System.
-         * @param ecs_manager Reference to the ECS manager instance.
          */
         GUI_System(ECS_Manager& ecs_manager);
 
-        // Functions for displaying and hiding loading screen
-        void show_loading_screen();
-        void hide_loading_screen();
-
         /**
-         * @brief Updates the progress bar value in loading screen.
-         * @param progress The new progress value between 0.0 and 1.0.
-         */
-        void set_progress(float progress);
-
-        // Functions for displaying and hiding mineral tank GUI
-        void show_mineral_tank_gui();
-        void show_oxygen_tank_gui();
-
-        // Functions for displaying and hiding mineral tank GUI
-        void hide_mineral_tank_gui();
-        void hide_oxygen_tank_gui();
-
-        /**
-         * @brief Updates the GUI system's state.
-         * @param delta_time Time elapsed since the last update.
+         * @brief Updates the GUI system's state every frame.
          */
         void update(float delta_time) override;
 
         /**
          * @brief Gets the system type identifier.
-         * @return String identifying this system as "GUI_System".
          */
         std::string get_type() const override { return "GUI_System"; }
 
+        // == MINERAL TANK GUI SHOW/HIDE ==
+        void show_mineral_tank_gui();
+        void hide_mineral_tank_gui();
+        void update_mineral_progress(float progress);
+
         /**
-         * @brief Gets the current progress value of the loading bar.
-         * @return Current progress value between 0.0 and 1.0, or 0.0 if no progress bar exists.
+         * @brief Get the current mineral hopper percentage progress.
          */
-        float get_progress() const {
-            if (progress_bar_id == INVALID_ENTITY_ID) return 0.0f;
-            const auto* gui = get_component_safe<GUI_Component>(progress_bar_id);
-            return gui ? gui->progress : 0.0f;
+        float get_current_hopper_percentage() const {
+            if (mineral_progress_bar != INVALID_ENTITY_ID) {
+                if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+                    return gui->progress;
+                }
+            }
+            return 0.0f;
         }
 
+        // == OXYGEN TANK GUI SHOW/HIDE ==
+        void show_oxygen_tank_gui();
+        void hide_oxygen_tank_gui();
+
+        // == OXYGEN PROGRESS UPDATE FUNCTIONS ==
+        void update_oxygen_progress1(float progress);
+        void update_oxygen_progress2(float progress);
+
+        // == OXYGEN WARNING FUNCTIONS ==
+        void show_oxygen_warning(float percent);
+        void hide_oxygen_warning(float percent);
+
         /**
-         * @brief Checks if the GUI is currently visible.
-         * @return True if the GUI container exists, false otherwise.
+         * @brief Checks if a general container is currently visible.
          */
         bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
-
     };
 } // namespace lof
 

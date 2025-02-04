@@ -18,6 +18,7 @@
 #include "Manager.h"
 
 #include "../Entity/Entity.h"
+#include <algorithm> // for std::clamp
 
 namespace lof {
     extern float imgui_camara_pos_x;
@@ -56,12 +57,19 @@ namespace lof {
         int forces_flag = -1;
 
         // Flag for scn file
-        int current_scene = 1;
+        int current_scene = 2;
 
-        //temporary value for bgm
-        int oxygen_level = 100;
-        bool increasing = false;
-        bool game_over = false;
+        // Top UI variables
+        float current_oxygen_level = 100.0f;  // Start at 100%
+        float ship_oxygen_level = 400.0f;     // [0..400]
+
+        float oxygen_drain_rate = 1.0f;     // Drain 5% per second
+        float oxygen_update_timer = 0.0f;   // Track time for updates
+        float current_panic_level = 0.0f;  // Starts at 0%
+        int timer_remaining = 300; // or any desired starting value
+
+        float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
+
         /**
          * @brief Determines the mineral value based on the block entity type
          * @param block_id The EntityID of the block being destroyed
@@ -143,6 +151,23 @@ namespace lof {
          */
         int get_current_scene();
 
+        /**
+         * @brief Returns the player's current oxygen level in the range [0..100].
+         * @return The current oxygen level as a float.
+         */
+        float get_current_oxygen_level() const { return current_oxygen_level; }
+        void  set_current_oxygen_level(float value) {
+            current_oxygen_level = std::clamp(value, 0.0f, 100.0f);
+        }
+
+        /**
+		 * @brief Returns the ship's current oxygen level in the range [0..400].
+		 * @return The current ship oxygen level as a float.
+		 */
+        float get_ship_oxygen_level() const { return ship_oxygen_level; }
+        void  set_ship_oxygen_level(float value) {
+            ship_oxygen_level = std::clamp(value, 0.0f, 400.0f);
+        }
     };
 
 } // namespace lof

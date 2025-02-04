@@ -14,8 +14,9 @@
 #include "Render_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
-#include "Collision_System.h"
-#include "../System/GUI_System.h"  // Add this for GUI system access
+#include "../Manager/Game_Manager.h"
+//#include "Collision_System.h"
+//#include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../Utility/globals.h"    // To access level_editor_mode
 
 namespace lof {
@@ -138,6 +139,25 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
+            int current_scene = GM.get_current_scene(); // Get the current scene number
+
+            if (camera.is_free_cam == GL_FALSE && current_scene != 1 && current_scene != 2) {
+
+                // Update world-to-camera view transformation matrix
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               0, 0, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                       0, 2.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+            }
+
+
             // Compute object scale matrix
             // Special case for text objects
             float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
@@ -211,6 +231,11 @@ namespace lof {
         // Get screen height
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
+        // Get models, textures, animation, and camera from the Graphics Manager
+        auto& models = GFXM.get_model_storage();
+        auto& textures = GFXM.get_texture_storage();
+        auto& animations = GFXM.get_animation_storage();
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
@@ -218,21 +243,21 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Render only what is on the viewport
-            if (level_editor_mode == false) {
-                EntityID player_id = ECSM.find_entity_by_name("player1");
-                if (entity_id != 0 && entity_id != player_id) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+            //if (level_editor_mode == false) {
+            //    EntityID player_id = ECSM.find_entity_by_name("player1");
+            //    if (entity_id != 0 && entity_id != player_id) {
+            //        auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
 
-                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+            //        float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+            //        float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
-                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
-                        continue;
-                    }
-                }
-            }
+            //        if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+            //            continue;
+            //        }
+            //    }
+            //}
 
-            // Get shaders, models, textures, animation, and camera from the Graphics Manager
+            // Get shader program
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
             auto& models = GFXM.get_models();
             auto& textures = ASM.get_texture_storage();
@@ -613,6 +638,149 @@ namespace lof {
             glBindTexture(GL_TEXTURE_2D, 0);
             GFXM.program_free();
         }
+
+        // Get particle system
+        for (auto& system : ECSM.get_systems()) {
+            if (system->get_type() == "Particle_System") {
+                auto* particle_system = static_cast<Particle_System*>(system.get());
+                if (!particle_system) {
+                    LM.write_log("Game_Manager::update(): Fail to get particle system");
+                    std::cerr << "Failed to get particle system" << std::endl;
+                    return;
+                }
+
+                // Get number of active particles and the particle storage
+                int particle_cnt = particle_system->get_particles_count();
+                auto& particles_storage = particle_system->get_particle_storage();
+
+                // Get shader program 
+                Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(0);
+
+                // Start shader program
+                GFXM.program_use(shader->program_handle);
+
+                // Bind VAO handle
+                glBindVertexArray(models["square"].vaoid);
+
+                // Set texture flag to true
+                GLuint tex_flag_true_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
+                if (tex_flag_true_loc >= 0) {
+                    glUniform1ui(tex_flag_true_loc, GL_TRUE);
+                }
+                else {
+                    LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Set animation flag to be false
+                GLuint animate_flag_false_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
+                if (animate_flag_false_loc >= 0) {
+                    glUniform1ui(animate_flag_false_loc, GL_FALSE);
+                }
+                else {
+                    LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Container for particle texture
+                std::string particle_tex{};
+
+                // Looping through each particles
+                for (int i = 0; i < particle_cnt; ++i) {
+
+                    // Set the texture for the type of particle
+                    switch (particles_storage[i].type) {
+                    case walking:
+                        particle_tex = "sparks_particle_batch_14";
+                        break;
+                    case mining:
+                        particle_tex = "sparks_particle_batch_14";
+                        break;
+                    case rock:
+                        particle_tex = "rock_particle_batch_14";
+                        break;
+                    case dirt:
+                        particle_tex = "dirt_particle_batch_14";
+                        break;
+                    case quartz:
+                        particle_tex = "quartz_particle_batch_14";
+                        break;
+                    case emerald:
+                        particle_tex = "emerald_particle_batch_14";
+                        break;
+                    case sapphire:
+                        particle_tex = "sapphire_particle_batch_14";
+                        break;
+                    case amethyst:
+                        particle_tex = "amethyst_particle_batch_14";
+                        break;
+                    case citrine:
+                        particle_tex = "citrine_particle_batch_14";
+                        break;
+                    case alexandrite:
+                        particle_tex = "alexandrite_particle_batch_14";
+                        break;
+                    case tnt:
+                        particle_tex = "sparks_particle_batch_14";
+                        break;
+                    case tnt_explode:
+                        particle_tex = "sparks_particle_batch_14";
+                        break;
+                    }
+
+                    // Look for texture in texture storage. If not found, load texture 
+                    if (textures.find(particle_tex) == textures.end()) {
+                        GFXM.load_texture(particle_tex);
+                    }
+
+                    // Assign texture object to use texture image unit 5. If texture
+                    // is not loaded, render with default black texture
+                    if (textures.find(particle_tex) == textures.end()) {
+                        glBindTextureUnit(5, 0);
+                    }
+                    else {
+                        glBindTextureUnit(5, textures[particle_tex]);
+                    }
+
+                    // Get camera for transform
+                    auto& camera = GFXM.get_camera();
+
+                    // Compute particle scale matrix
+                    glm::mat3 scale_mat{ particles_storage[i].curr_size * 64, 0, 0,
+                                        0, particles_storage[i].curr_size * 64, 0,
+                                        0, 0, 1 };
+
+                    // Compute particle translation matrix
+                    glm::mat3 trans_mat{ 1, 0, 0,
+                                            0, 1, 0,
+                                            particles_storage[i].position.x, particles_storage[i].position.y, 1 };
+
+                    // Compute final particles transform matrix
+                    glm::mat3 particles_xform = camera.world_to_ndc_xform * trans_mat * scale_mat;
+
+                    // Pass particle's mdl_to_ndc_xform to vertex shader to compute object's final position                    
+                    GLint mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
+                    if (mat_uniform_loc >= 0) {
+                        glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &particles_xform[0][0]);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                    // Draw particle
+                    glDrawElements(models["square"].primitive_type, models["square"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                }
+
+            }
+
+            // Clean up by unbinding the VAO and ending the shader program
+            glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            GFXM.program_free();
+        }
+
+        // Bind framebuffer if program is in editor mode
         if (GFXM.get_editor_mode() == 1) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0); 
         }

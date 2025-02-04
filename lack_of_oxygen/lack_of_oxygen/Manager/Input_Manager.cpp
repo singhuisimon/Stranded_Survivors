@@ -230,4 +230,12 @@ namespace lof {
         std::cout << "Input_Manager::reset(): All key and mouse button states reset." << std::endl;
     }
 
+    void Input_Manager::get_mouse_position(double& x, double& y) const {
+        GLFWwindow* window = glfwGetCurrentContext();
+        if (!window) return;
+
+        glfwGetCursorPos(window, &x, &y);
+    }
+
+
 } // namespace lof

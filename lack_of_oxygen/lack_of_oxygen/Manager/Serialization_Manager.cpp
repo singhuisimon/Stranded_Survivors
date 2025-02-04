@@ -20,6 +20,7 @@
 
 // Include Log_Manager
 #include "Log_Manager.h"
+#include "Game_Manager.h"
 
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
@@ -86,21 +87,23 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_Small.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
         }
 
-        // Load scene file 
+        // Load scene file
         const std::string scene_folder = "Scenes";
-        std::string loaded_scene = "scene1.scn";
+        std::string loaded_scene = "main_menu.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
-        std::string scene_path = ASM.get_full_path(scene_folder, "scene1.scn");
+        std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
         }
+
+        GM.set_current_scene(0);
 
         // Debug print level data if loaded successfully
         debug_print_level();
@@ -266,6 +269,10 @@ namespace lof {
     bool Serialization_Manager::load_scene(const char* filename) {
         LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
+        if (path.find("main_menu.scn") != std::string::npos) {
+            scene_no = 0;
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Main Menu");
+        }
         if (path.find("scene1.scn") != std::string::npos) {
             scene_no = 1;
             LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");
