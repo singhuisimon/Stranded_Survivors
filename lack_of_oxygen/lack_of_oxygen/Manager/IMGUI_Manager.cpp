@@ -62,7 +62,7 @@ namespace lof {
     //booleans to note down mouse behaviour
     static bool mouse_was_down = false;
     static ImVec2 mouse_pos_before_press;
-    
+
     char to_lower(char c) {
         return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
@@ -96,9 +96,9 @@ namespace lof {
                 [&]() { ECSM.add_component<Animation_Component>(entities[selected_object_index]->get_id(), Animation_Component()); },
                 [&]() { ECSM.remove_component<Animation_Component>(entities[selected_object_index]->get_id()); }},
 
-            {"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
+            /*{"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
                 [&]() { ECSM.add_component<Logic_Component>(entities[selected_object_index]->get_id(), Logic_Component()); },
-                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},
+                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},*/
 
             {"Audio Component", static_cast<ComponentID>(ECSM.get_component_id<Audio_Component>()),
                 [&]() { ECSM.add_component<Audio_Component>(entities[selected_object_index]->get_id(), Audio_Component()); },
@@ -112,7 +112,7 @@ namespace lof {
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
-    IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager){
+    IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager) {
         set_type("IMGUI_Manager");
     }
 
@@ -166,10 +166,10 @@ namespace lof {
 
         //Iterate through the directory and collect file names
         for (const auto& entry : std::filesystem::directory_iterator(level_path)) {
-            
+
             //If the file is found, add to the list of file names
-            if (entry.is_regular_file()) {  
-                
+            if (entry.is_regular_file()) {
+
                 file_names.push_back(entry.path().filename().string());
             }
 
@@ -205,44 +205,46 @@ namespace lof {
         if (selected_file_index != -1) {
             selected_file = file_names[selected_file_index];
         }
-        
+
         //load scene button
         if (ImGui::Button("Load Scene")) {
             load_selected = true;
-            
+
         }
 
         ImGui::Separator();
 
         ImGui::Button("Drop Scenes Here");
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
-                    const char* droppedFilePath = (const char*)payload->Data;
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
+                const char* droppedFilePath = (const char*)payload->Data;
 
-                    std::string file_name = droppedFilePath;
-                    file_name.erase(0, ASM.get_full_path("Scenes", "").length());
+                std::string file_name = droppedFilePath;
+                file_name.erase(0, ASM.get_full_path("Scenes", "").length());
 
-                    if (std::find(file_names.begin(), file_names.end(), file_name) == file_names.end()) {
-                        file_names.push_back(file_name);
-                        std::cout << "Added: " << file_name << std::endl;
-                    }
-                    else {
-                        std::cout << "Already exists: " << file_name << std::endl;
-                    }
+                if (std::find(file_names.begin(), file_names.end(), file_name) == file_names.end()) {
+                    file_names.push_back(file_name);
+                    std::cout << "Added: " << file_name << std::endl;
                 }
-                ImGui::EndDragDropTarget();
+                else {
+                    std::cout << "Already exists: " << file_name << std::endl;
+                }
             }
-        
-   
+            ImGui::EndDragDropTarget();
+        }
+
+
         ImGui::End();
 
         //If file name is clicked and button is pressed
         if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
+            ADM.stop_mastergroup();
+            ADM.set_new_scene(true);
 
             //Gets file according to index load
             const std::string scenes = "Scenes";
             if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
-   
+
                 GM.set_current_scene(selected_file_index + 1);
                 selected_object_index = -1;
 
@@ -393,7 +395,7 @@ namespace lof {
             }
 
             load_selected = false;
-        }     
+        }
     }
 
     //starts frame
@@ -426,7 +428,8 @@ namespace lof {
             mouse_texture_coord_world.x = mouse_texture_coord_screen.x;
             if (mouse_texture_coord_screen.x < (SCR_WIDTH / 4)) {
                 mouse_texture_coord_world.x = -((SCR_WIDTH / 4) - mouse_texture_coord_screen.x);
-            } else {
+            }
+            else {
                 mouse_texture_coord_world.x = mouse_texture_coord_screen.x - (SCR_WIDTH / 4);
             }
 
@@ -441,7 +444,8 @@ namespace lof {
             mouse_texture_coord_world.y = mouse_texture_coord_screen.y;
             if (mouse_texture_coord_screen.y <= (SCR_HEIGHT / 4)) {
                 mouse_texture_coord_world.y = (SCR_HEIGHT / 4) - mouse_texture_coord_screen.y;
-            } else {
+            }
+            else {
                 mouse_texture_coord_world.y = -(mouse_texture_coord_screen.y - (SCR_HEIGHT / 4));
             }
 
@@ -464,7 +468,7 @@ namespace lof {
 #if 1
 
     //Static bool to keep track if the mouse is in the viewport
-    static bool mouse_in_window = false; 
+    static bool mouse_in_window = false;
 
     //Rendering overall UI and asset browser
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
@@ -472,8 +476,8 @@ namespace lof {
         //Docking and window flags
         static ImGuiDockNodeFlags docking_flags = ImGuiDockNodeFlags_None;
         static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
-        | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
-        | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
         //Set up Viewport
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -482,12 +486,12 @@ namespace lof {
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        
+
         static int currentMode = 0; // Default to "Drag"
         const char* modes[] = { "None","Drag", "Scale", "Rotate" };
 
         ImGui::Begin("Level Editor Mode", nullptr, window_flags);
-       
+
         //Set up Dockspace
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
@@ -500,7 +504,7 @@ namespace lof {
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Menu"))
-            {          
+            {
                 if (ImGui::MenuItem("Stop Resizing ImGui Window", "", (docking_flags & ImGuiDockNodeFlags_NoResize) != 0)) {
                     docking_flags ^= ImGuiDockNodeFlags_NoResize;
                 }
@@ -510,7 +514,7 @@ namespace lof {
             }
             ImGui::EndMenuBar();
         }
-        
+
         ImGui::PopStyleVar(2);
         ImGui::End();
 
@@ -534,7 +538,7 @@ namespace lof {
             else {
                 mouse_in_window = false;
             }
-                
+
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
 
             //Display debug information
@@ -566,7 +570,7 @@ namespace lof {
                         mouse_clicked_or_dragged = true;
                         if (selectedEntityInfo.isSelected) {
                             select_entity = true;
-                            selectedEntityID = selectedEntityInfo.selectedEntity;   
+                            selectedEntityID = selectedEntityInfo.selectedEntity;
                             LM.write_log("IMGUI_Manager::render_ui(): Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
                         }
                         else {
@@ -579,13 +583,13 @@ namespace lof {
                         select_entity = false;
                     }
 
-                    if (selectedEntityInfo.selectedEntity == 5){
+                    /*if (selectedEntityInfo.selectedEntity == 5) {
                         ImGui::Text("Returned True");
                         ImGui::Text("Position: %.2f, %.2f", selectedEntityInfo.entitypos.x, selectedEntityInfo.entitypos.y);
                     }
                     else {
                         ImGui::Text("Not True");
-                    }
+                    }*/
 
                     // Show context menu on right click when an entity is selected
                     if (selectedEntityID != INVALID_ENTITY_ID && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
@@ -675,11 +679,11 @@ namespace lof {
                                     transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
                                     transform.prev_position = transform.position;
                                 }
-                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
+                                /*if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
                                     Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selectedEntityID].get()->get_id());
                                     logic.origin_pos.x = selected_entity_start_pos.x + dragged_offset.x;
                                     logic.origin_pos.y = selected_entity_start_pos.y + dragged_offset.y;
-                                }
+                                }*/
                             }
                             break;
                         }
@@ -763,10 +767,10 @@ namespace lof {
 
         for (auto& system : ECSM.get_systems()) {
             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-          
+
                 gui_system->hide_mineral_tank_gui();
                 gui_system->hide_oxygen_tank_gui();
-     
+
             }
         }
     }
@@ -824,7 +828,7 @@ namespace lof {
             const std::string SCENES = "Scenes";
 
             std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
-            if (SM.save_game_state(scene_path.c_str())) {   
+            if (SM.save_game_state(scene_path.c_str())) {
                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
             }
             else {
@@ -878,7 +882,7 @@ namespace lof {
                 last_selected_object_index = selected_object_index;
                 assigned_names.clear();
                 buffer_map.clear();
-                filled = false; 
+                filled = false;
             }
 
             if (selected_object_index == -1) {
@@ -1003,7 +1007,7 @@ namespace lof {
                                 const char* droppedFilePath = (const char*)payload->Data;
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Textures", "").length());
-                                file_name = file_name.substr(0, file_name.size()-4);
+                                file_name = file_name.substr(0, file_name.size() - 4);
 
                                 std::transform(file_name.begin(), file_name.end(), file_name.begin(), to_lower);
                                 texture_name = file_name;
@@ -1111,93 +1115,93 @@ namespace lof {
                     }
                 }
 
-                const char* logic_behaviour[] = { "Horizontal", "Circular"};
+                const char* logic_behaviour[] = { "Horizontal", "Circular" };
                 static std::vector<const char*> chosen_logic_behaviour;
 
-                //TODO: To Implement Fully Proper Logic Component Later!!!
-                if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
-                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
-                    if (ImGui::CollapsingHeader("Logic")) {
+                ////To Implement Fully Proper Logic Component Later
+                //if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+                //    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+                //    if (ImGui::CollapsingHeader("Logic")) {
 
-                        auto& is_active = logic.is_active;
-                        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                        if (button_toggle(s_label, &is_active_on)) {
-                            is_active = !is_active;
-                        }
+                //        auto& is_active = logic.is_active;
+                //        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                //        if (button_toggle(s_label, &is_active_on)) {
+                //            is_active = !is_active;
+                //        }
 
-                        auto& movement_pattern = logic.movement_pattern;
-                        //Update logic behavior, corresponds the string to the movement_pattern value
-                        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
-                        ImGui::Text("Choose Logic Behaviour");
-                        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
-                           
-                            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
-                        }
+                //        auto& movement_pattern = logic.movement_pattern;
+                //        //Update logic behavior, corresponds the string to the movement_pattern value
+                //        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
+                //        ImGui::Text("Choose Logic Behaviour");
+                //        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
 
-                        auto& movement_speed = logic.movement_speed;
-                        ImGui::InputFloat("Movement Speed", &movement_speed);
+                //            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
+                //        }
 
-                        auto& movement_range = logic.movement_range;
-                        ImGui::InputFloat("Movement Range", &movement_range);
+                //        auto& movement_speed = logic.movement_speed;
+                //        ImGui::InputFloat("Movement Speed", &movement_speed);
 
-                        auto& reverse_direction = logic.reverse_direction;
-                        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
-                        if (button_toggle(reverse_dir, &is_reverse_on)) {
-                            reverse_direction = !reverse_direction;
-                        }
+                //        auto& movement_range = logic.movement_range;
+                //        ImGui::InputFloat("Movement Range", &movement_range);
 
-                        auto& is_rotate = logic.rotate_with_motion;
-                        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
-                        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
-                            is_rotate = !is_rotate;
-                        }
+                //        auto& reverse_direction = logic.reverse_direction;
+                //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                //        if (button_toggle(reverse_dir, &is_reverse_on)) {
+                //            reverse_direction = !reverse_direction;
+                //        }
 
-                        auto& original_position = logic.origin_pos;
-                        ImGui::InputFloat2("Original Position", &original_position.x);
+                //        auto& is_rotate = logic.rotate_with_motion;
+                //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                //            is_rotate = !is_rotate;
+                //        }
 
-                        for (const char* behaviour_here : chosen_logic_behaviour) {
-                            ImGui::Text(behaviour_here);
-                            ImGui::NewLine;
-                        }
+                //        auto& original_position = logic.origin_pos;
+                //        ImGui::InputFloat2("Original Position", &original_position.x);
 
-                        if (ImGui::Button("Add Logic Behaviour")){           
-                            ImGui::OpenPopup("Add Behaviour Options");
-                        }
+                //        for (const char* behaviour_here : chosen_logic_behaviour) {
+                //            ImGui::Text(behaviour_here);
+                //            ImGui::NewLine;
+                //        }
 
-                        if (ImGui::BeginPopup("Add Behaviour Options")) {
-                            ImGui::Text("Select Operation");
-                            ImGui::Separator();
-                            for (const char* behaviour : logic_behaviour) {
-                                if (ImGui::Selectable(behaviour)) {
-                                    chosen_logic_behaviour.push_back(behaviour);
-                                }
-                            }
-                            ImGui::EndPopup();
-                        }
+                //        if (ImGui::Button("Add Logic Behaviour")) {
+                //            ImGui::OpenPopup("Add Behaviour Options");
+                //        }
 
-                        if (ImGui::Button("Remove Logic Behaviour")) {
-                            ImGui::OpenPopup("Remove Behaviour Options");
-                        }
+                //        if (ImGui::BeginPopup("Add Behaviour Options")) {
+                //            ImGui::Text("Select Operation");
+                //            ImGui::Separator();
+                //            for (const char* behaviour : logic_behaviour) {
+                //                if (ImGui::Selectable(behaviour)) {
+                //                    chosen_logic_behaviour.push_back(behaviour);
+                //                }
+                //            }
+                //            ImGui::EndPopup();
+                //        }
 
-                        if (ImGui::BeginPopup("Remove Behaviour Options")) {
-                            ImGui::Text("Select Operation");
-                            ImGui::Separator();
-                            for (const char* behaviour : logic_behaviour) {
-                                if (ImGui::Selectable(behaviour)) {
-                                    
-                                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
-                                    if(it != chosen_logic_behaviour.end()){
-                                        chosen_logic_behaviour.erase(it);
-                                    }
-                                    
-                                }
-                            }
-                            ImGui::EndPopup();
-                        }
+                //        if (ImGui::Button("Remove Logic Behaviour")) {
+                //            ImGui::OpenPopup("Remove Behaviour Options");
+                //        }
 
-                        ImGui::Separator();
-                    }
-                }
+                //        if (ImGui::BeginPopup("Remove Behaviour Options")) {
+                //            ImGui::Text("Select Operation");
+                //            ImGui::Separator();
+                //            for (const char* behaviour : logic_behaviour) {
+                //                if (ImGui::Selectable(behaviour)) {
+
+                //                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
+                //                    if (it != chosen_logic_behaviour.end()) {
+                //                        chosen_logic_behaviour.erase(it);
+                //                    }
+
+                //                }
+                //            }
+                //            ImGui::EndPopup();
+                //        }
+
+                //        ImGui::Separator();
+                //    }
+                //}
 
                 //Audio Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
@@ -1252,8 +1256,23 @@ namespace lof {
                                 int selected_index = selected_sounds[i];
                                 if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
 
+                                    if (sounds[i].audio_type == BGM) {
+                                        for (auto& system : ECSM.get_systems()) {
+                                            if (system->get_type() == "Audio_System") {
+                                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                                audio_system->stop_sound(sounds[i].key);
+                                            }
+                                        }
+                                    }
+                                    
                                     //Update the sound's file path based on the selected string from the sound map
                                     audio.set_filepath(sounds[i].key, sound_map_filenames[selected_index]);
+
+                                    if (sounds[i].audio_type == BGM) {
+                                        ADM.set_new_scene(true);
+                                    }
+
                                     LM.write_log("IMGUIM:: Sound being changed to %s for %s", sound_map_filenames[selected_index].c_str(), sounds[i].key.c_str());
                                 }
                             }
@@ -1270,7 +1289,7 @@ namespace lof {
                                     file_name = file_name.substr(0, file_name.find_last_of('.'));
 
                                     bool file_in_dropdown = false;
-                                    
+
                                     for (int j = 0; j < file_name_cstr.size(); ++j) {
                                         if (j < sound_map_filenames.size()) {
                                             if (file_name == sound_map_filenames[j]) {
@@ -1283,18 +1302,29 @@ namespace lof {
 
                                     if (!file_in_dropdown) {
 
+                                        if (sounds[i].audio_type == BGM) {
+                                            for (auto& system : ECSM.get_systems()) {
+                                                if (system->get_type() == "Audio_System") {
+                                                    auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                                    audio_system->stop_sound(sounds[i].key);
+                                                }
+                                            }
+                                        }
+
                                         ADM.load_sound(file_name, audio.get_audio_type(sounds[i].key));
                                         audio.set_filepath(sounds[i].key, file_name);
+                                        ADM.set_new_scene(true);
                                     }
-                                   
+
                                 }
                                 ImGui::EndDragDropTarget();
                             }
                         }
 
-                        //Updating Audio Key - Has Bug
+                        //Updating Audio Key 
                         for (int i = 0; i < sounds.size(); ++i) {
-                      
+
                             std::string old_key_name = sounds[i].key;
                             std::string condition_name_key = "key for " + std::to_string(i);
 
@@ -1312,7 +1342,7 @@ namespace lof {
                                 audio.set_key(old_key_name, new_key_name);
 
                             }
-                            
+
 
                         }
 
@@ -1320,7 +1350,7 @@ namespace lof {
                         static std::vector<int> selected_sounds_type;
                         selected_sounds_type.clear();
                         selected_sounds_type.resize(sounds.size(), -1);
-                        
+
                         int type_index = 0;
                         for (int i = 0; i < sounds.size(); ++i, ++type_index) {
 
@@ -1347,7 +1377,7 @@ namespace lof {
                             }
 
                             //Create a combo box to choose the new representative string for this sound
-                            std::string label = "Choose Audio Type for " + std::to_string(type_index); 
+                            std::string label = "Choose Audio Type for " + std::to_string(type_index);
                             if (ImGui::Combo(label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
 
                                 //Get the selected representative string type_index
@@ -1356,7 +1386,7 @@ namespace lof {
 
                                     // Update the sound's file path based on the selected rep string
                                     audio.set_audio_type(sounds[i].key, audio_types[selected_index].second);
-                                    
+
                                 }
                             }
                         }
@@ -1376,7 +1406,7 @@ namespace lof {
 
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FONT_ITEM")) {
                                 const char* droppedFilePath = (const char*)payload->Data;
-          
+
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Fonts", "").length());
                                 file_name = file_name.substr(0, file_name.size() - 4);
@@ -1483,7 +1513,7 @@ namespace lof {
                     switch (selected_to_remove) {
                     case 0:
                         break;
-                    default: 
+                    default:
                         if (selected_to_remove >= 0 && selected_to_remove < present_components.size()) {  // Bounds check
 
                             const auto& component_name = present_components[selected_to_remove];
@@ -1522,12 +1552,12 @@ namespace lof {
                     std::string temp = selected_filepath;
                     selected_filepath.clear();
                     std::filesystem::remove(temp);
-                   
+
                     size_t start_pos_of_folder_filepath;
 
                     //Deleting Textures from Associated Entities
                     if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Textures", ""))) != std::string::npos) {
-                        
+
                         temp.erase(0, ASM.get_full_path("Textures", "").length());
                         temp = temp.substr(0, temp.find_last_of('.'));
                         std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
@@ -1548,7 +1578,7 @@ namespace lof {
 
                         is_file_selected = false;
                     }
-                    
+
                     else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Fonts", ""))) != std::string::npos) {
 
                         temp.erase(0, ASM.get_full_path("Fonts", "").length());
@@ -1562,7 +1592,7 @@ namespace lof {
 
                         is_file_selected = false;
                     }
-                    else 
+                    else
                     {
                         ImGui::Text("Deletion Not Available For Asset Type");
                     }
@@ -1590,7 +1620,7 @@ namespace lof {
             if (ImGui::Button("DELETE FILE")) {
 
                 try {
-               
+
                     std::string temp = selected_filepath;
                     selected_filepath.clear();
                     size_t start_pos_of_folder_filepath;
@@ -1599,7 +1629,7 @@ namespace lof {
                     if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Textures", ""))) != std::string::npos) {
 
                         std::filesystem::remove(temp);
-                        
+
                         auto& texture_storage = ASM.get_texture_storage();
 
                         //Prepare the texture name for removal
@@ -1613,7 +1643,7 @@ namespace lof {
                         is_file_selected = false;
                     }
                     else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Fonts", ""))) != std::string::npos) {
-                        
+
                         std::filesystem::remove(temp);
 
                         temp.erase(0, ASM.get_full_path("Fonts", "").length());
@@ -1652,7 +1682,7 @@ namespace lof {
                             if (ECSM.has_component<Audio_Component>(entity)) {
                                 Audio_Component& audio = ECSM.get_component<Audio_Component>(entity);
                                 auto& sounds = audio.get_sounds();
-                                
+
                                 for (const auto& sound : sounds) {
                                     if (sound.filepath == filename) {
                                         entity_with_sound = entity;
@@ -1747,7 +1777,7 @@ namespace lof {
                         std::string filename = temp;
 
                         //TODO: Identify entity with selected sound
-                        EntityID entity_with_sound = 5; 
+                        EntityID entity_with_sound = 5;
 
                         //Get sound key from Audio Component
                         Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_with_sound);
@@ -1782,7 +1812,7 @@ namespace lof {
                                         //Plausible Fix
                                         //audio_system->get_channel_map().erase(key_for_channel_map);
 
-                                        std::cout << "deleted "<< key_for_channel_map << " from channel map\n";
+                                        std::cout << "deleted " << key_for_channel_map << " from channel map\n";
                                     }
 
                                     auto& sound_map = ADM.get_sound_map();
@@ -1858,7 +1888,7 @@ namespace lof {
                         std::cout << "------------------------------------" << std::endl;*/
 
                     }
-                    
+
 #endif 
                     else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos)
                     {
@@ -1887,6 +1917,30 @@ namespace lof {
                             }
                         }
 
+
+                        ////AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
+                        //std::cout << "------------------------------------" << std::endl;
+                        //std::cout << "BEFORE DELETION" << std::endl;
+                        //for (auto& system : ECSM.get_systems()) {
+                        //    if (system->get_type() == "Audio_System") {
+                        //        auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                        //        std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                        //        for (auto& channel : audio_system->get_channel_map()) {
+                        //            std::cout << channel.first << std::endl;
+                        //        }
+
+                        //        std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                        //        audio_system->get_active_channels();
+                        //    }
+                        //}
+                        //std::cout << "CHECKING SOUND MAP" << std::endl;
+                        //auto& sound_map = ADM.get_sound_map();
+                        //for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                        //    std::cout << it->first << std::endl;
+                        //}
+                        //std::cout << "------------------------------------" << std::endl;
+
                         //try to find and remove audio
                         ASM.find_and_remove_audio(filename);
 
@@ -1906,7 +1960,28 @@ namespace lof {
                         else {
                             std::cerr << "Failed to remove file: " << filename << std::endl;
                         }
-                        
+
+                        /*std::cout << "------------------------------------" << std::endl;
+                        std::cout << "AFTER DELETION" << std::endl;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                                for (auto& channel : audio_system->get_channel_map()) {
+                                    std::cout << channel.first << std::endl;
+                                }
+
+                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                                audio_system->get_active_channels();
+                            }
+                        }
+                        std::cout << "CHECKING SOUND MAP" << std::endl;
+                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                            std::cout << it->first << std::endl;
+                        }
+                        std::cout << "------------------------------------" << std::endl;*/
+
                     }
                     /*else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Scenes", ""))) != std::string::npos) {
                         std::filesystem::remove(temp);
@@ -1945,7 +2020,7 @@ namespace lof {
 
 #if 0
     void IMGUI_Manager::render_asset_browser() {
-        
+
         // Directory to load files from
         std::string tex_directory = ASM.get_full_path("Textures", "");
 
@@ -2005,7 +2080,7 @@ namespace lof {
 
     //asset browser
     void IMGUI_Manager::asset_browser() {
-        
+
         ImGui::Begin("Asset Browser");
 
         //current directory
@@ -2028,14 +2103,14 @@ namespace lof {
 
                 ImGui::Separator(); // Adds a separator between the columns and other widgets
 
-                try { 
+                try {
 
                     //accessing each file in assets directory
                     for (const auto& entry : std::filesystem::directory_iterator(assets_path)) {
 
                         //if directory is selected
                         if (entry.is_directory()) {
-                            if (ImGui::Button(entry.path().filename().string().c_str(), {128, 128})) {
+                            if (ImGui::Button(entry.path().filename().string().c_str(), { 128, 128 })) {
                                 current_directory = ASM.get_full_path(entry.path().filename().string(), "").c_str();
                             }
                             ImGui::Text(entry.path().filename().string().c_str());
@@ -2048,7 +2123,7 @@ namespace lof {
                 }
             }
             else { //if current directory isn't empty, its in a new directory
-                
+
                 ImGui::Columns(8, 0, false);
 
                 if (ImGui::Button("<- Back")) {
@@ -2063,8 +2138,8 @@ namespace lof {
                     try {
 
                         //Block for Models and Shaders
-                        if (current_directory == ASM.get_full_path("Models", "") || current_directory == ASM.get_full_path("Shaders", "") || 
-                            current_directory == ASM.get_full_path("Config", "") || current_directory == ASM.get_full_path("Prefab", "") || 
+                        if (current_directory == ASM.get_full_path("Models", "") || current_directory == ASM.get_full_path("Shaders", "") ||
+                            current_directory == ASM.get_full_path("Config", "") || current_directory == ASM.get_full_path("Prefab", "") ||
                             current_directory == ASM.get_full_path("Level_Design", "")) {
 
                             asset_browser_pop_up(show_msg, "N/A Message", "  Dragging Not Available For Asset Type  ");
@@ -2122,7 +2197,7 @@ namespace lof {
                                 set_drag_drop_source(current_directory, "Scenes", folder_entry.path().string(), "SCENES_ITEM");
 
                                 //Manually done to account for File
-                                if (current_directory == ASM.get_full_path("Fonts", "")) { 
+                                if (current_directory == ASM.get_full_path("Fonts", "")) {
                                     std::string file_path = folder_entry.path().string();
                                     if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
                                         if (ImGui::BeginDragDropSource()) {
@@ -2150,7 +2225,7 @@ namespace lof {
                     if (!show_msg) {
                         show_msg = true;
                     }
-                }   
+                }
             }
         }
         ImGui::End();
@@ -2201,7 +2276,7 @@ namespace lof {
                     transform.position.x = random_x;
                     transform.position.y = random_y;
                 }
-                
+
                 LM.write_log("IMGUI_Manager::add_game_objects(): New entity added: %i", new_entity);
             }
             else {
@@ -2236,7 +2311,7 @@ namespace lof {
         Buffer[sizeof(Buffer) - 1] = '\0';
 
         if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
-            
+
             //replaces the data with the input
             data_name = std::string(Buffer);
         }
@@ -2255,7 +2330,7 @@ namespace lof {
 
     //To set the payload (Update once extract filename)
     void IMGUI_Manager::set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name) {
-        
+
         if (current_directory == ASM.get_full_path(folder_name, "")) {
             if (ImGui::BeginDragDropSource()) {
                 ImGui::SetDragDropPayload(payload_name.c_str(), file_path.c_str(), file_path.length() + 1);
@@ -2346,6 +2421,6 @@ namespace lof {
 
 
 
-    
+
 
 } // namespace lof
