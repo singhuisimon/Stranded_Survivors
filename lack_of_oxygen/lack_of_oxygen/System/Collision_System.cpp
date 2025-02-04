@@ -1214,7 +1214,10 @@ namespace lof {
             check_main_menu_button_collision();
             return;  // Skip other collision checks for main menu
         }
-
+        else if (GM.get_current_scene() == 3) { // Credits scene
+            check_credits_back_button_collision();
+            return;  // Skip other collision checks for credits scene
+        }
        
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
  
@@ -1235,7 +1238,16 @@ namespace lof {
 
     }
 
+    bool Collision_System::is_transitioning = false;
+
+
     void Collision_System::check_main_menu_button_collision() {
+        // Reset transition flag at start of frame
+        is_transitioning = false;
+
+        // Return early if we're transitioning
+        if (is_transitioning) return;
+
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
@@ -1338,15 +1350,57 @@ namespace lof {
 
                             // Update IMGUI Manager's current file
                             IMGUIM.set_current_file_shown(scene_file);
+                            is_transitioning = true;
+                            return;
                         }
                         else {
                             LM.write_log("Failed to load scene file: %s", scene_path.c_str());
                         }
                     }
                     else if (entity_name == "credit_button") {
-                        // Handle credits button
+                        LM.write_log("Credits button held - attempting scene transition");
+
+                        // Clear dynamic entities first
+                        bool found_movement_system = false;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                movement_system->clear_dynamic_entities();
+                                found_movement_system = true;
+                                LM.write_log("Found and cleared Movement System");
+                                break;
+                            }
+                        }
+                        if (!found_movement_system) {
+                            LM.write_log("Warning: Movement System not found");
+                        }
+
+                        const std::string SCENES = "Scenes";
+                        std::string scene_file = "credit.scn";
+                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+                        if (SM.load_scene(scene_path.c_str())) {
+                            LM.write_log("Credits scene loaded successfully");
+
+                            // Reset camera position - add this section
+                            auto& camera = GFXM.get_camera();
+                            camera.pos_x = DEFAULT_CAMERA_POS_X;
+                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                            // Stop all currently playing audio
+                            ADM.stop_mastergroup();
+
+                            // Update current scene and IMGUI
+                            GM.set_current_scene(3); // Assuming 3 is credits scene
+                            IMGUIM.set_current_file_shown(scene_file);
+                            is_transitioning = true;
+                            return;
+                        }
+                        else {
+                            LM.write_log("Failed to load credits scene: %s", scene_path.c_str());
+                        }
                     }
                     else if (entity_name == "quit_button") {
+                        LM.write_log("Quit button pressed - ending game");
                         GM.set_game_over(true);
                     }
                 }
@@ -1362,7 +1416,95 @@ namespace lof {
         }
     }
 
+    void Collision_System::check_credits_back_button_collision() {
+        // Reset transition flag at start of frame
+        is_transitioning = false;
 
-} // namespace lof
+        // Return early if we're transitioning
+        if (is_transitioning) return;
+
+        Vec2D world_mouse_pos = ESS.Get_World_MousePos();
+
+        for (EntityID entity_id : get_entities()) {
+            auto* entity = ECSM.get_entity(entity_id);
+            if (!entity) continue;
+
+            std::string entity_name = entity->get_name();
+
+            if (entity_name != "back_button") continue;
+
+            if (!ECSM.has_component<Transform2D>(entity_id) ||
+                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+
+            auto& transform = ECSM.get_component<Transform2D>(entity_id);
+            auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+
+            bool is_hovered = ESS.Mouse_Over_AABB(
+                transform.position.x,
+                transform.position.y,
+                transform.scale.x,
+                transform.scale.y,
+                world_mouse_pos.x,
+                world_mouse_pos.y
+            );
+
+            std::string base_texture = "Back_Batch_14";
+
+            if (is_hovered) {
+                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                    graphics.texture_name = base_texture + "_PRESSED";
+
+                    LM.write_log("Back button held - returning to main menu");
+
+                    // Clear dynamic entities first
+                    bool found_movement_system = false;
+                    for (auto& system : ECSM.get_systems()) {
+                        if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                            movement_system->clear_dynamic_entities();
+                            found_movement_system = true;
+                            break;
+                        }
+                    }
+                    if (!found_movement_system) {
+                        LM.write_log("Warning: Movement System not found");
+                    }
+
+                    const std::string SCENES = "Scenes";
+                    std::string scene_file = "main_menu.scn";
+                    std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+                    if (SM.load_scene(scene_path.c_str())) {
+                        LM.write_log("Main menu scene loaded successfully");
+
+                        // Reset camera position
+                        auto& camera = GFXM.get_camera();
+                        camera.pos_x = DEFAULT_CAMERA_POS_X;
+                        camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                        // Stop all currently playing audio
+                        ADM.stop_mastergroup();
+
+                        // Update current scene and IMGUI
+                        GM.set_current_scene(0);
+                        IMGUIM.set_current_file_shown(scene_file);
+                        is_transitioning = true;
+                        return;
+                    }
+                    else {
+                        LM.write_log("Failed to load main menu scene: %s", scene_path.c_str());
+                    }
+                }
+                else {
+                    graphics.texture_name = base_texture + "_HIGHLIGHTED";
+                }
+            }
+            else {
+                graphics.texture_name = base_texture + "_NORMAL";
+            }
+        }
+    }
+
+
+}
 
 

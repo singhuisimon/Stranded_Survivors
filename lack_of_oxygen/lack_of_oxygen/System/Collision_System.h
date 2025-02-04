@@ -168,6 +168,10 @@ namespace lof {
         //incase want specific entity
         static EntityID mineral_tank;
         static EntityID oxygen_tank;
+
+        // 
+        static bool is_transitioning;  // Add this as a private member
+
         //static bool collision_handled;
         //float accumulated_time = 0.0f;
 
@@ -226,6 +230,8 @@ namespace lof {
 
         // == MAIN MENU BUTTON COLLISION ==
         void check_main_menu_button_collision();
+        // == CREDITS BUTTON COLLISION ==
+        void check_credits_back_button_collision();
     };
 
 
