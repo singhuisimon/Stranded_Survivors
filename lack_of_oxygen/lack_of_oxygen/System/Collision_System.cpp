@@ -351,6 +351,7 @@ namespace lof {
                 // Set upward velocity
                 e_velocity.velocity.y = 300.0f;
                 
+                //This is working (play without bgm to hear please <check with angus if thats how he wants it to be>
                 if (playerId != INVALID_ENTITY_ID) {
                     if (ECSM.has_component<Audio_Component>(playerId)) {
                         ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
@@ -370,6 +371,8 @@ namespace lof {
                         //ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
                         //TODO FIGURE OUT A WAY TO DETECT IT WHEN ITS ABV THE VENT STRIP TO STOP PLAYING AIRVENT IN AND PLAY AIRVENT OUT
                         //AS WELL AS TO STOP AIR VENT OUT WHEN ONE FLY OUT AKA MOVE AWAY FROM THE AIRVENT TOP.
+
+                        //TLDR It does stop the sound but it detects again thats in so it keeps playing but stopping and creating an awkward silence at times 
                     }
                 }
             }
