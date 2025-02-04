@@ -71,6 +71,15 @@ namespace lof {
         static AABB from_transform(const Transform2D& transform, const Collision_Component& collision);
     };
 
+    
+    struct PointLine{
+        Vec2D center; //this will be player's center
+        Vec2D edge; //this is the edge extending the player 
+
+        PointLine(const Vec2D& center, const Vec2D& edge); 
+
+        PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
+    };
 
     // extern SelectedEntityInfo g_selected_Entity_Info;
      /**

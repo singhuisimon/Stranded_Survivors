@@ -54,6 +54,31 @@ namespace lof {
         return AABB(min, max);
     }
 
+    PointLine::PointLine(const Vec2D& center, const Vec2D& edge) 
+        : center(center), edge(edge){}
+
+    //to be emerged from the player 
+    PointLine PointLine::create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision) {
+        Vec2D center {transform.position.x, transform.position.y};
+        Vec2D edge{ center };
+
+        switch (side) {
+        case CollisionSide::LEFT : 
+            edge.x -= collision.width;  
+            break; 
+        case CollisionSide::RIGHT : 
+            edge.x += collision.width; 
+            break; 
+        case CollisionSide::BOTTOM : 
+            edge.y -= collision.height;
+            break; 
+        case CollisionSide::TOP : 
+            edge.y += collision.height;
+            break;
+        }
+       return PointLine(center, edge); 
+    }
+
     Collision_System::Collision_System() {
         // Set the required components for this system
         signature.set(ECSM.get_component_id<Transform2D>()); 
@@ -347,7 +372,7 @@ namespace lof {
                 // Remove gravity while in vent
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
                 // Set upward velocity
-                e_velocity.velocity.y = 300.0f;
+                e_velocity.velocity.y = 250.0f;
             }
             else {
                 e_physics.force_helper.deactivate_force(VENT_FORCE);
@@ -543,7 +568,8 @@ namespace lof {
                         continue;
                     }
 
-                    if (!collision2.collidable) continue;
+                    if (!collision2.collidable) continue; //skip non-collidable entities
+
                     AABB aabb2 = AABB::from_transform(transform2, collision2);
 
                     float collision_time = delta_time;

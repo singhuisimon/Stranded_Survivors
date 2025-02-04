@@ -430,7 +430,7 @@ namespace lof {
                 }
                 std::cout << "mining strength: " << mining_strength << std::endl;
             }
-
+            
             // To check movement and mining 
             if (ECSM.has_component<Physics_Component>(player_id) && ECSM.has_component<Audio_Component>(player_id)) {
 
