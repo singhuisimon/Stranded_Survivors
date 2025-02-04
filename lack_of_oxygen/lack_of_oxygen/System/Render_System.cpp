@@ -691,7 +691,7 @@ namespace lof {
                     // Set the texture for the type of particle
                     switch (particles_storage[i].type) {
                     case walking:
-                        particle_tex = "sparks_particle_batch_14";
+                        particle_tex = "dirt_particle_batch_14";
                         break;
                     case mining:
                         particle_tex = "sparks_particle_batch_14";
