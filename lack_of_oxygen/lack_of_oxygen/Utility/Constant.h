@@ -198,6 +198,24 @@ namespace lof {
 	constexpr unsigned int DEFAULT_STRENGTH = 1;		//normal strength
 	constexpr unsigned int GOD_STRENGTH = 20;			//extra god strength
 
+	// ------------------------------ Particle_System.cpp --------------------------------
+	constexpr const unsigned int MAX_PARTICLES = 1000;
+
+	enum ParticleType {
+		walking = 1,
+		mining,
+		rock,
+		dirt,
+		quartz,
+		emerald,
+		sapphire,
+		amethyst,
+		citrine,
+		alexandrite,
+		tnt,
+		tnt_explode
+	};
+
 } // namespace lof
 
 #endif // CONSTANTS_H
