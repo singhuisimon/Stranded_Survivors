@@ -29,6 +29,7 @@
 #include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../System/Animation_System.h"  // For player_direction
 #include "../System/Collision_System.h" // for click entity object
+#include "../System/Particle_System.h" // To create particles 
 
 #include "../Utility/Entity_Selector_Helper.h"
 
@@ -430,373 +431,515 @@ namespace lof {
                 std::cout << "mining strength: " << mining_strength << std::endl;
             }
 
+            // To check movement and mining 
             if (ECSM.has_component<Physics_Component>(player_id) && ECSM.has_component<Audio_Component>(player_id)) {
 
-                auto& physics = ECSM.get_component<Physics_Component>(player_id);
+                // Get particle system
+                for (auto& system : ECSM.get_systems()) {
+                    if (system->get_type() == "Particle_System") {
+                        auto* particle_system = static_cast<Particle_System*>(system.get());
+                        if (!particle_system) {
+                            LM.write_log("Game_Manager::update(): Fail to get particle system");
+                            std::cerr << "Failed to get particle system" << std::endl;
+                            return;
+                        }
 
-                auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
-                if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
-                    if (CS.has_left_collide_detect()) {
-                        EntityID block_to_remove = CS.get_left_collide_entity();
-                        if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Update tile health
-                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
-                            if (animation.curr_tile_health > 0) {
-                                if (animation.curr_tile_health <= mining_strength) {
-                                    animation.curr_tile_health -= animation.curr_tile_health;
-                                }
-                                else {
-                                    animation.curr_tile_health -= mining_strength;
-                                }
+                        auto& physics = ECSM.get_component<Physics_Component>(player_id);
+
+                        auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
+                        if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+
+                            // Emit mining sparks particles
+                            for (int i = 0; i < 10; ++i) {
+                                // Randomize particle emit location in front of player
+                                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                                float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f);
+                                float part_y = player_transform.position.y;
+                                particle_system->particle_emit("mining", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
                             }
 
-                            // Destroy the block and update mineral count when health reaches 0
-                            if (animation.curr_tile_health == 0) {
-                                // Get mineral value before destroying the entity
-                                int mineral_value = get_mineral_value(block_to_remove);
+                            if (CS.has_left_collide_detect()) {
+                                EntityID block_to_remove = CS.get_left_collide_entity();
+                                if (block_to_remove != INVALID_ENTITY_ID) {
+                                    // Update tile health
+                                    auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                                    if (animation.curr_tile_health > 0) {
+                                        if (animation.curr_tile_health <= mining_strength) {
+                                            animation.curr_tile_health -= animation.curr_tile_health;
+                                        }
+                                        else {
+                                            animation.curr_tile_health -= mining_strength;
+                                        }
+                                    }
 
-                                // Update the mineral count text
-                                if (mineral_value > 0) {
-                                    update_mineral_count_text(mineral_value);
+                                    // Get block's position and size
+                                    auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
+
+                                    // Emit particles, destroy the block and update mineral count when health reaches 0
+                                    if (animation.curr_tile_health != 0) {
+                                        // Randomize particle emit count
+                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                        for (int i = 0; i < rand_part_cnt; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+                                    }
+                                    else {
+                                        // Get mineral value before destroying the entity
+                                        int mineral_value = get_mineral_value(block_to_remove);
+
+                                        // Update the mineral count text
+                                        if (mineral_value > 0) {
+                                            update_mineral_count_text(mineral_value);
+                                        }
+
+                                        // Emit final particles after destroying tile
+                                        for (int i = 0; i < 6; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+
+                                        // Destroy the entity
+                                        ECSM.destroy_entity(block_to_remove);
+                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                            block_to_remove, mineral_value);
+                                    }
+
+                                    // Determine sound based on mineral value
+                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);
+
                                 }
+                            }
+                        }
+                        else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
 
-                                // Destroy the entity
-                                ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                    block_to_remove, mineral_value);
+                            // Emit mining sparks particles
+                            for (int i = 0; i < 10; ++i) {
+                                // Randomize particle emit location in front of player
+                                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                                float part_x = player_transform.position.x + (player_transform.scale.x / 2.0f);
+                                float part_y = player_transform.position.y;
+                                particle_system->particle_emit("mining", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
                             }
 
-                            // Determine sound based on mineral value
-                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);
+                            if (CS.has_right_collide_detect()) {
+                                EntityID block_to_remove = CS.get_right_collide_entity();
+                                if (block_to_remove != INVALID_ENTITY_ID) {
+                                    // Update tile health
+                                    auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                                    if (animation.curr_tile_health > 0) {
+                                        if (animation.curr_tile_health <= mining_strength) {
+                                            animation.curr_tile_health -= animation.curr_tile_health;
+                                        }
+                                        else {
+                                            animation.curr_tile_health -= mining_strength;
+                                        }
+                                    }
 
+                                    // Get block's position and size
+                                    auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
+
+                                    // Emit particles, destroy the block and update mineral count when health reaches 0
+                                    if (animation.curr_tile_health != 0) {
+                                        // Randomize particle emit count
+                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                        for (int i = 0; i < rand_part_cnt; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+                                    }
+                                    else {
+                                        // Get mineral value before destroying the entity
+                                        int mineral_value = get_mineral_value(block_to_remove);
+
+                                        // Update the mineral count text
+                                        if (mineral_value > 0) {
+                                            update_mineral_count_text(mineral_value);
+                                        }
+
+                                        // Emit final particles after destroying tile
+                                        for (int i = 0; i < 6; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+
+                                        // Destroy the entity
+                                        ECSM.destroy_entity(block_to_remove);
+                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                            block_to_remove, mineral_value);
+                                    }
+
+                                    // Determine sound based on mineral value
+                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);
+                                }
+                            }
+                        }
+                        else if (IM.is_key_pressed(GLFW_KEY_UP)) {
+
+                            // Emit mining sparks particles
+                            for (int i = 0; i < 10; ++i) {
+                                // Randomize particle emit location in front of player
+                                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                                float part_x = player_transform.position.x;
+                                float part_y = player_transform.position.y + (player_transform.scale.y * 0.75f);
+                                particle_system->particle_emit("mining", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                            }
+
+                            if (CS.has_top_collide_detect()) {
+                                EntityID block_to_remove = CS.get_top_collide_entity();
+                                if (block_to_remove != INVALID_ENTITY_ID) {
+                                    // Update tile health
+                                    auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                                    if (animation.curr_tile_health > 0) {
+                                        if (animation.curr_tile_health <= mining_strength) {
+                                            animation.curr_tile_health -= animation.curr_tile_health;
+                                        }
+                                        else {
+                                            animation.curr_tile_health -= mining_strength;
+                                        }
+                                    }
+
+                                    // Get block's position and size
+                                    auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
+
+                                    // Emit particles, destroy the block and update mineral count when health reaches 0
+                                    if (animation.curr_tile_health != 0) {
+                                        // Randomize particle emit count
+                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                        for (int i = 0; i < rand_part_cnt; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+                                    }
+                                    else {
+                                        // Get mineral value before destroying the entity
+                                        int mineral_value = get_mineral_value(block_to_remove);
+
+                                        // Update the mineral count text
+                                        if (mineral_value > 0) {
+                                            update_mineral_count_text(mineral_value);
+                                        }
+
+                                        // Emit final particles after destroying tile
+                                        for (int i = 0; i < 6; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+
+                                        // Destroy the entity
+                                        ECSM.destroy_entity(block_to_remove);
+                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                            block_to_remove, mineral_value);
+                                    }
+
+                                    // Determine sound based on mineral value
+                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);
+                                }
+                            }
+                        }
+                        else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+
+                            // Emit mining sparks particles
+                            for (int i = 0; i < 10; ++i) {
+                                // Randomize particle emit location in front of player
+                                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                                float part_x = player_transform.position.x;
+                                float part_y = player_transform.position.y - (player_transform.scale.y * 0.75f);
+                                particle_system->particle_emit("mining", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                            }
+
+                            if (CS.has_bottom_collide_detect()) {
+                                EntityID block_to_remove = CS.get_bottom_collide_entity();
+                                if (block_to_remove != INVALID_ENTITY_ID) {
+                                    // Update tile health
+                                    auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
+                                    if (animation.curr_tile_health > 0) {
+                                        if (animation.curr_tile_health <= mining_strength) {
+                                            animation.curr_tile_health -= animation.curr_tile_health;
+                                        }
+                                        else {
+                                            animation.curr_tile_health -= mining_strength;
+                                        }
+                                    }
+
+                                    // Get block's position and size
+                                    auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
+
+                                    // Emit particles, destroy the block and update mineral count when health reaches 0
+                                    if (animation.curr_tile_health != 0) {
+                                        // Randomize particle emit count
+                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                        for (int i = 0; i < rand_part_cnt; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+                                    }
+                                    else {
+                                        // Get mineral value before destroying the entity
+                                        int mineral_value = get_mineral_value(block_to_remove);
+
+                                        // Update the mineral count text
+                                        if (mineral_value > 0) {
+                                            update_mineral_count_text(mineral_value);
+                                        }
+
+                                        // Emit final particles after destroying tile
+                                        for (int i = 0; i < 6; ++i) {
+                                            // Randomize particle emit location within the tile
+                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+
+                                        // Destroy the entity
+                                        ECSM.destroy_entity(block_to_remove);
+                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                            block_to_remove, mineral_value);
+                                    }
+
+                                    // Determine sound based on mineral value
+                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);
+                                }
+                            }
+                        }
+
+                        //cheat code to increase mineral
+                        if (IM.is_key_held(GLFW_KEY_G)) {
+                            int val_to_add = 500;
+                            update_mineral_count_text(val_to_add);
+                        }
+
+                        //just for testing
+                        /*if (IM.is_key_held(GLFW_KEY_F)) {
+                            int val_to_deduct = -20;
+                            if (std::stoi(ECSM.get_component<Text_Component>(mineral_count_text_id).text) >= -val_to_deduct) {
+                                update_mineral_count_text(val_to_deduct);
+                                ADM.play_now(player_id, "deposit mineral", audio_player);
+                            }
+                        }*/
+
+                        //just for testing
+                        //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
+                        /*if (IM.is_key_held(GLFW_KEY_T)) {
+                            int oxygen_to_add = 2;
+
+                            if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
+                                auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
+                                int current_value = std::stoi(oxygen_text.text);
+                                current_value += oxygen_to_add;
+                                oxygen_text.text = std::to_string(current_value);
+                                ADM.play_now(player_id, "refilling oxygen", audio_player);
+                            }
+                        }*/
+
+                        //just for testing
+                        //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
+                        /*if (IM.is_key_held(GLFW_KEY_Y)) {
+                            int oxygen_to_deduct = -1;
+                            if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
+                                auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
+                                if (std::stoi(oxygen_text.text) >= -oxygen_to_deduct) {
+                                    int current_value = std::stoi(oxygen_text.text);
+                                    current_value += oxygen_to_deduct;
+                                    oxygen_text.text = std::to_string(current_value);
+                                    ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
+                                }
+                            }
+                        }*/
+
+                        //just for testing
+                        /*if (IM.is_key_released(GLFW_KEY_F)) {
+                            ADM.stop_now(player_id, "deposit mineral", audio_player.get_filepath("deposit mineral"));
+                        }*/
+
+                        //just for testing
+                        //remember to remove the s inside the top_ui_timer_count_text for scene 1 & 2
+                        //if (IM.is_key_held(GLFW_KEY_U)) {
+                        //    int time_deduction = -1;
+                        //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                        //        auto& oxygen_text = ECSM.get_component<Text_Component>(timer_count_text_id);
+                        //        if (std::stoi(oxygen_text.text) > 0) {
+                        //            int current_value = std::stoi(oxygen_text.text);
+                        //            current_value += time_deduction;
+                        //            oxygen_text.text = std::to_string(current_value);
+                        //            //ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
+                        //        }
+                        //    }
+                        //}
+
+                        /*if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                            auto& timer_text = ECSM.get_component<Text_Component>(timer_count_text_id);
+                            if (std::stoi(timer_text.text) <= 0) {
+                                std::cout << "playing siren" << std::endl;
+                                ADM.play_now(player_id, "lava siren", audio_player);
+                            }
+                        }*/
+
+                        /*if (IM.is_key_held(GLFW_KEY_I)) {
+                            game_over = true;
+
+                        }*/
+
+                        /*if (game_over) {
+                            ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
+                        }*/
+
+                        // Get and set mining status for animation
+                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                            auto& mining_status = GFXM.get_mining_status();
+                            mining_status = MINE_LEFT;
+                            int& direction = GFXM.get_player_direction();
+                            direction = FACE_LEFT;
+
+                        }
+                        else if (IM.is_key_held(GLFW_KEY_UP)) {
+                            auto& mining_status = GFXM.get_mining_status();
+                            mining_status = MINE_UP;
+
+                        }
+                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+                            auto& mining_status = GFXM.get_mining_status();
+                            mining_status = MINE_DOWN;
+
+                        }
+                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+                            auto& mining_status = GFXM.get_mining_status();
+                            mining_status = MINE_RIGHT;
+                            int& direction = GFXM.get_player_direction();
+                            direction = FACE_RIGHT;
+
+                        }
+                        else {
+                            auto& mining_status = GFXM.get_mining_status();
+                            mining_status = NO_ACTION;
+                        }
+
+                        // Handle horizontal movement
+                        if (IM.is_key_held(GLFW_KEY_SPACE)) {
+                            physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
+                        }
+                        else {
+                            physics.set_jump_requested(false);
+                        }
+
+                        //activate and deactivate the forces. 
+                        if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
+                            // Updates forces
+                            physics.force_helper.deactivate_force(MOVE_RIGHT);
+                            physics.force_helper.activate_force(MOVE_LEFT);
+                            forces_flag = MOVE_LEFT;
+
+                            // Update player animation flag
+                            int& direction = GFXM.get_player_direction();
+                            direction = FACE_LEFT;
+                            int& moving_status = GFXM.get_moving_status();
+                            moving_status = RUN_LEFT;
+
+                            //std::cout << "moving left current scene number is " << current_scene << std::endl;
+                        }
+                        else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
+                            // Update forces
+                            physics.force_helper.deactivate_force(MOVE_LEFT);
+                            physics.force_helper.activate_force(MOVE_RIGHT);
+                            forces_flag = MOVE_RIGHT;
+
+                            // Update player animation flag
+                            int& direction = GFXM.get_player_direction();
+                            direction = FACE_RIGHT;
+                            int& moving_status = GFXM.get_moving_status();
+                            moving_status = RUN_RIGHT;
+
+                        }
+                        else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
+                            if (forces_flag == MOVE_LEFT) {
+                                // Update forces
+                                physics.force_helper.activate_force(MOVE_LEFT);
+                                forces_flag = MOVE_LEFT;
+
+                                // Update player animation flag
+                                int& direction = GFXM.get_player_direction();
+                                direction = FACE_LEFT;
+                                int& moving_status = GFXM.get_moving_status();
+                                moving_status = RUN_LEFT;
+                            }
+                            else {
+                                // Update forces
+                                physics.force_helper.deactivate_force(MOVE_LEFT);
+                                physics.force_helper.activate_force(MOVE_RIGHT);
+                                forces_flag = MOVE_RIGHT;
+
+                                // Update player animation flag
+                                int& direction = GFXM.get_player_direction();
+                                direction = FACE_RIGHT;
+                                int& moving_status = GFXM.get_moving_status();
+                                moving_status = RUN_RIGHT;
+                            }
+                        }
+                        else {
+                            // Reset forces and player animation
+                            physics.force_helper.deactivate_force(MOVE_LEFT);
+                            physics.force_helper.deactivate_force(MOVE_RIGHT);
+                            forces_flag = -1;
+
+                            int& moving_status = GFXM.get_moving_status();
+                            moving_status = NO_ACTION;
+
+                        }
+
+                        //audio logic is here.
+                        if (forces_flag != -1) {
+                            if (physics.get_is_grounded()) {
+                                if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
+                                    if (current_scene == 1) {
+                                        std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
+                                        ADM.play_now(player_id, audio_key, audio_player);
+                                    }
+                                    else if (current_scene == 2) {
+                                        ADM.play_now(player_id, "moving", audio_player);
+                                    }
+
+                                    // Emit walking dirt particles
+                                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                                    float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
+                                    float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
+                                    particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                }
+                            }
+                            else {
+                                //placeholder for other audio logic here for airvent and wormhole
+                            }
+                        }
+                        else {
+                            if (IM.is_key_released(GLFW_KEY_D) || IM.is_key_released(GLFW_KEY_A)) {
+                                if (current_scene == 1) {
+                                    ADM.stop_now(player_id, "moving right", audio_player.get_filepath("moving right"));
+                                    ADM.stop_now(player_id, "moving left", audio_player.get_filepath("moving left"));
+                                }
+                                else if (current_scene == 2) {
+                                    ADM.stop_now(player_id, "moving", audio_player.get_filepath("moving"));
+                                }
+                            }
                         }
                     }
                 }
-                else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
-                    if (CS.has_right_collide_detect()) {
-                        EntityID block_to_remove = CS.get_right_collide_entity();
-                        if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Update tile health
-                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
-                            if (animation.curr_tile_health > 0) {
-                                if (animation.curr_tile_health <= mining_strength) {
-                                    animation.curr_tile_health -= animation.curr_tile_health;
-                                }
-                                else {
-                                    animation.curr_tile_health -= mining_strength;
-                                }
-                            }
-
-                            // Destroy the block and update mineral count when health reaches 0
-                            if (animation.curr_tile_health == 0) {
-                                // Get mineral value before destroying the entity
-                                int mineral_value = get_mineral_value(block_to_remove);
-
-                                // Update the mineral count text
-                                if (mineral_value > 0) {
-                                    update_mineral_count_text(mineral_value);
-                                }
-
-                                // Destroy the entity
-                                ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                    block_to_remove, mineral_value);
-                            }
-
-                            // Determine sound based on mineral value
-                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);
-                        }
-                    }
-                }
-                else if (IM.is_key_pressed(GLFW_KEY_UP)) {
-                    if (CS.has_top_collide_detect()) {
-                        EntityID block_to_remove = CS.get_top_collide_entity();
-                        if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Update tile health
-                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
-                            if (animation.curr_tile_health > 0) {
-                                if (animation.curr_tile_health <= mining_strength) {
-                                    animation.curr_tile_health -= animation.curr_tile_health;
-                                }
-                                else {
-                                    animation.curr_tile_health -= mining_strength;
-                                }
-                            }
-
-                            // Destroy the block and update mineral count when health reaches 0
-                            if (animation.curr_tile_health == 0) {
-                                // Get mineral value before destroying the entity
-                                int mineral_value = get_mineral_value(block_to_remove);
-
-                                // Update the mineral count text
-                                if (mineral_value > 0) {
-                                    update_mineral_count_text(mineral_value);
-                                }
-
-                                // Destroy the entity
-                                ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                    block_to_remove, mineral_value);
-                            }
-
-                            // Determine sound based on mineral value
-                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);
-                        }
-                    }
-                }
-                else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
-                    if (CS.has_bottom_collide_detect()) {
-                        EntityID block_to_remove = CS.get_bottom_collide_entity();
-                        if (block_to_remove != INVALID_ENTITY_ID) {
-                            // Update tile health
-                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
-                            if (animation.curr_tile_health > 0) {
-                                if (animation.curr_tile_health <= mining_strength) {
-                                    animation.curr_tile_health -= animation.curr_tile_health;
-                                }
-                                else {
-                                    animation.curr_tile_health -= mining_strength;
-                                }
-                            }
-
-                            // Destroy the block and update mineral count when health reaches 0
-                            if (animation.curr_tile_health == 0) {
-                                // Get mineral value before destroying the entity
-                                int mineral_value = get_mineral_value(block_to_remove);
-
-                                // Update the mineral count text
-                                if (mineral_value > 0) {
-                                    update_mineral_count_text(mineral_value);
-                                }
-
-                                // Destroy the entity
-                                ECSM.destroy_entity(block_to_remove);
-                                LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                    block_to_remove, mineral_value);
-                            }
-
-                            // Determine sound based on mineral value
-                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);
-                        }
-                    }
-                }
-
-                //cheat code to increase mineral
-                if (IM.is_key_held(GLFW_KEY_G)) {
-                    int val_to_add = 500;
-                    update_mineral_count_text(val_to_add);
-                }
-
-                //just for testing
-                /*if (IM.is_key_held(GLFW_KEY_F)) {
-                    int val_to_deduct = -20;
-                    if (std::stoi(ECSM.get_component<Text_Component>(mineral_count_text_id).text) >= -val_to_deduct) {
-                        update_mineral_count_text(val_to_deduct);
-                        ADM.play_now(player_id, "deposit mineral", audio_player);
-                    }
-                }*/
-
-                //just for testing
-                //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
-                /*if (IM.is_key_held(GLFW_KEY_T)) {
-                    int oxygen_to_add = 2;
-            
-                    if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
-                        auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
-                        int current_value = std::stoi(oxygen_text.text);
-                        current_value += oxygen_to_add;
-                        oxygen_text.text = std::to_string(current_value);
-                        ADM.play_now(player_id, "refilling oxygen", audio_player);
-                    }
-                }*/
-
-                //just for testing
-                //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
-                /*if (IM.is_key_held(GLFW_KEY_Y)) {
-                    int oxygen_to_deduct = -1;
-                    if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
-                        auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
-                        if (std::stoi(oxygen_text.text) >= -oxygen_to_deduct) {
-                            int current_value = std::stoi(oxygen_text.text);
-                            current_value += oxygen_to_deduct;
-                            oxygen_text.text = std::to_string(current_value);
-                            ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
-                        }
-                    }
-                }*/
-
-                //just for testing
-                /*if (IM.is_key_released(GLFW_KEY_F)) {
-                    ADM.stop_now(player_id, "deposit mineral", audio_player.get_filepath("deposit mineral"));
-                }*/
-
-                //just for testing
-                //remember to remove the s inside the top_ui_timer_count_text for scene 1 & 2
-                //if (IM.is_key_held(GLFW_KEY_U)) {
-                //    int time_deduction = -1;
-                //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                //        auto& oxygen_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                //        if (std::stoi(oxygen_text.text) > 0) {
-                //            int current_value = std::stoi(oxygen_text.text);
-                //            current_value += time_deduction;
-                //            oxygen_text.text = std::to_string(current_value);
-                //            //ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
-                //        }
-                //    }
-                //}
-
-                /*if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                    auto& timer_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                    if (std::stoi(timer_text.text) <= 0) {
-                        std::cout << "playing siren" << std::endl;
-                        ADM.play_now(player_id, "lava siren", audio_player);
-                    }
-                }*/                
-
-                /*if (IM.is_key_held(GLFW_KEY_I)) {
-                    game_over = true;
-                    
-                }*/
-
-                /*if (game_over) {
-                    ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
-                }*/
-
-                // Get and set mining status for animation
-                if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                    auto& mining_status = GFXM.get_mining_status();
-                    mining_status = MINE_LEFT;
-                    int& direction = GFXM.get_player_direction();
-                    direction = FACE_LEFT; 
-
-                }
-                else if (IM.is_key_held(GLFW_KEY_UP)) {
-                    auto& mining_status = GFXM.get_mining_status();
-                    mining_status = MINE_UP;
-
-                }
-                else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                    auto& mining_status = GFXM.get_mining_status();
-                    mining_status = MINE_DOWN;
-
-                }
-                else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                    auto& mining_status = GFXM.get_mining_status();
-                    mining_status = MINE_RIGHT;
-                    int& direction = GFXM.get_player_direction(); 
-                    direction = FACE_RIGHT; 
-
-                }
-                else { 
-                    auto& mining_status = GFXM.get_mining_status();
-                    mining_status = NO_ACTION;
-                }  
-
-                // Handle horizontal movement
-                if (IM.is_key_held(GLFW_KEY_SPACE)) {
-                    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
-                }
-                else {
-                    physics.set_jump_requested(false);
-                }
-
-                //activate and deactivate the forces. 
-                if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
-                    // Updates forces
-                    physics.force_helper.deactivate_force(MOVE_RIGHT);
-                    physics.force_helper.activate_force(MOVE_LEFT);
-                    forces_flag = MOVE_LEFT;
-
-                    // Update player animation flag
-                    int& direction = GFXM.get_player_direction();
-                    direction = FACE_LEFT;
-                    int& moving_status = GFXM.get_moving_status();
-                    moving_status = RUN_LEFT;
-
-                    //std::cout << "moving left current scene number is " << current_scene << std::endl;
-                }
-                else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
-                    // Update forces
-                    physics.force_helper.deactivate_force(MOVE_LEFT);
-                    physics.force_helper.activate_force(MOVE_RIGHT);
-                    forces_flag = MOVE_RIGHT;
-
-                    // Update player animation flag
-                    int& direction = GFXM.get_player_direction();
-                    direction = FACE_RIGHT;
-                    int& moving_status = GFXM.get_moving_status();
-                    moving_status = RUN_RIGHT;
-
-                }
-                else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
-                    if (forces_flag == MOVE_LEFT) {
-                        // Update forces
-                        physics.force_helper.activate_force(MOVE_LEFT);
-                        forces_flag = MOVE_LEFT;
-
-                        // Update player animation flag
-                        int& direction = GFXM.get_player_direction();
-                        direction = FACE_LEFT;
-                        int& moving_status = GFXM.get_moving_status();
-                        moving_status = RUN_LEFT;
-                    }
-                    else {
-                        // Update forces
-                        physics.force_helper.deactivate_force(MOVE_LEFT);
-                        physics.force_helper.activate_force(MOVE_RIGHT);
-                        forces_flag = MOVE_RIGHT;
-
-                        // Update player animation flag
-                        int& direction = GFXM.get_player_direction();
-                        direction = FACE_RIGHT;
-                        int& moving_status = GFXM.get_moving_status();
-                        moving_status = RUN_RIGHT;
-                    }
-                }
-                else {
-                    // Reset forces and player animation
-                    physics.force_helper.deactivate_force(MOVE_LEFT);
-                    physics.force_helper.deactivate_force(MOVE_RIGHT);
-                    forces_flag = -1;
-
-                    int& moving_status = GFXM.get_moving_status();
-                    moving_status = NO_ACTION;
-                    
-                }
-
-                //audio logic is here.
-                if (forces_flag != -1) {
-                    if (physics.get_is_grounded()) {
-                        if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-                            if (current_scene == 1) {
-                                std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
-                                ADM.play_now(player_id, audio_key, audio_player);
-                            }
-                            else if (current_scene == 2) {
-                                ADM.play_now(player_id, "moving", audio_player);
-                            }
-                        }
-                    }
-                    else {
-                        //placeholder for other audio logic here for airvent and wormhole
-                    }
-                }
-                else {
-                    if (IM.is_key_released(GLFW_KEY_D) || IM.is_key_released(GLFW_KEY_A)) {
-                        if (current_scene == 1) {
-                            ADM.stop_now(player_id, "moving right", audio_player.get_filepath("moving right"));
-                            ADM.stop_now(player_id, "moving left", audio_player.get_filepath("moving left"));
-                        }
-                        else if (current_scene == 2) {
-                            ADM.stop_now(player_id, "moving", audio_player.get_filepath("moving"));
-                        }
-                    }
-                }
-
             }
         }
 

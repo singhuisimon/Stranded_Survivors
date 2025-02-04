@@ -44,6 +44,7 @@
     <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
     <ClCompile Include="Utility\Win_Control.cpp" />
     <ClCompile Include="Manager\Audio_Manager.cpp" />
+    <ClCompile Include="System\Particle_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -87,6 +88,7 @@
     <ClInclude Include="Utility\Entity_Selector_Helper.h" />
     <ClInclude Include="Utility\Win_Control.h" />
     <ClInclude Include="Manager\Audio_Manager.h" />
+    <ClInclude Include="System\Particle_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -186,6 +188,15 @@
     <Image Include="Assets\Textures\top_ui_o2_meter_fill_blue_batch_7.png" />
     <Image Include="Assets\Textures\top_ui_o2_meter_fill_purple_batch_7.png" />
     <Image Include="Assets\Textures\top_ui_o2_meter_fill_red_batch_7.png" />
+    <Image Include="Assets\Textures\alexandrite_particle_batch_14.png" />
+    <Image Include="Assets\Textures\amethyst_particle_batch_14.png" />
+    <Image Include="Assets\Textures\citrine_particle_batch_14.png" />
+    <Image Include="Assets\Textures\dirt_particle_batch_14.png" />
+    <Image Include="Assets\Textures\emerald_particle_batch_14.png" />
+    <Image Include="Assets\Textures\quartz_particle_batch_14.png" />
+    <Image Include="Assets\Textures\rock_particle_batch_14.png" />
+    <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
+    <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />
