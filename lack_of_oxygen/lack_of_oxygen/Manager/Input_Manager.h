@@ -136,6 +136,13 @@ namespace lof {
          * @brief Reset all key and mouse button states. Useful when initializing or resetting the game.
          */
         void reset();
+
+        /**
+		 * @brief Get the current mouse position.
+		 * @param[out] x Output parameter for the x-coordinate.
+		 * @param[out] y Output parameter for the y-coordinate.
+		 */
+        void get_mouse_position(double& x, double& y) const;
     };
 
 } // namespace lof

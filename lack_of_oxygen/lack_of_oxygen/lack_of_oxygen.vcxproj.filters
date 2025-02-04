@@ -44,6 +44,7 @@
     <ClCompile Include="Utility\Entity_Selector_Helper.cpp" />
     <ClCompile Include="Utility\Win_Control.cpp" />
     <ClCompile Include="Manager\Audio_Manager.cpp" />
+    <ClCompile Include="System\Particle_System.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -87,16 +88,18 @@
     <ClInclude Include="Utility\Entity_Selector_Helper.h" />
     <ClInclude Include="Utility\Win_Control.h" />
     <ClInclude Include="Manager\Audio_Manager.h" />
+    <ClInclude Include="System\Particle_System.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Config\config.json" />
-    <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Prefab\prefab.json" />
     <None Include="Assets\Level_Design\Level_Design_Small.csv" />
+    <None Include="Assets\Scenes\scene2.scn" />
+    <None Include="Assets\Scenes\main_menu.scn" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -186,9 +189,19 @@
     <Image Include="Assets\Textures\top_ui_o2_meter_fill_blue_batch_7.png" />
     <Image Include="Assets\Textures\top_ui_o2_meter_fill_purple_batch_7.png" />
     <Image Include="Assets\Textures\top_ui_o2_meter_fill_red_batch_7.png" />
+    <Image Include="Assets\Textures\alexandrite_particle_batch_14.png" />
+    <Image Include="Assets\Textures\amethyst_particle_batch_14.png" />
+    <Image Include="Assets\Textures\citrine_particle_batch_14.png" />
+    <Image Include="Assets\Textures\dirt_particle_batch_14.png" />
+    <Image Include="Assets\Textures\emerald_particle_batch_14.png" />
+    <Image Include="Assets\Textures\quartz_particle_batch_14.png" />
+    <Image Include="Assets\Textures\rock_particle_batch_14.png" />
+    <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
+    <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />
     <Text Include="Assets\Textures\spritesheet_atlas.txt" />
+    <Text Include="Lack_Of_Oxygen.log" />
   </ItemGroup>
 </Project>
