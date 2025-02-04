@@ -420,6 +420,8 @@ namespace lof {
         */
         const std::vector<SoundConfig>& get_sounds() const { return sounds; }
 
+        std::vector<SoundConfig>& get_sounds() { return sounds; }
+
         /**
         * @brief Getter for the soundconfig using param key
         * @param key The unique identifier of soundconfig

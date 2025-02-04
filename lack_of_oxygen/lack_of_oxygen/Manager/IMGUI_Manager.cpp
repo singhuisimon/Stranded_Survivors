@@ -27,7 +27,7 @@
 //Include other file headers
 #include "../Component/Component.h"
 #include "../System/GUI_System.h"
-#include "../System/Audio_System.h" // Add this for Audio System access
+#include "../System/Audio_System.h" //For Audio System access
 
 //Include standard headers
 #include <iostream>
@@ -35,6 +35,7 @@
 #include <chrono>
 #include <filesystem>
 #include <vector>
+#include <functional>
 
 
 namespace lof {
@@ -61,15 +62,57 @@ namespace lof {
     //booleans to note down mouse behaviour
     static bool mouse_was_down = false;
     static ImVec2 mouse_pos_before_press;
-    
+
     char to_lower(char c) {
         return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
 
+    std::vector<std::tuple<const char*, ComponentID, std::function<void()>, std::function<void()>>> component_checks;
+
+    void fill_component_checks() {
+        auto& entities = ECSM.get_entities();
+        component_checks = {
+            {"Transform Component", static_cast<ComponentID>(ECSM.get_component_id<Transform2D>()),
+                [&]() { ECSM.add_component<Transform2D>(entities[selected_object_index]->get_id(), Transform2D()); },
+                [&]() { ECSM.remove_component<Transform2D>(entities[selected_object_index]->get_id()); }},
+
+            {"Velocity Component", static_cast<ComponentID>(ECSM.get_component_id<Velocity_Component>()),
+                [&]() { ECSM.add_component<Velocity_Component>(entities[selected_object_index]->get_id(), Velocity_Component()); },
+                [&]() { ECSM.remove_component<Velocity_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Physics Component", static_cast<ComponentID>(ECSM.get_component_id<Physics_Component>()),
+                [&]() { ECSM.add_component<Physics_Component>(entities[selected_object_index]->get_id(), Physics_Component()); },
+                [&]() { ECSM.remove_component<Physics_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Graphics Component", static_cast<ComponentID>(ECSM.get_component_id<Graphics_Component>()),
+                [&]() { ECSM.add_component<Graphics_Component>(entities[selected_object_index]->get_id(), Graphics_Component()); },
+                [&]() { ECSM.remove_component<Graphics_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Collision Component", static_cast<ComponentID>(ECSM.get_component_id<Collision_Component>()),
+                [&]() { ECSM.add_component<Collision_Component>(entities[selected_object_index]->get_id(), Collision_Component()); },
+                [&]() { ECSM.remove_component<Collision_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Animation Component", static_cast<ComponentID>(ECSM.get_component_id<Animation_Component>()),
+                [&]() { ECSM.add_component<Animation_Component>(entities[selected_object_index]->get_id(), Animation_Component()); },
+                [&]() { ECSM.remove_component<Animation_Component>(entities[selected_object_index]->get_id()); }},
+
+            /*{"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
+                [&]() { ECSM.add_component<Logic_Component>(entities[selected_object_index]->get_id(), Logic_Component()); },
+                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},*/
+
+            {"Audio Component", static_cast<ComponentID>(ECSM.get_component_id<Audio_Component>()),
+                [&]() { ECSM.add_component<Audio_Component>(entities[selected_object_index]->get_id(), Audio_Component()); },
+                [&]() { ECSM.remove_component<Audio_Component>(entities[selected_object_index]->get_id()); }},
+
+            {"Text Component", static_cast<ComponentID>(ECSM.get_component_id<Text_Component>()),
+                [&]() { ECSM.add_component<Text_Component>(entities[selected_object_index]->get_id(), Text_Component()); },
+                [&]() { ECSM.remove_component<Text_Component>(entities[selected_object_index]->get_id()); }},
+        };
+    }
 
     IMGUI_Manager::IMGUI_Manager() : ecs(ECSM) {}
 
-    IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager){
+    IMGUI_Manager::IMGUI_Manager(ECS_Manager& ecs_manager) : ecs(ecs_manager) {
         set_type("IMGUI_Manager");
     }
 
@@ -97,28 +140,13 @@ namespace lof {
 
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
         fill_up_sound_names();
+        fill_component_checks();
 
         return 0;
     }
 
     //fill up sound names
     void IMGUI_Manager::fill_up_sound_names() {
-        
-        //const auto& entities = ecs.get_entities();
-        //for (auto& entity : entities) {
-        //    if (entity->has_component(ecs.get_component_id<Audio_Component>())) {
-        //        Audio_Component& audio = ecs.get_component<Audio_Component>(entity.get()->get_id());
-        //        //Iterate through sounds
-        //        auto& sounds = audio.get_sounds();
-        //        for (auto& sound : sounds) {
-        //            //Get the file name and the filepath and push it to audio_file_names
-        //            auto filepath = audio.get_filepath(sound.key);
-        //            size_t last_slash = filepath.find_last_of('\\');
-        //            size_t last_dot = filepath.find_last_of('.');
-        //            fill_audio_file_names(filepath.substr(last_slash + 1, last_dot - last_slash - 1), filepath);
-        //        }
-        //    }
-        //}
 
         //Fill in audio_types vector 
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
@@ -138,29 +166,14 @@ namespace lof {
 
         //Iterate through the directory and collect file names
         for (const auto& entry : std::filesystem::directory_iterator(level_path)) {
-            
+
             //If the file is found, add to the list of file names
-            if (entry.is_regular_file()) {  
-                
+            if (entry.is_regular_file()) {
+
                 file_names.push_back(entry.path().filename().string());
             }
 
         }
-
-        //ImGui::Text("Files: ");
-        //if (ImGui::BeginDragDropTarget()) {
-
-        //    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
-        //        const char* droppedFilePath = (const char*)payload->Data;
-
-        //        std::string file_name = droppedFilePath;
-        //        file_name.erase(0, level_path.length());
-        //        //file_name = file_name.substr(0, file_name.find_last_of('.'));
-        //        file_names.push_back(file_name);
-        //    }
-
-        //    ImGui::EndDragDropTarget();
-        //}
 
         //Indexes for files
         int current_file_index = 0;
@@ -192,23 +205,46 @@ namespace lof {
         if (selected_file_index != -1) {
             selected_file = file_names[selected_file_index];
         }
-        
+
         //load scene button
         if (ImGui::Button("Load Scene")) {
             load_selected = true;
-            
+
         }
-   
+
+        ImGui::Separator();
+
+        ImGui::Button("Drop Scenes Here");
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
+                const char* droppedFilePath = (const char*)payload->Data;
+
+                std::string file_name = droppedFilePath;
+                file_name.erase(0, ASM.get_full_path("Scenes", "").length());
+
+                if (std::find(file_names.begin(), file_names.end(), file_name) == file_names.end()) {
+                    file_names.push_back(file_name);
+                    std::cout << "Added: " << file_name << std::endl;
+                }
+                else {
+                    std::cout << "Already exists: " << file_name << std::endl;
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+
         ImGui::End();
 
         //If file name is clicked and button is pressed
         if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
+            ADM.stop_mastergroup();
+            ADM.set_new_scene(true);
 
             //Gets file according to index load
             const std::string scenes = "Scenes";
             if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
 
-               
                 GM.set_current_scene(selected_file_index + 1);
                 selected_object_index = -1;
 
@@ -216,7 +252,6 @@ namespace lof {
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
 
                 // Update top UI overlay position to follow player
                 EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -361,8 +396,6 @@ namespace lof {
 
             load_selected = false;
         }
-
-        
     }
 
     //starts frame
@@ -372,62 +405,57 @@ namespace lof {
         ImGui::NewFrame();
     }
 
-    //Gets mouse position in terms of game world
+    //Gets mouse position in terms of game world coordinates
     ImVec2 IMGUI_Manager::get_imgui_mouse_pos(ImVec2 texture_pos, ImVec2 mouse_pos, unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
-        // If Mouse within texture
+        //Checks if mouse is within texture
         if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
             mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
 
-            //Gets position of mouse in terms of viewports
+            //Gets position of mouse in terms of texture (viewport) coordinates
             ImVec2 mouse_texture_coord_screen{};
             mouse_texture_coord_screen.x = (mouse_pos.x - texture_pos.x);
             mouse_texture_coord_screen.y = (mouse_pos.y - texture_pos.y);
 
-            //Get camera position and changes
+            //Get camera's position in game world
             auto& camera = GFXM.get_camera();
 
-            //Gets position of mouse in terms of game world
+            //Calculate scale factors to normalise coordinates for window resolution changes
+            float normalise_x = static_cast<float>(SCR_WIDTH) / SM.get_scr_width();
+            float normalise_y = static_cast<float>(SCR_HEIGHT) / SM.get_scr_height();
+
+            //Gets x position of mouse in terms of which quadrant it lands in the game world
             mouse_texture_coord_world.x = mouse_texture_coord_screen.x;
             if (mouse_texture_coord_screen.x < (SCR_WIDTH / 4)) {
                 mouse_texture_coord_world.x = -((SCR_WIDTH / 4) - mouse_texture_coord_screen.x);
-                mouse_texture_coord_world.x *= 2;
-                mouse_texture_coord_world.x += camera.pos_x;
             }
             else {
                 mouse_texture_coord_world.x = mouse_texture_coord_screen.x - (SCR_WIDTH / 4);
-                mouse_texture_coord_world.x *= 2;
-                mouse_texture_coord_world.x += camera.pos_x;
             }
+
+            //Scale to account for original game world size (window size)
+            mouse_texture_coord_world.x *= 2;
+
+            //Normalising x position to account for window resolution changes; Add the camera's position
+            mouse_texture_coord_world.x = (mouse_texture_coord_world.x / normalise_x);
+            mouse_texture_coord_world.x += camera.pos_x;
+
+            //Do the same for y
             mouse_texture_coord_world.y = mouse_texture_coord_screen.y;
             if (mouse_texture_coord_screen.y <= (SCR_HEIGHT / 4)) {
                 mouse_texture_coord_world.y = (SCR_HEIGHT / 4) - mouse_texture_coord_screen.y;
-                mouse_texture_coord_world.y *= 2;
-                mouse_texture_coord_world.y += camera.pos_y;
             }
             else {
                 mouse_texture_coord_world.y = -(mouse_texture_coord_screen.y - (SCR_HEIGHT / 4));
-                mouse_texture_coord_world.y *= 2;
-                mouse_texture_coord_world.y += camera.pos_y;
             }
 
-            //Display debug information
-            ImGui::Separator();
-            ImGui::Text("Mouse in Game World at: (%.2f, %.2f)", mouse_texture_coord_world.x, mouse_texture_coord_world.y);
-            ImGui::Text("Mouse in screen at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
-            ImGui::Separator();
-            ImGui::Text("Camera at: (%.2f, %.2f)", camera.pos_x, camera.pos_y);
-
-        }
-        else {
-
-            //Display debug information
-            ImGui::Text("Mouse outside texture at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
+            mouse_texture_coord_world.y *= 2;
+            mouse_texture_coord_world.y = (mouse_texture_coord_world.y / normalise_y);
+            mouse_texture_coord_world.y += camera.pos_y;
         }
 
         //Return mouse in terms of game world
         return mouse_texture_coord_world;
-
     }
 
     ImVec2 IMGUI_Manager::imgui_mouse_pos() {
@@ -437,16 +465,19 @@ namespace lof {
     bool select_entity = false; //to ensure mouse click selected
     EntityID selectedEntityID = static_cast<EntityID>(-1);
 
-
 #if 1
+
+    //Static bool to keep track if the mouse is in the viewport
+    static bool mouse_in_window = false;
+
     //Rendering overall UI and asset browser
     void IMGUI_Manager::render_ui(unsigned int SCR_WIDTH, unsigned int SCR_HEIGHT) {
 
         //Docking and window flags
         static ImGuiDockNodeFlags docking_flags = ImGuiDockNodeFlags_None;
         static ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
-        | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
-        | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+            | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
         //Set up Viewport
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -455,12 +486,11 @@ namespace lof {
         ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        
+
         static int currentMode = 0; // Default to "Drag"
         const char* modes[] = { "None","Drag", "Scale", "Rotate" };
 
         ImGui::Begin("Level Editor Mode", nullptr, window_flags);
-        
 
         //Set up Dockspace
         ImGuiIO& io = ImGui::GetIO();
@@ -475,7 +505,6 @@ namespace lof {
         {
             if (ImGui::BeginMenu("Menu"))
             {
-                
                 if (ImGui::MenuItem("Stop Resizing ImGui Window", "", (docking_flags & ImGuiDockNodeFlags_NoResize) != 0)) {
                     docking_flags ^= ImGuiDockNodeFlags_NoResize;
                 }
@@ -485,7 +514,7 @@ namespace lof {
             }
             ImGui::EndMenuBar();
         }
-        
+
         ImGui::PopStyleVar(2);
         ImGui::End();
 
@@ -502,182 +531,218 @@ namespace lof {
                     ImVec2(0, 1), ImVec2(1, 0));
             }
 
+            //Ensure that the mouse is in the viewport or using the mouse pop-up
+            if (ImGui::IsPopupOpen("OperationContextMenu") || ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
+                mouse_in_window = true;
+            }
+            else {
+                mouse_in_window = false;
+            }
 
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
+
+            //Display debug information
+            /*ImGui::Text("Screen Dimensions: (%u, %u)", SCR_WIDTH, SCR_HEIGHT);
+            ImGui::Separator();
+            ImGui::Text("Texture starts at: (%.2f, %.2f)", texture_pos.x, texture_pos.y);
+            ImGui::Text("Texture ends at: (%.2f, %.2f)", (texture_pos.x + SCR_WIDTH / 2), (texture_pos.y + SCR_HEIGHT / 2));
+            ImGui::Text("Texture size: (%u, %u)", SCR_WIDTH / 2, SCR_HEIGHT / 2);
+            ImGui::Separator();
+            ImGui::Text("Mouse in terms of screen at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
+            ImGui::Separator();*/
+
             mouse_pos_game = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
+            if (mouse_in_window) {
+                ImGui::Text("Mouse in terms of world at: (%.2f, %.2f)", mouse_pos_game.x, mouse_pos_game.y);
+            }
+
             ESS.Check_Selected_Entity();
             EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
 
-            // Check if mouse is within texture bounds
-            if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
-                mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
+            //Only executes when mouse is in the viewport or using the mouse pop-up
+            if (mouse_in_window) {
+                // Check if mouse is within texture bounds
+                if (mouse_pos.x >= texture_pos.x && mouse_pos.x <= (texture_pos.x + SCR_WIDTH / 2) &&
+                    mouse_pos.y >= texture_pos.y && mouse_pos.y <= (texture_pos.y + SCR_HEIGHT / 2)) {
 
-                // Handle entity selection with left click
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-                    mouse_clicked_or_dragged = true;
-                    if (selectedEntityInfo.isSelected) {
-                        select_entity = true;
-                        selectedEntityID = selectedEntityInfo.selectedEntity;
-                        LM.write_log("IMGUI_Manager::render_ui(): Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
-                    }
-                    else {
-                        select_entity = false;
-                        selectedEntityID = selectedEntityInfo.selectedEntity;
-                    }
-                }
-                else {
-                    mouse_clicked_or_dragged = false;
-                    select_entity = false;
-                }
-
-                // Show context menu on right click when an entity is selected
-                if (selectedEntityID != INVALID_ENTITY_ID && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
-                    ImGui::OpenPopup("OperationContextMenu");
-                }
-
-                // Position the context menu at the mouse position
-                if (ImGui::BeginPopup("OperationContextMenu")) {
-                    ImGui::Text("Select Operation");
-                    ImGui::Separator();
-
-                    for (int i = 0; i < IM_ARRAYSIZE(modes); i++) {
-                        if (ImGui::Selectable(modes[i])) {
-                            currentMode = i;
-                        }
-                    }
-
-                    ImGui::EndPopup();
-                }
-
-                if (select_entity && selectedEntityID != INVALID_ENTITY_ID) {
-                    selected_object_index = selectedEntityID;
-                }
-
-                // Handle mouse operations
-                static ImVec2 selected_entity_start_pos;
-                auto& entities = ecs.get_entities();
-
-                if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && selectedEntityID != INVALID_ENTITY_ID) {
-                    if (!mouse_was_down) {
-                        mouse_pos_before_press = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
+                    // Handle entity selection with left click
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+                        mouse_clicked_or_dragged = true;
                         if (selectedEntityInfo.isSelected) {
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
-                                // Store initial values based on operation type
-                                switch (currentMode) {
-                                case 0: // None - do nothing
-                                    break;
-                                case 1: // Drag
-                                    selected_entity_start_pos.x = transform.position.x;
-                                    selected_entity_start_pos.y = transform.position.y;
-                                    break;
-                                case 2: // Scale
-                                    selected_entity_start_pos.x = transform.scale.x;
-                                    selected_entity_start_pos.y = transform.scale.y;
-                                    break;
-                                case 3: // Rotate
-                                    selected_entity_start_pos.x = transform.orientation.x;
-                                    selected_entity_start_pos.y = transform.orientation.y;
-                                    break;
-                                }
-                            }
-                        }
-                        mouse_was_down = true;
-                    }
-
-                    switch (currentMode) {
-                    case 0: 
-                        break;
-                    case 1: // Drag
-                    {
-                        ImVec2 dragged_offset;
-                        unsigned int game_scale_width = SM.get_scr_width();
-                        unsigned int game_scale_height = SM.get_scr_height();
-                        unsigned int window_width = WC.get_win_width();
-                        unsigned int window_height = WC.get_win_height();
-                        float ratio_width = static_cast<float>(game_scale_width) / window_width;
-                        float ratio_height = static_cast<float>(game_scale_height) / window_height;
-
-                        if (is_full_screen) {
-                            dragged_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * ratio_width;
-                            dragged_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * ratio_height;
+                            select_entity = true;
+                            selectedEntityID = selectedEntityInfo.selectedEntity;
+                            LM.write_log("IMGUI_Manager::render_ui(): Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);
                         }
                         else {
-                            dragged_offset.x = mouse_pos_game.x - mouse_pos_before_press.x;
-                            dragged_offset.y = mouse_pos_game.y - mouse_pos_before_press.y;
+                            select_entity = false;
+                            selectedEntityID = selectedEntityInfo.selectedEntity;
                         }
-
-                        if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
-                                transform.position.x = selected_entity_start_pos.x + dragged_offset.x;
-                                transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
-                                transform.prev_position = transform.position;
-                            }
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
-                                Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selectedEntityID].get()->get_id());
-                                logic.origin_pos.x = selected_entity_start_pos.x + dragged_offset.x;
-                                logic.origin_pos.y = selected_entity_start_pos.y + dragged_offset.y;
-                            }
-                        }
-                        break;
                     }
-                    case 2: // Scale
-                    {
-                        ImVec2 scale_offset;
-                        constexpr float SCALE_SENSITIVITY = 0.05f;
-                        scale_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * SCALE_SENSITIVITY;
-                        scale_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * SCALE_SENSITIVITY;
+                    else {
+                        mouse_clicked_or_dragged = false;
+                        select_entity = false;
+                    }
 
-                        if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                    /*if (selectedEntityInfo.selectedEntity == 5) {
+                        ImGui::Text("Returned True");
+                        ImGui::Text("Position: %.2f, %.2f", selectedEntityInfo.entitypos.x, selectedEntityInfo.entitypos.y);
+                    }
+                    else {
+                        ImGui::Text("Not True");
+                    }*/
 
-                                float scale_factor = 1.0f + scale_offset.x;
-                                float new_scale_x = selected_entity_start_pos.x * scale_factor;
-                                transform.scale.x = std::max(0.1f, new_scale_x);
+                    // Show context menu on right click when an entity is selected
+                    if (selectedEntityID != INVALID_ENTITY_ID && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+                        ImGui::OpenPopup("OperationContextMenu");
+                    }
 
-                                scale_factor = 1.0f + scale_offset.y;
-                                float new_scale_y = selected_entity_start_pos.y * scale_factor;
-                                transform.scale.y = std::max(0.1f, new_scale_y);
+                    // Position the context menu at the mouse position
+                    if (ImGui::BeginPopup("OperationContextMenu")) {
+                        ImGui::Text("Select Operation");
+                        ImGui::Separator();
 
-                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Collision_Component>())) {
-                                    Collision_Component& collision = ecs.get_component<Collision_Component>(entities[selectedEntityID].get()->get_id());
-                                    collision.width = transform.scale.x;
-                                    collision.height = transform.scale.y;
+                        for (int i = 0; i < IM_ARRAYSIZE(modes); i++) {
+                            if (ImGui::Selectable(modes[i])) {
+                                currentMode = i;
+                            }
+                        }
+
+                        ImGui::EndPopup();
+                    }
+
+                    if (select_entity && selectedEntityID != INVALID_ENTITY_ID) {
+                        selected_object_index = selectedEntityID;
+                    }
+
+                    // Handle mouse operations
+                    static ImVec2 selected_entity_start_pos;
+                    auto& entities = ecs.get_entities();
+
+                    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && selectedEntityID != INVALID_ENTITY_ID) {
+                        if (!mouse_was_down) {
+                            mouse_pos_before_press = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
+                            if (selectedEntityInfo.isSelected) {
+                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                    // Store initial values based on operation type
+                                    switch (currentMode) {
+                                    case 0: // None - do nothing
+                                        break;
+                                    case 1: // Drag
+                                        selected_entity_start_pos.x = transform.position.x;
+                                        selected_entity_start_pos.y = transform.position.y;
+                                        break;
+                                    case 2: // Scale
+                                        selected_entity_start_pos.x = transform.scale.x;
+                                        selected_entity_start_pos.y = transform.scale.y;
+                                        break;
+                                    case 3: // Rotate
+                                        selected_entity_start_pos.x = transform.orientation.x;
+                                        selected_entity_start_pos.y = transform.orientation.y;
+                                        break;
+                                    }
                                 }
                             }
+                            mouse_was_down = true;
                         }
-                        break;
-                    }
-                    case 3: //rotate
-                    {
-                        float rotation_offset = (mouse_pos_game.x - mouse_pos_before_press.x) * 0.5f;
 
-                        if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
-                                Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                        switch (currentMode) {
+                        case 0:
+                            break;
+                        case 1: // Drag
+                        {
+                            ImVec2 dragged_offset;
 
-                                // Update rotation
-                                transform.orientation.x = selected_entity_start_pos.x + rotation_offset;
+                            /*unsigned int game_scale_width = SM.get_scr_width();
+                            unsigned int game_scale_height = SM.get_scr_height();
+                            unsigned int window_width = WC.get_win_width();
+                            unsigned int window_height = WC.get_win_height();
+                            float ratio_width = static_cast<float>(game_scale_width) / window_width;
+                            float ratio_height = static_cast<float>(game_scale_height) / window_height;
 
-                                // Normalize rotation angle to keep it between 0 and 360 degrees
-                                while (transform.orientation.x >= 360.0f) transform.orientation.x -= 360.0f;
-                                while (transform.orientation.x < 0.0f) transform.orientation.x += 360.0f;
+                            if (is_full_screen) {
+                                dragged_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * ratio_width;
+                                dragged_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * ratio_height;
                             }
+                            else {
+                                dragged_offset.x = mouse_pos_game.x - mouse_pos_before_press.x;
+                                dragged_offset.y = mouse_pos_game.y - mouse_pos_before_press.y;
+                            }*/
+
+                            dragged_offset.x = mouse_pos_game.x - mouse_pos_before_press.x;
+                            dragged_offset.y = mouse_pos_game.y - mouse_pos_before_press.y;
+
+                            if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
+                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+                                    transform.position.x = selected_entity_start_pos.x + dragged_offset.x;
+                                    transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
+                                    transform.prev_position = transform.position;
+                                }
+                                /*if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
+                                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selectedEntityID].get()->get_id());
+                                    logic.origin_pos.x = selected_entity_start_pos.x + dragged_offset.x;
+                                    logic.origin_pos.y = selected_entity_start_pos.y + dragged_offset.y;
+                                }*/
+                            }
+                            break;
                         }
-                        break;
+                        case 2: // Scale
+                        {
+                            ImVec2 scale_offset;
+                            constexpr float SCALE_SENSITIVITY = 0.05f;
+                            scale_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * SCALE_SENSITIVITY;
+                            scale_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * SCALE_SENSITIVITY;
+
+                            if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
+                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+
+                                    float scale_factor = 1.0f + scale_offset.x;
+                                    float new_scale_x = selected_entity_start_pos.x * scale_factor;
+                                    transform.scale.x = std::max(0.1f, new_scale_x);
+
+                                    scale_factor = 1.0f + scale_offset.y;
+                                    float new_scale_y = selected_entity_start_pos.y * scale_factor;
+                                    transform.scale.y = std::max(0.1f, new_scale_y);
+
+                                    if (entities[selectedEntityID]->has_component(ecs.get_component_id<Collision_Component>())) {
+                                        Collision_Component& collision = ecs.get_component<Collision_Component>(entities[selectedEntityID].get()->get_id());
+                                        collision.width = transform.scale.x;
+                                        collision.height = transform.scale.y;
+                                    }
+                                }
+                            }
+                            break;
                         }
-                   
+                        case 3: //rotate
+                        {
+                            float rotation_offset = (mouse_pos_game.x - mouse_pos_before_press.x) * 0.5f;
+                            if (selectedEntityInfo.isSelected && selectedEntityID != INVALID_ENTITY_ID) {
+                                if (entities[selectedEntityID]->has_component(ecs.get_component_id<Transform2D>())) {
+                                    Transform2D& transform = ecs.get_component<Transform2D>(entities[selectedEntityID].get()->get_id());
+
+                                    // Update rotation
+                                    transform.orientation.x = selected_entity_start_pos.x + rotation_offset;
+
+                                    // Normalize rotation angle to keep it between 0 and 360 degrees
+                                    while (transform.orientation.x >= 360.0f) transform.orientation.x -= 360.0f;
+                                    while (transform.orientation.x < 0.0f) transform.orientation.x += 360.0f;
+                                }
+                            }
+                            break;
+                        }
+
+                        }
+
                     }
-       
-                }
-                else {
-                    mouse_was_down = false;
+                    else {
+                        mouse_was_down = false;
+                    }
                 }
             }
 
-            ImGui::Separator();
+            //ImGui::Separator();
             if (selectedEntityID == -1) {
                 ImGui::Text("Selected Entity: None");
             }
@@ -702,15 +767,13 @@ namespace lof {
 
         for (auto& system : ECSM.get_systems()) {
             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-          
+
                 gui_system->hide_mineral_tank_gui();
                 gui_system->hide_oxygen_tank_gui();
-     
+
             }
         }
     }
-
-    //----------------------------------------------- Game Object Manipulation -----------------------------------------------//
 
     //game object list
     void IMGUI_Manager::imgui_game_objects_list() {
@@ -736,9 +799,7 @@ namespace lof {
                     //selected; casuing seceond param state to change
                     selected_object_index = current_object_index;
                 }
-
             }
-
             ++current_object_index;
         }
 
@@ -748,7 +809,7 @@ namespace lof {
             show_window = !show_window;
         }
 
-        //Remove button; Disabled for when the Player entity is selecetd
+        //Remove button; Disabled for when the Player entity is selected
         ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
         if (ImGui::Button("Remove Game Object")) {
             remove_game_obj = !remove_game_obj;
@@ -767,13 +828,12 @@ namespace lof {
             const std::string SCENES = "Scenes";
 
             std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
-            if (SM.save_game_state(scene_path.c_str())) {   
+            if (SM.save_game_state(scene_path.c_str())) {
                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
             }
             else {
                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Failed saved game state");
             }
-
         }
 
         ImGui::End();
@@ -822,7 +882,7 @@ namespace lof {
                 last_selected_object_index = selected_object_index;
                 assigned_names.clear();
                 buffer_map.clear();
-                filled = false; 
+                filled = false;
             }
 
             if (selected_object_index == -1) {
@@ -833,11 +893,10 @@ namespace lof {
                 std::string Name = entities[selected_object_index]->get_name();
                 std::string condition_name_model = "Name of Entity";
 
-                //Not using function due to disabling it
+                //Not using text_input function due to disabling textbox
                 char buffer_disabled[128];
                 strncpy_s(buffer_disabled, Name.c_str(), sizeof(buffer_disabled));
                 buffer_disabled[sizeof(buffer_disabled) - 1] = '\0';
-
                 ImGui::BeginDisabled();
                 if (ImGui::InputText(condition_name_model.c_str(), buffer_disabled, sizeof(buffer_disabled))) {
                     std::string name = std::string(buffer_disabled);
@@ -932,23 +991,15 @@ namespace lof {
                         auto& texture_name = graphics.texture_name;
                         std::string condition_name_texture = "texture_name";
 
+                        //not using text_input due to to_lower
                         char buffer_graphics[128];
-                        //strncpy_s is safer
                         strncpy_s(buffer_graphics, texture_name.c_str(), sizeof(buffer_graphics));
                         buffer_graphics[sizeof(buffer_graphics) - 1] = '\0';
-
                         if (ImGui::InputText(condition_name_texture.c_str(), buffer_graphics, sizeof(buffer_graphics))) {
-
                             std::string buffer_string = std::string(buffer_graphics);
-
                             std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), to_lower);
-
-                            //replaces the data with the input
                             texture_name = buffer_string;
                         }
-
-                        //text_input(texture_name, condition_name_texture);
-                        //std::transform(texture_name.begin(), texture_name.end(), texture_name.begin(), ::tolower);
 
                         if (ImGui::BeginDragDropTarget()) {
 
@@ -956,7 +1007,7 @@ namespace lof {
                                 const char* droppedFilePath = (const char*)payload->Data;
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Textures", "").length());
-                                file_name = file_name.substr(0, file_name.size()-4);
+                                file_name = file_name.substr(0, file_name.size() - 4);
 
                                 std::transform(file_name.begin(), file_name.end(), file_name.begin(), to_lower);
                                 texture_name = file_name;
@@ -969,9 +1020,6 @@ namespace lof {
                         ImGui::BeginDisabled();
                         ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
                         ImGui::EndDisabled();
-
-                        
-
                     }
                 }
 
@@ -1067,50 +1115,93 @@ namespace lof {
                     }
                 }
 
-                const char* logic_behaviour[] = { "Horizontal", "Circular"};
+                const char* logic_behaviour[] = { "Horizontal", "Circular" };
+                static std::vector<const char*> chosen_logic_behaviour;
 
-                //Logic Component
-                if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
-                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
-                    if (ImGui::CollapsingHeader("Logic")) {
+                ////To Implement Fully Proper Logic Component Later
+                //if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+                //    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+                //    if (ImGui::CollapsingHeader("Logic")) {
 
-                        auto& is_active = logic.is_active;
-                        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                        if (button_toggle(s_label, &is_active_on)) {
-                            is_active = !is_active;
-                        }
+                //        auto& is_active = logic.is_active;
+                //        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                //        if (button_toggle(s_label, &is_active_on)) {
+                //            is_active = !is_active;
+                //        }
 
-                        auto& movement_pattern = logic.movement_pattern;
-                        //Update logic behavior, corresponds the string to the movement_pattern value
-                        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
-                        ImGui::Text("Choose Logic Behaviour");
-                        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
-                           
-                            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
-                        }
+                //        auto& movement_pattern = logic.movement_pattern;
+                //        //Update logic behavior, corresponds the string to the movement_pattern value
+                //        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
+                //        ImGui::Text("Choose Logic Behaviour");
+                //        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
 
-                        auto& movement_speed = logic.movement_speed;
-                        ImGui::InputFloat("Movement Speed", &movement_speed);
+                //            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
+                //        }
 
-                        auto& movement_range = logic.movement_range;
-                        ImGui::InputFloat("Movement Range", &movement_range);
+                //        auto& movement_speed = logic.movement_speed;
+                //        ImGui::InputFloat("Movement Speed", &movement_speed);
 
-                        auto& reverse_direction = logic.reverse_direction;
-                        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
-                        if (button_toggle(reverse_dir, &is_reverse_on)) {
-                            reverse_direction = !reverse_direction;
-                        }
+                //        auto& movement_range = logic.movement_range;
+                //        ImGui::InputFloat("Movement Range", &movement_range);
 
-                        auto& is_rotate = logic.rotate_with_motion;
-                        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
-                        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
-                            is_rotate = !is_rotate;
-                        }
+                //        auto& reverse_direction = logic.reverse_direction;
+                //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                //        if (button_toggle(reverse_dir, &is_reverse_on)) {
+                //            reverse_direction = !reverse_direction;
+                //        }
 
-                        auto& original_position = logic.origin_pos;
-                        ImGui::InputFloat2("Original Position", &original_position.x);
-                    }
-                }
+                //        auto& is_rotate = logic.rotate_with_motion;
+                //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                //            is_rotate = !is_rotate;
+                //        }
+
+                //        auto& original_position = logic.origin_pos;
+                //        ImGui::InputFloat2("Original Position", &original_position.x);
+
+                //        for (const char* behaviour_here : chosen_logic_behaviour) {
+                //            ImGui::Text(behaviour_here);
+                //            ImGui::NewLine;
+                //        }
+
+                //        if (ImGui::Button("Add Logic Behaviour")) {
+                //            ImGui::OpenPopup("Add Behaviour Options");
+                //        }
+
+                //        if (ImGui::BeginPopup("Add Behaviour Options")) {
+                //            ImGui::Text("Select Operation");
+                //            ImGui::Separator();
+                //            for (const char* behaviour : logic_behaviour) {
+                //                if (ImGui::Selectable(behaviour)) {
+                //                    chosen_logic_behaviour.push_back(behaviour);
+                //                }
+                //            }
+                //            ImGui::EndPopup();
+                //        }
+
+                //        if (ImGui::Button("Remove Logic Behaviour")) {
+                //            ImGui::OpenPopup("Remove Behaviour Options");
+                //        }
+
+                //        if (ImGui::BeginPopup("Remove Behaviour Options")) {
+                //            ImGui::Text("Select Operation");
+                //            ImGui::Separator();
+                //            for (const char* behaviour : logic_behaviour) {
+                //                if (ImGui::Selectable(behaviour)) {
+
+                //                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
+                //                    if (it != chosen_logic_behaviour.end()) {
+                //                        chosen_logic_behaviour.erase(it);
+                //                    }
+
+                //                }
+                //            }
+                //            ImGui::EndPopup();
+                //        }
+
+                //        ImGui::Separator();
+                //    }
+                //}
 
                 //Audio Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
@@ -1141,26 +1232,11 @@ namespace lof {
                             std::vector<const char*> file_name_cstr;
                             std::vector<std::string> sound_map_filenames;
 
-
                             //Retrieve the sound map filenames from Audio_System
                             sound_map_filenames = ADM.get_sound_map_filename();
                             for (const auto& name : sound_map_filenames) {
                                 file_name_cstr.push_back(name.c_str());
                             }
-
-
-                            //Retrieve the sound map filenames from Audio_System
-                            //for (auto& system : ECSM.get_systems()) {
-                            //    if (system->get_type() == "Audio_System") {
-                            //        auto* audio_system = static_cast<Audio_System*>(system.get());
-                            //        if (audio_system) {
-                            //            //sound_map_filenames = audio_system->get_sound_map_filename();
-                            //            for (const auto& name : sound_map_filenames) {
-                            //                file_name_cstr.push_back(name.c_str());
-                            //            }
-                            //        }
-                            //    }
-                            //}
 
                             //Find the current sound's representative string in the sound map
                             auto its = std::find(sound_map_filenames.begin(), sound_map_filenames.end(), sound_filepath);
@@ -1180,8 +1256,23 @@ namespace lof {
                                 int selected_index = selected_sounds[i];
                                 if (selected_index >= 0 && selected_index < file_name_cstr.size()) {
 
+                                    if (sounds[i].audio_type == BGM) {
+                                        for (auto& system : ECSM.get_systems()) {
+                                            if (system->get_type() == "Audio_System") {
+                                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                                audio_system->stop_sound(sounds[i].key);
+                                            }
+                                        }
+                                    }
+                                    
                                     //Update the sound's file path based on the selected string from the sound map
                                     audio.set_filepath(sounds[i].key, sound_map_filenames[selected_index]);
+
+                                    if (sounds[i].audio_type == BGM) {
+                                        ADM.set_new_scene(true);
+                                    }
+
                                     LM.write_log("IMGUIM:: Sound being changed to %s for %s", sound_map_filenames[selected_index].c_str(), sounds[i].key.c_str());
                                 }
                             }
@@ -1198,7 +1289,7 @@ namespace lof {
                                     file_name = file_name.substr(0, file_name.find_last_of('.'));
 
                                     bool file_in_dropdown = false;
-                                    
+
                                     for (int j = 0; j < file_name_cstr.size(); ++j) {
                                         if (j < sound_map_filenames.size()) {
                                             if (file_name == sound_map_filenames[j]) {
@@ -1207,50 +1298,33 @@ namespace lof {
                                                 break;
                                             }
                                         }
-
                                     }
 
                                     if (!file_in_dropdown) {
 
-                                        ADM.load_sound(file_name, audio.get_audio_type(sounds[i].key));
-                                        audio.set_filepath(sounds[i].key, file_name);
+                                        if (sounds[i].audio_type == BGM) {
+                                            for (auto& system : ECSM.get_systems()) {
+                                                if (system->get_type() == "Audio_System") {
+                                                    auto* audio_system = static_cast<Audio_System*>(system.get());
 
-                                        //for (auto& system : ECSM.get_systems()) {
-                                        //    if (system->get_type() == "Audio_System") {
-                                        //        auto* audio_system = static_cast<Audio_System*>(system.get());
-                                        //        //audio_system->load_sound(file_name, audio.get_audio_type(sounds[i].key));
-                                        //        
-                                        //        //fill_audio_file_names(file_name, file_path);
-
-                                        //        audio.set_filepath(sounds[i].key, file_name);
-                                        //    }
-                                        //}
-                                    }
-                                   
-                                    std::cout << "___________________________________________\nChecking Sound Map" << std::endl;
-
-                                    
-
-                                    for (auto& system : ECSM.get_systems()) {
-                                        if (system->get_type() == "Audio_System") {
-                                            auto* audio_system = static_cast<Audio_System*>(system.get());
-                                            if (audio_system) {
-                                                /*std::vector<std::string> names = audio_system->get_sound_map_filename();
-                                                for (int k = 0; k < names.size(); ++k) {
-                                                    std::cout << names[k] << std::endl;
-                                                }*/
+                                                    audio_system->stop_sound(sounds[i].key);
+                                                }
                                             }
                                         }
+
+                                        ADM.load_sound(file_name, audio.get_audio_type(sounds[i].key));
+                                        audio.set_filepath(sounds[i].key, file_name);
+                                        ADM.set_new_scene(true);
                                     }
-                                    std::cout << "-------------------------------------------------" << std::endl;
+
                                 }
                                 ImGui::EndDragDropTarget();
                             }
                         }
 
-                        //Updating Audio Key - Has Bug
+                        //Updating Audio Key 
                         for (int i = 0; i < sounds.size(); ++i) {
-                      
+
                             std::string old_key_name = sounds[i].key;
                             std::string condition_name_key = "key for " + std::to_string(i);
 
@@ -1258,12 +1332,7 @@ namespace lof {
                                 buffer_map[i] = old_key_name;
                             }
 
-                            char buffer_key[128];
-                            strncpy_s(buffer_key, buffer_map[i].c_str(), sizeof(buffer_key));
-                            buffer_key[sizeof(buffer_key) - 1] = '\0';
-                            if (ImGui::InputText(condition_name_key.c_str(), buffer_key, sizeof(buffer_key))) {
-                                buffer_map[i] = std::string(buffer_key); // Save changes to the persistent buffer
-                            }
+                            text_input(buffer_map[i], condition_name_key);
 
                             //Save button
                             std::string save = "save " + condition_name_key;
@@ -1273,7 +1342,7 @@ namespace lof {
                                 audio.set_key(old_key_name, new_key_name);
 
                             }
-                            
+
 
                         }
 
@@ -1281,7 +1350,7 @@ namespace lof {
                         static std::vector<int> selected_sounds_type;
                         selected_sounds_type.clear();
                         selected_sounds_type.resize(sounds.size(), -1);
-                        
+
                         int type_index = 0;
                         for (int i = 0; i < sounds.size(); ++i, ++type_index) {
 
@@ -1308,7 +1377,7 @@ namespace lof {
                             }
 
                             //Create a combo box to choose the new representative string for this sound
-                            std::string label = "Choose Audio Type for " + std::to_string(type_index); 
+                            std::string label = "Choose Audio Type for " + std::to_string(type_index);
                             if (ImGui::Combo(label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
 
                                 //Get the selected representative string type_index
@@ -1317,7 +1386,7 @@ namespace lof {
 
                                     // Update the sound's file path based on the selected rep string
                                     audio.set_audio_type(sounds[i].key, audio_types[selected_index].second);
-                                    
+
                                 }
                             }
                         }
@@ -1337,7 +1406,7 @@ namespace lof {
 
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FONT_ITEM")) {
                                 const char* droppedFilePath = (const char*)payload->Data;
-          
+
                                 std::string file_name = droppedFilePath;
                                 file_name.erase(0, ASM.get_full_path("Fonts", "").length());
                                 file_name = file_name.substr(0, file_name.size() - 4);
@@ -1354,27 +1423,6 @@ namespace lof {
                     }
                 }
 
-                //GUI Component
-                /*if (entities[selected_object_index]->has_component(ecs.get_component_id<GUI_Component>())) {
-                    GUI_Component& gui = ecs.get_component<GUI_Component>(entities[selected_object_index].get()->get_id());
-                    if (ImGui::CollapsingHeader("GUI Component")) {
-                        auto& progress = gui.progress;
-                        ImGui::InputFloat("Movement Range", &progress);
-                        auto& progress_bar = gui.is_progress_bar;
-                        std::string is_progress_bar = "is_progress_bar: " + std::string(progress_bar ? "On" : "Off");
-                        if (button_toggle(is_progress_bar, &progress_bar)) {
-                            progress_bar = !progress_bar;
-                        }
-                        auto& container = gui.is_container;
-                        std::string is_container = "is_container: " + std::string(container ? "On" : "Off");
-                        if (button_toggle(is_container, &container)) {
-                            container = !container;
-                        }
-                    }
-                }*/
-
-
-                //--------------------------------------------To Optimise -----------------------------------------//
                 static int selected = 0;
                 static std::vector<const char*> missing_components;
 
@@ -1382,21 +1430,9 @@ namespace lof {
                 missing_components.clear(); //clear previous data
                 missing_components.push_back("None");
 
-                std::vector<std::pair<const char*, ComponentID>> component_checks = {
-                    {"Transform Component", static_cast<ComponentID>(ecs.get_component_id<Transform2D>())},
-                    {"Velocity Component", static_cast<ComponentID>(ecs.get_component_id<Velocity_Component>())},
-                    {"Physics Component", static_cast<ComponentID>(ecs.get_component_id<Physics_Component>())},
-                    {"Graphics Component", static_cast<ComponentID>(ecs.get_component_id<Graphics_Component>())},
-                    {"Collision Component", static_cast<ComponentID>(ecs.get_component_id<Collision_Component>())},
-                    {"Animation Component", static_cast<ComponentID>(ecs.get_component_id<Animation_Component>())},
-                    {"Logic Component", static_cast<ComponentID>(ecs.get_component_id<Logic_Component>())},
-                    {"Audio Component", static_cast<ComponentID>(ecs.get_component_id<Audio_Component>())},
-                    {"Text Component", static_cast<ComponentID>(ecs.get_component_id<Text_Component>())}
-                };
-
-                for (const auto& paired : component_checks) {
-                    if (!entities[selected_object_index]->has_component(paired.second)) {
-                        missing_components.push_back(paired.first);
+                for (const auto& [name, id, add_func, remove_func] : component_checks) {
+                    if (!entities[selected_object_index]->has_component(id)) {
+                        missing_components.push_back(name);
                     }
                 }
 
@@ -1418,61 +1454,23 @@ namespace lof {
                     ImGui::EndPopup();
                 }
 
-                if (selected != -1) {  // Check if a valid selection was made
+                if (selected != -1) {
 
                     switch (selected) {
-                    case 0: // None - do nothing
+                    case 0:
                         break;
-                    default: // Handle component addition
-                        if (selected >= 0 && selected < missing_components.size()) {  // Bounds check
+                    default:
+                        if (selected >= 0 && static_cast<size_t>(selected) < missing_components.size()) {
 
                             const auto& component_name = missing_components[selected];
-                            if (std::string(component_name) == "Transform Component") {
-                                Transform2D transform;
-                                ecs.add_component<Transform2D>(entities[selected_object_index]->get_id(), transform);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added transform component to %s", entities[selected_object_index]->get_name().c_str());
+                            for (const auto& [name, id, add_func, remove_func] : component_checks) {
+                                if (std::string(component_name) == name) {
+                                    add_func();
+                                    LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added %s to %s", name, entities[selected_object_index]->get_name().c_str());
+                                    break;
+                                }
                             }
-                            else if (std::string(component_name) == "Velocity Component") {
-                                Velocity_Component velocity;
-                                ecs.add_component<Velocity_Component>(entities[selected_object_index]->get_id(), velocity);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added velocity component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Physics Component") {
-                                Physics_Component physics;
-                                ecs.add_component<Physics_Component>(entities[selected_object_index]->get_id(), physics);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added physics component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Graphics Component") {
-                                Graphics_Component graphics;
-                                ecs.add_component<Graphics_Component>(entities[selected_object_index]->get_id(), graphics);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added graphics component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Collision Component") {
-                                Collision_Component collision;
-                                ecs.add_component<Collision_Component>(entities[selected_object_index]->get_id(), collision);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added collision component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Animation Component") {
-                                Animation_Component animation;
-                                ecs.add_component<Animation_Component>(entities[selected_object_index]->get_id(), animation);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added animation component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Logic Component") {
-                                std::cout << "Adding Logic Component\n";
-                                Logic_Component logic;
-                                ecs.add_component<Logic_Component>(entities[selected_object_index]->get_id(), logic);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added logic component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Audio Component") {
-                                Audio_Component audio;
-                                ecs.add_component<Audio_Component>(entities[selected_object_index]->get_id(), audio);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added audio component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Text Component") {
-                                Text_Component text;
-                                ecs.add_component<Text_Component>(entities[selected_object_index]->get_id(), text);
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added text component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
+
                         }
                         break;
                     }
@@ -1486,9 +1484,9 @@ namespace lof {
                 present_components.clear(); //clear previous data
                 present_components.push_back("None");
 
-                for (const auto& present : component_checks) {
-                    if (entities[selected_object_index]->has_component(present.second)) {
-                        present_components.push_back(present.first);
+                for (const auto& [name, id, add_func, remove_func] : component_checks) {
+                    if (entities[selected_object_index]->has_component(id)) {
+                        present_components.push_back(name);
                     }
                 }
 
@@ -1515,46 +1513,16 @@ namespace lof {
                     switch (selected_to_remove) {
                     case 0:
                         break;
-                    default: 
+                    default:
                         if (selected_to_remove >= 0 && selected_to_remove < present_components.size()) {  // Bounds check
 
                             const auto& component_name = present_components[selected_to_remove];
-
-                            if (std::string(component_name) == "Transform Component") {
-                                ecs.remove_component<Transform2D>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed transform component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Velocity Component") {
-                                ecs.remove_component<Velocity_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed velocity component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Physics Component") {
-                                ecs.remove_component<Physics_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed physics component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Graphics Component") {
-                                ecs.remove_component<Graphics_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed graphics component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Collision Component") {
-                                ecs.remove_component<Collision_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed collision component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Animation Component") {
-                                ecs.remove_component<Animation_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed animation component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Logic Component") {
-                                ecs.remove_component<Logic_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed logic component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Audio Component") {
-                                ecs.remove_component<Audio_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed audio component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
-                            else if (std::string(component_name) == "Text Component") {
-                                ecs.remove_component<Text_Component>(entities[selected_object_index]->get_id());
-                                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed text component from %s", entities[selected_object_index]->get_name().c_str());
+                            for (const auto& [name, id, add_func, remove_func] : component_checks) {
+                                if (std::string(component_name) == name) {
+                                    remove_func();
+                                    LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed %s to %s", name, entities[selected_object_index]->get_name().c_str());
+                                    break;
+                                }
                             }
                         }
                         break;
@@ -1571,6 +1539,7 @@ namespace lof {
     static std::string selected_filepath = "";
     static bool is_file_selected = false;
 
+#if 0
     void remove_button() {
 
         if (is_file_selected == true) {
@@ -1578,45 +1547,55 @@ namespace lof {
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
             if (ImGui::Button("DELETE FILE")) {
 
-                std::cout << "Checking First Texture Storage: " << std::endl;
-                auto& texture_storage = GFXM.get_texture_storage();
-                for (auto& texture : texture_storage) {
-                    std::cout << texture.first << std::endl;
-                }
-
                 try {
 
                     std::string temp = selected_filepath;
                     selected_filepath.clear();
                     std::filesystem::remove(temp);
-                   
 
-                    temp.erase(0, ASM.get_full_path("Textures", "").length());
-                    temp = temp.substr(0, temp.find_last_of('.'));
+                    size_t start_pos_of_folder_filepath;
 
-                    std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+                    //Deleting Textures from Associated Entities
+                    if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Textures", ""))) != std::string::npos) {
 
-                    std::cout << "temp: " << temp << std::endl << "Checking Texture Storage: " << std::endl;
+                        temp.erase(0, ASM.get_full_path("Textures", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
 
-                    for (auto& texture : texture_storage) {
+                        auto& texture_storage = ASM.get_texture_storage();
+                        auto texture = texture_storage.begin();
 
-                        std::cout << texture.first << std::endl;
-
-                        auto it = texture_storage.find(temp);
-                        if (it != texture_storage.end()) {
-                            std::cout << temp << " is deleted. please delete from storage" << std::endl;
-                            
-                            texture_storage.erase(temp);
-                            //after erasing need a way to know which components have so can delete graphics component
+                        while (texture != texture_storage.end()) {
+                            std::cout << texture->first << std::endl;
+                            if (texture->first == temp) {
+                                std::cout << temp << " is deleted. please delete from storage" << std::endl;
+                                texture = texture_storage.erase(texture);
+                            }
+                            else {
+                                ++texture;
+                            }
                         }
+
+                        is_file_selected = false;
                     }
 
-                    std::cout << "------------------------------\nFinal Checking Of Texture Storage: " << std::endl;
-                    for (auto& texture : texture_storage) {
-                        std::cout << texture.first << std::endl;
-                    }
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Fonts", ""))) != std::string::npos) {
 
-                    is_file_selected = false;
+                        temp.erase(0, ASM.get_full_path("Fonts", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+
+                        auto& font_storage = ASM.get_font_storage();
+                        auto font = font_storage.begin();
+                        while (font != font_storage.end()) {
+                            std::cout << font->first << std::endl;
+                        }
+
+                        is_file_selected = false;
+                    }
+                    else
+                    {
+                        ImGui::Text("Deletion Not Available For Asset Type");
+                    }
                 }
                 catch (std::filesystem::filesystem_error& e) {
 
@@ -1632,10 +1611,476 @@ namespace lof {
             ImGui::PopStyleColor();
         }
     }
+#endif
+
+    void remove_button() {
+        if (is_file_selected == true) {
+
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
+            if (ImGui::Button("DELETE FILE")) {
+
+                try {
+
+                    std::string temp = selected_filepath;
+                    selected_filepath.clear();
+                    size_t start_pos_of_folder_filepath;
+
+                    //Deleting Textures from Associated Entities
+                    if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Textures", ""))) != std::string::npos) {
+
+                        std::filesystem::remove(temp);
+
+                        auto& texture_storage = ASM.get_texture_storage();
+
+                        //Prepare the texture name for removal
+                        temp.erase(0, ASM.get_full_path("Textures", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+
+                        // Step 3: Call the Assets_Manager's delete_texture function to delete the texture and remove associated components
+                        ASM.delete_texture(temp);
+
+                        is_file_selected = false;
+                    }
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Fonts", ""))) != std::string::npos) {
+
+                        std::filesystem::remove(temp);
+
+                        temp.erase(0, ASM.get_full_path("Fonts", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+
+                        auto& font_storage = ASM.get_font_storage();
+
+                        //To Change to Asset Manager
+                        auto font = font_storage.begin();
+
+                        //ASM.delete_font(temp);
+                        while (font != font_storage.end()) {
+                            std::cout << font->first << std::endl;
+                            if (font->first == temp) {
+                                font = font_storage.erase(font);
+                            }
+                            else {
+                                ++font;
+                            }
+                        }
+                        is_file_selected = false;
+                    }
+#if 0
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
+                        // Get the filepath and filename
+                        std::string filepath = temp;
+                        temp.erase(0, ASM.get_full_path("Audio", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::string filename = temp;
+
+                        // Find the entity using the sound
+                        EntityID entity_with_sound = INVALID_ENTITY_ID;
+                        std::string sound_key;
+                        for (const auto& entity_ptr : ECSM.get_entities()) {
+                            EntityID entity = entity_ptr->get_id();
+                            if (ECSM.has_component<Audio_Component>(entity)) {
+                                Audio_Component& audio = ECSM.get_component<Audio_Component>(entity);
+                                auto& sounds = audio.get_sounds();
+
+                                for (const auto& sound : sounds) {
+                                    if (sound.filepath == filename) {
+                                        entity_with_sound = entity;
+                                        sound_key = sound.key;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (entity_with_sound != INVALID_ENTITY_ID) {
+                                break;
+                            }
+                        }
+
+                        if (entity_with_sound == INVALID_ENTITY_ID) {
+                            std::cerr << "No entity found using the sound: " << filename << std::endl;
+                            return;
+                        }
+
+                        // Combine to get key for channel map
+                        std::string key_for_channel_map = filename + std::to_string(entity_with_sound) + sound_key;
+
+                        // Stop sound, erase from channel map, and clean up sound map
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+                                if (audio_system) {
+                                    audio_system->stop_sound(key_for_channel_map);
+                                    audio_system->get_channel_map().erase(key_for_channel_map);
+                                    std::cout << "Deleted " << key_for_channel_map << " from channel map\n";
+                                }
+
+                                auto& sound_map = ADM.get_sound_map();
+                                if (sound_map.erase(filename) > 0) {
+                                    std::cout << "Successfully removed from sound_map.\n";
+                                }
+                                else {
+                                    std::cout << "Sound was not found in sound_map.\n";
+                                }
+                            }
+                        }
+
+                        // Small delay to ensure system releases file
+                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                        // Attempt to delete the file
+                        if (std::filesystem::exists(filepath)) {
+                            std::cout << "File exists before removal.\n";
+                            if (std::filesystem::remove(filepath)) {
+                                std::cout << "File successfully removed.\n";
+                            }
+                            else {
+                                std::cerr << "Failed to remove file: " << filename << std::endl;
+                            }
+                        }
+                        else {
+                            std::cerr << "File does not exist.\n";
+                        }
+                    }
+#endif
+#if 0
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
+
+                        //AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
+                        /*std::cout << "------------------------------------" << std::endl;
+                        std::cout << "BEFORE DELETION" << std::endl;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                                for (auto& channel : audio_system->get_channel_map()) {
+                                    std::cout << channel.first << std::endl;
+                                }
+
+                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                                audio_system->get_active_channels();
+                            }
+                        }
+                        std::cout << "CHECKING SOUND MAP" << std::endl;
+                        auto& sound_map = ADM.get_sound_map();
+                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                            std::cout << it->first << std::endl;
+                        }
+                        std::cout << "------------------------------------" << std::endl;*/
+
+                        //Get the filepath
+                        std::string filepath = temp;
+
+                        //Get the filename
+                        temp.erase(0, ASM.get_full_path("Audio", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::string filename = temp;
+
+                        //TODO: Identify entity with selected sound
+                        EntityID entity_with_sound = 5;
+
+                        //Get sound key from Audio Component
+                        Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_with_sound);
+                        auto& sounds = audio.get_sounds();
+                        std::string sound_key;
+                        std::cout << "sound_key:" << std::endl;
+                        for (auto& sound : sounds) {
+                            std::cout << sound.filepath << std::endl;
+                            if (sound.filepath == filename) {
+                                sound_key = sound.key;
+                            }
+                        }
+
+                        std::cout << "sound_key: " << sound_key << std::endl;
+                        //If sound key is found
+                        if (!sound_key.empty()) {
+
+                            //audio.set_audio_state(sound_key, PlayState::NONE);
+
+                            //Combine to get key for channel map
+                            std::string key_for_channel_map = filename + std::to_string(entity_with_sound) + sound_key;
+
+                            //Stop sound, erase from channel map
+                            for (auto& system : ECSM.get_systems()) {
+                                if (system->get_type() == "Audio_System") {
+                                    auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                    //In audio System
+                                    if (audio_system) {
+                                        audio_system->stop_sound(key_for_channel_map);
+
+                                        //Plausible Fix
+                                        //audio_system->get_channel_map().erase(key_for_channel_map);
+
+                                        std::cout << "deleted " << key_for_channel_map << " from channel map\n";
+                                    }
+
+                                    auto& sound_map = ADM.get_sound_map();
+
+                                    /*for (auto it = sound_map.begin(); it != sound_map.end(); ) {
+                                        if (it->first == filename) {
+                                            it = sound_map.erase(it);
+                                            std::cout << "Deleted from sound map" << std::endl;
+                                        }
+                                        else {
+                                            ++it;
+                                        }
+                                    }*/
+
+                                    if (sound_map.find(filename) != sound_map.end()) {
+                                        sound_map.erase(filename);  //Remove from the map
+                                        std::cout << "Successfully removed from sound_map." << std::endl;
+                                    }
+                                    else {
+                                        std::cout << "Sound was not found in sound_map." << std::endl;
+                                    }
+
+                                }
+                            }
+
+                            //Small delay to ensure system releases file
+                            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                        }
+
+                        std::cout << "Attempting to remove: " << filename << std::endl;
+                        if (std::filesystem::exists(filepath)) {
+                            std::cout << "File exists before removal." << std::endl;
+
+                            //Attempt to close any open streams (precautionary)
+                            std::ifstream file(filepath);
+                            if (file.is_open()) {
+                                file.close();
+                                std::cout << "Closed any open file stream.\n";
+                            }
+
+                            // Attempt deletion
+                            if (std::filesystem::remove(filepath)) {
+                                std::cout << "File successfully removed.\n";
+                            }
+                            else {
+                                std::cerr << "Failed to remove file: " << filename << std::endl;
+                            }
+                        }
+                        else {
+                            std::cerr << "File does not exist.\n";
+                        }
+
+                        /*std::cout << "------------------------------------" << std::endl;
+                        std::cout << "AFTER DELETION" << std::endl;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                                for (auto& channel : audio_system->get_channel_map()) {
+                                    std::cout << channel.first << std::endl;
+                                }
+
+                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                                audio_system->get_active_channels();
+                            }
+                        }
+                        std::cout << "CHECKING SOUND MAP" << std::endl;
+                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                            std::cout << it->first << std::endl;
+                        }
+                        std::cout << "------------------------------------" << std::endl;*/
+
+                    }
+
+#endif 
+                    else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos)
+                    {
+                        //get the file path
+                        std::string filepath = temp;
+
+                        // get the filename
+                        temp.erase(0, ASM.get_full_path("Audio", "").length());
+                        temp = temp.substr(0, temp.find_last_of('.'));
+                        std::string filename = temp;
+                        // Print all entities with audio components before deleting
+                        std::vector<EntityID> entities_with_audio = ASM.get_all_entities_with_audio();
+                        std::cout << "Entities with Audio Components:\n";
+                        for (EntityID entity : entities_with_audio) {
+                            std::cout << "Entity ID: " << entity << " has the following audio files:\n";
+
+                            // Get the audio component for this entity
+                            if (ECSM.has_component<Audio_Component>(entity)) {
+                                Audio_Component& audio_component = ECSM.get_component<Audio_Component>(entity);
+                                const auto& sounds = audio_component.get_sounds();
+
+                                // Print each sound's file path associated with this entity
+                                for (const auto& sound : sounds) {
+                                    std::cout << "  - " << sound.filepath << "\n";
+                                }
+                            }
+                        }
+
+
+                        ////AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
+                        //std::cout << "------------------------------------" << std::endl;
+                        //std::cout << "BEFORE DELETION" << std::endl;
+                        //for (auto& system : ECSM.get_systems()) {
+                        //    if (system->get_type() == "Audio_System") {
+                        //        auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                        //        std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                        //        for (auto& channel : audio_system->get_channel_map()) {
+                        //            std::cout << channel.first << std::endl;
+                        //        }
+
+                        //        std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                        //        audio_system->get_active_channels();
+                        //    }
+                        //}
+                        //std::cout << "CHECKING SOUND MAP" << std::endl;
+                        //auto& sound_map = ADM.get_sound_map();
+                        //for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                        //    std::cout << it->first << std::endl;
+                        //}
+                        //std::cout << "------------------------------------" << std::endl;
+
+                        //try to find and remove audio
+                        ASM.find_and_remove_audio(filename);
+
+                        if (std::filesystem::exists(filepath))
+                        {
+                            std::ifstream file(filepath);
+                            if (file.is_open())
+                            {
+                                file.close();
+                            }
+                        }
+
+                        if (std::filesystem::remove(filepath))
+                        {
+                            std::cout << "File successfully removed.\n";
+                        }
+                        else {
+                            std::cerr << "Failed to remove file: " << filename << std::endl;
+                        }
+
+                        /*std::cout << "------------------------------------" << std::endl;
+                        std::cout << "AFTER DELETION" << std::endl;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (system->get_type() == "Audio_System") {
+                                auto* audio_system = static_cast<Audio_System*>(system.get());
+
+                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
+                                for (auto& channel : audio_system->get_channel_map()) {
+                                    std::cout << channel.first << std::endl;
+                                }
+
+                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
+                                audio_system->get_active_channels();
+                            }
+                        }
+                        std::cout << "CHECKING SOUND MAP" << std::endl;
+                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
+                            std::cout << it->first << std::endl;
+                        }
+                        std::cout << "------------------------------------" << std::endl;*/
+
+                    }
+                    /*else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Scenes", ""))) != std::string::npos) {
+                        std::filesystem::remove(temp);
+                    }*/
+                    else {
+
+                        std::filesystem::remove(temp);
+
+                        /*ImGui::OpenPopup("Warning Message");
+                        if (ImGui::BeginPopup("Warning Message")) {
+                            ImVec4 text_color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+                            ImGui::PushStyleColor(ImGuiCol_Text, text_color);
+                            ImGui::Text("Note: If file is deleted, game will not work when reloaded!");
+                            if (ImGui::Button("Delete Anyway")) {
+                                std::filesystem::remove(temp);
+                            }
+                            ImGui::PopStyleColor();
+                            ImGui::EndPopup();
+                        }*/
+                    }
+
+                }
+                catch (std::filesystem::filesystem_error& e) {
+                    const char* error_msg = e.what();
+                    if (error_msg) {
+                        std::cout << "Error in Deletion: " << error_msg << std::endl;
+                    }
+                    else {
+                        ImGui::Text("Error in Deletion");
+                    }
+                }
+            }
+            ImGui::PopStyleColor();
+        }
+    }
+
+#if 0
+    void IMGUI_Manager::render_asset_browser() {
+
+        // Directory to load files from
+        std::string tex_directory = ASM.get_full_path("Textures", "");
+
+        if (!std::filesystem::exists(tex_directory)) {
+            return;
+        }
+
+        if (ImGui::Begin("Asset Browser")) {
+            // Button to open the file browser
+            if (ImGui::Button("Add Asset")) {
+                // You can call your custom file selection logic here
+                std::string selected_file = open_file_explorer();  // Your file explorer function
+
+                if (!selected_file.empty()) {
+                    // Register the selected asset
+                    ASM.register_assets_from_file(selected_file);
+                }
+            }
+
+            auto& all_assets = ASM.get_all_assets();
+            // Display all registered assets
+            for (const auto& asset_name : all_assets) {
+                if (ImGui::Selectable(asset_name.c_str())) {
+                    // Handle asset selection (e.g., load the asset or preview it)
+                }
+            }
+
+            ImGui::End();
+        }
+    }
+
+    std::string IMGUI_Manager::open_file_explorer() {
+        // Display the files in the directory for selection
+        std::string tex_directory = ASM.get_full_path("Textures", "");
+
+        // Here we simulate opening the file explorer
+        // Loop through the files and list them in the ImGui UI (the file selection itself happens in the render loop)
+        for (const auto& entry : std::filesystem::directory_iterator(tex_directory)) {
+            if (entry.is_regular_file()) {
+                std::string file_name = entry.path().stem().string(); // Get the file name without extension
+
+                // Show the file name as a selectable item in ImGui
+                if (ImGui::Selectable(file_name.c_str())) {
+                    // Return the selected file path for registration
+                    return entry.path().string();  // Return full path of the selected file
+                }
+            }
+        }
+
+        return "";  // Return an empty string if no file is selected
+    }
+
+
+#endif 
+
+    static bool show_msg = true;
 
     //asset browser
     void IMGUI_Manager::asset_browser() {
-        
+
         ImGui::Begin("Asset Browser");
 
         //current directory
@@ -1644,22 +2089,6 @@ namespace lof {
         //get asset folder directory
         const std::string ASSETS = "";
         std::string assets_path = ASM.get_full_path(ASSETS, "");
-
-        /*if (current_directory.empty()) {
-            
-            //Start the column layout (2 columns, no border)
-            ImGui::Columns(8, 0, false);
-
-            if (ImGui::Button("Add Folder")) {
-                // Logic to add folder
-            }
-
-            ImGui::NextColumn();
-
-            if (ImGui::Button("Delete Folder")) {
-                selection_mode = true;
-            }
-        }*/
 
         ImGui::Columns(7, 0, false);
 
@@ -1674,14 +2103,14 @@ namespace lof {
 
                 ImGui::Separator(); // Adds a separator between the columns and other widgets
 
-                try { 
+                try {
 
                     //accessing each file in assets directory
                     for (const auto& entry : std::filesystem::directory_iterator(assets_path)) {
 
                         //if directory is selected
                         if (entry.is_directory()) {
-                            if (ImGui::Button(entry.path().filename().string().c_str(), {128, 128})) {
+                            if (ImGui::Button(entry.path().filename().string().c_str(), { 128, 128 })) {
                                 current_directory = ASM.get_full_path(entry.path().filename().string(), "").c_str();
                             }
                             ImGui::Text(entry.path().filename().string().c_str());
@@ -1695,18 +2124,6 @@ namespace lof {
             }
             else { //if current directory isn't empty, its in a new directory
 
-                //Back button that goes back to the assets directory (when current_directory is empty
-                
-                /*if (ImGui::Button("Add File")) {
-                    // Logic to add folder
-                }
-
-                ImGui::NextColumn();
-
-                if (ImGui::Button("Delete File")) {
-                    ;
-                }*/
-                
                 ImGui::Columns(8, 0, false);
 
                 if (ImGui::Button("<- Back")) {
@@ -1719,6 +2136,38 @@ namespace lof {
 
                 if (!current_directory.empty()) {
                     try {
+
+                        //Block for Models and Shaders
+                        if (current_directory == ASM.get_full_path("Models", "") || current_directory == ASM.get_full_path("Shaders", "") ||
+                            current_directory == ASM.get_full_path("Config", "") || current_directory == ASM.get_full_path("Prefab", "") ||
+                            current_directory == ASM.get_full_path("Level_Design", "")) {
+
+                            asset_browser_pop_up(show_msg, "N/A Message", "  Dragging Not Available For Asset Type  ");
+
+                            //if (show_msg) {
+                            //    ImGui::OpenPopup("N/A Message");
+                            //    ImVec2 popup_position = ImVec2(750, 750);  // Choose a fixed position
+                            //    ImGui::SetNextWindowPos(popup_position);
+                            //    if (ImGui::BeginPopup("N/A Message")) {
+                            //        // Customizing the text size and color
+                            //        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Use a custom or default font with larger size (if desired)
+                            //        ImVec4 text_color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red color for the text
+                            //        ImGui::PushStyleColor(ImGuiCol_Text, text_color);
+                            //        ImGui::NewLine();
+                            //        // Show the message
+                            //        ImGui::Text("  Dragging Not Available For Asset Type  ");
+                            //        ImGui::NewLine();
+                            //        // Reset styles to default
+                            //        ImGui::PopStyleColor();
+                            //        ImGui::PopFont();
+                            //        // Close button
+                            //        if (ImGui::Button("Close Message")) {
+                            //            show_msg = false;  // Close the message popup
+                            //        }
+                            //        ImGui::EndPopup();
+                            //    }
+                            //}
+                        }
 
                         //accessing each file in the current directory
                         for (const auto& folder_entry : std::filesystem::directory_iterator(current_directory)) {
@@ -1743,68 +2192,26 @@ namespace lof {
                                     ImGui::PopStyleColor();
                                 }
 
-                                //set_drag_drop_source(current_directory, "Textures", folder_entry.path().string(), "TEXTURE_ITEM");
-
-                                if (current_directory == ASM.get_full_path("Textures", "")) {
-                                    if (ImGui::BeginDragDropSource()) {
-
-                                        std::string file_path = folder_entry.path().string();
-                                        ImGui::SetDragDropPayload("TEXTURE_ITEM", file_path.c_str(), file_path.length() + 1);
-                                        ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
-                                        ImGui::EndDragDropSource();
-
-                                    }
-                                }
-
-                                if (current_directory == ASM.get_full_path("Audio", "")) {
-                                    if (ImGui::BeginDragDropSource()) {
-
-                                        std::string file_path = folder_entry.path().string();
-                                        ImGui::SetDragDropPayload("AUDIO_ITEM", file_path.c_str(), file_path.length() + 1);
-                                        ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
-                                        ImGui::EndDragDropSource();
-
-                                    }
-                                }
+                                set_drag_drop_source(current_directory, "Textures", folder_entry.path().string(), "TEXTURE_ITEM");
+                                set_drag_drop_source(current_directory, "Audio", folder_entry.path().string(), "AUDIO_ITEM");
+                                set_drag_drop_source(current_directory, "Scenes", folder_entry.path().string(), "SCENES_ITEM");
 
                                 //Manually done to account for File
                                 if (current_directory == ASM.get_full_path("Fonts", "")) {
-                                    
                                     std::string file_path = folder_entry.path().string();
                                     if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
                                         if (ImGui::BeginDragDropSource()) {
-
                                             ImGui::SetDragDropPayload("FONT_ITEM", file_path.c_str(), file_path.length() + 1);
                                             ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
                                             ImGui::EndDragDropSource();
-
                                         }
                                     }
                                     else {
                                         ImGui::Text("Dragging Not Available");
                                     }
-                                    
                                 }
-
-                                if (current_directory == ASM.get_full_path("Models", "") || current_directory == ASM.get_full_path("Shaders", "")) {
-                                    ImGui::Text("Dragging Not Available");
-                                }
-
-                                if (current_directory == ASM.get_full_path("Scenes", "")) {
-
-                                    if (ImGui::BeginDragDropSource()) {
-
-                                        std::string file_path = folder_entry.path().string();
-                                        ImGui::SetDragDropPayload("SCENES_ITEM", file_path.c_str(), file_path.length() + 1);
-                                        ImGui::Text("Dragging: %s", folder_entry.path().filename().string().c_str());
-                                        ImGui::EndDragDropSource();
-
-                                    }
-                                }
-
                                 ImGui::Text(folder_entry.path().filename().string().c_str());
                             }
-
                             ImGui::NextColumn();
                         }
 
@@ -1814,12 +2221,14 @@ namespace lof {
 
                     }
                 }
-                
+                else {
+                    if (!show_msg) {
+                        show_msg = true;
+                    }
+                }
             }
         }
-
         ImGui::End();
-
     }
 
     // ------------------------------------- Functions for Functionality and Optimisation -------------------------------------//
@@ -1867,7 +2276,7 @@ namespace lof {
                     transform.position.x = random_x;
                     transform.position.y = random_y;
                 }
-                
+
                 LM.write_log("IMGUI_Manager::add_game_objects(): New entity added: %i", new_entity);
             }
             else {
@@ -1902,7 +2311,7 @@ namespace lof {
         Buffer[sizeof(Buffer) - 1] = '\0';
 
         if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
-            
+
             //replaces the data with the input
             data_name = std::string(Buffer);
         }
@@ -1913,11 +2322,6 @@ namespace lof {
         prefab_names.push_back(prefab_name);
     }
 
-    //to fill up audio file names
-    /*void IMGUI_Manager::fill_audio_file_names(std::string audio_file_name, std::string audio_filepath_name) {
-        audio_file_names.push_back(std::make_pair(audio_file_name, audio_filepath_name));
-    }*/
-
     //set scene loaded
     void IMGUI_Manager::set_current_file_shown(std::string current_file) {
         current_file_shown = current_file;
@@ -1926,7 +2330,7 @@ namespace lof {
 
     //To set the payload (Update once extract filename)
     void IMGUI_Manager::set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name) {
-        
+
         if (current_directory == ASM.get_full_path(folder_name, "")) {
             if (ImGui::BeginDragDropSource()) {
                 ImGui::SetDragDropPayload(payload_name.c_str(), file_path.c_str(), file_path.length() + 1);
@@ -1948,18 +2352,42 @@ namespace lof {
         return current_file_shown;
     }
 
-    /*void IMGUI_Manager::drop_callback(GLFWwindow* window, int count, const char** paths) {
-        for (int i = 0; i < count; ++i) {
-            std::cout << paths[i] << std::endl;
+    void IMGUI_Manager::asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message) {
+        if (show_msg) {
+            ImGui::OpenPopup(popup_name);
+
+            ImVec2 popup_position = ImVec2(750, 750);
+            ImGui::SetNextWindowPos(popup_position);
+
+            if (ImGui::BeginPopup(popup_name)) {
+
+                //ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                ImVec4 text_color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+                ImGui::PushStyleColor(ImGuiCol_Text, text_color);
+
+                ImGui::NewLine();
+                ImGui::Text(message);
+                ImGui::NewLine();
+
+                ImGui::PopStyleColor();
+                //ImGui::PopFont();
+
+                if (ImGui::Button("Close Message")) {
+                    show_msg = false;
+                }
+
+                ImGui::EndPopup();
+            }
         }
-    }*/
+    }
 
-
+#if 1
     //render
     void IMGUI_Manager::render() {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+#endif
 
     //shut down
     void IMGUI_Manager::shut_down() {
@@ -1969,6 +2397,30 @@ namespace lof {
         LM.write_log("IMGUI_Manager::shut_down(): IMGUI_Manager shut down successfully.");
     }
 
-    
+    std::vector<std::string> assetFiles;
+    void IMGUI_Manager::Handle_Dropped_File(const std::string filePath)
+    {
+        std::string extension = filePath.substr(filePath.find_last_of(".") + 1); // find the type of file 
+
+        if (extension == "png")
+        {
+            assetFiles.push_back(filePath);
+            std::cout << "Added Asset: " << filePath << "\n";
+        }
+
+    }
+
+    void IMGUI_Manager::render_asset_browser()
+    {
+        ImGui::Begin("Asset Broswer");
+        for (const auto& path : assetFiles) {
+            ImGui::Text("%s", path.c_str());
+        }
+        ImGui::End();
+    }
+
+
+
+
 
 } // namespace lof

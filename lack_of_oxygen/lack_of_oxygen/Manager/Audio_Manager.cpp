@@ -1,4 +1,5 @@
 #include "Audio_Manager.h"
+#include "Assets_Manager.h"
 
 
 namespace lof {
@@ -110,7 +111,7 @@ namespace lof {
 			LM.write_log("Audio_System::load_sound: Failed to find audio file %s", file_path.c_str());
 			return;
 		}
-
+		
 		std::string full_path = ASM.get_audio_path(file_path);
 		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
 
@@ -136,7 +137,11 @@ namespace lof {
 		LM.write_log("Loading sound: %s (Resolved Path: %s)", file_path.c_str(), full_path.c_str());
 
 		sound_map[file_path] = sound;
+
+	
 		LM.write_log("Audio_System::load_sound: Successfully loaded sound");
+
+		
 	}
 
 	void Audio_Manager::unload_sound(const std::string& file_path) {

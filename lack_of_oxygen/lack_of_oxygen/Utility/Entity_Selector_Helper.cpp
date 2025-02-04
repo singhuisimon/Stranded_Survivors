@@ -185,23 +185,25 @@ namespace lof
 #if 1
     bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        // Mouse coordinates are already in world space from Get_World_MousePos()
-        // Just do a direct AABB check
-        float half_width = width / 2.0f;
-        float half_height = height / 2.0f;
+        if (level_editor_mode) {
+            
+            return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
+                mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
+        }
+        else {
 
-        // Debug logging
-        //LM.write_log("AABB Check - Box: (%f, %f), Size: (%f, %f), Mouse: (%f, %f)",
-            /*box_x, box_y, width, height, mouseX, mouseY);*/
+            unsigned int current_width = WC.get_win_width();
+            unsigned int current_height = WC.get_win_height();
 
-        bool result = (mouseX >= (box_x - half_width) &&
-            mouseX <= (box_x + half_width) &&
-            mouseY >= (box_y - half_height) &&
-            mouseY <= (box_y + half_height));
+            float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
+            float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
 
-        //LM.write_log("AABB Result: %s", result ? "true" : "false");
+            float adjustX = (mouseX / scaleX);
+            float adjustY = (mouseY / scaleY);
 
-        return result;
+            return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
+                adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
+        }
     }
 #endif
 
