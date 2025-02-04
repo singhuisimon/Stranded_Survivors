@@ -171,6 +171,7 @@ namespace lof {
     //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
 
+        // Check if the game manager is started
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
@@ -221,7 +222,7 @@ namespace lof {
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
-        // Code portion if in gameplay mode
+        // Code portion if in gameplay mode or player exists
         if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
 
             // Add oxygen update logic here, before the UI positioning
@@ -825,7 +826,7 @@ namespace lof {
 
             }
         }
-
+        // == End PLAYER CODE PORTION ==
 
 #if _DEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
@@ -1047,8 +1048,16 @@ namespace lof {
         if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
-            // Toggle between scenes
-            current_scene = (current_scene == 1) ? 2 : 1;
+            // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
+            if (current_scene == 0) {
+                current_scene = 1; // Switch to scene1
+            }
+            else if (current_scene == 1) {
+                current_scene = 2; // Switch to scene2
+            }
+            else {
+                current_scene = 0; // Switch back to main_menu
+            }
 
             for (auto& system : ECSM.get_systems()) {
                 if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
@@ -1057,47 +1066,68 @@ namespace lof {
                 }
             }
 
-            // Create full path to the scene file
+            // Define scene file names
             const std::string SCENES = "Scenes";
-            std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
+            std::string scene_file;
+
+            if (current_scene == 0) {
+                scene_file = "main_menu.scn";
+            }
+            else {
+                scene_file = "scene" + std::to_string(current_scene) + ".scn";
+            }
+
+            // Create full path to the scene file
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
             // Try to load the new scene
             if (SM.load_scene(scene_path.c_str())) {
-                LM.write_log("Game_Manager::update(): Successfully loaded scene%d: %s", current_scene, scene_path.c_str());
+                LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
 
-                // Reset camera position
+                // Reset camera position only if not in main menu
                 auto& camera = GFXM.get_camera();
-                camera.pos_x = DEFAULT_CAMERA_POS_X;
-                camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                // Stop all the audio that is currently playing
-                ADM.stop_mastergroup();
-
-                // Reset player position if exists
-                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (playerId != INVALID_ENTITY_ID) {
-                    if (ECSM.has_component<Transform2D>(playerId)) {
-                        auto& transform = ECSM.get_component<Transform2D>(playerId);
-                        transform.position = Vec2D(0.0f, 0.0f);
-                        transform.prev_position = transform.position;
-                    }
-                    if (ECSM.has_component<Velocity_Component>(player_id)) {
-                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                        velocity.velocity = Vec2D(0.0f, 0.0f);
-                    }
+                if (current_scene != 0) {
+                    camera.pos_x = DEFAULT_CAMERA_POS_X;
+                    camera.pos_y = DEFAULT_CAMERA_POS_Y;
                 }
 
-               
+                // Stop all audio currently playing
+                ADM.stop_mastergroup();
+
+                // Reset player position only if in scene1 or scene2
+                if (current_scene != 0) {
+                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                    if (playerId != INVALID_ENTITY_ID) {
+                        if (ECSM.has_component<Transform2D>(playerId)) {
+                            auto& transform = ECSM.get_component<Transform2D>(playerId);
+                            transform.position = Vec2D(0.0f, 0.0f);
+                            transform.prev_position = transform.position;
+                        }
+                        if (ECSM.has_component<Velocity_Component>(playerId)) {
+                            auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                            velocity.velocity = Vec2D(0.0f, 0.0f);
+                        }
+                    }
+                }
             }
             else {
-                LM.write_log("Game_Manager::update(): Failed to load scene%d: %s", current_scene, scene_path.c_str());
-                // Revert the scene number since load failed
-                current_scene = (current_scene == 1) ? 2 : 1;
+                LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+
+                // Revert scene number since load failed
+                if (current_scene == 0) {
+                    current_scene = 2;
+                }
+                else if (current_scene == 1) {
+                    current_scene = 0;
+                }
+                else {
+                    current_scene = 1;
+                }
             }
 
-            std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
-            IMGUIM.set_current_file_shown(get_file_name);
+            IMGUIM.set_current_file_shown(scene_file);
         }
+
 
         // Getting delta time for Input Manager
         //IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

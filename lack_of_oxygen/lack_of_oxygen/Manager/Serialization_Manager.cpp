@@ -20,6 +20,7 @@
 
 // Include Log_Manager
 #include "Log_Manager.h"
+#include "Game_Manager.h"
 
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
@@ -92,15 +93,17 @@ namespace lof {
             return -4;
         }
 
-        // Load scene file 
+        // Load scene file
         const std::string scene_folder = "Scenes";
-        std::string loaded_scene = "scene2.scn";
+        std::string loaded_scene = "main_menu.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
-        std::string scene_path = ASM.get_full_path(scene_folder, "scene2.scn");
+        std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
         }
+
+        GM.set_current_scene(0);
 
         // Debug print level data if loaded successfully
         debug_print_level();

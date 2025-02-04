@@ -901,6 +901,13 @@ namespace lof {
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
+
+        // If we're in the main menu scene (scene 0)
+        if (GM.get_current_scene() == 0) {
+            check_main_menu_button_collision();
+            return;  // Skip other collision checks for main menu
+        }
+
        
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
  
@@ -922,6 +929,79 @@ namespace lof {
     }
 
 
+    void Collision_System::check_main_menu_button_collision() {
+        // Get mouse position in world coordinates
+        Vec2D world_mouse_pos = ESS.Get_World_MousePos();
+
+        for (EntityID entity_id : get_entities()) {
+            auto* entity = ECSM.get_entity(entity_id);
+            if (!entity) continue;
+
+            std::string entity_name = entity->get_name();
+
+            // Only check for main menu buttons
+            if (entity_name != "play_button" &&
+                entity_name != "credit_button" &&
+                entity_name != "quit_button") continue;
+
+            if (!ECSM.has_component<Transform2D>(entity_id) ||
+                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+
+            auto& transform = ECSM.get_component<Transform2D>(entity_id);
+            auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+
+            // Check if mouse is hovering over the button
+            bool is_hovered = ESS.Mouse_Over_AABB(
+                transform.position.x,
+                transform.position.y,
+                transform.scale.x,
+                transform.scale.y,
+                world_mouse_pos.x,
+                world_mouse_pos.y
+            );
+
+            // Define the base texture name for each button
+            std::string base_texture;
+            if (entity_name == "play_button") {
+                base_texture = "Main_Menu_Play_Batch_14";
+            }
+            else if (entity_name == "credit_button") {
+                base_texture = "Main_Menu_Credits_Batch_14";
+            }
+            else if (entity_name == "quit_button") {
+                base_texture = "Main_Menu_Quit_Batch_14";
+            }
+
+            if (is_hovered) {
+                if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                    // Set pressed state texture
+                    graphics.texture_name = base_texture + "_PRESSED";
+
+                    // Scene Switching Logic
+                    if (entity_name == "play_button") {
+                        GM.set_current_scene(2);  // Switch to Scene 2
+                    }
+                    else if (entity_name == "credit_button") {
+                        // TODO: Implement credits scene (if applicable)
+                    }
+                    else if (entity_name == "quit_button") {
+                        GM.set_game_over(true); // Exit game
+                    }
+
+                    LM.write_log("Button %s clicked", entity_name.c_str());
+                }
+                else {
+                    // Set highlighted (hover) state texture
+                    graphics.texture_name = base_texture + "_HIGHLIGHTED";
+                    LM.write_log("Button %s highlighted", entity_name.c_str());
+                }
+            }
+            else {
+                // Reset to normal state texture
+                graphics.texture_name = base_texture + "_NORMAL";
+            }
+        }
+    }
 
 
 } // namespace lof

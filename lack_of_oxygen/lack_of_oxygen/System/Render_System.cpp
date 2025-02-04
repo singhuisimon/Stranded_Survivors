@@ -138,6 +138,22 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
+            if (camera.is_free_cam == GL_FALSE) {
+
+                // Update world-to-camera view transformation matrix
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               0, 0, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                       0, 2.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+            }
+
             // Compute object scale matrix
             // Special case for text objects
             float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
@@ -218,19 +234,19 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Render only what is on the viewport
-            if (level_editor_mode == false) {
-                EntityID player_id = ECSM.find_entity_by_name("player1");
-                if (entity_id != 0 && entity_id != player_id) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+            //if (level_editor_mode == false) {
+            //    EntityID player_id = ECSM.find_entity_by_name("player1");
+            //    if (entity_id != 0 && entity_id != player_id) {
+            //        auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
 
-                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+            //        float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+            //        float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
-                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
-                        continue;
-                    }
-                }
-            }
+            //        if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+            //            continue;
+            //        }
+            //    }
+            //}
 
             // Get shaders, models, textures, animation, and camera from the Graphics Manager
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);

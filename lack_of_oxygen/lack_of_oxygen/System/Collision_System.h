@@ -217,6 +217,8 @@ namespace lof {
         void Colliside_Oxygen_Mineral(float delta_time);
 
 
+        // == MAIN MENU BUTTON COLLISION ==
+        void check_main_menu_button_collision();
     };
 
 
