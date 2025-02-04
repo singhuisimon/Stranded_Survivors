@@ -334,10 +334,11 @@ namespace lof {
         return true;
     }
 
-    void Assets_Manager::unload_fonts()
-    {
+    void Assets_Manager::unload_fonts() {
         font_storage.clear();
+        LM.write_log("Assets_Manager: Unloaded all fonts");
     }
+
 
     void Assets_Manager::store_font(const std::string& font_name, const Font& font) {
         font_storage[font_name] = font;
@@ -488,19 +489,48 @@ namespace lof {
             }
         }
     }
+#if 0 
+    void Assets_Manager::delete_font(const std::string& text_name)
+    {
+        auto it = font_storage.find(text_name);
+        if (it != font_storage.end())
+        {
+            // remove the font
+            font_storage.erase(it);
+        }
+        else {
+            return;
+        }
 
+        for (auto& entity : ECSM.get_entities())
+        {
+            if (entity && ECSM.has_component<Text_Component>(entity->get_id()))
+            {
+                Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+                if (font_component.font_name == text_name)
+                {
+                    ECSM.destroy_entity(entity)
+                    ECSM.remove_component<Text_Component>(entity->get_id());
+                }
+            }
+        }
+
+    }
+#endif 
     //void Assets_Manager::delete_font(const std::string& text_name)
     //{
+    //    // Remove font if it exists in storage
     //    auto it = font_storage.find(text_name);
     //    if (it != font_storage.end())
     //    {
-    //        // remove the font
     //        font_storage.erase(it);
     //    }
-    //    else {
+    //    else
+    //    {
     //        return;
     //    }
 
+    //    // Iterate and destroy entities directly
     //    for (auto& entity : ECSM.get_entities())
     //    {
     //        if (entity && ECSM.has_component<Text_Component>(entity->get_id()))
@@ -508,14 +538,65 @@ namespace lof {
     //            Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
     //            if (font_component.font_name == text_name)
     //            {
-    //                ECSM.remove_component<Text_Component>(entity->get_id());
+    //                // Remove the component first, then destroy the entity
+    //                //ECSM.remove_component<Text_Component>(entity->get_id());
+    //                ECSM.destroy_entity(entity->get_id());
+
+    //                //printf("entity %d is being remove\n", entity->get_id());
+
+    //                
     //            }
     //        }
     //    }
-
     //}
 
-#if 1
+
+#if 0 
+    void Assets_Manager::delete_font(const std::string& text_name) {
+        // Log the font deletion process
+        LM.write_log("Assets_Manager: Deleting font: %s", text_name.c_str());
+
+        // Step 1: Collect all entities that use the font
+        std::vector<EntityID> entities_to_update;
+
+        for (auto& entity : ECSM.get_entities()) {
+            if (entity && ECSM.has_component<Text_Component>(entity->get_id())) {
+                Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+                if (font_component.font_name == text_name) {
+                    entities_to_update.push_back(entity->get_id());
+                    LM.write_log("Assets_Manager: Marked Entity %u for font removal due to font deletion: %s",
+                        entity->get_id(), text_name.c_str());
+                }
+            }
+        }
+
+        // Step 2: Remove or reset text components from entities
+        for (auto id : entities_to_update) {
+            Text_Component& font_component = ECSM.get_component<Text_Component>(id);
+
+            // Reset the font reference before deleting the font
+            font_component.font_name.clear();
+
+            // Remove the text component completely if needed
+            ECSM.remove_component<Text_Component>(id);
+            LM.write_log("Assets_Manager: Removed Entity %u text component due to font deletion", id);
+        }
+
+        // Step 3: Safely delete the font from font_storage
+        auto it = font_storage.find(text_name);
+        if (it != font_storage.end()) {
+            LM.write_log("Assets_Manager: Erasing font from font_storage: %s", text_name.c_str());
+            font_storage.erase(it);
+        }
+        else {
+            LM.write_log("Assets_Manager: Font %s not found in storage", text_name.c_str());
+        }
+    }
+#endif
+
+
+
+#if 0
     void Assets_Manager::delete_font(const std::string& text_name) {
         // Log the font deletion process
         LM.write_log("Assets_Manager: Deleting font: %s", text_name.c_str());

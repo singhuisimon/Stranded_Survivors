@@ -42,8 +42,8 @@ namespace lof {
 
     class Assets_Manager : public Manager {
         
-        friend class Graphics_Manager;      // To Graphics Manager to access the class private (Hui Shan)
-        friend class Serialization_Manager; // To Serialization Manager to access the class private (Hui Shan)
+        friend class Graphics_Manager;      
+        friend class Serialization_Manager; 
 
     public:
 

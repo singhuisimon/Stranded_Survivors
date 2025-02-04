@@ -1624,8 +1624,8 @@ namespace lof {
                         //To Change to Asset Manager
                         auto font = font_storage.begin();
 
-                        ASM.delete_font(temp);
-                     /*   while (font != font_storage.end()) {
+                        //ASM.delete_font(temp);
+                        while (font != font_storage.end()) {
                             std::cout << font->first << std::endl;
                             if (font->first == temp) {
                                 font = font_storage.erase(font);
@@ -1633,7 +1633,7 @@ namespace lof {
                             else {
                                 ++font;
                             }
-                        }*/
+                        }
                         is_file_selected = false;
                     }
 #if 0
