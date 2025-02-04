@@ -301,10 +301,38 @@ namespace lof {
         }
     }
 
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+
+    //        // Assuming the center is at (0, 0), clamp the player's position
+    //        player_transform.position.x = std::clamp(player_transform.position.x, -screen_width / 2, screen_width / 2);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, -screen_height / 2, screen_height / 2);
+    //    }
+    //}
+
     bool Collision_System::is_vent_entity(EntityID id) const {
         auto* entity = ECSM.get_entity(id); 
         return entity && entity->get_name().find("vent") != std::string::npos;
     }
+
+    
+
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
         //get components for entity
@@ -354,7 +382,7 @@ namespace lof {
                 //This is working (play without bgm to hear please <check with angus if thats how he wants it to be>
                 if (playerId != INVALID_ENTITY_ID) {
                     if (ECSM.has_component<Audio_Component>(playerId)) {
-                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                        ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
                     }
                 }
                 
@@ -375,6 +403,7 @@ namespace lof {
                         //TLDR It does stop the sound but it detects again thats in so it keeps playing but stopping and creating an awkward silence at times 
                     }
                 }
+                
             }
 
 
@@ -454,6 +483,73 @@ namespace lof {
             }
         }
     }
+
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+    //        auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+
+    //        // Clamp the player's position to stay within the screen boundaries
+    //        player_transform.position.x = std::clamp(player_transform.position.x, -screen_width, screen_width);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, -screen_height, screen_height);
+    //    }
+    //}
+
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    // Get the camera's position using your existing method
+    //    auto& camera = GFXM.get_camera();  // Assuming this gives you the camera component or transform
+    //    GLfloat camera_x = camera.pos_x;
+    //    GLfloat camera_y = camera.pos_y;
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+
+    //        // Calculate boundaries based on the camera's position
+    //        GLfloat half_width = screen_width / 2;
+    //        GLfloat half_height = screen_height / 2;
+
+    //        GLfloat minX = -half_width + camera_x;
+    //        GLfloat maxX = half_width + camera_x;
+    //        GLfloat minY = -half_height + camera_y;
+    //        GLfloat maxY = half_height + camera_y;
+
+    //        // Clamp the player's position based on the camera's offset
+    //        player_transform.position.x = std::clamp(player_transform.position.x, minX, maxX);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, minY, maxY);
+    //    }
+    //}
+
+
 
    // Initialize value for detect the tiles that player is near to
     EntityID Collision_System::bottom_collision_entity = static_cast<EntityID>(-1);
@@ -1153,6 +1249,9 @@ namespace lof {
 
     void Collision_System::update(float delta_time) {
         std::vector<CollisionPair> collisions;
+        //Boundary_Check();
+        // Boundary_Check();
+        //Boundary_Check();
        
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
  

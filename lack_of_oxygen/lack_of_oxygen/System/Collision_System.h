@@ -142,6 +142,8 @@ namespace lof {
         EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
         EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
+        //void Boundary_Check();
+      
 
     private:
         static std::unique_ptr<Collision_System> instance;
