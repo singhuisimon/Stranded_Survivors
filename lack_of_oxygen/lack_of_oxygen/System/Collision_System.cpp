@@ -26,6 +26,7 @@
 #include "../Manager/Input_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Manager/Serialization_Manager.h"
+#include "../Manager/Audio_Manager.h"
 
 namespace lof {
     std::unique_ptr<Collision_System> Collision_System::instance;
@@ -1234,7 +1235,6 @@ namespace lof {
 
     }
 
-
     void Collision_System::check_main_menu_button_collision() {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
@@ -1279,27 +1279,80 @@ namespace lof {
             }
 
             if (is_hovered) {
-                if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     // Set pressed state texture
                     graphics.texture_name = base_texture + "_PRESSED";
 
                     // Scene Switching Logic
                     if (entity_name == "play_button") {
-                        GM.set_current_scene(2);  // Switch to Scene 2
+                        LM.write_log("Play button held - attempting scene transition");
+
+                        // Clear dynamic entities first
+                        bool found_movement_system = false;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                movement_system->clear_dynamic_entities();
+                                found_movement_system = true;
+                                LM.write_log("Found and cleared Movement System");
+                                break;
+                            }
+                        }
+                        if (!found_movement_system) {
+                            LM.write_log("Warning: Movement System not found");
+                        }
+
+                        // Set up scene loading
+                        const std::string SCENES = "Scenes";
+                        std::string scene_file = "scene2.scn";
+                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+                        LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
+
+                        // Try to load scene2
+                        if (SM.load_scene(scene_path.c_str())) {
+                            LM.write_log("Scene loaded successfully");
+
+                            // Reset camera position
+                            auto& camera = GFXM.get_camera();
+                            camera.pos_x = DEFAULT_CAMERA_POS_X;
+                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                            // Stop all currently playing audio
+                            ADM.stop_mastergroup();
+
+                            // Reset player position if it exists
+                            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                            if (playerId != INVALID_ENTITY_ID) {
+                                if (ECSM.has_component<Transform2D>(playerId)) {
+                                    auto& transform = ECSM.get_component<Transform2D>(playerId);
+                                    transform.position = Vec2D(0.0f, 0.0f);
+                                    transform.prev_position = transform.position;
+                                }
+                                if (ECSM.has_component<Velocity_Component>(playerId)) {
+                                    auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                                    velocity.velocity = Vec2D(0.0f, 0.0f);
+                                }
+                            }
+
+                            // Update current scene in Game Manager
+                            GM.set_current_scene(2);
+
+                            // Update IMGUI Manager's current file
+                            IMGUIM.set_current_file_shown(scene_file);
+                        }
+                        else {
+                            LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+                        }
                     }
                     else if (entity_name == "credit_button") {
-                        // TODO: Implement credits scene (if applicable)
+                        // Handle credits button
                     }
                     else if (entity_name == "quit_button") {
-                        GM.set_game_over(true); // Exit game
+                        GM.set_game_over(true);
                     }
-
-                    LM.write_log("Button %s clicked", entity_name.c_str());
                 }
                 else {
-                    // Set highlighted (hover) state texture
+                    // Set highlighted state when just hovering
                     graphics.texture_name = base_texture + "_HIGHLIGHTED";
-                    LM.write_log("Button %s highlighted", entity_name.c_str());
                 }
             }
             else {

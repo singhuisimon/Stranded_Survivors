@@ -220,7 +220,7 @@ namespace lof {
             increasing = true;
         }
         std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;*/
-        ADM.update_bgm_layering(current_scene, oxygen_level, increasing);
+        //ADM.update_bgm_layering(current_scene, oxygen_level, increasing);
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);

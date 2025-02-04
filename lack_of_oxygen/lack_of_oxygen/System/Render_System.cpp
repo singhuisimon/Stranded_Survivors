@@ -14,6 +14,7 @@
 #include "Render_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
+#include "../Manager/Game_Manager.h"
 //#include "Collision_System.h"
 //#include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../Utility/globals.h"    // To access level_editor_mode
@@ -138,7 +139,9 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
-            if (camera.is_free_cam == GL_FALSE) {
+            int current_scene = GM.get_current_scene(); // Get the current scene number
+
+            if (camera.is_free_cam == GL_FALSE && current_scene != 1 && current_scene != 2) {
 
                 // Update world-to-camera view transformation matrix
                 camera.view_xform = glm::mat3{ 1, 0, 0,
@@ -153,6 +156,7 @@ namespace lof {
                 // Update world-to-NDC transformation matrix
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
+
 
             // Compute object scale matrix
             // Special case for text objects
