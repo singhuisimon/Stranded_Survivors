@@ -27,6 +27,8 @@
 #include "../System/Animation_System.h"
 #include "../System/Logic_System.h"
 #include "../System/Interruption_System.h"
+#include "../System/Particle_System.h"
+
 
 // Include Entity.h
 #include "../Entity/Entity.h"
@@ -135,6 +137,9 @@ namespace lof {
 
             add_system(std::make_unique<Interruption_System>(window)); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
+
+            add_system(std::make_unique<Particle_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Particle_System'.");
 
             m_is_started = true;
             LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");
@@ -378,6 +383,7 @@ namespace lof {
                     //skip movement and collision in editor mode 
                     if ((system->get_type() == "Movement_System" || system->get_type() == "Collision_System") &&
                         level_editor_mode) {
+                        system->set_time(0);
                         continue; 
                     }
 
@@ -393,6 +399,7 @@ namespace lof {
                 }
                 else { //systems that do not use time in calculations
                     if (system->get_type() == "Audio_System" && level_editor_mode) {
+                        system->set_time(0);
                         continue; //skip audio in the level editor mode
                     }
                     // Getting delta time for each system

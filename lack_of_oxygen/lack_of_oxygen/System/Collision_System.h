@@ -190,6 +190,13 @@ namespace lof {
         void collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time);
         void collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time);
 
+
+        /*
+        @brief Checks if an entity is a vent
+        */
+        bool is_vent_entity(EntityID id) const;
+        void handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded);
+
         /**
          * @brief Resolve collisions and update the positions and velocities of involved entities.
          * @param collisions A reference to a vector of CollisionPair objects for their overlap information.

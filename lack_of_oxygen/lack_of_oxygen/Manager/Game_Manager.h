@@ -83,6 +83,8 @@ namespace lof {
          */
         void update_mineral_count_text(int value_to_add);
 
+        bool check_non_mineral(EntityID block_id, std::string block_name) const;
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
