@@ -232,9 +232,9 @@ namespace lof {
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
         // Get models, textures, animation, and camera from the Graphics Manager
-        auto& models = GFXM.get_model_storage();
-        auto& textures = GFXM.get_texture_storage();
-        auto& animations = GFXM.get_animation_storage();
+        auto& models = GFXM.get_models();
+        auto& textures = ASM.get_texture_storage();
+        auto& animations = ASM.get_animation_storage();
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
