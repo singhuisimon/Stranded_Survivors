@@ -54,7 +54,8 @@ namespace lof {
                     logic.origin_pos.y);
             }
 
-            if (logic.is_active && !level_editor_mode) {
+            //if (logic.is_active && !level_editor_mode) {
+            if (logic.is_active) {
                 logic.timer += delta_time;
 
                 // Debug every second

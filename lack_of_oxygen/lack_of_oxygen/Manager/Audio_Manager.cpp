@@ -390,9 +390,9 @@ namespace lof {
 		bool pause;
 		mastergroup->getPaused(&pause);
 
-		if (level_editor_mode && pause) {
+		/*if (level_editor_mode && pause) {
 			return;
-		}
+		}*/
 
 		if (pause) {
 			errorcheck(mastergroup->setPaused(false), "Audio_System::pause_resume_group", "resume mastergroup");

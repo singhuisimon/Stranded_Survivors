@@ -380,12 +380,12 @@ namespace lof {
                     system->get_type() == "Animation_System" ||
                     system->get_type() == "Render_System" ) {
 
-                    //skip movement and collision in editor mode 
-                    if ((system->get_type() == "Movement_System" || system->get_type() == "Collision_System") &&
-                        level_editor_mode) {
-                        system->set_time(0);
-                        continue; 
-                    }
+                    ////skip movement and collision in editor mode 
+                    //if ((system->get_type() == "Movement_System" || system->get_type() == "Collision_System") &&
+                    //    level_editor_mode) {
+                    //    system->set_time(0);
+                    //    continue; 
+                    //}
 
                     for (int i = 0; i < steps; ++i) {
                         // Getting delta time for each system
@@ -398,10 +398,10 @@ namespace lof {
                     
                 }
                 else { //systems that do not use time in calculations
-                    if (system->get_type() == "Audio_System" && level_editor_mode) {
-                        system->set_time(0);
-                        continue; //skip audio in the level editor mode
-                    }
+                    //if (system->get_type() == "Audio_System" && level_editor_mode) {
+                    //    system->set_time(0);
+                    //    continue; //skip audio in the level editor mode
+                    //}
                     // Getting delta time for each system
                     system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                     // Updating each system

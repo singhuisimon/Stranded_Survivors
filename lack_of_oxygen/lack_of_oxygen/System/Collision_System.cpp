@@ -1369,7 +1369,7 @@ namespace lof {
                             GM.set_current_scene(2);
 
                             // Update IMGUI Manager's current file
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
@@ -1411,7 +1411,7 @@ namespace lof {
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(3);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
@@ -1511,7 +1511,7 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
+                        //IMGUIM.set_current_file_shown(scene_file);
                         current_cooldown = transition_cooldown;  // Set the cooldown timer
                         is_transitioning = true;
                         return;
@@ -1636,7 +1636,7 @@ namespace lof {
                             ADM.stop_mastergroup();
 
                             GM.set_current_scene(0);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             current_cooldown = transition_cooldown;
                             grace_timer = post_transition_grace_period; // Set grace period
                             is_transitioning = true;

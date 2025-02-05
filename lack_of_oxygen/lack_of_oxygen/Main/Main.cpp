@@ -31,7 +31,7 @@
 
 using namespace lof;
 
-bool level_editor_mode = false;
+//bool level_editor_mode = false;
 GLFWwindow* window = nullptr;
 bool is_full_screen = true;
 GLFWmonitor* monitor = nullptr;
@@ -157,16 +157,16 @@ int main(void) {
 
     // --------------------------- Start IMGUI_Manager ---------------------------
 
-    IMGUIM.start_up(window);
+    //IMGUIM.start_up(window);
 
     //gets a reference to ImGui's IO structure
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    //IMGUI configuration
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    ////IMGUI configuration
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
@@ -228,11 +228,11 @@ int main(void) {
         // Poll for and process events 
         glfwPollEvents();
 
-        bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
+        /*bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
         if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
             level_editor_mode = !level_editor_mode;
         }
-        tab_key_was_pressed_last_frame = is_TAB_pressed;
+        tab_key_was_pressed_last_frame = is_TAB_pressed;*/
 
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
@@ -254,36 +254,36 @@ int main(void) {
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         // Start the Dear ImGui frame
-        IMGUIM.start_frame();
+        //IMGUIM.start_frame();
 
 #ifndef NDEBUG
-        ImGui::Begin("Performance Viewer");
+        //ImGui::Begin("Performance Viewer");
 
-        //Dispalys the % of the manager and system's time in the game loop in an IMGUI window
-        system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-        //system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
-        system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
-        ImGui::Separator();
-        ImGui::Text("In ECS Manager: \n");
-        for (auto& system : ECSM.get_systems()) {
-            system_performance(GM.get_time(), system->get_time(), system->get_type());
-        }
-        ImGui::End();
+        ////Dispalys the % of the manager and system's time in the game loop in an IMGUI window
+        //system_performance(GM.get_time(), IM.get_time(), IM.get_type());
+        ////system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+        //system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
+        //ImGui::Separator();
+        //ImGui::Text("In ECS Manager: \n");
+        //for (auto& system : ECSM.get_systems()) {
+        //    system_performance(GM.get_time(), system->get_time(), system->get_type());
+        //}
+        //ImGui::End();
 
 #endif
 
-        //When editor is on
-        if (level_editor_mode) {
+        ////When editor is on
+        //if (level_editor_mode) {
 
-            //Renders UI and functionalities
-            IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
+        //    //Renders UI and functionalities
+        //    IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
 
-            //Ensures in game GUI is disabled when in level editor
-            IMGUIM.disable_GUI();
-        }
+        //    //Ensures in game GUI is disabled when in level editor
+        //    IMGUIM.disable_GUI();
+        //}
 
-        // Rendering IMGUI
-        IMGUIM.render();
+        //// Rendering IMGUI
+        //IMGUIM.render();
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {
@@ -298,18 +298,18 @@ int main(void) {
         // End of frame timing and FPS control
         FPSM.frame_end();
 
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        /*if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             GLFWwindow* backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
-        }
+        }*/
 
     }
 
     //Shuts down IMGUI
-    IMGUIM.shut_down();
+    //IMGUIM.shut_down();
 
     glfwDestroyWindow(window);
     glfwTerminate();

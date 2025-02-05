@@ -39,9 +39,9 @@
 #include "../Manager/FPS_Manager.h"
 #include "../Manager/Serialization_Manager.h"
 #include "../Manager/Graphics_Manager.h"
-#include "../Manager/IMGUI_Manager.h"
+//#include "../Manager/IMGUI_Manager.h"
 
-//Include IMGUI headers
+////Include IMGUI headers
 #include "../IMGUI/imgui.h"
 #include "../IMGUI/imgui_impl_glfw.h"
 #include "../IMGUI/imgui_impl_opengl3.h"

@@ -124,19 +124,19 @@ namespace lof
     void Entity_Selector_Helper::Update_Selected_Entity_Info(EntityID entityID, float entityX, float entityY, float entityWidth, float entityHeight)
     {
         bool isSelected = false;
-        if (level_editor_mode)
-        {
+        //if (level_editor_mode)
+        //{
 
-            ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
-            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-            g_selected_entity_info.mousePos = mousePos;
-        }
-        else
-        {
+        //    ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
+        //    isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+        //    g_selected_entity_info.mousePos = mousePos;
+        //}
+        //else
+        //{
             Vec2D mousePos = Get_World_MousePos();
             isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
             g_selected_entity_info.entitypos = mousePos;
-        }
+        //}
         
 
         g_selected_entity_info.isSelected = isSelected;
@@ -185,12 +185,12 @@ namespace lof
 #if 1
     bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        if (level_editor_mode) {
+        /*if (level_editor_mode) {
             
             return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
                 mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
         }
-        else {
+        else {*/
 
             unsigned int current_width = WC.get_win_width();
             unsigned int current_height = WC.get_win_height();
@@ -203,7 +203,7 @@ namespace lof
 
             return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
                 adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
-        }
+        //}
     }
 #endif
 

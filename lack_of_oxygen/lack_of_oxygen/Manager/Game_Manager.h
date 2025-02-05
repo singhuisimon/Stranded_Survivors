@@ -23,8 +23,8 @@
 #include <unordered_map> // For tnt logic
 
 namespace lof {
-    extern float imgui_camara_pos_x;
-    extern float imgui_camera_pos_y;
+    //extern float imgui_camara_pos_x;
+    //extern float imgui_camera_pos_y;
    
     /**
      * @class Game_Manager

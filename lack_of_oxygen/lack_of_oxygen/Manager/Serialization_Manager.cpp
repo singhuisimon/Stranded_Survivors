@@ -24,7 +24,7 @@
 
 // Include ECS_Manager for entity creation
 #include "ECS_Manager.h"
-#include "IMGUI_Manager.h"
+//#include "IMGUI_Manager.h"
 #include "Assets_Manager.h"
 
 // Include all component headers
@@ -96,7 +96,7 @@ namespace lof {
         // Load scene file
         const std::string scene_folder = "Scenes";
         std::string loaded_scene = "main_menu.scn";
-        IMGUIM.set_current_file_shown(loaded_scene);
+        //IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
         // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4
         GM.set_current_scene(0);
@@ -249,7 +249,7 @@ namespace lof {
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
             
-            IMGUIM.fill_prefab_names(prefab_name.c_str());
+            //IMGUIM.fill_prefab_names(prefab_name.c_str());
 
             //DEBUG
             LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());

@@ -133,7 +133,7 @@ namespace lof {
                 GM.set_current_scene(4);
 
                 // Update IMGUI Manager's current file
-                IMGUIM.set_current_file_shown(scene_file);
+                //IMGUIM.set_current_file_shown(scene_file);
 
                 // Reset stored mineral progress
                 stored_mineral_progress = 0.0f;

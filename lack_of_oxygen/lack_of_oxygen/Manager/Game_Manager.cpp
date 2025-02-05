@@ -197,15 +197,22 @@ namespace lof {
             //std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
+        //non-level editor version
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_5)) {
             ADM.pause_resume_mastergroup();
         }
 
-        //to ensure sound pause during level_editor_mode
-        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
-            ADM.pause_resume_mastergroup();
-        }
+        //level editor version
+        ////to pause all the sound that is playing
+        //if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+        //    ADM.pause_resume_mastergroup();
+        //}
+
+        ////to ensure sound pause during level_editor_mode
+        //if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        //    ADM.pause_resume_mastergroup();
+        //}
 
         //commented out this is for me to test - Amanda
         /*if (IM.is_key_held(GLFW_KEY_J)) {
@@ -226,8 +233,8 @@ namespace lof {
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
         // Code portion if in gameplay mode or player exists
-        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
-
+        //if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID) {
             // Add oxygen update logic here, before the UI positioning
             oxygen_update_timer += delta_time;
             if (oxygen_update_timer >= 1.0f) { // Every second
@@ -1271,17 +1278,20 @@ namespace lof {
 
 #if _DEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
-        if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
+        //if (IM.is_key_pressed(GLFW_KEY_1) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_1)) {
             LM.write_log("Graphics_Manager::update(): '1' key pressed, render mode is now FILL.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_FILL;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_2)&& !level_editor_mode) {
+        //else if (IM.is_key_pressed(GLFW_KEY_2)&& !level_editor_mode) {
+        else if (IM.is_key_pressed(GLFW_KEY_2)) {
             LM.write_log("Graphics_Manager::update(): '2' key pressed, render mode is now LINE.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_LINE;
         }
-        else if (IM.is_key_pressed(GLFW_KEY_3)&& !level_editor_mode) {
+        //else if (IM.is_key_pressed(GLFW_KEY_3) && !level_editor_mode) {
+        else if (IM.is_key_pressed(GLFW_KEY_3)) {
             LM.write_log("Graphics_Manager::update(): '3' key pressed, render mode is now POINT.");
             GLenum& mode = GFXM.get_render_mode();
             mode = GL_POINT;
@@ -1306,97 +1316,97 @@ namespace lof {
 
         // Check if the left mouse button was pressed
         //EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        //if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
-            if (selectedEntityInfo.isSelected) {
-                select_entity = true;
-                selectedID = selectedEntityInfo.selectedEntity;
+        //    if (selectedEntityInfo.isSelected) {
+        //        select_entity = true;
+        //        selectedID = selectedEntityInfo.selectedEntity;
 
-            /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
+        //    /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+        //        std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+        //        std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+        //        LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
 
-            }
-            else {
-                select_entity = false;
-                selectedID = static_cast<EntityID>(-1);
+        //    }
+        //    else {
+        //        select_entity = false;
+        //        selectedID = static_cast<EntityID>(-1);
 
-            }
-        }
+        //    }
+        //}
 
         
-        if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
-        {
-            // First check if entity has required components
-            if (!ECSM.has_component<Transform2D>(selectedID)) {
-                //std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
-                return;
-            }
+        //if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
+        //{
+        //    // First check if entity has required components
+        //    if (!ECSM.has_component<Transform2D>(selectedID)) {
+        //        //std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
+        //        return;
+        //    }
 
-            auto& transform = ECSM.get_component<Transform2D>(selectedID);
-            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-            GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+        //    auto& transform = ECSM.get_component<Transform2D>(selectedID);
+        //    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+        //    GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
 
-            // Check if entity has collision component before using it
-            bool has_collision = ECSM.has_component<Collision_Component>(selectedID);
-            Collision_Component* collision = nullptr;
-            if (has_collision) {
-                collision = &ECSM.get_component<Collision_Component>(selectedID);
-            }
+        //    // Check if entity has collision component before using it
+        //    bool has_collision = ECSM.has_component<Collision_Component>(selectedID);
+        //    Collision_Component* collision = nullptr;
+        //    if (has_collision) {
+        //        collision = &ECSM.get_component<Collision_Component>(selectedID);
+        //    }
 
-            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
-            {
-                std::cout << selectedID << " scaling up in level editor\n";
-                transform.scale.x += scale_change;
-                transform.scale.y += scale_change;
+        //    if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
+        //    {
+        //        std::cout << selectedID << " scaling up in level editor\n";
+        //        transform.scale.x += scale_change;
+        //        transform.scale.y += scale_change;
 
-                if (collision) {
-                    collision->width += scale_change;
-                    collision->height += scale_change;
-                }
-            }
-            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP)))
-            {
+        //        if (collision) {
+        //            collision->width += scale_change;
+        //            collision->height += scale_change;
+        //        }
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP)))
+        //    {
 
-                if (transform.scale.x > 0.0f) {
-                    transform.scale.x -= scale_change;
-                    if (collision) {
-                        collision->width -= scale_change;
-                    }
-                }
-                else {
-                    transform.scale.x = 0.0f;
-                    if (collision) {
-                        collision->width = 0.0f;
-                    }
-                }
+        //        if (transform.scale.x > 0.0f) {
+        //            transform.scale.x -= scale_change;
+        //            if (collision) {
+        //                collision->width -= scale_change;
+        //            }
+        //        }
+        //        else {
+        //            transform.scale.x = 0.0f;
+        //            if (collision) {
+        //                collision->width = 0.0f;
+        //            }
+        //        }
 
-                if (transform.scale.y > 0.0f) {
-                    transform.scale.y -= scale_change;
-                    if (collision) {
-                        collision->height -= scale_change;
-                    }
-                }
-                else {
-                    transform.scale.y = 0.0f;
-                    if (collision) {
-                        collision->height = 0.0f;
-                    }
-                }
-            }
-            else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
-            {
-                transform.orientation.x += rot_change;
-            }
-            else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
-            {
-                transform.orientation.x -= rot_change;
-            }
-        }
+        //        if (transform.scale.y > 0.0f) {
+        //            transform.scale.y -= scale_change;
+        //            if (collision) {
+        //                collision->height -= scale_change;
+        //            }
+        //        }
+        //        else {
+        //            transform.scale.y = 0.0f;
+        //            if (collision) {
+        //                collision->height = 0.0f;
+        //            }
+        //        }
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
+        //    {
+        //        transform.orientation.x += rot_change;
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
+        //    {
+        //        transform.orientation.x -= rot_change;
+        //    }
+        //}
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #endif
-        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        /*if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE) {
                 camera.is_free_cam = GL_TRUE;
@@ -1412,7 +1422,7 @@ namespace lof {
             else {
                 editor_mode = 1;
             }
-        }
+        }*/
 
         // Camera up-down scrolling when I or K pressed
         if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
@@ -1486,7 +1496,8 @@ namespace lof {
             camera_left_right_scroll_flag = 0;
         }
 
-        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
+        //if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
+        if (IM.is_key_pressed(GLFW_KEY_0)) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
             // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
@@ -1566,7 +1577,7 @@ namespace lof {
                 }
             }
 
-            IMGUIM.set_current_file_shown(scene_file);
+            //IMGUIM.set_current_file_shown(scene_file);
         }
 
 
@@ -1595,7 +1606,7 @@ namespace lof {
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         m_step_count++;
-    }
+}
 
     void Game_Manager::set_game_over(bool new_game_over) {
         m_game_over = new_game_over;
