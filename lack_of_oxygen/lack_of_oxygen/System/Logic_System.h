@@ -11,16 +11,26 @@
 #ifndef LOF_LOGIC_SYSTEM_H
 #define LOF_LOGIC_SYSTEM_H
 
+#include <functional>
+#include <string>
+#include <memory>
+
 #include "System.h"
+#include "../Utility/Constant.h"
+#include "../Entity/Entity.h"
 #include "../Component/Component.h"
+#include "../Component/Logic_Components.h"
+
+#define LGS lof::Logic_System::get_instance()
 
 namespace lof {
+
+    class Script;
+
     class Logic_System : public System {
     public:
-        /**
-         * @brief Constructor for Logic_System.
-         */
-        Logic_System();
+
+        static Logic_System& get_instance();
 
         /**
          * @brief Gets the type identifier for this system.
@@ -34,22 +44,26 @@ namespace lof {
          */
         void update(float delta_time) override;
 
+        void add_script(const std::string& script_name, std::shared_ptr<Script> script);
+
+        std::shared_ptr<Script> get_script(const std::string& script_name);
+        
     private:
-        /**
-         * @brief Updates linear movement for a given entity.
-         * @param logic The Logic_Component containing movement parameters.
-         * @param transform The Transform2D to update.
-         * @param delta_time Time elapsed since the last update.
-         */
-        void update_linear_movement(Logic_Component& logic, Transform2D& transform, float delta_time);
 
         /**
-         * @brief Updates circular movement for a given entity.
-         * @param logic The Logic_Component containing movement parameters.
-         * @param transform The Transform2D to update.
-         * @param delta_time Time elapsed since the last update.
+         * @brief Constructor for Logic_System.
          */
-        void update_circular_movement(Logic_Component& logic, Transform2D& transform, float delta_time);
+        Logic_System();
+
+        static std::unique_ptr<Logic_System> instance;
+        static std::once_flag once_flag;
+
+        //using script name to access the scripts
+        std::unordered_map <std::string, std::shared_ptr<Script>> script_map;
+        std::vector<Logic_Component*> script_components;
+
     };
 } // namespace lof
 #endif // LOF_LOGIC_SYSTEM_H
+
+//~Logic_System();
