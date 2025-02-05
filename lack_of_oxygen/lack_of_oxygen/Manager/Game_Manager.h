@@ -20,6 +20,8 @@
 #include "../Entity/Entity.h"
 #include <algorithm> // for std::clamp
 
+#include <unordered_map> // For tnt logic
+
 namespace lof {
     extern float imgui_camara_pos_x;
     extern float imgui_camera_pos_y;
@@ -69,6 +71,9 @@ namespace lof {
         int timer_remaining = 300; // or any desired starting value
 
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
+
+        // Stores the TNTs that are activated with it's entity name and fuse time
+        std::unordered_map<std::string, float> tnt_to_destroy;
 
         /**
          * @brief Determines the mineral value based on the block entity type

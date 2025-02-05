@@ -136,16 +136,24 @@ namespace lof {
 
         // Free the data storages
         ASM.unload_shader_programs();
-        model_storage.clear();
+        ASM.unload_models();
+        ASM.unload_textures();
+        ASM.unload_animations();
+        /*model_storage.clear();
         texture_storage.clear();
         animation_storage.clear();
-        font_storage.clear();
+        font_storage.clear();*/
 
         // Free imgui framebuffer and tex object
         glDeleteFramebuffers(1, &imgui_fbo);
         glDeleteTextures(1, &imgui_tex);
 
         m_is_started = false;
+    }
+
+    std::unordered_map<std::string, Assets_Manager::Model>& Graphics_Manager::get_models()
+    {
+        return models;
     }
 
     // Add models to storage
@@ -155,17 +163,17 @@ namespace lof {
             return GL_FALSE;
         }
 
-        for (const auto& pair : ASM.model_storage) {
+        for (const auto& pair : ASM.get_model_storage()) {
             const std::string& model_name = pair.first;
             const Assets_Manager::ModelData& modelData = pair.second;
 
             // Skip if model already exists in Graphics_Manager
-            if (model_storage.find(model_name) != model_storage.end()) {
+            if (models.find(model_name) != models.end()) {
                 continue;
             }
 
             // Create model and buffer storages
-            Model mdl{};
+            Assets_Manager::Model mdl{};
             GLuint vbo_hdl{}, vaoid{}, ebo_hdl{};
             glCreateVertexArrays(1, &vaoid);
 
@@ -216,7 +224,7 @@ namespace lof {
             mdl.vaoid = vaoid;
             mdl.primitive_type = modelData.primitiveType;
             mdl.draw_cnt = static_cast<GLuint>(modelData.vtxIdx.size());
-            model_storage[model_name] = mdl;
+            models[model_name] = mdl;
 
             LM.write_log("Graphics_Manager: Created GPU resources for model %s", model_name.c_str());
         }
@@ -225,6 +233,7 @@ namespace lof {
         return GL_TRUE;
     }
 
+    
     // Add a texture into the texture storage
     GLboolean Graphics_Manager::load_texture(std::string const& texture_name) {
         // Texture file path
@@ -274,7 +283,7 @@ namespace lof {
         }
 
         // Add newly created texture into texture storage
-        texture_storage.emplace(std::make_pair(texture_name, tex_id));
+        ASM.texture_storage.emplace(std::make_pair(texture_name, tex_id));
         return GL_TRUE;
     }
 
@@ -299,8 +308,8 @@ namespace lof {
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
             // Load first 128 characters of ASCII set
-            std::map<GLchar, Character> characters_set;
-            Font new_font{};
+            std::map<GLchar, Assets_Manager::Character> characters_set;
+            Assets_Manager::Font new_font{};
 
             for (unsigned char ch = 0; ch < 128; ++ch) {
                 // Load character glyph
@@ -326,13 +335,13 @@ namespace lof {
                     0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
 
                 // Store character information
-                Character character = {
+                Assets_Manager::Character character = {
                     texture,
                     glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
                     glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                     static_cast<unsigned int>(face->glyph->advance.x)
                 };
-                characters_set.insert(std::pair<char, Character>(ch, character));
+                characters_set.insert(std::pair<char, Assets_Manager::Character>(ch, character));
             }
 
             // Create and configure VAO/VBO for rendering
@@ -353,7 +362,7 @@ namespace lof {
             new_font.characters = characters_set;
 
             // Add to storage
-            font_storage[font_name] = new_font;
+            ASM.font_storage[font_name] = new_font;
             LM.write_log("Font %s successfully added.", font_name.c_str());
 
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -371,16 +380,16 @@ namespace lof {
     }
 
     // Return reference to model storage
-    Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() { return model_storage; }
+    //Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() { return model_storage; }
 
     // Return reference to texture storage
-    Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() { return texture_storage; }
+    //Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() { return texture_storage; }
 
     // Return reference to animation storage
-    Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; }
+    //Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; }
 
     // Return reference to font storage
-    Graphics_Manager::FONTS& Graphics_Manager::get_font_storage() { return font_storage; }
+    //Graphics_Manager::FONTS& Graphics_Manager::get_font_storage() { return font_storage; }
 
     // Return state of current render mode
     GLenum& Graphics_Manager::get_render_mode() { return render_mode; }

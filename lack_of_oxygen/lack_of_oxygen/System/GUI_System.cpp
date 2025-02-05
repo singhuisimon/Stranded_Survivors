@@ -10,6 +10,10 @@
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Game_Manager.h"
+#include "../Manager/Graphics_Manager.h"
+#include "../Manager/Audio_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
+#include "../System/Movement_System.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -30,6 +34,30 @@ namespace lof {
 
     void GUI_System::update(float delta_time)
     {
+        // Add logging for current scene and GUI state
+        LM.write_log("Current scene: %d", GM.get_current_scene());
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
+        }
+
+        // Win screen check
+        // Check for win screen first, before any GUI-related code
+        if (GM.get_current_scene() == 4) {  // Win screen
+            // Force-invalidate all GUI entity IDs
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            mineral_progress_bar = INVALID_ENTITY_ID;
+            mineral_percentage_text = INVALID_ENTITY_ID;
+            mineral_deposit_count_text = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+            oxygen_progress_bar1 = INVALID_ENTITY_ID;
+            oxygen_progress_bar2 = INVALID_ENTITY_ID;
+            oxygen_percentage_text1 = INVALID_ENTITY_ID;
+            oxygen_percentage_text2 = INVALID_ENTITY_ID;
+            return;  // Skip all GUI updates on win screen
+        }
+
         // == Mineral E prompt bobbing ==
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
             e_prompt_animation_timer += delta_time;
@@ -47,6 +75,73 @@ namespace lof {
                 float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                 transform->position.y = original_e_prompt_y + offset;
                 transform->position.x = oxygen_e_prompt_x; // keep X constant
+            }
+        }
+
+        // Check if we've reached 100% (50,000 minerals)
+        // Check if we've reached 100% (50,000 minerals)
+        if (stored_mineral_progress * 50000.0f >= 50000.0f) {
+            // Force hide all GUI elements before scene transition
+            hide_mineral_tank_gui();
+            hide_oxygen_tank_gui();
+            hide_oxygen_warning(50.0f);
+            hide_oxygen_warning(20.0f);
+            hide_oxygen_warning(5.0f);
+
+            // Reset GUI state variables
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+
+            // Clear mineral progress
+            stored_mineral_progress = 0.0f;
+
+            // Clear dynamic entities first
+            bool found_movement_system = false;
+            for (auto& system : ECSM.get_systems()) {
+                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                    movement_system->clear_dynamic_entities();
+                    found_movement_system = true;
+                    LM.write_log("Found and cleared Movement System");
+                    break;
+                }
+            }
+            if (!found_movement_system) {
+                LM.write_log("Warning: Movement System not found");
+            }
+
+            // Set up scene loading
+            const std::string SCENES = "Scenes";
+            std::string scene_file = "win_screen.scn";
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
+
+            // Try to load win screen
+            if (SM.load_scene(scene_path.c_str())) {
+                LM.write_log("Win screen loaded successfully");
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Stop all currently playing audio
+                ADM.stop_mastergroup();
+
+                // Update current scene in Game Manager
+                GM.set_current_scene(4);
+
+                // Update IMGUI Manager's current file
+                IMGUIM.set_current_file_shown(scene_file);
+
+                // Reset stored mineral progress
+                stored_mineral_progress = 0.0f;
+
+                return;
+            }
+            else {
+                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
             }
         }
 
@@ -180,6 +275,11 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_mineral_tank_gui()
     {
+        // Add scene check at the start
+        if (GM.get_current_scene() == 4) {  // Win screen
+            return;  // Don't show GUI on win screen
+        }
+
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             return; // GUI already shown
         }

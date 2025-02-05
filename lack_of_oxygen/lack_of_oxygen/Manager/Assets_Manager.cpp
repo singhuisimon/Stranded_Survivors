@@ -27,6 +27,7 @@ namespace lof {
     Assets_Manager::Assets_Manager() {
         set_type("Assets_Manager");
         initialize_paths();
+        all_assets_in_file();
     }
 
      std::string Assets_Manager::get_executable_directory() {
@@ -263,8 +264,8 @@ namespace lof {
 
         std::string file_line, prefix;
         std::string anim_name;
-        Graphics_Manager::Animation animation{};
-        Graphics_Manager::Frame frame{};
+        Assets_Manager::Animation animation{};
+        Assets_Manager::Frame frame{};
 
         while (getline(input_file, file_line)) {
             std::istringstream file_line_ss{ file_line };
@@ -289,7 +290,7 @@ namespace lof {
             else if (prefix == "EA") {
            
                 animation.frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
-                GFXM.animation_storage[anim_name] = animation;
+                ASM.animation_storage[anim_name] = animation;
                 animation = {};
                 //LM.write_log("Assets_Manager: %s animation loaded", anim_name.c_str());
             }
@@ -333,6 +334,16 @@ namespace lof {
         return true;
     }
 
+    void Assets_Manager::unload_fonts() {
+        font_storage.clear();
+        LM.write_log("Assets_Manager: Unloaded all fonts");
+    }
+
+
+    void Assets_Manager::store_font(const std::string& font_name, const Font& font) {
+        font_storage[font_name] = font;
+    }
+
     // Read and store names of fonts 
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
         std::ifstream input_file{ file_name, std::ios::in };
@@ -370,10 +381,593 @@ namespace lof {
     }
 
 
-  
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void Assets_Manager::shut_down() {
+        // Unload assets
+        unload_textures();
+        unload_shader_programs();
+        unload_models();
+        unload_animations();
+        unload_fonts();
+
+        LM.write_log("Assets Manager and other resources have been shut down.");
+    }
 
 
-    
+    void Assets_Manager::unload_models()
+    {
+        model_storage.clear();
+    }
+
+
+    void Assets_Manager::unload_textures() {
+        /*for (auto& pair : texture_storage) {
+            glDeleteTextures(1, &pair.second);
+        }*/
+        texture_storage.clear();
+        std::cout << "Assets_Manager: All textures have been unloaded." << std::endl;
+    }
+
+    void Assets_Manager::unload_animations()
+    {
+        animation_storage.clear();
+    }
+
+    void Assets_Manager::track_entity_asset(EntityID entity_id, const std::string& component_name, const std::string& asset_name) {
+        tracked_assets[entity_id][component_name].emplace(asset_name);
+
+        LM.write_log("Tracking asset: Entity ID: %u, Component: %s, Asset: %s",
+                 entity_id, component_name.c_str(), asset_name.c_str());
+
+    }
+
+    void Assets_Manager::register_asset(const std::string& asset_name) {
+        all_assets.emplace(asset_name);
+        //LM.write_log("Registered asset: %s", asset_name.c_str());
+    }
+
+    // to register new assets
+    void Assets_Manager::register_assets_from_file(const std::string& file_path)
+    {
+        std::string asset_name = std::filesystem::path(file_path).stem().string();
+        register_asset(asset_name);
+        LM.write_log("Registered new asset: %s", asset_name.c_str());
+    }
+
+    // to get the items in the texture folder
+    void Assets_Manager::all_assets_in_file()
+    {
+        std::string tex_directory = get_full_path(TEXTURE_PATH, "");
+
+        if (!std::filesystem::exists(tex_directory))
+        {
+            return;
+        }
+
+        for (const auto& entry : std::filesystem::directory_iterator(tex_directory))
+        {
+            if (entry.is_regular_file())
+            {
+                std::string texture_name = entry.path().stem().string(); //get file name 
+                register_asset(texture_name);
+                LM.write_log("Registered texture asset: %s", texture_name.c_str());
+            }
+
+
+        }
+    }
+
+    void Assets_Manager::delete_texture(const std::string& texture_name) {
+        // Check if texture exists in storage
+        auto it = texture_storage.find(texture_name);
+        if (it != texture_storage.end()) {
+            // Delete the OpenGL texture
+            GLuint tex_id = it->second;
+            glDeleteTextures(1, &tex_id);
+            texture_storage.erase(it);
+
+            // Log the deletion
+            LM.write_log("Assets_Manager: Deleted texture asset: %s", texture_name.c_str());
+        }
+        else {
+            LM.write_log("Assets_Manager: Texture %s not found in storage", texture_name.c_str());
+            return;
+        }
+
+        // remove Graphics Components
+        for (auto& entity : ECSM.get_entities()) {
+            if (entity && ECSM.has_component<Graphics_Component>(entity->get_id())) {
+                Graphics_Component& graphics = ECSM.get_component<Graphics_Component>(entity->get_id());
+
+                if (graphics.texture_name == texture_name) {
+                    // If the component is using the deleted texture, remove it
+                    ECSM.remove_component<Graphics_Component>(entity->get_id());
+                    LM.write_log("Assets_Manager: Removed Graphics Component from Entity %u due to texture deletion: %s",
+                        entity->get_id(), texture_name.c_str());
+                }
+            }
+        }
+    }
+#if 0 
+    void Assets_Manager::delete_font(const std::string& text_name)
+    {
+        auto it = font_storage.find(text_name);
+        if (it != font_storage.end())
+        {
+            // remove the font
+            font_storage.erase(it);
+        }
+        else {
+            return;
+        }
+
+        for (auto& entity : ECSM.get_entities())
+        {
+            if (entity && ECSM.has_component<Text_Component>(entity->get_id()))
+            {
+                Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+                if (font_component.font_name == text_name)
+                {
+                    ECSM.destroy_entity(entity)
+                    ECSM.remove_component<Text_Component>(entity->get_id());
+                }
+            }
+        }
+
+    }
+#endif 
+    //void Assets_Manager::delete_font(const std::string& text_name)
+    //{
+    //    // Remove font if it exists in storage
+    //    auto it = font_storage.find(text_name);
+    //    if (it != font_storage.end())
+    //    {
+    //        font_storage.erase(it);
+    //    }
+    //    else
+    //    {
+    //        return;
+    //    }
+
+    //    // Iterate and destroy entities directly
+    //    for (auto& entity : ECSM.get_entities())
+    //    {
+    //        if (entity && ECSM.has_component<Text_Component>(entity->get_id()))
+    //        {
+    //            Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+    //            if (font_component.font_name == text_name)
+    //            {
+    //                // Remove the component first, then destroy the entity
+    //                //ECSM.remove_component<Text_Component>(entity->get_id());
+    //                ECSM.destroy_entity(entity->get_id());
+
+    //                //printf("entity %d is being remove\n", entity->get_id());
+
+    //                
+    //            }
+    //        }
+    //    }
+    //}
+
+
+#if 0 
+    void Assets_Manager::delete_font(const std::string& text_name) {
+        // Log the font deletion process
+        LM.write_log("Assets_Manager: Deleting font: %s", text_name.c_str());
+
+        // Step 1: Collect all entities that use the font
+        std::vector<EntityID> entities_to_update;
+
+        for (auto& entity : ECSM.get_entities()) {
+            if (entity && ECSM.has_component<Text_Component>(entity->get_id())) {
+                Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+                if (font_component.font_name == text_name) {
+                    entities_to_update.push_back(entity->get_id());
+                    LM.write_log("Assets_Manager: Marked Entity %u for font removal due to font deletion: %s",
+                        entity->get_id(), text_name.c_str());
+                }
+            }
+        }
+
+        // Step 2: Remove or reset text components from entities
+        for (auto id : entities_to_update) {
+            Text_Component& font_component = ECSM.get_component<Text_Component>(id);
+
+            // Reset the font reference before deleting the font
+            font_component.font_name.clear();
+
+            // Remove the text component completely if needed
+            ECSM.remove_component<Text_Component>(id);
+            LM.write_log("Assets_Manager: Removed Entity %u text component due to font deletion", id);
+        }
+
+        // Step 3: Safely delete the font from font_storage
+        auto it = font_storage.find(text_name);
+        if (it != font_storage.end()) {
+            LM.write_log("Assets_Manager: Erasing font from font_storage: %s", text_name.c_str());
+            font_storage.erase(it);
+        }
+        else {
+            LM.write_log("Assets_Manager: Font %s not found in storage", text_name.c_str());
+        }
+    }
+#endif
+
+
+
+#if 0
+    void Assets_Manager::delete_font(const std::string& text_name) {
+        // Log the font deletion process
+        LM.write_log("Assets_Manager: Deleting font: %s", text_name.c_str());
+
+        // Manually iterate through the font_storage map
+        for (auto font = font_storage.begin(); font != font_storage.end(); ) {
+            if (font->first == text_name) {
+                // If the font name matches, erase it from the map
+                LM.write_log("Assets_Manager: Erasing font: %s", text_name.c_str());
+                font = font_storage.erase(font);  // Safely erase and get the next iterator
+            }
+            else {
+                ++font;  // Proceed to the next font if no deletion occurred
+            }
+        }
+
+      
+        for (auto& entity : ECSM.get_entities()) {
+            if (entity && ECSM.has_component<Text_Component>(entity->get_id())) {
+                Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+                if (font_component.font_name == text_name) {
+                    // remove the entire entity
+                   
+                    ECSM.remove_component<Text_Component>(entity->get_id());
+                    LM.write_log("Assets_Manager: Removed Entity %u due to font deletion: %s",
+                        entity->get_id(), text_name.c_str());
+                }
+            }
+        }
+    }
+#endif 
+#if 0
+    void Assets_Manager::delete_font(const std::string& text_name) {
+        LM.write_log("Assets_Manager: Deleting font: %s", text_name.c_str());
+
+        // First, gather entities to remove components from
+        std::vector<EntityID*> entities_to_remove;
+
+        // Manually iterate through the font_storage map
+        for (auto font = font_storage.begin(); font != font_storage.end();) {
+            if (font->first == text_name) {
+                LM.write_log("Assets_Manager: Erasing font: %s", text_name.c_str());
+                font = font_storage.erase(font);  // Safely erase and get the next iterator
+            }
+            else {
+                ++font;
+            }
+        }
+
+        // Now remove the font component from entities
+        for (auto& entity : ECSM.get_entities()) {
+            if (entity && ECSM.has_component<Text_Component>(entity->get_id())) {
+                Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+                if (font_component.font_name == text_name) {
+                    // Push the address of entity (if it's an object, not a pointer)
+                    entities_to_remove.push_back(&entity);  // Address of entity
+                    LM.write_log("Assets_Manager: Found Entity %u with font: %s", entity->get_id(), text_name.c_str());
+                }
+            }
+        }
+
+        // Now perform the actual removal of components
+        for (auto* entity : entities_to_remove) {  // Dereference the pointer when accessing
+            ECSM.remove_component<Text_Component>(entity->get_id());
+            LM.write_log("Assets_Manager: Removed Entity %u due to font deletion: %s", entity->get_id(), text_name.c_str());
+        }
+    }
+#endif
+
+    //void Assets_Manager::delete_font(const std::string& text_name) {
+    //    // Log the font deletion process
+    //    LM.write_log("Assets_Manager: Deleting font: %s", text_name.c_str());
+
+    //    // Manually iterate through the font_storage map
+    //    for (auto font = font_storage.begin(); font != font_storage.end(); ) {
+    //        if (font->first == text_name) {
+    //            // If the font name matches, erase it from the map
+    //            LM.write_log("Assets_Manager: Erasing font: %s", text_name.c_str());
+    //            font = font_storage.erase(font);  // Safely erase and get the next iterator
+    //        }
+    //        else {
+    //            ++font;  // Proceed to the next font if no deletion occurred
+    //        }
+    //    }
+
+    //    // Create a list to store entities to be removed
+    //    std::vector<EntityID> entities_to_remove;
+
+    //    // Now, check each entity and gather those to be removed
+    //    for (auto& entity : ECSM.get_entities()) {
+    //        if (entity && ECSM.has_component<Text_Component>(entity->get_id())) {
+    //            Text_Component& font_component = ECSM.get_component<Text_Component>(entity->get_id());
+    //            if (font_component.font_name == text_name) {
+    //                // Add the entity to the removal list
+    //                entities_to_remove.push_back(entity->get_id());
+    //                LM.write_log("Assets_Manager: Found Entity %u with font: %s", entity->get_id(), text_name.c_str());
+    //            }
+    //        }
+    //    }
+
+    //    // Now, attempt to remove the entire entity after removing the component
+    //    for (auto& entity_id : entities_to_remove) {
+    //        // Ensure we first remove the component before destroying the entity
+    //        ECSM.remove_component<Text_Component>(entity_id);
+    //        LM.write_log("Assets_Manager: Removed Text_Component from Entity %u due to font deletion: %s", entity_id, text_name.c_str());
+
+    //        // Now, safely destroy the entity
+    //        ECSM.destroy_entity(entity_id);
+    //        LM.write_log("Assets_Manager: Destroyed Entity %u due to font deletion: %s", entity_id, text_name.c_str());
+    //    }
+    //}
+
+
+
+
+
+
+    void Assets_Manager::AddAsset(const std::string& filePath) {
+        // Extract the file extension
+        std::string extension = filePath.substr(filePath.find_last_of('.') + 1);
+        std::string fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
+
+        // Determine the destination subfolder within Assets
+        std::string destinationSubfolder;
+
+        if (extension == "png") {
+            destinationSubfolder = TEXTURE_PATH;
+        }
+        else if (extension == "obj") {
+            destinationSubfolder = MODEL_PATH;
+        }
+        else if (extension == "wav") {
+            destinationSubfolder = AUDIO_PATH;
+        }
+        else if (extension == "vert" || extension == "frag") {  
+            destinationSubfolder = SHADER_PATH;
+        }
+        else if (extension == "ttf") {
+            destinationSubfolder = FONT_PATH;
+        }
+        else if (extension == "csv")
+        {
+            destinationSubfolder = LEVEL_PATH;
+        }
+        else {
+            //std::cout << "Unsupported asset type: " << filePath << "\n";
+            LM.write_log("Assets_Manager: Unsupported asset type %s being added.", filePath);
+            return;
+        }
+
+        // Build the target file path within the Assets directory
+        std::string targetPath = get_full_path(destinationSubfolder, fileName);;
+
+        // Ensure the directory exists and copy the file
+        if (CopyFileTo(targetPath, filePath)) {
+            //std::cout << "File successfully added to: " << targetPath << "\n";
+            LM.write_log("Assets_Manager: File %s successfully added to: %s.", fileName, targetPath);
+        }
+        else {
+            //std::cout << "Failed to add file: " << filePath << "\n";
+            LM.write_log("Assets_Manager: Failed to add file %s", filePath);
+        }
+    }
+
+    bool Assets_Manager::CopyFileTo(const std::string& destinationPath, const std::string& sourcePath) {
+        try {
+            
+            std::filesystem::create_directories(std::filesystem::path(destinationPath).parent_path());
+
+            // Open the source file and destination file in binary mode
+            std::ifstream src(sourcePath, std::ios::binary);
+            std::ofstream dst(destinationPath, std::ios::binary);
+
+            if (!src.is_open() || !dst.is_open()) {
+                //std::cerr << "Error opening source or destination file.\n";
+                LM.write_log("Error opening source or destination file.");
+                return false;
+            }
+
+            dst << src.rdbuf();  // Copy the file content
+            return true;
+        }
+        catch (const std::exception& e) {
+            //std::cerr << "Error copying file: " << e.what() << std::endl;
+            LM.write_log("Error copying file");
+            return false;
+        }
+    }
+
+    // to check if the entity have the audio component, true (have), false (dont have)
+    bool Assets_Manager::has_audio_component(const EntityID& entity)
+    {
+        return ECSM.has_component<Audio_Component>(entity);
+    }
+
+    bool Assets_Manager::is_entity_using_audio(const EntityID& entity, const std::string target_audio)
+    {
+        // if contain audio component
+        if (ECSM.has_component<Audio_Component>(entity))
+        {
+            auto audio_component = ECSM.get_component<Audio_Component>(entity);
+
+            const auto& sounds = audio_component.get_sounds();
+            for (const auto& sound : sounds)
+            {
+                if (sound.filepath == target_audio)
+                {
+                    std::cout << "yes! entity " << entity << "has audio component " << "\n";
+                    track_audio_usage[entity] = target_audio;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    EntityID Assets_Manager::get_entity_with_audio(const std::string& target_audio) {
+        for (const auto& entity_ptr : ECSM.get_entities()) {
+            EntityID entity = entity_ptr->get_id();
+
+            if (ECSM.has_component<Audio_Component>(entity)) {
+                Audio_Component& audio_component = ECSM.get_component<Audio_Component>(entity);
+
+                const auto& sounds = audio_component.get_sounds();
+                for (const auto& sound : sounds) {
+                    if (sound.filepath == target_audio) {
+                        std::cout << "Found entity " << entity << " with audio: " << target_audio << "\n";
+                        track_audio_usage[entity] = target_audio;  // Store result if needed
+                        return entity;
+                    }
+                }
+            }
+        }
+
+        return INVALID_ENTITY_ID;
+    }
+
+    std::vector<EntityID> Assets_Manager::get_all_entities_with_audio() {
+        std::vector<EntityID> entities_with_audio;
+
+        for (const auto& entity_ptr : ECSM.get_entities()) {
+            EntityID entity = entity_ptr->get_id();
+
+            if (ECSM.has_component<Audio_Component>(entity)) {
+                // Add this entity to the list if it has an Audio_Component
+                entities_with_audio.push_back(entity);
+            }
+        }
+
+        return entities_with_audio;
+    }
+
+
+#if 1
+    bool Assets_Manager::find_and_remove_audio(const std::string& target_audio) {
+        EntityID entity_with_audio = get_entity_with_audio(target_audio);
+
+        if (entity_with_audio == INVALID_ENTITY_ID) {
+            std::cout << "No entity found with the audio component for: " << target_audio << std::endl;
+            return false;
+        }
+
+        // Remove the audio sound and update the channel/sound map
+        Audio_Component& audio = ECSM.get_component<Audio_Component>(entity_with_audio);
+        auto& sounds = audio.get_sounds();
+        std::string sound_key;
+
+        // Find the sound key
+        for (const auto& sound : sounds) {
+            if (sound.filepath == target_audio) {
+                sound_key = sound.key;
+                break;
+            }
+        }
+
+        if (!sound_key.empty()) {
+            std::string key_for_channel_map = target_audio + std::to_string(entity_with_audio) + sound_key;
+
+            // Stop the sound and clean up the channel map
+            for (auto& system : ECSM.get_systems()) {
+                if (system->get_type() == "Audio_System") {
+                    auto* audio_system = static_cast<Audio_System*>(system.get());
+                    if (audio_system) {
+                        audio_system->stop_sound(key_for_channel_map);
+                        std::cout << "Deleted " << key_for_channel_map << " from channel map\n";
+                    }
+
+                    // Remove from the sound map if it exists
+                    auto& sound_map = ADM.get_sound_map();
+                    if (sound_map.erase(target_audio) > 0) {
+                        std::cout << "Successfully removed from sound_map.\n";
+                    }
+                    else {
+                        std::cout << "Sound was not found in sound_map.\n";
+                    }
+                }
+            }
+
+            // Small delay to ensure the system releases file
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            return true;
+        }
+
+        return false;
+    }
+
+#endif
+
+#if 0
+    bool Assets_Manager::find_and_remove_audio(const std::string& target_audio) {
+        for (const auto& entity_ptr : ECSM.get_entities()) {
+            EntityID entity = entity_ptr->get_id();
+
+            std::cout << "Assets manager: check audio entity " << entity << "\n";
+
+            if (is_entity_using_audio(entity, target_audio)) {
+                // Remove the audio sound and update the channel/sound map
+                Audio_Component& audio = ECSM.get_component<Audio_Component>(entity);
+                auto& sounds = audio.get_sounds();
+                std::string sound_key;
+
+                // Find the sound key
+                for (const auto& sound : sounds) {
+                    if (sound.filepath == target_audio) {
+                        sound_key = sound.key;
+                        break;
+                    }
+                }
+
+                if (!sound_key.empty()) {
+                    std::string key_for_channel_map = target_audio + std::to_string(entity) + sound_key;
+
+                    // Stop the sound and clean up the channel map
+                    for (auto& system : ECSM.get_systems()) {
+                        if (system->get_type() == "Audio_System") {
+                            auto* audio_system = static_cast<Audio_System*>(system.get());
+                            if (audio_system) {
+                                audio_system->stop_sound(key_for_channel_map);
+                                std::cout << "Deleted " << key_for_channel_map << " from channel map\n";
+                            }
+
+                            // Remove from the sound map if it exists
+                            auto& sound_map = ADM.get_sound_map();
+                            if (sound_map.find(target_audio) != sound_map.end()) {
+                                sound_map.erase(target_audio);
+                                std::cout << "Successfully removed from sound_map.\n";
+                            }
+                            else {
+                                std::cout << "Sound was not found in sound_map.\n";
+                            }
+                        }
+                    }
+
+                    // Small delay to ensure the system releases file
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    return true;
+                }
+            }
+        }
+        std::cout << "No entity with the audio component found for: " << target_audio << std::endl;
+        return false;
+    }
+#endif
+
+   
+
+
+ 
+
+
 } // namespace lof
 
 

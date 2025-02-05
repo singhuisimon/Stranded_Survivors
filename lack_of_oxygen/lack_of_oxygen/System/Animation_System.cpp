@@ -29,7 +29,7 @@ namespace lof {
     void Animation_System::update(float delta_time) { 
 
         // Get a reference to the animation container
-        auto& animations_storage = GFXM.get_animation_storage();   
+        auto& animations_storage = ASM.get_animation_storage();   
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
         // Loop over the entities that match the system's signature
