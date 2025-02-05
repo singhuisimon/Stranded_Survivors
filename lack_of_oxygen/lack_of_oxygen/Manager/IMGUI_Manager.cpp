@@ -175,7 +175,14 @@ namespace lof {
         const std::string scenes = "Scenes";
         if (SM.load_scene(ASM.get_full_path(scenes, file_name).c_str())) {
 
-            GM.set_current_scene(selected_file_index);
+            auto it = std::find_if(file_name.begin(), file_name.end(), ::isdigit);
+
+            if (it != file_name.end()) {
+                GM.set_current_scene(std::stoi(std::string(it, file_name.end())));
+            }
+            else {
+                GM.set_current_scene(selected_file_index);
+            }
 
             selected_object_index = -1;
 
@@ -183,6 +190,10 @@ namespace lof {
             auto& camera = GFXM.get_camera();
             camera.pos_x = DEFAULT_CAMERA_POS_X;
             camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+            if (GM.get_current_oxygen_level() < 100) {
+                GM.set_current_oxygen_level(100);
+            }
             
             /*if (selected_file_index == 2) {
                 // Update top UI overlay position to follow player
@@ -1102,34 +1113,27 @@ namespace lof {
 
                 //        auto& movement_speed = logic.movement_speed;
                 //        ImGui::InputFloat("Movement Speed", &movement_speed);
-
                 //        auto& movement_range = logic.movement_range;
                 //        ImGui::InputFloat("Movement Range", &movement_range);
-
                 //        auto& reverse_direction = logic.reverse_direction;
                 //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
                 //        if (button_toggle(reverse_dir, &is_reverse_on)) {
                 //            reverse_direction = !reverse_direction;
                 //        }
-
                 //        auto& is_rotate = logic.rotate_with_motion;
                 //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
                 //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
                 //            is_rotate = !is_rotate;
                 //        }
-
                 //        auto& original_position = logic.origin_pos;
                 //        ImGui::InputFloat2("Original Position", &original_position.x);
-
                 //        for (const char* behaviour_here : chosen_logic_behaviour) {
                 //            ImGui::Text(behaviour_here);
                 //            ImGui::NewLine;
                 //        }
-
                 //        if (ImGui::Button("Add Logic Behaviour")) {
                 //            ImGui::OpenPopup("Add Behaviour Options");
                 //        }
-
                 //        if (ImGui::BeginPopup("Add Behaviour Options")) {
                 //            ImGui::Text("Select Operation");
                 //            ImGui::Separator();
@@ -1140,27 +1144,22 @@ namespace lof {
                 //            }
                 //            ImGui::EndPopup();
                 //        }
-
                 //        if (ImGui::Button("Remove Logic Behaviour")) {
                 //            ImGui::OpenPopup("Remove Behaviour Options");
                 //        }
-
                 //        if (ImGui::BeginPopup("Remove Behaviour Options")) {
                 //            ImGui::Text("Select Operation");
                 //            ImGui::Separator();
                 //            for (const char* behaviour : logic_behaviour) {
                 //                if (ImGui::Selectable(behaviour)) {
-
                 //                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
                 //                    if (it != chosen_logic_behaviour.end()) {
                 //                        chosen_logic_behaviour.erase(it);
                 //                    }
-
                 //                }
                 //            }
                 //            ImGui::EndPopup();
                 //        }
-
                 //        ImGui::Separator();
                 //    }
                 //}
@@ -1592,12 +1591,16 @@ namespace lof {
 
                         std::filesystem::remove(temp);
 
-                        auto& texture_storage = ASM.get_texture_storage();
+                        auto& texture_storage = ASM.get_texture_storage();                        
 
                         //Prepare the texture name for removal
                         temp.erase(0, ASM.get_full_path("Textures", "").length());
                         temp = temp.substr(0, temp.find_last_of('.'));
-                        std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+
+                        auto it = texture_storage.find(temp);
+                        if (it == texture_storage.end()) {
+                            std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+                        }
 
                         // Step 3: Call the Assets_Manager's delete_texture function to delete the texture and remove associated components
                         ASM.delete_texture(temp);
