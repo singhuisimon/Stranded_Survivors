@@ -169,8 +169,12 @@ namespace lof {
         static EntityID mineral_tank;
         static EntityID oxygen_tank;
 
-        // 
-        static bool is_transitioning;  // Add this as a private member
+        static bool is_transitioning;
+        float transition_cooldown = 0.5f;
+        float current_cooldown = 0.0f;
+
+        float post_transition_grace_period = 0.5f; // Grace period after transition
+        float grace_timer = 0.0f; // Timer to track grace period
 
         //static bool collision_handled;
         //float accumulated_time = 0.0f;
@@ -229,9 +233,12 @@ namespace lof {
 
 
         // == MAIN MENU BUTTON COLLISION ==
-        void check_main_menu_button_collision();
+        void check_main_menu_button_collision(float delta_time);
         // == CREDITS BUTTON COLLISION ==
-        void check_credits_back_button_collision();
+        void check_credits_back_button_collision(float delta_time);
+        // == WIN SCREEN BUTTON COLLISION ==
+        void check_win_screen_button_collision(float delta_time);
+
     };
 
 

@@ -34,6 +34,30 @@ namespace lof {
 
     void GUI_System::update(float delta_time)
     {
+        // Add logging for current scene and GUI state
+        LM.write_log("Current scene: %d", GM.get_current_scene());
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
+        }
+
+        // Win screen check
+        // Check for win screen first, before any GUI-related code
+        if (GM.get_current_scene() == 4) {  // Win screen
+            // Force-invalidate all GUI entity IDs
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            mineral_progress_bar = INVALID_ENTITY_ID;
+            mineral_percentage_text = INVALID_ENTITY_ID;
+            mineral_deposit_count_text = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+            oxygen_progress_bar1 = INVALID_ENTITY_ID;
+            oxygen_progress_bar2 = INVALID_ENTITY_ID;
+            oxygen_percentage_text1 = INVALID_ENTITY_ID;
+            oxygen_percentage_text2 = INVALID_ENTITY_ID;
+            return;  // Skip all GUI updates on win screen
+        }
+
         // == Mineral E prompt bobbing ==
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
             e_prompt_animation_timer += delta_time;
@@ -55,8 +79,23 @@ namespace lof {
         }
 
         // Check if we've reached 100% (50,000 minerals)
+        // Check if we've reached 100% (50,000 minerals)
         if (stored_mineral_progress * 50000.0f >= 50000.0f) {
-            LM.write_log("Win condition met - attempting scene transition");
+            // Force hide all GUI elements before scene transition
+            hide_mineral_tank_gui();
+            hide_oxygen_tank_gui();
+            hide_oxygen_warning(50.0f);
+            hide_oxygen_warning(20.0f);
+            hide_oxygen_warning(5.0f);
+
+            // Reset GUI state variables
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+
+            // Clear mineral progress
+            stored_mineral_progress = 0.0f;
 
             // Clear dynamic entities first
             bool found_movement_system = false;
@@ -95,6 +134,10 @@ namespace lof {
 
                 // Update IMGUI Manager's current file
                 IMGUIM.set_current_file_shown(scene_file);
+
+                // Reset stored mineral progress
+                stored_mineral_progress = 0.0f;
+
                 return;
             }
             else {
@@ -232,6 +275,11 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_mineral_tank_gui()
     {
+        // Add scene check at the start
+        if (GM.get_current_scene() == 4) {  // Win screen
+            return;  // Don't show GUI on win screen
+        }
+
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             return; // GUI already shown
         }
