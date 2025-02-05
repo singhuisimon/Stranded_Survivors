@@ -97,6 +97,19 @@ namespace lof {
             // Clear mineral progress
             stored_mineral_progress = 0.0f;
 
+            // Reset all gameplay values
+            stored_mineral_progress = 0.0f;  // Reset mineral progress
+            GM.set_current_oxygen_level(100.0f);  // Reset player oxygen to full
+            GM.set_ship_oxygen_level(400.0f);  // Reset ship oxygen to full
+
+            // Reset goal percentage text
+            EntityID goal_text_entity = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
+            if (goal_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_entity)) {
+                auto& text_comp = ECSM.get_component<Text_Component>(goal_text_entity);
+                text_comp.text = "00%";  // Reset to 0%
+            }
+
+
             // Clear dynamic entities first
             bool found_movement_system = false;
             for (auto& system : ECSM.get_systems()) {
