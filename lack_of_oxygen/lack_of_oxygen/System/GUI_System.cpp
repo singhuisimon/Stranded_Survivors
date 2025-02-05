@@ -10,6 +10,10 @@
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Game_Manager.h"
+#include "../Manager/Graphics_Manager.h"
+#include "../Manager/Audio_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
+#include "../System/Movement_System.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -30,6 +34,30 @@ namespace lof {
 
     void GUI_System::update(float delta_time)
     {
+        // Add logging for current scene and GUI state
+        LM.write_log("Current scene: %d", GM.get_current_scene());
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            //LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
+        }
+
+        // Win screen check
+        // Check for win screen first, before any GUI-related code
+        if (GM.get_current_scene() == 4) {  // Win screen
+            // Force-invalidate all GUI entity IDs
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            mineral_progress_bar = INVALID_ENTITY_ID;
+            mineral_percentage_text = INVALID_ENTITY_ID;
+            mineral_deposit_count_text = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+            oxygen_progress_bar1 = INVALID_ENTITY_ID;
+            oxygen_progress_bar2 = INVALID_ENTITY_ID;
+            oxygen_percentage_text1 = INVALID_ENTITY_ID;
+            oxygen_percentage_text2 = INVALID_ENTITY_ID;
+            return;  // Skip all GUI updates on win screen
+        }
+
         // == Mineral E prompt bobbing ==
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
             e_prompt_animation_timer += delta_time;
@@ -47,6 +75,86 @@ namespace lof {
                 float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                 transform->position.y = original_e_prompt_y + offset;
                 transform->position.x = oxygen_e_prompt_x; // keep X constant
+            }
+        }
+
+        // Check if we've reached 100% (50,000 minerals)
+        // Check if we've reached 100% (50,000 minerals)
+        if (stored_mineral_progress * 50000.0f >= 50000.0f) {
+            // Force hide all GUI elements before scene transition
+            hide_mineral_tank_gui();
+            hide_oxygen_tank_gui();
+            hide_oxygen_warning(50.0f);
+            hide_oxygen_warning(20.0f);
+            hide_oxygen_warning(5.0f);
+
+            // Reset GUI state variables
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+
+            // Clear mineral progress
+            stored_mineral_progress = 0.0f;
+
+            // Reset all gameplay values
+            stored_mineral_progress = 0.0f;  // Reset mineral progress
+            GM.set_current_oxygen_level(100.0f);  // Reset player oxygen to full
+            GM.set_ship_oxygen_level(400.0f);  // Reset ship oxygen to full
+
+            // Reset goal percentage text
+            EntityID goal_text_entity = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
+            if (goal_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_entity)) {
+                auto& text_comp = ECSM.get_component<Text_Component>(goal_text_entity);
+                text_comp.text = "00%";  // Reset to 0%
+            }
+
+
+            // Clear dynamic entities first
+            bool found_movement_system = false;
+            for (auto& system : ECSM.get_systems()) {
+                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                    movement_system->clear_dynamic_entities();
+                    found_movement_system = true;
+                    LM.write_log("Found and cleared Movement System");
+                    break;
+                }
+            }
+            if (!found_movement_system) {
+                LM.write_log("Warning: Movement System not found");
+            }
+
+            // Set up scene loading
+            const std::string SCENES = "Scenes";
+            std::string scene_file = "win_screen.scn";
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
+
+            // Try to load win screen
+            if (SM.load_scene(scene_path.c_str())) {
+                LM.write_log("Win screen loaded successfully");
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Stop all currently playing audio
+                ADM.stop_mastergroup();
+
+                // Update current scene in Game Manager
+                GM.set_current_scene(4);
+
+                // Update IMGUI Manager's current file
+                IMGUIM.set_current_file_shown(scene_file);
+
+                // Reset stored mineral progress
+                stored_mineral_progress = 0.0f;
+
+                return;
+            }
+            else {
+                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
             }
         }
 
@@ -180,6 +288,11 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_mineral_tank_gui()
     {
+        // Add scene check at the start
+        if (GM.get_current_scene() == 4) {  // Win screen
+            return;  // Don't show GUI on win screen
+        }
+
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             return; // GUI already shown
         }
@@ -282,35 +395,35 @@ namespace lof {
     void GUI_System::hide_mineral_tank_gui() {
         // (5) Destroy deposit count text
         if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
+            //LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
             ecs_manager.destroy_entity(mineral_deposit_count_text);
             mineral_deposit_count_text = INVALID_ENTITY_ID;
         }
 
         // (4) Destroy percentage text
         if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
+            //LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
             ecs_manager.destroy_entity(mineral_percentage_text);
             mineral_percentage_text = INVALID_ENTITY_ID;
         }
 
         // (3) Destroy progress bar
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
+            //LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
             ecs_manager.destroy_entity(mineral_progress_bar);
             mineral_progress_bar = INVALID_ENTITY_ID;
         }
 
         // (2) Destroy container
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
+            //LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
             ecs_manager.destroy_entity(mineral_interaction_container);
             mineral_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) Finally, destroy the E prompt
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
+            //LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
             ecs_manager.destroy_entity(mineral_e_prompt);
             mineral_e_prompt = INVALID_ENTITY_ID;
         }
@@ -525,42 +638,42 @@ namespace lof {
 
         // (6) Second bar text
         if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
+            //LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
             ecs_manager.destroy_entity(oxygen_percentage_text2);
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
         }
 
         // (5) Second progress bar
         if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
+            //LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
             ecs_manager.destroy_entity(oxygen_progress_bar2);
             oxygen_progress_bar2 = INVALID_ENTITY_ID;
         }
 
         // (4) First bar text
         if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
+            //LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
             ecs_manager.destroy_entity(oxygen_percentage_text1);
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
         }
 
         // (3) First progress bar
         if (oxygen_progress_bar1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
+            //LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
             ecs_manager.destroy_entity(oxygen_progress_bar1);
             oxygen_progress_bar1 = INVALID_ENTITY_ID;
         }
 
         // (2) Main container
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
+            //LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
             ecs_manager.destroy_entity(oxygen_interaction_container);
             oxygen_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) E prompt
         if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
+            //LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
             ecs_manager.destroy_entity(oxygen_e_prompt);
             oxygen_e_prompt = INVALID_ENTITY_ID;
         }
