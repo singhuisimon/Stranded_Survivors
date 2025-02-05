@@ -177,11 +177,18 @@ namespace lof {
 
             auto it = std::find_if(file_name.begin(), file_name.end(), ::isdigit);
 
+            std::cout << file_name << std::endl;
             if (it != file_name.end()) {
                 GM.set_current_scene(std::stoi(std::string(it, file_name.end())));
             }
-            else {
-                GM.set_current_scene(selected_file_index);
+            else if (file_name == "credit.scn") {
+                GM.set_current_scene(3);
+            }
+            else if (file_name == "main_menu.scn") {
+                GM.set_current_scene(0);
+            }
+            else if (file_name == "win_screen.scn") {
+                GM.set_current_scene(4);
             }
 
             selected_object_index = -1;
