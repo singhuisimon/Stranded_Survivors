@@ -125,6 +125,7 @@
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
+    <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
   </ItemGroup>

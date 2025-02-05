@@ -10,6 +10,10 @@
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Game_Manager.h"
+#include "../Manager/Graphics_Manager.h"
+#include "../Manager/Audio_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
+#include "../System/Movement_System.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -47,6 +51,54 @@ namespace lof {
                 float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                 transform->position.y = original_e_prompt_y + offset;
                 transform->position.x = oxygen_e_prompt_x; // keep X constant
+            }
+        }
+
+        // Check if we've reached 100% (50,000 minerals)
+        if (stored_mineral_progress * 50000.0f >= 50000.0f) {
+            LM.write_log("Win condition met - attempting scene transition");
+
+            // Clear dynamic entities first
+            bool found_movement_system = false;
+            for (auto& system : ECSM.get_systems()) {
+                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                    movement_system->clear_dynamic_entities();
+                    found_movement_system = true;
+                    LM.write_log("Found and cleared Movement System");
+                    break;
+                }
+            }
+            if (!found_movement_system) {
+                LM.write_log("Warning: Movement System not found");
+            }
+
+            // Set up scene loading
+            const std::string SCENES = "Scenes";
+            std::string scene_file = "win_screen.scn";
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
+
+            // Try to load win screen
+            if (SM.load_scene(scene_path.c_str())) {
+                LM.write_log("Win screen loaded successfully");
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Stop all currently playing audio
+                ADM.stop_mastergroup();
+
+                // Update current scene in Game Manager
+                GM.set_current_scene(4);
+
+                // Update IMGUI Manager's current file
+                IMGUIM.set_current_file_shown(scene_file);
+                return;
+            }
+            else {
+                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
             }
         }
 
