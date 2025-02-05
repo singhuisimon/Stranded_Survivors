@@ -37,7 +37,7 @@ namespace lof {
         // Add logging for current scene and GUI state
         LM.write_log("Current scene: %d", GM.get_current_scene());
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
+            //LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
         }
 
         // Win screen check
@@ -382,35 +382,35 @@ namespace lof {
     void GUI_System::hide_mineral_tank_gui() {
         // (5) Destroy deposit count text
         if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
+            //LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
             ecs_manager.destroy_entity(mineral_deposit_count_text);
             mineral_deposit_count_text = INVALID_ENTITY_ID;
         }
 
         // (4) Destroy percentage text
         if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
+            //LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
             ecs_manager.destroy_entity(mineral_percentage_text);
             mineral_percentage_text = INVALID_ENTITY_ID;
         }
 
         // (3) Destroy progress bar
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
+            //LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
             ecs_manager.destroy_entity(mineral_progress_bar);
             mineral_progress_bar = INVALID_ENTITY_ID;
         }
 
         // (2) Destroy container
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
+            //LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
             ecs_manager.destroy_entity(mineral_interaction_container);
             mineral_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) Finally, destroy the E prompt
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
+            //LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
             ecs_manager.destroy_entity(mineral_e_prompt);
             mineral_e_prompt = INVALID_ENTITY_ID;
         }
@@ -625,42 +625,42 @@ namespace lof {
 
         // (6) Second bar text
         if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
+            //LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
             ecs_manager.destroy_entity(oxygen_percentage_text2);
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
         }
 
         // (5) Second progress bar
         if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
+            //LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
             ecs_manager.destroy_entity(oxygen_progress_bar2);
             oxygen_progress_bar2 = INVALID_ENTITY_ID;
         }
 
         // (4) First bar text
         if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
+            //LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
             ecs_manager.destroy_entity(oxygen_percentage_text1);
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
         }
 
         // (3) First progress bar
         if (oxygen_progress_bar1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
+            //LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
             ecs_manager.destroy_entity(oxygen_progress_bar1);
             oxygen_progress_bar1 = INVALID_ENTITY_ID;
         }
 
         // (2) Main container
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
+            //LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
             ecs_manager.destroy_entity(oxygen_interaction_container);
             oxygen_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) E prompt
         if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
+            //LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
             ecs_manager.destroy_entity(oxygen_e_prompt);
             oxygen_e_prompt = INVALID_ENTITY_ID;
         }
