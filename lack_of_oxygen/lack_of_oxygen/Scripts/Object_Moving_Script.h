@@ -12,6 +12,7 @@
 #ifndef LOF_OBJECT_MOVING_SCRIPT_H
 #define LOF_OBJECT_MOVING_SCRIPT_H
 
+#include <unordered_map>
 #include "../Scripts/Script.h"
 #include "../Component/Logic_Components.h"
 
@@ -20,7 +21,7 @@ namespace lof {
 
     public:
         struct EntityData {
-            std::string movement_pattern;
+            int movement_pattern;
             float movement_speed;
             float movement_range;
             Vec2D origin_pos;
@@ -32,18 +33,23 @@ namespace lof {
 
     public:
 
-        static void register_script();
+        void register_script();
 
-        Object_Moving_Script() = default;
+        Object_Moving_Script();
 
-        void init_get_movement_data(Entity* entity);
+        //void init_get_movement_data(EntityID entity);
         void update_obj_movement(Entity* entity);
 
     private:
 
         const std::string script_name = "object_moving_script";
 
+        //mutable std::mutex entity_data_mutex;
         std::unordered_map<EntityID, EntityData> entity_data;
+
+        void add_entity_data(EntityID id, const EntityData& data);
+        bool get_entity_data(EntityID id, EntityData& out_data) const;
+        void remove_entity_data(EntityID id);
 
         /**
         * @brief Updates linear movement for a given entity.

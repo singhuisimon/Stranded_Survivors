@@ -33,6 +33,7 @@ using namespace lof;
 
 bool level_editor_mode = false;
 GLFWwindow* window = nullptr;
+float delta_time = 0.0f;
 bool is_full_screen = true;
 GLFWmonitor* monitor = nullptr;
 const GLFWvidmode* mode = nullptr;
@@ -200,7 +201,8 @@ int main(void) {
         FPSM.frame_start();
 
         // Get delta_time after frame_start()
-        float delta_time = FPSM.get_delta_time(); // Get delta time in seconds
+        //float delta_time = FPSM.get_delta_time(); // Get delta time in seconds
+        delta_time = FPSM.get_delta_time(); // Get delta time in seconds
 
         // Get FPS
         fps = FPSM.get_current_fps();

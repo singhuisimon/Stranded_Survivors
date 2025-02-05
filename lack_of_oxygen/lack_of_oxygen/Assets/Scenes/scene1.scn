@@ -705,9 +705,9 @@
           "scripts": [
             {
               "script_name": "object_moving_script",
-              "init": "init_function",
-              "update": "update_function",
-              "end": "end_function",
+              "init": "init",
+              "update": "update",
+              "end": "end",
               "data": {
                 "logic_type": 0,
                 "movement_pattern": 0,
@@ -811,12 +811,12 @@
           "scripts": [
             {
               "script_name": "object_moving_script",
-              "init": "init_function",
-              "update": "update_function",
-              "end": "end_function",
+              "init": "init",
+              "update": "update",
+              "end": "end",
               "data": {
                 "logic_type": 0,
-                "movement_pattern": 0,
+                "movement_pattern": 1,
                 "movement_speed": 1.0,
                 "movement_range": 200.0,
                 "reverse_direction": false,
@@ -827,7 +827,7 @@
                 ]
               },
               "state": 0,
-              "is_active": false
+              "is_active": true
             }
           ]
         }

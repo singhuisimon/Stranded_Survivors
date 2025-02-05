@@ -20,7 +20,7 @@ namespace lof {
 	public:
 
 		// Using std::function instead of raw function pointers for flexibility
-		using ScriptFunction = std::function<void(EntityID*)>;
+		using ScriptFunction = std::function<void(EntityID)>;
 
 		Script() = default;
 
@@ -37,8 +37,10 @@ namespace lof {
 		ScriptFunction get_function(const std::string& function_name) const {
 			auto it = functions_map.find(function_name);
 			if (it != functions_map.end()) {
+				LM.write_log("FOUND FUNCTION %s", function_name.c_str());
 				return it->second;
 			}
+			LM.write_log("DID NOT FIND FUNCTION %s", function_name.c_str());
 			return nullptr;
 		}
 

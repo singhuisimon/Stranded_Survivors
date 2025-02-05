@@ -11,7 +11,6 @@
 #include <vector>
 #include <string>
 
-//unneeded rubbish - just joking hais...
 namespace lof {
 
     using ScriptData = std::unordered_map<std::string, std::variant<int, float, std::string, bool, Vec2D>>;

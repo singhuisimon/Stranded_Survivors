@@ -43,6 +43,7 @@ namespace lof {
          * @param delta_time Time elapsed since the last update.
          */
         void update(float delta_time) override;
+        void update_script(float delta_time);
 
         void add_script(const std::string& script_name, std::shared_ptr<Script> script);
 

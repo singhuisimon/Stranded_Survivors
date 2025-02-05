@@ -31,16 +31,21 @@ namespace lof {
 			LM.write_log("Logic_Manager::start_up(): Failed to initalize. Error: %s", e.what());
 			return -1;
 		}
+
+		m_is_started = true;
+		return 0;
 	}
 
 	void Logic_Manager::update(float delta_time) {
 
-		LGS.update(delta_time);
+		//LM.write_log("Logic_Manager:: updating");
+		LGS.update_script(delta_time);
 	}
 
 	void Logic_Manager::register_all_scripts() {
 		// Register Object Moving Script
-		Object_Moving_Script::register_script();
+		Object_Moving_Script object_moving_script;
+		object_moving_script.register_script();
 		LM.write_log("Registered Object Moving Script");
 
 		// Register other scripts here as they are added

@@ -45,59 +45,76 @@ namespace lof {
     }
 
     void Logic_System::update(float delta_time) {
+        //keeping this empty
+    }
+
+    void Logic_System::update_script(float delta_time) {
         // Loop over each script in the map and update
         //loop over the entity
         //check for those that have logic component
         //after that loop to get the script name and ensure to update or based off entity state to call upon the script function
         
-        const auto& entityids = get_entities();
-        
-        for (EntityID entityid : entityids) {
+        if (level_editor_mode) {
+            //LM.write_log("Logic_System updating script in level editor mode");
+            return;
+        }
+
+        auto& entityids = ECSM.get_entities();
+
+        for (int i = 0; i < entityids.size(); ++i) {
+
+
+            EntityID entityid = entityids[i]->get_id();
+
             if (!ECSM.has_component<Logic_Component>(entityid)) {
+                LM.write_log("Logic_System::update_script, entity %u has no logic component", entityid);
                 continue;
             }
 
             Logic_Component& logic = ECSM.get_component<Logic_Component>(entityid);
 
             for (auto& logic_data : logic.logic_datas) {
+
+                //this is keep for in the future when level editor disable it.
                 if (!logic_data->is_active) {
+                    LM.write_log("Logic_System::update_script, entity %u logic is not active", entityid);
                     continue;
                 }
+
+                //gets the script based off the script name
                 auto script = get_script(logic_data->script_name);
                 if (!script) {
+                    LM.write_log("Logic_System::update_script script not found");
                     continue;
                 }
 
                 if (logic_data->state == ExecutionState::Uninitialized) {
                     auto init_func = script->get_function(logic_data->init_func);
-                    if (init_func) {
-                        init_func(&entityid);
+                    if (!init_func) {
+                        return;
                     }
+                    init_func(entityid);
                     logic_data->state = ExecutionState::Running;
+                    LM.write_log("Logic_System::update_script initializing script");
                 }
                 else if (logic_data->state == ExecutionState::Running) {
                     auto update_func = script->get_function(logic_data->update_func);
-                    if (update_func) {
-                        update_func(&entityid);
+                    if (!update_func) {
+                        return;
                     }
+                    update_func(entityid);
+                    LM.write_log("Logic_System::update_script updating script");
                 }
                 else if (logic_data->state == ExecutionState::Completed) {
                     auto end_func = script->get_function(logic_data->end_func);
-                    if (end_func) {
-                        end_func(&entityid);
+                    if (!end_func) {
+                        return;
                     }
+                    end_func(entityid);
+                    LM.write_log("Logic_System::update_script completed script");
                     //logic_data->is_active = false; //maybe add a check on
                     //if state == completed & still active change to running or waiting?
                 }
-
-                //create a function here to check what state the entity is in to play the
-                    //respective required function.
-                    //from there then optain the function 
-                    //script->execute(entity_id, logic_data.script_data);
-                /*auto update_func = script->get_function(logic_data->update_func);
-                if (update_func) {
-                    update_func(&entityid);
-                }*/
             }
         }
     }

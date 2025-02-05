@@ -17,6 +17,7 @@
 #include "FPS_Manager.h"
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
+#include "Logic_Manager.h"
 #include "Graphics_Manager.h"
 #include "Audio_Manager.h"
 
@@ -114,9 +115,9 @@ namespace lof {
         else {
             LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
-        // ---------------------------- Audio Manager Start Up ---------------------------
-        if (ADM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+        // -------------------------- Logic Manager Start Up --------------------------
+        if (LGM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() failed");
             IM.shut_down();
             FPSM.shut_down();
             SM.shut_down();
@@ -124,16 +125,31 @@ namespace lof {
             LM.shut_down();
             return -6;
         }
-        // -------------------------- Graphics Manager Start Up --------------------------
-        if (GFXM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
-            ADM.shut_down();
+        else {
+            LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() successful");
+        }
+        // ---------------------------- Audio Manager Start Up ---------------------------
+        if (ADM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+            LGM.shut_down();
             IM.shut_down();
             FPSM.shut_down();
             SM.shut_down();
             ECSM.shut_down();
             LM.shut_down();
             return -7;
+        }
+        // -------------------------- Graphics Manager Start Up --------------------------
+        if (GFXM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
+            ADM.shut_down();
+            LGM.shut_down();
+            IM.shut_down();
+            FPSM.shut_down();
+            SM.shut_down();
+            ECSM.shut_down();
+            LM.shut_down();
+            return -8;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
@@ -154,6 +170,7 @@ namespace lof {
         // Shut down managers in reverse order of startup
         GFXM.shut_down(); // Graphics_Manager
         ADM.shut_down();  // Audio_Manager
+        LGM.shut_down();  // Logic_Manager
         IM.shut_down();   // Input_Manager
         FPSM.shut_down(); // FPS_Manager
         SM.shut_down();   // Serialization_Manager
@@ -1579,6 +1596,10 @@ namespace lof {
 
         auto end_time = std::chrono::steady_clock::now();
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
+
+
+        LGM.update(delta_time);
+        LGM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         //No Graphics Manager Update
         //// Getting delta time for Graphics Manager
