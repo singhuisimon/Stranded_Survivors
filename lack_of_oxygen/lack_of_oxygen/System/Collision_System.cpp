@@ -294,12 +294,18 @@ namespace lof {
         // Get current scene number
         int current_scene = SM.scene_switch();
 
-        if (current_scene == 1) {
+        if (current_scene == 0)
+        {
+            check_main_menu_button_collision();
+
+        }
+        else if (current_scene == 1) {
             collision_check_scene1(collisions, delta_time);
         }
         else if (current_scene == 2) {
             collision_check_scene2(collisions, delta_time);
         }
+         
     }
 
     //void Collision_System::Boundary_Check()
@@ -332,8 +338,7 @@ namespace lof {
         return entity && entity->get_name().find("vent") != std::string::npos;
     }
 
-    
-
+   
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
         //get components for entity
@@ -352,12 +357,14 @@ namespace lof {
         AABB av_aabb = AABB::from_transform(av_transform, av_collision);
 
         float collision_time = delta_time; 
+        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
+        static bool is_in_air_vent = false; // track audio use 
         
         //check for collision
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
             collision_time, delta_time)) {
 
-            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
             // Calculate horizontal center distance between player and vent
             float vent_center_x = av_transform.position.x;
@@ -381,34 +388,69 @@ namespace lof {
                 e_velocity.velocity.y = 300.0f;
                 
                 //This is working (play without bgm to hear please <check with angus if thats how he wants it to be>
-                if (playerId != INVALID_ENTITY_ID) {
-                    if (ECSM.has_component<Audio_Component>(playerId)) {
-                        ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+                if (playerId != INVALID_ENTITY_ID  && ECSM.has_component<Audio_Component>(playerId)) {
+                   /* if (ECSM.has_component<Audio_Component>(playerId)) {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                    }*/
+                    if (!is_in_air_vent)
+                    {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                        is_in_air_vent = true;
                     }
                 }
-                
-            }
-            else {
-                e_physics.force_helper.deactivate_force(VENT_FORCE);
-                if (!is_grounded) {
-                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-                }
-
-                if (playerId != INVALID_ENTITY_ID) {
-                    if (ECSM.has_component<Audio_Component>(playerId)) {
-                        ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
-                        //ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
-                        //TODO FIGURE OUT A WAY TO DETECT IT WHEN ITS ABV THE VENT STRIP TO STOP PLAYING AIRVENT IN AND PLAY AIRVENT OUT
-                        //AS WELL AS TO STOP AIR VENT OUT WHEN ONE FLY OUT AKA MOVE AWAY FROM THE AIRVENT TOP.
-
-                        //TLDR It does stop the sound but it detects again thats in so it keeps playing but stopping and creating an awkward silence at times 
+                else {
+                    //player is no longer inside the vent
+                    e_physics.force_helper.deactivate_force((VENT_FORCE));
+                    if (!is_grounded)
+                    {
+                        e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                     }
-                }
-                
+
+                    if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId))
+                    {
+                        if (is_in_air_vent)
+                        {
+                            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                            ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+                            is_in_air_vent = false;
+                        }
+                    }
+                } 
+            
+            
             }
+            else 
+            {
+                //Ensure the audio state resets when there's no collision at all
+                if (is_in_air_vent && playerId != INVALID_ENTITY_ID)
+                {
+                    ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                    is_in_air_vent = false;
+                }
+            }
+            //else {
+            //    e_physics.force_helper.deactivate_force(VENT_FORCE);
+            //    if (!is_grounded) {
+            //        e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            //    }
+
+            //    if (playerId != INVALID_ENTITY_ID) {
+            //        if (ECSM.has_component<Audio_Component>(playerId)) {
+            //            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+            //            //ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+            //            //TODO FIGURE OUT A WAY TO DETECT IT WHEN ITS ABV THE VENT STRIP TO STOP PLAYING AIRVENT IN AND PLAY AIRVENT OUT
+            //            //AS WELL AS TO STOP AIR VENT OUT WHEN ONE FLY OUT AKA MOVE AWAY FROM THE AIRVENT TOP.
+
+            //            //TLDR It does stop the sound but it detects again thats in so it keeps playing but stopping and creating an awkward silence at times 
+            //        }
+            //    }
+
+            //    
+            //}
 
 
         }
+        
     }
 
 
@@ -1329,11 +1371,11 @@ namespace lof {
         // Boundary_Check();
         //Boundary_Check();
 
-        // If we're in the main menu scene (scene 0)
-        if (GM.get_current_scene() == 0) {
-            check_main_menu_button_collision();
-            return;  // Skip other collision checks for main menu
-        }
+        //// If we're in the main menu scene (scene 0)
+        //if (GM.get_current_scene() == 0) {
+        //    check_main_menu_button_collision();
+        //    return;  // Skip other collision checks for main menu
+        //}
 
        
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
@@ -1355,132 +1397,238 @@ namespace lof {
 
     }
 
+#if 1
     void Collision_System::check_main_menu_button_collision() {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
+        int current_scene = SM.scene_switch();
+        if (current_scene == 0)
+        {
+            static std::unordered_map<std::string, bool> button_hover_states;
+            for (EntityID entity_id : get_entities()) {
+                auto* entity = ECSM.get_entity(entity_id);
+                if (!entity) continue;
 
-        for (EntityID entity_id : get_entities()) {
-            auto* entity = ECSM.get_entity(entity_id);
-            if (!entity) continue;
+                std::string entity_name = entity->get_name();
 
-            std::string entity_name = entity->get_name();
+                // Only check for main menu buttons
+                if (entity_name != "play_button" &&
+                    entity_name != "credit_button" &&
+                    entity_name != "quit_button") continue;
 
-            // Only check for main menu buttons
-            if (entity_name != "play_button" &&
-                entity_name != "credit_button" &&
-                entity_name != "quit_button") continue;
+                if (!ECSM.has_component<Transform2D>(entity_id) ||
+                    !ECSM.has_component<Graphics_Component>(entity_id) ||
+                    !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
-            if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                auto& transform = ECSM.get_component<Transform2D>(entity_id);
+                auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+                auto& audio_component = ECSM.get_component<Audio_Component>(entity_id);
 
-            auto& transform = ECSM.get_component<Transform2D>(entity_id);
-            auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+                // Check if mouse is hovering over the button
+                bool is_hovered = ESS.Mouse_Over_AABB(
+                    transform.position.x,
+                    transform.position.y,
+                    transform.scale.x,
+                    transform.scale.y,
+                    world_mouse_pos.x,
+                    world_mouse_pos.y
+                );
 
-            // Check if mouse is hovering over the button
-            bool is_hovered = ESS.Mouse_Over_AABB(
-                transform.position.x,
-                transform.position.y,
-                transform.scale.x,
-                transform.scale.y,
-                world_mouse_pos.x,
-                world_mouse_pos.y
-            );
+                // Define the base texture name for each button
+                std::string base_texture;
+                std::string hover_sound = "button_hover";  // for button hover sound
 
-            // Define the base texture name for each button
-            std::string base_texture;
-            if (entity_name == "play_button") {
-                base_texture = "Main_Menu_Play_Batch_14";
-            }
-            else if (entity_name == "credit_button") {
-                base_texture = "Main_Menu_Credits_Batch_14";
-            }
-            else if (entity_name == "quit_button") {
-                base_texture = "Main_Menu_Quit_Batch_14";
-            }
+                if (entity_name == "play_button") {
+                    base_texture = "Main_Menu_Play_Batch_14";
+                }
+                else if (entity_name == "credit_button") {
+                    base_texture = "Main_Menu_Credits_Batch_14";
+                }
+                else if (entity_name == "quit_button") {
+                    base_texture = "Main_Menu_Quit_Batch_14";
+                }
 
-            if (is_hovered) {
-                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
-                    // Set pressed state texture
-                    graphics.texture_name = base_texture + "_PRESSED";
+                if (is_hovered) {
+                    if (!button_hover_states[entity_name]) {
+                        // Play the hover sound once when hovering
+                        ADM.play_now(entity_id, hover_sound, audio_component);
+                        button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                    }
+                    if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                        // Set pressed state texture
+                        graphics.texture_name = base_texture + "_PRESSED";
 
-                    // Scene Switching Logic
-                    if (entity_name == "play_button") {
-                        LM.write_log("Play button held - attempting scene transition");
+                        // Scene Switching Logic
+                        if (entity_name == "play_button") {
+                            LM.write_log("Play button held - attempting scene transition");
 
-                        // Clear dynamic entities first
-                        bool found_movement_system = false;
-                        for (auto& system : ECSM.get_systems()) {
-                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                                movement_system->clear_dynamic_entities();
-                                found_movement_system = true;
-                                LM.write_log("Found and cleared Movement System");
-                                break;
-                            }
-                        }
-                        if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
-                        }
-
-                        // Set up scene loading
-                        const std::string SCENES = "Scenes";
-                        std::string scene_file = "scene2.scn";
-                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-                        LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
-
-                        // Try to load scene2
-                        if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("Scene loaded successfully");
-
-                            // Reset camera position
-                            auto& camera = GFXM.get_camera();
-                            camera.pos_x = DEFAULT_CAMERA_POS_X;
-                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                            // Stop all currently playing audio
-                            ADM.stop_mastergroup();
-
-                            // Reset player position if it exists
-                            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                            if (playerId != INVALID_ENTITY_ID) {
-                                if (ECSM.has_component<Transform2D>(playerId)) {
-                                    auto& transform = ECSM.get_component<Transform2D>(playerId);
-                                    transform.position = Vec2D(0.0f, 0.0f);
-                                    transform.prev_position = transform.position;
-                                }
-                                if (ECSM.has_component<Velocity_Component>(playerId)) {
-                                    auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                                    velocity.velocity = Vec2D(0.0f, 0.0f);
+                            // Clear dynamic entities first
+                            bool found_movement_system = false;
+                            for (auto& system : ECSM.get_systems()) {
+                                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                    movement_system->clear_dynamic_entities();
+                                    found_movement_system = true;
+                                    LM.write_log("Found and cleared Movement System");
+                                    break;
                                 }
                             }
+                            if (!found_movement_system) {
+                                LM.write_log("Warning: Movement System not found");
+                            }
 
-                            // Update current scene in Game Manager
-                            GM.set_current_scene(2);
+                            // Set up scene loading
+                            const std::string SCENES = "Scenes";
+                            std::string scene_file = "scene2.scn";
+                            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+                            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
 
-                            // Update IMGUI Manager's current file
-                            IMGUIM.set_current_file_shown(scene_file);
+                            // Try to load scene2
+                            if (SM.load_scene(scene_path.c_str())) {
+                                LM.write_log("Scene loaded successfully");
+
+                                // Reset camera position
+                                auto& camera = GFXM.get_camera();
+                                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                                // Stop all currently playing audio
+                                ADM.stop_mastergroup();
+
+                                // Reset player position if it exists
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                if (playerId != INVALID_ENTITY_ID) {
+                                    if (ECSM.has_component<Transform2D>(playerId)) {
+                                        auto& transform = ECSM.get_component<Transform2D>(playerId);
+                                        transform.position = Vec2D(0.0f, 0.0f);
+                                        transform.prev_position = transform.position;
+                                    }
+                                    if (ECSM.has_component<Velocity_Component>(playerId)) {
+                                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                                    }
+                                }
+
+                                // Update current scene in Game Manager
+                                GM.set_current_scene(2);
+
+                                // Update IMGUI Manager's current file
+                                IMGUIM.set_current_file_shown(scene_file);
+                            }
+                            else {
+                                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+                            }
                         }
-                        else {
-                            LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+                        else if (entity_name == "credit_button") {
+                            // Handle credits button
+                        }
+                        else if (entity_name == "quit_button") {
+                            GM.set_game_over(true);
                         }
                     }
-                    else if (entity_name == "credit_button") {
-                        // Handle credits button
-                    }
-                    else if (entity_name == "quit_button") {
-                        GM.set_game_over(true);
+                    else {
+                        // Set highlighted state when just hovering
+                        graphics.texture_name = base_texture + "_HIGHLIGHTED";
                     }
                 }
                 else {
-                    // Set highlighted state when just hovering
-                    graphics.texture_name = base_texture + "_HIGHLIGHTED";
+                    // Reset to normal state texture
+                    graphics.texture_name = base_texture + "_NORMAL";
                 }
             }
-            else {
-                // Reset to normal state texture
-                graphics.texture_name = base_texture + "_NORMAL";
+        }
+        
+    }
+#endif
+#if 0
+    void Collision_System::check_main_menu_button_collision() {
+        // Get mouse position in world coordinates
+        Vec2D world_mouse_pos = ESS.Get_World_MousePos();
+        int current_scene = SM.scene_switch();
+
+        if (current_scene == 0) {
+            static std::unordered_map<std::string, bool> button_hover_states;
+
+            for (EntityID entity_id : get_entities()) {
+                auto* entity = ECSM.get_entity(entity_id);
+                if (!entity) continue;
+
+                std::string entity_name = entity->get_name();
+
+                // Only check for main menu buttons
+                if (entity_name != "play_button" &&
+                    entity_name != "credit_button" &&
+                    entity_name != "quit_button") continue;
+
+                if (!ECSM.has_component<Transform2D>(entity_id) ||
+                    !ECSM.has_component<Graphics_Component>(entity_id) ||
+                    !ECSM.has_component<Audio_Component>(entity_id)) continue;
+
+                auto& transform = ECSM.get_component<Transform2D>(entity_id);
+                auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+                auto& audio_component = ECSM.get_component<Audio_Component>(entity_id);
+
+                // Check if mouse is hovering over the button
+                bool is_hovered = ESS.Mouse_Over_AABB(
+                    transform.position.x,
+                    transform.position.y,
+                    transform.scale.x,
+                    transform.scale.y,
+                    world_mouse_pos.x,
+                    world_mouse_pos.y
+                );
+
+                // Define the base texture name and hover sound for each button
+                std::string base_texture;
+                std::string hover_sound = "button_hover";  // Use correct key from the JSON
+                if (entity_name == "play_button") {
+                    base_texture = "Main_Menu_Play_Batch_14";
+                }
+                else if (entity_name == "credit_button") {
+                    base_texture = "Main_Menu_Credits_Batch_14";
+                }
+                else if (entity_name == "quit_button") {
+                    base_texture = "Main_Menu_Quit_Batch_14";
+                }
+
+                if (is_hovered) {
+                    if (!button_hover_states[entity_name]) {
+                        // Play the hover sound once when hovering
+                        ADM.play_now(entity_id, hover_sound, audio_component);
+                        button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                    }
+
+                    if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                        graphics.texture_name = base_texture + "_PRESSED";
+
+                        // Scene Switching Logic
+                        if (entity_name == "play_button") {
+                            LM.write_log("Play button held - attempting scene transition");
+                            // Other scene switching code
+                        }
+                        else if (entity_name == "credit_button") {
+                            // Handle credits button
+                        }
+                        else if (entity_name == "quit_button") {
+                            GM.set_game_over(true);
+                        }
+                    }
+                    else {
+                        // Set highlighted state when just hovering
+                        graphics.texture_name = base_texture + "_HIGHLIGHTED";
+                    }
+                }
+                else {
+                    // Reset hover state when mouse leaves
+                    graphics.texture_name = base_texture + "_NORMAL";
+                    button_hover_states[entity_name] = false;
+                }
             }
         }
     }
+#endif
+
+
+
 
 
 } // namespace lof

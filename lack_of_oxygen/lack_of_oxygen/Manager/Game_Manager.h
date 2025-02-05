@@ -58,7 +58,7 @@ namespace lof {
 
         // Flag for scn file
         int current_scene = 2;
-
+        bool increasing = false;
         // Top UI variables
         float current_oxygen_level = 100.0f;  // Start at 100%
         float ship_oxygen_level = 400.0f;     // [0..400]
