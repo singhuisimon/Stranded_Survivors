@@ -505,8 +505,8 @@
           "curr_animation_idx": 0,
           "start_animation_idx": 0,
           "curr_frame_index": 0,
-          "start_tile_health": 2,
-          "curr_tile_health": 2
+          "start_tile_health": 1,
+          "curr_tile_health": 1
         }
       }
     },
