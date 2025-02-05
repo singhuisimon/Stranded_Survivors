@@ -303,7 +303,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14";  // E key icon
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
                 transform->position = Vec2D(mineral_e_prompt_x, original_e_prompt_y);
@@ -325,7 +325,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "Mineral_Deposit UI_BG_Batch_14";
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
                 transform->position = Vec2D(-350.0f, 120.0f);
@@ -340,7 +340,7 @@ namespace lof {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
                 // White or Gold color for minerals
-                graphics->color = glm::vec3(1.0f, 1.0f, 1.0f);
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
                 float max_width = 435.0f;
@@ -483,7 +483,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14"; // E key icon
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
                 transform->position = Vec2D(oxygen_e_prompt_x, original_e_prompt_y);
@@ -506,7 +506,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "Oxygen_Refill UI_BG_Batch_14";
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
                 transform->position = Vec2D(-350.0f, 120.0f);
@@ -537,7 +537,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar1)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
-                graphics->color = glm::vec3(0.0f, 0.68f, 1.0f);
+                graphics->color = glm::vec4(0.0f, 0.68f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
                 float current_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
@@ -589,7 +589,7 @@ namespace lof {
                 if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar2)) {
                     graphics->model_name = "square";
                     graphics->texture_name = "NoTexture";
-                    graphics->color = glm::vec3(1.0f, 1.0f, 0.0f); // Yellow
+                    graphics->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
                 }
                 if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
                     // Anchor left at -570.0f, same as your code
@@ -811,7 +811,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(container_id)) {
                 graphics->model_name = "square";
                 graphics->texture_name = texture_name;
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
 
             // Position warning - same for all levels

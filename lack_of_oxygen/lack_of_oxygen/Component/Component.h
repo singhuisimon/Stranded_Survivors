@@ -258,7 +258,7 @@ namespace lof {
     class Graphics_Component : public Component {
     public:
         std::string model_name;
-        glm::vec3 color;
+        glm::vec4 color;
         std::string texture_name;
         GLuint shd_ref;
         glm::mat3 mdl_to_ndc_xform;
@@ -277,7 +277,7 @@ namespace lof {
          * @param mdl_to_ndc_xform Model-to-world-to-NDC transformation.
          */
 
-        Graphics_Component(std::string mdl_name, glm::vec3 clr, std::string tex_name, GLuint shader, glm::mat3 xform) :
+        Graphics_Component(std::string mdl_name, glm::vec4 clr, std::string tex_name, GLuint shader, glm::mat3 xform) :
             model_name(mdl_name), color(clr), texture_name(tex_name), shd_ref(shader), mdl_to_ndc_xform(xform) {}
     };
 
