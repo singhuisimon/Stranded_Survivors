@@ -171,7 +171,7 @@ texture Spritesheet_Map
 frame_no 18
 time_delay 0.0
 EF
-frame_no 32
+frame_no 18
 time_delay 0.0
 EF
 EA
