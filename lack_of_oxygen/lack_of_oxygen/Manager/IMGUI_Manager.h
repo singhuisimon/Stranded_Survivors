@@ -222,7 +222,11 @@ namespace lof {
         void Handle_Dropped_File(const std::string filePath);
         //void render_asset_browser();
         void asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message);
-    };
+
+        std::vector<std::string> get_scene_files();
+
+        void load_scene(const std::string& file_name);
+};
 
 } // namespace lof
 

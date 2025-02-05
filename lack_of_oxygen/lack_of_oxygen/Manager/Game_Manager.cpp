@@ -1005,14 +1005,16 @@ namespace lof {
                         if (forces_flag != -1) {
                             if (physics.get_is_grounded()) {
                                 if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-                                    if (current_scene == 1) {
+                                    /*if (current_scene == 1) {
                                         std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
                                         ADM.play_now(player_id, audio_key, audio_player);
                                     }
                                     else if (current_scene == 2) {
                                         ADM.play_now(player_id, "moving", audio_player);
-                                    }
+                                    }*/
 
+
+                                    ADM.play_now(player_id, "moving", audio_player);
                                     // Emit walking dirt particles
                                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                                     float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
