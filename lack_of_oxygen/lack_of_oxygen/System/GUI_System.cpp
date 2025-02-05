@@ -32,6 +32,63 @@ namespace lof {
         signature.set(ecs_manager.get_component_id<GUI_Component>());
     }
 
+    void GUI_System::reset_all_game_state() {
+        // Hide all GUI elements
+        hide_mineral_tank_gui();
+        hide_oxygen_tank_gui();
+        hide_oxygen_warning(50.0f);
+        hide_oxygen_warning(20.0f);
+        hide_oxygen_warning(5.0f);
+
+        // Reset GUI state variables
+        mineral_e_prompt = INVALID_ENTITY_ID;
+        oxygen_e_prompt = INVALID_ENTITY_ID;
+        mineral_interaction_container = INVALID_ENTITY_ID;
+        oxygen_interaction_container = INVALID_ENTITY_ID;
+        oxygen_progress_bar1 = INVALID_ENTITY_ID;
+        oxygen_progress_bar2 = INVALID_ENTITY_ID;
+        oxygen_percentage_text1 = INVALID_ENTITY_ID;
+        oxygen_percentage_text2 = INVALID_ENTITY_ID;
+
+        // Reset all gameplay values
+        stored_mineral_progress = 0.0f;
+        GM.set_current_oxygen_level(100.0f);
+        GM.set_ship_oxygen_level(400.0f);
+
+        // Reset mineral count text
+        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+            text_comp.text = "000000";
+        }
+
+        // Reset goal percentage text
+        EntityID goal_text_entity = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
+        if (goal_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(goal_text_entity);
+            text_comp.text = "00%";
+        }
+
+        // Reset timer text
+        EntityID timer_text_entity = ECSM.find_entity_by_name("top_ui_timer_count_text");
+        if (timer_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(timer_text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(timer_text_entity);
+            text_comp.text = "300";
+            GM.reset_timer();
+        }
+
+        // Reset warning states
+        warning_50_active = false;
+        warning_20_active = false;
+        warning_5_active = false;
+        warning_50_shown = false;
+        warning_20_shown = false;
+        warning_5_shown = false;
+        warning_50_display_time = 0.0f;
+        warning_20_display_time = 0.0f;
+        warning_5_display_time = 0.0f;
+    }
+
     void GUI_System::update(float delta_time)
     {
         // Add logging for current scene and GUI state
@@ -79,78 +136,26 @@ namespace lof {
         }
 
         // Check if we've reached 100% (50,000 minerals)
-        // Check if we've reached 100% (50,000 minerals)
         if (stored_mineral_progress * 50000.0f >= 50000.0f) {
-            // Force hide all GUI elements before scene transition
-            hide_mineral_tank_gui();
-            hide_oxygen_tank_gui();
-            hide_oxygen_warning(50.0f);
-            hide_oxygen_warning(20.0f);
-            hide_oxygen_warning(5.0f);
+            reset_all_game_state();
 
-            // Reset GUI state variables
-            mineral_e_prompt = INVALID_ENTITY_ID;
-            oxygen_e_prompt = INVALID_ENTITY_ID;
-            mineral_interaction_container = INVALID_ENTITY_ID;
-            oxygen_interaction_container = INVALID_ENTITY_ID;
-
-            // Clear mineral progress
-            stored_mineral_progress = 0.0f;
-
-            // Reset all gameplay values
-            stored_mineral_progress = 0.0f;  // Reset mineral progress
-            GM.set_current_oxygen_level(100.0f);  // Reset player oxygen to full
-            GM.set_ship_oxygen_level(400.0f);  // Reset ship oxygen to full
-
-            // Reset goal percentage text
-            EntityID goal_text_entity = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
-            if (goal_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_entity)) {
-                auto& text_comp = ECSM.get_component<Text_Component>(goal_text_entity);
-                text_comp.text = "00%";  // Reset to 0%
-            }
-
-
-            // Clear dynamic entities first
-            bool found_movement_system = false;
-            for (auto& system : ECSM.get_systems()) {
-                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                    movement_system->clear_dynamic_entities();
-                    found_movement_system = true;
-                    LM.write_log("Found and cleared Movement System");
-                    break;
-                }
-            }
-            if (!found_movement_system) {
-                LM.write_log("Warning: Movement System not found");
-            }
-
-            // Set up scene loading
+            // Load win screen
             const std::string SCENES = "Scenes";
             std::string scene_file = "win_screen.scn";
             std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
 
-            // Try to load win screen
             if (SM.load_scene(scene_path.c_str())) {
-                LM.write_log("Win screen loaded successfully");
-
                 // Reset camera position
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
-                // Stop all currently playing audio
+                // Stop all audio
                 ADM.stop_mastergroup();
 
-                // Update current scene in Game Manager
+                // Update scene
                 GM.set_current_scene(4);
-
-                // Update IMGUI Manager's current file
                 IMGUIM.set_current_file_shown(scene_file);
-
-                // Reset stored mineral progress
-                stored_mineral_progress = 0.0f;
-
                 return;
             }
             else {
