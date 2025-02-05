@@ -61,7 +61,7 @@ namespace lof {
         //temporary value for bgm
         int oxygen_level = 100;
         bool increasing = false;
-        bool game_over = false;
+        //bool game_over = false;
         /**
          * @brief Determines the mineral value based on the block entity type
          * @param block_id The EntityID of the block being destroyed
@@ -143,7 +143,7 @@ namespace lof {
          */
         int get_current_scene();
 
-        bool get_game_over();
+        //bool get_game_over();
     };
 
 } // namespace lof

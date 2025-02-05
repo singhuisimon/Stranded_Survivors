@@ -16,6 +16,7 @@
 
 // Include Components
 #include "../Component/Component.h"
+#include "../Component/Logic_Components.h"
 
 // Include other necessary headers
 #include "../Utility/Matrix3x3.h"
@@ -504,46 +505,244 @@ namespace lof {
                 }
             // ------------------------------------ Logic_Component -------------------------------------------
             else if (component_name == "Logic_Component") {
-                // Log the raw value from JSON
-                int pattern_value = component_data["movement_pattern"].GetInt();
-                LM.write_log("Parsing Logic Component - Raw movement pattern value: %d", pattern_value);
 
-                Logic_Component logic(
-                    static_cast<Logic_Component::LogicType>(component_data["logic_type"].GetInt()),
-                    static_cast<Logic_Component::MovementPattern>(pattern_value)
-                );
+                Logic_Component logic_component;
 
-                // Set other properties
-                if (component_data.HasMember("is_active")) {
-                    logic.is_active = component_data["is_active"].GetBool();
-                }
-                if (component_data.HasMember("movement_speed")) {
-                    logic.movement_speed = component_data["movement_speed"].GetFloat();
-                }
-                if (component_data.HasMember("movement_range")) {
-                    logic.movement_range = component_data["movement_range"].GetFloat();
-                }
-                if (component_data.HasMember("reverse_direction")) {
-                    logic.reverse_direction = component_data["reverse_direction"].GetBool();
-                }
-                if (component_data.HasMember("rotate_with_motion")) {
-                    logic.rotate_with_motion = component_data["rotate_with_motion"].GetBool();
-                }
-                if (component_data.HasMember("origin_pos") && component_data["origin_pos"].IsArray()) {
-                    logic.origin_pos.x = component_data["origin_pos"][0].GetFloat();
-                    logic.origin_pos.y = component_data["origin_pos"][1].GetFloat();
-                }
+                if (component_data.HasMember("scripts") && component_data["scripts"].IsArray()) {
+                    const auto& script_array = component_data["scripts"];
 
-                // Log the final state
-                LM.write_log("Created Logic Component with movement pattern: %d, speed: %.2f, range: %.2f",
-                    static_cast<int>(logic.movement_pattern),
-                    logic.movement_speed,
-                    logic.movement_range);
+                    for (const auto& script : script_array.GetArray()) {
+                        // Extract required script fields
+                        std::string script_name;
+                        std::string init_func;
+                        std::string update_func;
+                        std::string end_func;
+                        bool is_active = true;
+                        ScriptData script_data;
+
+                        // Parse basic script properties
+                        if (script.HasMember("script_name") && script["script_name"].IsString()) {
+                            script_name = script["script_name"].GetString();
+                        }
+                        if (script.HasMember("init") && script["init"].IsString()) {
+                            init_func = script["init"].GetString();
+                        }
+                        if (script.HasMember("update") && script["update"].IsString()) {
+                            update_func = script["update"].GetString();
+                        }
+                        if (script.HasMember("end") && script["end"].IsString()) {
+                            end_func = script["end"].GetString();
+                        }
+                        if (script.HasMember("is_active") && script["is_active"].IsBool()) {
+                            is_active = script["is_active"].GetBool();
+                        }
+
+                        // Parse script data (parameters)
+                        if (script.HasMember("data") && script["data"].IsObject()) {
+                            const rapidjson::Value& data_obj = script["data"];
+
+                            for (auto it = data_obj.MemberBegin(); it != data_obj.MemberEnd(); ++it) {
+                                std::string key = it->name.GetString();
+                                const rapidjson::Value& value = it->value;
+
+                                try {
+                                    // Handle different data types with proper variant construction
+                                    if (value.IsInt()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(value.GetInt());
+                                    }
+                                    else if (value.IsFloat() || value.IsDouble()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(
+                                            static_cast<float>(value.GetDouble()));
+                                    }
+                                    else if (value.IsString()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(
+                                            std::string(value.GetString()));
+                                    }
+                                    else if (value.IsBool()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(value.GetBool());
+                                    }
+                                    else if (value.IsArray() && value.Size() == 2 &&
+                                        value[0].IsNumber() && value[1].IsNumber()) {
+                                        Vec2D vec;
+                                        vec.x = static_cast<float>(value[0].GetDouble());
+                                        vec.y = static_cast<float>(value[1].GetDouble());
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(vec);
+                                    }
+                                    else {
+                                        LM.write_log("Warning: Unsupported data type for key '%s' in script '%s'",
+                                            key.c_str(), script_name.c_str());
+                                    }
+                                }
+                                catch (const std::exception& e) {
+                                    LM.write_log("Error: Failed to set script data for key '%s' in script '%s': %s",
+                                        key.c_str(), script_name.c_str(), e.what());
+                                }
+                            }
+                        }
+
+                        // Add script to component
+                        logic_component.add_script(script_name, init_func, update_func, end_func, script_data, is_active);
+
+                        LM.write_log("Added script '%s' to Logic_Component for entity %u",
+                            script_name.c_str(), entity);
+                    }
+                }
 
                 // Add component to entity
-                ecs_manager.add_component<Logic_Component>(entity, logic);
+                ecs_manager.add_component<Logic_Component>(entity, logic_component);
                 LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
-                }
+
+                //Logic_Component logic_component;
+
+                //if (component_data.HasMember("scripts") && component_data["scripts"].IsArray()) {
+                //    const auto& script_array = component_data["scripts"];
+
+                //    for (const auto& scripts : script_array.GetArray()) {
+                //        auto script = std::make_unique<Logic_Component::LogicData>();
+                //        
+                //        if (scripts.HasMember("script_name") && scripts["script_name"].IsString()) {
+                //            script->script_name = scripts["script_name"].GetString();
+                //        }
+                //        if (scripts.HasMember("init") && scripts["init"].IsString()) {
+                //            script->init_func = scripts["init"].GetString();
+                //        }
+                //        if (scripts.HasMember("update") && scripts["update"].IsString()) {
+                //            script->update_func = scripts["update"].GetString();
+                //        }
+                //        if (scripts.HasMember("end") && scripts["end"].IsString()) {
+                //            script->end_func = scripts["end"].GetString();
+                //        }
+
+                //        // Deserialize script data
+                //        if (scripts.HasMember("data") && scripts["data"].IsObject()) {
+                //            const rapidjson::Value& script_data = scripts["data"];
+
+                //            for (auto it = script_data.MemberBegin(); it != script_data.MemberEnd(); ++it) {
+                //                std::string key = it->name.GetString();
+
+                //                if (it->value.IsInt()) {
+                //                    script->script_data[key] = it->value.GetInt();
+                //                }
+                //                else if (it->value.IsFloat()) {
+                //                    script->script_data[key] = it->value.GetFloat();
+                //                }
+                //                else if (it->value.IsString()) {
+                //                    script->script_data[key] = std::string(it->value.GetString());
+                //                }
+                //                else if (it->value.IsBool()) {
+                //                    script->script_data[key] = it->value.GetBool();
+                //                }
+                //                else if (it->value.IsArray() && it->value.Size() == 2 && it->value[0].IsNumber() && it->value[1].IsNumber()) {
+                //                    // Deserialize Vec2D (assuming x and y are stored in an array)
+                //                    Vec2D vec;
+                //                    vec.x = it->value[0].GetFloat();
+                //                    vec.y = it->value[1].GetFloat();
+                //                    script->script_data[key] = vec;
+                //                }
+                //            }
+                //        }
+                //    }
+
+                //}
+
+            }
+
+
+            //    const rapidjson::Value& scripts_obj = component_data["scripts"];
+
+            //    for (auto& category : scripts_obj.GetObject()) {
+            //        const std::string& category_name = category.name.GetString();
+            //        const rapidjson::Value& scripts_data = category.value;
+
+            //        for (auto& script : scripts_data.GetObject()) {
+            //            const std::string& script_name = script.name.GetString();
+            //            const rapidjson::Value& script_data = script.value;
+            //            const rapidjson::Value& params = script_data["params"];
+
+            //            //create a new logic_component or get existing one
+            //            Logic_Component logic(category_name);
+            //            logic.add_script(category_name, script_name); //add the script to the logic component
+
+            //            //iterate through the params dynamically
+            //            for (auto& param : params.GetObject()) {
+            //                const std::string& param_key = param.name.GetString();
+            //                const rapidjson::Value& param_value = param.value;
+
+            //                //check the type of the value and set the corresponding paramer in the logic_component
+            //                if (param_value.IsBool()) {
+            //                    logic.set_param(category_name, script_name, param_key, param_value.GetBool());
+            //                }
+            //                else if (param_value.IsInt()) {
+            //                    logic.set_param(category_name, script_name, param_key, param_value.GetInt());
+            //                }
+            //                else if (param_value.IsFloat()) {
+            //                    logic.set_param(category_name, script_name, param_key, param_value.GetFloat());
+            //                }
+            //                else if (param_value.IsString()) {
+            //                    logic.set_param(category_name, script_name, param_key, param_value.GetString());
+            //                }
+            //                else if (param_value.IsArray() && param_value.Size() == 2) {
+            //                    Vec2D vec;
+            //                    vec.x = param_value[0].GetFloat();
+            //                    vec.y = param_value[1].GetFloat();
+            //                    logic.set_param(category_name, script_name, param_key, vec);
+            //                }
+            //                else {
+            //                    LM.write_log("Component_Parser for logic: Unknown or unsupported parameter type for %s -> %s", script_name.c_str(), param_key.c_str());
+            //                }
+            //            }
+
+            //            LM.write_log("Successfully added script: %s with parameters", script_name.c_str());
+
+            //            ecs_manager.add_component<Logic_Component>(entity, logic);
+            //            LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+            //        }
+            //    }
+            //}
+
+                
+
+                //useless now
+                // Log the raw value from JSON
+                //int pattern_value = component_data["movement_pattern"].GetInt();
+                //LM.write_log("Parsing Logic Component - Raw movement pattern value: %d", pattern_value);
+
+                //Logic_Component logic(
+                //    static_cast<Logic_Component::LogicType>(component_data["logic_type"].GetInt()),
+                //    static_cast<Logic_Component::MovementPattern>(pattern_value)
+                //);
+
+                //// Set other properties
+                //if (component_data.HasMember("is_active")) {
+                //    logic.is_active = component_data["is_active"].GetBool();
+                //}
+                //if (component_data.HasMember("movement_speed")) {
+                //    logic.movement_speed = component_data["movement_speed"].GetFloat();
+                //}
+                //if (component_data.HasMember("movement_range")) {
+                //    logic.movement_range = component_data["movement_range"].GetFloat();
+                //}
+                //if (component_data.HasMember("reverse_direction")) {
+                //    logic.reverse_direction = component_data["reverse_direction"].GetBool();
+                //}
+                //if (component_data.HasMember("rotate_with_motion")) {
+                //    logic.rotate_with_motion = component_data["rotate_with_motion"].GetBool();
+                //}
+                //if (component_data.HasMember("origin_pos") && component_data["origin_pos"].IsArray()) {
+                //    logic.origin_pos.x = component_data["origin_pos"][0].GetFloat();
+                //    logic.origin_pos.y = component_data["origin_pos"][1].GetFloat();
+                //}
+
+                //// Log the final state
+                //LM.write_log("Created Logic Component with movement pattern: %d, speed: %.2f, range: %.2f",
+                //    static_cast<int>(logic.movement_pattern),
+                //    logic.movement_speed,
+                //    logic.movement_range);
+
+                // Add component to entity
+                /*ecs_manager.add_component<Logic_Component>(entity, logic);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+                }*/
             // ------------------------------------ Text_Component -------------------------------------------
             else if (component_name == "Text_Component") {
                 // Parse Text_Component

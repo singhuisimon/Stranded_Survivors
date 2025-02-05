@@ -50,9 +50,11 @@
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
     <ClCompile Include="Manager\IMGUI_Manager.cpp" />
     <ClCompile Include="Manager\Input_Manager.cpp" />
+    <ClCompile Include="Manager\Logic_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
+    <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
@@ -73,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\Component.h" />
+    <ClInclude Include="Component\Logic_Components.h" />
     <ClInclude Include="Entity\Entity.h" />
     <ClInclude Include="Glad\glad.h" />
     <ClInclude Include="IMGUI\imgui.h" />
@@ -84,6 +87,7 @@
     <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
+    <ClInclude Include="Manager\Logic_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
     <ClInclude Include="Manager\FPS_Manager.h" />
@@ -91,6 +95,8 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="Scripts\Object_Moving_Script.h" />
+    <ClInclude Include="Scripts\Script.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />

@@ -614,11 +614,11 @@ namespace lof {
                                 transform.position.y = selected_entity_start_pos.y + dragged_offset.y;
                                 transform.prev_position = transform.position;
                             }
-                            if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
+                            /*if (entities[selectedEntityID]->has_component(ecs.get_component_id<Logic_Component>())) {
                                 Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selectedEntityID].get()->get_id());
                                 logic.origin_pos.x = selected_entity_start_pos.x + dragged_offset.x;
                                 logic.origin_pos.y = selected_entity_start_pos.y + dragged_offset.y;
-                            }
+                            }*/
                         }
                         break;
                     }
@@ -1070,47 +1070,47 @@ namespace lof {
                 const char* logic_behaviour[] = { "Horizontal", "Circular"};
 
                 //Logic Component
-                if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
-                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
-                    if (ImGui::CollapsingHeader("Logic")) {
+                //if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+                //    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+                //    if (ImGui::CollapsingHeader("Logic")) {
 
-                        auto& is_active = logic.is_active;
-                        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                        if (button_toggle(s_label, &is_active_on)) {
-                            is_active = !is_active;
-                        }
+                //        auto& is_active = logic.is_active;
+                //        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                //        if (button_toggle(s_label, &is_active_on)) {
+                //            is_active = !is_active;
+                //        }
 
-                        auto& movement_pattern = logic.movement_pattern;
-                        //Update logic behavior, corresponds the string to the movement_pattern value
-                        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
-                        ImGui::Text("Choose Logic Behaviour");
-                        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
-                           
-                            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
-                        }
+                //        auto& movement_pattern = logic.movement_pattern;
+                //        //Update logic behavior, corresponds the string to the movement_pattern value
+                //        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
+                //        ImGui::Text("Choose Logic Behaviour");
+                //        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
+                //           
+                //            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
+                //        }
 
-                        auto& movement_speed = logic.movement_speed;
-                        ImGui::InputFloat("Movement Speed", &movement_speed);
+                //        auto& movement_speed = logic.movement_speed;
+                //        ImGui::InputFloat("Movement Speed", &movement_speed);
 
-                        auto& movement_range = logic.movement_range;
-                        ImGui::InputFloat("Movement Range", &movement_range);
+                //        auto& movement_range = logic.movement_range;
+                //        ImGui::InputFloat("Movement Range", &movement_range);
 
-                        auto& reverse_direction = logic.reverse_direction;
-                        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
-                        if (button_toggle(reverse_dir, &is_reverse_on)) {
-                            reverse_direction = !reverse_direction;
-                        }
+                //        auto& reverse_direction = logic.reverse_direction;
+                //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                //        if (button_toggle(reverse_dir, &is_reverse_on)) {
+                //            reverse_direction = !reverse_direction;
+                //        }
 
-                        auto& is_rotate = logic.rotate_with_motion;
-                        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
-                        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
-                            is_rotate = !is_rotate;
-                        }
+                //        auto& is_rotate = logic.rotate_with_motion;
+                //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                //            is_rotate = !is_rotate;
+                //        }
 
-                        auto& original_position = logic.origin_pos;
-                        ImGui::InputFloat2("Original Position", &original_position.x);
-                    }
-                }
+                //        auto& original_position = logic.origin_pos;
+                //        ImGui::InputFloat2("Original Position", &original_position.x);
+                //    }
+                //}
 
                 //Audio Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
@@ -1389,7 +1389,7 @@ namespace lof {
                     {"Graphics Component", static_cast<ComponentID>(ecs.get_component_id<Graphics_Component>())},
                     {"Collision Component", static_cast<ComponentID>(ecs.get_component_id<Collision_Component>())},
                     {"Animation Component", static_cast<ComponentID>(ecs.get_component_id<Animation_Component>())},
-                    {"Logic Component", static_cast<ComponentID>(ecs.get_component_id<Logic_Component>())},
+                    //{"Logic Component", static_cast<ComponentID>(ecs.get_component_id<Logic_Component>())},
                     {"Audio Component", static_cast<ComponentID>(ecs.get_component_id<Audio_Component>())},
                     {"Text Component", static_cast<ComponentID>(ecs.get_component_id<Text_Component>())}
                 };
@@ -1457,12 +1457,12 @@ namespace lof {
                                 ecs.add_component<Animation_Component>(entities[selected_object_index]->get_id(), animation);
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added animation component to %s", entities[selected_object_index]->get_name().c_str());
                             }
-                            else if (std::string(component_name) == "Logic Component") {
+                            /*else if (std::string(component_name) == "Logic Component") {
                                 std::cout << "Adding Logic Component\n";
                                 Logic_Component logic;
                                 ecs.add_component<Logic_Component>(entities[selected_object_index]->get_id(), logic);
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added logic component to %s", entities[selected_object_index]->get_name().c_str());
-                            }
+                            }*/
                             else if (std::string(component_name) == "Audio Component") {
                                 Audio_Component audio;
                                 ecs.add_component<Audio_Component>(entities[selected_object_index]->get_id(), audio);
@@ -1544,10 +1544,10 @@ namespace lof {
                                 ecs.remove_component<Animation_Component>(entities[selected_object_index]->get_id());
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed animation component from %s", entities[selected_object_index]->get_name().c_str());
                             }
-                            else if (std::string(component_name) == "Logic Component") {
+                            /*else if (std::string(component_name) == "Logic Component") {
                                 ecs.remove_component<Logic_Component>(entities[selected_object_index]->get_id());
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed logic component from %s", entities[selected_object_index]->get_name().c_str());
-                            }
+                            }*/
                             else if (std::string(component_name) == "Audio Component") {
                                 ecs.remove_component<Audio_Component>(entities[selected_object_index]->get_id());
                                 LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed audio component from %s", entities[selected_object_index]->get_name().c_str());
