@@ -127,9 +127,11 @@
     <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Level_Design\Level_Design_Small.csv" />
     <None Include="Assets\Prefab\prefab.json" />
+    <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
+    <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
   </ItemGroup>

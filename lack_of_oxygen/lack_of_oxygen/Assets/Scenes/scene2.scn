@@ -23,11 +23,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.5,
-            0.5,
-            0.5
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "skybox_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -194,11 +190,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "ship_open_batch_2",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -245,11 +237,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "mineral_hopper_conveyor_empty_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -320,11 +308,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "oxygen_tank_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -394,11 +378,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            1.0,
-            0.0
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "spritesheet_player",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -631,7 +611,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 0.0, 0.0, 0.0 ],
+          "color": [ 0.0, 0.0, 0.0, 1.0 ],
           "shd_ref": 0
         }
       }
@@ -660,11 +640,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.0,
-            0.0
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "top_ui_o2_meter_fill_blue_batch_7",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -699,11 +675,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "top_ui_o2_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -750,11 +722,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "top_ui_Panik_Fill_full_red_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -801,11 +769,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "Panik_meter_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -852,11 +816,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [
-            0.0,
-            0.800000011920929,
-            0.20000000298023224
-          ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "top_ui_minerals_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -890,7 +850,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -917,7 +877,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -945,7 +905,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -972,7 +932,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -999,7 +959,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -1026,7 +986,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -1053,7 +1013,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
@@ -1080,7 +1040,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],

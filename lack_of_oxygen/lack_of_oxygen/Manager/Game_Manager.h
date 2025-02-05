@@ -173,6 +173,8 @@ namespace lof {
         void  set_ship_oxygen_level(float value) {
             ship_oxygen_level = std::clamp(value, 0.0f, 400.0f);
         }
+
+        void reset_timer() { timer_remaining = 300; }
     };
 
 } // namespace lof

@@ -10,6 +10,10 @@
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Game_Manager.h"
+#include "../Manager/Graphics_Manager.h"
+#include "../Manager/Audio_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
+#include "../System/Movement_System.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -28,8 +32,89 @@ namespace lof {
         signature.set(ecs_manager.get_component_id<GUI_Component>());
     }
 
+    void GUI_System::reset_all_game_state() {
+        // Hide all GUI elements
+        hide_mineral_tank_gui();
+        hide_oxygen_tank_gui();
+        hide_oxygen_warning(50.0f);
+        hide_oxygen_warning(20.0f);
+        hide_oxygen_warning(5.0f);
+
+        // Reset GUI state variables
+        mineral_e_prompt = INVALID_ENTITY_ID;
+        oxygen_e_prompt = INVALID_ENTITY_ID;
+        mineral_interaction_container = INVALID_ENTITY_ID;
+        oxygen_interaction_container = INVALID_ENTITY_ID;
+        oxygen_progress_bar1 = INVALID_ENTITY_ID;
+        oxygen_progress_bar2 = INVALID_ENTITY_ID;
+        oxygen_percentage_text1 = INVALID_ENTITY_ID;
+        oxygen_percentage_text2 = INVALID_ENTITY_ID;
+
+        // Reset all gameplay values
+        stored_mineral_progress = 0.0f;
+        GM.set_current_oxygen_level(100.0f);
+        GM.set_ship_oxygen_level(400.0f);
+
+        // Reset mineral count text
+        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+            text_comp.text = "000000";
+        }
+
+        // Reset goal percentage text
+        EntityID goal_text_entity = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
+        if (goal_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(goal_text_entity);
+            text_comp.text = "00%";
+        }
+
+        // Reset timer text
+        EntityID timer_text_entity = ECSM.find_entity_by_name("top_ui_timer_count_text");
+        if (timer_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(timer_text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(timer_text_entity);
+            text_comp.text = "300";
+            GM.reset_timer();
+        }
+
+        // Reset warning states
+        warning_50_active = false;
+        warning_20_active = false;
+        warning_5_active = false;
+        warning_50_shown = false;
+        warning_20_shown = false;
+        warning_5_shown = false;
+        warning_50_display_time = 0.0f;
+        warning_20_display_time = 0.0f;
+        warning_5_display_time = 0.0f;
+    }
+
     void GUI_System::update(float delta_time)
     {
+        // Add logging for current scene and GUI state
+        LM.write_log("Current scene: %d", GM.get_current_scene());
+        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            //LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
+        }
+
+        // Win screen check
+        // Check for win screen first, before any GUI-related code
+        if (GM.get_current_scene() == 4) {  // Win screen
+            // Force-invalidate all GUI entity IDs
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            mineral_progress_bar = INVALID_ENTITY_ID;
+            mineral_percentage_text = INVALID_ENTITY_ID;
+            mineral_deposit_count_text = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+            oxygen_progress_bar1 = INVALID_ENTITY_ID;
+            oxygen_progress_bar2 = INVALID_ENTITY_ID;
+            oxygen_percentage_text1 = INVALID_ENTITY_ID;
+            oxygen_percentage_text2 = INVALID_ENTITY_ID;
+            return;  // Skip all GUI updates on win screen
+        }
+
         // == Mineral E prompt bobbing ==
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
             e_prompt_animation_timer += delta_time;
@@ -47,6 +132,34 @@ namespace lof {
                 float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                 transform->position.y = original_e_prompt_y + offset;
                 transform->position.x = oxygen_e_prompt_x; // keep X constant
+            }
+        }
+
+        // Check if we've reached 100% (50,000 minerals)
+        if (stored_mineral_progress * 50000.0f >= 50000.0f) {
+            reset_all_game_state();
+
+            // Load win screen
+            const std::string SCENES = "Scenes";
+            std::string scene_file = "win_screen.scn";
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+            if (SM.load_scene(scene_path.c_str())) {
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Stop all audio
+                ADM.stop_mastergroup();
+
+                // Update scene
+                GM.set_current_scene(4);
+                IMGUIM.set_current_file_shown(scene_file);
+                return;
+            }
+            else {
+                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
             }
         }
 
@@ -180,6 +293,11 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_mineral_tank_gui()
     {
+        // Add scene check at the start
+        if (GM.get_current_scene() == 4) {  // Win screen
+            return;  // Don't show GUI on win screen
+        }
+
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
             return; // GUI already shown
         }
@@ -190,7 +308,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14";  // E key icon
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
                 transform->position = Vec2D(mineral_e_prompt_x, original_e_prompt_y);
@@ -212,7 +330,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "Mineral_Deposit UI_BG_Batch_14";
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
                 transform->position = Vec2D(-350.0f, 120.0f);
@@ -227,7 +345,7 @@ namespace lof {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
                 // White or Gold color for minerals
-                graphics->color = glm::vec3(1.0f, 1.0f, 1.0f);
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
                 float max_width = 435.0f;
@@ -282,35 +400,35 @@ namespace lof {
     void GUI_System::hide_mineral_tank_gui() {
         // (5) Destroy deposit count text
         if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
+            //LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
             ecs_manager.destroy_entity(mineral_deposit_count_text);
             mineral_deposit_count_text = INVALID_ENTITY_ID;
         }
 
         // (4) Destroy percentage text
         if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
+            //LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
             ecs_manager.destroy_entity(mineral_percentage_text);
             mineral_percentage_text = INVALID_ENTITY_ID;
         }
 
         // (3) Destroy progress bar
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
+            //LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
             ecs_manager.destroy_entity(mineral_progress_bar);
             mineral_progress_bar = INVALID_ENTITY_ID;
         }
 
         // (2) Destroy container
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
+            //LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
             ecs_manager.destroy_entity(mineral_interaction_container);
             mineral_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) Finally, destroy the E prompt
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
+            //LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
             ecs_manager.destroy_entity(mineral_e_prompt);
             mineral_e_prompt = INVALID_ENTITY_ID;
         }
@@ -370,7 +488,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14"; // E key icon
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
                 transform->position = Vec2D(oxygen_e_prompt_x, original_e_prompt_y);
@@ -393,7 +511,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "Oxygen_Refill UI_BG_Batch_14";
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
                 transform->position = Vec2D(-350.0f, 120.0f);
@@ -424,7 +542,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar1)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
-                graphics->color = glm::vec3(0.0f, 0.68f, 1.0f);
+                graphics->color = glm::vec4(0.0f, 0.68f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
                 float current_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
@@ -476,7 +594,7 @@ namespace lof {
                 if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar2)) {
                     graphics->model_name = "square";
                     graphics->texture_name = "NoTexture";
-                    graphics->color = glm::vec3(1.0f, 1.0f, 0.0f); // Yellow
+                    graphics->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
                 }
                 if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
                     // Anchor left at -570.0f, same as your code
@@ -525,42 +643,42 @@ namespace lof {
 
         // (6) Second bar text
         if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
+            //LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
             ecs_manager.destroy_entity(oxygen_percentage_text2);
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
         }
 
         // (5) Second progress bar
         if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
+            //LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
             ecs_manager.destroy_entity(oxygen_progress_bar2);
             oxygen_progress_bar2 = INVALID_ENTITY_ID;
         }
 
         // (4) First bar text
         if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
+            //LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
             ecs_manager.destroy_entity(oxygen_percentage_text1);
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
         }
 
         // (3) First progress bar
         if (oxygen_progress_bar1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
+            //LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
             ecs_manager.destroy_entity(oxygen_progress_bar1);
             oxygen_progress_bar1 = INVALID_ENTITY_ID;
         }
 
         // (2) Main container
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
+            //LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
             ecs_manager.destroy_entity(oxygen_interaction_container);
             oxygen_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) E prompt
         if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
+            //LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
             ecs_manager.destroy_entity(oxygen_e_prompt);
             oxygen_e_prompt = INVALID_ENTITY_ID;
         }
@@ -698,7 +816,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(container_id)) {
                 graphics->model_name = "square";
                 graphics->texture_name = texture_name;
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
 
             // Position warning - same for all levels

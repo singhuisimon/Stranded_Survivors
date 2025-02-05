@@ -170,6 +170,8 @@ namespace lof {
          * @brief Checks if a general container is currently visible.
          */
         bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
+
+        void reset_all_game_state();
     };
 } // namespace lof
 

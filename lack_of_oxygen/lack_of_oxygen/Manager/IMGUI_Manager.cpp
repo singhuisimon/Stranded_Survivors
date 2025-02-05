@@ -46,7 +46,7 @@ namespace lof {
     int selected_object_index = -1;
 
     //booleans to open IMGUI windows or execute functionalities
-    bool load_selected = false;
+    //bool load_selected = false;
     bool show_window = false;
     bool remove_game_obj = false;
     bool create_game_obj = false;
@@ -155,114 +155,62 @@ namespace lof {
 
     }
 
-    //file list
-    void IMGUI_Manager::display_loading_options() {
-
-        ImGui::Begin("File List");
-
-        const std::string SCENES = "Scenes";
-        std::string level_path = ASM.get_full_path(SCENES, "");
+    std::vector<std::string> IMGUI_Manager::get_scene_files() {
         std::vector<std::string> file_names;
+        std::string level_path = ASM.get_full_path("Scenes", "");
 
-        //Iterate through the directory and collect file names
         for (const auto& entry : std::filesystem::directory_iterator(level_path)) {
-
-            //If the file is found, add to the list of file names
             if (entry.is_regular_file()) {
-
                 file_names.push_back(entry.path().filename().string());
             }
-
         }
+        return file_names;
+    }
 
-        //Indexes for files
-        int current_file_index = 0;
-        int shown_file_index = -1;
-        std::string selected_file{};
+    void IMGUI_Manager::load_scene(const std::string& file_name) {
 
-        //Iterate through file names
-        for (int i = 0; i < file_names.size(); ++i) {
+        ADM.stop_mastergroup();
+        ADM.set_new_scene(true);
 
-            if (!file_names[i].empty()) {
+        const std::string scenes = "Scenes";
+        if (SM.load_scene(ASM.get_full_path(scenes, file_name).c_str())) {
 
-                //selectable for clicking; second param for highlighting
-                if (ImGui::Selectable(file_names[i].c_str(), selected_file_index == current_file_index)) {
+            auto it = std::find_if(file_name.begin(), file_name.end(), ::isdigit);
 
-                    //selected; casuing seceond param state to change
-                    selected_file_index = current_file_index;
-                }
-
-                if (file_names[i] == get_current_file_shown()) {
-                    shown_file_index = i;
-                }
-
+            std::cout << file_name << std::endl;
+            if (it != file_name.end()) {
+                GM.set_current_scene(std::stoi(std::string(it, file_name.end())));
+            }
+            else if (file_name == "credit.scn") {
+                GM.set_current_scene(3);
+            }
+            else if (file_name == "main_menu.scn") {
+                GM.set_current_scene(0);
+            }
+            else if (file_name == "win_screen.scn") {
+                GM.set_current_scene(4);
             }
 
-            ++current_file_index;
-        }
+            selected_object_index = -1;
 
-        //If file is selecetd
-        if (selected_file_index != -1) {
-            selected_file = file_names[selected_file_index];
-        }
+            // Reset camera position
+            auto& camera = GFXM.get_camera();
+            camera.pos_x = DEFAULT_CAMERA_POS_X;
+            camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
-        //load scene button
-        if (ImGui::Button("Load Scene")) {
-            load_selected = true;
-
-        }
-
-        ImGui::Separator();
-
-        ImGui::Button("Drop Scenes Here");
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
-                const char* droppedFilePath = (const char*)payload->Data;
-
-                std::string file_name = droppedFilePath;
-                file_name.erase(0, ASM.get_full_path("Scenes", "").length());
-
-                if (std::find(file_names.begin(), file_names.end(), file_name) == file_names.end()) {
-                    file_names.push_back(file_name);
-                    std::cout << "Added: " << file_name << std::endl;
-                }
-                else {
-                    std::cout << "Already exists: " << file_name << std::endl;
-                }
+            if (GM.get_current_oxygen_level() < 100) {
+                GM.set_current_oxygen_level(100);
             }
-            ImGui::EndDragDropTarget();
-        }
-
-
-        ImGui::End();
-
-        //If file name is clicked and button is pressed
-        if (load_selected && (selected_file_index != -1) && !selected_file.empty()) {
-            ADM.stop_mastergroup();
-            ADM.set_new_scene(true);
-
-            //Gets file according to index load
-            const std::string scenes = "Scenes";
-            if (SM.load_scene(ASM.get_full_path(scenes, selected_file).c_str())) {
-
-                GM.set_current_scene(selected_file_index + 1);
-                selected_object_index = -1;
-
-                // Reset camera position
-                auto& camera = GFXM.get_camera();
-                camera.pos_x = DEFAULT_CAMERA_POS_X;
-                camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
+            
+            /*if (selected_file_index == 2) {
                 // Update top UI overlay position to follow player
                 EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
                 EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
                 EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
                 EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
-
                 EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
                 EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
                 EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-
                 // Reset player position if exists
                 EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                 if (player_id != INVALID_ENTITY_ID && GM.get_current_scene() == 2) {
@@ -276,11 +224,9 @@ namespace lof {
                         velocity.velocity = Vec2D(0.0f, 0.0f);
                     }
                 }
-
                 if (ui_overlay_id != INVALID_ENTITY_ID) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
-
                     // Define layout constants for vertical stacking
                     constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
                     constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
@@ -288,22 +234,18 @@ namespace lof {
                     constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
                     //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
                     constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
-
                     // Calculate base position for UI elements
                     Vec2D base_position{
                         0.0f,
                         player_transform.position.y + VERTICAL_OFFSET
                     };
-
                     // Update main UI overlay position
                     ui_transform.position = base_position;
                     ui_transform.prev_position = ui_transform.position;
-
                     // Position oxygen meter (top meter)
                     if (oxygen_meter_id != INVALID_ENTITY_ID &&
                         ECSM.has_component<Transform2D>(oxygen_meter_id)) {
                         auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
-
                         // Set position and scale for oxygen meter
                         oxygen_transform.position = {
                             base_position.x - METER_WIDTH,  // Center horizontally
@@ -312,14 +254,12 @@ namespace lof {
                         oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                         oxygen_transform.prev_position = oxygen_transform.position;
                     }
-
                     // Position oxygen text
                     if (oxygen_text_id != INVALID_ENTITY_ID &&
                         ECSM.has_component<Transform2D>(oxygen_text_id)) {
                         auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id);
                         //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
                         auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
-
                         // Position text to the left of the oxygen meter
                         oxygen_text_transform.position = {
                             (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
@@ -327,12 +267,10 @@ namespace lof {
                         };
                         oxygen_text_transform.prev_position = oxygen_text_transform.position;
                     }
-
                     // Position panic meter (bottom meter)
                     if (panic_meter_id != INVALID_ENTITY_ID &&
                         ECSM.has_component<Transform2D>(panic_meter_id)) {
                         auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
-
                         // Set position and scale for panic meter
                         panic_transform.position = {
                             base_position.x - METER_WIDTH,          // Center horizontally
@@ -341,13 +279,11 @@ namespace lof {
                         panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                         panic_transform.prev_position = panic_transform.position;
                     }
-
                     // Position panic text
                     if (panic_text_id != INVALID_ENTITY_ID &&
                         ECSM.has_component<Transform2D>(panic_text_id)) {
                         auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
                         auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
-
                         // Position text to the left of the panic meter
                         panic_text_transform.position = {
                             (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
@@ -355,26 +291,22 @@ namespace lof {
                         };
                         panic_text_transform.prev_position = panic_text_transform.position;
                     }
-
                     // Position mineral texture on the right side
                     if (mineral_texture_id != INVALID_ENTITY_ID &&
                         ECSM.has_component<Transform2D>(mineral_texture_id)) {
                         auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-
                         mineral_transform.position = {
                             base_position.x,                         // Center position
                             base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
                         };
                         mineral_transform.prev_position = mineral_transform.position;
                     }
-
                     // Position mineral count text
                     if (mineral_count_text_id != INVALID_ENTITY_ID &&
                         ECSM.has_component<Transform2D>(mineral_count_text_id) &&
                         ECSM.has_component<Transform2D>(mineral_texture_id)) {
                         auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
                         auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-
                         // Position text to the right of the mineral texture
                         mineral_count_text_transform.position = {
                             (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
@@ -383,19 +315,67 @@ namespace lof {
                         mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
                     }
                 }
+            }*/
+ 
+            //Note down current file
+            set_current_file_shown(file_name);
 
-                //Note down current file
-                set_current_file_shown(selected_file);
+            //Reset audio names
+            audio_file_names.clear();
+            audio_types.clear();
+            fill_up_sound_names();
 
-                //Reset audio names
-                audio_file_names.clear();
-                audio_types.clear();
-                fill_up_sound_names();
+        }
+    }
+
+    //file list
+    void IMGUI_Manager::display_loading_options() {
+
+        ImGui::Begin("File List");
+        
+        std::vector<std::string> file_names = get_scene_files();
+
+        static std::string selected_file{};
+
+        //Iterate through file names
+        for (int i = 0; i < file_names.size(); ++i) {
+
+            if (!file_names[i].empty()) {
+
+                //selectable for clicking; second param for highlighting
+                if (ImGui::Selectable(file_names[i].c_str(), selected_file_index == i)) {
+
+                    //selected; casuing seceond param state to change
+                    selected_file_index = i;
+                    selected_file = file_names[i];
+                }
 
             }
-
-            load_selected = false;
         }
+
+        //load scene button
+        if (ImGui::Button("Load Scene") && (selected_file_index != -1) && !selected_file.empty()) {
+            load_scene(selected_file);
+        }
+
+        ImGui::Separator();
+        ImGui::Button("Drop Scenes Here");
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
+                const char* droppedFilePath = (const char*)payload->Data;
+                std::string file_name = droppedFilePath;
+                file_name.erase(0, ASM.get_full_path("Scenes", "").length());
+                if (std::find(file_names.begin(), file_names.end(), file_name) == file_names.end()) {
+                    file_names.push_back(file_name);
+                    std::cout << "Added: " << file_name << std::endl;
+                }
+                else {
+                    std::cout << "Already exists: " << file_name << std::endl;
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+        ImGui::End();
     }
 
     //starts frame
@@ -756,7 +736,7 @@ namespace lof {
         //Calls other window's functions
         IMGUIM.asset_browser();
         IMGUIM.imgui_game_objects_list();
-        IMGUIM.display_loading_options();
+        IMGUIM.display_loading_options();       
         IMGUIM.imgui_game_objects_edit();
 
     }
@@ -1140,34 +1120,27 @@ namespace lof {
 
                 //        auto& movement_speed = logic.movement_speed;
                 //        ImGui::InputFloat("Movement Speed", &movement_speed);
-
                 //        auto& movement_range = logic.movement_range;
                 //        ImGui::InputFloat("Movement Range", &movement_range);
-
                 //        auto& reverse_direction = logic.reverse_direction;
                 //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
                 //        if (button_toggle(reverse_dir, &is_reverse_on)) {
                 //            reverse_direction = !reverse_direction;
                 //        }
-
                 //        auto& is_rotate = logic.rotate_with_motion;
                 //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
                 //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
                 //            is_rotate = !is_rotate;
                 //        }
-
                 //        auto& original_position = logic.origin_pos;
                 //        ImGui::InputFloat2("Original Position", &original_position.x);
-
                 //        for (const char* behaviour_here : chosen_logic_behaviour) {
                 //            ImGui::Text(behaviour_here);
                 //            ImGui::NewLine;
                 //        }
-
                 //        if (ImGui::Button("Add Logic Behaviour")) {
                 //            ImGui::OpenPopup("Add Behaviour Options");
                 //        }
-
                 //        if (ImGui::BeginPopup("Add Behaviour Options")) {
                 //            ImGui::Text("Select Operation");
                 //            ImGui::Separator();
@@ -1178,27 +1151,22 @@ namespace lof {
                 //            }
                 //            ImGui::EndPopup();
                 //        }
-
                 //        if (ImGui::Button("Remove Logic Behaviour")) {
                 //            ImGui::OpenPopup("Remove Behaviour Options");
                 //        }
-
                 //        if (ImGui::BeginPopup("Remove Behaviour Options")) {
                 //            ImGui::Text("Select Operation");
                 //            ImGui::Separator();
                 //            for (const char* behaviour : logic_behaviour) {
                 //                if (ImGui::Selectable(behaviour)) {
-
                 //                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
                 //                    if (it != chosen_logic_behaviour.end()) {
                 //                        chosen_logic_behaviour.erase(it);
                 //                    }
-
                 //                }
                 //            }
                 //            ImGui::EndPopup();
                 //        }
-
                 //        ImGui::Separator();
                 //    }
                 //}
@@ -1630,12 +1598,16 @@ namespace lof {
 
                         std::filesystem::remove(temp);
 
-                        auto& texture_storage = ASM.get_texture_storage();
+                        auto& texture_storage = ASM.get_texture_storage();                        
 
                         //Prepare the texture name for removal
                         temp.erase(0, ASM.get_full_path("Textures", "").length());
                         temp = temp.substr(0, temp.find_last_of('.'));
-                        std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+
+                        auto it = texture_storage.find(temp);
+                        if (it == texture_storage.end()) {
+                            std::transform(temp.begin(), temp.end(), temp.begin(), to_lower);
+                        }
 
                         // Step 3: Call the Assets_Manager's delete_texture function to delete the texture and remove associated components
                         ASM.delete_texture(temp);
@@ -2196,7 +2168,7 @@ namespace lof {
                                 set_drag_drop_source(current_directory, "Audio", folder_entry.path().string(), "AUDIO_ITEM");
                                 set_drag_drop_source(current_directory, "Scenes", folder_entry.path().string(), "SCENES_ITEM");
 
-                                //Manually done to account for File
+                                //Fonts - Manually done to account for File
                                 if (current_directory == ASM.get_full_path("Fonts", "")) {
                                     std::string file_path = folder_entry.path().string();
                                     if (file_path != ASM.get_full_path("Fonts", "Fonts.txt")) {
