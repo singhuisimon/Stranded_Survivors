@@ -123,7 +123,7 @@ namespace lof {
 	// ------------------------- Movement_System.cpp constants ------------------------- 
 
 	constexpr float DEFAULT_SPEED = 400.0f;
-	constexpr float GRAVITY_ACCELERATOR = 10.0f;
+	constexpr float GRAVITY_ACCELERATOR = 1.5f;
 	constexpr size_t MAX_DYNAMIC_ENTITIES = 20; 
 
 	// ------------------------------ Graphics_Manager.cpp -----------------------------

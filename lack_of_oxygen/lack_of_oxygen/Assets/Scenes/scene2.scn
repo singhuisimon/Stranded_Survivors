@@ -411,7 +411,7 @@
           ],
           "damping_factor": 0.949999988079071,
           "max_velocity": 20000.0,
-          "mass": 10.0,
+          "mass":10.0,
           "jump_force": 2000.0,
           "is_static": false,
           "is_grounded": true,

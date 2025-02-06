@@ -88,7 +88,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V2.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -1129,7 +1129,7 @@ namespace lof {
             for (size_t col = 0; col < current_level.cols; ++col) {
                 const TileData& tile = get_tile(static_cast<int>(row), static_cast<int>(col));
                 //std::cout << "tile row: " << tile.row << "tile col: " << tile.row << "\n";
-                LM.write_log("tile row: (%zu), tile col: (%zu)", tile.row, tile.col);
+                //LM.write_log("tile row: (%zu), tile col: (%zu)", tile.row, tile.col);
                 // Skip empty tiles early
                 if (tile.type == 'e') {
                     continue;
@@ -1161,8 +1161,8 @@ namespace lof {
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
                 float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
-                LM.write_log("First tile X position: %.2f", x_pos);
-                LM.write_log("Last tile X position: %.2f", y_pos);
+                //LM.write_log("First tile X position: %.2f", x_pos);
+                //LM.write_log("Last tile X position: %.2f", y_pos);
                 
                 // Create unique name for the tile entity
                 std::string entity_name = prefab_name + "_" + std::to_string(row) + "_" + std::to_string(col);
@@ -1177,9 +1177,9 @@ namespace lof {
                         transform.prev_position = Vec2D(transform.position);
                         transform.scale = Vec2D(tile_width, tile_height);
 
-                        // Log the position for debugging
-                        LM.write_log("Created tile '%c' at (%.2f, %.2f) with size %.2f x %.2f",
-                            tile.type, x_pos, y_pos, tile_width, tile_height);
+                        //// Log the position for debugging
+                        //LM.write_log("Created tile '%c' at (%.2f, %.2f) with size %.2f x %.2f",
+                        //    tile.type, x_pos, y_pos, tile_width, tile_height);
                        
                     }
                     

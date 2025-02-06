@@ -36,6 +36,12 @@ namespace lof {
         EntityID oxygen_e_prompt = INVALID_ENTITY_ID;  // 'E' prompt entity for Oxygen tank
         EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
         float oxygen_e_prompt_x = 800.0f;  // X position for 'E' prompt
+
+        static constexpr float OXYGEN_BAR_MAX_WIDTH = 630.0f;
+        static constexpr float OXYGEN_BAR_HEIGHT = 15.0f;
+        static constexpr float OXYGEN_BAR_PLAYER_Y = 78.0f;
+        static constexpr float OXYGEN_BAR_SHIP_Y = 50.0f;
+        static constexpr float OXYGEN_BAR_START_X = -657.0f;
         // 1st bar
         EntityID oxygen_percentage_text1 = INVALID_ENTITY_ID;
         EntityID oxygen_progress_bar1 = INVALID_ENTITY_ID;
@@ -60,13 +66,13 @@ namespace lof {
         float warning_20_display_time = 0.0f;
         float warning_5_display_time = 0.0f;
 
-        // Entity IDs for each warning
-        EntityID warning_container_50 = INVALID_ENTITY_ID;
-        EntityID warning_text_50 = INVALID_ENTITY_ID;
-        EntityID warning_container_20 = INVALID_ENTITY_ID;
-        EntityID warning_text_20 = INVALID_ENTITY_ID;
-        EntityID warning_container_5 = INVALID_ENTITY_ID;
-        EntityID warning_text_5 = INVALID_ENTITY_ID;
+        // Warning entity names (instead of IDs)
+        std::string warning_text_50_name;
+        std::string warning_container_50_name;
+        std::string warning_text_20_name;
+        std::string warning_container_20_name;
+        std::string warning_text_5_name;
+        std::string warning_container_5_name;
 
         // Timers, positions, etc.
         float e_prompt_animation_timer = 0.0f;
@@ -121,6 +127,12 @@ namespace lof {
          */
         void validate_gui_state();
 
+        // Helper function to get entity ID from name
+        EntityID get_warning_entity(const std::string& name) {
+            if (name.empty()) return INVALID_ENTITY_ID;
+            return ecs_manager.find_entity_by_name(name);
+        }
+
     public:
         /**
          * @brief Constructor for the GUI System.
@@ -172,7 +184,9 @@ namespace lof {
         bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
 
         void reset_all_game_state();
+
     };
+
 } // namespace lof
 
 #endif // LOF_GUI_SYSTEM_H

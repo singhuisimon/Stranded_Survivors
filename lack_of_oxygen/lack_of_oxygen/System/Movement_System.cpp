@@ -13,7 +13,7 @@
 //SYSTEM FILE HEADERS
 #include "Movement_System.h"
 #include "../System/Render_System.h"
-#include "Collision_System.h"
+#include "../System/Collision_System.h"
 
 //MANAGER FILE HEADERS
 #include "../Manager/ECS_Manager.h"
@@ -148,7 +148,7 @@ namespace lof {
             Vec2D sum_force = physics.force_helper.get_resultant_Force();
 
             //add gravity 
-            sum_force += physics.get_gravity() * physics.get_mass();
+            sum_force += physics.get_gravity() * physics.get_mass() * GRAVITY_ACCELERATOR;
 
 
             //save the accumulated forces

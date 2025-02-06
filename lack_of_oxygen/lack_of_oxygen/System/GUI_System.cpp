@@ -22,10 +22,18 @@
 namespace lof {
     GUI_System::GUI_System(ECS_Manager& ecs_manager)
         : ecs_manager(ecs_manager)
+        , warning_text_50_name("")
+        , warning_container_50_name("")
+        , warning_text_20_name("")
+        , warning_container_20_name("")
+        , warning_text_5_name("")
+        , warning_container_5_name("")
     {
         container_id = INVALID_ENTITY_ID;
         background_bar_id = INVALID_ENTITY_ID;
         progress_bar_id = INVALID_ENTITY_ID;
+
+
 
         // Set up the required components
         signature.set(ecs_manager.get_component_id<Transform2D>());
@@ -353,12 +361,12 @@ namespace lof {
 
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Mineral_Deposit UI_BG_Batch_14";
+                graphics->texture_name = "UI_MineralsFill_1920x1080_v2";
                 graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 120.0f);
-                transform->scale = Vec2D(500.0f, 300.0f);
+                transform->position = Vec2D(0.0f, 0.0f);
+                transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
@@ -372,10 +380,10 @@ namespace lof {
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
-                float max_width = 435.0f;
+                float max_width = 600.0f;
                 float current_width = max_width * stored_mineral_progress;
-                transform->position = Vec2D(-569.5f + (current_width / 2.0f), 110.0f);
-                transform->scale = Vec2D(current_width, 52.0f);
+                transform->position = Vec2D(-642.0f + (current_width / 2.0f), 60.0f);
+                transform->scale = Vec2D(current_width, 42.0f);
             }
             if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
                 gui->is_progress_bar = true;
@@ -394,7 +402,7 @@ namespace lof {
                 text->scale = glm::vec2(0.5f, 0.5f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_percentage_text)) {
-                transform->position = Vec2D(-350.0f, 40.0f);
+                transform->position = Vec2D(-350.0f, 10.0f);
                 transform->scale = Vec2D(1.0f, 1.0f);
             }
         }
@@ -414,8 +422,8 @@ namespace lof {
                 text->scale = glm::vec2(0.38f, 0.38f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_deposit_count_text)) {
-                transform->position = Vec2D(-350.0f, 110.0f);
-                transform->scale = Vec2D(0.38f, 0.38f);
+                transform->position = Vec2D(-350.0f, 57.0f);
+                transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
     }
@@ -472,11 +480,11 @@ namespace lof {
         // 2) Update the progress bar width/position
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
-                float max_width = 435.0f;
+                float max_width = 600.0f;
                 float new_width = max_width * stored_mineral_progress;
 
                 transform->scale.x = new_width;
-                transform->position.x = -569.5f + (new_width / 2.0f);
+                transform->position.x = -642.0f + (new_width / 2.0f);
             }
 
             if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
@@ -497,6 +505,7 @@ namespace lof {
             if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
                 // Example calculation: depositCount = stored_mineral_progress * 50000
                 int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
+                //printf("deposit count %d\n", depositCount);
                 text->text = std::to_string(depositCount) + " / 50000";
             }
         }
@@ -540,28 +549,24 @@ namespace lof {
 
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill UI_BG_Batch_14";
+                graphics->texture_name = "UI_OxygenRefill_1920x1080_v2";
                 graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 120.0f);
-                transform->scale = Vec2D(500.0f, 300.0f);
+                transform->position = Vec2D(0.0f, 0.0f);
+                transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
-        //
-        // == Player Oxygen Bar ==
-        // Use current_oxygen_level directly from Game_Manager, convert [0..100] -> [0..1]
-        //
+        // == Player Oxygen Bar 
         float playerOxygen = GM.get_current_oxygen_level(); // 0..100
         float playerFraction = playerOxygen / 100.0f;       // 0..1
         stored_oxygen_progress1 = playerFraction;
 
-        // We'll set a consistent bar width & height for both bars
-        const float BAR_MAX_WIDTH = 437.0f; // same as ship bar
-        const float BAR_HEIGHT = 18.0f;
+        // Set a consistent bar width & height for both bars
+        const float BAR_MAX_WIDTH = 620.0f; // same as ship bar
+        const float BAR_HEIGHT = 14.0f;
         constexpr float SHIP_MAX = 400.0f;
-        // Anchor them similarly in X and just offset Y for the top bar
 
         //
         // 3) First progress bar (Player Oxygen)
@@ -576,9 +581,9 @@ namespace lof {
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
                 float current_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
-                float bar_y = 134.0f; // Some Y offset
+                float bar_y = 78.5f; // Some Y offset
 
-                transform->position = Vec2D(-570.0f + (current_width / 2.0f), bar_y);
+                transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y);
                 transform->scale = Vec2D(current_width, BAR_HEIGHT);
             }
             if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar1)) {
@@ -603,14 +608,14 @@ namespace lof {
                 text->scale = glm::vec2(0.4f, 0.4f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text1)) {
-                transform->position = Vec2D(-540.0f, 157.0f);
+                transform->position = Vec2D(-623.0f, 100.0f);
                 transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
 
         // 5) Second progress bar (Ship Oxygen) in YELLOW
         {
-            float currentShipOxy = GM.get_ship_oxygen_level(); // e.g. 400 => full
+            float currentShipOxy = GM.get_ship_oxygen_level();
             // "Used fraction" => how much we've consumed.
             // If ship is still at 400 => used fraction=0 => bar is full
             float usedFraction = (SHIP_MAX - currentShipOxy) / SHIP_MAX;
@@ -627,9 +632,8 @@ namespace lof {
                     graphics->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
                 }
                 if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
-                    // Anchor left at -570.0f, same as your code
-                    float bar_y_ship = 106.0f;
-                    transform->position = Vec2D(-570.0f + (current_width / 2.0f), bar_y_ship);
+                    float bar_y_ship = 53.3f;
+                    transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y_ship);
                     transform->scale = Vec2D(current_width, BAR_HEIGHT);
                 }
                 if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar2)) {
@@ -653,7 +657,7 @@ namespace lof {
                     text->scale = glm::vec2(0.4f, 0.4f);
                 }
                 if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text2)) {
-                    transform->position = Vec2D(-540.0f, 78.0f);
+                    transform->position = Vec2D(-620.0f, 25.0f);
                     transform->scale = Vec2D(0.4f, 0.4f);
                 }
             }
@@ -725,13 +729,13 @@ namespace lof {
         if (oxygen_progress_bar1 != INVALID_ENTITY_ID)
         {
             // MATCH the logic/anchors from show_oxygen_tank_gui()
-            float BAR_MAX_WIDTH = 437.0f;
-            float bar_y = 134.0f;         // e.g. from show_oxygen_tank_gui() for the player bar
+            float BAR_MAX_WIDTH = 620.0f;
+            float bar_y = 78.5f;         // e.g. from show_oxygen_tank_gui() for the player bar
             float new_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
 
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
                 transform->scale.x = new_width;
-                transform->position.x = -570.0f + (new_width / 2.0f);
+                transform->position.x = -657.0f + (new_width / 2.0f);
                 transform->position.y = bar_y;
             }
 
@@ -761,8 +765,8 @@ namespace lof {
 
         if (oxygen_progress_bar2 != INVALID_ENTITY_ID)
         {
-            float BAR_MAX_WIDTH = 437.0f;
-            float bar_y = 106.0f;
+            float BAR_MAX_WIDTH = 620.0f;
+            float bar_y = 53.3f;
 
             // Reversed fill => 1 - usedFraction
             float reversed_value = 1.0f - stored_oxygen_progress2;
@@ -770,7 +774,7 @@ namespace lof {
 
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
                 transform->scale.x = new_width;
-                transform->position.x = -570.0f + (new_width / 2.0f);
+                transform->position.x = -657.0f + (new_width / 2.0f);
                 transform->position.y = bar_y;
             }
 
@@ -788,29 +792,19 @@ namespace lof {
     // OXYGEN WARNING GUI
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_warning(float percent) {
-        // Determine which warning flags to use
-        bool& warning_active = (percent == 50.0f) ? warning_50_active :
-            (percent == 20.0f) ? warning_20_active :
-            warning_5_active;
-        bool& warning_shown = (percent == 50.0f) ? warning_50_shown :
-            (percent == 20.0f) ? warning_20_shown :
-            warning_5_shown;
+        // Determine which warning names to use
+        std::string& text_name = (percent == 50.0f) ? warning_text_50_name :
+            (percent == 20.0f) ? warning_text_20_name :
+            warning_text_5_name;
 
-        // If warning is already active, don't restart it
-        if (warning_active) {
+        std::string& container_name = (percent == 50.0f) ? warning_container_50_name :
+            (percent == 20.0f) ? warning_container_20_name :
+            warning_container_5_name;
+
+        // If warning is already active, don't recreate it
+        if (!text_name.empty() || !container_name.empty()) {
             return;
         }
-
-        warning_active = true;
-        warning_shown = true;
-
-        EntityID& container_id = (percent == 50.0f) ? warning_container_50 :
-            (percent == 20.0f) ? warning_container_20 :
-            warning_container_5;
-
-        EntityID& text_id = (percent == 50.0f) ? warning_text_50 :
-            (percent == 20.0f) ? warning_text_20 :
-            warning_text_5;
 
         // Get the appropriate texture and message based on warning level
         std::string texture_name;
@@ -818,9 +812,11 @@ namespace lof {
         glm::vec3 text_color;
 
         if (percent == 50.0f) {
-            texture_name = "Purple_Oxy_Warning_Batch_14";
-            warning_message = "WARNING: OXYGEN LEVEL 50%";
-            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+            if (percent == 50.0f) {
+                texture_name = "Purple_Oxy_Warning_Batch_14";  // Fixed typo here
+                warning_message = "WARNING: OXYGEN LEVEL 50%";
+                text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+            }
         }
         else if (percent == 20.0f) {
             texture_name = "Red_Oxy_Warning_Batch_14";
@@ -833,9 +829,13 @@ namespace lof {
             text_color = glm::vec3(1.0f, 1.0f, 1.0f);
         }
 
-        // Create warning container
-        container_id = ecs_manager.clone_entity_from_prefab("gui_container");
+        // Create warning container with unique name
+        EntityID container_id = ecs_manager.clone_entity_from_prefab("gui_container");
         if (container_id != INVALID_ENTITY_ID) {
+            std::string unique_name = "warning_container_" + std::to_string(static_cast<int>(percent));
+            ecs_manager.update_entity_name(container_id, unique_name);
+            container_name = unique_name;
+
             auto* container_gui = get_component_safe<GUI_Component>(container_id);
             if (!container_gui) {
                 hide_oxygen_warning(percent);
@@ -849,25 +849,28 @@ namespace lof {
                 graphics->color = glm::vec4(1.0f);
             }
 
-            // Position warning - same for all levels
             if (auto* transform = get_component_safe<Transform2D>(container_id)) {
                 transform->position = Vec2D(0.0f, 200.0f);
                 transform->scale = Vec2D(2000.0f, 50.0f);
             }
         }
 
-        // Create warning text
-        text_id = ecs_manager.clone_entity_from_prefab("text_object");
+        // Create warning text with unique name
+        EntityID text_id = ecs_manager.clone_entity_from_prefab("text_object");
         if (text_id != INVALID_ENTITY_ID) {
+            std::string unique_name = "warning_text_" + std::to_string(static_cast<int>(percent));
+            ecs_manager.update_entity_name(text_id, unique_name);
+            text_name = unique_name;
+
             if (auto* text = get_component_safe<Text_Component>(text_id)) {
-                text->font_name = DEFAULT_FONT_NAME;  // Added font name
+                text->font_name = DEFAULT_FONT_NAME;
                 text->text = warning_message;
                 text->color = text_color;
-                text->scale = glm::vec2(0.7f, 0.7f);  // Matched scale style
+                text->scale = glm::vec2(0.7f, 0.7f);
             }
             if (auto* transform = get_component_safe<Transform2D>(text_id)) {
                 transform->position = Vec2D(0.0f, 195.0f);
-                transform->scale = Vec2D(0.7f, 0.7f);  // Matched transform scale
+                transform->scale = Vec2D(0.7f, 0.7f);
             }
         }
 
@@ -877,22 +880,45 @@ namespace lof {
     }
 
     void GUI_System::hide_oxygen_warning(float percent) {
-        EntityID& text_id = (percent == 50.0f) ? warning_text_50 :
-            (percent == 20.0f) ? warning_text_20 :
-            warning_text_5;
+        // Get the appropriate warning names
+        std::string& text_name = (percent == 50.0f) ? warning_text_50_name :
+            (percent == 20.0f) ? warning_text_20_name :
+            warning_text_5_name;
 
-        EntityID& container_id = (percent == 50.0f) ? warning_container_50 :
-            (percent == 20.0f) ? warning_container_20 :
-            warning_container_5;
+        std::string& container_name = (percent == 50.0f) ? warning_container_50_name :
+            (percent == 20.0f) ? warning_container_20_name :
+            warning_container_5_name;
 
+        // Look up current entity IDs by name
+        EntityID text_id = ecs_manager.find_entity_by_name(text_name);
+        EntityID container_id = ecs_manager.find_entity_by_name(container_name);
+
+        // Destroy text entity if it exists
         if (text_id != INVALID_ENTITY_ID) {
             ecs_manager.destroy_entity(text_id);
-            text_id = INVALID_ENTITY_ID;
         }
+
+        // Destroy container entity if it exists
         if (container_id != INVALID_ENTITY_ID) {
             ecs_manager.destroy_entity(container_id);
-            container_id = INVALID_ENTITY_ID;
+        }
+
+        // Clear the stored names
+        text_name.clear();
+        container_name.clear();
+
+        // Reset the corresponding warning flags
+        if (percent == 50.0f) {
+            warning_50_active = false;
+            warning_50_shown = false;
+        }
+        else if (percent == 20.0f) {
+            warning_20_active = false;
+            warning_20_shown = false;
+        }
+        else if (percent == 5.0f) {
+            warning_5_active = false;
+            warning_5_shown = false;
         }
     }
-
 } // namespace lof

@@ -251,12 +251,24 @@ namespace lof {
             return font_storage;
         }
 
+        /**
+        * @brief Unload the fonts that store in the font storage.
+        */
         void unload_fonts();
 
+        /**
+        * @brief Unload the models that store in the model storage.
+        */
         void unload_models();
 
+        /**
+        * @brief Unload the texture that store in the texture storage.
+        */
         void unload_textures();
 
+        /**
+        * @brief Unload the animation that store in the animation storage.
+        */
         void unload_animations();
 
         void store_font(const std::string& font_name, const Font& font);
@@ -273,8 +285,6 @@ namespace lof {
             return model_storage;
         }
 
-        //void unload_models();
-
         void track_entity_asset(EntityID entity_id, const std::string& component_name, const std::string& asset_name);
 
         void register_asset(const std::string& asset_name);
@@ -285,10 +295,6 @@ namespace lof {
         void delete_texture(const std::string& texture_name);
 
         void register_assets_from_file(const std::string& file_path);
-
-        //std::string open_file_explorer();
-
-        //void delete_audio(const std::string& audio_name);
      
         std::unordered_set<std::string>& get_all_assets() { return all_assets; };
 
@@ -297,28 +303,15 @@ namespace lof {
 
         bool has_audio_component(const EntityID& entity);
 
-       bool is_entity_using_audio(const EntityID& entity, const std::string target_audio);
-
-        //void print_track_audio();
-        //EntityID is_entity_using_audio(const std::string target_audio);
-
-       // std::vector<EntityID>get_entities_using_audio(const std::string target_audio);
-        //bool is_entity_using_audio(const std::string& target_audio);
-
-        //std::vector<EntityID>get_entity_audio();
-
-
-        // EntityID find_entity_with_audio(const std::string& audio_filename);
+        bool is_entity_using_audio(const EntityID& entity, const std::string target_audio);
 
         bool find_and_remove_audio(const std::string& target_audio);
 
-        void delete_font(const std::string& text_name);
+        
 
         EntityID get_entity_with_audio(const std::string& target_audio);
 
         std::vector<EntityID> get_all_entities_with_audio();
-
-
 
     private:
 
