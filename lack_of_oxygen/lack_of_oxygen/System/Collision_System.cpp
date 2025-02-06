@@ -1168,7 +1168,17 @@ namespace lof {
 
                                     
                                 }
-                                
+
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                if ((is_e_pressed || is_e_held) && deposit_count > 0)
+                                {
+                                    ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
+                                    deposit_count--;
+                                }
+                                else if (!(e_press && e_last_frame) && current_minerals <= 20)
+                                {
+                                    ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
+                                }
                          
 
                             }
@@ -1184,16 +1194,7 @@ namespace lof {
                     //    deposit = false;
                     //}
 
-                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                    if ((is_e_pressed || is_e_held) && deposit_count > 0)
-                    {
-                        ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
-                        //deposit_count--;
-                    }
-                    else if (!(e_press && e_last_frame))
-                    {
-                        ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
-                    }
+                    
                 }
                 else {
                     gui_system->hide_mineral_tank_gui();

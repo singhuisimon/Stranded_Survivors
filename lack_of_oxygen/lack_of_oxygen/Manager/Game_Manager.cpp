@@ -816,7 +816,7 @@ namespace lof {
                                     // Check if player is dead to reset the scene
                                     if (is_player_dead == true) {
                                         tnt_to_destroy.clear();
-                                        IMGUIM.set_current_file_shown("scene2.scn");
+                                        //IMGUIM.set_current_file_shown("scene2.scn");
                                         break;
                                     } else {
                                         // Destroy tnt and remove it from the list of tnt to destroy

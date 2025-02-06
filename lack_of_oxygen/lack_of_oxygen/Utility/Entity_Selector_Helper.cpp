@@ -190,9 +190,9 @@ namespace lof
             return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
                 mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
         }
-        else {*/
+        else {
 
-          /*  unsigned int current_width = WC.get_win_width();
+             unsigned int current_width = WC.get_win_width();
             unsigned int current_height = WC.get_win_height();
 
             float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
@@ -203,7 +203,9 @@ namespace lof
 
             return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
                 adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
-        //}
+        }*/
+        return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
+            mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
     }
 #endif
 
