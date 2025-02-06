@@ -1467,11 +1467,11 @@ namespace lof {
 
             // Define the base texture name for each button
             std::string base_texture;
-            /*if (entity_name == "play_button") {
+            //if (entity_name == "play_button") {
             std::string hover_sound = "button_hover";
             std::string main_menu_sound = "main_menu";
 
-            if (entity_name == "play_button") {
+            /*if (entity_name == "play_button") {
                 base_texture = "Main_Menu_Play_Batch_14";
             }
             else if (entity_name == "credit_button") {
@@ -1679,14 +1679,14 @@ namespace lof {
             }
 
             //std::string base_texture = "Back_Batch_14";
-            std::string base_texture = "Back_Batch_14";
+            //std::string base_texture = "Back_Batch_14";
             std::string hover_sound = "button_hover";  
             std::string click_sound = "main_menu"; 
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
                     // Play hover sound
-                    ADM.play_now(entity_id, hover_sound, audio);
+                    ADM.play_now(entity_id, "button_hover", audio);
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
