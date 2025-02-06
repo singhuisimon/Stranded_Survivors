@@ -72,12 +72,12 @@ namespace lof {
     void Player_Script::update_player_movement(Physics_Component& physic_comp) {
 
         // Handle horizontal movement
-        if (IM.is_key_held(GLFW_KEY_SPACE)) {
+        if (IM.is_key_pressed(GLFW_KEY_SPACE)) {
             physic_comp.set_jump_requested(true); //this will set the flag to true inside the physics_component 
         }
-        else {
+        /*else {
             physic_comp.set_jump_requested(false);
-        }
+        }*/
 
         //activate and deactivate the forces. 
         if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
