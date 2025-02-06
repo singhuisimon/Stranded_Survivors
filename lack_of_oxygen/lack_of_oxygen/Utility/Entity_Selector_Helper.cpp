@@ -192,7 +192,7 @@ namespace lof
         }
         else {*/
 
-            unsigned int current_width = WC.get_win_width();
+          /*  unsigned int current_width = WC.get_win_width();
             unsigned int current_height = WC.get_win_height();
 
             float scaleX = static_cast<float>(current_width) / SM.get_scr_width();

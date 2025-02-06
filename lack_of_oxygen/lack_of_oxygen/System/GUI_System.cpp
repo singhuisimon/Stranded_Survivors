@@ -14,6 +14,7 @@
 #include "../Manager/Audio_Manager.h"
 #include "../Manager/IMGUI_Manager.h"
 #include "../System/Movement_System.h"
+#include "../System/Collision_System.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -32,14 +33,89 @@ namespace lof {
         signature.set(ecs_manager.get_component_id<GUI_Component>());
     }
 
-    void GUI_System::update(float delta_time)
-    {
-        // Add logging for current scene and GUI state
-        LM.write_log("Current scene: %d", GM.get_current_scene());
-        if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
+    void GUI_System::reset_all_game_state() {
+        // Reset the core progress tracker that triggers win condition
+        stored_mineral_progress = 0.0f;
+
+        // Reset stored goal percentage using Game Manager
+        GM.set_stored_goal_percentage(0.0f);
+
+        // Reset the total deposited minerals in Collision System
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* collision_system = dynamic_cast<Collision_System*>(system.get())) {
+                collision_system->reset_deposited_minerals();
+                break;
+            }
         }
 
+        // Hide all GUI elements with logging
+        LM.write_log("GUI_System::reset_all_game_state(): Hiding GUI elements...");
+        hide_mineral_tank_gui();
+        hide_oxygen_tank_gui();
+        hide_oxygen_warning(50.0f);
+        hide_oxygen_warning(20.0f);
+        hide_oxygen_warning(5.0f);
+
+        // Log initial state of entities before reset
+        LM.write_log("GUI_System::reset_all_game_state(): Current entity states - "
+            "mineral_e_prompt: %d, oxygen_e_prompt: %d",
+            mineral_e_prompt, oxygen_e_prompt);
+
+        // Reset GUI state variables
+        mineral_e_prompt = INVALID_ENTITY_ID;
+        oxygen_e_prompt = INVALID_ENTITY_ID;
+        mineral_interaction_container = INVALID_ENTITY_ID;
+        oxygen_interaction_container = INVALID_ENTITY_ID;
+        oxygen_progress_bar1 = INVALID_ENTITY_ID;
+        oxygen_progress_bar2 = INVALID_ENTITY_ID;
+        oxygen_percentage_text1 = INVALID_ENTITY_ID;
+        oxygen_percentage_text2 = INVALID_ENTITY_ID;
+
+        // Reset gameplay values with logging
+        LM.write_log("GUI_System::reset_all_game_state(): Resetting gameplay values...");
+        GM.set_current_oxygen_level(100.0f);
+        GM.set_ship_oxygen_level(400.0f);
+
+        // Reset mineral count text
+        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+            text_comp.text = "000000";
+        }
+
+        // Reset goal percentage text
+        EntityID goal_text_entity = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
+        if (goal_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(goal_text_entity);
+            text_comp.text = "00%";
+        }
+
+        // Reset timer text
+        EntityID timer_text_entity = ECSM.find_entity_by_name("top_ui_timer_count_text");
+        if (timer_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(timer_text_entity)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(timer_text_entity);
+            text_comp.text = "300";
+            GM.reset_timer();
+        }
+
+        // Reset warning states
+        LM.write_log("GUI_System::reset_all_game_state(): Resetting warning states...");
+        warning_50_active = false;
+        warning_20_active = false;
+        warning_5_active = false;
+        warning_50_shown = false;
+        warning_20_shown = false;
+        warning_5_shown = false;
+        warning_50_display_time = 0.0f;
+        warning_20_display_time = 0.0f;
+        warning_5_display_time = 0.0f;
+
+        LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
+    }
+
+
+    void GUI_System::update(float delta_time)
+    {
         // Win screen check
         // Check for win screen first, before any GUI-related code
         if (GM.get_current_scene() == 4) {  // Win screen
@@ -79,57 +155,29 @@ namespace lof {
         }
 
         // Check if we've reached 100% (50,000 minerals)
-        // Check if we've reached 100% (50,000 minerals)
-        if (stored_mineral_progress * 50000.0f >= 50000.0f) {
-            // Force hide all GUI elements before scene transition
-            hide_mineral_tank_gui();
-            hide_oxygen_tank_gui();
-            hide_oxygen_warning(50.0f);
-            hide_oxygen_warning(20.0f);
-            hide_oxygen_warning(5.0f);
+        if (stored_mineral_progress * 50000 >= 50000) {
+            // win condition log current stored mineral ammount
+            LM.write_log("Win condition met: %f minerals collected", stored_mineral_progress * 50000.0f);
 
-            // Reset GUI state variables
-            mineral_e_prompt = INVALID_ENTITY_ID;
-            oxygen_e_prompt = INVALID_ENTITY_ID;
-            mineral_interaction_container = INVALID_ENTITY_ID;
-            oxygen_interaction_container = INVALID_ENTITY_ID;
+            reset_all_game_state();
 
-            // Clear mineral progress
-            stored_mineral_progress = 0.0f;
+            LM.write_log("Reset met: %f minerals collected", stored_mineral_progress * 50000.0f);
 
-            // Clear dynamic entities first
-            bool found_movement_system = false;
-            for (auto& system : ECSM.get_systems()) {
-                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                    movement_system->clear_dynamic_entities();
-                    found_movement_system = true;
-                    LM.write_log("Found and cleared Movement System");
-                    break;
-                }
-            }
-            if (!found_movement_system) {
-                LM.write_log("Warning: Movement System not found");
-            }
-
-            // Set up scene loading
+            // Load win screen
             const std::string SCENES = "Scenes";
             std::string scene_file = "win_screen.scn";
             std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
 
-            // Try to load win screen
             if (SM.load_scene(scene_path.c_str())) {
-                LM.write_log("Win screen loaded successfully");
-
                 // Reset camera position
                 auto& camera = GFXM.get_camera();
                 camera.pos_x = DEFAULT_CAMERA_POS_X;
                 camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
-                // Stop all currently playing audio
+                // Stop all audio
                 ADM.stop_mastergroup();
 
-                // Update current scene in Game Manager
+                // Update scene
                 GM.set_current_scene(4);
 
                 // Update IMGUI Manager's current file
@@ -290,7 +338,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14";  // E key icon
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
                 transform->position = Vec2D(mineral_e_prompt_x, original_e_prompt_y);
@@ -311,12 +359,12 @@ namespace lof {
 
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Mineral_Deposit UI_BG_Batch_14";
-                graphics->color = glm::vec3(1.0f);
+                graphics->texture_name = "UI_MineralsFill_1920x1080_v2";
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 120.0f);
-                transform->scale = Vec2D(500.0f, 300.0f);
+                transform->position = Vec2D(0.0f, 0.0f);
+                transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
@@ -327,13 +375,13 @@ namespace lof {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
                 // White or Gold color for minerals
-                graphics->color = glm::vec3(1.0f, 1.0f, 1.0f);
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
-                float max_width = 435.0f;
+                float max_width = 600.0f;
                 float current_width = max_width * stored_mineral_progress;
-                transform->position = Vec2D(-569.5f + (current_width / 2.0f), 110.0f);
-                transform->scale = Vec2D(current_width, 52.0f);
+                transform->position = Vec2D(-642.0f + (current_width / 2.0f), 60.0f);
+                transform->scale = Vec2D(current_width, 42.0f);
             }
             if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
                 gui->is_progress_bar = true;
@@ -352,7 +400,7 @@ namespace lof {
                 text->scale = glm::vec2(0.5f, 0.5f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_percentage_text)) {
-                transform->position = Vec2D(-350.0f, 40.0f);
+                transform->position = Vec2D(-350.0f, 10.0f);
                 transform->scale = Vec2D(1.0f, 1.0f);
             }
         }
@@ -372,8 +420,8 @@ namespace lof {
                 text->scale = glm::vec2(0.38f, 0.38f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_deposit_count_text)) {
-                transform->position = Vec2D(-350.0f, 110.0f);
-                transform->scale = Vec2D(0.38f, 0.38f);
+                transform->position = Vec2D(-350.0f, 57.0f);
+                transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
     }
@@ -382,35 +430,35 @@ namespace lof {
     void GUI_System::hide_mineral_tank_gui() {
         // (5) Destroy deposit count text
         if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
+            //LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
             ecs_manager.destroy_entity(mineral_deposit_count_text);
             mineral_deposit_count_text = INVALID_ENTITY_ID;
         }
 
         // (4) Destroy percentage text
         if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
+            //LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
             ecs_manager.destroy_entity(mineral_percentage_text);
             mineral_percentage_text = INVALID_ENTITY_ID;
         }
 
         // (3) Destroy progress bar
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
+            //LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
             ecs_manager.destroy_entity(mineral_progress_bar);
             mineral_progress_bar = INVALID_ENTITY_ID;
         }
 
         // (2) Destroy container
         if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
+            //LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
             ecs_manager.destroy_entity(mineral_interaction_container);
             mineral_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) Finally, destroy the E prompt
         if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
+            //LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
             ecs_manager.destroy_entity(mineral_e_prompt);
             mineral_e_prompt = INVALID_ENTITY_ID;
         }
@@ -418,17 +466,23 @@ namespace lof {
 
     void GUI_System::update_mineral_progress(float progress)
     {
+        if (GM.get_current_scene() == 0) { // Main menu
+            stored_mineral_progress = 0.0f;
+            LM.write_log("GUI_System::update_mineral_progress(): Reset progress on main menu");
+            return;
+        }
+
         // 1) Clamp and store the new progress
         stored_mineral_progress = std::clamp(progress, 0.0f, 1.0f);
 
         // 2) Update the progress bar width/position
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
-                float max_width = 435.0f;
+                float max_width = 600.0f;
                 float new_width = max_width * stored_mineral_progress;
 
                 transform->scale.x = new_width;
-                transform->position.x = -569.5f + (new_width / 2.0f);
+                transform->position.x = -642.0f + (new_width / 2.0f);
             }
 
             if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
@@ -449,6 +503,7 @@ namespace lof {
             if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
                 // Example calculation: depositCount = stored_mineral_progress * 50000
                 int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
+                //printf("deposit count %d\n", depositCount);
                 text->text = std::to_string(depositCount) + " / 50000";
             }
         }
@@ -470,7 +525,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14"; // E key icon
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
                 transform->position = Vec2D(oxygen_e_prompt_x, original_e_prompt_y);
@@ -492,28 +547,24 @@ namespace lof {
 
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Oxygen_Refill UI_BG_Batch_14";
-                graphics->color = glm::vec3(1.0f);
+                graphics->texture_name = "UI_OxygenRefill_1920x1080_v2";
+                graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 120.0f);
-                transform->scale = Vec2D(500.0f, 300.0f);
+                transform->position = Vec2D(0.0f, 0.0f);
+                transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
-        //
-        // == Player Oxygen Bar ==
-        // Use current_oxygen_level directly from Game_Manager, convert [0..100] -> [0..1]
-        //
+        // == Player Oxygen Bar 
         float playerOxygen = GM.get_current_oxygen_level(); // 0..100
         float playerFraction = playerOxygen / 100.0f;       // 0..1
         stored_oxygen_progress1 = playerFraction;
 
-        // We'll set a consistent bar width & height for both bars
-        const float BAR_MAX_WIDTH = 437.0f; // same as ship bar
-        const float BAR_HEIGHT = 18.0f;
+        // Set a consistent bar width & height for both bars
+        const float BAR_MAX_WIDTH = 620.0f; // same as ship bar
+        const float BAR_HEIGHT = 14.0f;
         constexpr float SHIP_MAX = 400.0f;
-        // Anchor them similarly in X and just offset Y for the top bar
 
         //
         // 3) First progress bar (Player Oxygen)
@@ -524,13 +575,13 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar1)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
-                graphics->color = glm::vec3(0.0f, 0.68f, 1.0f);
+                graphics->color = glm::vec4(0.0f, 0.68f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
                 float current_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
-                float bar_y = 134.0f; // Some Y offset
+                float bar_y = 78.5f; // Some Y offset
 
-                transform->position = Vec2D(-570.0f + (current_width / 2.0f), bar_y);
+                transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y);
                 transform->scale = Vec2D(current_width, BAR_HEIGHT);
             }
             if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar1)) {
@@ -555,14 +606,14 @@ namespace lof {
                 text->scale = glm::vec2(0.4f, 0.4f);
             }
             if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text1)) {
-                transform->position = Vec2D(-540.0f, 157.0f);
+                transform->position = Vec2D(-623.0f, 100.0f);
                 transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
 
         // 5) Second progress bar (Ship Oxygen) in YELLOW
         {
-            float currentShipOxy = GM.get_ship_oxygen_level(); // e.g. 400 => full
+            float currentShipOxy = GM.get_ship_oxygen_level();
             // "Used fraction" => how much we've consumed.
             // If ship is still at 400 => used fraction=0 => bar is full
             float usedFraction = (SHIP_MAX - currentShipOxy) / SHIP_MAX;
@@ -576,12 +627,11 @@ namespace lof {
                 if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar2)) {
                     graphics->model_name = "square";
                     graphics->texture_name = "NoTexture";
-                    graphics->color = glm::vec3(1.0f, 1.0f, 0.0f); // Yellow
+                    graphics->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
                 }
                 if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
-                    // Anchor left at -570.0f, same as your code
-                    float bar_y_ship = 106.0f;
-                    transform->position = Vec2D(-570.0f + (current_width / 2.0f), bar_y_ship);
+                    float bar_y_ship = 53.3f;
+                    transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y_ship);
                     transform->scale = Vec2D(current_width, BAR_HEIGHT);
                 }
                 if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar2)) {
@@ -605,7 +655,7 @@ namespace lof {
                     text->scale = glm::vec2(0.4f, 0.4f);
                 }
                 if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text2)) {
-                    transform->position = Vec2D(-540.0f, 78.0f);
+                    transform->position = Vec2D(-620.0f, 25.0f);
                     transform->scale = Vec2D(0.4f, 0.4f);
                 }
             }
@@ -625,42 +675,42 @@ namespace lof {
 
         // (6) Second bar text
         if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
+            //LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
             ecs_manager.destroy_entity(oxygen_percentage_text2);
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
         }
 
         // (5) Second progress bar
         if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
+            //LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
             ecs_manager.destroy_entity(oxygen_progress_bar2);
             oxygen_progress_bar2 = INVALID_ENTITY_ID;
         }
 
         // (4) First bar text
         if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
+            //LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
             ecs_manager.destroy_entity(oxygen_percentage_text1);
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
         }
 
         // (3) First progress bar
         if (oxygen_progress_bar1 != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
+            //LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
             ecs_manager.destroy_entity(oxygen_progress_bar1);
             oxygen_progress_bar1 = INVALID_ENTITY_ID;
         }
 
         // (2) Main container
         if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
+            //LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
             ecs_manager.destroy_entity(oxygen_interaction_container);
             oxygen_interaction_container = INVALID_ENTITY_ID;
         }
 
         // (1) E prompt
         if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
+            //LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
             ecs_manager.destroy_entity(oxygen_e_prompt);
             oxygen_e_prompt = INVALID_ENTITY_ID;
         }
@@ -677,13 +727,13 @@ namespace lof {
         if (oxygen_progress_bar1 != INVALID_ENTITY_ID)
         {
             // MATCH the logic/anchors from show_oxygen_tank_gui()
-            float BAR_MAX_WIDTH = 437.0f;
-            float bar_y = 134.0f;         // e.g. from show_oxygen_tank_gui() for the player bar
+            float BAR_MAX_WIDTH = 620.0f;
+            float bar_y = 78.5f;         // e.g. from show_oxygen_tank_gui() for the player bar
             float new_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
 
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
                 transform->scale.x = new_width;
-                transform->position.x = -570.0f + (new_width / 2.0f);
+                transform->position.x = -657.0f + (new_width / 2.0f);
                 transform->position.y = bar_y;
             }
 
@@ -713,8 +763,8 @@ namespace lof {
 
         if (oxygen_progress_bar2 != INVALID_ENTITY_ID)
         {
-            float BAR_MAX_WIDTH = 437.0f;
-            float bar_y = 106.0f;
+            float BAR_MAX_WIDTH = 620.0f;
+            float bar_y = 53.3f;
 
             // Reversed fill => 1 - usedFraction
             float reversed_value = 1.0f - stored_oxygen_progress2;
@@ -722,7 +772,7 @@ namespace lof {
 
             if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
                 transform->scale.x = new_width;
-                transform->position.x = -570.0f + (new_width / 2.0f);
+                transform->position.x = -657.0f + (new_width / 2.0f);
                 transform->position.y = bar_y;
             }
 
@@ -798,7 +848,7 @@ namespace lof {
             if (auto* graphics = get_component_safe<Graphics_Component>(container_id)) {
                 graphics->model_name = "square";
                 graphics->texture_name = texture_name;
-                graphics->color = glm::vec3(1.0f);
+                graphics->color = glm::vec4(1.0f);
             }
 
             // Position warning - same for all levels

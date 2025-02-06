@@ -96,7 +96,7 @@ int main(void) {
     
     // Create a fullscreen window
     // Change to windowed mode window and its OpenGL context using NULL for fourth option
-    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", NULL, NULL);
+    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
     glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
 
     if (!window) {

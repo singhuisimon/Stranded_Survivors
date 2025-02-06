@@ -401,38 +401,49 @@ namespace lof {
                     std::exit(EXIT_FAILURE);
                 }
 
-                // If entity has animation, pass animation data to fragment shader
+
+                // If entity has animation that is not default, pass animation data to fragment shader
                 bool has_animation = ECSM.has_component<Animation_Component>(entity_id);
                 if (has_animation == true) {
-
                     auto& animation = ECSM.get_component<Animation_Component>(entity_id);
                     std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
-
-                    // Set animation flag to be true
-                    GLuint animate_flag_true_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
-                    if (animate_flag_true_loc >= 0) {
-                        glUniform1ui(animate_flag_true_loc, GL_TRUE);
-                    }
-                    else {
-                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
-                        std::exit(EXIT_FAILURE);
-                    }
-
-                    // Pass frame number of current frame
-                    GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
-                    if (frame_no_loc >= 0) {
-                        if (curr_animation_name == "vent_strip" || curr_animation_name == "lava_animate") {
-                            glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animations[curr_animation_name].curr_frame_index].frame_number);
+                    if ((curr_animation_name != DEFAULT_ANIMATION_NAME) && (animations.find(curr_animation_name) != animations.end())) {
+                        // Set animation flag to be true
+                        GLuint animate_flag_true_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
+                        if (animate_flag_true_loc >= 0) {
+                            glUniform1ui(animate_flag_true_loc, GL_TRUE);
                         }
                         else {
-                            glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animation.curr_frame_index].frame_number);
+                            LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+
+                        // Pass frame number of current frame
+                        GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
+                        if (frame_no_loc >= 0) {
+                            if (curr_animation_name == "vent_strip" || curr_animation_name == "lava_animate") {
+                                glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animations[curr_animation_name].curr_frame_index].frame_number);
+                            }
+                            else {
+                                glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animation.curr_frame_index].frame_number);
+                            }
+                        }
+                        else {
+                            LM.write_log("Render_System::draw(): Frame number value doesn't exist.");
+                            std::exit(EXIT_FAILURE);
                         }
                     }
                     else {
-                        LM.write_log("Render_System::draw(): Frame number value doesn't exist.");
-                        std::exit(EXIT_FAILURE);
-                    } 
-
+                        // Set animation flag to be false
+                        GLuint animate_flag_false_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
+                        if (animate_flag_false_loc >= 0) {
+                            glUniform1ui(animate_flag_false_loc, GL_FALSE);
+                        }
+                        else {
+                            LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+                    }
                 }
                 else {
                     // Set animation flag to be false
@@ -461,7 +472,7 @@ namespace lof {
             // Pass object's color to fragment shader uniform variable uColor
             GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
             if (color_uniform_loc >= 0) {
-                glUniform3fv(color_uniform_loc, 1, &graphics.color[0]);
+                glUniform4fv(color_uniform_loc, 1, &graphics.color[0]);
             }
             else {
                 LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
@@ -509,9 +520,9 @@ namespace lof {
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
                         GLint debug_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
-                        glm::vec3 debug_color{ 0.0f, 0.0f, 0.0f };
+                        glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
                         if (debug_color_uniform_loc >= 0) {
-                            glUniform3fv(debug_color_uniform_loc, 1, &debug_color[0]);
+                            glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
                         }
                         else {
                             LM.write_log("Render_System::draw(): Debug color uniform variable doesn't exist.");
@@ -725,6 +736,9 @@ namespace lof {
                         break;
                     case tnt_explode:
                         particle_tex = "sparks_particle_batch_14";
+                        break;
+                    case tnt_vfx:
+                        particle_tex = "sparks_red_particle_batch_14";
                         break;
                     }
 

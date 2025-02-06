@@ -11,7 +11,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "MISSION_ACCOMPLISHED_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -33,7 +33,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "Restart_Batch_14_NORMAL",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -57,6 +57,37 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "button_hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            }
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
         }
       }
     },
@@ -71,7 +102,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "Main_Menu_Batch_14_NORMAL",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -95,6 +126,37 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "button_hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            }
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
         }
       }
     }

@@ -18,7 +18,7 @@ layout (location = 0) in vec2 vTextCoord;
 layout (location = 0) out vec4 fFragColor;
 
 // Uniforms
-uniform vec3 uColor;
+uniform vec4 uColor;
 uniform sampler2D uTex2d; 
 uniform bool uTexFlag;		// Flag for texture
 uniform bool  uAnimateFlag; // Flag for animation
@@ -46,10 +46,10 @@ void main() {
 
 		float offset_x = Pos_X / frame_size;  // Accounting for offset due to position in texture
 		float offset_y = Pos_Y / frame_size;
-		fFragColor = texture(uTex2d, vec2(vTextCoord.x / scaling_x, vTextCoord.y / scaling_y) + vec2(offset_x / scaling_x, offset_y / scaling_y));
+		fFragColor = texture(uTex2d, vec2(vTextCoord.x / scaling_x, vTextCoord.y / scaling_y) + vec2(offset_x / scaling_x, offset_y / scaling_y)) * uColor;
 	} else if (uTexFlag == true){
-		fFragColor = texture(uTex2d, vTextCoord);	
+		fFragColor = texture(uTex2d, vTextCoord) * uColor;	
 	} else {
-		fFragColor = vec4(uColor, 1.0);
+		fFragColor = uColor;
 	}
 }

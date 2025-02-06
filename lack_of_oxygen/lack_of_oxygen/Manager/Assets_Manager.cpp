@@ -417,8 +417,8 @@ namespace lof {
     void Assets_Manager::track_entity_asset(EntityID entity_id, const std::string& component_name, const std::string& asset_name) {
         tracked_assets[entity_id][component_name].emplace(asset_name);
 
-        LM.write_log("Tracking asset: Entity ID: %u, Component: %s, Asset: %s",
-                 entity_id, component_name.c_str(), asset_name.c_str());
+        /*LM.write_log("Tracking asset: Entity ID: %u, Component: %s, Asset: %s",
+                 entity_id, component_name.c_str(), asset_name.c_str());*/
 
     }
 

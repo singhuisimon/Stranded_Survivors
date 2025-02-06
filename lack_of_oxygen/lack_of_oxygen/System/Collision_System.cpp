@@ -21,12 +21,14 @@
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
 #include "../System/GUI_System.h"
+#include "../Manager/Audio_Manager.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Manager/Input_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Manager/Serialization_Manager.h"
 #include "../Manager/Audio_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
 
 namespace lof {
     std::unique_ptr<Collision_System> Collision_System::instance;
@@ -293,18 +295,51 @@ namespace lof {
         // Get current scene number
         int current_scene = GM.get_current_scene();
 
+       /* if (current_scene == 0)
+        {
+            check_main_menu_button_collision(delta_time);
+
+        }*/
         if (current_scene == 1) {
             collision_check_scene1(collisions, delta_time);
         }
         else if (current_scene == 2) {
             collision_check_scene2(collisions, delta_time);
         }
+         
     }
+
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+
+    //        // Assuming the center is at (0, 0), clamp the player's position
+    //        player_transform.position.x = std::clamp(player_transform.position.x, -screen_width / 2, screen_width / 2);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, -screen_height / 2, screen_height / 2);
+    //    }
+    //}
 
     bool Collision_System::is_vent_entity(EntityID id) const {
         auto* entity = ECSM.get_entity(id); 
         return entity && entity->get_name().find("vent") != std::string::npos;
     }
+
+   
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
         //get components for entity
@@ -323,6 +358,9 @@ namespace lof {
         AABB av_aabb = AABB::from_transform(av_transform, av_collision);
 
         float collision_time = delta_time; 
+        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
+        static bool is_in_air_vent = false; // track audio use 
         
         //check for collision
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
@@ -349,16 +387,71 @@ namespace lof {
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
                 // Set upward velocity
                 e_velocity.velocity.y = 300.0f;
+                
+                //This is working (play without bgm to hear please <check with angus if thats how he wants it to be>
+                if (playerId != INVALID_ENTITY_ID  && ECSM.has_component<Audio_Component>(playerId)) {
+                   /* if (ECSM.has_component<Audio_Component>(playerId)) {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                    }*/
+                    if (!is_in_air_vent)
+                    {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                        is_in_air_vent = true;
+                    }
+                }
+                else {
+                    //player is no longer inside the vent
+                    e_physics.force_helper.deactivate_force((VENT_FORCE));
+                    if (!is_grounded)
+                    {
+                        e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                    }
+
+                    if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId))
+                    {
+                        if (is_in_air_vent)
+                        {
+                            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                            ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+                            is_in_air_vent = false;
+                        }
+                    }
+                } 
+            
+            
             }
-            else {
-                e_physics.force_helper.deactivate_force(VENT_FORCE);
-                if (!is_grounded) {
-                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            else 
+            {
+                //Ensure the audio state resets when there's no collision at all
+                if (is_in_air_vent && playerId != INVALID_ENTITY_ID)
+                {
+                    ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                    is_in_air_vent = false;
                 }
             }
+            //else {
+            //    e_physics.force_helper.deactivate_force(VENT_FORCE);
+            //    if (!is_grounded) {
+            //        e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            //    }
+
+            //    if (playerId != INVALID_ENTITY_ID) {
+            //        if (ECSM.has_component<Audio_Component>(playerId)) {
+            //            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+            //            //ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+            //            //TODO FIGURE OUT A WAY TO DETECT IT WHEN ITS ABV THE VENT STRIP TO STOP PLAYING AIRVENT IN AND PLAY AIRVENT OUT
+            //            //AS WELL AS TO STOP AIR VENT OUT WHEN ONE FLY OUT AKA MOVE AWAY FROM THE AIRVENT TOP.
+
+            //            //TLDR It does stop the sound but it detects again thats in so it keeps playing but stopping and creating an awkward silence at times 
+            //        }
+            //    }
+
+            //    
+            //}
 
 
         }
+        
     }
 
 
@@ -434,6 +527,76 @@ namespace lof {
             }
         }
     }
+
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+    //        auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+
+    //        // Clamp the player's position to stay within the screen boundaries
+    //        player_transform.position.x = std::clamp(player_transform.position.x, -screen_width, screen_width);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, -screen_height, screen_height);
+    //    }
+    //}
+
+    void Collision_System::Boundary_Check() {
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+
+        auto& camera = GFXM.get_camera();
+        GLfloat camera_x = camera.pos_x;
+
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            // Skip static entities (not moving)
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
+
+            // Calculate half-width of the player
+            GLfloat player_half_width = player_transform.scale.x / 2.0f;
+
+            // Calculate boundaries based on the camera's position
+            GLfloat half_width = screen_width / 2.0f;
+
+            GLfloat minX = -half_width + camera_x + player_half_width;
+            GLfloat maxX = half_width + camera_x - player_half_width;
+
+            // Stop the player when reaching the left or right boundary
+            if (player_transform.position.x <= minX && player_velocity.velocity.x < 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = minX;
+            }
+            else if (player_transform.position.x >= maxX && player_velocity.velocity.x > 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = maxX;
+            }
+        }
+    }
+
+
+
 
    // Initialize value for detect the tiles that player is near to
     EntityID Collision_System::bottom_collision_entity = static_cast<EntityID>(-1);
@@ -658,6 +821,8 @@ namespace lof {
 
 #endif
 
+
+#if 0
     EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
     EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
     EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
@@ -667,9 +832,6 @@ namespace lof {
     void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
     {
         const auto& collision_entities = get_entities();
-
-        // Introduce a static variable to track total deposited minerals
-        static int total_deposited_minerals = 0;
 
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
         {
@@ -749,18 +911,34 @@ namespace lof {
                     // Try both pressed and held states
                     if (is_e_pressed || is_e_held) {
                         EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+                        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
                         if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
                             auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+                            auto& player_audio = ECSM.get_component<Audio_Component>(player_ID);
 
                             try {
                                 // Get current minerals from UI text
                                 int current_minerals = std::stoi(text_comp.text);
+                                //store the previous value of current minerals
+                                //int previous_minerals = current_minerals;
 
-                                if (current_minerals > 0) {
+                                // check if current minearal has decreased
+                                if (current_minerals > 0)
+                                {
+                                    if (is_e_pressed || is_e_held)
+                                    {
+                                        ADM.play_now(player_ID, "mineral deposit", player_audio);
+                                    }
+                                }
+                                //update previous minerals 
+                                //previous_minerals = current_minerals;
+                                if (current_minerals >=  100) {
                                     // Add current minerals to the total deposited minerals
-                                    total_deposited_minerals += current_minerals;
+                                    //total_deposited_minerals += current_minerals;
 
+                                    current_minerals -= 100;
+                                    total_deposited_minerals += 100;
                                     // Calculate progress percentage based on total deposited minerals
                                     float current_percentage = total_deposited_minerals / 50000.0f;
                                     current_percentage = std::min(current_percentage, 1.0f);
@@ -833,6 +1011,278 @@ namespace lof {
             }
         }
     }
+
+#endif 
+
+    EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
+    EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
+    EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
+    bool Collision_System::entites_detect = false;
+    int deposit_count = 0;
+    //bool deposit_count_bool = false;
+    int previous_minerals = 0;
+    int previous_oxygen = 0;
+    int oxygen_count = 0; 
+
+    void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
+    {
+       
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+        {
+            e_last_frame = e_press;
+            e_press = IM.is_key_held(GLFW_KEY_E);
+
+
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
+            auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+
+            AABB aabb_player = AABB::from_transform(player_transform, player_collision1);
+
+            auto it_2 = std::next(iter1);
+
+            // Check for collisions with other entities
+            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                EntityID entities_ID = *iter2;
+
+                if (player_ID == entities_ID)
+                {
+                    continue;
+                }
+
+                auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
+                auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
+                auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
+
+                if (entities_collision.collidable) continue;
+
+                AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
+                if (entities_ID == 3) {
+                    enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
+                }
+
+                float collision_time = delta_time;
+                if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
+                    check_non_collidable_entities = entities_ID;
+                    entites_detect = true;
+                    break;
+                }
+                else
+                {
+                    check_non_collidable_entities = static_cast<EntityID>(-1);
+                    entites_detect = false;
+                }
+            }
+
+            if (check_non_collidable_entities == 2)
+            {
+                mineral_tank = check_non_collidable_entities;
+            }
+            else if (check_non_collidable_entities == 3)
+            {
+                oxygen_tank = check_non_collidable_entities;
+            }
+            else {
+                oxygen_tank = static_cast<EntityID>(-1);
+                mineral_tank = static_cast<EntityID>(-1);
+            }
+        }
+
+        bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+        bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+        bool is_e_release = IM.is_key_released(GLFW_KEY_E);
+        
+        // Find GUI System to trigger interface and handle mineral deposit
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                // Check mineral tank collision and handle deposit
+                if (mineral_tank_detected() != -1) {
+                    gui_system->show_mineral_tank_gui();
+
+                    // Debug the key state
+
+                    // Try both pressed and held states
+                    if (is_e_pressed || is_e_held) {
+                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+                        std::string deposit_mineral_sound = "mineral deposit";
+
+                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+                            //auto& player_audio = ECSM.get_component<Audio_Component>(player_entity);
+
+                            try {
+                                // Get current minerals from UI text
+                                int current_minerals = std::stoi(text_comp.text);
+                                
+                                //previous_minerals = current_minerals;
+                                //printf("previous minerals is %d\n", previous_minerals);
+                                printf("current minerals is %d\n", current_minerals);
+
+                                if (current_minerals >= 100) {
+                                    // Add current minerals to the total deposited minerals
+                                    //total_deposited_minerals += current_minerals;
+
+
+                                    //printf("total_deposited_minearals %d\n", total_deposited_minerals);
+                                    current_minerals -= 100;
+
+                                 /*   if (current_minerals --)
+                                    {
+                                        deposit_count++;
+                                        deposit_count_bool = true;
+                                        
+                                    }*/
+                                    
+                                    total_deposited_minerals += 100;
+                                    //deposit_count_bool = true;
+                                    previous_minerals = current_minerals; //store previous value
+                                    if (previous_minerals -= 100)
+                                    {
+                                        deposit_count++;
+                                    }
+                                   
+                                    
+                                    printf("deposit count %d\n", deposit_count);
+                                    //std::cout << "After deposit: text_comp.text = " << text_comp.text << ", current_minerals = " << current_minerals << std::endl;
+                                    // Calculate progress percentage based on total deposited minerals
+                                    float current_percentage = total_deposited_minerals / 50000.0f;
+                                    current_percentage = std::min(current_percentage, 100.0f);
+
+                                    // Update progress bar and its text
+                                    gui_system->update_mineral_progress(current_percentage);
+
+                                    // Reset the mineral count to 0 (optional, depending on your game logic)
+                                    //text_comp.text = "0";
+
+                                    text_comp.text = std::to_string(current_minerals);
+
+                                    
+                                }
+                                
+                         
+
+                            }
+                            catch (const std::exception& e) {
+                                // Handle exception
+                            }
+                        }
+                    }
+                   
+                    
+                    //else if(IM.is_key_released(GLFW_KEY_E)){
+                    //    //std::cout << " stop pressing e" << std::endl;
+                    //    deposit = false;
+                    //}
+
+                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                    if ((is_e_pressed || is_e_held) && deposit_count > 0)
+                    {
+                        ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
+                        //deposit_count--;
+                    }
+                    else if (!(e_press && e_last_frame))
+                    {
+                        ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
+                    }
+                }
+                else {
+                    gui_system->hide_mineral_tank_gui();
+                    //deposit = false;
+                }
+                
+                
+                //if (!is_e_pressed && !is_e_held && was_depositing) {
+                //    // Stop the mineral deposit sound if needed
+                //    // ADM.stop_now(player_entity, deposit_mineral_sound, "sfx_mineral_deposit");
+                //    was_depositing = false;  // Reset flag
+                //}
+
+
+                // Check oxygen tank collision
+                if (oxygen_tank_detected() != -1)
+                {
+                    gui_system->show_oxygen_tank_gui();
+
+                    // If E is pressed or held
+                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+                    bool increasing = false;
+
+                    if (is_e_pressed || is_e_held)
+                    {
+                        // (1) Player oxygen / Ship oxygen
+                        float playerOxy = GM.get_current_oxygen_level(); // [0..100]
+                        float shipOxy = GM.get_ship_oxygen_level();    // [0..400]
+
+                        // (2) If player not full and ship has some oxygen
+                        if (playerOxy < 100.0f && shipOxy > 0.0f)
+                        {
+                            // (3) Figure out how much the player needs
+                            float needed = 100.0f - playerOxy;
+                            previous_oxygen = playerOxy;
+                            // The ship can only give up to 'shipOxy' it has:
+                            float transfer = std::min(needed, shipOxy);
+
+                            // Transfer
+                            //playerOxy += transfer;  // player goes up
+                            //shipOxy -= transfer;  // ship goes down
+                            
+                            if (transfer > 0) {
+                                playerOxy++; //player goes up
+								shipOxy--; // ship goes down
+                                increasing = true;
+                            }
+                            else {
+                                increasing = false;
+                            }
+
+                            
+
+                            // (4) Store them back
+                            GM.set_current_oxygen_level(playerOxy);
+                            GM.set_ship_oxygen_level(shipOxy);
+
+                            // (5) Update the GUI bars
+                            //    - Player fraction = playerOxy / 100
+                            float playerFraction = playerOxy / 100.0f;
+                            gui_system->update_oxygen_progress1(playerFraction);
+
+
+                            float usedFraction = (400.0f - shipOxy) / 400.0f;
+                            gui_system->update_oxygen_progress2(usedFraction);
+
+                            if (playerOxy > previous_oxygen && increasing) {
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                ADM.play_now(playerId, "refilling oxygen", ECSM.get_component<Audio_Component>(playerId));
+							}
+                            else {
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                ADM.stop_now(playerId, "refilling oxygen", "sfx_refilling_oxygen");
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    gui_system->hide_oxygen_tank_gui();
+                }
+
+                break;
+            }
+        }
+      
+    }
+
 
 
     /**
@@ -1220,6 +1670,9 @@ namespace lof {
         }
 
         std::vector<CollisionPair> collisions;
+        //Boundary_Check();
+        // Boundary_Check();
+        Boundary_Check();
 
         // If we're in the main menu scene (scene 0)
         if (GM.get_current_scene() == 0) {
@@ -1261,6 +1714,7 @@ namespace lof {
         if (current_cooldown > 0.0f) {
             return;  // Still in cooldown
         }
+       
 
         // Reset transition flag at start of frame
         is_transitioning = false;
@@ -1272,6 +1726,7 @@ namespace lof {
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
         for (EntityID entity_id : get_entities()) {
+            //static std::unordered_map<std::string, bool> button_hover_states;
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
 
@@ -1283,10 +1738,12 @@ namespace lof {
                 entity_name != "quit_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id) ||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             // Check if mouse is hovering over the button
             bool is_hovered = ESS.Mouse_Over_AABB(
@@ -1300,7 +1757,11 @@ namespace lof {
 
             // Define the base texture name for each button
             std::string base_texture;
-            if (entity_name == "play_button") {
+            //if (entity_name == "play_button") {
+            std::string hover_sound = "button_hover";
+            std::string main_menu_sound = "main_menu";
+
+            /*if (entity_name == "play_button") {
                 base_texture = "Main_Menu_Play_Batch_14";
             }
             else if (entity_name == "credit_button") {
@@ -1308,11 +1769,34 @@ namespace lof {
             }
             else if (entity_name == "quit_button") {
                 base_texture = "Main_Menu_Quit_Batch_14";
+            }*/
+
+            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            for (auto& base_textures : buttons_and_associated_batches) {
+                if (entity_name == base_textures.first) {
+                    base_texture = base_textures.second;
+                }
             }
 
+
             if (is_hovered) {
+                if (!button_hover_states[entity_name]) {
+                    // Play the hover sound once when hovering
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
+              
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                    if (main_menu_sound_playing[entity_name] == false) {
+                        // Play the main menu sound if it's not already playing
+                        ADM.play_now(entity_id, main_menu_sound, audio);
+                        main_menu_sound_playing[entity_name] = true;  // Mark sound as playing
+                    }
+                    
+                    
                     // Set pressed state texture
+                    
                     graphics.texture_name = base_texture + "_PRESSED";
 
                     // Scene Switching Logic
@@ -1349,7 +1833,7 @@ namespace lof {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             // Stop all currently playing audio
-                            ADM.stop_mastergroup();
+                            //ADM.stop_mastergroup();
 
                             // Reset player position if it exists
                             EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1379,7 +1863,7 @@ namespace lof {
                     }
                     else if (entity_name == "credit_button") {
                         LM.write_log("Credits button held - attempting scene transition");
-
+                        
                         // Clear dynamic entities first
                         bool found_movement_system = false;
                         for (auto& system : ECSM.get_systems()) {
@@ -1407,7 +1891,7 @@ namespace lof {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             // Stop all currently playing audio
-                            ADM.stop_mastergroup();
+                            //ADM.stop_mastergroup();
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(3);
@@ -1432,6 +1916,8 @@ namespace lof {
             else {
                 // Reset to normal state texture
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false; //reset
+                main_menu_sound_playing[entity_name] = false;
             }
         }
     }
@@ -1459,11 +1945,12 @@ namespace lof {
             if (entity_name != "back_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id)||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
                 transform.position.y,
@@ -1473,12 +1960,30 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-            std::string base_texture = "Back_Batch_14";
+            std::string base_texture;
+            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            for (auto& base_textures : buttons_and_associated_batches) {
+                if (entity_name == base_textures.first) {
+                    base_texture = base_textures.second;
+                }
+            }
+
+            //std::string base_texture = "Back_Batch_14";
+            //std::string base_texture = "Back_Batch_14";
+            std::string hover_sound = "button_hover";  
+            std::string click_sound = "main_menu"; 
 
             if (is_hovered) {
+                if (!button_hover_states[entity_name]) {
+                    // Play hover sound
+                    ADM.play_now(entity_id, "button_hover", audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
+                    ADM.play_now(entity_id, click_sound, audio);
 
+                   
                     LM.write_log("Back button held - returning to main menu");
 
                     // Clear dynamic entities first
@@ -1507,7 +2012,7 @@ namespace lof {
                         camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                         // Stop all currently playing audio
-                        ADM.stop_mastergroup();
+                        //ADM.stop_mastergroup();
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
@@ -1526,12 +2031,14 @@ namespace lof {
             }
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false;
             }
         }
     }
 
     void Collision_System::check_win_screen_button_collision(float delta_time) {
         if (current_cooldown > 0.0f) {
+            current_cooldown -= delta_time;
             return;  // Still in cooldown
         }
 
@@ -1556,10 +2063,12 @@ namespace lof {
             if (entity_name != "restart_button" && entity_name != "main_menu_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id)||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
@@ -1570,14 +2079,37 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-            // Set base texture name based on which button we're processing
-            std::string base_texture = (entity_name == "restart_button") ?
-                "Restart_Batch_14" : "Main_Menu_Batch_14";
+
+            std::string base_texture;
+            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            for (auto& base_textures : buttons_and_associated_batches) {
+                if (entity_name == base_textures.first) {
+                    base_texture = base_textures.second;
+                }
+            }
+
+            std::cout << "base_texture is " << base_texture << std::endl;
+
+            //// Set base texture name based on which button we're processing
+            //std::string base_texture = (entity_name == "restart_button") ?
+            //    "Restart_Batch_14" : "Main_Menu_Batch_14";
+
+            std::string hover_sound = "button_hover";
+            std::string click_sound = "main_menu";
+            
+            static bool clicked_played = false;
 
             if (is_hovered) {
+
+                if (!button_hover_states[entity_name]) {
+                    // Play hover sound
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
-
+                    ADM.play_now(entity_id, click_sound, audio);
                     // Handle button click logic
                     if (entity_name == "restart_button") {
                         LM.write_log("Restart button held - reloading game scene");
@@ -1652,6 +2184,8 @@ namespace lof {
             }
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false;
+
             }
         }
     }

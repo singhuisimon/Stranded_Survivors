@@ -80,7 +80,7 @@ namespace lof {
 
 	// Graphics component constants
 	constexpr const char* DEFAULT_MODEL_NAME = "square";
-	constexpr glm::vec3 DEFAULT_COLOR = { 0.0f, 0.0f, 0.0f };
+	constexpr glm::vec4 DEFAULT_COLOR = { 1.0f, 1.0f, 1.0f, 1.0f };
 	constexpr unsigned int DEFAULT_SHADER_REF = 0;
 	constexpr glm::mat3 DEFAULT_MDL_TO_NDC_MAT = { glm::mat3(0.0f) };
 
@@ -213,7 +213,8 @@ namespace lof {
 		citrine,
 		alexandrite,
 		tnt,
-		tnt_explode
+		tnt_explode,
+		tnt_vfx
 	};
 
 } // namespace lof

@@ -80,7 +80,7 @@ namespace lof {
         void update(float delta_time) override;
 
         // This creates and sets the parameters needed to emit particles for an event
-        void particle_emit(std::string type, Vec2D pos, Vec3D col);
+        void particle_emit(std::string type, Vec2D pos, Vec3D col, float lifespan = 0.0f);
 
         // This destroys a particle once its lifetime is over
         void particle_destroy(int destroy_id);

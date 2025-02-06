@@ -142,6 +142,12 @@ namespace lof {
         EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
         EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
+        void Boundary_Check();
+      
+        void reset_deposited_minerals() {
+            total_deposited_minerals = 0;
+        }
+
 
     private:
         static std::unique_ptr<Collision_System> instance;
@@ -160,7 +166,10 @@ namespace lof {
         static EntityID right_collision_entity;
         static EntityID top_collision_entity;
 
-
+        //int previous_value = 0;
+        bool deposit = false;
+        bool e_press = false;
+        bool e_last_frame = false;
 
         static EntityID check_non_collidable_entities;
         static bool entites_detect;
@@ -173,8 +182,13 @@ namespace lof {
         float transition_cooldown = 0.5f;
         float current_cooldown = 0.0f;
 
+        int total_deposited_minerals = 0;
+
         float post_transition_grace_period = 0.5f; // Grace period after transition
         float grace_timer = 0.0f; // Timer to track grace period
+
+        std::unordered_map<std::string, bool> button_hover_states;
+        std::unordered_map<std::string, bool> main_menu_sound_playing;
 
         //static bool collision_handled;
         //float accumulated_time = 0.0f;
@@ -238,7 +252,6 @@ namespace lof {
         void check_credits_back_button_collision(float delta_time);
         // == WIN SCREEN BUTTON COLLISION ==
         void check_win_screen_button_collision(float delta_time);
-
     };
 
 
