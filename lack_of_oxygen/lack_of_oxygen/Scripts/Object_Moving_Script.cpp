@@ -30,7 +30,7 @@ namespace lof {
 
     void Object_Moving_Script::register_script() {
         std::shared_ptr<Object_Moving_Script> object_moving_script = std::make_shared<Object_Moving_Script>();
-
+        static auto maintained_script = object_moving_script;
         std::weak_ptr<Object_Moving_Script> weak_script = object_moving_script;
 
         object_moving_script->add_function("init", [weak_script](EntityID entity_id) {
