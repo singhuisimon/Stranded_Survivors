@@ -60,7 +60,7 @@ namespace lof {
 
         // Flag for scn file
         int current_scene = 2;
-
+        bool increasing = false;
         // Top UI variables
         float current_oxygen_level = 100.0f;  // Start at 100%
         float ship_oxygen_level = 400.0f;     // [0..400]
@@ -175,6 +175,9 @@ namespace lof {
         }
 
         void reset_timer() { timer_remaining = 300; }
+
+        float get_stored_goal_percentage() const { return stored_goal_percentage; }
+        void set_stored_goal_percentage(float value) { stored_goal_percentage = value; }
     };
 
 } // namespace lof
