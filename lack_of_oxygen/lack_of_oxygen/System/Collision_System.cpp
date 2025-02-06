@@ -617,6 +617,8 @@ namespace lof {
         const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
         const float CELL_HEIGHT = CELL_WIDTH;
 
+        const float SIDE_COLLISION_THRESHOLD = CELL_WIDTH * 0.9f; //reduced from 1.5f
+
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
             EntityID entity_ID1 = *iter1;
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
@@ -632,6 +634,9 @@ namespace lof {
             // Convert world coordinate to grid coordinate
             int player_col = static_cast<int>((transform1.position.x - LEFT_BOUND) / CELL_WIDTH);
             int player_row = static_cast<int>((START_Y - transform1.position.y) / CELL_HEIGHT);
+
+            float first_row_y = START_Y; 
+            bool is_above_first_row = transform1.position.y > first_row_y; 
 
             // Ensure coordinate is within the range
             player_col = std::clamp(player_col, 0, TOTAL_COLS - 1);
@@ -706,26 +711,28 @@ namespace lof {
                     }
                    
 
+                    if (!is_above_first_row) {
                     // Check for left collision
-                    if (!found_left_collision &&
-                        entity2_col == player_col - 1 &&
-                        entity2_row == player_row &&
-                        transform2.position.x < transform1.position.x &&
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) {
-                        found_left_collision = true;
-                        current_left_entity = entity_ID2;
-                    }
+                        if (!found_left_collision &&
+                            entity2_col == player_col - 1 &&
+                            entity2_row == player_row &&
+                            transform2.position.x < transform1.position.x &&
+                            std::abs(transform2.position.x - transform1.position.x) <= SIDE_COLLISION_THRESHOLD) {
+                            found_left_collision = true;
+                            current_left_entity = entity_ID2;
+                        }
 
-                    // Check for right collision
-                    if (!found_right_collision &&
-                        entity2_col == player_col + 1 &&
-                        entity2_row == player_row &&
-                        transform2.position.x > transform1.position.x &&
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) {
-                        found_right_collision = true;
-                        current_right_entity = entity_ID2;
-                    }
+                        // Check for right collision
+                        if (!found_right_collision &&
+                            entity2_col == player_col + 1 &&
+                            entity2_row == player_row &&
+                            transform2.position.x > transform1.position.x &&
+                            std::abs(transform2.position.x - transform1.position.x) <= SIDE_COLLISION_THRESHOLD) {
+                            found_right_collision = true;
+                            current_right_entity = entity_ID2;
+                        }
 
+                    }
                     // Check for top collision
                     if (!found_top_collision &&
                         entity2_row == player_row - 1 &&
