@@ -577,7 +577,7 @@ namespace lof {
             AABB aabb1 = AABB::from_transform(transform1, collision1);
 
             //offset the player's y for the collision box
-            aabb1.max.y -= 20; 
+            aabb1.max.y -= 30; 
 
             // Only check collisions when player is near the level design map
             if (transform1.position.y <= (START_Y + (collision1.height / 2.0f))) {

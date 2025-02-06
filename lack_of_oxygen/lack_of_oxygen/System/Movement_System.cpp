@@ -148,7 +148,7 @@ namespace lof {
             Vec2D sum_force = physics.force_helper.get_resultant_Force();
 
             //add gravity 
-            sum_force += physics.get_gravity() * physics.get_mass();
+            sum_force += physics.get_gravity() * physics.get_mass() * GRAVITY_ACCELERATOR;
 
 
             //save the accumulated forces
