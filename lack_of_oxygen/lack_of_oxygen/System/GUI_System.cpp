@@ -14,6 +14,7 @@
 #include "../Manager/Audio_Manager.h"
 #include "../Manager/IMGUI_Manager.h"
 #include "../System/Movement_System.h"
+#include "../System/Collision_System.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -33,12 +34,32 @@ namespace lof {
     }
 
     void GUI_System::reset_all_game_state() {
-        // Hide all GUI elements
+        // Reset the core progress tracker that triggers win condition
+        stored_mineral_progress = 0.0f;
+
+        // Reset stored goal percentage using Game Manager
+        GM.set_stored_goal_percentage(0.0f);
+
+        // Reset the total deposited minerals in Collision System
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* collision_system = dynamic_cast<Collision_System*>(system.get())) {
+                collision_system->reset_deposited_minerals();
+                break;
+            }
+        }
+
+        // Hide all GUI elements with logging
+        LM.write_log("GUI_System::reset_all_game_state(): Hiding GUI elements...");
         hide_mineral_tank_gui();
         hide_oxygen_tank_gui();
         hide_oxygen_warning(50.0f);
         hide_oxygen_warning(20.0f);
         hide_oxygen_warning(5.0f);
+
+        // Log initial state of entities before reset
+        LM.write_log("GUI_System::reset_all_game_state(): Current entity states - "
+            "mineral_e_prompt: %d, oxygen_e_prompt: %d",
+            mineral_e_prompt, oxygen_e_prompt);
 
         // Reset GUI state variables
         mineral_e_prompt = INVALID_ENTITY_ID;
@@ -50,8 +71,8 @@ namespace lof {
         oxygen_percentage_text1 = INVALID_ENTITY_ID;
         oxygen_percentage_text2 = INVALID_ENTITY_ID;
 
-        // Reset all gameplay values
-        stored_mineral_progress = 0.0f;
+        // Reset gameplay values with logging
+        LM.write_log("GUI_System::reset_all_game_state(): Resetting gameplay values...");
         GM.set_current_oxygen_level(100.0f);
         GM.set_ship_oxygen_level(400.0f);
 
@@ -78,6 +99,7 @@ namespace lof {
         }
 
         // Reset warning states
+        LM.write_log("GUI_System::reset_all_game_state(): Resetting warning states...");
         warning_50_active = false;
         warning_20_active = false;
         warning_5_active = false;
@@ -87,16 +109,13 @@ namespace lof {
         warning_50_display_time = 0.0f;
         warning_20_display_time = 0.0f;
         warning_5_display_time = 0.0f;
+
+        LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
     }
+
 
     void GUI_System::update(float delta_time)
     {
-        // Add logging for current scene and GUI state
-        LM.write_log("Current scene: %d", GM.get_current_scene());
-        if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            //LM.write_log("Mineral E prompt exists with ID: %d", mineral_e_prompt);
-        }
-
         // Win screen check
         // Check for win screen first, before any GUI-related code
         if (GM.get_current_scene() == 4) {  // Win screen
@@ -136,8 +155,13 @@ namespace lof {
         }
 
         // Check if we've reached 100% (50,000 minerals)
-        if (stored_mineral_progress * 50000.0f >= 50000.0f) {
+        if (stored_mineral_progress * 50000 >= 50000) {
+            // win condition log current stored mineral ammount
+            LM.write_log("Win condition met: %f minerals collected", stored_mineral_progress * 50000.0f);
+
             reset_all_game_state();
+
+            LM.write_log("Reset met: %f minerals collected", stored_mineral_progress * 50000.0f);
 
             // Load win screen
             const std::string SCENES = "Scenes";
@@ -436,6 +460,12 @@ namespace lof {
 
     void GUI_System::update_mineral_progress(float progress)
     {
+        if (GM.get_current_scene() == 0) { // Main menu
+            stored_mineral_progress = 0.0f;
+            LM.write_log("GUI_System::update_mineral_progress(): Reset progress on main menu");
+            return;
+        }
+
         // 1) Clamp and store the new progress
         stored_mineral_progress = std::clamp(progress, 0.0f, 1.0f);
 

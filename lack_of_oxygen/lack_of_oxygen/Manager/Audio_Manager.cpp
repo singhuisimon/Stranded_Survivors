@@ -289,7 +289,7 @@ namespace lof {
 		}
 	}
 
-	void Audio_Manager::update_bgm_layering(const int current_scene, const int oxygen_level, bool increasing) {
+	void Audio_Manager::update_bgm_layering(const int current_scene, const float oxygen_level, bool increasing) {
 		
 		EntityID background_id = ECSM.find_entity_by_name("background");
 		
@@ -331,7 +331,7 @@ namespace lof {
 			}
 
 			// A vector of pair for the condition and which the sound is going to be played
-			std::vector<std::pair<int, std::string>> oxygen_layers = {
+			std::vector<std::pair<float, std::string>> oxygen_layers = {
 				{80, "bgm 80"}, {50, "bgm 50_1"}, {50, "bgm 50_2"},
 				{35, "bgm 35"}, {25, "bgm 25"}, {20, "bgm 20"}
 			};

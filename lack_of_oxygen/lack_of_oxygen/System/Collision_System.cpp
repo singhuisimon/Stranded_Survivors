@@ -21,6 +21,7 @@
 #include "../Component/Component.h"
 #include "../System/Render_System.h"
 #include "../System/GUI_System.h"
+#include "../Manager/Audio_Manager.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
 #include "../Manager/Input_Manager.h"
@@ -293,18 +294,51 @@ namespace lof {
         // Get current scene number
         int current_scene = GM.get_current_scene();
 
+       /* if (current_scene == 0)
+        {
+            check_main_menu_button_collision(delta_time);
+
+        }*/
         if (current_scene == 1) {
             collision_check_scene1(collisions, delta_time);
         }
         else if (current_scene == 2) {
             collision_check_scene2(collisions, delta_time);
         }
+         
     }
+
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+
+    //        // Assuming the center is at (0, 0), clamp the player's position
+    //        player_transform.position.x = std::clamp(player_transform.position.x, -screen_width / 2, screen_width / 2);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, -screen_height / 2, screen_height / 2);
+    //    }
+    //}
 
     bool Collision_System::is_vent_entity(EntityID id) const {
         auto* entity = ECSM.get_entity(id); 
         return entity && entity->get_name().find("vent") != std::string::npos;
     }
+
+   
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
         //get components for entity
@@ -323,6 +357,9 @@ namespace lof {
         AABB av_aabb = AABB::from_transform(av_transform, av_collision);
 
         float collision_time = delta_time; 
+        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
+        static bool is_in_air_vent = false; // track audio use 
         
         //check for collision
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
@@ -349,16 +386,71 @@ namespace lof {
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
                 // Set upward velocity
                 e_velocity.velocity.y = 300.0f;
+                
+                //This is working (play without bgm to hear please <check with angus if thats how he wants it to be>
+                if (playerId != INVALID_ENTITY_ID  && ECSM.has_component<Audio_Component>(playerId)) {
+                   /* if (ECSM.has_component<Audio_Component>(playerId)) {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                    }*/
+                    if (!is_in_air_vent)
+                    {
+                        ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                        is_in_air_vent = true;
+                    }
+                }
+                else {
+                    //player is no longer inside the vent
+                    e_physics.force_helper.deactivate_force((VENT_FORCE));
+                    if (!is_grounded)
+                    {
+                        e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                    }
+
+                    if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId))
+                    {
+                        if (is_in_air_vent)
+                        {
+                            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                            ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+                            is_in_air_vent = false;
+                        }
+                    }
+                } 
+            
+            
             }
-            else {
-                e_physics.force_helper.deactivate_force(VENT_FORCE);
-                if (!is_grounded) {
-                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            else 
+            {
+                //Ensure the audio state resets when there's no collision at all
+                if (is_in_air_vent && playerId != INVALID_ENTITY_ID)
+                {
+                    ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+                    is_in_air_vent = false;
                 }
             }
+            //else {
+            //    e_physics.force_helper.deactivate_force(VENT_FORCE);
+            //    if (!is_grounded) {
+            //        e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            //    }
+
+            //    if (playerId != INVALID_ENTITY_ID) {
+            //        if (ECSM.has_component<Audio_Component>(playerId)) {
+            //            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
+            //            //ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+            //            //TODO FIGURE OUT A WAY TO DETECT IT WHEN ITS ABV THE VENT STRIP TO STOP PLAYING AIRVENT IN AND PLAY AIRVENT OUT
+            //            //AS WELL AS TO STOP AIR VENT OUT WHEN ONE FLY OUT AKA MOVE AWAY FROM THE AIRVENT TOP.
+
+            //            //TLDR It does stop the sound but it detects again thats in so it keeps playing but stopping and creating an awkward silence at times 
+            //        }
+            //    }
+
+            //    
+            //}
 
 
         }
+        
     }
 
 
@@ -434,6 +526,76 @@ namespace lof {
             }
         }
     }
+
+    //void Collision_System::Boundary_Check()
+    //{
+    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+
+    //    const auto& collision_entities = get_entities();
+
+    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+    //    {
+    //        EntityID player_ID = *iter1;
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+    //        // Skip static entities (not moving)
+    //        if (physic1.get_is_static()) {
+    //            continue;
+    //        }
+
+    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+    //        auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+
+    //        // Clamp the player's position to stay within the screen boundaries
+    //        player_transform.position.x = std::clamp(player_transform.position.x, -screen_width, screen_width);
+    //        player_transform.position.y = std::clamp(player_transform.position.y, -screen_height, screen_height);
+    //    }
+    //}
+
+    void Collision_System::Boundary_Check() {
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+
+        auto& camera = GFXM.get_camera();
+        GLfloat camera_x = camera.pos_x;
+
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            // Skip static entities (not moving)
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
+
+            // Calculate half-width of the player
+            GLfloat player_half_width = player_transform.scale.x / 2.0f;
+
+            // Calculate boundaries based on the camera's position
+            GLfloat half_width = screen_width / 2.0f;
+
+            GLfloat minX = -half_width + camera_x + player_half_width;
+            GLfloat maxX = half_width + camera_x - player_half_width;
+
+            // Stop the player when reaching the left or right boundary
+            if (player_transform.position.x <= minX && player_velocity.velocity.x < 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = minX;
+            }
+            else if (player_transform.position.x >= maxX && player_velocity.velocity.x > 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = maxX;
+            }
+        }
+    }
+
+
+
 
    // Initialize value for detect the tiles that player is near to
     EntityID Collision_System::bottom_collision_entity = static_cast<EntityID>(-1);
@@ -667,9 +829,6 @@ namespace lof {
     void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
     {
         const auto& collision_entities = get_entities();
-
-        // Introduce a static variable to track total deposited minerals
-        static int total_deposited_minerals = 0;
 
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
         {
@@ -1220,6 +1379,9 @@ namespace lof {
         }
 
         std::vector<CollisionPair> collisions;
+        //Boundary_Check();
+        // Boundary_Check();
+        Boundary_Check();
 
         // If we're in the main menu scene (scene 0)
         if (GM.get_current_scene() == 0) {
@@ -1261,6 +1423,7 @@ namespace lof {
         if (current_cooldown > 0.0f) {
             return;  // Still in cooldown
         }
+       
 
         // Reset transition flag at start of frame
         is_transitioning = false;
@@ -1272,6 +1435,7 @@ namespace lof {
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
         for (EntityID entity_id : get_entities()) {
+            //static std::unordered_map<std::string, bool> button_hover_states;
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
 
@@ -1283,10 +1447,12 @@ namespace lof {
                 entity_name != "quit_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id) ||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             // Check if mouse is hovering over the button
             bool is_hovered = ESS.Mouse_Over_AABB(
@@ -1300,6 +1466,9 @@ namespace lof {
 
             // Define the base texture name for each button
             std::string base_texture;
+            std::string hover_sound = "button_hover";
+            std::string main_menu_sound = "main_menu";
+
             if (entity_name == "play_button") {
                 base_texture = "Main_Menu_Play_Batch_14";
             }
@@ -1311,8 +1480,23 @@ namespace lof {
             }
 
             if (is_hovered) {
+                if (!button_hover_states[entity_name]) {
+                    // Play the hover sound once when hovering
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
+              
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                    if (main_menu_sound_playing[entity_name] == false) {
+                        // Play the main menu sound if it's not already playing
+                        ADM.play_now(entity_id, main_menu_sound, audio);
+                        main_menu_sound_playing[entity_name] = true;  // Mark sound as playing
+                    }
+                    
+                    
                     // Set pressed state texture
+                    
                     graphics.texture_name = base_texture + "_PRESSED";
 
                     // Scene Switching Logic
@@ -1349,7 +1533,7 @@ namespace lof {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             // Stop all currently playing audio
-                            ADM.stop_mastergroup();
+                            //ADM.stop_mastergroup();
 
                             // Reset player position if it exists
                             EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1379,7 +1563,7 @@ namespace lof {
                     }
                     else if (entity_name == "credit_button") {
                         LM.write_log("Credits button held - attempting scene transition");
-
+                        
                         // Clear dynamic entities first
                         bool found_movement_system = false;
                         for (auto& system : ECSM.get_systems()) {
@@ -1407,7 +1591,7 @@ namespace lof {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             // Stop all currently playing audio
-                            ADM.stop_mastergroup();
+                            //ADM.stop_mastergroup();
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(3);
@@ -1432,6 +1616,8 @@ namespace lof {
             else {
                 // Reset to normal state texture
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false; //reset
+                main_menu_sound_playing[entity_name] = false;
             }
         }
     }
@@ -1459,11 +1645,12 @@ namespace lof {
             if (entity_name != "back_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id)||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
                 transform.position.y,
@@ -1474,11 +1661,20 @@ namespace lof {
             );
 
             std::string base_texture = "Back_Batch_14";
+            std::string hover_sound = "button_hover";  
+            std::string click_sound = "main_menu"; 
 
             if (is_hovered) {
+                if (!button_hover_states[entity_name]) {
+                    // Play hover sound
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
+                    ADM.play_now(entity_id, click_sound, audio);
 
+                   
                     LM.write_log("Back button held - returning to main menu");
 
                     // Clear dynamic entities first
@@ -1507,7 +1703,7 @@ namespace lof {
                         camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                         // Stop all currently playing audio
-                        ADM.stop_mastergroup();
+                        //ADM.stop_mastergroup();
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
@@ -1526,12 +1722,14 @@ namespace lof {
             }
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false;
             }
         }
     }
 
     void Collision_System::check_win_screen_button_collision(float delta_time) {
         if (current_cooldown > 0.0f) {
+            current_cooldown -= delta_time;
             return;  // Still in cooldown
         }
 
@@ -1556,10 +1754,12 @@ namespace lof {
             if (entity_name != "restart_button" && entity_name != "main_menu_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id)||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
@@ -1574,10 +1774,22 @@ namespace lof {
             std::string base_texture = (entity_name == "restart_button") ?
                 "Restart_Batch_14" : "Main_Menu_Batch_14";
 
+            std::string hover_sound = "button_hover";
+            std::string click_sound = "main_menu";
+            
+            static bool clicked_played = false;
+
             if (is_hovered) {
+
+                if (!button_hover_states[entity_name]) {
+                    // Play hover sound
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
-
+                    ADM.play_now(entity_id, click_sound, audio);
                     // Handle button click logic
                     if (entity_name == "restart_button") {
                         LM.write_log("Restart button held - reloading game scene");
@@ -1652,6 +1864,8 @@ namespace lof {
             }
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false;
+
             }
         }
     }

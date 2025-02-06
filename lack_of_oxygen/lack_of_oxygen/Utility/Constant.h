@@ -219,7 +219,8 @@ namespace lof {
 		citrine,
 		alexandrite,
 		tnt,
-		tnt_explode
+		tnt_explode,
+		tnt_vfx
 	};
 
 } // namespace lof

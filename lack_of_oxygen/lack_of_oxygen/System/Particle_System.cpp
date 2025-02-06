@@ -203,6 +203,20 @@ namespace lof {
 		};
 		particle_base.emplace("TNT_Explode", tnt_explode);
 
+		// TNT fuse visual effect particle data
+		Particle_Data tnt_vfx = {
+			Vec2D(),					// position
+			Vec3D(),					// color
+			ParticleType::tnt_vfx,		// type
+			0,							// id
+			2.0f,						// current size
+			2.0f,						// starting size
+			0.0f,						// speed
+			180.0f,						// direction
+			2.0f,						// lifespan
+			2.0f						// life left
+		};
+		particle_base.emplace("TNT_VFX", tnt_vfx);
 	}
 
     std::string Particle_System::get_type() const {
@@ -226,7 +240,9 @@ namespace lof {
 			}
 
 			// Decrease particle size by lifespan 
-			particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
+			if (particles_storage[i].type != tnt_vfx) {
+				particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
+			}
 
 			// Update movement and direction
 			float angle{};
@@ -247,7 +263,7 @@ namespace lof {
 	}
 
 	// This creates and sets the parameters needed to emit particles for an event
-	void Particle_System::particle_emit(std::string type, Vec2D pos, Vec3D col) {
+	void Particle_System::particle_emit(std::string type, Vec2D pos, Vec3D col, float lifespan) {
 
 		// Create particles if there are space
 		if (active_particles < MAX_PARTICLES) {
@@ -256,6 +272,11 @@ namespace lof {
 			particles_storage[active_particles] = particle_base[type];
 			
 			// Set particle id and increment active particles count
+			if (lifespan > 0.0f) {
+				particles_storage[active_particles].life_left = lifespan;
+				particles_storage[active_particles].life_span = lifespan;
+			}
+
 			particles_storage[active_particles].position = pos;
 			particles_storage[active_particles].color = col;
 			particles_storage[active_particles].id = active_particles;
