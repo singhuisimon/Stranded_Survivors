@@ -343,7 +343,7 @@
           "position": [ 0.0, 0.0 ],
           "prev_position": [ 0.0, 0.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 100.0, 100.0 ]
+          "scale": [ 10.0, 10.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",

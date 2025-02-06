@@ -332,47 +332,94 @@ namespace lof {
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
         //get components for entity
-        auto& e_physics = ECSM.get_component<Physics_Component>(entity); 
+        auto& e_physics = ECSM.get_component<Physics_Component>(entity);
         auto& e_velocity = ECSM.get_component<Velocity_Component>(entity);
-        auto& e_transform = ECSM.get_component<Transform2D>(entity); 
-        auto& e_collision = ECSM.get_component<Collision_Component>(entity); 
+        auto& e_transform = ECSM.get_component<Transform2D>(entity);
+        auto& e_collision = ECSM.get_component<Collision_Component>(entity);
 
         //vent 
-        auto& av_transform = ECSM.get_component<Transform2D>(vent); 
-        auto& av_collision = ECSM.get_component<Collision_Component>(vent); 
+        auto& av_transform = ECSM.get_component<Transform2D>(vent);
+        auto& av_collision = ECSM.get_component<Collision_Component>(vent);
         auto& av_velocity = ECSM.get_component<Velocity_Component>(vent);
 
         //aabb for intersection set 
-        AABB e_aabb = AABB::from_transform(e_transform, e_collision); 
+        AABB e_aabb = AABB::from_transform(e_transform, e_collision);
         AABB av_aabb = AABB::from_transform(av_transform, av_collision);
 
-        float collision_time = delta_time; 
-        
-        //check for collision
+        float collision_time = delta_time;
+
+        // Calculate horizontal center distance between player and vent
+        float horizontal_distance = std::abs(e_transform.position.x - av_transform.position.x);
+        Vec2D overlap = compute_overlap(e_aabb, av_aabb);
+        bool has_vertical_overlap = overlap.y > 0;
+
+        // Define the maximum distance from vent center to activate
+        const float VENT_ACTIVATION_THRESHOLD = av_collision.width / 2.0f;
+
+        // Level grid constants (from check_scene2)
+        const float LEFT_BOUND = -960.0f;
+        const float RIGHT_BOUND = 960.0f;
+        const float START_Y = -150.0f;
+        const int TOTAL_ROWS = static_cast<int>(SM.get_level_rows());
+        const int TOTAL_COLS = static_cast<int>(SM.get_level_cols());
+        const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
+        const float CELL_HEIGHT = CELL_WIDTH;
+
+        // Get player's grid position
+        int player_col = static_cast<int>((e_transform.position.x - LEFT_BOUND) / CELL_WIDTH);
+        int player_row = static_cast<int>((START_Y - e_transform.position.y) / CELL_HEIGHT);
+
+        // Check for collision
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
             collision_time, delta_time)) {
 
+            // Check for entity in the tile above using the top collision detection logic
+            player_col = std::clamp(player_col, 0, TOTAL_COLS - 1);
+            player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
 
-            // Calculate horizontal center distance between player and vent
-            float vent_center_x = av_transform.position.x;
-            float player_center_x = e_transform.position.x;
-            float horizontal_distance = std::abs(player_center_x - vent_center_x);
+            bool found_top_collision = false;
+            EntityID current_top_entity = static_cast<EntityID>(-1);
 
-            // Calculate vertical overlap
-            Vec2D overlap = compute_overlap(e_aabb, av_aabb);
-            bool has_vertical_overlap = overlap.y > 0;
+            // Check entities near the player
+            for (auto iter2 = get_entities().begin(); iter2 != get_entities().end(); ++iter2) {
+                EntityID entity_ID2 = *iter2;
+                if (entity == entity_ID2) continue;
 
-            // Define the maximum distance from vent center to activate
-            const float VENT_ACTIVATION_THRESHOLD = av_collision.width / 2.0f;
+                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
 
-            // Activate vent if player is within threshold horizontally and has vertical overlap
-            if (horizontal_distance <= VENT_ACTIVATION_THRESHOLD && has_vertical_overlap) {
-                // Add or update vent force
+                // Calculate entity2's grid position
+                int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
+                int entity2_row = static_cast<int>((START_Y - transform2.position.y) / CELL_HEIGHT);
+
+                // Check if this entity is in the tile above the player
+                if (entity2_row == player_row - 1 && entity2_col == player_col) {
+                    auto* entity2 = ECSM.get_entity(entity_ID2);
+                    if (entity2 && entity2->get_name().find("vent") != std::string::npos) {
+                        found_top_collision = true;
+                        current_top_entity = entity_ID2;
+                        break;
+                    }
+                }
+            }
+
+            if (horizontal_distance <= VENT_ACTIVATION_THRESHOLD) {
+
+                if(has_vertical_overlap){
+
+                // Add vent force
                 e_physics.force_helper.activate_force(VENT_FORCE);
                 // Remove gravity while in vent
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
                 // Set upward velocity
-                e_velocity.velocity.y = 250.0f;
+                e_velocity.velocity.y = 300.0f;
+                }
+                // If we're touching a vent but there's no vent above us
+                if (!found_top_collision) {
+                    // Apply stronger upward thrust for exit
+                    e_velocity.velocity.y = 700.0f; // Higher exit velocity
+                    e_physics.force_helper.deactivate_force(VENT_FORCE);
+                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                }
             }
             else {
                 e_physics.force_helper.deactivate_force(VENT_FORCE);
@@ -380,11 +427,8 @@ namespace lof {
                     e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 }
             }
-
-
         }
     }
-
 
 
 
@@ -530,6 +574,9 @@ namespace lof {
             int end_col = std::min(TOTAL_COLS - 1, player_col + CHECK_RADIUS);
 
             AABB aabb1 = AABB::from_transform(transform1, collision1);
+
+            //offset the player's y for the collision box
+            aabb1.max.y -= 20; 
 
             // Only check collisions when player is near the level design map
             if (transform1.position.y <= (START_Y + (collision1.height / 2.0f))) {
