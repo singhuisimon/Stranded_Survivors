@@ -154,6 +154,8 @@ namespace lof {
     }
 
     std::shared_ptr<Script> Logic_System::get_script(const std::string& script_name) {
+
+        /*
         auto it = script_map.find(script_name);
         if (it != script_map.end()) {
             std::shared_ptr<Script> script = it->second.lock();
@@ -166,12 +168,13 @@ namespace lof {
             }
         }
         return nullptr;
+        */
 
-        /*auto it = script_map.find(script_name);
+        auto it = script_map.find(script_name);
         if (it != script_map.end()) {
-            return it->second;
+            return it->second.lock();
         }
-        return nullptr;*/
+        return nullptr;
     }
 
 	void Logic_System::remove_script(const std::string& script_name) {

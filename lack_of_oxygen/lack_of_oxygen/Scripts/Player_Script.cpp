@@ -15,8 +15,10 @@ namespace lof {
     }
 
     void Player_Script::register_script() {
-        std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
 
+
+        std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
+        static auto maintained_script = player_script;
         std::weak_ptr<Player_Script> weak_script = player_script;
 
         player_script->add_function("init", [weak_script](EntityID entity_id) {
