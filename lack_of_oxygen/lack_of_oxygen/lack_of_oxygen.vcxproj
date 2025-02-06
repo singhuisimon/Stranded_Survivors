@@ -198,6 +198,7 @@
     <Image Include="Assets\Textures\oxygen_tank_batch_4.png" />
     <Image Include="Assets\Textures\Prisoner.png" />
     <Image Include="Assets\Textures\Prisoner_Spritesheet.png" />
+    <Image Include="Assets\Textures\Purple_Oxy_Warning_Batch_14.png" />
     <Image Include="Assets\Textures\Quartz_001_Batch_4.png" />
     <Image Include="Assets\Textures\Quartz_002_Batch 4.png" />
     <Image Include="Assets\Textures\Quartz_Geode.png" />
