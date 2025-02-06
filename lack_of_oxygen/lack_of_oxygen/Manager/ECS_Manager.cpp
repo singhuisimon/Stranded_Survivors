@@ -178,18 +178,18 @@ namespace lof {
 
 
     EntityID ECS_Manager::clone_entity_from_prefab(const std::string& prefab_name, const std::string& entity_name) {
-        LM.write_log("ECS_Manager::clone_entity_from_prefab(): Cloning entity from prefab '%s'.", prefab_name.c_str());
+        //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Cloning entity from prefab '%s'.", prefab_name.c_str());
 
         // Validate prefab exists
         const rapidjson::Value* prefab = SM.get_prefab(prefab_name);
         if (!prefab) {
-            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Prefab '%s' not found.", prefab_name.c_str());
+            //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Prefab '%s' not found.", prefab_name.c_str());
             return INVALID_ENTITY_ID;
         }
 
         // Validate prefab has components
         if (!prefab->HasMember("components") || !(*prefab)["components"].IsObject()) {
-            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Prefab '%s' does not have valid components object.", prefab_name.c_str());
+            //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Prefab '%s' does not have valid components object.", prefab_name.c_str());
             return INVALID_ENTITY_ID;
         }
 
@@ -214,7 +214,7 @@ namespace lof {
         // Create new entity with the unique name
         EntityID eid = create_entity(unique_name);
         if (eid == INVALID_ENTITY_ID) {
-            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Failed to create entity.");
+            //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Failed to create entity.");
             return INVALID_ENTITY_ID;
         }
 
@@ -223,11 +223,11 @@ namespace lof {
             const rapidjson::Value& components = (*prefab)["components"];
             add_components_from_json(eid, components);
 
-            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Successfully cloned entity '%s' with ID %u from prefab '%s'",
-                unique_name.c_str(), eid, prefab_name.c_str());
+            //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Successfully cloned entity '%s' with ID %u from prefab '%s'",
+            //    unique_name.c_str(), eid, prefab_name.c_str());
         }
         catch (const std::exception& e) {
-            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Error adding components to entity: %s", e.what());
+            //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Error adding components to entity: %s", e.what());
             destroy_entity(eid); // Clean up the partially created entity
             return INVALID_ENTITY_ID;
         }
