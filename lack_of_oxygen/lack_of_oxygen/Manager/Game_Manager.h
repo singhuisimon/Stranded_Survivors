@@ -56,7 +56,7 @@ namespace lof {
         int editor_camera_flag = false;
 
         // Flag for forces applied
-        //int forces_flag = -1;
+        int forces_flag = -1;
 
         // Flag for scn file
         int current_scene = 2;
@@ -73,20 +73,20 @@ namespace lof {
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
 
         // Stores the TNTs that are activated with it's entity name and fuse time
-        //std::unordered_map<std::string, float> tnt_to_destroy;
+        std::unordered_map<std::string, float> tnt_to_destroy;
 
         /**
          * @brief Determines the mineral value based on the block entity type
          * @param block_id The EntityID of the block being destroyed
          * @return The mineral value associated with that block type
          */
-        //int get_mineral_value(EntityID block_id) const;
+        int get_mineral_value(EntityID block_id) const;
 
         /**
          * @brief Updates the mineral count text in the UI
          * @param value_to_add The value to add to the current mineral count
          */
-        //void update_mineral_count_text(int value_to_add);
+        void update_mineral_count_text(int value_to_add);
 
         bool check_non_mineral(EntityID block_id, std::string block_name) const;
 
