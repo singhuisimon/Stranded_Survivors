@@ -337,7 +337,6 @@ int main(void) {
     // Application exit
     std::cout << "Application exited successfully." << std::endl;
 
-    _CrtDumpMemoryLeaks();
 
     return 0;
 }
