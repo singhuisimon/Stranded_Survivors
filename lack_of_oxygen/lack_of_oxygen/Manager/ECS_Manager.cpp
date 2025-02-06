@@ -375,14 +375,23 @@ namespace lof {
 
                 //system that use time in the update
                 if(system->get_type() == "Movement_System" ||
-                    system->get_type() == "Collision_System" )
+                    system->get_type() == "Collision_System" ||
+                    system->get_type() == "Animation_System" ||
+                    system->get_type() == "Logic_System" ||
+                    system->get_type() == "Render_System")
                     {
+                    //system that use time in the update
+                    if (system->get_type() == "Movement_System" ||
+                        system->get_type() == "Collision_System") {
 
-                    if (level_editor_mode) {
-                        system->set_time(0);
-                        continue;
+
+
+                        if (level_editor_mode) {
+                            system->set_time(0);
+                            continue;
+                        }
+
                     }
-
                     for (int i = 0; i < steps; ++i) {
                         // Getting delta time for each system
                         system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -407,49 +416,10 @@ namespace lof {
 
                 }
 
-                //auto end_time = std::chrono::steady_clock::now(); 
-                //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count(); 
-                //system->set_time(duration); 
                
                
             }
-#if 0
 
-        for (auto& system : systems) {
-
-            if (level_editor_mode && (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System")) {
-                system->set_time(0);
-                continue;
-            }
-
-            auto start_time = std::chrono::steady_clock::now();
-            system->update(delta_time);
-            auto end_time = std::chrono::steady_clock::now();
-            system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
-
-            ////Stops movement, collision and audio system in level editor
-            //if (system->get_type() == "Movement_System" || system->get_type() == "Collision_System" || system->get_type() == "Audio_System") {
-            //    if (!level_editor_mode) {
-            //        // Getting delta time for each system
-            //        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-            //        // Updating each system
-            //        system->update(delta_time);
-            //        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
-            //    }
-            //    else {
-            //        system->set_time(0);
-            //    }
-            //}
-            //else {
-            //    // Getting delta time for each system
-            //    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-            //    // Updating each system
-            //    system->update(delta_time);
-            //    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
-            //}
-                
-        }
-#endif 
     }
 
     Entity* ECS_Manager::get_entity(EntityID entity_id) {
