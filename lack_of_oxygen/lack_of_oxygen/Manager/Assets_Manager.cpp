@@ -147,10 +147,10 @@ namespace lof {
             shader_programs.emplace_back(shader_program);
             std::size_t shader_idx = shader_programs.size() - 1;
 
-            //LM.write_log("Assets_Manager::load_shader_programs(): Shader program handle is %u.",
-               // shader_program.program_handle);
-            //LM.write_log("Assets_Manager::load_shader_programs(): Shader program %zu created, compiled and added successfully.",
-              //  shader_idx);
+            LM.write_log("Assets_Manager::load_shader_programs(): Shader program handle is %u.",
+                shader_program.program_handle);
+            LM.write_log("Assets_Manager::load_shader_programs(): Shader program %zu created, compiled and added successfully.",
+                shader_idx);
         }
         return true;
     }
@@ -519,7 +519,7 @@ namespace lof {
         }
         else {
             //std::cout << "Unsupported asset type: " << filePath << "\n";
-            LM.write_log("Assets_Manager: Unsupported asset type %s being added.", filePath);
+            //LM.write_log("Assets_Manager: Unsupported asset type %s being added.", filePath);
             return;
         }
 
@@ -529,11 +529,11 @@ namespace lof {
         // Ensure the directory exists and copy the file
         if (CopyFileTo(targetPath, filePath)) {
             //std::cout << "File successfully added to: " << targetPath << "\n";
-            LM.write_log("Assets_Manager: File %s successfully added to: %s.", fileName, targetPath);
+            LM.write_log("Assets_Manager: File %s successfully added to: %s.", fileName.c_str(), targetPath.c_str());
         }
         else {
             //std::cout << "Failed to add file: " << filePath << "\n";
-            LM.write_log("Assets_Manager: Failed to add file %s", filePath);
+            LM.write_log("Assets_Manager: Failed to add file %s", filePath.c_str());
         }
     }
 
@@ -555,7 +555,7 @@ namespace lof {
             dst << src.rdbuf();  // Copy the file content
             return true;
         }
-        catch (const std::exception& e) {
+        catch (const std::exception&) {
             //std::cerr << "Error copying file: " << e.what() << std::endl;
             LM.write_log("Error copying file");
             return false;
@@ -573,7 +573,7 @@ namespace lof {
         // if contain audio component
         if (ECSM.has_component<Audio_Component>(entity))
         {
-            auto audio_component = ECSM.get_component<Audio_Component>(entity);
+            auto& audio_component = ECSM.get_component<Audio_Component>(entity);
 
             const auto& sounds = audio_component.get_sounds();
             for (const auto& sound : sounds)
@@ -612,18 +612,18 @@ namespace lof {
     }
 
     std::vector<EntityID> Assets_Manager::get_all_entities_with_audio() {
-        std::vector<EntityID> entities_with_audio;
+        std::vector<EntityID> audio_entities;
 
         for (const auto& entity_ptr : ECSM.get_entities()) {
             EntityID entity = entity_ptr->get_id();
 
             if (ECSM.has_component<Audio_Component>(entity)) {
                 // Add this entity to the list if it has an Audio_Component
-                entities_with_audio.push_back(entity);
+                audio_entities.push_back(entity);
             }
         }
 
-        return entities_with_audio;
+        return audio_entities;
     }
 
 

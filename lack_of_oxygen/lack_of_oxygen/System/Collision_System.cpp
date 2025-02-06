@@ -1008,7 +1008,7 @@ namespace lof {
     int deposit_count = 0;
     //bool deposit_count_bool = false;
     int previous_minerals = 0;
-    int previous_oxygen = 0;
+    float previous_oxygen = 0;
     int oxygen_count = 0; 
 
     void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
@@ -1086,7 +1086,7 @@ namespace lof {
 
         bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
         bool is_e_held = IM.is_key_held(GLFW_KEY_E);
-        bool is_e_release = IM.is_key_released(GLFW_KEY_E);
+        //bool is_e_release = IM.is_key_released(GLFW_KEY_E);
         
         // Find GUI System to trigger interface and handle mineral deposit
         for (auto& system : ECSM.get_systems()) {
@@ -1182,8 +1182,8 @@ namespace lof {
                     gui_system->show_oxygen_tank_gui();
 
                     // If E is pressed or held
-                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
-                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+                    //bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+                    //bool is_e_held = IM.is_key_held(GLFW_KEY_E);
                     bool increasing = false;
 
                     if (is_e_pressed || is_e_held)

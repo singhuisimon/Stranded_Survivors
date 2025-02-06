@@ -421,7 +421,7 @@ namespace lof {
         // A list of ShaderProgram objects, likely to manage all loaded shader programs
         std::vector<ShaderProgram> shader_programs;
 
-        std::vector<EntityID> entities_with_audio;
+        //std::vector<EntityID> entities_with_audio;
 
        /**
        * @brief See if the file is valid 
