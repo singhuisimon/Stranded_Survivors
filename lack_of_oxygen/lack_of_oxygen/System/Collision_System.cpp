@@ -1188,7 +1188,7 @@ namespace lof {
                     if ((is_e_pressed || is_e_held) && deposit_count > 0)
                     {
                         ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
-                        //deposit_count--;
+                        deposit_count--;
                     }
                     else if (!(e_press && e_last_frame))
                     {
@@ -1245,8 +1245,6 @@ namespace lof {
                             else {
                                 increasing = false;
                             }
-
-                            
 
                             // (4) Store them back
                             GM.set_current_oxygen_level(playerOxy);
