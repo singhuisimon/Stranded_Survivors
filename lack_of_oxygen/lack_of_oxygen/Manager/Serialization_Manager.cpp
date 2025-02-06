@@ -444,6 +444,7 @@ namespace lof {
         color.PushBack(component.color.x, allocator);
         color.PushBack(component.color.y, allocator);
         color.PushBack(component.color.z, allocator);
+        color.PushBack(component.color.w, allocator);
         comp_obj.AddMember("color", color, allocator);
 
         comp_obj.AddMember("texture_name", rapidjson::Value(component.texture_name.c_str(), allocator), allocator);

@@ -461,7 +461,7 @@ namespace lof {
             // Pass object's color to fragment shader uniform variable uColor
             GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
             if (color_uniform_loc >= 0) {
-                glUniform3fv(color_uniform_loc, 1, &graphics.color[0]);
+                glUniform4fv(color_uniform_loc, 1, &graphics.color[0]);
             }
             else {
                 LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
@@ -509,9 +509,9 @@ namespace lof {
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
                         GLint debug_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
-                        glm::vec3 debug_color{ 0.0f, 0.0f, 0.0f };
+                        glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
                         if (debug_color_uniform_loc >= 0) {
-                            glUniform3fv(debug_color_uniform_loc, 1, &debug_color[0]);
+                            glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
                         }
                         else {
                             LM.write_log("Render_System::draw(): Debug color uniform variable doesn't exist.");

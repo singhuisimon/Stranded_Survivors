@@ -11,7 +11,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "MISSION_ACCOMPLISHED_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -33,7 +33,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "Restart_Batch_14_NORMAL",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
@@ -102,7 +102,7 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0 ],
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
           "texture_name": "Main_Menu_Batch_14_NORMAL",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [

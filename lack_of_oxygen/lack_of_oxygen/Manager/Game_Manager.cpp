@@ -505,15 +505,15 @@ namespace lof {
                     // Find the GUI system to get the current stored mineral progress
                     for (auto& system : ECSM.get_systems()) {
                         if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                            // Calculate new percentage only if interacting with hopper
                             if (gui_system->get_current_hopper_percentage() > 0.0f) {
-                                // Update stored percentage
-                                stored_goal_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
+                                // Calculate and store the percentage in Game Manager
+                                float new_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
+                                GM.set_stored_goal_percentage(new_percentage);
                             }
 
-                            // Always use the stored percentage for display
+                            // Use the stored percentage from Game Manager
                             std::stringstream ss;
-                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(stored_goal_percentage) << "%";
+                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(GM.get_stored_goal_percentage()) << "%";
                             text_comp.text = ss.str();
                             break;
                         }
@@ -557,6 +557,7 @@ namespace lof {
 
                                 // Emit particles every 0.5s within 2s of fuse time
                                 auto& tnt_transform = ECSM.get_component<Transform2D>(tnt_id);
+                                auto& tnt_graphics = ECSM.get_component<Graphics_Component>(tnt_id);
                                 int time_fract = static_cast<int>(10.0f * (current->second - std::floorf(current->second)));
                                 if (time_fract % 6 == 2) {
 
@@ -570,6 +571,17 @@ namespace lof {
                                     float part_x = tnt_transform.position.x - (tnt_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.x);
                                     float part_y = tnt_transform.position.y - (tnt_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.y);
                                     particle_system->particle_emit("TNT", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+
+                                    // Change TNT alpha
+                                    tnt_graphics.color.a = 0.5f;
+                                    tnt_transform.scale.x = 96.0f * 1.1f;
+                                    tnt_transform.scale.y = 96.0f * 1.1f;
+                                }
+                                else {
+                                    // Change TNT alpha
+                                    tnt_graphics.color.a = 1.0f;
+                                    tnt_transform.scale.x = 96.0f;
+                                    tnt_transform.scale.y = 96.0f;
                                 }
                                 current->second -= delta_time; // Decrement particle fuse time
 
@@ -580,7 +592,8 @@ namespace lof {
                                         auto& audio = ECSM.get_component<Audio_Component>(tnt_id);
                                         ADM.play_now(tnt_id, "TNT_Boom", audio);
                                     }
-                                    // Emit explosion particles
+                                    
+                                    // Emit explosion particles in a circular pattern
                                     for (int i = 0; i < 10; ++i) {
                                         float angle = i * 36.0f * (PI_VALUE / 180.0f);
                                         float part_x = tnt_transform.position.x + (cos(angle) * tnt_transform.scale.x / 10.0f);
@@ -606,10 +619,11 @@ namespace lof {
                                     }
 
                                     // Calculate boundary around tnt to destroy tiles within  
-                                    float boundary_left = tnt_transform.position.x - 96.0f;
-                                    float boundary_right = tnt_transform.position.x + 96.0f;
-                                    float boundary_top = tnt_transform.position.y + 96.0f;
-                                    float boundary_bottom = tnt_transform.position.y - 96.0f;
+                                    float boundary_offset = tnt_transform.scale.x * 2.0f - 1.0f;
+                                    float boundary_left = tnt_transform.position.x - boundary_offset;
+                                    float boundary_right = tnt_transform.position.x + boundary_offset;
+                                    float boundary_top = tnt_transform.position.y + boundary_offset;
+                                    float boundary_bottom = tnt_transform.position.y - boundary_offset;
 
                                     // Destroy tiles within boundary
                                     if (following_check_cnt > 0) {
@@ -718,20 +732,69 @@ namespace lof {
                                     }
 
                                     // Check if player is within boundary
+                                    bool is_player_dead = false;
                                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                                     if ((boundary_left <= player_transform.position.x && player_transform.position.x <= boundary_right) &&
                                         (boundary_bottom <= player_transform.position.y && player_transform.position.y <= boundary_top)) {
 
-                                        // Game over logic
-                                        //LM.write_log("Game_Manager::update: Player got blown by TNT. GAME OVER");
-                                        //std::cerr << "Failed to get particle system" << std::endl;
-                                        //return;
+                                        // Reset player to starting point if within TNT blast boundary
+                                        is_player_dead = true;
+                                        std::string scene_file{ "scene2.scn" };
+                                        current_scene = 2;
+
+                                        // Create full path to the scene file
+                                        std::string scene_path = ASM.get_full_path("Scenes", scene_file);
+
+                                        // Try to load the new scene
+                                        if (SM.load_scene(scene_path.c_str())) {
+                                            LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
+
+                                            // Reset camera position only if not in main menu
+                                            auto& camera = GFXM.get_camera();
+                                            if (current_scene != 0) {
+                                                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                                                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+                                            }
+
+                                            // Stop all audio currently playing
+                                            ADM.stop_mastergroup();
+
+                                            // Reset player position only if in scene1 or scene2
+                                            if (current_scene != 0) {
+                                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                                if (playerId != INVALID_ENTITY_ID) {
+                                                    if (ECSM.has_component<Transform2D>(playerId)) {
+                                                        auto& transform = ECSM.get_component<Transform2D>(playerId);
+                                                        transform.position = Vec2D(0.0f, 0.0f);
+                                                        transform.prev_position = transform.position;
+                                                    }
+                                                    if (ECSM.has_component<Velocity_Component>(playerId)) {
+                                                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                                                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+
+                                            // Revert to main menu since load failed
+                                            current_scene = 0;
+                                        }
+
                                     }
 
-                                    // Destroy tnt and remove it from the list of tnt to destroy
-                                    ECSM.destroy_entity(tnt_id);
-                                    tnt_to_destroy.erase(current->first);
-                                    LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
+                                    // Check if player is dead to reset the scene
+                                    if (is_player_dead == true) {
+                                        tnt_to_destroy.erase(current->first);
+                                        IMGUIM.set_current_file_shown("scene2.scn");
+                                        continue;
+                                    } else {
+                                        // Destroy tnt and remove it from the list of tnt to destroy
+                                        ECSM.destroy_entity(tnt_id);
+                                        tnt_to_destroy.erase(current->first);
+                                        LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
+                                    }
                                 }
                             }
                         }
@@ -1275,14 +1338,16 @@ namespace lof {
                         if (forces_flag != -1) {
                             if (physics.get_is_grounded()) {
                                 if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-                                    if (current_scene == 1) {
+                                    /*if (current_scene == 1) {
                                         std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
                                         ADM.play_now(player_id, audio_key, audio_player);
                                     }
                                     else if (current_scene == 2) {
                                         ADM.play_now(player_id, "moving", audio_player);
-                                    }
+                                    }*/
 
+
+                                    ADM.play_now(player_id, "moving", audio_player);
                                     // Emit walking dirt particles
                                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                                     float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);

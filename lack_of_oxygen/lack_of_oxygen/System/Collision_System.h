@@ -144,6 +144,10 @@ namespace lof {
 
         //void Boundary_Check();
       
+        void reset_deposited_minerals() {
+            total_deposited_minerals = 0;
+        }
+
 
     private:
         static std::unique_ptr<Collision_System> instance;
@@ -174,6 +178,8 @@ namespace lof {
         static bool is_transitioning;
         float transition_cooldown = 0.5f;
         float current_cooldown = 0.0f;
+
+        int total_deposited_minerals = 0;
 
         float post_transition_grace_period = 0.5f; // Grace period after transition
         float grace_timer = 0.0f; // Timer to track grace period
@@ -243,7 +249,6 @@ namespace lof {
         void check_credits_back_button_collision(float delta_time);
         // == WIN SCREEN BUTTON COLLISION ==
         void check_win_screen_button_collision(float delta_time);
-
     };
 
 

@@ -827,9 +827,6 @@ namespace lof {
     {
         const auto& collision_entities = get_entities();
 
-        // Introduce a static variable to track total deposited minerals
-        static int total_deposited_minerals = 0;
-
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
         {
             EntityID player_ID = *iter1;
