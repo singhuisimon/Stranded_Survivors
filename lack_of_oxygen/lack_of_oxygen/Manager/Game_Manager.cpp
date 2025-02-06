@@ -656,14 +656,14 @@ namespace lof {
                     }
                 }                
 
-                if (IM.is_key_held(GLFW_KEY_I)) {
-                    game_over = true;
-                    
-                }
+                //if (IM.is_key_held(GLFW_KEY_I)) {
+                //    //game_over = true;
+                //    
+                //}
 
-                if (game_over) {
-                    ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
-                }
+                //if (game_over) {
+                //    ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
+                //}
 
                 // Get and set mining status for animation
                 if (IM.is_key_held(GLFW_KEY_LEFT)) {
@@ -1213,8 +1213,8 @@ namespace lof {
         return false;
     }
 
-    bool Game_Manager::get_game_over() {
+    /*bool Game_Manager::get_game_over() {
         return game_over;
-    }
+    }*/
 
 } // namespace lof
