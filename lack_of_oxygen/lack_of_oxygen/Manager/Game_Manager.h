@@ -175,6 +175,9 @@ namespace lof {
         }
 
         void reset_timer() { timer_remaining = 300; }
+
+        float get_stored_goal_percentage() const { return stored_goal_percentage; }
+        void set_stored_goal_percentage(float value) { stored_goal_percentage = value; }
     };
 
 } // namespace lof

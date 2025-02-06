@@ -501,15 +501,15 @@ namespace lof {
                     // Find the GUI system to get the current stored mineral progress
                     for (auto& system : ECSM.get_systems()) {
                         if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                            // Calculate new percentage only if interacting with hopper
                             if (gui_system->get_current_hopper_percentage() > 0.0f) {
-                                // Update stored percentage
-                                stored_goal_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
+                                // Calculate and store the percentage in Game Manager
+                                float new_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
+                                GM.set_stored_goal_percentage(new_percentage);
                             }
 
-                            // Always use the stored percentage for display
+                            // Use the stored percentage from Game Manager
                             std::stringstream ss;
-                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(stored_goal_percentage) << "%";
+                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(GM.get_stored_goal_percentage()) << "%";
                             text_comp.text = ss.str();
                             break;
                         }
