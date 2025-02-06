@@ -78,7 +78,7 @@ namespace lof {
 
         PointLine(const Vec2D& center, const Vec2D& edge); 
 
-        PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
+       // PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
     };
 
     // extern SelectedEntityInfo g_selected_Entity_Info;
@@ -175,7 +175,10 @@ namespace lof {
         static EntityID right_collision_entity;
         static EntityID top_collision_entity;
 
-
+        //int previous_value = 0;
+        bool deposit = false;
+        bool e_press = false;
+        bool e_last_frame = false;
 
         static EntityID check_non_collidable_entities;
         static bool entites_detect;

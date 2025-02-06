@@ -58,7 +58,7 @@ namespace lof {
 
     PointLine::PointLine(const Vec2D& center, const Vec2D& edge) 
         : center(center), edge(edge){}
-
+    /*
     //to be emerged from the player 
     PointLine PointLine::create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision) {
         Vec2D center {transform.position.x, transform.position.y};
@@ -80,6 +80,7 @@ namespace lof {
         }
        return PointLine(center, edge); 
     }
+    */
 
     Collision_System::Collision_System() {
         // Set the required components for this system
@@ -617,6 +618,8 @@ namespace lof {
         const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
         const float CELL_HEIGHT = CELL_WIDTH;
 
+        const float SIDE_COLLISION_THRESHOLD = CELL_WIDTH * 0.9f; //reduced from 1.5f
+
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
             EntityID entity_ID1 = *iter1;
             auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
@@ -632,6 +635,9 @@ namespace lof {
             // Convert world coordinate to grid coordinate
             int player_col = static_cast<int>((transform1.position.x - LEFT_BOUND) / CELL_WIDTH);
             int player_row = static_cast<int>((START_Y - transform1.position.y) / CELL_HEIGHT);
+
+            float first_row_y = START_Y; 
+            bool is_above_first_row = transform1.position.y > first_row_y; 
 
             // Ensure coordinate is within the range
             player_col = std::clamp(player_col, 0, TOTAL_COLS - 1);
@@ -706,26 +712,28 @@ namespace lof {
                     }
                    
 
+                    if (!is_above_first_row) {
                     // Check for left collision
-                    if (!found_left_collision &&
-                        entity2_col == player_col - 1 &&
-                        entity2_row == player_row &&
-                        transform2.position.x < transform1.position.x &&
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) {
-                        found_left_collision = true;
-                        current_left_entity = entity_ID2;
-                    }
+                        if (!found_left_collision &&
+                            entity2_col == player_col - 1 &&
+                            entity2_row == player_row &&
+                            transform2.position.x < transform1.position.x &&
+                            std::abs(transform2.position.x - transform1.position.x) <= SIDE_COLLISION_THRESHOLD) {
+                            found_left_collision = true;
+                            current_left_entity = entity_ID2;
+                        }
 
-                    // Check for right collision
-                    if (!found_right_collision &&
-                        entity2_col == player_col + 1 &&
-                        entity2_row == player_row &&
-                        transform2.position.x > transform1.position.x &&
-                        std::abs(transform2.position.x - transform1.position.x) <= (CELL_WIDTH * 1.5f)) {
-                        found_right_collision = true;
-                        current_right_entity = entity_ID2;
-                    }
+                        // Check for right collision
+                        if (!found_right_collision &&
+                            entity2_col == player_col + 1 &&
+                            entity2_row == player_row &&
+                            transform2.position.x > transform1.position.x &&
+                            std::abs(transform2.position.x - transform1.position.x) <= SIDE_COLLISION_THRESHOLD) {
+                            found_right_collision = true;
+                            current_right_entity = entity_ID2;
+                        }
 
+                    }
                     // Check for top collision
                     if (!found_top_collision &&
                         entity2_row == player_row - 1 &&
@@ -800,6 +808,8 @@ namespace lof {
 
 #endif
 
+
+#if 0
     EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
     EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
     EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
@@ -888,18 +898,34 @@ namespace lof {
                     // Try both pressed and held states
                     if (is_e_pressed || is_e_held) {
                         EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+                        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
                         if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
                             auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+                            auto& player_audio = ECSM.get_component<Audio_Component>(player_ID);
 
                             try {
                                 // Get current minerals from UI text
                                 int current_minerals = std::stoi(text_comp.text);
+                                //store the previous value of current minerals
+                                //int previous_minerals = current_minerals;
 
-                                if (current_minerals > 0) {
+                                // check if current minearal has decreased
+                                if (current_minerals > 0)
+                                {
+                                    if (is_e_pressed || is_e_held)
+                                    {
+                                        ADM.play_now(player_ID, "mineral deposit", player_audio);
+                                    }
+                                }
+                                //update previous minerals 
+                                //previous_minerals = current_minerals;
+                                if (current_minerals >=  100) {
                                     // Add current minerals to the total deposited minerals
-                                    total_deposited_minerals += current_minerals;
+                                    //total_deposited_minerals += current_minerals;
 
+                                    current_minerals -= 100;
+                                    total_deposited_minerals += 100;
                                     // Calculate progress percentage based on total deposited minerals
                                     float current_percentage = total_deposited_minerals / 50000.0f;
                                     current_percentage = std::min(current_percentage, 1.0f);
@@ -972,6 +998,257 @@ namespace lof {
             }
         }
     }
+
+#endif 
+
+    EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
+    EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
+    EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
+    bool Collision_System::entites_detect = false;
+    int deposit_count = 0;
+    //bool deposit_count_bool = false;
+    int previous_minerals = 0;
+    int previous_oxygen = 0;
+    int oxygen_count = 0; 
+
+    void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
+    {
+       
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+        {
+            e_last_frame = e_press;
+            e_press = IM.is_key_held(GLFW_KEY_E);
+
+
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
+            auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+
+            AABB aabb_player = AABB::from_transform(player_transform, player_collision1);
+
+            auto it_2 = std::next(iter1);
+
+            // Check for collisions with other entities
+            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                EntityID entities_ID = *iter2;
+
+                if (player_ID == entities_ID)
+                {
+                    continue;
+                }
+
+                auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
+                auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
+                auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
+
+                if (entities_collision.collidable) continue;
+
+                AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
+                if (entities_ID == 3) {
+                    enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
+                }
+
+                float collision_time = delta_time;
+                if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
+                    check_non_collidable_entities = entities_ID;
+                    entites_detect = true;
+                    break;
+                }
+                else
+                {
+                    check_non_collidable_entities = static_cast<EntityID>(-1);
+                    entites_detect = false;
+                }
+            }
+
+            if (check_non_collidable_entities == 2)
+            {
+                mineral_tank = check_non_collidable_entities;
+            }
+            else if (check_non_collidable_entities == 3)
+            {
+                oxygen_tank = check_non_collidable_entities;
+            }
+            else {
+                oxygen_tank = static_cast<EntityID>(-1);
+                mineral_tank = static_cast<EntityID>(-1);
+            }
+        }
+
+        bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+        bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+        bool is_e_release = IM.is_key_released(GLFW_KEY_E);
+        
+        // Find GUI System to trigger interface and handle mineral deposit
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                // Check mineral tank collision and handle deposit
+                if (mineral_tank_detected() != -1) {
+                    gui_system->show_mineral_tank_gui();
+
+                    // Debug the key state
+
+                    // Try both pressed and held states
+                    if (is_e_pressed || is_e_held) {
+                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+                        std::string deposit_mineral_sound = "mineral deposit";
+
+                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+                            //auto& player_audio = ECSM.get_component<Audio_Component>(player_entity);
+
+                            try {
+                                // Get current minerals from UI text
+                                int current_minerals = std::stoi(text_comp.text);
+                                
+                                
+                                printf("current minerals is %d\n", current_minerals);
+
+                                if (current_minerals >= 100) {
+                                    
+                                    current_minerals -= 100;
+
+                            
+                                    
+                                    total_deposited_minerals += 100;
+                                    //deposit_count_bool = true;
+                                    previous_minerals = current_minerals; //store previous value
+                                    if (previous_minerals -= 100)
+                                    {
+                                        deposit_count++;
+                                    }
+                                   
+                                    
+                                  
+                                    // Calculate progress percentage based on total deposited minerals
+                                    float current_percentage = total_deposited_minerals / 50000.0f;
+                                    current_percentage = std::min(current_percentage, 100.0f);
+
+                                    // Update progress bar and its text
+                                    gui_system->update_mineral_progress(current_percentage);
+
+                                    // Reset the mineral count to 0 (optional, depending on your game logic)
+                                    //text_comp.text = "0";
+
+                                    text_comp.text = std::to_string(current_minerals);
+
+                                    
+                                }
+                                
+                         
+
+                            }
+                            catch (const std::exception& e) {
+                                // Handle exception
+                            }
+                        }
+                    }
+                   
+                    
+                  
+
+                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                    if ((is_e_pressed || is_e_held) && deposit_count > 0)
+                    {
+                        ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
+                        deposit_count--;
+                    }
+                    else if (!(e_press && e_last_frame))
+                    {
+                        ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
+                    }
+                }
+                else {
+                    gui_system->hide_mineral_tank_gui();
+                    //deposit = false;
+                }
+                
+                
+              
+
+                // Check oxygen tank collision
+                if (oxygen_tank_detected() != -1)
+                {
+                    gui_system->show_oxygen_tank_gui();
+
+                    // If E is pressed or held
+                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+                    bool increasing = false;
+
+                    if (is_e_pressed || is_e_held)
+                    {
+                        // (1) Player oxygen / Ship oxygen
+                        float playerOxy = GM.get_current_oxygen_level(); // [0..100]
+                        float shipOxy = GM.get_ship_oxygen_level();    // [0..400]
+
+                        // (2) If player not full and ship has some oxygen
+                        if (playerOxy < 100.0f && shipOxy > 0.0f)
+                        {
+                            // (3) Figure out how much the player needs
+                            float needed = 100.0f - playerOxy;
+                            previous_oxygen = playerOxy;
+                            // The ship can only give up to 'shipOxy' it has:
+                            float transfer = std::min(needed, shipOxy);
+
+                            // Transfer
+                            //playerOxy += transfer;  // player goes up
+                            //shipOxy -= transfer;  // ship goes down
+                            
+                            if (transfer > 0) {
+                                playerOxy++; //player goes up
+								shipOxy--; // ship goes down
+                                increasing = true;
+                            }
+                            else {
+                                increasing = false;
+                            }
+
+                            // (4) Store them back
+                            GM.set_current_oxygen_level(playerOxy);
+                            GM.set_ship_oxygen_level(shipOxy);
+
+                            // (5) Update the GUI bars
+                            //    - Player fraction = playerOxy / 100
+                            float playerFraction = playerOxy / 100.0f;
+                            gui_system->update_oxygen_progress1(playerFraction);
+
+
+                            float usedFraction = (400.0f - shipOxy) / 400.0f;
+                            gui_system->update_oxygen_progress2(usedFraction);
+
+                            if (playerOxy > previous_oxygen && increasing) {
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                ADM.play_now(playerId, "refilling oxygen", ECSM.get_component<Audio_Component>(playerId));
+							}
+                            else if (!increasing && !(e_press && e_last_frame)) {
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                ADM.stop_now(playerId, "refilling oxygen", "sfx_refilling_oxygen");
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    gui_system->hide_oxygen_tank_gui();
+                }
+
+                break;
+            }
+        }
+      
+    }
+
 
 
     /**
@@ -1227,7 +1504,7 @@ namespace lof {
     //bottom bouncy code but other sides work fine. ;-;
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         // Constants for collision response
-        const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
+        //const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
         const float MIN_PENETRATION = 0.001f; // Minimum penetration to respond to
         const float POSITION_CORRECTION = 1.0f; // Increased from 0.8f for more immediate correction
         const float CORRECTION_FACTOR = 0.15f;
@@ -1317,12 +1594,12 @@ namespace lof {
 
                 // Position correction for walls
                 if (collision.overlap.x > MIN_PENETRATION) {
-                    float correction = collision.overlap.x * POSITION_CORRECTION;
+                    float horizontal_correction = collision.overlap.x * POSITION_CORRECTION;
                     if (collision.side == CollisionSide::LEFT) {
-                        transform1.position.x += correction;
+                        transform1.position.x += horizontal_correction;
                     }
                     else {
-                        transform1.position.x -= correction;
+                        transform1.position.x -= horizontal_correction;
                     }
                 }
 

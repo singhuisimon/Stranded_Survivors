@@ -505,6 +505,7 @@ namespace lof {
             if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
                 // Example calculation: depositCount = stored_mineral_progress * 50000
                 int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
+                //printf("deposit count %d\n", depositCount);
                 text->text = std::to_string(depositCount) + " / 50000";
             }
         }
