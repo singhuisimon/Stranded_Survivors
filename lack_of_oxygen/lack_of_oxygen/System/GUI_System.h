@@ -36,6 +36,12 @@ namespace lof {
         EntityID oxygen_e_prompt = INVALID_ENTITY_ID;  // 'E' prompt entity for Oxygen tank
         EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
         float oxygen_e_prompt_x = 800.0f;  // X position for 'E' prompt
+
+        static constexpr float OXYGEN_BAR_MAX_WIDTH = 630.0f;
+        static constexpr float OXYGEN_BAR_HEIGHT = 15.0f;
+        static constexpr float OXYGEN_BAR_PLAYER_Y = 78.0f;
+        static constexpr float OXYGEN_BAR_SHIP_Y = 50.0f;
+        static constexpr float OXYGEN_BAR_START_X = -657.0f;
         // 1st bar
         EntityID oxygen_percentage_text1 = INVALID_ENTITY_ID;
         EntityID oxygen_progress_bar1 = INVALID_ENTITY_ID;
