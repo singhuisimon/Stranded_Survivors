@@ -1571,8 +1571,6 @@ namespace lof {
             }
             else if (collision.side == CollisionSide::TOP) {
                 // Ceiling collision - immediately stop upward movement and forces
-                velocity1.velocity.y = 0.0f;
-                physics1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
 
                 // Immediate position correction for ceiling
                 if (collision.overlap.y > MIN_PENETRATION) {
@@ -1584,6 +1582,8 @@ namespace lof {
                 }
 
 
+                velocity1.velocity.y = 0.0f;
+                physics1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 // Cancel all upward forces and jumping state
                 Vec2D acc_force = physics1.get_accumulated_force();
                 acc_force.y = 0.0f;  // Zero out vertical force
