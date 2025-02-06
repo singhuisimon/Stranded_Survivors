@@ -353,12 +353,12 @@ namespace lof {
 
             if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Mineral_Deposit UI_BG_Batch_14";
+                graphics->texture_name = "UI_MineralsFill_1920x1080_v2";
                 graphics->color = glm::vec4(1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
-                transform->position = Vec2D(-350.0f, 120.0f);
-                transform->scale = Vec2D(500.0f, 300.0f);
+                transform->position = Vec2D(0.0f, 0.0f);
+                transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
@@ -372,10 +372,10 @@ namespace lof {
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
-                float max_width = 435.0f;
+                float max_width = 600.0f;
                 float current_width = max_width * stored_mineral_progress;
-                transform->position = Vec2D(-569.5f + (current_width / 2.0f), 110.0f);
-                transform->scale = Vec2D(current_width, 52.0f);
+                transform->position = Vec2D(-642.0f + (current_width / 2.0f), 60.0f);
+                transform->scale = Vec2D(current_width, 42.0f);
             }
             if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
                 gui->is_progress_bar = true;
@@ -394,7 +394,7 @@ namespace lof {
                 text->scale = glm::vec2(0.5f, 0.5f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_percentage_text)) {
-                transform->position = Vec2D(-350.0f, 40.0f);
+                transform->position = Vec2D(-350.0f, 10.0f);
                 transform->scale = Vec2D(1.0f, 1.0f);
             }
         }
@@ -414,8 +414,8 @@ namespace lof {
                 text->scale = glm::vec2(0.38f, 0.38f);
             }
             if (auto* transform = get_component_safe<Transform2D>(mineral_deposit_count_text)) {
-                transform->position = Vec2D(-350.0f, 110.0f);
-                transform->scale = Vec2D(0.38f, 0.38f);
+                transform->position = Vec2D(-350.0f, 57.0f);
+                transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
     }
@@ -472,11 +472,11 @@ namespace lof {
         // 2) Update the progress bar width/position
         if (mineral_progress_bar != INVALID_ENTITY_ID) {
             if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
-                float max_width = 435.0f;
+                float max_width = 600.0f;
                 float new_width = max_width * stored_mineral_progress;
 
                 transform->scale.x = new_width;
-                transform->position.x = -569.5f + (new_width / 2.0f);
+                transform->position.x = -642.0f + (new_width / 2.0f);
             }
 
             if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
