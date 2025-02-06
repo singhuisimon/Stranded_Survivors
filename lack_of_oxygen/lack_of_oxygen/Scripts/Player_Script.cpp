@@ -10,12 +10,17 @@ namespace lof {
 
     Player_Script::Player_Script() {
         //entity_data = std::unordered_map<EntityID, MovementData>();
+        key_space_last_frame = false;
+		key_space_pressed = false;
+		key_a_pressed = false;
+		key_d_pressed = false;
+		key_a_last_frame = false;
+		key_d_last_frame = false;
 		forces_flag = -1;
 		player_id = 0;
     }
 
     void Player_Script::register_script() {
-
 
         std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
         static auto maintained_script = player_script;
@@ -43,6 +48,8 @@ namespace lof {
             auto& physics_comp = ECSM.get_component<Physics_Component>(entity_id);
             auto& audio_comp = ECSM.get_component<Audio_Component>(entity_id);
 
+            player_script->check_keys();
+
             //update player horizontal movement
             player_script->update_player_movement(physics_comp);
             player_script->update_player_audio(physics_comp, audio_comp);
@@ -51,6 +58,30 @@ namespace lof {
         });
 
         LGS.add_script("player_script", player_script);
+    }
+
+    void Player_Script::check_keys() {
+		//check for keys here
+		key_space_last_frame = key_space_pressed;
+		key_a_last_frame = key_a_pressed;
+		key_d_last_frame = key_d_pressed;
+        
+        key_space_pressed = IM.is_key_held(GLFW_KEY_SPACE);
+		key_a_pressed = IM.is_key_held(GLFW_KEY_A);
+		key_d_pressed = IM.is_key_held(GLFW_KEY_D);
+    }
+
+    bool Player_Script::is_key_just_pressed(int key) {
+        if (key == GLFW_KEY_SPACE) {
+            return key_space_pressed && !key_space_last_frame;
+        }
+        else if (key == GLFW_KEY_A) {
+			return key_a_pressed && !key_a_last_frame;
+        }
+        else if (key == GLFW_KEY_D) {
+            return key_d_pressed && !key_d_last_frame;
+        }
+        return false;
     }
 
 	void Player_Script::set_force_flag(int flag) {
@@ -72,7 +103,7 @@ namespace lof {
     void Player_Script::update_player_movement(Physics_Component& physic_comp) {
 
         // Handle horizontal movement
-        if (IM.is_key_held(GLFW_KEY_SPACE)) {
+        if (is_key_just_pressed(GLFW_KEY_SPACE)) {
             physic_comp.set_jump_requested(true); //this will set the flag to true inside the physics_component 
         }
         else {
@@ -203,12 +234,9 @@ namespace lof {
                     update_player_walking_particle();
                 }
             }
-            else {
-                //placeholder for other audio logic here for airvent and wormhole
-            }
         }
         else {
-            if (IM.is_key_released(GLFW_KEY_D) || IM.is_key_released(GLFW_KEY_A)) {
+            if (!is_key_just_pressed(GLFW_KEY_D) || !is_key_just_pressed(GLFW_KEY_A)) {
                 ADM.stop_now(player_id, "moving", audio_comp.get_filepath("moving"));
             }
         }

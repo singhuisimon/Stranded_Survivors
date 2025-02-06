@@ -22,6 +22,8 @@ namespace lof {
 	public:
 		Player_Script();
 		void register_script() override;
+		void check_keys();
+		bool is_key_just_pressed(int key);
 
 	private:
 
@@ -30,7 +32,14 @@ namespace lof {
 		EntityID player_id;
 
 		int forces_flag;
-		
+
+		bool key_space_pressed = false;
+		bool key_space_last_frame = false;
+		bool key_a_pressed = false;
+		bool key_d_pressed = false;
+		bool key_a_last_frame = false;
+		bool key_d_last_frame = false;
+
 		void set_force_flag(int flag);
 
 		int get_force_flag() const;

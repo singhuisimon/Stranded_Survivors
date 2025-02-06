@@ -1233,22 +1233,6 @@ namespace lof {
                         //    }
                         //}
 
-                        /*if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                            auto& timer_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                            if (std::stoi(timer_text.text) <= 0) {
-                                std::cout << "playing siren" << std::endl;
-                                ADM.play_now(player_id, "lava siren", audio_player);
-                            }
-                        }*/
-
-                        /*if (IM.is_key_held(GLFW_KEY_I)) {
-                            game_over = true;
-
-                        }*/
-
-                        /*if (game_over) {
-                            ADM.stop_now(player_id, "lava siren", audio_player.get_filepath("lava siren"));
-                        }*/
 
                         // Get and set mining status for animation
                         if (IM.is_key_held(GLFW_KEY_LEFT)) {
@@ -1280,106 +1264,7 @@ namespace lof {
                             mining_status = NO_ACTION;
                         }
 
-                        // Handle horizontal movement
-                        if (IM.is_key_pressed(GLFW_KEY_SPACE)) {
-                            physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
-                        }
-                        else {
-                            physics.set_jump_requested(false);
-                        }
 
-                        //activate and deactivate the forces. 
-                        if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
-                            // Updates forces
-                            physics.force_helper.deactivate_force(MOVE_RIGHT);
-                            physics.force_helper.activate_force(MOVE_LEFT);
-                            forces_flag = MOVE_LEFT;
-
-                            // Update player animation flag
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_LEFT;
-                            int& moving_status = GFXM.get_moving_status();
-                            moving_status = RUN_LEFT;
-
-                            //std::cout << "moving left current scene number is " << current_scene << std::endl;
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
-                            // Update forces
-                            physics.force_helper.deactivate_force(MOVE_LEFT);
-                            physics.force_helper.activate_force(MOVE_RIGHT);
-                            forces_flag = MOVE_RIGHT;
-
-                            // Update player animation flag
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_RIGHT;
-                            int& moving_status = GFXM.get_moving_status();
-                            moving_status = RUN_RIGHT;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
-                            if (forces_flag == MOVE_LEFT) {
-                                // Update forces
-                                physics.force_helper.activate_force(MOVE_LEFT);
-                                forces_flag = MOVE_LEFT;
-
-                                // Update player animation flag
-                                int& direction = GFXM.get_player_direction();
-                                direction = FACE_LEFT;
-                                int& moving_status = GFXM.get_moving_status();
-                                moving_status = RUN_LEFT;
-                            }
-                            else {
-                                // Update forces
-                                physics.force_helper.deactivate_force(MOVE_LEFT);
-                                physics.force_helper.activate_force(MOVE_RIGHT);
-                                forces_flag = MOVE_RIGHT;
-
-                                // Update player animation flag
-                                int& direction = GFXM.get_player_direction();
-                                direction = FACE_RIGHT;
-                                int& moving_status = GFXM.get_moving_status();
-                                moving_status = RUN_RIGHT;
-                            }
-                        }
-                        else {
-                            // Reset forces and player animation
-                            physics.force_helper.deactivate_force(MOVE_LEFT);
-                            physics.force_helper.deactivate_force(MOVE_RIGHT);
-                            forces_flag = -1;
-
-                            int& moving_status = GFXM.get_moving_status();
-                            moving_status = NO_ACTION;
-
-                        }
-
-                        //audio logic is here.
-                        if (forces_flag != -1) {
-                            if (physics.get_is_grounded()) {
-                                if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-
-                                    ADM.play_now(player_id, "moving", audio_player);
-                                    // Emit walking dirt particles
-                                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-                                    float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
-                                    float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
-                                    particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                                }
-                            }
-                            else {
-                                //placeholder for other audio logic here for airvent and wormhole
-                            }
-                        }
-                        else {
-                            if (IM.is_key_released(GLFW_KEY_D) || IM.is_key_released(GLFW_KEY_A)) {
-                                if (current_scene == 1) {
-                                    ADM.stop_now(player_id, "moving right", audio_player.get_filepath("moving right"));
-                                    ADM.stop_now(player_id, "moving left", audio_player.get_filepath("moving left"));
-                                }
-                                else if (current_scene == 2) {
-                                    ADM.stop_now(player_id, "moving", audio_player.get_filepath("moving"));
-                                }
-                            }
-                        }
                     }
                 }
             }
