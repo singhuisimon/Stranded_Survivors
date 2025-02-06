@@ -1506,6 +1506,7 @@ namespace lof {
         // Constants for collision response
         //const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
         const float MIN_PENETRATION = 0.001f; // Minimum penetration to respond to
+        const float TOP_POSITION_CORRECTION = 2.f; 
         const float POSITION_CORRECTION = 1.0f; // Increased from 0.8f for more immediate correction
         const float CORRECTION_FACTOR = 0.15f;
 
@@ -1575,8 +1576,13 @@ namespace lof {
 
                 // Immediate position correction for ceiling
                 if (collision.overlap.y > MIN_PENETRATION) {
-                    transform1.position.y -= collision.overlap.y * POSITION_CORRECTION;
+                    float strong_correction = collision.overlap.y * TOP_POSITION_CORRECTION; 
+                    transform1.position.y -= strong_correction;
+
+                    //add additional downward impluse
+                    velocity1.velocity.y -= 100.f; 
                 }
+
 
                 // Cancel all upward forces and jumping state
                 Vec2D acc_force = physics1.get_accumulated_force();
