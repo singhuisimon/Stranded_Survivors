@@ -122,18 +122,22 @@ namespace lof {
                     update_func(entityid);
                     LM.write_log("Logic_System::update_script updating script");
 					if (GM.get_game_over()) {
-						logic_data->state = ExecutionState::Completed;
+						logic_data->state = ExecutionState::Terminated;
 					}
                 }
                 else if (logic_data->state == ExecutionState::Completed) {
+                    LM.write_log("Logic_System::update_script completed script");
+                    //logic_data->is_active = false; //maybe add a check on
+                    //if state == completed & still active change to running or waiting?
+                }
+
+                if (logic_data->state == ExecutionState::Terminated) {
                     auto end_func = script->get_function(logic_data->end_func);
                     if (!end_func) {
                         return;
                     }
                     end_func(entityid);
                     LM.write_log("Logic_System::update_script completed script");
-                    //logic_data->is_active = false; //maybe add a check on
-                    //if state == completed & still active change to running or waiting?
                 }
             }
         }
@@ -154,21 +158,6 @@ namespace lof {
     }
 
     std::shared_ptr<Script> Logic_System::get_script(const std::string& script_name) {
-
-        /*
-        auto it = script_map.find(script_name);
-        if (it != script_map.end()) {
-            std::shared_ptr<Script> script = it->second.lock();
-			if (script) {
-				return script;
-            }
-            else {
-				LM.write_log("Logic_System::get_script script %s is expired", script_name.c_str());
-				script_map.erase(it);
-            }
-        }
-        return nullptr;
-        */
 
         auto it = script_map.find(script_name);
         if (it != script_map.end()) {

@@ -41,7 +41,7 @@ namespace lof {
             }
 
             auto& physics_comp = ECSM.get_component<Physics_Component>(entity_id);
-            EntityID get_player_id() const;
+            auto& audio_comp = ECSM.get_component<Audio_Component>(entity_id);
 
             //update player horizontal movement
             player_script->update_player_movement(physics_comp);

@@ -33,20 +33,21 @@ namespace lof {
 
         mining_script->add_function("mining", [weak_script](EntityID entity_id) {
             auto mining_script = weak_script.lock();
-            if (!entity_id || !ECSM.has_component<Audio_Component>(entity_id) || !ECSM.has_component<Animation_Component>(entity_id)) {
+            if (!entity_id || !ECSM.has_component<Audio_Component>(entity_id) || !ECSM.has_component<Animation_Component>(entity_id) ||
+                !ECSM.has_component<Physics_Component>(entity_id)) {
                 LM.write_log("Mining_Script::register_script(): Entity %d does not have required components.", entity_id);
                 return;
             }
 
             if (entity_id != mining_script->get_player_id()) {
-                LM.write_log("Player_Script::register_script(): Entity %d is not the player.", entity_id);
+                LM.write_log("Mining_Script::register_script(): Entity %d is not the player.", entity_id);
                 return;
             }
 
             auto& audio_comp = ECSM.get_component<Audio_Component>(entity_id);
 
+            mining_script->check_keys();
             mining_script->update_mining(audio_comp);
-
 
         });
 
@@ -61,6 +62,36 @@ namespace lof {
 		return player_id;
 	}
 
+    void Mining_Script::check_keys() {
+        // Update previous frame states
+        left_key_last_frame = left_key_pressed;
+        right_key_last_frame = right_key_pressed;
+        up_key_last_frame = up_key_pressed;
+        down_key_last_frame = down_key_pressed;
+
+        // Get current frame states
+        left_key_pressed = IM.is_key_held(GLFW_KEY_LEFT);
+        right_key_pressed = IM.is_key_held(GLFW_KEY_RIGHT);
+        up_key_pressed = IM.is_key_held(GLFW_KEY_UP);
+        down_key_pressed = IM.is_key_held(GLFW_KEY_DOWN);
+    }
+
+    bool Mining_Script::is_key_just_pressed(const std::string& direction) const {
+        if (direction == "left") {
+            return left_key_pressed && !left_key_last_frame;
+        }
+        else if (direction == "right") {
+            return right_key_pressed && !right_key_last_frame;
+        }
+        else if (direction == "up") {
+            return up_key_pressed && !up_key_last_frame;
+        }
+        else if (direction == "down") {
+            return down_key_pressed && !down_key_last_frame;
+        }
+        return false;
+    }
+
 	void Mining_Script::update_mining(Audio_Component& audio_comp) {
 
         for (auto& system : ECSM.get_systems()) {
@@ -71,9 +102,9 @@ namespace lof {
                     std::cerr << "Failed to get particle system" << std::endl;
                     return;
                 }
-
-                if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
-
+                
+                if (is_key_just_pressed("left")) {
+                    std::cout << "LEFT IS PRESSED" << std::endl;
                     // Emit mining sparks particles
                     update_mining_sparks(particle_system);
 
@@ -93,13 +124,13 @@ namespace lof {
                             //}
 
                             // Determine sound based on mineral value
-                            /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);*/
                             update_mining_audio(block_to_remove, audio_comp);
                         }
                     }
+
+                    //left_was_press_last_frame = false;
                 }
-                else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                else if (is_key_just_pressed("right")) {
 
                     // Emit mining sparks particles
                     update_mining_sparks(particle_system);
@@ -119,14 +150,12 @@ namespace lof {
                             //    }
                             //}
 
-                            // Determine sound based on mineral value
-                            /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);*/
+                            // play mineral value audio
                             update_mining_audio(block_to_remove, audio_comp);
                         }
                     }
                 }
-                else if (IM.is_key_pressed(GLFW_KEY_UP)) {
+                else if (is_key_just_pressed("up")) {
 
                     // Emit mining sparks particles
                     update_mining_sparks(particle_system);
@@ -135,7 +164,6 @@ namespace lof {
                         EntityID block_to_remove = CS.get_top_collide_entity();
                         if (block_to_remove != INVALID_ENTITY_ID) {
                             // Update tile 
-                            auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
                             update_tile(block_to_remove, particle_system);
                             //else {
                             //    // Emit particles, destroy the block and update mineral count when health reaches 0
@@ -147,14 +175,12 @@ namespace lof {
                             //    }
                             //}
 
-                            // Determine sound based on mineral value
-                            /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);*/
+                            // play mineral value audio
                             update_mining_audio(block_to_remove, audio_comp);
                         }
                     }
                 }
-                else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                else if (is_key_just_pressed("down")) {
 
                     // Emit mining sparks particles
                     update_mining_sparks(particle_system);
@@ -174,15 +200,17 @@ namespace lof {
                             //    }
                             //}
 
-                            // Determine sound based on mineral value
-                            /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                            ADM.play_now(player_id, sound_key, audio_player);*/
+                            // play mineral value audio
                             update_mining_audio(block_to_remove, audio_comp);
                         }
                     }
                 }
             }
         }
+
+
+
+        
 
 	}
 

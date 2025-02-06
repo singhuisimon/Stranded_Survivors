@@ -21,9 +21,24 @@ namespace lof {
 
 		unsigned int mining_strength;
 
+		bool left_key_pressed = false;
+		bool left_key_last_frame = false;
+		bool right_key_pressed = false;
+		bool right_key_last_frame = false;
+		bool up_key_pressed = false;
+		bool up_key_last_frame = false;
+		bool down_key_pressed = false;
+		bool down_key_last_frame = false;
+
+		// Stores the TNTs that are activated with it's entity name and fuse time
+		std::unordered_map<std::string, float> tnt_to_destroy;
+
 		void set_player_id(EntityID entityid);
 
 		EntityID get_player_id() const;
+
+		void check_keys();
+		bool is_key_just_pressed(const std::string& direction) const;
 
 		void update_mining(Audio_Component& audio_comp);
 

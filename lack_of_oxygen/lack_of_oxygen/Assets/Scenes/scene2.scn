@@ -611,7 +611,7 @@
             {
               "script_name": "mining_script",
               "init": "init",
-              "update": "mining_script",
+              "update": "mining",
               "end": "",
               "data": {},
               "state": 0,
