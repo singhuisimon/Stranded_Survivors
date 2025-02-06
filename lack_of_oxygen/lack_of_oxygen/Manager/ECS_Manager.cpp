@@ -366,25 +366,21 @@ namespace lof {
     void ECS_Manager::update(float delta_time) {
 
         //get the fixed time and step count
-        int steps = FPSM.get_current_number_of_steps(); 
+        int steps = std::min(FPSM.get_current_number_of_steps(), DEFAULT_MAX_STEPS); 
         float fixed_dt = FPSM.get_fixed_delta_time(); 
 
-        //limit the maximum number of steps 
-        steps = std::min(steps, DEFAULT_MAX_STEPS);
 
             for (auto& system : systems) {
+
+
                 //system that use time in the update
                 if(system->get_type() == "Movement_System" ||
-                    system->get_type() == "Collision_System" || 
-                    system->get_type() == "Logic_System" || 
-                    system->get_type() == "Animation_System" ||
-                    system->get_type() == "Render_System" ) {
+                    system->get_type() == "Collision_System" )
+                    {
 
-                    //skip movement and collision in editor mode 
-                    if ((system->get_type() == "Movement_System" || system->get_type() == "Collision_System") &&
-                        level_editor_mode) {
+                    if (level_editor_mode) {
                         system->set_time(0);
-                        continue; 
+                        continue;
                     }
 
                     for (int i = 0; i < steps; ++i) {
@@ -396,7 +392,8 @@ namespace lof {
 
                     }
                     
-                }
+                    
+                  }
                 else { //systems that do not use time in calculations
                     if (system->get_type() == "Audio_System" && level_editor_mode) {
                         system->set_time(0);
@@ -409,6 +406,11 @@ namespace lof {
                     system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
 
                 }
+
+                //auto end_time = std::chrono::steady_clock::now(); 
+                //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count(); 
+                //system->set_time(duration); 
+               
                
             }
 #if 0
