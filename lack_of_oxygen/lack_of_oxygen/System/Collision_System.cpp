@@ -27,6 +27,7 @@
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Manager/Serialization_Manager.h"
 #include "../Manager/Audio_Manager.h"
+#include "../Manager/IMGUI_Manager.h"
 
 namespace lof {
     std::unique_ptr<Collision_System> Collision_System::instance;
@@ -1300,7 +1301,7 @@ namespace lof {
 
             // Define the base texture name for each button
             std::string base_texture;
-            if (entity_name == "play_button") {
+            /*if (entity_name == "play_button") {
                 base_texture = "Main_Menu_Play_Batch_14";
             }
             else if (entity_name == "credit_button") {
@@ -1308,7 +1309,15 @@ namespace lof {
             }
             else if (entity_name == "quit_button") {
                 base_texture = "Main_Menu_Quit_Batch_14";
+            }*/
+
+            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            for (auto& base_textures : buttons_and_associated_batches) {
+                if (entity_name == base_textures.first) {
+                    base_texture = base_textures.second;
+                }
             }
+
 
             if (is_hovered) {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
@@ -1473,7 +1482,15 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-            std::string base_texture = "Back_Batch_14";
+            std::string base_texture;
+            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            for (auto& base_textures : buttons_and_associated_batches) {
+                if (entity_name == base_textures.first) {
+                    base_texture = base_textures.second;
+                }
+            }
+
+            //std::string base_texture = "Back_Batch_14";
 
             if (is_hovered) {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
@@ -1570,9 +1587,20 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-            // Set base texture name based on which button we're processing
-            std::string base_texture = (entity_name == "restart_button") ?
-                "Restart_Batch_14" : "Main_Menu_Batch_14";
+
+            std::string base_texture;
+            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            for (auto& base_textures : buttons_and_associated_batches) {
+                if (entity_name == base_textures.first) {
+                    base_texture = base_textures.second;
+                }
+            }
+
+            std::cout << "base_texture is " << base_texture << std::endl;
+
+            //// Set base texture name based on which button we're processing
+            //std::string base_texture = (entity_name == "restart_button") ?
+            //    "Restart_Batch_14" : "Main_Menu_Batch_14";
 
             if (is_hovered) {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {

@@ -177,7 +177,7 @@ namespace lof {
 
             auto it = std::find_if(file_name.begin(), file_name.end(), ::isdigit);
 
-            std::cout << file_name << std::endl;
+            //std::cout << file_name << std::endl;
             if (it != file_name.end()) {
                 GM.set_current_scene(std::stoi(std::string(it, file_name.end())));
             }
@@ -359,19 +359,13 @@ namespace lof {
         }
 
         ImGui::Separator();
-        ImGui::Button("Drop Scenes Here");
+        ImGui::Button("Drop Scenes Here To Load");
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
-                const char* droppedFilePath = (const char*)payload->Data;
+                const char* droppedFilePath = (const char*)payload->Data; 
                 std::string file_name = droppedFilePath;
                 file_name.erase(0, ASM.get_full_path("Scenes", "").length());
-                if (std::find(file_names.begin(), file_names.end(), file_name) == file_names.end()) {
-                    file_names.push_back(file_name);
-                    std::cout << "Added: " << file_name << std::endl;
-                }
-                else {
-                    std::cout << "Already exists: " << file_name << std::endl;
-                }
+                load_scene(file_name);
             }
             ImGui::EndDragDropTarget();
         }
@@ -509,6 +503,19 @@ namespace lof {
                 ImGui::Image((ImTextureID)(intptr_t)GFXM.get_framebuffer_texture(),
                     ImVec2(static_cast<float>(SCR_WIDTH) / 2, static_cast<float>(SCR_HEIGHT) / 2),
                     ImVec2(0, 1), ImVec2(1, 0));
+            }
+
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENES_ITEM")) {
+                    const char* droppedFilePath = (const char*)payload->Data;
+                    std::string file_name = droppedFilePath;
+                    file_name.erase(0, ASM.get_full_path("Scenes", "").length());
+
+                    load_scene(file_name);
+
+                }
+                ImGui::EndDragDropTarget();
             }
 
             //Ensure that the mouse is in the viewport or using the mouse pop-up
@@ -971,35 +978,118 @@ namespace lof {
                         auto& texture_name = graphics.texture_name;
                         std::string condition_name_texture = "texture_name";
 
-                        //not using text_input due to to_lower
-                        char buffer_graphics[128];
-                        strncpy_s(buffer_graphics, texture_name.c_str(), sizeof(buffer_graphics));
-                        buffer_graphics[sizeof(buffer_graphics) - 1] = '\0';
-                        if (ImGui::InputText(condition_name_texture.c_str(), buffer_graphics, sizeof(buffer_graphics))) {
-                            std::string buffer_string = std::string(buffer_graphics);
-                            std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), to_lower);
-                            texture_name = buffer_string;
-                        }
+                        //Identify if Entity is a button
+                        std::string is_button = "_button";
+                        size_t found = Name.find(is_button);
+                        if (found != std::string::npos) {
+                                               
+                            /*for (auto& paired : batch_and_button) {
+                                std::cout << paired.first << ", " << paired.second << std::endl;
+                            }*/
 
-                        if (ImGui::BeginDragDropTarget()) {
+                            size_t pos = texture_name.find_last_of('_');  // Find first underscore
+                            std::string batch_name = texture_name.substr(0, pos);
+                            ImGui::Text("Batch: %s", batch_name.c_str());
 
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
-                                const char* droppedFilePath = (const char*)payload->Data;
-                                std::string file_name = droppedFilePath;
-                                file_name.erase(0, ASM.get_full_path("Textures", "").length());
-                                file_name = file_name.substr(0, file_name.size() - 4);
+                            char buffer_graphics[128];
+                            strncpy_s(buffer_graphics, texture_name.c_str(), sizeof(buffer_graphics));
+                            buffer_graphics[sizeof(buffer_graphics) - 1] = '\0';
+                            if (ImGui::InputText(condition_name_texture.c_str(), buffer_graphics, sizeof(buffer_graphics))) {
+                                std::string buffer_string = std::string(buffer_graphics);
 
-                                std::transform(file_name.begin(), file_name.end(), file_name.begin(), to_lower);
-                                texture_name = file_name;
+                                //std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), to_lower);
+                                texture_name = buffer_string;
+
+                                for (std::string name : batches) {
+
+                                    //std::cout << name << " " << texture_name << std::endl;
+                                    size_t found = texture_name.find(name);
+
+                                    if (found != std::string::npos) {
+
+                                        //std::cout << "found " << std::endl;
+                                        for (auto& paired : batch_and_button) {
+
+                                            if (Name == paired.first) {
+                                                paired.second = name;
+                                            }
+                                        }
+                                    }
+                                }
+                                
                             }
 
-                            ImGui::EndDragDropTarget();
+                            if (ImGui::BeginDragDropTarget()) {
+
+                                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
+                                    const char* droppedFilePath = (const char*)payload->Data;
+                                    std::string file_name = droppedFilePath;
+                                    file_name.erase(0, ASM.get_full_path("Textures", "").length());
+                                    file_name = file_name.substr(0, file_name.size() - 4);
+
+                                    //std::transform(file_name.begin(), file_name.end(), file_name.begin(), to_lower);
+                                    texture_name = file_name;
+
+                                    for (std::string name : batches) {
+
+                                        //std::cout << name << " " << texture_name << std::endl;
+                                        size_t found = texture_name.find(name);
+
+                                        if (found != std::string::npos) {
+
+                                            //std::cout << "found " << std::endl;
+                                            for (auto& paired : batch_and_button) {
+
+                                                if (Name == paired.first) {
+                                                    paired.second = name;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                ImGui::EndDragDropTarget();
+                            }
+                            
                         }
+                        else {
+
+                            //not using text_input due to to_lower
+                            char buffer_graphics[128];
+                            strncpy_s(buffer_graphics, texture_name.c_str(), sizeof(buffer_graphics));
+                            buffer_graphics[sizeof(buffer_graphics) - 1] = '\0';
+                            if (ImGui::InputText(condition_name_texture.c_str(), buffer_graphics, sizeof(buffer_graphics))) {
+                                std::string buffer_string = std::string(buffer_graphics);
+                                std::transform(buffer_string.begin(), buffer_string.end(), buffer_string.begin(), to_lower);
+                                texture_name = buffer_string;
+                            }
+
+                            if (ImGui::BeginDragDropTarget()) {
+
+                                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
+                                    const char* droppedFilePath = (const char*)payload->Data;
+                                    std::string file_name = droppedFilePath;
+                                    file_name.erase(0, ASM.get_full_path("Textures", "").length());
+                                    file_name = file_name.substr(0, file_name.size() - 4);
+
+                                    std::transform(file_name.begin(), file_name.end(), file_name.begin(), to_lower);
+                                    texture_name = file_name;
+                                }
+
+                                ImGui::EndDragDropTarget();
+                            }
+                        }
+
+                        
 
                         auto& shd_ref = graphics.shd_ref;
                         ImGui::BeginDisabled();
                         ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
                         ImGui::EndDisabled();
+
+                        for (auto& button : batch_and_button) {
+                            ImGui::Text("%s, %s", button.first.c_str(), button.second.c_str());
+                        }
                     }
                 }
 
@@ -1042,40 +1132,43 @@ namespace lof {
 
                         auto& animation_list = animation.animations;
 
-                        //vector to keep track of selected items for each animation
-                        //initialized with -1 for each item, no selection
-                        static std::vector<int> selected_items(animation_list.size(), -1);
+                        ////vector to keep track of selected items for each animation
+                        ////initialized with -1 for each item, no selection
+                        //static std::vector<int> selected_items(animation_list.size(), -1);
+                        ////index of the action to select animation for
+                        //int index = 0;
+                        //for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
+                        //    //ensures the selected_items vector is the same size as the animation_list
+                        //    if (selected_items.size() != animation_list.size()) {
+                        //        selected_items.resize(animation_list.size(), -1);
+                        //    }
+                        //    ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
+                        //    std::string label = "Choose Animation for " + std::to_string(index);
+                        //    //Dropdown for the animation
+                        //    if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
+                        //        //If valid animation is selected, update the animation.
+                        //        if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
+                        //            //Update the animation's name
+                        //            it->second = assigned_names[selected_items[index]];
+                        //        }
+                        //    }
+                        //}
 
-                        //index of the action to select animation for
-                        int index = 0;
 
-                        for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
-
-                            //ensures the selected_items vector is the same size as the animation_list
-                            if (selected_items.size() != animation_list.size()) {
-                                selected_items.resize(animation_list.size(), -1);
-                            }
-
-                            ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
-                            std::string label = "Choose Animation for " + std::to_string(index);
-
-                            //Dropdown for the animation
-                            if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
-
-                                //If valid animation is selected, update the animation.
-                                if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
-
-                                    //Update the animation's name
-                                    it->second = assigned_names[selected_items[index]];
-                                }
-                            }
+                        for (auto it = animation_list.begin(); it != animation_list.end(); ++it) {
+                            std::string selected_ani_condition = "Animation For: " + it->first;
+                            IMGUIM.text_input(it->second, selected_ani_condition);
                         }
 
 
                         auto& curr = animation.curr_animation_idx;
 
                         ImGui::Text("Current Animation Index: %i", curr);
+
+                        ImGui::Separator();
                         ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
+
+                        ImGui::Separator();
                         int temp_value = static_cast<int>(curr);
                         if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, static_cast<int>(animation_list.size()) - 1)) {
 
@@ -2392,7 +2485,9 @@ namespace lof {
     }
 
 
-
+    std::vector<std::pair<std::string, std::string>>& IMGUI_Manager::return_buttons_and_batches() {
+        return batch_and_button;
+    }
 
 
 } // namespace lof
