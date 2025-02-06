@@ -24,60 +24,62 @@ namespace lof {
     }
 
 	void Object_Moving_Script::cleanup() {
+        LM.write_log("Object_Moving_Script::cleanup() called");
 		entity_data.clear();
 	}
 
     void Object_Moving_Script::register_script() {
         std::shared_ptr<Object_Moving_Script> object_moving_script = std::make_shared<Object_Moving_Script>();
 
-        //std::weak_ptr<Object_Moving_Script> weak_this = std::dynamic_pointer_cast<Object_Moving_Script>(script);
+        std::weak_ptr<Object_Moving_Script> weak_script = object_moving_script;
 
-        object_moving_script->add_function("init", [object_moving_script](EntityID entity_id) {
-
-        if (!entity_id || !ECSM.has_component<Logic_Component>(entity_id) ||
-            !ECSM.has_component<Transform2D>(entity_id)) {
-			LM.write_log("Object_Moving_Script::register_script(): Entity %d does not have required components.", entity_id);
-            return;
-        }
-
-        auto& logic_comp = ECSM.get_component<Logic_Component>(entity_id);
-        ScriptData script_data = logic_comp.get_script_data("object_moving_script", "update");
-
-        try {
-            MovementData data;
-
-            data.movement_pattern = logic_comp.get_script_individual_data<int>(script_data, "movement_pattern");
-            data.movement_speed = logic_comp.get_script_individual_data<float>(script_data, "movement_speed");
-            data.movement_range = logic_comp.get_script_individual_data<float>(script_data, "movement_range");
-            data.origin_pos = logic_comp.get_script_individual_data<Vec2D>(script_data, "origin_pos");
-            data.reverse_direction = logic_comp.get_script_individual_data<bool>(script_data, "reverse_direction");
-            data.rotate_with_motion = logic_comp.get_script_individual_data<bool>(script_data, "rotate_with_motion");
-            data.timer = 0.0f;
-
-            if (data.movement_pattern == 0) {
-				// Linear movement
-                data.pattern = 1;
-            }
-            else if (data.movement_pattern == 1) {
-				// Circular movement
-                data.pattern = 2;
-            }
-            else {
-                //unknown;
-                data.pattern = 0;
+        object_moving_script->add_function("init", [weak_script](EntityID entity_id) {
+		    auto object_moving_script = weak_script.lock();
+            if (!entity_id || !ECSM.has_component<Logic_Component>(entity_id) ||
+                !ECSM.has_component<Transform2D>(entity_id)) {
+		    	LM.write_log("Object_Moving_Script::register_script(): Entity %d does not have required components.", entity_id);
+                return;
             }
 
-            object_moving_script->entity_data[entity_id] = data;
+            auto& logic_comp = ECSM.get_component<Logic_Component>(entity_id);
+            ScriptData script_data = logic_comp.get_script_data("object_moving_script", "update");
 
-        }
-        catch (const std::exception& e) {
-            LM.write_log("Failed to initialize component: %s", e.what());
-            return;
-        }
+            try {
+                MovementData data;
+
+                data.movement_pattern = logic_comp.get_script_individual_data<int>(script_data, "movement_pattern");
+                data.movement_speed = logic_comp.get_script_individual_data<float>(script_data, "movement_speed");
+                data.movement_range = logic_comp.get_script_individual_data<float>(script_data, "movement_range");
+                data.origin_pos = logic_comp.get_script_individual_data<Vec2D>(script_data, "origin_pos");
+                data.reverse_direction = logic_comp.get_script_individual_data<bool>(script_data, "reverse_direction");
+                data.rotate_with_motion = logic_comp.get_script_individual_data<bool>(script_data, "rotate_with_motion");
+                data.timer = 0.0f;
+
+                if (data.movement_pattern == 0) {
+		    		// Linear movement
+                    data.pattern = 1;
+                }
+                else if (data.movement_pattern == 1) {
+		    		// Circular movement
+                    data.pattern = 2;
+                }
+                else {
+                    //unknown;
+                    data.pattern = 0;
+                }
+
+                object_moving_script->entity_data[entity_id] = data;
+
+            }
+            catch (const std::exception& e) {
+                LM.write_log("Failed to initialize component: %s", e.what());
+                return;
+            }
             
         });
 
-        object_moving_script->add_function("update", [object_moving_script](EntityID entity_id) {
+        object_moving_script->add_function("update", [weak_script](EntityID entity_id) {
+			auto object_moving_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Logic_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {
                 return;
@@ -113,7 +115,8 @@ namespace lof {
             });
 
         // End Function (Cleanup)
-        object_moving_script->add_function("end", [object_moving_script](EntityID entity_id) {
+        object_moving_script->add_function("end", [weak_script](EntityID entity_id) {
+			auto object_moving_script = weak_script.lock();
             if (!entity_id) {
                 return;
             }

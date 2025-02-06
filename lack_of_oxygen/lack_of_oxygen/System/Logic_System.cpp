@@ -22,6 +22,7 @@
 #include "../Manager/Log_Manager.h"
 #include "../Manager/Input_Manager.h"
 #include "../Manager/Logic_Manager.h"
+#include "../Manager/Game_Manager.h"
 #include "../Utility/Globals.h"
 
 namespace lof {
@@ -41,11 +42,16 @@ namespace lof {
     }
 
     Logic_System::~Logic_System() {
+
+		//remove_script("player_script");
+		//remove_script("object_moving_script");
+
         // Clean up
         cleanup();
 
         if (instance) {
             instance.reset();
+			LM.write_log("Logic_System::instance reset");
         }
     }
 
@@ -114,6 +120,9 @@ namespace lof {
                     }
                     update_func(entityid);
                     LM.write_log("Logic_System::update_script updating script");
+					if (GM.get_game_over()) {
+						logic_data->state = ExecutionState::Completed;
+					}
                 }
                 else if (logic_data->state == ExecutionState::Completed) {
                     auto end_func = script->get_function(logic_data->end_func);
@@ -146,10 +155,30 @@ namespace lof {
     std::shared_ptr<Script> Logic_System::get_script(const std::string& script_name) {
         auto it = script_map.find(script_name);
         if (it != script_map.end()) {
-            return it->second;
+            std::shared_ptr<Script> script = it->second.lock();
+			if (script) {
+				return script;
+            }
+            else {
+				LM.write_log("Logic_System::get_script script %s is expired", script_name.c_str());
+				script_map.erase(it);
+            }
         }
         return nullptr;
+
+        /*auto it = script_map.find(script_name);
+        if (it != script_map.end()) {
+            return it->second;
+        }
+        return nullptr;*/
     }
+
+	void Logic_System::remove_script(const std::string& script_name) {
+		auto it = script_map.find(script_name);
+		if (it != script_map.end()) {
+			script_map.erase(it);
+		}
+	}
 
     //Logic_System::~Logic_System() {
     //    // Clean up

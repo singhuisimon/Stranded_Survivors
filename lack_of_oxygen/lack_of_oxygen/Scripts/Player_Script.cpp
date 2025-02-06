@@ -17,13 +17,16 @@ namespace lof {
     void Player_Script::register_script() {
         std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
 
-        player_script->add_function("init", [player_script](EntityID entity_id) {
+        std::weak_ptr<Player_Script> weak_script = player_script;
+
+        player_script->add_function("init", [weak_script](EntityID entity_id) {
+			auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);
         });
 
-        player_script->add_function("movement", [player_script](EntityID entity_id) {
-
+        player_script->add_function("movement", [weak_script](EntityID entity_id) {
+            auto player_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Physics_Component>(entity_id) || !ECSM.has_component<Audio_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {
                 LM.write_log("Player_Script::register_script(): Entity %d does not have required components.", entity_id);

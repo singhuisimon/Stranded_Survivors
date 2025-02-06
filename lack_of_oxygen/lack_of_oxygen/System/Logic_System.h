@@ -57,14 +57,19 @@ namespace lof {
          */
         void update_script(float delta_time);
 
-        void cleanup();
-
         /**
          * @brief Add scripts to the scripts_map.
 		 * @param script_name The name of the script.
 		 * @param script The script to be added.
          */
         void add_script(const std::string& script_name, std::shared_ptr<Script> script);
+
+		void remove_script(const std::string& script_name);
+
+		/**
+		 * @brief Cleanup the scripts_map.
+		 */
+        void cleanup();
 
         /**
 		 * @brief Retrieve a script from the scripts_map.
@@ -87,7 +92,7 @@ namespace lof {
         static std::once_flag once_flag;
 
         
-        std::unordered_map <std::string, std::shared_ptr<Script>> script_map; //using script name to access the scripts
+        std::unordered_map <std::string, std::weak_ptr<Script>> script_map; //using script name to access the scripts
 
     };
 } // namespace lof
