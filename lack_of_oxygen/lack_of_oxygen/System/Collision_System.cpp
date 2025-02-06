@@ -434,7 +434,7 @@ namespace lof {
                 // If we're touching a vent but there's no vent above us
                 if (!found_top_collision) {
                     // Apply stronger upward thrust for exit
-                    e_velocity.velocity.y = 1000.0f; // Higher exit velocity
+                    e_velocity.velocity.y = 800.0f; // Higher exit velocity
                     e_physics.force_helper.deactivate_force(VENT_FORCE);
                     e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
 
@@ -527,6 +527,48 @@ namespace lof {
             physic1.set_is_grounded(is_grounded);
             if (!is_grounded) {
                 physic1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            }
+        }
+    }
+
+
+    void Collision_System::Boundary_Check() {
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
+
+        auto& camera = GFXM.get_camera();
+        GLfloat camera_x = camera.pos_x;
+
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            // Skip static entities (not moving)
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
+
+            // Calculate half-width of the player
+            GLfloat player_half_width = player_transform.scale.x / 2.0f;
+
+            // Calculate boundaries based on the camera's position
+            GLfloat half_width = screen_width / 2.0f;
+
+            GLfloat minX = -half_width + camera_x + player_half_width;
+            GLfloat maxX = half_width + camera_x - player_half_width;
+
+            // Stop the player when reaching the left or right boundary
+            if (player_transform.position.x <= minX && player_velocity.velocity.x < 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = minX;
+            }
+            else if (player_transform.position.x >= maxX && player_velocity.velocity.x > 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = maxX;
             }
         }
     }
@@ -1317,6 +1359,7 @@ namespace lof {
         }
 
         std::vector<CollisionPair> collisions;
+        Boundary_Check(); 
 
         // If we're in the main menu scene (scene 0)
         if (GM.get_current_scene() == 0) {
@@ -1380,10 +1423,12 @@ namespace lof {
                 entity_name != "quit_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id) || 
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             // Check if mouse is hovering over the button
             bool is_hovered = ESS.Mouse_Over_AABB(
@@ -1397,11 +1442,10 @@ namespace lof {
 
             // Define the base texture name for each button
             std::string base_texture;
-            //if (entity_name == "play_button") {
             std::string hover_sound = "button_hover";
             std::string main_menu_sound = "main_menu";
 
-            /*if (entity_name == "play_button") {
+            if (entity_name == "play_button") {
                 base_texture = "Main_Menu_Play_Batch_14";
             }
             else if (entity_name == "credit_button") {
@@ -1409,8 +1453,9 @@ namespace lof {
             }
             else if (entity_name == "quit_button") {
                 base_texture = "Main_Menu_Quit_Batch_14";
-            }*/
-
+            }
+                
+            //dont know where this came or what it does
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -1420,10 +1465,24 @@ namespace lof {
 
 
             if (is_hovered) {
+                if (!button_hover_states[entity_name]) {
+                    // Play the hover sound once when hovering
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
+
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                    if (main_menu_sound_playing[entity_name] == false) {
+                        // Play the main menu sound if it's not already playing
+                        ADM.play_now(entity_id, main_menu_sound, audio);
+                        main_menu_sound_playing[entity_name] = true;  // Mark sound as playing
+                    }
+
+
                     // Set pressed state texture
                     graphics.texture_name = base_texture + "_PRESSED";
-
+                    
                     // Scene Switching Logic
                     if (entity_name == "play_button") {
                         LM.write_log("Play button held - attempting scene transition");
@@ -1458,7 +1517,7 @@ namespace lof {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             // Stop all currently playing audio
-                            ADM.stop_mastergroup();
+                            // ADM.stop_mastergroup();
 
                             // Reset player position if it exists
                             EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1516,7 +1575,7 @@ namespace lof {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             // Stop all currently playing audio
-                            ADM.stop_mastergroup();
+                            //ADM.stop_mastergroup();
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(3);
@@ -1541,6 +1600,8 @@ namespace lof {
             else {
                 // Reset to normal state texture
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false; //reset
+                main_menu_sound_playing[entity_name] = false;
             }
         }
     }
@@ -1568,10 +1629,12 @@ namespace lof {
             if (entity_name != "back_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id) ||
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
@@ -1582,18 +1645,17 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-            std::string base_texture;
+            std::string base_texture = "Back_Batch_14";
+            std::string hover_sound = "button_hover";
+            std::string click_sound = "main_menu";
+
+            //is this code from lily??
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
             }
-
-            //std::string base_texture = "Back_Batch_14";
-            //std::string base_texture = "Back_Batch_14";
-            std::string hover_sound = "button_hover";  
-            std::string click_sound = "main_menu"; 
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
@@ -1603,7 +1665,7 @@ namespace lof {
                 }
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
-
+                    ADM.play_now(entity_id, click_sound, audio);
                     LM.write_log("Back button held - returning to main menu");
 
                     // Clear dynamic entities first
@@ -1632,7 +1694,7 @@ namespace lof {
                         camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                         // Stop all currently playing audio
-                        ADM.stop_mastergroup();
+                        //ADM.stop_mastergroup();
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
@@ -1651,12 +1713,14 @@ namespace lof {
             }
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false;
             }
         }
     }
 
     void Collision_System::check_win_screen_button_collision(float delta_time) {
         if (current_cooldown > 0.0f) {
+            current_cooldown -= delta_time; 
             return;  // Still in cooldown
         }
 
@@ -1681,10 +1745,12 @@ namespace lof {
             if (entity_name != "restart_button" && entity_name != "main_menu_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id)) continue;
+                !ECSM.has_component<Graphics_Component>(entity_id) || 
+                !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+            auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
@@ -1696,7 +1762,17 @@ namespace lof {
             );
 
 
-            std::string base_texture;
+            // Set base texture name based on which button we're processing
+            std::string base_texture = (entity_name == "restart_button") ?
+                "Restart_Batch_14" : "Main_Menu_Batch_14";
+
+            std::string hover_sound = "button_hover";
+            std::string click_sound = "main_menu";
+
+            static bool clicked_played = false;
+
+
+            //lily's update/?
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -1704,15 +1780,19 @@ namespace lof {
                 }
             }
 
-            std::cout << "base_texture is " << base_texture << std::endl;
-
-            //// Set base texture name based on which button we're processing
-            //std::string base_texture = (entity_name == "restart_button") ?
-            //    "Restart_Batch_14" : "Main_Menu_Batch_14";
+           
 
             if (is_hovered) {
+
+                if (!button_hover_states[entity_name]) {
+                    // Play hover sound
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
+                    ADM.play_now(entity_id, click_sound, audio);
 
                     // Handle button click logic
                     if (entity_name == "restart_button") {
@@ -1788,6 +1868,8 @@ namespace lof {
             }
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
+                button_hover_states[entity_name] = false;
+
             }
         }
     }
