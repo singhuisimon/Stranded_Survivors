@@ -66,7 +66,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Transform2D>(entity, transform);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Transform2D component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Transform2D component to entity ID %u.", entity);
             }
             // ------------------------------------ Velocity_Component -------------------------------------------
             else if (component_name == "Velocity_Component") {
@@ -80,7 +80,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Velocity_Component>(entity, velocity);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Velocity_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Velocity_Component to entity ID %u.", entity);
             }
             // ------------------------------------ Physics_Component -------------------------------------------
             else if (component_name == "Physics_Component") {
@@ -183,8 +183,8 @@ namespace lof {
 
                             physics_component.force_helper.add_force(force_obj);
 
-                            LM.write_log("Component_Parser::add_components_from_json(): Added force of type %d to entity ID %u",
-                                type, entity);
+                            //LM.write_log("Component_Parser::add_components_from_json(): Added force of type %d to entity ID %u",
+                            //    type, entity);
 
                         }
                     }
@@ -194,7 +194,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Physics_Component>(entity, physics_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Physics_Component to entity ID %u.", entity);
             }
             // ------------------------------------ Graphics_Component -------------------------------------------
             else if (component_name == "Graphics_Component") {
@@ -263,7 +263,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Graphics_Component>(entity, graphics_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Graphics_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Graphics_Component to entity ID %u.", entity);
             }
             // ------------------------------------ Collision_Component -------------------------------------------
             else if (component_name == "Collision_Component") {
@@ -284,7 +284,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Collision_Component>(entity, collision_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Collision_Component to entity ID %u.", entity);
             }
             // ------------------------------------- Audio_Component ---------------------------------------------
             else if (component_name == "Audio_Component") {
@@ -394,7 +394,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Audio_Component>(entity, audio_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Audio_Component to entity ID %u", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Audio_Component to entity ID %u", entity);
 
                 // Log all sounds in the component for verification
                 const auto& sounds = audio_component.get_sounds();
@@ -433,7 +433,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<GUI_Component>(entity, gui_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added GUI_Component to entity ID %u.", entity);
             }
             // ------------------------------------ Animation_Component -------------------------------------------
             else if (component_name == "Animation_Component") {
@@ -501,7 +501,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Animation_Component>(entity, animation_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Animation_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Animation_Component to entity ID %u.", entity);
                 }
             // ------------------------------------ Logic_Component -------------------------------------------
             else if (component_name == "Logic_Component") {
@@ -543,7 +543,7 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Logic_Component>(entity, logic);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
                 }
             // ------------------------------------ Text_Component -------------------------------------------
             else if (component_name == "Text_Component") {
@@ -573,11 +573,11 @@ namespace lof {
 
                 // Add component to entity
                 ecs_manager.add_component<Text_Component>(entity, text_component);
-                LM.write_log("Component_Parser::add_components_from_json(): Added Text_Component to entity ID %u.", entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Added Text_Component to entity ID %u.", entity);
                 }
             // ------------------------------------ Unknown Component -------------------------------------------
             else {
-                LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
+                //LM.write_log("Component_Parser::add_components_from_json(): Unknown component '%s' for entity ID %u. Skipping.", component_name.c_str(), entity);
             }
         }
     }

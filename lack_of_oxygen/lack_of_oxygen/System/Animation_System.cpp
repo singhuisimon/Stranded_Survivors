@@ -38,6 +38,12 @@ namespace lof {
             // Get reference to the animation component
             auto& animation_comp = ECSM.get_component<Animation_Component>(entity_id);  
 
+            // Check if animation is valid
+            std::string check_animation = animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)];
+            if ((check_animation == DEFAULT_ANIMATION_NAME) || (animations_storage.find(check_animation) == animations_storage.end())) {
+                continue;
+            }
+
             // Determine which frame of which animation to play
             // Set logic for player animation here first (This should be done before coming into animation system)
             if (entity_id == player_id) { 
