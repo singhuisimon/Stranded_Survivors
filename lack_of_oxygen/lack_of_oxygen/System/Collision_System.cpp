@@ -553,44 +553,47 @@ namespace lof {
     //    }
     //}
 
-    //void Collision_System::Boundary_Check()
-    //{
-    //    GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
-    //    GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
+    void Collision_System::Boundary_Check() {
+        GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
 
-    //    // Get the camera's position using your existing method
-    //    auto& camera = GFXM.get_camera();  // Assuming this gives you the camera component or transform
-    //    GLfloat camera_x = camera.pos_x;
-    //    GLfloat camera_y = camera.pos_y;
+        auto& camera = GFXM.get_camera();
+        GLfloat camera_x = camera.pos_x;
 
-    //    const auto& collision_entities = get_entities();
+        const auto& collision_entities = get_entities();
 
-    //    for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
-    //    {
-    //        EntityID player_ID = *iter1;
-    //        auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
 
-    //        // Skip static entities (not moving)
-    //        if (physic1.get_is_static()) {
-    //            continue;
-    //        }
+            // Skip static entities (not moving)
+            if (physic1.get_is_static()) {
+                continue;
+            }
 
-    //        auto& player_transform = ECSM.get_component<Transform2D>(player_ID); // to get player position
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
 
-    //        // Calculate boundaries based on the camera's position
-    //        GLfloat half_width = screen_width / 2;
-    //        GLfloat half_height = screen_height / 2;
+            // Calculate half-width of the player
+            GLfloat player_half_width = player_transform.scale.x / 2.0f;
 
-    //        GLfloat minX = -half_width + camera_x;
-    //        GLfloat maxX = half_width + camera_x;
-    //        GLfloat minY = -half_height + camera_y;
-    //        GLfloat maxY = half_height + camera_y;
+            // Calculate boundaries based on the camera's position
+            GLfloat half_width = screen_width / 2.0f;
 
-    //        // Clamp the player's position based on the camera's offset
-    //        player_transform.position.x = std::clamp(player_transform.position.x, minX, maxX);
-    //        player_transform.position.y = std::clamp(player_transform.position.y, minY, maxY);
-    //    }
-    //}
+            GLfloat minX = -half_width + camera_x + player_half_width;
+            GLfloat maxX = half_width + camera_x - player_half_width;
+
+            // Stop the player when reaching the left or right boundary
+            if (player_transform.position.x <= minX && player_velocity.velocity.x < 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = minX;
+            }
+            else if (player_transform.position.x >= maxX && player_velocity.velocity.x > 0) {
+                player_velocity.velocity.x = 0.0f;
+                player_transform.position.x = maxX;
+            }
+        }
+    }
+
 
 
 
@@ -1378,7 +1381,7 @@ namespace lof {
         std::vector<CollisionPair> collisions;
         //Boundary_Check();
         // Boundary_Check();
-        //Boundary_Check();
+        Boundary_Check();
 
         // If we're in the main menu scene (scene 0)
         if (GM.get_current_scene() == 0) {
@@ -1726,7 +1729,7 @@ namespace lof {
 
     void Collision_System::check_win_screen_button_collision(float delta_time) {
         if (current_cooldown > 0.0f) {
-            
+            current_cooldown -= delta_time;
             return;  // Still in cooldown
         }
 
