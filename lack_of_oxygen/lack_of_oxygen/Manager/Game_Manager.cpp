@@ -37,6 +37,8 @@
 #include <iostream>
 #include <random>
 #include <chrono>
+#include <iomanip>  // for std::setw and std::setfill
+#include <sstream>  // for std::stringstream
 
 namespace lof {
 
@@ -170,26 +172,23 @@ namespace lof {
     //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
 
-        
-
+        // Check if the game manager is started
         if (!is_started()) {
             LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
         }
 
-
-
-        //std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
-        try {
-            // Simulate a crash when the 'P' key is pressed
-            if (IM.is_key_pressed(GLFW_KEY_P)) {
-                LM.write_log("Game_Manager::update(): Simulated crash. 'P' key was pressed.");
-                throw std::runtime_error("Simulated crash: 'P' key was pressed.");
-            }
-        }
-        catch (const std::exception& e) {
-            LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
-        }
+        ////std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
+        //try {
+        //    // Simulate a crash when the 'P' key is pressed
+        //    if (IM.is_key_pressed(GLFW_KEY_P)) {
+        //        LM.write_log("Game_Manager::update(): Simulated crash. 'P' key was pressed.");
+        //        throw std::runtime_error("Simulated crash: 'P' key was pressed.");
+        //    }
+        //}
+        //catch (const std::exception& e) {
+        //    LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
+        //}
 
         // Check for game over condition based on input, before IM update
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
@@ -221,18 +220,32 @@ namespace lof {
             increasing = true;
         }
         std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;*/
-        ADM.update_bgm_layering(current_scene, oxygen_level, increasing);
+        //ADM.update_bgm_layering(current_scene, oxygen_level, increasing);
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
+        // Code portion if in gameplay mode or player exists
         if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+
+            // Add oxygen update logic here, before the UI positioning
+            oxygen_update_timer += delta_time;
+            if (oxygen_update_timer >= 1.0f) { // Every second
+                oxygen_update_timer = 0.0f;
+                current_oxygen_level = std::max(0.0f, current_oxygen_level - oxygen_drain_rate);
+                // Update panic level inversely to oxygen level
+                current_panic_level = 100.0f - current_oxygen_level;
+            }
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
+
             EntityID oxygen_meter_fill_id = ECSM.find_entity_by_name("top_ui_oxygen_meter_fill");
             EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
+
+            EntityID panic_meter_fill_id = ECSM.find_entity_by_name("top_ui_panik_meter_fill");
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
+
             EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
             EntityID timer_icon_id = ECSM.find_entity_by_name("top_ui_timer");
             EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
@@ -271,19 +284,42 @@ namespace lof {
                     ECSM.has_component<Transform2D>(oxygen_meter_fill_id)) {
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
                     auto& oxygen_fill_transform = ECSM.get_component<Transform2D>(oxygen_meter_fill_id);
+                    auto& oxygen_fill_graphics = ECSM.get_component<Graphics_Component>(oxygen_meter_fill_id);
 
-                    // Set position and scale for oxygen meter
+                    // Position and scale for meter stays the same
                     oxygen_transform.position = {
-                        base_position.x - 575.0f,  // Left of UI overlay
-                        base_position.y                 // Top position
+                        base_position.x - 573.0f,
+                        base_position.y
                     };
                     oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     oxygen_transform.prev_position = oxygen_transform.position;
 
-                    // Set position and scale for oxygen meter fill
-                    oxygen_fill_transform.position = oxygen_transform.position;
-                    oxygen_fill_transform.scale = oxygen_transform.scale;
+                    // Calculate the new width of the fill bar
+                    float new_width = METER_WIDTH * (current_oxygen_level / 100.0f);
+
+                    // Update fill position and scale
+                    oxygen_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+
+                    // Anchor to left side by offsetting position based on the current width
+                    oxygen_fill_transform.position = {
+                        oxygen_transform.position.x + 3.0f + (new_width - METER_WIDTH) / 2.0f,
+                        oxygen_transform.position.y
+                    };
                     oxygen_fill_transform.prev_position = oxygen_fill_transform.position;
+
+                    // Update the fill bar texture based on oxygen level
+                    if (current_oxygen_level > 50.0f) {
+                        // Blue bar for 100-50%
+                        oxygen_fill_graphics.texture_name = "O2_Fill_full_blue_Batch_7";
+                    }
+                    else if (current_oxygen_level > 20.0f) {
+                        // Purple bar for 50-20%
+                        oxygen_fill_graphics.texture_name = "O2_Fill_full_purple_Batch_7";
+                    }
+                    else {
+                        // Red bar for 20-0%
+                        oxygen_fill_graphics.texture_name = "O2_Fill_full_red_Batch_7";
+                    }
                 }
 
                 // Position oxygen text and oxygen percentage
@@ -307,20 +343,40 @@ namespace lof {
                         oxygen_text_transform.position.y
                     };
                     oxygen_percentage_text_transform.prev_position = oxygen_percentage_text_transform.position;
+
+                    // Update oxygen text
+                    if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
+                        auto& text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
+                        text.text = std::to_string(static_cast<int>(current_oxygen_level)) + "%";
+                    }
                 }
 
-                // Position panic meter (bottom meter)
+                // Position panic meter and fill (bottom meter)
                 if (panic_meter_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(panic_meter_id)) {
+                    ECSM.has_component<Transform2D>(panic_meter_id) &&
+                    ECSM.has_component<Transform2D>(panic_meter_fill_id)) {
                     auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
+                    auto& panic_fill_transform = ECSM.get_component<Transform2D>(panic_meter_fill_id);
 
                     // Set position and scale for panic meter
                     panic_transform.position = {
                         base_position.x - 575.0f,          // Left of UI overlay
-                        base_position.y - METER_SPACING         // Below oxygen meter
+                        base_position.y - METER_SPACING    // Below oxygen meter
                     };
                     panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
                     panic_transform.prev_position = panic_transform.position;
+
+                    // Calculate the new width of the panic fill bar
+                    float new_width = METER_WIDTH * (current_panic_level / 100.0f);
+
+                    // Update fill position and scale
+                    panic_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+                    // Anchor to left side by offsetting position based on the current width
+                    panic_fill_transform.position = {
+                        panic_transform.position.x + 3.0f + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
+                        panic_transform.position.y
+                    };
+                    panic_fill_transform.prev_position = panic_fill_transform.position;
                 }
 
                 // Position panic text
@@ -358,7 +414,7 @@ namespace lof {
 
                     // Position text to the right of the mineral texture
                     mineral_count_text_transform.position = {
-                        (mineral_transform.position.x + (mineral_transform.scale.x * 2.0f)) ,  // Right of icon
+                        (mineral_transform.position.x + (mineral_transform.scale.x * 2.0f) - 20.0f) ,  // Right of icon
                         mineral_transform.position.y                        // Vertically centered with mineral icon
                     };
                     mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
@@ -376,20 +432,40 @@ namespace lof {
                     timer_icon_transform.prev_position = timer_icon_transform.position;
                 }
 
-                // Position timer count text
+                // ------------------------- TIMER UPDATE CHANGES -------------------------
+                // 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
+                static float timer_accumulator = 0.0f; // You can make this a class member if you like
+                timer_accumulator += delta_time;
+                if (timer_accumulator >= 1.0f) {
+                    timer_accumulator = 0.0f;
+
+                    // Only decrease if you haven't hit zero
+                    if (timer_remaining > 0) {
+                        timer_remaining -= 1;
+                    }
+                }
+
                 if (timer_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(timer_count_text_id) &&
-                    ECSM.has_component<Transform2D>(timer_icon_id)) {
+                    ECSM.has_component<Transform2D>(timer_icon_id))
+                {
                     auto& timer_count_text_transform = ECSM.get_component<Transform2D>(timer_count_text_id);
                     auto& timer_icon_transform = ECSM.get_component<Transform2D>(timer_icon_id);
 
-                    // Position text to the right of the timer 
+                    // Position the timer text
                     timer_count_text_transform.position = {
-                        (timer_icon_transform.position.x + (timer_icon_transform.scale.x * 1.5f)) ,  // Right of icon
-                        base_position.y - METER_SPACING / 2.0f                              // Vertically centered with mineral icon
+                        timer_icon_transform.position.x + (timer_icon_transform.scale.x * 1.5f), // Right of icon
+                        base_position.y - METER_SPACING / 2.0f                                   // Vertically centered
                     };
                     timer_count_text_transform.prev_position = timer_count_text_transform.position;
+
+                    // If it has a Text_Component, update the visible text to show the integer countdown
+                    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
+                        timer_text_comp.text = std::to_string(timer_remaining);
+                    }
                 }
+                // ------------------------- END TIMER UPDATE CHANGES -------------------------
 
                 // Position goal text on the right side
                 if (goal_text_id != INVALID_ENTITY_ID &&
@@ -403,21 +479,42 @@ namespace lof {
                     goal_text_transform.prev_position = goal_text_transform.position;
                 }
 
-                // Position goal percentage count text
+                
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(goal_percentage_count_text_id) &&
-                    ECSM.has_component<Transform2D>(goal_text_id)) {
+                    ECSM.has_component<Text_Component>(goal_percentage_count_text_id)) {
+
+                    // Get the goal percentage transform
                     auto& goal_percentage_count_transform = ECSM.get_component<Transform2D>(goal_percentage_count_text_id);
                     auto& goal_text_transform = ECSM.get_component<Transform2D>(goal_text_id);
 
-                    // Position text to the right of the timer 
+                    // Position text
                     goal_percentage_count_transform.position = {
-                        goal_text_transform.position.x + 150.0f ,  // Right of icon
-                        goal_text_transform.position.y                              // Vertically centered with mineral icon
+                        goal_text_transform.position.x + 120.0f,  // Right of icon
+                        goal_text_transform.position.y           // Vertically centered with goal text
                     };
                     goal_percentage_count_transform.prev_position = goal_percentage_count_transform.position;
-                }
 
+                    // Update the text value based on mineral progress
+                    auto& text_comp = ECSM.get_component<Text_Component>(goal_percentage_count_text_id);
+
+                    // Find the GUI system to get the current stored mineral progress
+                    for (auto& system : ECSM.get_systems()) {
+                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                            if (gui_system->get_current_hopper_percentage() > 0.0f) {
+                                // Calculate and store the percentage in Game Manager
+                                float new_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
+                                GM.set_stored_goal_percentage(new_percentage);
+                            }
+
+                            // Use the stored percentage from Game Manager
+                            std::stringstream ss;
+                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(GM.get_stored_goal_percentage()) << "%";
+                            text_comp.text = ss.str();
+                            break;
+                        }
+                    }
+                }
             }
 
             //cheat code in mining
@@ -444,9 +541,251 @@ namespace lof {
                             return;
                         }
 
-                        auto& physics = ECSM.get_component<Physics_Component>(player_id);
+                        // Loop through the TNT to destroy and update it 
+                        for (auto start = tnt_to_destroy.begin(), end = tnt_to_destroy.end(); start != end;) {
 
+                            // Get current tnt ready and prep iterator for the next
+                            auto current = start++;
+
+                            // Retrieve TNT id
+                            EntityID tnt_id = ECSM.find_entity_by_name(current->first);
+                            if (tnt_id != INVALID_ENTITY_ID) {
+
+                                // Emit particles every 0.5s within 2s of fuse time
+                                auto& tnt_transform = ECSM.get_component<Transform2D>(tnt_id);
+                                auto& tnt_graphics = ECSM.get_component<Graphics_Component>(tnt_id);
+                                int time_fract = static_cast<int>(10.0f * (current->second - std::floorf(current->second)));
+                                if (time_fract % 6 == 2) {
+                                    // Emit fuse sparks particles
+                                    float part_x = tnt_transform.position.x - (tnt_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.x);
+                                    float part_y = tnt_transform.position.y - (tnt_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.y);
+                                    particle_system->particle_emit("TNT", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+
+                                    // Change TNT alpha
+                                    tnt_graphics.color.a = 0.5f;
+                                    tnt_transform.scale.x = 96.0f * 1.1f;
+                                    tnt_transform.scale.y = 96.0f * 1.1f;
+                                }
+                                else {
+                                    // Change TNT alpha
+                                    tnt_graphics.color.a = 1.0f;
+                                    tnt_transform.scale.x = 96.0f;
+                                    tnt_transform.scale.y = 96.0f;
+                                }
+                                current->second -= delta_time; // Decrement particle fuse time
+
+                                // Destroy itself and emit final particles when fuse time ends 
+                                if (current->second <= 0.0f) {
+
+                                    // Emit explosion particles in a circular pattern
+                                    for (int i = 0; i < 10; ++i) {
+                                        float angle = i * 36.0f * (PI_VALUE / 180.0f);
+                                        float part_x = tnt_transform.position.x + (cos(angle) * tnt_transform.scale.x / 10.0f);
+                                        float part_y = tnt_transform.position.y + (sin(angle) * tnt_transform.scale.y / 10.0f);
+
+                                        for (int j = 1; j <= 5; ++j) {
+                                            part_x = tnt_transform.position.x + j * (cos(angle) * tnt_transform.scale.x / 10.0f);
+                                            part_y = tnt_transform.position.y + j * (sin(angle) * tnt_transform.scale.y / 10.0f);
+                                            particle_system->particle_emit("TNT_Explode", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                        }
+                                    }
+
+                                    // Decide how many entities to check 
+                                    int preceding_check_cnt{ 21 }, following_check_cnt{ 21 };
+                                    preceding_check_cnt = tnt_id > 21 ? 21 : (tnt_id - 1);
+                                    following_check_cnt = (ECSM.get_entities().size() - tnt_id - 1) > 21 ? 21 : (ECSM.get_entities().size() - tnt_id - 1);
+
+                                    if (tnt_transform.position.x == -912.0f && preceding_check_cnt > 0) {
+                                        preceding_check_cnt--;
+                                    }
+                                    else if (tnt_transform.position.x == 912.0f && following_check_cnt > 0) {
+                                        following_check_cnt--;
+                                    }
+
+                                    // Calculate boundary around tnt to destroy tiles within  
+                                    float boundary_offset = tnt_transform.scale.x * 2.0f - 1.0f;
+                                    float boundary_left = tnt_transform.position.x - boundary_offset;
+                                    float boundary_right = tnt_transform.position.x + boundary_offset;
+                                    float boundary_top = tnt_transform.position.y + boundary_offset;
+                                    float boundary_bottom = tnt_transform.position.y - boundary_offset;
+
+                                    // Destroy tiles within boundary
+                                    if (following_check_cnt > 0) {
+                                        for (int i = 0; i < following_check_cnt; ++i) {
+
+                                            // Set entity id
+                                            EntityID entity_id = tnt_id + following_check_cnt - i;
+                                            auto& entity_transform = ECSM.get_component<Transform2D>(entity_id);
+                                            if (!ECSM.has_component<Animation_Component>(entity_id)) {
+                                                continue;
+                                            }
+                                            auto& entity_animation = ECSM.get_component<Animation_Component>(entity_id);
+
+                                            // Skip for these entities
+                                            if (entity_animation.animations["0"] == "vent_strip" || entity_animation.animations["0"] == "vent" ||
+                                                entity_animation.animations["0"] == "wormhole" || entity_animation.animations["0"] == "lava" ||
+                                                entity_animation.animations["0"] == "lava_animate") {
+                                                continue;
+                                            }
+
+                                            // Check if entity is inside boundary
+                                            if ((boundary_left <= entity_transform.position.x && entity_transform.position.x <= boundary_right) &&
+                                                (boundary_bottom <= entity_transform.position.y && entity_transform.position.y <= boundary_top)) {
+
+                                                // Check if it's TNT or minerals
+                                                if (entity_animation.animations["0"] != "TNT") {
+                                                    // Emit final particles before destroying tile
+                                                    for (int i = 0; i < 6; ++i) {
+                                                        // Randomize particle emit location within the tile
+                                                        float part_x = entity_transform.position.x - (entity_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.x);
+                                                        float part_y = entity_transform.position.y - (entity_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.y);
+                                                        particle_system->particle_emit(entity_animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                                    }
+
+                                                    // Destroy the entity
+                                                    ECSM.destroy_entity(entity_id);
+                                                    LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
+                                                }
+                                                else {
+
+                                                    // Set tnt health to 0
+                                                    entity_animation.curr_tile_health = 0;
+
+                                                    // Store name of TNT to destroy
+                                                    std::string name = ECSM.get_entity(entity_id)->get_name();
+                                                    tnt_to_destroy[name] = 2.0f;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (preceding_check_cnt > 0) {
+
+                                        int offset = 0;
+                                        for (int i = 1; i <= preceding_check_cnt; ++i) {
+
+                                            // Set entity id
+                                            EntityID entity_id = tnt_id - i + offset;
+                                            auto& entity_transform = ECSM.get_component<Transform2D>(entity_id);
+                                            if (!ECSM.has_component<Animation_Component>(entity_id)) {
+                                                continue;
+                                            }
+                                            auto& entity_animation = ECSM.get_component<Animation_Component>(entity_id);
+
+                                            // Skip for these entities
+                                            if (entity_animation.animations["0"] == "vent_strip" || entity_animation.animations["0"] == "vent" ||
+                                                entity_animation.animations["0"] == "wormhole" || entity_animation.animations["0"] == "lava" ||
+                                                entity_animation.animations["0"] == "lava_animate") {
+                                                continue;
+                                            }
+
+                                            // Check if entity is inside boundary
+                                            if ((boundary_left <= entity_transform.position.x && entity_transform.position.x <= boundary_right) &&
+                                                (boundary_bottom <= entity_transform.position.y && entity_transform.position.y <= boundary_top)) {
+
+                                                // Check if it's TNT or minerals
+                                                if (entity_animation.animations["0"] != "TNT") {
+
+                                                    // Increment offset and decrement tnt_id
+                                                    offset++;
+                                                    tnt_id--;
+
+                                                    // Emit final particles before destroying tile
+                                                    for (int i = 0; i < 6; ++i) {
+                                                        // Randomize particle emit location within the tile
+                                                        float part_x = entity_transform.position.x - (entity_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.x);
+                                                        float part_y = entity_transform.position.y - (entity_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.y);
+                                                        particle_system->particle_emit(entity_animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                                    }
+
+                                                    // Destroy the entity
+                                                    ECSM.destroy_entity(entity_id);
+                                                    LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
+                                                }
+                                                else {
+
+                                                    // Set tnt health to 0
+                                                    entity_animation.curr_tile_health = 0;
+
+                                                    // Store name of TNT to destroy
+                                                    std::string name = ECSM.get_entity(entity_id)->get_name();
+                                                    tnt_to_destroy[name] = 2.0f;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Check if player is within boundary
+                                    bool is_player_dead = false;
+                                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                                    if ((boundary_left <= player_transform.position.x && player_transform.position.x <= boundary_right) &&
+                                        (boundary_bottom <= player_transform.position.y && player_transform.position.y <= boundary_top)) {
+
+                                        // Reset player to starting point if within TNT blast boundary
+                                        is_player_dead = true;
+                                        std::string scene_file{ "scene2.scn" };
+                                        current_scene = 2;
+
+                                        // Create full path to the scene file
+                                        std::string scene_path = ASM.get_full_path("Scenes", scene_file);
+
+                                        // Try to load the new scene
+                                        if (SM.load_scene(scene_path.c_str())) {
+                                            LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
+
+                                            // Reset camera position only if not in main menu
+                                            auto& camera = GFXM.get_camera();
+                                            if (current_scene != 0) {
+                                                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                                                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+                                            }
+
+                                            // Stop all audio currently playing
+                                            ADM.stop_mastergroup();
+
+                                            // Reset player position only if in scene1 or scene2
+                                            if (current_scene != 0) {
+                                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                                if (playerId != INVALID_ENTITY_ID) {
+                                                    if (ECSM.has_component<Transform2D>(playerId)) {
+                                                        auto& transform = ECSM.get_component<Transform2D>(playerId);
+                                                        transform.position = Vec2D(0.0f, 0.0f);
+                                                        transform.prev_position = transform.position;
+                                                    }
+                                                    if (ECSM.has_component<Velocity_Component>(playerId)) {
+                                                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                                                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+
+                                            // Revert to main menu since load failed
+                                            current_scene = 0;
+                                        }
+
+                                    }
+
+                                    // Check if player is dead to reset the scene
+                                    if (is_player_dead == true) {
+                                        tnt_to_destroy.erase(current->first);
+                                        IMGUIM.set_current_file_shown("scene2.scn");
+                                        continue;
+                                    } else {
+                                        // Destroy tnt and remove it from the list of tnt to destroy
+                                        ECSM.destroy_entity(tnt_id);
+                                        tnt_to_destroy.erase(current->first);
+                                        LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
+                                    }
+                                }
+                            }
+                        }
+
+                        auto& physics = ECSM.get_component<Physics_Component>(player_id);
                         auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
+
                         if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
 
                             // Emit mining sparks particles
@@ -475,38 +814,50 @@ namespace lof {
                                     // Get block's position and size
                                     auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
 
-                                    // Emit particles, destroy the block and update mineral count when health reaches 0
-                                    if (animation.curr_tile_health != 0) {
-                                        // Randomize particle emit count
-                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
-                                        for (int i = 0; i < rand_part_cnt; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                    // Check if tile is not TNT
+                                    if (animation.animations["0"] != "TNT") {
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health != 0) {
+                                            // Randomize particle emit count
+                                            int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                            for (int i = 0; i < rand_part_cnt; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+                                        }
+                                        else {
+                                            // Get mineral value before destroying the entity
+                                            int mineral_value = get_mineral_value(block_to_remove);
+
+                                            // Update the mineral count text
+                                            if (mineral_value > 0) {
+                                                update_mineral_count_text(mineral_value);
+                                            }
+
+                                            // Emit final particles after destroying tile
+                                            for (int i = 0; i < 6; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+
+                                            // Destroy the entity
+                                            ECSM.destroy_entity(block_to_remove);
+                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                                block_to_remove, mineral_value);
                                         }
                                     }
-                                    else {
-                                        // Get mineral value before destroying the entity
-                                        int mineral_value = get_mineral_value(block_to_remove);
+                                    else { // TNT's logic
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health == 0 && animation.curr_frame_index != 1) {
 
-                                        // Update the mineral count text
-                                        if (mineral_value > 0) {
-                                            update_mineral_count_text(mineral_value);
+                                            // Store name of TNT to destroy
+                                            std::string name = ECSM.get_entity(block_to_remove)->get_name();
+                                            tnt_to_destroy[name] = 2.0f;
                                         }
-
-                                        // Emit final particles after destroying tile
-                                        for (int i = 0; i < 6; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                                        }
-
-                                        // Destroy the entity
-                                        ECSM.destroy_entity(block_to_remove);
-                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                            block_to_remove, mineral_value);
                                     }
 
                                     // Determine sound based on mineral value
@@ -544,38 +895,50 @@ namespace lof {
                                     // Get block's position and size
                                     auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
 
-                                    // Emit particles, destroy the block and update mineral count when health reaches 0
-                                    if (animation.curr_tile_health != 0) {
-                                        // Randomize particle emit count
-                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
-                                        for (int i = 0; i < rand_part_cnt; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                    // Check if tile is not TNT
+                                    if (animation.animations["0"] != "TNT") {
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health != 0) {
+                                            // Randomize particle emit count
+                                            int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                            for (int i = 0; i < rand_part_cnt; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+                                        }
+                                        else {
+                                            // Get mineral value before destroying the entity
+                                            int mineral_value = get_mineral_value(block_to_remove);
+
+                                            // Update the mineral count text
+                                            if (mineral_value > 0) {
+                                                update_mineral_count_text(mineral_value);
+                                            }
+
+                                            // Emit final particles after destroying tile
+                                            for (int i = 0; i < 6; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+
+                                            // Destroy the entity
+                                            ECSM.destroy_entity(block_to_remove);
+                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                                block_to_remove, mineral_value);
                                         }
                                     }
                                     else {
-                                        // Get mineral value before destroying the entity
-                                        int mineral_value = get_mineral_value(block_to_remove);
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health == 0 && animation.curr_frame_index != 1) {
 
-                                        // Update the mineral count text
-                                        if (mineral_value > 0) {
-                                            update_mineral_count_text(mineral_value);
+                                            // Store name of TNT to destroy
+                                            std::string name = ECSM.get_entity(block_to_remove)->get_name();
+                                            tnt_to_destroy[name] = 2.0f;
                                         }
-
-                                        // Emit final particles after destroying tile
-                                        for (int i = 0; i < 6; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                                        }
-
-                                        // Destroy the entity
-                                        ECSM.destroy_entity(block_to_remove);
-                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                            block_to_remove, mineral_value);
                                     }
 
                                     // Determine sound based on mineral value
@@ -612,38 +975,50 @@ namespace lof {
                                     // Get block's position and size
                                     auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
 
-                                    // Emit particles, destroy the block and update mineral count when health reaches 0
-                                    if (animation.curr_tile_health != 0) {
-                                        // Randomize particle emit count
-                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
-                                        for (int i = 0; i < rand_part_cnt; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                    // Check if tile is not TNT
+                                    if (animation.animations["0"] != "TNT") {
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health != 0) {
+                                            // Randomize particle emit count
+                                            int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                            for (int i = 0; i < rand_part_cnt; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+                                        }
+                                        else {
+                                            // Get mineral value before destroying the entity
+                                            int mineral_value = get_mineral_value(block_to_remove);
+
+                                            // Update the mineral count text
+                                            if (mineral_value > 0) {
+                                                update_mineral_count_text(mineral_value);
+                                            }
+
+                                            // Emit final particles after destroying tile
+                                            for (int i = 0; i < 6; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+
+                                            // Destroy the entity
+                                            ECSM.destroy_entity(block_to_remove);
+                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                                block_to_remove, mineral_value);
                                         }
                                     }
                                     else {
-                                        // Get mineral value before destroying the entity
-                                        int mineral_value = get_mineral_value(block_to_remove);
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health == 0 && animation.curr_frame_index != 1) {
 
-                                        // Update the mineral count text
-                                        if (mineral_value > 0) {
-                                            update_mineral_count_text(mineral_value);
+                                            // Store name of TNT to destroy
+                                            std::string name = ECSM.get_entity(block_to_remove)->get_name();
+                                            tnt_to_destroy[name] = 2.0f;
                                         }
-
-                                        // Emit final particles after destroying tile
-                                        for (int i = 0; i < 6; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                                        }
-
-                                        // Destroy the entity
-                                        ECSM.destroy_entity(block_to_remove);
-                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                            block_to_remove, mineral_value);
                                     }
 
                                     // Determine sound based on mineral value
@@ -680,38 +1055,50 @@ namespace lof {
                                     // Get block's position and size
                                     auto& block_transform = ECSM.get_component<Transform2D>(block_to_remove);
 
-                                    // Emit particles, destroy the block and update mineral count when health reaches 0
-                                    if (animation.curr_tile_health != 0) {
-                                        // Randomize particle emit count
-                                        int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
-                                        for (int i = 0; i < rand_part_cnt; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                    // Check if tile is not TNT
+                                    if (animation.animations["0"] != "TNT") {
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health != 0) {
+                                            // Randomize particle emit count
+                                            int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
+                                            for (int i = 0; i < rand_part_cnt; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+                                        }
+                                        else {
+                                            // Get mineral value before destroying the entity
+                                            int mineral_value = get_mineral_value(block_to_remove);
+
+                                            // Update the mineral count text
+                                            if (mineral_value > 0) {
+                                                update_mineral_count_text(mineral_value);
+                                            }
+
+                                            // Emit final particles after destroying tile
+                                            for (int i = 0; i < 6; ++i) {
+                                                // Randomize particle emit location within the tile
+                                                float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
+                                                float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
+                                                particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+
+                                            // Destroy the entity
+                                            ECSM.destroy_entity(block_to_remove);
+                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                                block_to_remove, mineral_value);
                                         }
                                     }
                                     else {
-                                        // Get mineral value before destroying the entity
-                                        int mineral_value = get_mineral_value(block_to_remove);
+                                        // Emit particles, destroy the block and update mineral count when health reaches 0
+                                        if (animation.curr_tile_health == 0 && animation.curr_frame_index != 1) {
 
-                                        // Update the mineral count text
-                                        if (mineral_value > 0) {
-                                            update_mineral_count_text(mineral_value);
+                                            // Store name of TNT to destroy
+                                            std::string name = ECSM.get_entity(block_to_remove)->get_name();
+                                            tnt_to_destroy[name] = 2.0f;
                                         }
-
-                                        // Emit final particles after destroying tile
-                                        for (int i = 0; i < 6; ++i) {
-                                            // Randomize particle emit location within the tile
-                                            float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
-                                            float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
-                                            particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                                        }
-
-                                        // Destroy the entity
-                                        ECSM.destroy_entity(block_to_remove);
-                                        LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                            block_to_remove, mineral_value);
                                     }
 
                                     // Determine sound based on mineral value
@@ -908,14 +1295,16 @@ namespace lof {
                         if (forces_flag != -1) {
                             if (physics.get_is_grounded()) {
                                 if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-                                    if (current_scene == 1) {
+                                    /*if (current_scene == 1) {
                                         std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
                                         ADM.play_now(player_id, audio_key, audio_player);
                                     }
                                     else if (current_scene == 2) {
                                         ADM.play_now(player_id, "moving", audio_player);
-                                    }
+                                    }*/
 
+
+                                    ADM.play_now(player_id, "moving", audio_player);
                                     // Emit walking dirt particles
                                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                                     float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
@@ -942,7 +1331,7 @@ namespace lof {
                 }
             }
         }
-
+        // == End PLAYER CODE PORTION ==
 
 #if _DEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
@@ -1164,8 +1553,16 @@ namespace lof {
         if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
             LM.write_log("Game_Manager::update(): Toggling between scenes");
 
-            // Toggle between scenes
-            current_scene = (current_scene == 1) ? 2 : 1;
+            // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
+            if (current_scene == 0) {
+                current_scene = 1; // Switch to scene1
+            }
+            else if (current_scene == 1) {
+                current_scene = 2; // Switch to scene2
+            }
+            else {
+                current_scene = 0; // Switch back to main_menu
+            }
 
             for (auto& system : ECSM.get_systems()) {
                 if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
@@ -1174,47 +1571,68 @@ namespace lof {
                 }
             }
 
-            // Create full path to the scene file
+            // Define scene file names
             const std::string SCENES = "Scenes";
-            std::string scene_path = ASM.get_full_path(SCENES, "scene" + std::to_string(current_scene) + ".scn");
+            std::string scene_file;
+
+            if (current_scene == 0) {
+                scene_file = "main_menu.scn";
+            }
+            else {
+                scene_file = "scene" + std::to_string(current_scene) + ".scn";
+            }
+
+            // Create full path to the scene file
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
             // Try to load the new scene
             if (SM.load_scene(scene_path.c_str())) {
-                LM.write_log("Game_Manager::update(): Successfully loaded scene%d: %s", current_scene, scene_path.c_str());
+                LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
 
-                // Reset camera position
+                // Reset camera position only if not in main menu
                 auto& camera = GFXM.get_camera();
-                camera.pos_x = DEFAULT_CAMERA_POS_X;
-                camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                // Stop all the audio that is currently playing
-                ADM.stop_mastergroup();
-
-                // Reset player position if exists
-                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (playerId != INVALID_ENTITY_ID) {
-                    if (ECSM.has_component<Transform2D>(playerId)) {
-                        auto& transform = ECSM.get_component<Transform2D>(playerId);
-                        transform.position = Vec2D(0.0f, 0.0f);
-                        transform.prev_position = transform.position;
-                    }
-                    if (ECSM.has_component<Velocity_Component>(player_id)) {
-                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                        velocity.velocity = Vec2D(0.0f, 0.0f);
-                    }
+                if (current_scene != 0) {
+                    camera.pos_x = DEFAULT_CAMERA_POS_X;
+                    camera.pos_y = DEFAULT_CAMERA_POS_Y;
                 }
 
-               
+                // Stop all audio currently playing
+                ADM.stop_mastergroup();
+
+                // Reset player position only if in scene1 or scene2
+                if (current_scene != 0) {
+                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                    if (playerId != INVALID_ENTITY_ID) {
+                        if (ECSM.has_component<Transform2D>(playerId)) {
+                            auto& transform = ECSM.get_component<Transform2D>(playerId);
+                            transform.position = Vec2D(0.0f, 0.0f);
+                            transform.prev_position = transform.position;
+                        }
+                        if (ECSM.has_component<Velocity_Component>(playerId)) {
+                            auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                            velocity.velocity = Vec2D(0.0f, 0.0f);
+                        }
+                    }
+                }
             }
             else {
-                LM.write_log("Game_Manager::update(): Failed to load scene%d: %s", current_scene, scene_path.c_str());
-                // Revert the scene number since load failed
-                current_scene = (current_scene == 1) ? 2 : 1;
+                LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+
+                // Revert scene number since load failed
+                if (current_scene == 0) {
+                    current_scene = 2;
+                }
+                else if (current_scene == 1) {
+                    current_scene = 0;
+                }
+                else {
+                    current_scene = 1;
+                }
             }
 
-            std::string get_file_name = "scene" + std::to_string(current_scene) + ".scn";
-            IMGUIM.set_current_file_shown(get_file_name);
+            IMGUIM.set_current_file_shown(scene_file);
         }
+
 
         // Getting delta time for Input Manager
         //IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -1317,9 +1735,13 @@ namespace lof {
             // Convert current text to integer, add new value
             int current_value = std::stoi(text_comp.text);
             current_value += value_to_add;
-            // Convert back to string and update text
-            text_comp.text = std::to_string(current_value);
-            LM.write_log("Updated mineral count to: %d", current_value);
+
+            // Format the number with leading zeros (6 digits)
+            std::stringstream ss;
+            ss << std::setw(6) << std::setfill('0') << current_value;
+            text_comp.text = ss.str();
+
+            LM.write_log("Updated mineral count to: %06d", current_value);
         }
         catch (const std::exception& e) {
             LM.write_log("Error updating mineral count: %s", e.what());

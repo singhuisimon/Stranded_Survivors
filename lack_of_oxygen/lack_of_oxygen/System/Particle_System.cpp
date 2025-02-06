@@ -32,7 +32,7 @@ namespace lof {
 			2.0f,					// current size
 			2.0f,					// starting size
 			0.5f,					// speed
-			90.0f,					// direction
+			270.0f,					// direction
 			0.1f,					// lifespan
 			0.1f					// life left
 		};				
@@ -179,12 +179,12 @@ namespace lof {
 			Vec3D(),				// color
 			ParticleType::tnt,		// type
 			0,						// id
-			3.0f,					// current size
-			3.0f,					// starting size
+			4.0f,					// current size
+			4.0f,					// starting size
 			0.0f,					// speed
 			0.0f,					// direction
-			1.0f,					// lifespan
-			1.0f					// life left
+			0.5f,					// lifespan
+			0.5f					// life left
 		};
 		particle_base.emplace("TNT", tnt);
 
@@ -196,10 +196,10 @@ namespace lof {
 			0,							// id
 			1.0f,						// current size
 			1.0f,						// starting size
-			0.0f,						// speed
-			get_rand_float(),			// direction
-			1.0f,						// lifespan
-			1.0f						// life left
+			0.3f,						// speed
+			180.0f,						// direction
+			0.5f,						// lifespan
+			0.5f						// life left
 		};
 		particle_base.emplace("TNT_Explode", tnt_explode);
 
@@ -226,28 +226,21 @@ namespace lof {
 			}
 
 			// Decrease particle size by lifespan 
-			if (particles_storage[i].type != tnt_explode) {
-				particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
-			}
+			particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
 
 			// Update movement and direction
 			float angle{};
-			if (particles_storage[i].type != mining) {
-				angle = particles_storage[i].direction * (PI_VALUE / 180.0f);
-			} else {
+			if (particles_storage[i].type == mining || particles_storage[i].type == tnt_explode) {
 				angle = (particles_storage[i].direction * get_rand_float()) * (PI_VALUE / 180.0f);
+			} else {
+				angle = particles_storage[i].direction * (PI_VALUE / 180.0f);
 			}
-			particles_storage[i].position.x += static_cast<float>(cos(angle)) * particles_storage[i].speed;
-			particles_storage[i].position.y += static_cast<float>(sin(angle)) * particles_storage[i].speed;
 
-			/*
-				Some thing to update:
-					- All the minerals' particles (including dirt and rock) and TNT fuse 
-					will shrink in size according to it's life span (DONE)
-					- Mining particles have a random direction in 360 deg (DONE)
-					- TNT exploding particles have a random direction of emitting in straight lines
-
-			*/
+			// Ensure that particle is set to move
+			if (particles_storage[i].direction != 0.0f) {
+				particles_storage[i].position.x += (cos(angle) * particles_storage[i].speed);
+				particles_storage[i].position.y += (sin(angle) * particles_storage[i].speed);
+			}
 		}
 
 

@@ -220,7 +220,7 @@ namespace lof {
 					int get_current_loop_count;
 					existing_channel->getLoopCount(&get_current_loop_count);
 					existing_channel->setLoopCount(get_current_loop_count + 1);
-					LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
+					//LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
 					return;
 				}
 				else {
@@ -333,7 +333,7 @@ namespace lof {
 		}
 		else {
 			if (it1->second != file_path) {
-				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
+				//LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
 
 				std::string entityID = cskey.substr(file_path.length(), cskey.length() - file_path.length() - audio_key.length());
 
@@ -356,7 +356,7 @@ namespace lof {
 
 			FMOD_RESULT result = core_system->playSound(sound, nullptr, false, &channel);
 			if (ADM.errorcheck(result) != 0 || !channel) {
-				LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
+				//LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 				return;
 			}
 
@@ -390,7 +390,7 @@ namespace lof {
 	void Audio_System::pause_resume_sound(const std::string& channel_key, bool pause) {
 		auto it = channel_map.find(channel_key);
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::pause_resume_sound: failed to pause/resume sound as sound isn't even playing in the channel.");
+			//LM.write_log("Audio_System::pause_resume_sound: failed to pause/resume sound as sound isn't even playing in the channel.");
 			return;
 		}
 
@@ -427,7 +427,7 @@ namespace lof {
 
 		for (FMOD::Channel* channel : channels) {
 			if (channel == nullptr) {
-				LM.write_log("Audio_System::stop_sound: failed to stop sound as %s is a nullptr.", channel_key.c_str());
+				//LM.write_log("Audio_System::stop_sound: failed to stop sound as %s is a nullptr.", channel_key.c_str());
 				return;
 			}
 
@@ -437,17 +437,15 @@ namespace lof {
 				ADM.errorcheck(channel->stop(), "Audio_System::stop_sound", "stop channel" + channel_key); //if the channel is playing stop it
 			}
 			else {
-				return;	//nothing to do as channel has already finish playing music
+				continue;	//nothing to do as channel has already finish playing music
 
 			}
-
-			channels.clear(); //clear the vector as no channels should remain after stopping
-
-			//technically once function reaches here it means all channel in the channel key data vector has been stopped
-			//so removal shouldn't cause an issues
-			channel_map.erase(channel_key);
-
 		}
+		channels.clear(); //clear the vector as no channels should remain after stopping
+
+		//technically once function reaches here it means all channel in the channel key data vector has been stopped
+		//so removal shouldn't cause an issues
+		channel_map.erase(channel_key);
 	}
 
 	void Audio_System::set_channel_pitch(const std::string& channel_key, float pitch) {

@@ -37,6 +37,20 @@ bool is_full_screen = true;
 GLFWmonitor* monitor = nullptr;
 const GLFWvidmode* mode = nullptr;
 
+
+void drop_callback(GLFWwindow* window, int count, const char** paths)
+{
+
+    for (int i = 0; i < count; ++i)
+    {
+        const char* filePath = paths[i];
+
+        printf("Dropped file: %s\n", filePath);
+        ASM.AddAsset(filePath);
+
+    }
+}
+
 int main(void) {
 
     // --------------------------- Initialization ---------------------------
@@ -81,7 +95,8 @@ int main(void) {
 
     
     // Create a fullscreen window
-    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
+    // Change to windowed mode window and its OpenGL context using NULL for fourth option
+    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", NULL, NULL);
     glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
 
     if (!window) {
@@ -94,6 +109,10 @@ int main(void) {
         LM.write_log("GLFW window created successfully with size %ux%u.", mode->width, mode->height);
         std::cout << "GLFW window created successfully with size 800x600." << std::endl;
     }
+
+    // register the drop call function 
+   
+    glfwSetDropCallback(window, drop_callback);
 
     // Make the window's context current
     glfwMakeContextCurrent(window);

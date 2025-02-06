@@ -213,6 +213,7 @@ namespace lof {
                     graphics_component.color.x = clr[0].GetFloat();
                     graphics_component.color.y = clr[1].GetFloat();
                     graphics_component.color.z = clr[2].GetFloat();
+                    graphics_component.color.w = clr[3].GetFloat();
                 }
 
                 if (component_data.HasMember("texture_name") && component_data["texture_name"].IsString()) {

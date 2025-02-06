@@ -14,6 +14,7 @@
 #include "Render_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
+#include "../Manager/Game_Manager.h"
 //#include "Collision_System.h"
 //#include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../Utility/globals.h"    // To access level_editor_mode
@@ -138,6 +139,25 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
+            int current_scene = GM.get_current_scene(); // Get the current scene number
+
+            if (camera.is_free_cam == GL_FALSE && current_scene != 1 && current_scene != 2) {
+
+                // Update world-to-camera view transformation matrix
+                camera.view_xform = glm::mat3{ 1, 0, 0,
+                                               0, 1, 0,
+                                               0, 0, 1 };
+
+                // Update window-to-NDC transformation matrix
+                camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                       0, 2.f / screen_height, 0,
+                                                       0, 0, 1 };
+
+                // Update world-to-NDC transformation matrix
+                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+            }
+
+
             // Compute object scale matrix
             // Special case for text objects
             float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
@@ -212,9 +232,9 @@ namespace lof {
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
         // Get models, textures, animation, and camera from the Graphics Manager
-        auto& models = GFXM.get_model_storage();
-        auto& textures = GFXM.get_texture_storage();
-        auto& animations = GFXM.get_animation_storage();
+        auto& models = GFXM.get_models();
+        auto& textures = ASM.get_texture_storage();
+        auto& animations = ASM.get_animation_storage();
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
@@ -223,29 +243,32 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Render only what is on the viewport
-            if (level_editor_mode == false) {
-                EntityID player_id = ECSM.find_entity_by_name("player1");
-                if (entity_id != 0 && entity_id != player_id) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+            //if (level_editor_mode == false) {
+            //    EntityID player_id = ECSM.find_entity_by_name("player1");
+            //    if (entity_id != 0 && entity_id != player_id) {
+            //        auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
 
-                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+            //        float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+            //        float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
-                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
-                        continue;
-                    }
-                }
-            }
+            //        if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+            //            continue;
+            //        }
+            //    }
+            //}
 
             // Get shader program
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
+            auto& models = GFXM.get_models();
+            auto& textures = ASM.get_texture_storage();
+            auto& animations = ASM.get_animation_storage();
 
             // Check for text objects to render 
             bool is_text = ECSM.has_component<Text_Component>(entity_id);
             if (is_text == true) {
 
                 auto& text_comp = ECSM.get_component<Text_Component>(entity_id);
-                auto& fonts = GFXM.get_font_storage();
+                auto& fonts = ASM.get_font_storage();
 
                 // Start the shader program used for text rendering
                 GFXM.program_use(shader->program_handle);
@@ -344,6 +367,7 @@ namespace lof {
             // Check if entity has a texture
             if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
 
+                ASM.track_entity_asset(entity_id, "Graphics_Component", graphics.texture_name);
                 // Look for texture in texture storage. If not found, load texture 
                 if (textures.find(graphics.texture_name) == textures.end()) {
                     GFXM.load_texture(graphics.texture_name);
@@ -437,7 +461,7 @@ namespace lof {
             // Pass object's color to fragment shader uniform variable uColor
             GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
             if (color_uniform_loc >= 0) {
-                glUniform3fv(color_uniform_loc, 1, &graphics.color[0]);
+                glUniform4fv(color_uniform_loc, 1, &graphics.color[0]);
             }
             else {
                 LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
@@ -485,9 +509,9 @@ namespace lof {
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
                         GLint debug_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
-                        glm::vec3 debug_color{ 0.0f, 0.0f, 0.0f };
+                        glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
                         if (debug_color_uniform_loc >= 0) {
-                            glUniform3fv(debug_color_uniform_loc, 1, &debug_color[0]);
+                            glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
                         }
                         else {
                             LM.write_log("Render_System::draw(): Debug color uniform variable doesn't exist.");
@@ -667,7 +691,7 @@ namespace lof {
                     // Set the texture for the type of particle
                     switch (particles_storage[i].type) {
                     case walking:
-                        particle_tex = "sparks_particle_batch_14";
+                        particle_tex = "dirt_particle_batch_14";
                         break;
                     case mining:
                         particle_tex = "sparks_particle_batch_14";

@@ -1,5 +1,5 @@
 /**
- * @file Globals.h
+ * @file type.h
  * @brief Contains all the extern declaration
  * @author Simon Chan (100%)
  * @date September 15, 2024

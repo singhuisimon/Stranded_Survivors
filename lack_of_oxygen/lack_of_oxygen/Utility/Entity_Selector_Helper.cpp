@@ -157,56 +157,53 @@ namespace lof
 
     Vec2D Entity_Selector_Helper::Get_World_MousePos()
     {
+        if (!window) return Vec2D(0.0f, 0.0f);
 
-        if (!window)
-        {
-            return Vec2D(0.0f, 0.0f);
-        }
-
-
-        double screen_width = SM.get_scr_width();
-        double screen_height = SM.get_scr_height(); //1020 /2
-        //std::cout << "scene width: " << SM.get_scr_width() << " scene height: " << SM.get_scr_height() << "\n";
-        // 1980 x 1020
-
-        
         double mouse_x, mouse_y;
         glfwGetCursorPos(window, &mouse_x, &mouse_y);
-        mouse_x -= (screen_width / 2);
-        mouse_y -= (screen_height / 2);
-        mouse_x = mouse_x;
-        mouse_y = mouse_y;
-        mouse_y = -mouse_y;
-   
-    
-        // Get camera position
+
+        // Apply same scaling as in Mouse_Over_AABB
+        float scaleX = static_cast<float>(WC.get_win_width()) / SM.get_scr_width();
+        float scaleY = static_cast<float>(WC.get_win_height()) / SM.get_scr_height();
+
+        mouse_x = mouse_x / scaleX;
+        mouse_y = mouse_y / scaleY;
+
+        // Center coordinates
+        mouse_x -= (SM.get_scr_width() / 2);
+        mouse_y -= (SM.get_scr_height() / 2);
+        mouse_y = -mouse_y;  // Flip Y coordinate
+
+        // Apply camera offset
         auto& camera = GFXM.get_camera();
+        mouse_x += camera.pos_x;
+        mouse_y += camera.pos_y;
 
-
-        // Convert screen coordinates to world coordinates by adding camera position
-        double world_x = mouse_x + camera.pos_x;
-        double world_y = mouse_y + camera.pos_y;
-        //std::cout << "cursor position x: " << world_x << " " << "cursor position y: " << world_y << "\n";
-        return Vec2D(static_cast<float>(world_x), static_cast<float>(world_y));
-
+        return Vec2D(static_cast<float>(mouse_x), static_cast<float>(mouse_y));
     }
 
 #if 1
     bool Entity_Selector_Helper::Mouse_Over_AABB(float box_x, float box_y, float width, float height, float mouseX, float mouseY)
     {
-        
-        unsigned int current_width =  WC.get_win_width();
-        unsigned int current_height = WC.get_win_height();
+        if (level_editor_mode) {
+            
+            return (mouseX > (box_x - width / 2.0f) && mouseX < (box_x + width / 2.0f) &&
+                mouseY >(box_y - height / 2.0f) && mouseY < (box_y + height / 2.0f));
+        }
+        else {
 
-        //printf("window width, height (%.f, %.f)\n", current_width, current_height);
-        float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
-        float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
+            unsigned int current_width = WC.get_win_width();
+            unsigned int current_height = WC.get_win_height();
 
-        float adjustX = (mouseX /scaleX);
-        float adjustY = (mouseY / scaleY);
+            float scaleX = static_cast<float>(current_width) / SM.get_scr_width();
+            float scaleY = static_cast<float>(current_height) / SM.get_scr_height();
 
-        return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
-            adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
+            float adjustX = (mouseX / scaleX);
+            float adjustY = (mouseY / scaleY);
+
+            return (adjustX > (box_x - width / 2.0f) && adjustX < (box_x + width / 2.0f) &&
+                adjustY >(box_y - height / 2.0f) && adjustY < (box_y + height / 2.0f));
+        }
     }
 #endif
 
