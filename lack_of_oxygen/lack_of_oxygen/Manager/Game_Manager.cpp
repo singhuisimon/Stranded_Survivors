@@ -17,6 +17,7 @@
 #include "FPS_Manager.h"
 #include "Serialization_Manager.h"
 #include "Input_Manager.h"
+#include "Logic_Manager.h"
 #include "Graphics_Manager.h"
 #include "Audio_Manager.h"
 
@@ -114,9 +115,9 @@ namespace lof {
         else {
             LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
-        // ---------------------------- Audio Manager Start Up ---------------------------
-        if (ADM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+        // -------------------------- Logic Manager Start Up --------------------------
+        if (LGM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() failed");
             IM.shut_down();
             FPSM.shut_down();
             SM.shut_down();
@@ -124,16 +125,31 @@ namespace lof {
             LM.shut_down();
             return -6;
         }
-        // -------------------------- Graphics Manager Start Up --------------------------
-        if (GFXM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
-            ADM.shut_down();
+        else {
+            LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() successful");
+        }
+        // ---------------------------- Audio Manager Start Up ---------------------------
+        if (ADM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+            LGM.shut_down();
             IM.shut_down();
             FPSM.shut_down();
             SM.shut_down();
             ECSM.shut_down();
             LM.shut_down();
             return -7;
+        }
+        // -------------------------- Graphics Manager Start Up --------------------------
+        if (GFXM.start_up() != 0) {
+            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
+            ADM.shut_down();
+            LGM.shut_down();
+            IM.shut_down();
+            FPSM.shut_down();
+            SM.shut_down();
+            ECSM.shut_down();
+            LM.shut_down();
+            return -8;
         }
         else {
             LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
@@ -154,6 +170,7 @@ namespace lof {
         // Shut down managers in reverse order of startup
         GFXM.shut_down(); // Graphics_Manager
         ADM.shut_down();  // Audio_Manager
+        LGM.shut_down();  // Logic_Manager
         IM.shut_down();   // Input_Manager
         FPSM.shut_down(); // FPS_Manager
         SM.shut_down();   // Serialization_Manager
@@ -895,7 +912,7 @@ namespace lof {
                                             }
                                         }
                                         else {
-                                            // Get mineral value before destroying the entity
+                                             //Get mineral value before destroying the entity
                                             int mineral_value = get_mineral_value(block_to_remove);
 
                                             // Update the mineral count text
@@ -1200,48 +1217,6 @@ namespace lof {
                             update_mineral_count_text(val_to_add);
                         }
 
-                        //just for testing
-                        /*if (IM.is_key_held(GLFW_KEY_F)) {
-                            int val_to_deduct = -20;
-                            if (std::stoi(ECSM.get_component<Text_Component>(mineral_count_text_id).text) >= -val_to_deduct) {
-                                update_mineral_count_text(val_to_deduct);
-                                ADM.play_now(player_id, "deposit mineral", audio_player);
-                            }
-                        }*/
-
-                        //just for testing
-                        //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
-                        /*if (IM.is_key_held(GLFW_KEY_T)) {
-                            int oxygen_to_add = 2;
-
-                            if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
-                                auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
-                                int current_value = std::stoi(oxygen_text.text);
-                                current_value += oxygen_to_add;
-                                oxygen_text.text = std::to_string(current_value);
-                                ADM.play_now(player_id, "refilling oxygen", audio_player);
-                            }
-                        }*/
-
-                        //just for testing
-                        //remember to remove the % inside the top_ui_oxygen_percentage_text entity for scene 1 & 2.
-                        /*if (IM.is_key_held(GLFW_KEY_Y)) {
-                            int oxygen_to_deduct = -1;
-                            if (ECSM.has_component<Text_Component>(oxygen_percentage_text_id)) {
-                                auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_percentage_text_id);
-                                if (std::stoi(oxygen_text.text) >= -oxygen_to_deduct) {
-                                    int current_value = std::stoi(oxygen_text.text);
-                                    current_value += oxygen_to_deduct;
-                                    oxygen_text.text = std::to_string(current_value);
-                                    ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
-                                }
-                            }
-                        }*/
-
-                        //just for testing
-                        /*if (IM.is_key_released(GLFW_KEY_F)) {
-                            ADM.stop_now(player_id, "deposit mineral", audio_player.get_filepath("deposit mineral"));
-                        }*/
 
                         //just for testing
                         //remember to remove the s inside the top_ui_timer_count_text for scene 1 & 2
@@ -1381,14 +1356,6 @@ namespace lof {
                         if (forces_flag != -1) {
                             if (physics.get_is_grounded()) {
                                 if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-                                    /*if (current_scene == 1) {
-                                        std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
-                                        ADM.play_now(player_id, audio_key, audio_player);
-                                    }
-                                    else if (current_scene == 2) {
-                                        ADM.play_now(player_id, "moving", audio_player);
-                                    }*/
-
 
                                     ADM.play_now(player_id, "moving", audio_player);
                                     // Emit walking dirt particles
@@ -1729,6 +1696,11 @@ namespace lof {
 
         auto end_time = std::chrono::steady_clock::now();
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
+
+        start_time = std::chrono::steady_clock::now();
+        LGM.update(delta_time);
+        end_time = std::chrono::steady_clock::now();
+        LGM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         //No Graphics Manager Update
         //// Getting delta time for Graphics Manager

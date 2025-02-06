@@ -1,4 +1,13 @@
-#pragma once
+/**
+ * @file Audio_Manager.h
+ * @brief Defines the Audio Manager class.
+ * @author Amanda Leow Boon Suan (100%)
+ * @date January 15, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 
 #ifndef LOF_AUDIO_MANAGER_H

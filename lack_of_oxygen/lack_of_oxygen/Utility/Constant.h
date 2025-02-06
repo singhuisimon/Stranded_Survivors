@@ -98,13 +98,13 @@ namespace lof {
 		NIL = 3
 	};
 
-	/*enum PlayState {
-		PLAYING = 0,    ///<Audio is to be played
-		STOPPED = 1,    ///<Audio is to be stopped
-		PAUSED = 2,     ///<Audio is to be paused
-		RESUMED = 3,	///<Audio is to be resumed
-		NONE = 4		///<Audio is not played at all nor need to stop
-	};*/
+	enum class ExecutionState { 
+		Uninitialized, 
+		Running, 
+		Paused, 
+		Completed, 
+		Terminated 
+	};
 
 	// ------------------------- Audio_Manager.cpp constants ---------------------------
 	enum GroupType {
@@ -123,7 +123,7 @@ namespace lof {
 	// ------------------------- Movement_System.cpp constants ------------------------- 
 
 	constexpr float DEFAULT_SPEED = 400.0f;
-	constexpr float GRAVITY_ACCELERATOR = 1.5f;
+	constexpr float GRAVITY_ACCELERATOR = 1.2f;
 	constexpr size_t MAX_DYNAMIC_ENTITIES = 20; 
 
 	// ------------------------------ Graphics_Manager.cpp -----------------------------
@@ -182,6 +182,12 @@ namespace lof {
 	constexpr unsigned int	COLLISION_RIGHT = 0x00000002;	//0010
 	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
 	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
+
+	// ------------------------------- Logic_System.cpp -----------------------------------
+
+	enum class LogicSystemType {
+		OBJECT_MOVEMENT,
+	};
 
 	// -------------------------- Common variables used in Systems -----------------------------------
 	constexpr char const* DEFAULT_PLAYER_NAME = "player1";

@@ -47,4 +47,5 @@
 #include "../IMGUI/imgui_impl_opengl3.h"
 
 extern GLFWwindow* window;
+//extern float delta_time;
 #endif // LOF_MAIN_H

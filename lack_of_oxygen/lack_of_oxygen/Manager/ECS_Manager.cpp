@@ -376,7 +376,7 @@ namespace lof {
                 //system that use time in the update
                 if(system->get_type() == "Movement_System" ||
                     system->get_type() == "Collision_System" || 
-                    system->get_type() == "Logic_System" || 
+                    //system->get_type() == "Logic_System" || 
                     system->get_type() == "Animation_System" ||
                     system->get_type() == "Render_System" ) {
 
