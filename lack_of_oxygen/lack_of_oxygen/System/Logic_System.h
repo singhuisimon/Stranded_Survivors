@@ -1,7 +1,7 @@
 /**
  * @file Logic_System.h
  * @brief Defines the declaration for logic systems.
- * @author Simon Chan (100%)
+ * @author Simon Chan (50%), Amanda Leow Boon Suan (50%)
  * @date November 07, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -19,7 +19,6 @@
 #include "../Utility/Constant.h"
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
-#include "../Component/Logic_Components.h"
 
 #define LGS lof::Logic_System::get_instance()
 

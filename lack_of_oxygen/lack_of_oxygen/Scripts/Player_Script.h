@@ -1,9 +1,19 @@
+/**
+ * @file Player_Scrupt.h
+ * @brief Define the player script class.
+ * @author Amanda Leow Boon Suan (100%)
+ * @date January 15, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 #ifndef LOF_PLAYER_SCRIPT_H
 #define LOF_PLAYER_SCRIPT_H
 
 #include "../Scripts/Script.h"
-#include "../Component/Logic_Components.h"
+#include "../Component/Component.h"
 
 namespace lof {
 

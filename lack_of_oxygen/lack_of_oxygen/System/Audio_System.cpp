@@ -151,14 +151,7 @@ namespace lof {
 			}
 		}
 
-		
-
 		core_system->update();
-
-		//to be implemented later
-		// 
-		// things to consider
-		// seek help from prof elie if can't solve by today.
 
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
 		//get_active_channels();
@@ -244,27 +237,6 @@ namespace lof {
 			channels.erase(channels.begin());
 		}
 
-		if (audio.get_is3d(audio_key)) {
-			FMOD_MODE mode;
-			sound->getMode(&mode);
-			LM.write_log("mode currently is initially: %s", ADM.modeToString(mode).c_str());
-			// Desired mode should have FMOD_3D and FMOD_3D_INVERSEROLLOFF flags
-			//FMOD_MODE desiredMode = FMOD_DEFAULT | FMOD_3D | FMOD_3D_INVERSEROLLOFF;
-
-			//// Check if the 3D flag is set (ignore other flags for now)
-			//if (!(mode & FMOD_3D)) {
-			//	LM.write_log("Setting mode to 3D (with inverse rolloff)...");
-			//	sound->setMode(desiredMode);
-			//}
-			//else {
-			//	LM.write_log("Mode is already 3D: %s", ADM.modeToString(mode).c_str());
-			//}
-
-			//// Verify that the mode is set correctly after applying
-			//sound->getMode(&mode);
-			//LM.write_log("Mode after setting: %s", ADM.modeToString(mode).c_str());
-		}
-
 		FMOD::Channel* channel = nullptr;
 
 		FMOD_RESULT result = core_system->playSound(sound, nullptr, false, &channel);
@@ -301,7 +273,7 @@ namespace lof {
 		channel->setPitch(audio.get_pitch(audio_key));
 		channel->setVolume(audio.get_volume(audio_key));
 
-		LM.write_log("Audio_System::play_sound: sound %s is playing ", cskey.c_str());
+		//LM.write_log("Audio_System::play_sound: sound %s is playing ", cskey.c_str());
 	}
 
 	void Audio_System::play_bgm_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio) {

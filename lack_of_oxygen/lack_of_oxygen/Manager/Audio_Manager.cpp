@@ -1,3 +1,13 @@
+/**
+ * @file Audio_Manager.h
+ * @brief Declare the Audio Manager class and its member functions
+ * @author Amanda Leow Boon Suan (100%)
+ * @date January 15, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include "Audio_Manager.h"
 #include "Assets_Manager.h"
 
@@ -207,7 +217,7 @@ namespace lof {
 					audio_system->play_bgm_sound(file_path, channel_key, audio_key, audio_component);
 				}
 				
-				LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
 				break; //need not update other system just skip to the next command. can choose to return instead if needed
 			}
 			else {

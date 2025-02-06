@@ -19,7 +19,6 @@
 
 // Include component headers
 #include "../Component/Component.h"
-#include "../Component/Logic_Components.h"
 
 // Include RapidJSON headers
 #include "rapidjson/document.h"

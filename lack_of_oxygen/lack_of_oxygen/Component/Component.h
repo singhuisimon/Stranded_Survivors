@@ -679,6 +679,129 @@ namespace lof {
             font_name(name), text(text), color(color), scale(scale) {}
     };
 
+    using ScriptData = std::unordered_map<std::string, std::variant<int, float, std::string, bool, Vec2D>>;
+
+    class Logic_Component : public Component {
+    public:
+
+        struct LogicData {
+            std::string script_name;
+            std::string init_func;
+            std::string update_func;
+            std::string end_func;
+            ScriptData script_data;
+            ExecutionState state;
+            bool is_active;
+
+            LogicData(const std::string& name, const std::string& init, const std::string& update,
+                const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true)
+                : script_name(name), init_func(init), update_func(update),
+                end_func(end), script_data(data), is_active(active), state(set_state) {
+            }
+        };
+
+        std::vector<std::shared_ptr<LogicData>> logic_datas;
+
+        Logic_Component() = default;
+
+        ~Logic_Component() {
+            logic_datas.clear();
+            //LM.write_log("Logic_Component::clean up complete");
+        }
+
+        const std::vector<std::shared_ptr<LogicData>>& get_logic_datas() const { return logic_datas; }
+
+        void add_script(const std::string& name, const std::string& init, const std::string& update,
+            const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true) {
+            auto script = std::make_shared<LogicData>(name, init, update, end, data, set_state, active);
+
+            logic_datas.push_back(script);
+        }
+
+        std::shared_ptr<LogicData> find_logic_data(const std::string& script_name, const std::string& update_func) const {
+            auto it = std::find_if(logic_datas.begin(), logic_datas.end(),
+                [&](const std::shared_ptr<LogicData>& logic_data) {
+                    return logic_data->script_name == script_name &&
+                        logic_data->update_func == update_func;
+                });
+            return (it != logic_datas.end()) ? *it : nullptr;
+        }
+
+        // Getter and Setter for the script data
+        const ScriptData& get_script_data(const std::string& script_name, const std::string& update_func) const {
+            auto logic_data = find_logic_data(script_name, update_func);
+            if (logic_data) {
+                return logic_data->script_data;
+            }
+            throw std::runtime_error("Script not found");
+        }
+
+        template<typename T>
+        T get_script_individual_data(const ScriptData& script_data, const std::string& data_name) {
+            auto it = script_data.find(data_name);
+            if (it == script_data.end()) {
+                throw std::out_of_range("Key not found in ScriptData: " + data_name);
+            }
+            if (auto value = std::get_if<T>(&it->second)) {
+                return *value;
+            }
+            else {
+                throw std::bad_variant_access();
+            }
+        }
+
+        void set_script_data(const std::string& script_name, const std::string& update_func, const ScriptData& new_data) {
+            auto logic_data = find_logic_data(script_name, update_func);
+            if (logic_data) {
+                logic_data->script_data = new_data;
+            }
+            else {
+                throw std::runtime_error("Script not found");
+            }
+        }
+
+        void set_active(const std::string& script_name, const std::string& update_func, bool active) {
+            for (auto& logic_data : logic_datas) {
+                if (logic_data->script_name == script_name && logic_data->update_func == update_func) {
+                    logic_data->is_active = active;
+                    return;
+                }
+            }
+
+            throw std::runtime_error("Script instance not found: " + script_name + "( " + update_func + ")");
+        }
+
+        void remove_script(const std::string& script_name, const std::string& update_func) {
+            auto it = std::remove_if(logic_datas.begin(), logic_datas.end(),
+                [&](const std::shared_ptr<LogicData>& logic_data) {
+                    return logic_data->script_name == script_name &&
+                        logic_data->update_func == update_func;
+                });
+            if (it != logic_datas.end()) {
+                logic_datas.erase(it, logic_datas.end());
+            }
+        }
+
+        ExecutionState get_state(const std::string& script_name, const std::string& update_func) const {
+            for (auto& logic_data : logic_datas) {
+                if (logic_data->script_name == script_name && logic_data->update_func == update_func) {
+                    return logic_data->state;
+                }
+            }
+            return ExecutionState::Terminated;
+        }
+
+        void set_state(const std::string& script_name, const std::string& update_func, ExecutionState new_state) {
+            for (auto& logic_data : logic_datas) {
+                if (logic_data->script_name == script_name && logic_data->update_func == update_func) {
+                    logic_data->state = new_state;
+                    return;
+                }
+            }
+        }
+
+    };
+
 } // namespace lof
 
 #endif // LOF_COMPONENT_H

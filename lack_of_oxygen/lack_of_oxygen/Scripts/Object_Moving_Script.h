@@ -1,7 +1,7 @@
 /**
  * @file Object_Moving_Script.h
- * @brief Declare gameplay logic function for object moving.
- * @author Simon Chan (100%), Amanda Leow Boon Suan
+ * @brief Define the object moving script class.
+ * @author Amanda Leow Boon Suan (80%), Simon Chan (20%)
  * @date February 2, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -14,7 +14,7 @@
 
 #include <unordered_map>
 #include "../Scripts/Script.h"
-#include "../Component/Logic_Components.h"
+#include "../Component/Component.h"
 
 namespace lof {
 	class Object_Moving_Script : public Script {

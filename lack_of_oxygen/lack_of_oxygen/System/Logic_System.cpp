@@ -1,7 +1,7 @@
 /**
  * @file Logic_System.cpp
  * @brief Defines the definition for Logic systems.
- * @author Simon Chan (100%)
+ * @author Amanda Leow Boon Suan (80%), Simon Chan (5%), Wai Lwin Thit (5%)
  * @date November 07, 2024
  * Copyright (C) 2024 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -44,9 +44,6 @@ namespace lof {
 
     Logic_System::~Logic_System() {
 
-		//remove_script("player_script");
-		//remove_script("object_moving_script");
-
         // Clean up
         cleanup();
 
@@ -86,7 +83,7 @@ namespace lof {
                 //LM.write_log("Logic_System::update_script, entity %u has no logic component", entityid);
                 continue;
             }
-            LM.write_log("Logic_System::update_script, entity %u has logic component", entityid);
+            //LM.write_log("Logic_System::update_script, entity %u has logic component", entityid);
 
             Logic_Component& logic = ECSM.get_component<Logic_Component>(entityid);
 
@@ -112,7 +109,7 @@ namespace lof {
                     }
                     init_func(entityid);
                     logic_data->state = ExecutionState::Running;
-                    LM.write_log("Logic_System::update_script initializing script");
+                    //LM.write_log("Logic_System::update_script initializing script");
                 }
                 else if (logic_data->state == ExecutionState::Running) {
                     auto update_func = script->get_function(logic_data->update_func);
@@ -120,15 +117,15 @@ namespace lof {
                         return;
                     }
                     update_func(entityid);
-                    LM.write_log("Logic_System::update_script updating script");
+                    //LM.write_log("Logic_System::update_script updating script");
 					if (GM.get_game_over()) {
 						logic_data->state = ExecutionState::Terminated;
 					}
                 }
                 else if (logic_data->state == ExecutionState::Completed) {
-                    LM.write_log("Logic_System::update_script completed script");
-                    //logic_data->is_active = false; //maybe add a check on
+                    //LM.write_log("Logic_System::update_script completed script");
                     //if state == completed & still active change to running or waiting?
+                    //add condition TODO IN M5
                 }
 
                 if (logic_data->state == ExecutionState::Terminated) {
@@ -137,6 +134,7 @@ namespace lof {
                         return;
                     }
                     end_func(entityid);
+                    logic_data->is_active = false;
                     LM.write_log("Logic_System::update_script completed script");
                 }
             }
@@ -174,67 +172,4 @@ namespace lof {
 		}
 	}
 
-    //Logic_System::~Logic_System() {
-    //    // Clean up
-    //    for (auto& [name, script] : script_map) {
-    //        delete script;  // Make sure to delete dynamically allocated scripts
-    //    }
-    //}
-
-            // First frame debugging
-            //if (first_frame) {
-            //    LM.write_log("Entity [%d] '%s' - Pattern: %d, Active: %d",
-            //        entity_id,
-            //        entity->get_name().c_str(),
-            //        static_cast<int>(logic.movement_pattern),
-            //        logic.is_active);
-            //}
-
-            //// Store origin position if not set
-            //if (length_vec2d(logic.origin_pos) == 0) {
-            //    logic.origin_pos = transform.position;
-            //    LM.write_log("Set origin for entity [%d] '%s' to (%.2f, %.2f)",
-            //        entity_id,
-            //        entity->get_name().c_str(),
-            //        logic.origin_pos.x,
-            //        logic.origin_pos.y);
-            //}
-
-            //if (logic.is_active && !level_editor_mode) {
-            //    logic.timer += delta_time;
-
-            //    // Debug every second
-            //    static float debug_timer = 0.0f;
-            //    debug_timer += delta_time;
-            //    if (debug_timer >= 1.0f) {
-            //        LM.write_log("Entity [%d] '%s' - Pattern: %d, Timer: %.2f, Pos: (%.2f, %.2f)",
-            //            entity_id,
-            //            entity->get_name().c_str(),
-            //            static_cast<int>(logic.movement_pattern),
-            //            logic.timer,
-            //            transform.position.x,
-            //            transform.position.y);
-            //        debug_timer = 0.0f;
-            //    }
-
-                //update_movement(logic, transform, delta_time);
-
-                //switch (logic.movement_pattern) {
-                //case Logic_Component::MovementPattern::LINEAR:
-                //    //update_linear_movement(logic, transform, delta_time);
-                //    break;
-
-                //case Logic_Component::MovementPattern::CIRCULAR:
-                //    //update_circular_movement(logic, transform, delta_time);
-                //    break;
-
-                //default:
-                //    LM.write_log("WARNING: Unknown movement pattern %d for entity [%d] '%s'",
-                //        static_cast<int>(logic.movement_pattern),
-                //        entity_id,
-                //        entity->get_name().c_str());
-                //    break;
-                //}
-            //}
-        //}
 }
