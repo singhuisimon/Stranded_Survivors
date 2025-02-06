@@ -561,18 +561,36 @@ namespace lof {
                                     float part_y = tnt_transform.position.y - (tnt_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.y);
                                     particle_system->particle_emit("TNT", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
 
-                                    // Change TNT alpha
-                                    tnt_graphics.color.a = 0.5f;
-                                    tnt_transform.scale.x = 96.0f * 1.1f;
-                                    tnt_transform.scale.y = 96.0f * 1.1f;
+                                    //// Change TNT alpha
+                                    //tnt_graphics.color.a = 0.5f;
+                                    //tnt_transform.scale.x = 96.0f * 1.1f;
+                                    //tnt_transform.scale.y = 96.0f * 1.1f;
                                 }
                                 else {
-                                    // Change TNT alpha
-                                    tnt_graphics.color.a = 1.0f;
-                                    tnt_transform.scale.x = 96.0f;
-                                    tnt_transform.scale.y = 96.0f;
+                                    //// Change TNT alpha
+                                    //tnt_graphics.color.a = 1.0f;
+                                    //tnt_transform.scale.x = 96.0f;
+                                    //tnt_transform.scale.y = 96.0f;
                                 }
                                 current->second -= delta_time; // Decrement particle fuse time
+
+                                // Emit circular visual effect for tnt fuse
+                                float angle = (360.0f * current->second / 2.0f) * (PI_VALUE / 180.0f);
+                                for (int i = 1; i <= 5; ++i) {
+
+                                    // Randomizer value
+                                    int randomizer = 4 + static_cast<int>(particle_system->get_rand_float() * 5.0f);
+
+                                    // lifetime of particle
+                                    float lifetime = current->second - 0.01f;
+                                    if (lifetime <= 0.0f) {
+                                        lifetime = 0.001f;
+                                    }
+
+                                    float part_x = tnt_transform.position.x + i * (cos(angle) * tnt_transform.scale.x / randomizer);
+                                    float part_y = tnt_transform.position.y + i * (sin(angle) * tnt_transform.scale.y / randomizer);
+                                    particle_system->particle_emit("TNT_VFX", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f), lifetime);
+                                }
 
                                 // Destroy itself and emit final particles when fuse time ends 
                                 if (current->second <= 0.0f) {
@@ -647,13 +665,15 @@ namespace lof {
                                                     LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
                                                 }
                                                 else {
+                                                    // Check if tnt is activated to prevent activation again
+                                                    if (entity_animation.curr_tile_health != 0) {
+                                                        // Set tnt health to 0
+                                                        entity_animation.curr_tile_health = 0;
 
-                                                    // Set tnt health to 0
-                                                    entity_animation.curr_tile_health = 0;
-
-                                                    // Store name of TNT to destroy
-                                                    std::string name = ECSM.get_entity(entity_id)->get_name();
-                                                    tnt_to_destroy[name] = 2.0f;
+                                                        // Store name of TNT to destroy
+                                                        std::string name = ECSM.get_entity(entity_id)->get_name();
+                                                        tnt_to_destroy[name] = 2.0f;
+                                                    }
                                                 }
                                             }
                                         }
@@ -703,13 +723,15 @@ namespace lof {
                                                     LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
                                                 }
                                                 else {
+                                                    // Check if tnt is activated to prevent activation again
+                                                    if (entity_animation.curr_tile_health != 0) {
+                                                        // Set tnt health to 0
+                                                        entity_animation.curr_tile_health = 0;
 
-                                                    // Set tnt health to 0
-                                                    entity_animation.curr_tile_health = 0;
-
-                                                    // Store name of TNT to destroy
-                                                    std::string name = ECSM.get_entity(entity_id)->get_name();
-                                                    tnt_to_destroy[name] = 2.0f;
+                                                        // Store name of TNT to destroy
+                                                        std::string name = ECSM.get_entity(entity_id)->get_name();
+                                                        tnt_to_destroy[name] = 2.0f;
+                                                    }
                                                 }
                                             }
                                         }
@@ -770,9 +792,9 @@ namespace lof {
 
                                     // Check if player is dead to reset the scene
                                     if (is_player_dead == true) {
-                                        tnt_to_destroy.erase(current->first);
+                                        tnt_to_destroy.clear();
                                         IMGUIM.set_current_file_shown("scene2.scn");
-                                        continue;
+                                        break;
                                     } else {
                                         // Destroy tnt and remove it from the list of tnt to destroy
                                         ECSM.destroy_entity(tnt_id);
