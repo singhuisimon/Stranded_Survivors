@@ -340,9 +340,9 @@ namespace lof {
     }
 
 
-    void Assets_Manager::store_font(const std::string& font_name, const Font& font) {
+    /*void Assets_Manager::store_font(const std::string& font_name, const Font& font) {
         font_storage[font_name] = font;
-    }
+    }*/
 
     // Read and store names of fonts 
     bool Assets_Manager::read_font_list(const std::string& file_name, std::vector<std::string>& out_font_names) {
@@ -424,7 +424,6 @@ namespace lof {
 
     void Assets_Manager::register_asset(const std::string& asset_name) {
         all_assets.emplace(asset_name);
-        //LM.write_log("Registered asset: %s", asset_name.c_str());
     }
 
     // to register new assets
@@ -432,7 +431,7 @@ namespace lof {
     {
         std::string asset_name = std::filesystem::path(file_path).stem().string();
         register_asset(asset_name);
-        LM.write_log("Registered new asset: %s", asset_name.c_str());
+        //LM.write_log("Registered new asset: %s", asset_name.c_str());
     }
 
     // to get the items in the texture folder
