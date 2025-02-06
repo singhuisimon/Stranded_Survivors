@@ -1124,24 +1124,14 @@ namespace lof {
                                 // Get current minerals from UI text
                                 int current_minerals = std::stoi(text_comp.text);
                                 
-                                //previous_minerals = current_minerals;
-                                //printf("previous minerals is %d\n", previous_minerals);
+                                
                                 printf("current minerals is %d\n", current_minerals);
 
                                 if (current_minerals >= 100) {
-                                    // Add current minerals to the total deposited minerals
-                                    //total_deposited_minerals += current_minerals;
-
-
-                                    //printf("total_deposited_minearals %d\n", total_deposited_minerals);
+                                    
                                     current_minerals -= 100;
 
-                                 /*   if (current_minerals --)
-                                    {
-                                        deposit_count++;
-                                        deposit_count_bool = true;
-                                        
-                                    }*/
+                            
                                     
                                     total_deposited_minerals += 100;
                                     //deposit_count_bool = true;
@@ -1152,8 +1142,7 @@ namespace lof {
                                     }
                                    
                                     
-                                    printf("deposit count %d\n", deposit_count);
-                                    //std::cout << "After deposit: text_comp.text = " << text_comp.text << ", current_minerals = " << current_minerals << std::endl;
+                                  
                                     // Calculate progress percentage based on total deposited minerals
                                     float current_percentage = total_deposited_minerals / 50000.0f;
                                     current_percentage = std::min(current_percentage, 100.0f);
@@ -1179,10 +1168,7 @@ namespace lof {
                     }
                    
                     
-                    //else if(IM.is_key_released(GLFW_KEY_E)){
-                    //    //std::cout << " stop pressing e" << std::endl;
-                    //    deposit = false;
-                    //}
+                  
 
                     EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                     if ((is_e_pressed || is_e_held) && deposit_count > 0)
@@ -1201,12 +1187,7 @@ namespace lof {
                 }
                 
                 
-                //if (!is_e_pressed && !is_e_held && was_depositing) {
-                //    // Stop the mineral deposit sound if needed
-                //    // ADM.stop_now(player_entity, deposit_mineral_sound, "sfx_mineral_deposit");
-                //    was_depositing = false;  // Reset flag
-                //}
-
+              
 
                 // Check oxygen tank collision
                 if (oxygen_tank_detected() != -1)
@@ -1263,7 +1244,7 @@ namespace lof {
                                 EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                                 ADM.play_now(playerId, "refilling oxygen", ECSM.get_component<Audio_Component>(playerId));
 							}
-                            else {
+                            else if (!increasing && !(e_press && e_last_frame)) {
                                 EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                                 ADM.stop_now(playerId, "refilling oxygen", "sfx_refilling_oxygen");
                             }
