@@ -1183,21 +1183,24 @@ namespace lof {
                     //    //std::cout << " stop pressing e" << std::endl;
                     //    deposit = false;
                     //}
+
+                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                    if ((is_e_pressed || is_e_held) && deposit_count > 0)
+                    {
+                        ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
+                        //deposit_count--;
+                    }
+                    else if (!(e_press && e_last_frame))
+                    {
+                        ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
+                    }
                 }
                 else {
                     gui_system->hide_mineral_tank_gui();
                     //deposit = false;
                 }
-                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if ( (is_e_pressed || is_e_held) && deposit_count > 0)
-                {
-                    ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
-                    //deposit_count--;
-                }
-                else if (!(e_press && e_last_frame))
-                {
-                    ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
-                }
+                
+                
                 //if (!is_e_pressed && !is_e_held && was_depositing) {
                 //    // Stop the mineral deposit sound if needed
                 //    // ADM.stop_now(player_entity, deposit_mineral_sound, "sfx_mineral_deposit");
@@ -1213,6 +1216,7 @@ namespace lof {
                     // If E is pressed or held
                     bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
                     bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+                    bool increasing = false;
 
                     if (is_e_pressed || is_e_held)
                     {
@@ -1230,8 +1234,17 @@ namespace lof {
                             float transfer = std::min(needed, shipOxy);
 
                             // Transfer
-                            playerOxy += transfer;  // player goes up
-                            shipOxy -= transfer;  // ship goes down
+                            //playerOxy += transfer;  // player goes up
+                            //shipOxy -= transfer;  // ship goes down
+                            
+                            if (transfer > 0) {
+                                playerOxy++; //player goes up
+								shipOxy--; // ship goes down
+                                increasing = true;
+                            }
+                            else {
+                                increasing = false;
+                            }
 
                             
 
@@ -1248,11 +1261,14 @@ namespace lof {
                             float usedFraction = (400.0f - shipOxy) / 400.0f;
                             gui_system->update_oxygen_progress2(usedFraction);
 
-                            if (playerOxy > previous_oxygen) {
+                            if (playerOxy > previous_oxygen && increasing) {
                                 EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                                 ADM.play_now(playerId, "refilling oxygen", ECSM.get_component<Audio_Component>(playerId));
+							}
+                            else {
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                ADM.stop_now(playerId, "refilling oxygen", "sfx_refilling_oxygen");
                             }
-
                         }
                     }
 
