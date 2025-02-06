@@ -62,7 +62,17 @@
           "sounds": [
             {
               "key": "button_hover",
-              "filepath": "Button_Hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
               "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 1.0,
@@ -121,7 +131,17 @@
           "sounds": [
             {
               "key": "button_hover",
-              "filepath": "Button_Hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
               "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 1.0,
@@ -180,7 +200,17 @@
           "sounds": [
             {
               "key": "button_hover",
-              "filepath": "Button_Hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
               "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 1.0,

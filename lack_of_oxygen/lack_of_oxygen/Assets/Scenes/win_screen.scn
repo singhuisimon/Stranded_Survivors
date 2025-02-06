@@ -57,6 +57,37 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "button_hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            }
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
         }
       }
     },
@@ -95,6 +126,37 @@
         },
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "button_hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            }
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
         }
       }
     }

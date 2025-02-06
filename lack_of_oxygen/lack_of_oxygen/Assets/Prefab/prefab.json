@@ -495,6 +495,38 @@
         "Velocity_Component": {
           "velocity": [ 0.0, 0.0 ]
         },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "TNT_Explosion_Sound",
+              "filepath": "sfx_tnt_fuse",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            },
+            {
+              "key": "TNT_Boom",
+              "filepath": "sfx_tnt_boom",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "is3d": false
+            }
+
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "min_distance": 1.0,
+          "max_distance": 100.0
+        },
         "Animation_Component": {
           "animations": [
             [
