@@ -287,7 +287,6 @@ namespace lof {
                 constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                constexpr float TEXT_OFFSET_Y = 10.0f;           // Vertical offset from the UI element
 
                 // Calculate base position for UI elements
                 Vec2D base_position{
@@ -574,7 +573,6 @@ namespace lof {
 
                                 // Emit particles every 0.5s within 2s of fuse time
                                 auto& tnt_transform = ECSM.get_component<Transform2D>(tnt_id);
-                                auto& tnt_graphics = ECSM.get_component<Graphics_Component>(tnt_id);
                                 int time_fract = static_cast<int>(10.0f * (current->second - std::floorf(current->second)));
                                 if (time_fract % 6 == 2) {
 
@@ -588,22 +586,11 @@ namespace lof {
                                     float part_x = tnt_transform.position.x - (tnt_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.x);
                                     float part_y = tnt_transform.position.y - (tnt_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.y);
                                     particle_system->particle_emit("TNT", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-
-                                    //// Change TNT alpha
-                                    //tnt_graphics.color.a = 0.5f;
-                                    //tnt_transform.scale.x = 96.0f * 1.1f;
-                                    //tnt_transform.scale.y = 96.0f * 1.1f;
-                                }
-                                else {
-                                    //// Change TNT alpha
-                                    //tnt_graphics.color.a = 1.0f;
-                                    //tnt_transform.scale.x = 96.0f;
-                                    //tnt_transform.scale.y = 96.0f;
                                 }
                                 current->second -= delta_time; // Decrement particle fuse time
 
                                 // Emit circular visual effect for tnt fuse
-                                float angle = (360.0f * current->second / 2.0f) * (PI_VALUE / 180.0f);
+                                float angle_fuse = (360.0f * current->second / 2.0f) * (PI_VALUE / 180.0f);
                                 for (int i = 1; i <= 5; ++i) {
 
                                     // Randomizer value
@@ -615,8 +602,8 @@ namespace lof {
                                         lifetime = 0.001f;
                                     }
 
-                                    float part_x = tnt_transform.position.x + i * (cos(angle) * tnt_transform.scale.x / randomizer);
-                                    float part_y = tnt_transform.position.y + i * (sin(angle) * tnt_transform.scale.y / randomizer);
+                                    float part_x = tnt_transform.position.x + i * (cos(angle_fuse) * tnt_transform.scale.x / randomizer);
+                                    float part_y = tnt_transform.position.y + i * (sin(angle_fuse) * tnt_transform.scale.y / randomizer);
                                     particle_system->particle_emit("TNT_VFX", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f), lifetime);
                                 }
 
@@ -644,7 +631,8 @@ namespace lof {
                                     // Decide how many entities to check 
                                     int preceding_check_cnt{ 21 }, following_check_cnt{ 21 };
                                     preceding_check_cnt = tnt_id > 21 ? 21 : (tnt_id - 1);
-                                    following_check_cnt = (ECSM.get_entities().size() - tnt_id - 1) > 21 ? 21 : (ECSM.get_entities().size() - tnt_id - 1);
+                                    following_check_cnt = (static_cast<int>(ECSM.get_entities().size()) - tnt_id - 1) > 21 ? 
+                                                            21 : (static_cast<int>(ECSM.get_entities().size()) - tnt_id - 1);
 
                                     if (tnt_transform.position.x == -912.0f && preceding_check_cnt > 0) {
                                         preceding_check_cnt--;
@@ -692,7 +680,7 @@ namespace lof {
                                                 // Check if it's TNT or minerals
                                                 if (entity_animation.animations["0"] != "TNT") {
                                                     // Emit final particles before destroying tile
-                                                    for (int i = 0; i < 6; ++i) {
+                                                    for (int j = 0; j < 6; ++j) {
                                                         // Randomize particle emit location within the tile
                                                         float part_x = entity_transform.position.x - (entity_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.x);
                                                         float part_y = entity_transform.position.y - (entity_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.y);
@@ -756,7 +744,7 @@ namespace lof {
                                                     tnt_id--;
 
                                                     // Emit final particles before destroying tile
-                                                    for (int i = 0; i < 6; ++i) {
+                                                    for (int j = 0; j < 6; ++j) {
                                                         // Randomize particle emit location within the tile
                                                         float part_x = entity_transform.position.x - (entity_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.x);
                                                         float part_y = entity_transform.position.y - (entity_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * entity_transform.scale.y);
@@ -789,8 +777,8 @@ namespace lof {
                                         (boundary_bottom <= player_transform.position.y && player_transform.position.y <= boundary_top)) {
 
                                         // Reset all GUI states first
-                                        for (auto& system : ECSM.get_systems()) {
-                                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                        for (auto& systems_gui : ECSM.get_systems()) {
+                                            if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
                                                 gui_system->reset_all_game_state();
                                                 LM.write_log("Game_Manager::update(): Reset GUI state after player death");
                                                 break;

@@ -231,10 +231,9 @@ namespace lof {
         // Get screen height
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
-        // Get models, textures, animation, and camera from the Graphics Manager
+        // Get models and textures
         auto& models = GFXM.get_models();
         auto& textures = ASM.get_texture_storage();
-        auto& animations = ASM.get_animation_storage();
 
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
@@ -243,25 +242,24 @@ namespace lof {
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Render only what is on the viewport
-            //if (level_editor_mode == false) {
-            //    EntityID player_id = ECSM.find_entity_by_name("player1");
-            //    if (entity_id != 0 && entity_id != player_id) {
-            //        auto& player_transform = ECSM.get_component<Transform2D>(player_id); 
+            int current_scene = GM.get_current_scene(); // Get the current scene number
+            auto& camera = GFXM.get_camera();
+            if (camera.is_free_cam == GL_FALSE && current_scene != 0 && current_scene != 1) {
+                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (entity_id != 0 && entity_id != player_id) {
+                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
 
-            //        float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-            //        float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
-            //        if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
-            //            continue;
-            //        }
-            //    }
-            //}
+                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+                        continue;
+                    }
+                }
+            }
 
             // Get shader program
             Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
-            auto& models = GFXM.get_models();
-            auto& textures = ASM.get_texture_storage();
-            auto& animations = ASM.get_animation_storage();
 
             // Check for text objects to render 
             bool is_text = ECSM.has_component<Text_Component>(entity_id);
@@ -405,6 +403,10 @@ namespace lof {
                 // If entity has animation that is not default, pass animation data to fragment shader
                 bool has_animation = ECSM.has_component<Animation_Component>(entity_id);
                 if (has_animation == true) {
+
+                    // Get animation storage
+                    auto& animations = ASM.get_animation_storage();
+
                     auto& animation = ECSM.get_component<Animation_Component>(entity_id);
                     std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
                     if ((curr_animation_name != DEFAULT_ANIMATION_NAME) && (animations.find(curr_animation_name) != animations.end())) {
@@ -503,9 +505,6 @@ namespace lof {
             if (entity_id != 0) { // Background object unaffected 
                 if (GFXM.get_debug_mode() == GL_TRUE) {
 
-                    // Get camera
-                    auto& camera = GFXM.get_camera();
-
                     // Check if entity has Velocity_Component and Collision_Component
                     bool has_velocity = ECSM.has_component<Velocity_Component>(entity_id);
                     bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
@@ -519,7 +518,7 @@ namespace lof {
                         GFXM.program_use(debug_shader->program_handle);
 
                         // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
-                        GLint debug_color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
+                        GLint debug_color_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uColor");
                         glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
                         if (debug_color_uniform_loc >= 0) {
                             glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
