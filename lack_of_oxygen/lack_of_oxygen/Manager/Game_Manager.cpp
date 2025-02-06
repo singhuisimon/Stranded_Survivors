@@ -649,6 +649,12 @@ namespace lof {
 
                                             // Set entity id
                                             EntityID entity_id = tnt_id + following_check_cnt - i;
+                                            
+                                            // Leave player to be checked last
+                                            if (entity_id == player_id) { 
+                                                continue;
+                                            }
+
                                             auto& entity_transform = ECSM.get_component<Transform2D>(entity_id);
                                             if (!ECSM.has_component<Animation_Component>(entity_id)) {
                                                 continue;
@@ -702,6 +708,12 @@ namespace lof {
 
                                             // Set entity id
                                             EntityID entity_id = tnt_id - i + offset;
+
+                                            // Leave player to be checked last
+                                            if (entity_id == player_id) { 
+                                                continue;
+                                            }
+
                                             auto& entity_transform = ECSM.get_component<Transform2D>(entity_id);
                                             if (!ECSM.has_component<Animation_Component>(entity_id)) {
                                                 continue;
@@ -758,6 +770,15 @@ namespace lof {
                                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                                     if ((boundary_left <= player_transform.position.x && player_transform.position.x <= boundary_right) &&
                                         (boundary_bottom <= player_transform.position.y && player_transform.position.y <= boundary_top)) {
+
+                                        // Reset all GUI states first
+                                        for (auto& system : ECSM.get_systems()) {
+                                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                                gui_system->reset_all_game_state();
+                                                LM.write_log("Game_Manager::update(): Reset GUI state after player death");
+                                                break;
+                                            }
+                                        }
 
                                         // Reset player to starting point if within TNT blast boundary
                                         is_player_dead = true;
