@@ -78,7 +78,7 @@ namespace lof {
 
         PointLine(const Vec2D& center, const Vec2D& edge); 
 
-        PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
+       // PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
     };
 
     // extern SelectedEntityInfo g_selected_Entity_Info;

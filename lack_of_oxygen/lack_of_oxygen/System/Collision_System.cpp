@@ -58,7 +58,7 @@ namespace lof {
 
     PointLine::PointLine(const Vec2D& center, const Vec2D& edge) 
         : center(center), edge(edge){}
-
+    /*
     //to be emerged from the player 
     PointLine PointLine::create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision) {
         Vec2D center {transform.position.x, transform.position.y};
@@ -80,6 +80,7 @@ namespace lof {
         }
        return PointLine(center, edge); 
     }
+    */
 
     Collision_System::Collision_System() {
         // Set the required components for this system
@@ -1503,7 +1504,7 @@ namespace lof {
     //bottom bouncy code but other sides work fine. ;-;
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         // Constants for collision response
-        const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
+        //const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
         const float MIN_PENETRATION = 0.001f; // Minimum penetration to respond to
         const float POSITION_CORRECTION = 1.0f; // Increased from 0.8f for more immediate correction
         const float CORRECTION_FACTOR = 0.15f;
@@ -1593,12 +1594,12 @@ namespace lof {
 
                 // Position correction for walls
                 if (collision.overlap.x > MIN_PENETRATION) {
-                    float correction = collision.overlap.x * POSITION_CORRECTION;
+                    float horizontal_correction = collision.overlap.x * POSITION_CORRECTION;
                     if (collision.side == CollisionSide::LEFT) {
-                        transform1.position.x += correction;
+                        transform1.position.x += horizontal_correction;
                     }
                     else {
-                        transform1.position.x -= correction;
+                        transform1.position.x -= horizontal_correction;
                     }
                 }
 
