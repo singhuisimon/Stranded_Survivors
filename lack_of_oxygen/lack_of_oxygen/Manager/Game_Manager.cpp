@@ -1223,7 +1223,7 @@ namespace lof {
 
 
                         // Get and set mining status for animation
-                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+                       /* if (IM.is_key_held(GLFW_KEY_LEFT)) {
                             auto& mining_status = GFXM.get_mining_status();
                             mining_status = MINE_LEFT;
                             int& direction = GFXM.get_player_direction();
@@ -1250,7 +1250,7 @@ namespace lof {
                         else {
                             auto& mining_status = GFXM.get_mining_status();
                             mining_status = NO_ACTION;
-                        }
+                        }*/
 
 
                     }
