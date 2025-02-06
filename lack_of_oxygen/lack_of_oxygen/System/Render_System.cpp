@@ -726,6 +726,9 @@ namespace lof {
                     case tnt_explode:
                         particle_tex = "sparks_particle_batch_14";
                         break;
+                    case tnt_vfx:
+                        particle_tex = "sparks_red_particle_batch_14";
+                        break;
                     }
 
                     // Look for texture in texture storage. If not found, load texture 
