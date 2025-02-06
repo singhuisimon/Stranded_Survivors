@@ -820,6 +820,8 @@ namespace lof {
 
 #endif
 
+
+#if 0
     EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
     EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
     EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
@@ -908,18 +910,34 @@ namespace lof {
                     // Try both pressed and held states
                     if (is_e_pressed || is_e_held) {
                         EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+                        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
                         if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
                             auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+                            auto& player_audio = ECSM.get_component<Audio_Component>(player_ID);
 
                             try {
                                 // Get current minerals from UI text
                                 int current_minerals = std::stoi(text_comp.text);
+                                //store the previous value of current minerals
+                                //int previous_minerals = current_minerals;
 
-                                if (current_minerals > 0) {
+                                // check if current minearal has decreased
+                                if (current_minerals > 0)
+                                {
+                                    if (is_e_pressed || is_e_held)
+                                    {
+                                        ADM.play_now(player_ID, "mineral deposit", player_audio);
+                                    }
+                                }
+                                //update previous minerals 
+                                //previous_minerals = current_minerals;
+                                if (current_minerals >=  100) {
                                     // Add current minerals to the total deposited minerals
-                                    total_deposited_minerals += current_minerals;
+                                    //total_deposited_minerals += current_minerals;
 
+                                    current_minerals -= 100;
+                                    total_deposited_minerals += 100;
                                     // Calculate progress percentage based on total deposited minerals
                                     float current_percentage = total_deposited_minerals / 50000.0f;
                                     current_percentage = std::min(current_percentage, 1.0f);
@@ -992,6 +1010,262 @@ namespace lof {
             }
         }
     }
+
+#endif 
+
+    EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
+    EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
+    EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
+    bool Collision_System::entites_detect = false;
+    int deposit_count = 0;
+    //bool deposit_count_bool = false;
+    int previous_minerals = 0;
+    int previous_oxygen = 0;
+    int oxygen_count = 0; 
+
+    void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
+    {
+       
+        const auto& collision_entities = get_entities();
+
+        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
+        {
+            e_last_frame = e_press;
+            e_press = IM.is_key_held(GLFW_KEY_E);
+
+
+            EntityID player_ID = *iter1;
+            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
+
+            if (physic1.get_is_static()) {
+                continue;
+            }
+
+            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+            auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
+            auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
+
+            AABB aabb_player = AABB::from_transform(player_transform, player_collision1);
+
+            auto it_2 = std::next(iter1);
+
+            // Check for collisions with other entities
+            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
+                EntityID entities_ID = *iter2;
+
+                if (player_ID == entities_ID)
+                {
+                    continue;
+                }
+
+                auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
+                auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
+                auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
+
+                if (entities_collision.collidable) continue;
+
+                AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
+                if (entities_ID == 3) {
+                    enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
+                }
+
+                float collision_time = delta_time;
+                if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
+                    check_non_collidable_entities = entities_ID;
+                    entites_detect = true;
+                    break;
+                }
+                else
+                {
+                    check_non_collidable_entities = static_cast<EntityID>(-1);
+                    entites_detect = false;
+                }
+            }
+
+            if (check_non_collidable_entities == 2)
+            {
+                mineral_tank = check_non_collidable_entities;
+            }
+            else if (check_non_collidable_entities == 3)
+            {
+                oxygen_tank = check_non_collidable_entities;
+            }
+            else {
+                oxygen_tank = static_cast<EntityID>(-1);
+                mineral_tank = static_cast<EntityID>(-1);
+            }
+        }
+
+        bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+        bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+        bool is_e_release = IM.is_key_released(GLFW_KEY_E);
+        
+        // Find GUI System to trigger interface and handle mineral deposit
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                // Check mineral tank collision and handle deposit
+                if (mineral_tank_detected() != -1) {
+                    gui_system->show_mineral_tank_gui();
+
+                    // Debug the key state
+
+                    // Try both pressed and held states
+                    if (is_e_pressed || is_e_held) {
+                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+
+                        std::string deposit_mineral_sound = "mineral deposit";
+
+                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
+                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
+                            //auto& player_audio = ECSM.get_component<Audio_Component>(player_entity);
+
+                            try {
+                                // Get current minerals from UI text
+                                int current_minerals = std::stoi(text_comp.text);
+                                
+                                //previous_minerals = current_minerals;
+                                //printf("previous minerals is %d\n", previous_minerals);
+                                printf("current minerals is %d\n", current_minerals);
+
+                                if (current_minerals >= 100) {
+                                    // Add current minerals to the total deposited minerals
+                                    //total_deposited_minerals += current_minerals;
+
+
+                                    //printf("total_deposited_minearals %d\n", total_deposited_minerals);
+                                    current_minerals -= 100;
+
+                                 /*   if (current_minerals --)
+                                    {
+                                        deposit_count++;
+                                        deposit_count_bool = true;
+                                        
+                                    }*/
+                                    
+                                    total_deposited_minerals += 100;
+                                    //deposit_count_bool = true;
+                                    previous_minerals = current_minerals; //store previous value
+                                    if (previous_minerals -= 100)
+                                    {
+                                        deposit_count++;
+                                    }
+                                   
+                                    
+                                    printf("deposit count %d\n", deposit_count);
+                                    //std::cout << "After deposit: text_comp.text = " << text_comp.text << ", current_minerals = " << current_minerals << std::endl;
+                                    // Calculate progress percentage based on total deposited minerals
+                                    float current_percentage = total_deposited_minerals / 50000.0f;
+                                    current_percentage = std::min(current_percentage, 100.0f);
+
+                                    // Update progress bar and its text
+                                    gui_system->update_mineral_progress(current_percentage);
+
+                                    // Reset the mineral count to 0 (optional, depending on your game logic)
+                                    //text_comp.text = "0";
+
+                                    text_comp.text = std::to_string(current_minerals);
+
+                                    
+                                }
+                                
+                         
+
+                            }
+                            catch (const std::exception& e) {
+                                // Handle exception
+                            }
+                        }
+                    }
+                   
+                    
+                    //else if(IM.is_key_released(GLFW_KEY_E)){
+                    //    //std::cout << " stop pressing e" << std::endl;
+                    //    deposit = false;
+                    //}
+                }
+                else {
+                    gui_system->hide_mineral_tank_gui();
+                    //deposit = false;
+                }
+                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if ( (is_e_pressed || is_e_held) && deposit_count > 0)
+                {
+                    ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
+                    //deposit_count--;
+                }
+                else if (!(e_press && e_last_frame))
+                {
+                    ADM.stop_now(playerId, "mineral deposit", "sfx_mineral_deposit");
+                }
+                //if (!is_e_pressed && !is_e_held && was_depositing) {
+                //    // Stop the mineral deposit sound if needed
+                //    // ADM.stop_now(player_entity, deposit_mineral_sound, "sfx_mineral_deposit");
+                //    was_depositing = false;  // Reset flag
+                //}
+
+
+                // Check oxygen tank collision
+                if (oxygen_tank_detected() != -1)
+                {
+                    gui_system->show_oxygen_tank_gui();
+
+                    // If E is pressed or held
+                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
+                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
+
+                    if (is_e_pressed || is_e_held)
+                    {
+                        // (1) Player oxygen / Ship oxygen
+                        float playerOxy = GM.get_current_oxygen_level(); // [0..100]
+                        float shipOxy = GM.get_ship_oxygen_level();    // [0..400]
+
+                        // (2) If player not full and ship has some oxygen
+                        if (playerOxy < 100.0f && shipOxy > 0.0f)
+                        {
+                            // (3) Figure out how much the player needs
+                            float needed = 100.0f - playerOxy;
+                            previous_oxygen = playerOxy;
+                            // The ship can only give up to 'shipOxy' it has:
+                            float transfer = std::min(needed, shipOxy);
+
+                            // Transfer
+                            playerOxy += transfer;  // player goes up
+                            shipOxy -= transfer;  // ship goes down
+
+                            
+
+                            // (4) Store them back
+                            GM.set_current_oxygen_level(playerOxy);
+                            GM.set_ship_oxygen_level(shipOxy);
+
+                            // (5) Update the GUI bars
+                            //    - Player fraction = playerOxy / 100
+                            float playerFraction = playerOxy / 100.0f;
+                            gui_system->update_oxygen_progress1(playerFraction);
+
+
+                            float usedFraction = (400.0f - shipOxy) / 400.0f;
+                            gui_system->update_oxygen_progress2(usedFraction);
+
+                            if (playerOxy > previous_oxygen) {
+                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                                ADM.play_now(playerId, "refilling oxygen", ECSM.get_component<Audio_Component>(playerId));
+                            }
+
+                        }
+                    }
+
+                }
+                else {
+                    gui_system->hide_oxygen_tank_gui();
+                }
+
+                break;
+            }
+        }
+      
+    }
+
 
 
     /**
