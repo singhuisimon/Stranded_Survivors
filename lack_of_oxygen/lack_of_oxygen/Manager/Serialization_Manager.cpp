@@ -31,6 +31,7 @@
 #include "../Component/Component.h"
 
 // Include Utility headers
+#include "../Utility/Type.h"
 #include "../Utility/Matrix3x3.h"
 #include "../Utility/Component_Parser.h" // Adding components from JSON
 #include "../Utility/Force_Helper.h"
@@ -95,7 +96,7 @@ namespace lof {
 
         // Load scene file
         const std::string scene_folder = "Scenes";
-        std::string loaded_scene = "main_menu.scn";
+        std::string loaded_scene = "scene1.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
         // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4
@@ -637,25 +638,111 @@ namespace lof {
         return comp_obj;
     }
 
+    //rapidjson::Value Serialization_Manager::serialize_logic_component(const Logic_Component& component, rapidjson::Document::AllocatorType& allocator) {
+    //    rapidjson::Value comp_obj(rapidjson::kObjectType);
+
+    //    // Add primitive members with explicit rapidjson::Value creation
+    //    comp_obj.AddMember("logic_type", rapidjson::Value(static_cast<int>(component.logic_type)), allocator);
+    //    comp_obj.AddMember("movement_pattern", rapidjson::Value(static_cast<int>(component.movement_pattern)), allocator);
+    //    comp_obj.AddMember("is_active", rapidjson::Value(component.is_active), allocator);
+    //    comp_obj.AddMember("movement_speed", rapidjson::Value(component.movement_speed), allocator);
+    //    comp_obj.AddMember("movement_range", rapidjson::Value(component.movement_range), allocator);
+    //    comp_obj.AddMember("reverse_direction", rapidjson::Value(component.reverse_direction), allocator);
+    //    comp_obj.AddMember("rotate_with_motion", rapidjson::Value(component.rotate_with_motion), allocator);
+
+    //    // Add origin position as array
+    //    rapidjson::Value origin_pos(rapidjson::kArrayType);
+    //    origin_pos.PushBack(rapidjson::Value(component.origin_pos.x), allocator);
+    //    origin_pos.PushBack(rapidjson::Value(component.origin_pos.y), allocator);
+    //    comp_obj.AddMember("origin_pos", origin_pos, allocator);
+
+    //    return comp_obj;
+    //}
+
     rapidjson::Value Serialization_Manager::serialize_logic_component(const Logic_Component& component, rapidjson::Document::AllocatorType& allocator) {
         rapidjson::Value comp_obj(rapidjson::kObjectType);
 
-        // Add primitive members with explicit rapidjson::Value creation
-        comp_obj.AddMember("logic_type", rapidjson::Value(static_cast<int>(component.logic_type)), allocator);
-        comp_obj.AddMember("movement_pattern", rapidjson::Value(static_cast<int>(component.movement_pattern)), allocator);
-        comp_obj.AddMember("is_active", rapidjson::Value(component.is_active), allocator);
-        comp_obj.AddMember("movement_speed", rapidjson::Value(component.movement_speed), allocator);
-        comp_obj.AddMember("movement_range", rapidjson::Value(component.movement_range), allocator);
-        comp_obj.AddMember("reverse_direction", rapidjson::Value(component.reverse_direction), allocator);
-        comp_obj.AddMember("rotate_with_motion", rapidjson::Value(component.rotate_with_motion), allocator);
+        rapidjson::Value scripts_array(rapidjson::kArrayType);
+        auto& all_scripts = component.get_logic_datas();
 
-        // Add origin position as array
-        rapidjson::Value origin_pos(rapidjson::kArrayType);
-        origin_pos.PushBack(rapidjson::Value(component.origin_pos.x), allocator);
-        origin_pos.PushBack(rapidjson::Value(component.origin_pos.y), allocator);
-        comp_obj.AddMember("origin_pos", origin_pos, allocator);
+        for (auto& scripts : all_scripts) {
+            rapidjson::Value script_obj(rapidjson::kObjectType);
+
+            //Add script name
+            script_obj.AddMember("script_name", rapidjson::Value(scripts->script_name.c_str(), allocator), allocator);
+
+            //Add init
+            script_obj.AddMember("init", rapidjson::Value(scripts->init_func.c_str(), allocator), allocator);
+
+            //Add update
+            script_obj.AddMember("update", rapidjson::Value(scripts->update_func.c_str(), allocator), allocator);
+
+            //Add end
+            script_obj.AddMember("end", rapidjson::Value(scripts->end_func.c_str(), allocator), allocator);
+
+            //Add script details
+            rapidjson::Value script_data_obj(rapidjson::kObjectType);
+            for (const auto& [key, value] : scripts->script_data) {
+                rapidjson::Value key_val(key.c_str(), allocator);
+
+                if (std::holds_alternative<int>(value)) {
+                    script_data_obj.AddMember(key_val, rapidjson::Value(std::get<int>(value)), allocator);
+                }
+                else if (std::holds_alternative<float>(value)) {
+                    script_data_obj.AddMember(key_val, rapidjson::Value(std::get<float>(value)), allocator);
+                }
+                else if (std::holds_alternative<std::string>(value)) {
+                    script_data_obj.AddMember(key_val, rapidjson::Value(std::get<std::string>(value).c_str(), allocator), allocator);
+                }
+                else if (std::holds_alternative<bool>(value)) {
+                    script_data_obj.AddMember(key_val, rapidjson::Value(std::get<bool>(value)), allocator);
+                }
+                else if (std::holds_alternative<Vec2D>(value)) {
+                    rapidjson::Value vec(rapidjson::kArrayType);
+                    Vec2D vec2 = std::get<Vec2D>(value);
+                    vec.PushBack(rapidjson::Value(vec2.x), allocator);
+                    vec.PushBack(rapidjson::Value(vec2.y), allocator);
+                    script_data_obj.AddMember(key_val, vec, allocator);
+                }
+            }
+
+            //add state
+            script_obj.AddMember("state", rapidjson::Value(static_cast<int>(scripts->state)), allocator);
+
+            //boolean isactive
+            script_obj.AddMember("is_active", scripts->is_active, allocator);
+
+            // Add the serialized sound object to the sounds array
+            scripts_array.PushBack(script_obj, allocator);
+        }
+        
+        comp_obj.AddMember("scripts", scripts_array, allocator);
 
         return comp_obj;
+    }
+
+    template<typename T>
+    void Serialization_Manager::add_logic_member(rapidjson::Value& obj, const std::string& key, const T& value, rapidjson::Document::AllocatorType& allocator) {
+        //obj.AddMember(rapidjson::Value(key.c_str(), allocator), rapidjson::Value(value), allocator);
+        if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, bool>) {
+            // Handle numeric and boolean types
+            obj.AddMember(rapidjson::Value(key.c_str(), allocator), rapidjson::Value(value), allocator);
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
+            // Handle std::string
+            obj.AddMember(rapidjson::Value(key.c_str(), allocator), rapidjson::Value(value.c_str(), allocator), allocator);
+        }
+        else {
+            // Handle unsupported types (or throw an error)
+            static_assert(sizeof(T) == 0, "Unsupported type for add_logic_member");
+        }
+    }
+
+    void Serialization_Manager::add_logic_vec2d_member(rapidjson::Value& obj, const std::string& key, const Vec2D& value, rapidjson::Document::AllocatorType& allocator) {
+        rapidjson::Value vec(rapidjson::kArrayType);
+        vec.PushBack(rapidjson::Value(value.x), allocator);
+        vec.PushBack(rapidjson::Value(value.y), allocator);
+        obj.AddMember(rapidjson::Value(key.c_str(), allocator), vec, allocator);
     }
 
     rapidjson::Value Serialization_Manager::serialize_text_component(const Text_Component& component, rapidjson::Document::AllocatorType& allocator) {
