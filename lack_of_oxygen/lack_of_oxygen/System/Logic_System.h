@@ -33,6 +33,13 @@ namespace lof {
         static Logic_System& get_instance();
 
         /**
+         * @brief Constructor for Logic_System.
+         */
+        Logic_System();
+
+        ~Logic_System();
+
+        /**
          * @brief Gets the type identifier for this system.
          * @return String identifying the system type.
          */
@@ -43,25 +50,44 @@ namespace lof {
          * @param delta_time Time elapsed since the last update.
          */
         void update(float delta_time) override;
+        
+        /**
+         * @brief Updates the scripts for all relevant entities.
+         * @param delta_time Time elapsed since the last update.
+         */
         void update_script(float delta_time);
 
+        void cleanup();
+
+        /**
+         * @brief Add scripts to the scripts_map.
+		 * @param script_name The name of the script.
+		 * @param script The script to be added.
+         */
         void add_script(const std::string& script_name, std::shared_ptr<Script> script);
 
+        /**
+		 * @brief Retrieve a script from the scripts_map.
+		 * @param script_name The name of the script to retrieve.
+         */
         std::shared_ptr<Script> get_script(const std::string& script_name);
         
     private:
 
-        /**
-         * @brief Constructor for Logic_System.
-         */
-        Logic_System();
+        
 
+        /**
+		 * @brief unique instance of Logic_System.
+         */
         static std::unique_ptr<Logic_System> instance;
+
+        /**
+		 * @brief set the flag to create the instance of Logic_System.
+         */
         static std::once_flag once_flag;
 
-        //using script name to access the scripts
-        std::unordered_map <std::string, std::shared_ptr<Script>> script_map;
-        std::vector<Logic_Component*> script_components;
+        
+        std::unordered_map <std::string, std::shared_ptr<Script>> script_map; //using script name to access the scripts
 
     };
 } // namespace lof

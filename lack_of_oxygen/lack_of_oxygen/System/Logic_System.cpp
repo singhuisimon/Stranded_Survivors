@@ -40,6 +40,15 @@ namespace lof {
         signature.set(ECSM.get_component_id<Logic_Component>());
     }
 
+    Logic_System::~Logic_System() {
+        // Clean up
+        cleanup();
+
+        if (instance) {
+            instance.reset();
+        }
+    }
+
     std::string Logic_System::get_type() const {
         return "Logic_System";
     }
@@ -67,9 +76,10 @@ namespace lof {
             EntityID entityid = entityids[i]->get_id();
 
             if (!ECSM.has_component<Logic_Component>(entityid)) {
-                LM.write_log("Logic_System::update_script, entity %u has no logic component", entityid);
+                //LM.write_log("Logic_System::update_script, entity %u has no logic component", entityid);
                 continue;
             }
+            LM.write_log("Logic_System::update_script, entity %u has logic component", entityid);
 
             Logic_Component& logic = ECSM.get_component<Logic_Component>(entityid);
 
@@ -119,6 +129,16 @@ namespace lof {
         }
     }
 
+    void Logic_System::cleanup() {
+        for (auto& script_pair : script_map) {
+            script_pair.second.reset(); // reset each shared_ptr
+            LM.write_log("Logic_System::cleanup() resetting shared_ptr");
+        }
+
+        script_map.clear();
+		
+    }
+
     void Logic_System::add_script(const std::string& script_name, std::shared_ptr<Script> script) {
         script_map[script_name] = script;
     }
@@ -137,21 +157,6 @@ namespace lof {
     //        delete script;  // Make sure to delete dynamically allocated scripts
     //    }
     //}
-
-    //static bool first_frame = true;
-
-        //for (EntityID entity_id : get_entities()) {
-        //    auto& logic = ECSM.get_component<Logic_Component>(entity_id);
-        //    auto* entity = ECSM.get_entity(entity_id);
-
-        //    if (logic.is_active && !level_editor_mode) {
-        //        //update all scripts attached to this entity
-        //        for (auto& [category, scripts] : logic.scripts) {
-        //            for (auto& [script_name, script_data] : scripts) {
-        //                update_scripts(logic, script_name, delta_time);
-        //            }
-        //        }
-        //    }
 
             // First frame debugging
             //if (first_frame) {

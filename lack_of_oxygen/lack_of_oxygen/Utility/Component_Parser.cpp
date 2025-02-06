@@ -520,6 +520,7 @@ namespace lof {
                         std::string end_func;
                         bool is_active = true;
                         ScriptData script_data;
+                        ExecutionState state;
 
                         // Parse basic script properties
                         if (script.HasMember("script_name") && script["script_name"].IsString()) {
@@ -581,8 +582,24 @@ namespace lof {
                             }
                         }
 
+                        // Parse execution state
+                        if (script.HasMember("state") && script["state"].IsInt()) {
+                            int state_num = script["state"].GetInt();
+                            switch (state_num) {
+                            case 0: state = ExecutionState::Uninitialized; break;
+                            case 1: state = ExecutionState::Running; break;
+                            case 2: state = ExecutionState::Paused; break;
+                            case 3: state = ExecutionState::Completed; break;
+                            case 4: state = ExecutionState::Terminated; break;
+                            default:
+                                LM.write_log("Warning: Invalid execution state number %d for script '%s', defaulting to Uninitialized",
+                                    state_num, script_name.c_str());
+                                state = ExecutionState::Uninitialized;
+                            }
+                        }
+
                         // Add script to component
-                        logic_component.add_script(script_name, init_func, update_func, end_func, script_data, is_active);
+                        logic_component.add_script(script_name, init_func, update_func, end_func, script_data, state, is_active);
 
                         LM.write_log("Added script '%s' to Logic_Component for entity %u",
                             script_name.c_str(), entity);

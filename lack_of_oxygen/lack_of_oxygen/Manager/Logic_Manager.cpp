@@ -1,6 +1,7 @@
 
 
 #include "../Scripts/Object_Moving_Script.h"
+#include "../Scripts/Player_Script.h"
 
 #include "../Manager/Logic_Manager.h"
 #include "../Manager/ECS_Manager.h"
@@ -48,11 +49,11 @@ namespace lof {
 		object_moving_script.register_script();
 		LM.write_log("Registered Object Moving Script");
 
-		// Register other scripts here as they are added
-		// Example:
-		// PlayerScript::register_script();
-		// EnemyScript::register_script();
-		// etc.
+		Player_Script player_script;
+		player_script.register_script();
+		LM.write_log("Registered Player Script");
+
+		// Register other scripts here as they are added.
 	}
 
 	void Logic_Manager::shut_down() {
@@ -62,6 +63,15 @@ namespace lof {
 		}
 
 		//clear anything here ig :">
+
+		LGS.cleanup();
+		if (instance) {
+			instance.reset();
+			LM.write_log("Logic_Manager::shut_down(): Logic_Manager instance deleted.");
+		}
+
+		LM.write_log("Logic_Manager::shut_down(): Logic_Manager shut down.");
+		
 	}
 
 	

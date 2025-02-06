@@ -28,9 +28,9 @@ namespace lof {
             bool is_active;
 
             LogicData(const std::string& name, const std::string& init, const std::string& update,
-                const std::string& end, const ScriptData& data, bool active = true)
+                const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true)
                 : script_name(name), init_func(init), update_func(update),
-                end_func(end), script_data(data), is_active(active), state(ExecutionState::Uninitialized) {
+                end_func(end), script_data(data), is_active(active), state(set_state) {
             }
         };
 
@@ -38,11 +38,16 @@ namespace lof {
 
         Logic_Component() = default;
 
+        ~Logic_Component() {
+            logic_datas.clear();
+			LM.write_log("Logic_Component::clean up complete");
+        }
+
         const std::vector<std::shared_ptr<LogicData>>& get_logic_datas() const { return logic_datas; }
 
         void add_script(const std::string& name, const std::string& init, const std::string& update,
-            const std::string& end, const ScriptData& data, bool active = true) {
-            auto script = std::make_shared<LogicData>(name, init, update, end, data, true);
+            const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true) {
+            auto script = std::make_shared<LogicData>(name, init, update, end, data, set_state, true);
 
             logic_datas.push_back(script);
         }

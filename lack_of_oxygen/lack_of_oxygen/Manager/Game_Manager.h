@@ -56,7 +56,7 @@ namespace lof {
         int editor_camera_flag = false;
 
         // Flag for forces applied
-        int forces_flag = -1;
+        //int forces_flag = -1;
 
         // Flag for scn file
         int current_scene = 2;

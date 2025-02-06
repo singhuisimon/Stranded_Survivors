@@ -24,6 +24,10 @@ namespace lof {
 
 		Script() = default;
 
+		virtual ~Script() {
+			functions_map.clear();
+		}
+
 		Script(const std::string& name) : script_name(name) {}
 
 		//this is to load data from the logic component and save into it as well (check if needed)

@@ -1237,113 +1237,105 @@ namespace lof {
                         }
 
                         // Handle horizontal movement
-                        if (IM.is_key_held(GLFW_KEY_SPACE)) {
-                            physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
-                        }
-                        else {
-                            physics.set_jump_requested(false);
-                        }
+                        //if (IM.is_key_held(GLFW_KEY_SPACE)) {
+                        //    physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
+                        //}
+                        //else {
+                        //    physics.set_jump_requested(false);
+                        //}
 
                         //activate and deactivate the forces. 
-                        if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
-                            // Updates forces
-                            physics.force_helper.deactivate_force(MOVE_RIGHT);
-                            physics.force_helper.activate_force(MOVE_LEFT);
-                            forces_flag = MOVE_LEFT;
+                        //if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
+                        //    // Updates forces
+                        //    physics.force_helper.deactivate_force(MOVE_RIGHT);
+                        //    physics.force_helper.activate_force(MOVE_LEFT);
+                        //    forces_flag = MOVE_LEFT;
 
-                            // Update player animation flag
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_LEFT;
-                            int& moving_status = GFXM.get_moving_status();
-                            moving_status = RUN_LEFT;
+                        //    // Update player animation flag
+                        //    int& direction = GFXM.get_player_direction();
+                        //    direction = FACE_LEFT;
+                        //    int& moving_status = GFXM.get_moving_status();
+                        //    moving_status = RUN_LEFT;
 
-                            //std::cout << "moving left current scene number is " << current_scene << std::endl;
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
-                            // Update forces
-                            physics.force_helper.deactivate_force(MOVE_LEFT);
-                            physics.force_helper.activate_force(MOVE_RIGHT);
-                            forces_flag = MOVE_RIGHT;
+                        //    //std::cout << "moving left current scene number is " << current_scene << std::endl;
+                        //}
+                        //else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
+                        //    // Update forces
+                        //    physics.force_helper.deactivate_force(MOVE_LEFT);
+                        //    physics.force_helper.activate_force(MOVE_RIGHT);
+                        //    forces_flag = MOVE_RIGHT;
 
-                            // Update player animation flag
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_RIGHT;
-                            int& moving_status = GFXM.get_moving_status();
-                            moving_status = RUN_RIGHT;
+                        //    // Update player animation flag
+                        //    int& direction = GFXM.get_player_direction();
+                        //    direction = FACE_RIGHT;
+                        //    int& moving_status = GFXM.get_moving_status();
+                        //    moving_status = RUN_RIGHT;
 
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
-                            if (forces_flag == MOVE_LEFT) {
-                                // Update forces
-                                physics.force_helper.activate_force(MOVE_LEFT);
-                                forces_flag = MOVE_LEFT;
+                        //}
+                        //else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
+                        //    if (forces_flag == MOVE_LEFT) {
+                        //        // Update forces
+                        //        physics.force_helper.activate_force(MOVE_LEFT);
+                        //        forces_flag = MOVE_LEFT;
 
-                                // Update player animation flag
-                                int& direction = GFXM.get_player_direction();
-                                direction = FACE_LEFT;
-                                int& moving_status = GFXM.get_moving_status();
-                                moving_status = RUN_LEFT;
-                            }
-                            else {
-                                // Update forces
-                                physics.force_helper.deactivate_force(MOVE_LEFT);
-                                physics.force_helper.activate_force(MOVE_RIGHT);
-                                forces_flag = MOVE_RIGHT;
+                        //        // Update player animation flag
+                        //        int& direction = GFXM.get_player_direction();
+                        //        direction = FACE_LEFT;
+                        //        int& moving_status = GFXM.get_moving_status();
+                        //        moving_status = RUN_LEFT;
+                        //    }
+                        //    else {
+                        //        // Update forces
+                        //        physics.force_helper.deactivate_force(MOVE_LEFT);
+                        //        physics.force_helper.activate_force(MOVE_RIGHT);
+                        //        forces_flag = MOVE_RIGHT;
 
-                                // Update player animation flag
-                                int& direction = GFXM.get_player_direction();
-                                direction = FACE_RIGHT;
-                                int& moving_status = GFXM.get_moving_status();
-                                moving_status = RUN_RIGHT;
-                            }
-                        }
-                        else {
-                            // Reset forces and player animation
-                            physics.force_helper.deactivate_force(MOVE_LEFT);
-                            physics.force_helper.deactivate_force(MOVE_RIGHT);
-                            forces_flag = -1;
+                        //        // Update player animation flag
+                        //        int& direction = GFXM.get_player_direction();
+                        //        direction = FACE_RIGHT;
+                        //        int& moving_status = GFXM.get_moving_status();
+                        //        moving_status = RUN_RIGHT;
+                        //    }
+                        //}
+                        //else {
+                        //    // Reset forces and player animation
+                        //    physics.force_helper.deactivate_force(MOVE_LEFT);
+                        //    physics.force_helper.deactivate_force(MOVE_RIGHT);
+                        //    forces_flag = -1;
 
-                            int& moving_status = GFXM.get_moving_status();
-                            moving_status = NO_ACTION;
+                        //    int& moving_status = GFXM.get_moving_status();
+                        //    moving_status = NO_ACTION;
 
-                        }
+                        //}
 
                         //audio logic is here.
-                        if (forces_flag != -1) {
-                            if (physics.get_is_grounded()) {
-                                if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
-                                    /*if (current_scene == 1) {
-                                        std::string audio_key = forces_flag == MOVE_RIGHT ? "moving right" : "moving left";
-                                        ADM.play_now(player_id, audio_key, audio_player);
-                                    }
-                                    else if (current_scene == 2) {
-                                        ADM.play_now(player_id, "moving", audio_player);
-                                    }*/
+                        //if (forces_flag != -1) {
+                        //    if (physics.get_is_grounded()) {
+                        //        if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
 
-
-                                    ADM.play_now(player_id, "moving", audio_player);
-                                    // Emit walking dirt particles
-                                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-                                    float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
-                                    float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
-                                    particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                                }
-                            }
-                            else {
-                                //placeholder for other audio logic here for airvent and wormhole
-                            }
-                        }
-                        else {
-                            if (IM.is_key_released(GLFW_KEY_D) || IM.is_key_released(GLFW_KEY_A)) {
-                                if (current_scene == 1) {
-                                    ADM.stop_now(player_id, "moving right", audio_player.get_filepath("moving right"));
-                                    ADM.stop_now(player_id, "moving left", audio_player.get_filepath("moving left"));
-                                }
-                                else if (current_scene == 2) {
-                                    ADM.stop_now(player_id, "moving", audio_player.get_filepath("moving"));
-                                }
-                            }
-                        }
+                        //            ADM.play_now(player_id, "moving", audio_player);
+                        //            // Emit walking dirt particles
+                        //            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                        //            float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
+                        //            float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
+                        //            particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                        //        }
+                        //    }
+                        //    else {
+                        //        //placeholder for other audio logic here for airvent and wormhole
+                        //    }
+                        //}
+                        //else {
+                        //    if (IM.is_key_released(GLFW_KEY_D) || IM.is_key_released(GLFW_KEY_A)) {
+                        //        if (current_scene == 1) {
+                        //            ADM.stop_now(player_id, "moving right", audio_player.get_filepath("moving right"));
+                        //            ADM.stop_now(player_id, "moving left", audio_player.get_filepath("moving left"));
+                        //        }
+                        //        else if (current_scene == 2) {
+                        //            ADM.stop_now(player_id, "moving", audio_player.get_filepath("moving"));
+                        //        }
+                        //    }
+                        //}
                     }
                 }
             }
@@ -1661,8 +1653,9 @@ namespace lof {
         auto end_time = std::chrono::steady_clock::now();
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
-
+        start_time = std::chrono::steady_clock::now();
         LGM.update(delta_time);
+        end_time = std::chrono::steady_clock::now();
         LGM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         //No Graphics Manager Update

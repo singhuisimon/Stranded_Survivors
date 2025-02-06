@@ -20,15 +20,15 @@ namespace lof {
 	class Object_Moving_Script : public Script {
 
     public:
-        struct EntityData {
-            int movement_pattern;
-            float movement_speed;
-            float movement_range;
-            Vec2D origin_pos;
-            bool reverse_direction;
-            bool rotate_with_motion;
+        struct MovementData {
+            int movement_pattern = 0;
+            float movement_speed = 0.0;
+            float movement_range = 0.0;
+            Vec2D origin_pos = Vec2D();
+            bool reverse_direction = false;
+            bool rotate_with_motion = false;
             float timer = 0.0f;
-            int pattern;
+            int pattern = 0;
         };
 
     public:
@@ -37,18 +37,19 @@ namespace lof {
 
         Object_Moving_Script();
 
-        //void init_get_movement_data(EntityID entity);
-        void update_obj_movement(Entity* entity);
+        ~Object_Moving_Script();
+
+        void cleanup();
 
     private:
 
         const std::string script_name = "object_moving_script";
 
         //mutable std::mutex entity_data_mutex;
-        std::unordered_map<EntityID, EntityData> entity_data;
+        std::unordered_map<EntityID, MovementData> entity_data;
 
-        void add_entity_data(EntityID id, const EntityData& data);
-        bool get_entity_data(EntityID id, EntityData& out_data) const;
+        void add_entity_data(EntityID id, const MovementData& data);
+        bool get_entity_data(EntityID id, MovementData& out_data) const;
         void remove_entity_data(EntityID id);
 
         /**
@@ -57,7 +58,7 @@ namespace lof {
         * @param transform The Transform2D to update.
         * @param delta_time Time elapsed since the last update.
         */
-        void update_linear_movement(EntityData& data, Transform2D& transform_comp);
+        void update_linear_movement(MovementData& data, Transform2D& transform_comp);
 
         /**
         * @brief Updates circular movement for a given entity.
@@ -65,7 +66,7 @@ namespace lof {
         * @param transform The Transform2D to update.
         * @param delta_time Time elapsed since the last update.
         */
-        void update_circular_movement(EntityData& data, Transform2D& transform_comp);
+        void update_circular_movement(MovementData& data, Transform2D& transform_comp);
 	};
 }
 

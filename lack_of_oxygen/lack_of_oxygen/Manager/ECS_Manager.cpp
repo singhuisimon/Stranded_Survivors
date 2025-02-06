@@ -25,7 +25,7 @@
 #include "../System/GUI_System.h"
 #include "../System/Audio_System.h"
 #include "../System/Animation_System.h"
-//#include "../System/Logic_System.h"
+#include "../System/Logic_System.h"
 #include "../System/Interruption_System.h"
 #include "../System/Particle_System.h"
 
@@ -132,8 +132,8 @@ namespace lof {
             add_system(std::make_unique<Animation_System>()); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
 
-            //add_system(std::make_unique<Logic_System>());
-            //LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
+            add_system(std::make_unique<Logic_System>());
+            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
             add_system(std::make_unique<Interruption_System>(window)); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
