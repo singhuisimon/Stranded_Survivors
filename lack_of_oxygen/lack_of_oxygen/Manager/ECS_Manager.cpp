@@ -172,7 +172,7 @@ namespace lof {
     }
 
     void ECS_Manager::add_components_from_json(EntityID entity, const rapidjson::Value& components) {
-        LM.write_log("ECS_Manager::add_components_from_json(): Adding components to entity ID %u.", entity);
+        //LM.write_log("ECS_Manager::add_components_from_json(): Adding components to entity ID %u.", entity);
         Component_Parser::add_components_from_json(*this, entity, components);
     }
 
