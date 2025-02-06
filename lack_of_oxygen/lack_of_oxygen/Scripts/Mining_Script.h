@@ -64,6 +64,8 @@ namespace lof {
 		 * @param value_to_add The value to add to the current mineral count
 		 */
 		void update_mineral_count_text(int value_to_add);
+
+		void store_tnt_to_destroy(Animation_Component& animation_comp, int block_to_remove);
 	};
 }
 

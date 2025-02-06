@@ -73,7 +73,7 @@ namespace lof {
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
 
         // Stores the TNTs that are activated with it's entity name and fuse time
-        std::unordered_map<std::string, float> tnt_to_destroy;
+        //std::unordered_map<std::string, float> tnt_to_destroy;
 
         /**
          * @brief Determines the mineral value based on the block entity type

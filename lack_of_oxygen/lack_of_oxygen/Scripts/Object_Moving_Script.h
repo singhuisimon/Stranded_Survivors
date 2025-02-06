@@ -37,7 +37,7 @@ namespace lof {
 
         Object_Moving_Script();
 
-        ~Object_Moving_Script();
+        ~Object_Moving_Script() override;
 
         void cleanup();
 

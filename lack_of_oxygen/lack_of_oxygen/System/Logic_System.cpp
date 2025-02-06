@@ -155,6 +155,7 @@ namespace lof {
 
     void Logic_System::add_script(const std::string& script_name, std::shared_ptr<Script> script) {
         script_map[script_name] = script;
+        LM.write_log("registered %s script into script map", script_name.c_str());
     }
 
     std::shared_ptr<Script> Logic_System::get_script(const std::string& script_name) {

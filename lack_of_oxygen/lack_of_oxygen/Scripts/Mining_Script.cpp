@@ -6,11 +6,13 @@
 #include <sstream>  // for std::stringstream
 
 #include "../Scripts/Mining_Script.h"
+#include "../Scripts/TNT_Script.h"
 #include "../Manager/Log_Manager.h"
 #include "../System/Logic_System.h"
 #include "../System/Collision_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Input_Manager.h"
+//#include "../Manager/Game_Manager.h"
 #include "../Manager/Audio_Manager.h"
 
 namespace lof {
@@ -208,10 +210,6 @@ namespace lof {
             }
         }
 
-
-
-        
-
 	}
 
 	void Mining_Script::update_tile(int block_to_remove, Particle_System* particle_system) {
@@ -252,6 +250,9 @@ namespace lof {
                 LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
                     block_to_remove, mineral_value);
             }
+        }
+        else {
+			//store_tnt_to_destroy(animation, block_to_remove);
         }
 	}
 
@@ -364,4 +365,14 @@ namespace lof {
             LM.write_log("Error updating mineral count: %s", e.what());
         }
     }
+
+    void Mining_Script::store_tnt_to_destroy(Animation_Component& animation_comp, int block_to_remove) {
+        if (animation_comp.curr_tile_health == 0 && animation_comp.curr_frame_index != 1) {
+
+            // Store name of TNT to destroy
+            std::string name = ECSM.get_entity(block_to_remove)->get_name();
+            tnt_to_destroy[name] = 2.0f;
+        }
+    }
+
 }

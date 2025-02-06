@@ -46,9 +46,10 @@
     <ClCompile Include="Manager\Audio_Manager.cpp" />
     <ClCompile Include="System\Particle_System.cpp" />
     <ClCompile Include="Manager\Logic_Manager.cpp" />
-    <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="Scripts\Mining_Script.cpp" />
+    <ClCompile Include="Scripts\TNT_Script.cpp" />
+    <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -95,10 +96,11 @@
     <ClInclude Include="System\Particle_System.h" />
     <ClInclude Include="Component\Logic_Components.h" />
     <ClInclude Include="Manager\Logic_Manager.h" />
-    <ClInclude Include="Scripts\Object_Moving_Script.h" />
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
     <ClInclude Include="Scripts\Mining_Script.h" />
+    <ClInclude Include="Scripts\TNT_Script.h" />
+    <ClInclude Include="Scripts\Object_Moving_Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
