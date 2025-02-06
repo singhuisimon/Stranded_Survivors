@@ -11,7 +11,7 @@ namespace lof {
 
 	public:
 		Player_Script();
-		void register_script();
+		void register_script() override;
 
 	private:
 
@@ -29,10 +29,6 @@ namespace lof {
 
 		EntityID get_player_id() const;
 
-		/*std::unordered_map<EntityID, MovementData> entity_data;
-		void add_entity_data(EntityID id, const MovementData& data);
-		bool get_entity_data(EntityID id, MovementData& out_data) const;
-		void remove_entity_data(EntityID id);*/
 		/**
 		* @brief Updates linear movement for a given entity.
 		* @param logic The Logic_Component containing movement parameters.
@@ -40,6 +36,9 @@ namespace lof {
 		* @param delta_time Time elapsed since the last update.
 		*/
 		void update_player_movement(Physics_Component& physic_comp);
+
+		void update_player_animation();
+
 		/**
 		* @brief Updates circular movement for a given entity.
 		* @param logic The Logic_Component containing movement parameters.
@@ -48,7 +47,8 @@ namespace lof {
 		*/
 		void update_player_audio(Physics_Component& physic_comp, Audio_Component& audio_comp);
 
-		void update_player_animation(Physics_Component& physic_comp);
+		void update_player_walking_particle();
+		
 	};
 
 }

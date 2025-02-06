@@ -33,6 +33,7 @@ namespace lof {
 		//this is to load data from the logic component and save into it as well (check if needed)
 		//virtual void save_logic_data(ScriptData* data) = 0;
 		//virtual void load_logic_data(ScriptData* data) = 0;
+		virtual void register_script() = 0;
 
 		void add_function(const std::string& function_name, ScriptFunction func) {
 			functions_map[function_name] = func;

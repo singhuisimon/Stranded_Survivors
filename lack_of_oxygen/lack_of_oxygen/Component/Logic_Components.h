@@ -47,7 +47,7 @@ namespace lof {
 
         void add_script(const std::string& name, const std::string& init, const std::string& update,
             const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true) {
-            auto script = std::make_shared<LogicData>(name, init, update, end, data, set_state, true);
+            auto script = std::make_shared<LogicData>(name, init, update, end, data, set_state, active);
 
             logic_datas.push_back(script);
         }

@@ -41,11 +41,12 @@ namespace lof {
             }
 
             auto& physics_comp = ECSM.get_component<Physics_Component>(entity_id);
-            auto& audio_comp = ECSM.get_component<Audio_Component>(entity_id);
+            EntityID get_player_id() const;
 
             //update player horizontal movement
             player_script->update_player_movement(physics_comp);
             player_script->update_player_audio(physics_comp, audio_comp);
+            player_script->update_player_animation();
 
         });
 
@@ -85,6 +86,41 @@ namespace lof {
             physic_comp.force_helper.activate_force(MOVE_LEFT);
             forces_flag = MOVE_LEFT;
 
+            //std::cout << "moving left current scene number is " << current_scene << std::endl;
+        }
+        else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
+            // Update forces
+            physic_comp.force_helper.deactivate_force(MOVE_LEFT);
+            physic_comp.force_helper.activate_force(MOVE_RIGHT);
+            forces_flag = MOVE_RIGHT;
+
+        }
+        else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
+            if (forces_flag == MOVE_LEFT) {
+                // Update forces
+                physic_comp.force_helper.activate_force(MOVE_LEFT);
+                forces_flag = MOVE_LEFT;
+            }
+            else {
+                // Update forces
+                physic_comp.force_helper.deactivate_force(MOVE_LEFT);
+                physic_comp.force_helper.activate_force(MOVE_RIGHT);
+                forces_flag = MOVE_RIGHT;
+            }
+        }
+        else {
+            // Reset forces
+            physic_comp.force_helper.deactivate_force(MOVE_LEFT);
+            physic_comp.force_helper.deactivate_force(MOVE_RIGHT);
+            forces_flag = -1;
+        }
+    }
+
+    void Player_Script::update_player_animation() {
+
+        //activate and deactivate the forces. 
+        if (IM.is_key_held(GLFW_KEY_A) && !(IM.is_key_held(GLFW_KEY_D))) {
+
             // Update player animation flag
             int& direction = GFXM.get_player_direction();
             direction = FACE_LEFT;
@@ -94,10 +130,6 @@ namespace lof {
             //std::cout << "moving left current scene number is " << current_scene << std::endl;
         }
         else if (IM.is_key_held(GLFW_KEY_D) && !(IM.is_key_held(GLFW_KEY_A))) {
-            // Update forces
-            physic_comp.force_helper.deactivate_force(MOVE_LEFT);
-            physic_comp.force_helper.activate_force(MOVE_RIGHT);
-            forces_flag = MOVE_RIGHT;
 
             // Update player animation flag
             int& direction = GFXM.get_player_direction();
@@ -108,10 +140,6 @@ namespace lof {
         }
         else if (IM.is_key_held(GLFW_KEY_D) && IM.is_key_held(GLFW_KEY_A)) {
             if (forces_flag == MOVE_LEFT) {
-                // Update forces
-                physic_comp.force_helper.activate_force(MOVE_LEFT);
-                forces_flag = MOVE_LEFT;
-
                 // Update player animation flag
                 int& direction = GFXM.get_player_direction();
                 direction = FACE_LEFT;
@@ -119,11 +147,6 @@ namespace lof {
                 moving_status = RUN_LEFT;
             }
             else {
-                // Update forces
-                physic_comp.force_helper.deactivate_force(MOVE_LEFT);
-                physic_comp.force_helper.activate_force(MOVE_RIGHT);
-                forces_flag = MOVE_RIGHT;
-
                 // Update player animation flag
                 int& direction = GFXM.get_player_direction();
                 direction = FACE_RIGHT;
@@ -132,14 +155,41 @@ namespace lof {
             }
         }
         else {
-            // Reset forces and player animation
-            physic_comp.force_helper.deactivate_force(MOVE_LEFT);
-            physic_comp.force_helper.deactivate_force(MOVE_RIGHT);
-            forces_flag = -1;
-
+            // Reset player animation
             int& moving_status = GFXM.get_moving_status();
             moving_status = NO_ACTION;
 
+        }
+
+
+        //player mining animation
+        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = MINE_LEFT;
+            int& direction = GFXM.get_player_direction();
+            direction = FACE_LEFT;
+
+        }
+        else if (IM.is_key_held(GLFW_KEY_UP)) {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = MINE_UP;
+
+        }
+        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = MINE_DOWN;
+
+        }
+        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = MINE_RIGHT;
+            int& direction = GFXM.get_player_direction();
+            direction = FACE_RIGHT;
+
+        }
+        else {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = NO_ACTION;
         }
     }
 
@@ -150,7 +200,7 @@ namespace lof {
                 if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
 
                     ADM.play_now(player_id, "moving", audio_comp);
-                    update_player_animation(physic_comp);
+                    update_player_walking_particle();
                 }
             }
             else {
@@ -164,7 +214,7 @@ namespace lof {
         }
     }
 
-    void Player_Script::update_player_animation(Physics_Component& physic_comp) {
+    void Player_Script::update_player_walking_particle() {
         //animation logic is here.
 
         for (auto& system : ECSM.get_systems()) {

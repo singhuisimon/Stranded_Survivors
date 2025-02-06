@@ -542,20 +542,20 @@ namespace lof {
 		return core_system;
 	}
 
-	Vec3D Audio_System::get_channel_pos(const std::string& channel_key) {
-		auto it = channel_map.find(channel_key);
-		if (it == channel_map.end()) {
-			return Vec3D(); //there is no position by right if channel doesn't exist for now standard is return as default.
-		}
+	//Vec3D Audio_System::get_channel_pos(const std::string& channel_key) {
+	//	auto it = channel_map.find(channel_key);
+	//	if (it == channel_map.end()) {
+	//		return Vec3D(); //there is no position by right if channel doesn't exist for now standard is return as default.
+	//	}
 
-		FMOD_VECTOR pos;
-		for (FMOD::Channel* channel : it->second) {
-			channel->get3DAttributes(&pos, nullptr);
-			return Vec3D(pos.x, pos.y, pos.z);
-		}
+	//	FMOD_VECTOR pos;
+	//	for (FMOD::Channel* channel : it->second) {
+	//		channel->get3DAttributes(&pos, nullptr);
+	//		return Vec3D(pos.x, pos.y, pos.z);
+	//	}
 
-		return Vec3D();
-	}
+	//	return Vec3D();
+	//}
 
 	Vec3D Audio_System::get_listener_pos() {
 		FMOD_VECTOR pos;

@@ -520,7 +520,7 @@ namespace lof {
                         std::string end_func;
                         bool is_active = true;
                         ScriptData script_data;
-                        ExecutionState state;
+                        ExecutionState state = ExecutionState::Uninitialized;
 
                         // Parse basic script properties
                         if (script.HasMember("script_name") && script["script_name"].IsString()) {

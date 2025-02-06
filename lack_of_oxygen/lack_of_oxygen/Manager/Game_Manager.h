@@ -80,13 +80,13 @@ namespace lof {
          * @param block_id The EntityID of the block being destroyed
          * @return The mineral value associated with that block type
          */
-        int get_mineral_value(EntityID block_id) const;
+        //int get_mineral_value(EntityID block_id) const;
 
         /**
          * @brief Updates the mineral count text in the UI
          * @param value_to_add The value to add to the current mineral count
          */
-        void update_mineral_count_text(int value_to_add);
+        //void update_mineral_count_text(int value_to_add);
 
         bool check_non_mineral(EntityID block_id, std::string block_name) const;
 

@@ -33,7 +33,7 @@ namespace lof {
 
     public:
 
-        void register_script();
+        void register_script() override;
 
         Object_Moving_Script();
 
