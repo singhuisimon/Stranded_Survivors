@@ -1285,7 +1285,7 @@ namespace lof {
                         }
 
                         // Handle horizontal movement
-                        if (IM.is_key_held(GLFW_KEY_SPACE)) {
+                        if (IM.is_key_pressed(GLFW_KEY_SPACE)) {
                             physics.set_jump_requested(true); //this will set the flag to true inside the physics_component 
                         }
                         else {
