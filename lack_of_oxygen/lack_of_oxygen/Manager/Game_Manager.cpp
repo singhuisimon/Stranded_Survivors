@@ -208,19 +208,23 @@ namespace lof {
         }
 
         //commented out this is for me to test - Amanda
-        /*if (IM.is_key_held(GLFW_KEY_J)) {
-            oxygen_level--;
-            std::cout << "current oxygen level " << oxygen_level << std::endl;
+        if (IM.is_key_held(GLFW_KEY_J)) {
+            current_oxygen_level--;
+            //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
             increasing = false;
         }
 
         if (IM.is_key_held(GLFW_KEY_K)) {
-            oxygen_level++;
-            std::cout << "current oxygen level " << oxygen_level << std::endl;
+            current_oxygen_level++;
+            //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
             increasing = true;
         }
-        std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;*/
-        //ADM.update_bgm_layering(current_scene, oxygen_level, increasing);
+        //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
+        if (current_scene == 2 || current_scene == 1)
+        {
+            ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
+
+        }
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -556,27 +560,57 @@ namespace lof {
                                 auto& tnt_graphics = ECSM.get_component<Graphics_Component>(tnt_id);
                                 int time_fract = static_cast<int>(10.0f * (current->second - std::floorf(current->second)));
                                 if (time_fract % 6 == 2) {
+
+                                    // play the sound
+                                    if (ECSM.has_component<Audio_Component>(tnt_id)) {
+                                        auto& audio = ECSM.get_component<Audio_Component>(tnt_id);
+                                        ADM.play_now(tnt_id, "TNT_Explosion_Sound", audio);
+                                    }
+
                                     // Emit fuse sparks particles
                                     float part_x = tnt_transform.position.x - (tnt_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.x);
                                     float part_y = tnt_transform.position.y - (tnt_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * tnt_transform.scale.y);
                                     particle_system->particle_emit("TNT", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
 
-                                    // Change TNT alpha
-                                    tnt_graphics.color.a = 0.5f;
-                                    tnt_transform.scale.x = 96.0f * 1.1f;
-                                    tnt_transform.scale.y = 96.0f * 1.1f;
+                                    //// Change TNT alpha
+                                    //tnt_graphics.color.a = 0.5f;
+                                    //tnt_transform.scale.x = 96.0f * 1.1f;
+                                    //tnt_transform.scale.y = 96.0f * 1.1f;
                                 }
                                 else {
-                                    // Change TNT alpha
-                                    tnt_graphics.color.a = 1.0f;
-                                    tnt_transform.scale.x = 96.0f;
-                                    tnt_transform.scale.y = 96.0f;
+                                    //// Change TNT alpha
+                                    //tnt_graphics.color.a = 1.0f;
+                                    //tnt_transform.scale.x = 96.0f;
+                                    //tnt_transform.scale.y = 96.0f;
                                 }
                                 current->second -= delta_time; // Decrement particle fuse time
+
+                                // Emit circular visual effect for tnt fuse
+                                float angle = (360.0f * current->second / 2.0f) * (PI_VALUE / 180.0f);
+                                for (int i = 1; i <= 5; ++i) {
+
+                                    // Randomizer value
+                                    int randomizer = 4 + static_cast<int>(particle_system->get_rand_float() * 5.0f);
+
+                                    // lifetime of particle
+                                    float lifetime = current->second - 0.01f;
+                                    if (lifetime <= 0.0f) {
+                                        lifetime = 0.001f;
+                                    }
+
+                                    float part_x = tnt_transform.position.x + i * (cos(angle) * tnt_transform.scale.x / randomizer);
+                                    float part_y = tnt_transform.position.y + i * (sin(angle) * tnt_transform.scale.y / randomizer);
+                                    particle_system->particle_emit("TNT_VFX", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f), lifetime);
+                                }
 
                                 // Destroy itself and emit final particles when fuse time ends 
                                 if (current->second <= 0.0f) {
 
+                                    if (ECSM.has_component<Audio_Component>(tnt_id)) {
+                                        auto& audio = ECSM.get_component<Audio_Component>(tnt_id);
+                                        ADM.play_now(tnt_id, "TNT_Boom", audio);
+                                    }
+                                    
                                     // Emit explosion particles in a circular pattern
                                     for (int i = 0; i < 10; ++i) {
                                         float angle = i * 36.0f * (PI_VALUE / 180.0f);
@@ -647,13 +681,15 @@ namespace lof {
                                                     LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
                                                 }
                                                 else {
+                                                    // Check if tnt is activated to prevent activation again
+                                                    if (entity_animation.curr_tile_health != 0) {
+                                                        // Set tnt health to 0
+                                                        entity_animation.curr_tile_health = 0;
 
-                                                    // Set tnt health to 0
-                                                    entity_animation.curr_tile_health = 0;
-
-                                                    // Store name of TNT to destroy
-                                                    std::string name = ECSM.get_entity(entity_id)->get_name();
-                                                    tnt_to_destroy[name] = 2.0f;
+                                                        // Store name of TNT to destroy
+                                                        std::string name = ECSM.get_entity(entity_id)->get_name();
+                                                        tnt_to_destroy[name] = 2.0f;
+                                                    }
                                                 }
                                             }
                                         }
@@ -703,13 +739,15 @@ namespace lof {
                                                     LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
                                                 }
                                                 else {
+                                                    // Check if tnt is activated to prevent activation again
+                                                    if (entity_animation.curr_tile_health != 0) {
+                                                        // Set tnt health to 0
+                                                        entity_animation.curr_tile_health = 0;
 
-                                                    // Set tnt health to 0
-                                                    entity_animation.curr_tile_health = 0;
-
-                                                    // Store name of TNT to destroy
-                                                    std::string name = ECSM.get_entity(entity_id)->get_name();
-                                                    tnt_to_destroy[name] = 2.0f;
+                                                        // Store name of TNT to destroy
+                                                        std::string name = ECSM.get_entity(entity_id)->get_name();
+                                                        tnt_to_destroy[name] = 2.0f;
+                                                    }
                                                 }
                                             }
                                         }
@@ -770,9 +808,9 @@ namespace lof {
 
                                     // Check if player is dead to reset the scene
                                     if (is_player_dead == true) {
-                                        tnt_to_destroy.erase(current->first);
+                                        tnt_to_destroy.clear();
                                         IMGUIM.set_current_file_shown("scene2.scn");
-                                        continue;
+                                        break;
                                     } else {
                                         // Destroy tnt and remove it from the list of tnt to destroy
                                         ECSM.destroy_entity(tnt_id);
@@ -818,6 +856,14 @@ namespace lof {
                                     if (animation.animations["0"] != "TNT") {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
+
+                                            // play the tnt destroyed sound
+                                            /*if (ECSM.has_component<Audio_Component>(block_to_remove)) {
+                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
+                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
+                                            }*/
+
+
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -899,6 +945,13 @@ namespace lof {
                                     if (animation.animations["0"] != "TNT") {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
+
+                                            // play the tnt destroyed sound
+                                           /* if (ECSM.has_component<Audio_Component>(block_to_remove)) {
+                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
+                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
+                                            }*/
+
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -979,6 +1032,13 @@ namespace lof {
                                     if (animation.animations["0"] != "TNT") {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
+
+                                            // play the tnt destroyed sound
+                                            /*if (ECSM.has_component<Audio_Component>(block_to_remove)) {
+                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
+                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
+
+                                            }*/
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -1059,6 +1119,11 @@ namespace lof {
                                     if (animation.animations["0"] != "TNT") {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
+                                            // play the tnt destroyed sound
+                                           /* if (ECSM.has_component<Audio_Component>(block_to_remove)) {
+                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
+                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
+                                            }*/
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {

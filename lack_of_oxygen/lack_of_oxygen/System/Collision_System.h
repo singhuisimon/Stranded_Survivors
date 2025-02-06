@@ -151,6 +151,8 @@ namespace lof {
         EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
         EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
+        void Boundary_Check();
+      
         void reset_deposited_minerals() {
             total_deposited_minerals = 0;
         }
@@ -190,6 +192,9 @@ namespace lof {
 
         float post_transition_grace_period = 0.5f; // Grace period after transition
         float grace_timer = 0.0f; // Timer to track grace period
+
+        std::unordered_map<std::string, bool> button_hover_states;
+        std::unordered_map<std::string, bool> main_menu_sound_playing;
 
         //static bool collision_handled;
         //float accumulated_time = 0.0f;

@@ -80,7 +80,7 @@ namespace lof {
 
 		void unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
-		void update_bgm_layering(const int current_scene, const int oxygen_level = 100, bool increasing = false);
+		void update_bgm_layering(const int current_scene, const float oxygen_level = 100, bool increasing = false);
 
 		bool is_layer_playing(EntityID entity_id, const std::string& audio_key);
 
