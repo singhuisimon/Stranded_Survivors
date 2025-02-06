@@ -6,6 +6,8 @@
 #include "../Manager/Logic_Manager.h"
 #include "../Manager/ECS_Manager.h"
 
+#include <mutex>
+
 namespace lof {
 
 	std::unique_ptr<Logic_Manager> Logic_Manager::instance;

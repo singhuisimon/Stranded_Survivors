@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <mutex>
 
 #include "../Scripts/Script.h"
 
