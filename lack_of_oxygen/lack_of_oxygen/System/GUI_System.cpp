@@ -809,7 +809,7 @@ namespace lof {
         // Get the appropriate texture and message based on warning level
         std::string texture_name;
         std::string warning_message;
-        glm::vec3 text_color;
+        glm::vec3 text_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
         if (percent == 50.0f) {
             if (percent == 50.0f) {
@@ -830,26 +830,26 @@ namespace lof {
         }
 
         // Create warning container with unique name
-        EntityID container_id = ecs_manager.clone_entity_from_prefab("gui_container");
+        EntityID warning_container_id = ecs_manager.clone_entity_from_prefab("gui_container");
         if (container_id != INVALID_ENTITY_ID) {
             std::string unique_name = "warning_container_" + std::to_string(static_cast<int>(percent));
             ecs_manager.update_entity_name(container_id, unique_name);
             container_name = unique_name;
 
-            auto* container_gui = get_component_safe<GUI_Component>(container_id);
+            auto* container_gui = get_component_safe<GUI_Component>(warning_container_id);
             if (!container_gui) {
                 hide_oxygen_warning(percent);
                 return;
             }
             container_gui->is_container = true;
 
-            if (auto* graphics = get_component_safe<Graphics_Component>(container_id)) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(warning_container_id)) {
                 graphics->model_name = "square";
                 graphics->texture_name = texture_name;
                 graphics->color = glm::vec4(1.0f);
             }
 
-            if (auto* transform = get_component_safe<Transform2D>(container_id)) {
+            if (auto* transform = get_component_safe<Transform2D>(warning_container_id)) {
                 transform->position = Vec2D(0.0f, 200.0f);
                 transform->scale = Vec2D(2000.0f, 50.0f);
             }
@@ -890,17 +890,17 @@ namespace lof {
             warning_container_5_name;
 
         // Look up current entity IDs by name
-        EntityID text_id = ecs_manager.find_entity_by_name(text_name);
-        EntityID container_id = ecs_manager.find_entity_by_name(container_name);
+        EntityID warning_text_id = ecs_manager.find_entity_by_name(text_name);
+        EntityID warning_container_id = ecs_manager.find_entity_by_name(container_name);
 
         // Destroy text entity if it exists
-        if (text_id != INVALID_ENTITY_ID) {
-            ecs_manager.destroy_entity(text_id);
+        if (warning_text_id != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(warning_text_id);
         }
 
         // Destroy container entity if it exists
-        if (container_id != INVALID_ENTITY_ID) {
-            ecs_manager.destroy_entity(container_id);
+        if (warning_container_id != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(warning_container_id);
         }
 
         // Clear the stored names

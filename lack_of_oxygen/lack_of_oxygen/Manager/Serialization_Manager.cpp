@@ -88,7 +88,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V2.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -96,7 +96,7 @@ namespace lof {
 
         // Load scene file
         const std::string scene_folder = "Scenes";
-        std::string loaded_scene = "scene1.scn";
+        std::string loaded_scene = "main_menu.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
         // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4
