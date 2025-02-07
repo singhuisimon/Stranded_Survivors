@@ -35,6 +35,7 @@ namespace lof {
         std::weak_ptr<Player_Script> weak_script = player_script;
 
         player_script->add_function("init", [weak_script](EntityID entity_id) {
+            (void)entity_id;
 			auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);

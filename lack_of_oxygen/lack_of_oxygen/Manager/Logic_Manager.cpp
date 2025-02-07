@@ -48,9 +48,9 @@ namespace lof {
 	}
 
 	void Logic_Manager::update(float delta_time) {
-
+		(void)delta_time;
 		//LM.write_log("Logic_Manager:: updating");
-		LGS.update_script(delta_time);
+		LGS.update_script();
 	}
 
 	void Logic_Manager::register_all_scripts() {

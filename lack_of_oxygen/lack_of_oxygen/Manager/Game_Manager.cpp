@@ -847,7 +847,6 @@ namespace lof {
                             }
                         }
 
-                        auto& physics = ECSM.get_component<Physics_Component>(player_id);
                         auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
 
                         if (IM.is_key_pressed(GLFW_KEY_LEFT)) {

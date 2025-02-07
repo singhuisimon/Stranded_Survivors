@@ -58,9 +58,8 @@ namespace lof {
         
         /**
          * @brief Updates the scripts for all relevant entities.
-         * @param delta_time Time elapsed since the last update.
          */
-        void update_script(float delta_time);
+        void update_script();
 
         /**
          * @brief Add scripts to the scripts_map.
