@@ -57,7 +57,7 @@ namespace lof {
         }
 
         // Hide all GUI elements with logging
-        LM.write_log("GUI_System::reset_all_game_state(): Hiding GUI elements...");
+        //LM.write_log("GUI_System::reset_all_game_state(): Hiding GUI elements...");
         hide_mineral_tank_gui();
         hide_oxygen_tank_gui();
         hide_oxygen_warning(50.0f);
@@ -65,9 +65,9 @@ namespace lof {
         hide_oxygen_warning(5.0f);
 
         // Log initial state of entities before reset
-        LM.write_log("GUI_System::reset_all_game_state(): Current entity states - "
-            "mineral_e_prompt: %d, oxygen_e_prompt: %d",
-            mineral_e_prompt, oxygen_e_prompt);
+        //LM.write_log("GUI_System::reset_all_game_state(): Current entity states - "
+            //"mineral_e_prompt: %d, oxygen_e_prompt: %d",
+           // mineral_e_prompt, oxygen_e_prompt);
 
         // Reset GUI state variables
         mineral_e_prompt = INVALID_ENTITY_ID;
@@ -80,7 +80,7 @@ namespace lof {
         oxygen_percentage_text2 = INVALID_ENTITY_ID;
 
         // Reset gameplay values with logging
-        LM.write_log("GUI_System::reset_all_game_state(): Resetting gameplay values...");
+       // LM.write_log("GUI_System::reset_all_game_state(): Resetting gameplay values...");
         GM.set_current_oxygen_level(100.0f);
         GM.set_ship_oxygen_level(400.0f);
 
@@ -107,7 +107,7 @@ namespace lof {
         }
 
         // Reset warning states
-        LM.write_log("GUI_System::reset_all_game_state(): Resetting warning states...");
+       // LM.write_log("GUI_System::reset_all_game_state(): Resetting warning states...");
         warning_50_active = false;
         warning_20_active = false;
         warning_5_active = false;
@@ -118,7 +118,7 @@ namespace lof {
         warning_20_display_time = 0.0f;
         warning_5_display_time = 0.0f;
 
-        LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
+       // LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
     }
 
 
@@ -165,11 +165,11 @@ namespace lof {
         // Check if we've reached 100% (50,000 minerals)
         if (stored_mineral_progress * 50000 >= 50000) {
             // win condition log current stored mineral ammount
-            LM.write_log("Win condition met: %f minerals collected", stored_mineral_progress * 50000.0f);
+         //   LM.write_log("Win condition met: %f minerals collected", stored_mineral_progress * 50000.0f);
 
             reset_all_game_state();
 
-            LM.write_log("Reset met: %f minerals collected", stored_mineral_progress * 50000.0f);
+         //   LM.write_log("Reset met: %f minerals collected", stored_mineral_progress * 50000.0f);
 
             // Load win screen
             const std::string SCENES = "Scenes";
@@ -187,11 +187,11 @@ namespace lof {
 
                 // Update scene
                 GM.set_current_scene(4);
-                IMGUIM.set_current_file_shown(scene_file);
+                //IMGUIM.set_current_file_shown(scene_file);
                 return;
             }
             else {
-                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+             //   LM.write_log("Failed to load scene file: %s", scene_path.c_str());
             }
         }
 
@@ -266,58 +266,58 @@ namespace lof {
 
     void GUI_System::debug_entity(const char* prefix, EntityID id) {
         if (id == INVALID_ENTITY_ID) {
-            LM.write_log("%s: Invalid entity ID", prefix);
+          //  LM.write_log("%s: Invalid entity ID", prefix);
             return;
         }
 
         auto* entity = ecs_manager.get_entity(id);
         if (!entity) {
-            LM.write_log("%s: Entity %u not found in ECS", prefix, id);
+          //  LM.write_log("%s: Entity %u not found in ECS", prefix, id);
             return;
         }
 
-        LM.write_log("%s: Entity %u exists, name: %s", prefix, id, entity->get_name().c_str());
+       // LM.write_log("%s: Entity %u exists, name: %s", prefix, id, entity->get_name().c_str());
 
         if (ecs_manager.has_component<Transform2D>(id)) {
             auto& transform = ecs_manager.get_component<Transform2D>(id);
-            LM.write_log("  - Transform2D: pos(%.2f, %.2f)", transform.position.x, transform.position.y);
+          //  LM.write_log("  - Transform2D: pos(%.2f, %.2f)", transform.position.x, transform.position.y);
         }
 
         if (ecs_manager.has_component<Graphics_Component>(id)) {
             auto& graphics = ecs_manager.get_component<Graphics_Component>(id);
-            LM.write_log("  - Graphics: texture='%s'", graphics.texture_name.c_str());
+           // LM.write_log("  - Graphics: texture='%s'", graphics.texture_name.c_str());
         }
 
         if (ecs_manager.has_component<GUI_Component>(id)) {
             auto& gui = ecs_manager.get_component<GUI_Component>(id);
-            LM.write_log("  - GUI: progress=%.2f, isContainer=%d, isProgressBar=%d",
-                gui.progress, gui.is_container, gui.is_progress_bar);
+           // LM.write_log("  - GUI: progress=%.2f, isContainer=%d, isProgressBar=%d",
+           //     gui.progress, gui.is_container, gui.is_progress_bar);
         }
 
         // Check if entity is in this system
         if (entities.find(id) != entities.end()) {
-            LM.write_log("  - Present in GUI_System");
+           // LM.write_log("  - Present in GUI_System");
         }
         else {
-            LM.write_log("  - NOT present in GUI_System");
+           // LM.write_log("  - NOT present in GUI_System");
         }
     }
 
     void GUI_System::validate_gui_state() {
-        LM.write_log("=== GUI State Validation ===");
+       // LM.write_log("=== GUI State Validation ===");
         debug_entity("Container", container_id);
         debug_entity("Background Bar", background_bar_id);
         debug_entity("Progress Bar", progress_bar_id);
 
         // List all entities in this system
-        LM.write_log("Entities in GUI_System:");
+       // LM.write_log("Entities in GUI_System:");
         for (EntityID id : entities) {
             auto* entity = ecs_manager.get_entity(id);
             if (entity) {
-                LM.write_log("  - Entity %u (%s)", id, entity->get_name().c_str());
+               // LM.write_log("  - Entity %u (%s)", id, entity->get_name().c_str());
             }
         }
-        LM.write_log("=== End GUI State Validation ===");
+       // LM.write_log("=== End GUI State Validation ===");
     }
 
     // ---------------------------------------------------------
@@ -470,7 +470,7 @@ namespace lof {
     {
         if (GM.get_current_scene() == 0) { // Main menu
             stored_mineral_progress = 0.0f;
-            LM.write_log("GUI_System::update_mineral_progress(): Reset progress on main menu");
+          //  LM.write_log("GUI_System::update_mineral_progress(): Reset progress on main menu");
             return;
         }
 

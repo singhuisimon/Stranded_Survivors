@@ -49,7 +49,7 @@ namespace lof {
 
         if (instance) {
             instance.reset();
-			LM.write_log("Logic_System::instance reset");
+			//LM.write_log("Logic_System::instance reset");
         }
     }
 
@@ -91,14 +91,14 @@ namespace lof {
 
                 //this is keep for in the future when level editor disable it.
                 if (!logic_data->is_active) {
-                    LM.write_log("Logic_System::update_script, entity %u logic is not active", entityid);
+                  //  LM.write_log("Logic_System::update_script, entity %u logic is not active", entityid);
                     continue;
                 }
 
                 //gets the script based off the script name
                 auto script = get_script(logic_data->script_name);
                 if (!script) {
-                    LM.write_log("Logic_System::update_script script not found");
+                  //  LM.write_log("Logic_System::update_script script not found");
                     continue;
                 }
 
@@ -135,7 +135,7 @@ namespace lof {
                     }
                     end_func(entityid);
                     logic_data->is_active = false;
-                    LM.write_log("Logic_System::update_script completed script");
+                   // LM.write_log("Logic_System::update_script completed script");
                 }
             }
         }
@@ -144,7 +144,7 @@ namespace lof {
     void Logic_System::cleanup() {
         for (auto& script_pair : script_map) {
             script_pair.second.reset(); // reset each shared_ptr
-            LM.write_log("Logic_System::cleanup() resetting shared_ptr");
+         //   LM.write_log("Logic_System::cleanup() resetting shared_ptr");
         }
 
         script_map.clear();
@@ -153,7 +153,7 @@ namespace lof {
 
     void Logic_System::add_script(const std::string& script_name, std::shared_ptr<Script> script) {
         script_map[script_name] = script;
-        LM.write_log("registered %s script into script map", script_name.c_str());
+        //LM.write_log("registered %s script into script map", script_name.c_str());
     }
 
     std::shared_ptr<Script> Logic_System::get_script(const std::string& script_name) {

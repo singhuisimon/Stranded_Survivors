@@ -17,7 +17,7 @@ namespace lof {
 		signature.set(ECSM.get_component_id<Transform2D>());	//this is for the listener, etc
 
 		if (initialize()) {
-			LM.write_log("successfully initialize audio system.");
+			//LM.write_log("successfully initialize audio system.");
 		}
 	}
 
@@ -57,7 +57,7 @@ namespace lof {
 
 			if (entityID == ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME)) {
 				if (!ECSM.has_component<Transform2D>(entityID)) {
-					LM.write_log("Audio_System. update has detected player to update listener_pos but no transform component");
+					//LM.write_log("Audio_System. update has detected player to update listener_pos but no transform component");
 					continue;
 				}
 				//update listener position here
@@ -73,7 +73,7 @@ namespace lof {
 
 				//check if the file exist, if it no longer does stop and release the sound immediately if it is still playing
 				if (!ASM.load_audio_file(audio.get_filepath(audio_key))) {
-					LM.write_log("Audio_System::update Audio File %s no longer exist", audio.get_filepath(audio_key).c_str());
+					//LM.write_log("Audio_System::update Audio File %s no longer exist", audio.get_filepath(audio_key).c_str());
 					if (channel_map.find(channel_key) != channel_map.end()) {
 						stop_sound(channel_key);
 						ADM.unload_sound(audio.get_filepath(audio_key));
@@ -91,7 +91,7 @@ namespace lof {
 				else {
 					//checking if filepath name aligns
 					if (it1->second != file_path) {
-						LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
+					//	LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
 				
 						std::string old_channel_key = it1->second + std::to_string(entityID) + audio_key;
 				
@@ -171,7 +171,7 @@ namespace lof {
 			core_system = nullptr;
 		}
 
-		LM.write_log("Audio System shutdown successfully");
+		//LM.write_log("Audio System shutdown successfully");
 	}
 
 	std::string Audio_System::generate_channel_key(EntityID entity_id, const std::string& file_path, const std::string& audio_key) {
@@ -186,7 +186,7 @@ namespace lof {
 		}
 		else {
 			if (it1->second != file_path) {
-				LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
+			//	LM.write_log("Audio_System::play_sound: Stopping previous sound %s due to audio key %s path is mismatch", it1->second.c_str(), audio_key.c_str());
 
 				std::string entityID = cskey.substr(file_path.length(), cskey.length() - file_path.length() - audio_key.length());
 
@@ -231,7 +231,7 @@ namespace lof {
 		//it checks if the max channel size has been reach and if so it stops the first one and play the next <- this is for mining specially tbh.
 		//it needs to check incase the number of channel currently is less than 1. (if so no need stop) //THINK AGAIN ABOUT THIS LOGIC
 		if (channels.size() >= audio.get_max_simultaneous(audio_key) && audio.get_max_simultaneous(audio_key) >= MIN_SIMULTANEOUS) {
-			LM.write_log("Max simultaneous channel reached, stopping the first channel");
+			//LM.write_log("Max simultaneous channel reached, stopping the first channel");
 			FMOD::Channel* first = channels.front();
 			first->stop();
 			channels.erase(channels.begin());
@@ -241,7 +241,7 @@ namespace lof {
 
 		FMOD_RESULT result = core_system->playSound(sound, nullptr, false, &channel);
 		if (ADM.errorcheck(result) != 0 || !channel) {
-			LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
+		//	LM.write_log("Audio_System::play_sound: Channel creation failed for %s", file_path.c_str());
 			return;
 		}
 
@@ -250,11 +250,11 @@ namespace lof {
 		//add channel into the respective channel group
 		if (audio.get_audio_type(audio_key) == SFX) {
 			channel->setChannelGroup(ADM.get_sfxgroup());
-			LM.write_log("audio added into SFX Group");
+			//LM.write_log("audio added into SFX Group");
 		}
 		else {
 			channel->setChannelGroup(ADM.get_uigroup());
-			LM.write_log("audio added into UI Group");
+			//LM.write_log("audio added into UI Group");
 		}
 
 		if (audio.get_loop(audio_key)) {
@@ -286,15 +286,15 @@ namespace lof {
 
 			existing_channel->isPlaying(&is_playing);
 			if (is_playing) {
-				LM.write_log("BGM %s is already playing, skipping restart.", cskey.c_str());
+				//LM.write_log("BGM %s is already playing, skipping restart.", cskey.c_str());
 				return;
 			}
 			else {
-				LM.write_log("BGM %s was in channel_map but is NOT playing, restarting.", cskey.c_str());
+				//LM.write_log("BGM %s was in channel_map but is NOT playing, restarting.", cskey.c_str());
 				stop_sound(cskey);
 			}
 
-			LM.write_log("BGM %s is already playing", cskey.c_str());
+			//LM.write_log("BGM %s is already playing", cskey.c_str());
 			return;
 		}
 
@@ -391,7 +391,7 @@ namespace lof {
 		//check if the channel key even exist in the map
 		auto it = channel_map.find(channel_key);
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::stop_sound: %s isn't found in the channelmap.", channel_key.c_str());
+			//LM.write_log("Audio_System::stop_sound: %s isn't found in the channelmap.", channel_key.c_str());
 			return;
 		}
 
@@ -422,7 +422,7 @@ namespace lof {
 
 	void Audio_System::set_channel_pitch(const std::string& channel_key, float pitch) {
 		if (channel_map.find(channel_key) == channel_map.end()) {
-			LM.write_log("Audio_System::set_channel_pitch: failed to set channel pitch as channel is not in channel map.");
+		//	LM.write_log("Audio_System::set_channel_pitch: failed to set channel pitch as channel is not in channel map.");
 			return;
 		}
 		auto it = channel_map.find(channel_key);
@@ -444,7 +444,7 @@ namespace lof {
 		auto it = channel_map.find(channel_key);
 		
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::set_channel_volume: failed to set channel volume as channel is not in channel map.");
+		//	LM.write_log("Audio_System::set_channel_volume: failed to set channel volume as channel is not in channel map.");
 			return;
 		}
 
@@ -465,7 +465,7 @@ namespace lof {
 		auto it = channel_map.find(channel_key);
 		
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::set_channel_mute: failed to set channel mute as channel is not in channel map.");
+		//	LM.write_log("Audio_System::set_channel_mute: failed to set channel mute as channel is not in channel map.");
 			return;
 		}
 
@@ -498,7 +498,7 @@ namespace lof {
 		auto it = channel_map.find(channel_key);
 
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::get_channel_mute: failed to get mute status of channel as channel is not in the map");
+			//LM.write_log("Audio_System::get_channel_mute: failed to get mute status of channel as channel is not in the map");
 			return;
 		}
 
@@ -510,7 +510,7 @@ namespace lof {
 	}
 
 	FMOD::System* Audio_System::get_core_system() {
-		LM.write_log("Audio_System::get_core_system: retrieveing core_system");
+		//LM.write_log("Audio_System::get_core_system: retrieveing core_system");
 		return core_system;
 	}
 
@@ -598,7 +598,7 @@ namespace lof {
 			for (FMOD::Channel* channel : channels) {
 				channel->isPlaying(&playing);
 				if (playing) {
-					LM.write_log("Active channel %s", key.c_str());
+					//LM.write_log("Active channel %s", key.c_str());
 				}				
 			}
 
@@ -614,7 +614,7 @@ namespace lof {
 			for (FMOD::Channel* channel : channels) {
 				channel->getMute(&muted);
 				if (muted) {
-					LM.write_log("Current channek %s is muted", key.c_str());
+					//LM.write_log("Current channek %s is muted", key.c_str());
 				}
 
 			}
@@ -631,7 +631,7 @@ namespace lof {
 				if (sound) {
 					char sound_name[512];
 					sound->getName(sound_name, sizeof(sound_name));
-					LM.write_log("Active Sound: %s (key: %s)", sound_name, key.c_str());
+					//LM.write_log("Active Sound: %s (key: %s)", sound_name, key.c_str());
 				}
 			}
 		}

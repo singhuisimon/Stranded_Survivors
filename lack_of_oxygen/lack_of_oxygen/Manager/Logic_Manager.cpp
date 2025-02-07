@@ -22,16 +22,16 @@ namespace lof {
 
 	int Logic_Manager::start_up() {
 		if (is_started()) {
-			LM.write_log("Logic_Manager::start_up(): Logic_Manager is already started.");
+			//LM.write_log("Logic_Manager::start_up(): Logic_Manager is already started.");
 			return 0; //Already started
 		}
 
 		try {
 			register_all_scripts();
-			LM.write_log("Logic_Manager::start_up(): Added script """);
+			///LM.write_log("Logic_Manager::start_up(): Added script """);
 		}
 		catch (const std::exception& e) {
-			LM.write_log("Logic_Manager::start_up(): Failed to initalize. Error: %s", e.what());
+			//LM.write_log("Logic_Manager::start_up(): Failed to initalize. Error: %s", e.what());
 			return -1;
 		}
 
@@ -49,28 +49,28 @@ namespace lof {
 		// Register Object Moving Script
 		Object_Moving_Script object_moving_script;
 		object_moving_script.register_script();
-		LM.write_log("Registered Object Moving Script");
+		//LM.write_log("Registered Object Moving Script");
 
 		Player_Script player_script;
 		player_script.register_script();
-		LM.write_log("Registered Player Script");
+		//LM.write_log("Registered Player Script");
 
 		// Register other scripts here as they are added.
 	}
 
 	void Logic_Manager::shut_down() {
 		if (!is_started()) {
-			LM.write_log("Logic_Manager::shut_down(): Logic_Manager is not started. Nothing to shut down");
+			//LM.write_log("Logic_Manager::shut_down(): Logic_Manager is not started. Nothing to shut down");
 			return;
 		}
 
 		LGS.cleanup();
 		if (instance) {
 			instance.reset();
-			LM.write_log("Logic_Manager::shut_down(): Logic_Manager instance deleted.");
+			//LM.write_log("Logic_Manager::shut_down(): Logic_Manager instance deleted.");
 		}
 
-		LM.write_log("Logic_Manager::shut_down(): Logic_Manager shut down.");
+		//LM.write_log("Logic_Manager::shut_down(): Logic_Manager shut down.");
 		
 	}
 }

@@ -1010,6 +1010,8 @@ namespace lof {
     int previous_minerals = 0;
     float previous_oxygen = 0;
     int oxygen_count = 0; 
+	bool bgm_oxygen_increasing = false;
+    float last_oxygen_level = 0.0f;
 
     void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
     {
@@ -1243,6 +1245,20 @@ namespace lof {
                     gui_system->hide_oxygen_tank_gui();
                 }
 
+                float current_oxygen = GM.get_current_oxygen_level();
+                if (current_oxygen > last_oxygen_level) {
+                    bgm_oxygen_increasing = true;
+
+				}
+				else if (current_oxygen < last_oxygen_level) {
+					bgm_oxygen_increasing = false;
+				}
+				last_oxygen_level = current_oxygen; 
+                
+                int current_scene = GM.get_current_scene();
+                if (current_scene == 1 || current_scene == 2) {
+					ADM.update_bgm_layering(current_scene, current_oxygen, bgm_oxygen_increasing);
+                }
                 break;
             }
         }
@@ -1739,12 +1755,12 @@ namespace lof {
             }
                 
             //dont know where this came or what it does
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
 
             if (is_hovered) {
@@ -1768,7 +1784,7 @@ namespace lof {
                     
                     // Scene Switching Logic
                     if (entity_name == "play_button") {
-                        LM.write_log("Play button held - attempting scene transition");
+                        //LM.write_log("Play button held - attempting scene transition");
 
                         // Clear dynamic entities first
                         bool found_movement_system = false;
@@ -1776,23 +1792,23 @@ namespace lof {
                             if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
                                 movement_system->clear_dynamic_entities();
                                 found_movement_system = true;
-                                LM.write_log("Found and cleared Movement System");
+                               // LM.write_log("Found and cleared Movement System");
                                 break;
                             }
                         }
                         if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
+                            //LM.write_log("Warning: Movement System not found");
                         }
 
                         // Set up scene loading
                         const std::string SCENES = "Scenes";
                         std::string scene_file = "scene2.scn";
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-                        LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
+                       // LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
 
                         // Try to load scene2
                         if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("Scene loaded successfully");
+                            //LM.write_log("Scene loaded successfully");
 
                             // Reset camera position
                             auto& camera = GFXM.get_camera();
@@ -1820,16 +1836,16 @@ namespace lof {
                             GM.set_current_scene(2);
 
                             // Update IMGUI Manager's current file
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
                         else {
-                            LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+                           // LM.write_log("Failed to load scene file: %s", scene_path.c_str());
                         }
                     }
                     else if (entity_name == "credit_button") {
-                        LM.write_log("Credits button held - attempting scene transition");
+                      //  LM.write_log("Credits button held - attempting scene transition");
 
                         // Clear dynamic entities first
                         bool found_movement_system = false;
@@ -1837,12 +1853,12 @@ namespace lof {
                             if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
                                 movement_system->clear_dynamic_entities();
                                 found_movement_system = true;
-                                LM.write_log("Found and cleared Movement System");
+                                //LM.write_log("Found and cleared Movement System");
                                 break;
                             }
                         }
                         if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
+                            //LM.write_log("Warning: Movement System not found");
                         }
 
                         const std::string SCENES = "Scenes";
@@ -1850,7 +1866,7 @@ namespace lof {
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
                         if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("Credits scene loaded successfully");
+                          //  LM.write_log("Credits scene loaded successfully");
 
                             // Reset camera position - add this section
                             auto& camera = GFXM.get_camera();
@@ -1862,16 +1878,16 @@ namespace lof {
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(3);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
                         else {
-                            LM.write_log("Failed to load credits scene: %s", scene_path.c_str());
+                           // LM.write_log("Failed to load credits scene: %s", scene_path.c_str());
                         }
                     }
                     else if (entity_name == "quit_button") {
-                        LM.write_log("Quit button pressed - ending game");
+                       // LM.write_log("Quit button pressed - ending game");
                         GM.set_game_over(true);
                     }
                 }
@@ -1933,12 +1949,12 @@ namespace lof {
             std::string click_sound = "main_menu";
 
             //is this code from lily??
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
@@ -1949,7 +1965,7 @@ namespace lof {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
-                    LM.write_log("Back button held - returning to main menu");
+                   // LM.write_log("Back button held - returning to main menu");
 
                     // Clear dynamic entities first
                     bool found_movement_system = false;
@@ -1961,7 +1977,7 @@ namespace lof {
                         }
                     }
                     if (!found_movement_system) {
-                        LM.write_log("Warning: Movement System not found");
+                       // LM.write_log("Warning: Movement System not found");
                     }
 
                     const std::string SCENES = "Scenes";
@@ -1969,7 +1985,7 @@ namespace lof {
                     std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
                     if (SM.load_scene(scene_path.c_str())) {
-                        LM.write_log("Main menu scene loaded successfully");
+                       // LM.write_log("Main menu scene loaded successfully");
 
                         // Reset camera position
                         auto& camera = GFXM.get_camera();
@@ -1981,13 +1997,13 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
+                        //IMGUIM.set_current_file_shown(scene_file);
                         current_cooldown = transition_cooldown;  // Set the cooldown timer
                         is_transitioning = true;
                         return;
                     }
                     else {
-                        LM.write_log("Failed to load main menu scene: %s", scene_path.c_str());
+                      //  LM.write_log("Failed to load main menu scene: %s", scene_path.c_str());
                     }
                 }
                 else {
@@ -2056,12 +2072,12 @@ namespace lof {
 
 
             //lily's update/?
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
            
 
@@ -2079,7 +2095,7 @@ namespace lof {
 
                     // Handle button click logic
                     if (entity_name == "restart_button") {
-                        LM.write_log("Restart button held - reloading game scene");
+                       // LM.write_log("Restart button held - reloading game scene");
 
                         // Clear dynamic entities first
                         bool found_movement_system = false;
@@ -2091,20 +2107,20 @@ namespace lof {
                             }
                         }
                         if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
+                           // LM.write_log("Warning: Movement System not found");
                         }
 
                         const std::string SCENES = "Scenes";
                         std::string scene_path = ASM.get_full_path(SCENES, "scene2.scn");
                         if (SM.load_scene(scene_path.c_str())) {
                             GM.set_current_scene(2);
-                            LM.write_log("Successfully reloaded scene2.scn");
+                            //LM.write_log("Successfully reloaded scene2.scn");
                             is_transitioning = true;
                             return;
                         }
                     }
                     else { // main_menu_button
-                        LM.write_log("Main menu button held - returning to main menu");
+                       // LM.write_log("Main menu button held - returning to main menu");
 
                         // Clear dynamic entities first
                         bool found_movement_system = false;
@@ -2116,14 +2132,14 @@ namespace lof {
                             }
                         }
                         if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
+                            //LM.write_log("Warning: Movement System not found");
                         }
 
                         const std::string SCENES = "Scenes";
                         std::string scene_file = "main_menu.scn";  // Store filename separately
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
-                        LM.write_log("Attempting to load main menu scene: %s", scene_path.c_str());  // Add debug logging
+                     //   LM.write_log("Attempting to load main menu scene: %s", scene_path.c_str());  // Add debug logging
 
                         if (SM.load_scene(scene_path.c_str())) {
                             // Reset camera position
@@ -2135,11 +2151,11 @@ namespace lof {
                             ADM.stop_mastergroup();
 
                             GM.set_current_scene(0);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             current_cooldown = transition_cooldown;
                             grace_timer = post_transition_grace_period; // Set grace period
                             is_transitioning = true;
-                            LM.write_log("Successfully loaded main menu scene");  // Add success logging
+                            //LM.write_log("Successfully loaded main menu scene");  // Add success logging
                             return;
                         }
                     }

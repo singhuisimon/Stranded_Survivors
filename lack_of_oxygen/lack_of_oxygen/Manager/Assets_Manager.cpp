@@ -147,10 +147,10 @@ namespace lof {
             shader_programs.emplace_back(shader_program);
             std::size_t shader_idx = shader_programs.size() - 1;
 
-            LM.write_log("Assets_Manager::load_shader_programs(): Shader program handle is %u.",
-                shader_program.program_handle);
+            //LM.write_log("Assets_Manager::load_shader_programs(): Shader program handle is %u.",
+                /*shader_program.program_handle);
             LM.write_log("Assets_Manager::load_shader_programs(): Shader program %zu created, compiled and added successfully.",
-                shader_idx);
+                shader_idx);*/
         }
         return true;
     }

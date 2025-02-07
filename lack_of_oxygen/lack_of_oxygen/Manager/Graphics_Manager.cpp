@@ -73,11 +73,11 @@ namespace lof {
 
         // Load shader files
         if (!ASM.load_shader_programs(shader_files)) {
-            LM.write_log("Graphics_Manager::start_up(): Failed to load shader programs");
+           // LM.write_log("Graphics_Manager::start_up(): Failed to load shader programs");
             return -1;
         }
         else {
-            LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
+            //LM.write_log("Graphics_Manager::start_up(): Succesfully added shader programs.");
         }
 
         // File path for assets
@@ -87,26 +87,26 @@ namespace lof {
 
         // Add models
         if (!add_model(mesh_path)) {
-            LM.write_log("Graphics_Manager::start_up(): Failed to add models");
+           // LM.write_log("Graphics_Manager::start_up(): Failed to add models");
             return -2;
         }
 
         // Add animations
         if (!add_animations(animation_path.c_str())) {
-            LM.write_log("Fail to add animations.");
+          //  LM.write_log("Fail to add animations.");
             return -4;
         }
 
         // Add fonts
         if (!add_fonts(font_path.c_str())) {
-            LM.write_log("Fail to add fonts.");
+           // LM.write_log("Fail to add fonts.");
             return -5;
         }
 
         // Set up the framebuffer and game scene texture for imgui viewport
         glGenFramebuffers(1, &imgui_fbo);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE) {
-            LM.write_log("Graphics_Manager::start_up(): FRAME BUFFER CREATION SUCCESSFUL.");
+           // LM.write_log("Graphics_Manager::start_up(): FRAME BUFFER CREATION SUCCESSFUL.");
         }
         glBindFramebuffer(GL_FRAMEBUFFER, imgui_fbo);
 
@@ -159,7 +159,7 @@ namespace lof {
     // Add models to storage
     GLboolean Graphics_Manager::add_model(const std::string& file_name) {
         if (!ASM.load_model_data(file_name)) {
-            LM.write_log("Graphics_Manager: Failed to load model data");
+           // LM.write_log("Graphics_Manager: Failed to load model data");
             return GL_FALSE;
         }
 
@@ -226,10 +226,10 @@ namespace lof {
             mdl.draw_cnt = static_cast<GLuint>(modelData.vtxIdx.size());
             models[model_name] = mdl;
 
-            LM.write_log("Graphics_Manager: Created GPU resources for model %s", model_name.c_str());
+        //    LM.write_log("Graphics_Manager: Created GPU resources for model %s", model_name.c_str());
         }
 
-        LM.write_log("Graphics_Manager: All models successfully created and stored.");
+      //  LM.write_log("Graphics_Manager: All models successfully created and stored.");
         return GL_TRUE;
     }
 
@@ -242,12 +242,12 @@ namespace lof {
         texture_file = ASM.get_full_path(ASM.TEXTURE_PATH, texture_file);
         std::ifstream input_file{ texture_file, std::ios::in };
         if (!input_file) {
-            LM.write_log("Assets_Manager: Unable to open texture list %s", texture_file.c_str());
+          //  LM.write_log("Assets_Manager: Unable to open texture list %s", texture_file.c_str());
             return GL_FALSE;
         }
         input_file.close();
 
-        LM.write_log("Graphics Manager: Loading texture from %s", texture_file.c_str());
+      //  LM.write_log("Graphics Manager: Loading texture from %s", texture_file.c_str());
 
         // Load texture data
         int width{ 0 }, height{ 0 }, channels{ 0 };
@@ -255,7 +255,7 @@ namespace lof {
         unsigned char* tex_data = stbi_load(texture_file.c_str(), &width, &height, &channels, 4);
 
         // Add debug logging for dimensions
-        LM.write_log("Graphics Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
+      //  LM.write_log("Graphics Manager: Texture dimensions: %dx%d with %d channels", width, height, channels);
 
         // Create and initialize texture object
         GLuint tex_id{};
@@ -274,11 +274,11 @@ namespace lof {
             stbi_image_free(tex_data);
 
             // Add debug logging
-            LM.write_log("Graphics Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
+         //   LM.write_log("Graphics Manager: Created texture with ID %u for %s", tex_id, texture_name.c_str());
         }
         else {
             stbi_image_free(tex_data);
-            LM.write_log("Graphics Manager: Failed to load texture data for %s", texture_name.c_str());
+         //   LM.write_log("Graphics Manager: Failed to load texture data for %s", texture_name.c_str());
             return GL_FALSE;
         }
 
@@ -314,7 +314,7 @@ namespace lof {
             for (unsigned char ch = 0; ch < 128; ++ch) {
                 // Load character glyph
                 if (FT_Load_Char(face, ch, FT_LOAD_RENDER)) {
-                    LM.write_log("Failed to load Glyph");
+                  //  LM.write_log("Failed to load Glyph");
                     continue;
                 }
 
@@ -363,14 +363,14 @@ namespace lof {
 
             // Add to storage
             ASM.font_storage[font_name] = new_font;
-            LM.write_log("Font %s successfully added.", font_name.c_str());
+          //  LM.write_log("Font %s successfully added.", font_name.c_str());
 
             glBindTexture(GL_TEXTURE_2D, 0);
             FT_Done_Face(face);
             FT_Done_FreeType(font_type);
         }
 
-        LM.write_log("All fonts successfully created and stored.");
+     //   LM.write_log("All fonts successfully created and stored.");
         return GL_TRUE;
     }
 
@@ -431,19 +431,19 @@ namespace lof {
             // Check if file's state is good for reading
             std::string shader_source;
             if (!ASM.read_shader_file(file.second, shader_source)) {
-                LM.write_log("Graphics_Manager::compile_shader(): File %s has error.", file.second.c_str());
+               // LM.write_log("Graphics_Manager::compile_shader(): File %s has error.", file.second.c_str());
                 return GL_FALSE;
             }
-            LM.write_log("Graphics_Manager::compile_shader(): File %s is good for reading.", file.second.c_str());
+           // LM.write_log("Graphics_Manager::compile_shader(): File %s is good for reading.", file.second.c_str());
 
             // Create shader program
             if (shader.program_handle <= 0) {
                 shader.program_handle = glCreateProgram();
                 if (shader.program_handle == 0) {
-                    LM.write_log("Graphics_Manager::compile_shader(): Cannot create program handle");
+                    //LM.write_log("Graphics_Manager::compile_shader(): Cannot create program handle");
                     return GL_FALSE;
                 }
-                LM.write_log("Graphics_Manager::compile_shader(): Program handle %u created", shader.program_handle);
+              //  LM.write_log("Graphics_Manager::compile_shader(): Program handle %u created", shader.program_handle);
             }
 
             // Create shader object and load shader code with it
@@ -455,7 +455,7 @@ namespace lof {
                 shader_obj = glCreateShader(GL_FRAGMENT_SHADER);
             }
             else {
-                LM.write_log("Graphics_Manager::compile_shader(): Invalid shader type.");
+               // LM.write_log("Graphics_Manager::compile_shader(): Invalid shader type.");
                 return GL_FALSE;
             }
             const GLchar* shader_code[] = { shader_source.c_str() };
@@ -466,13 +466,13 @@ namespace lof {
             GLint compile_status;
             glGetShaderiv(shader_obj, GL_COMPILE_STATUS, &compile_status);
             if (compile_status == GL_FALSE) {
-                LM.write_log("Graphics_Manager::compile_shader(): Shader from file %s compilation fail.", file.second.c_str());
+               // LM.write_log("Graphics_Manager::compile_shader(): Shader from file %s compilation fail.", file.second.c_str());
 
                 return GL_FALSE;
             }
             else {
                 glAttachShader(shader.program_handle, shader_obj);
-                LM.write_log("Graphics_Manager::compile_shader(): Shader from file %s compilation successful.", file.second.c_str());
+              //  LM.write_log("Graphics_Manager::compile_shader(): Shader from file %s compilation successful.", file.second.c_str());
             }
         }
 
@@ -482,11 +482,11 @@ namespace lof {
             GLint link_status;
             glGetProgramiv(shader.program_handle, GL_LINK_STATUS, &link_status);
             if (link_status == GL_FALSE) {
-                LM.write_log("Graphics_Manager::compile_shader(): Compiled shaders failed to link.");
+               // LM.write_log("Graphics_Manager::compile_shader(): Compiled shaders failed to link.");
                 return GL_FALSE;
             }
             shader.link_status = GL_TRUE;
-            LM.write_log("Graphics_Manager::compile_shader(): Compiled shaders are linked successfully.");
+           // LM.write_log("Graphics_Manager::compile_shader(): Compiled shaders are linked successfully.");
         }
 
         // Check if the program created can be executed in current OpenGL state
@@ -494,10 +494,10 @@ namespace lof {
         GLint validate_status;
         glGetProgramiv(shader.program_handle, GL_VALIDATE_STATUS, &validate_status);
         if (validate_status == GL_FALSE) {
-            LM.write_log("Graphics_Manager::compile_shader(): Shader program is invalid in current OpenGL state.");
+           // LM.write_log("Graphics_Manager::compile_shader(): Shader program is invalid in current OpenGL state.");
             return GL_FALSE;
         }
-        LM.write_log("Graphics_Manager::compile_shader(): Shader program is validated and ready to execute in current OpenGL state.");
+      //  LM.write_log("Graphics_Manager::compile_shader(): Shader program is validated and ready to execute in current OpenGL state.");
         return GL_TRUE;
 
     }

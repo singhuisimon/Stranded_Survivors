@@ -59,14 +59,14 @@ namespace lof {
 
                     int scale_flag = GFXM.get_scale_flag();
                     if (scale_flag == GLFW_KEY_UP) {
-                        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
+                       // LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
                         transform.scale.x += scale_change;
                         transform.scale.y += scale_change;
                         collision.width += scale_change;
                         collision.height += scale_change;
                     }
                     else if (scale_flag == GLFW_KEY_DOWN) {
-                        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
+                      //  LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
                         if (transform.scale.x > 0.0f) {
                             transform.scale.x -= scale_change;
                             collision.width -= scale_change;
@@ -92,12 +92,12 @@ namespace lof {
                     if (rotation_flag == GLFW_KEY_LEFT) {  
                         GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
                         transform.orientation.x += rot_change;
-                        LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                       // LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
                     }
                     else if (rotation_flag == GLFW_KEY_RIGHT) {
                         GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
                         transform.orientation.x -= rot_change;
-                        LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                      //  LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
                     }
 
                 }
@@ -277,7 +277,7 @@ namespace lof {
                     glUniform3fv(text_color_uniform_loc, 1, &text_comp.color[0]);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Text colour uniform variable doesn't exist.");
+                  //  LM.write_log("Render_System::draw(): Text colour uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
@@ -288,7 +288,7 @@ namespace lof {
                     //glUniformMatrix3fv(text_mat_uniform_loc, 1, GL_FALSE, &final_xform[0][0]);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                 //   LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
@@ -385,7 +385,7 @@ namespace lof {
                     glUniform1ui(tex_flag_true_loc, GL_TRUE);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
+                  //  LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
@@ -395,7 +395,7 @@ namespace lof {
                     glUniform1i(tex_uniform_loc, 5);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist.");
+                    //LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
@@ -416,7 +416,7 @@ namespace lof {
                             glUniform1ui(animate_flag_true_loc, GL_TRUE);
                         }
                         else {
-                            LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                         //   LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
                             std::exit(EXIT_FAILURE);
                         }
 
@@ -431,7 +431,7 @@ namespace lof {
                             }
                         }
                         else {
-                            LM.write_log("Render_System::draw(): Frame number value doesn't exist.");
+                        //    LM.write_log("Render_System::draw(): Frame number value doesn't exist.");
                             std::exit(EXIT_FAILURE);
                         }
                     }
@@ -442,7 +442,7 @@ namespace lof {
                             glUniform1ui(animate_flag_false_loc, GL_FALSE);
                         }
                         else {
-                            LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                           // LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
                             std::exit(EXIT_FAILURE);
                         }
                     }
@@ -454,7 +454,7 @@ namespace lof {
                         glUniform1ui(animate_flag_false_loc, GL_FALSE);
                     }
                     else {
-                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                      //  LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
                         std::exit(EXIT_FAILURE);
                     }
                 }
@@ -466,7 +466,7 @@ namespace lof {
                     glUniform1ui(tex_flag_false_loc, GL_FALSE);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
+                   // LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
             }
@@ -477,7 +477,7 @@ namespace lof {
                 glUniform4fv(color_uniform_loc, 1, &graphics.color[0]);
             }
             else {
-                LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
+               // LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
                 std::exit(EXIT_FAILURE);
             }
 
@@ -487,7 +487,7 @@ namespace lof {
                 glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
             }
             else {
-                LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+              // LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
                 std::exit(EXIT_FAILURE);
             }
 
@@ -654,7 +654,7 @@ namespace lof {
             if (system->get_type() == "Particle_System") {
                 auto* particle_system = static_cast<Particle_System*>(system.get());
                 if (!particle_system) {
-                    LM.write_log("Game_Manager::update(): Fail to get particle system");
+                  //  LM.write_log("Game_Manager::update(): Fail to get particle system");
                     std::cerr << "Failed to get particle system" << std::endl;
                     return;
                 }
@@ -678,7 +678,7 @@ namespace lof {
                     glUniform1ui(tex_flag_true_loc, GL_TRUE);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
+                   // LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
@@ -688,7 +688,7 @@ namespace lof {
                     glUniform1ui(animate_flag_false_loc, GL_FALSE);
                 }
                 else {
-                    LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                   // LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
                     std::exit(EXIT_FAILURE);
                 }
 
@@ -777,7 +777,7 @@ namespace lof {
                         glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &particles_xform[0][0]);
                     }
                     else {
-                        LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                     //   LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
                         std::exit(EXIT_FAILURE);
                     }
 

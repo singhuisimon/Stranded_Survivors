@@ -40,10 +40,10 @@ namespace lof {
         key_states[key] = state;
 
         // Log the key event via Log_Manager
-        LM.write_log("Key %d set to state %d", key, static_cast<int>(state));
+       // LM.write_log("Key %d set to state %d", key, static_cast<int>(state));
 
         // Also output to the console
-        std::cout << "Key " << key << " set to state " << static_cast<int>(state) << std::endl;
+       // std::cout << "Key " << key << " set to state " << static_cast<int>(state) << std::endl;
     }
 
     // Set the mouse button state
@@ -53,16 +53,16 @@ namespace lof {
         mouse_button_states[button] = state;
 
         // Log the mouse button event via Log_Manager
-        LM.write_log("Mouse Button %d set to state %d", button, static_cast<int>(state));
+       // LM.write_log("Mouse Button %d set to state %d", button, static_cast<int>(state));
 
         // Also output to the console
-        std::cout << "Mouse Button " << button << " set to state " << static_cast<int>(state) << std::endl;
+        //std::cout << "Mouse Button " << button << " set to state " << static_cast<int>(state) << std::endl;
     }
 
     // Static key callback function
     void Input_Manager::key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/) {
         // Log key event
-        std::cout << "Key Callback: Key " << key << " Action " << action << std::endl;
+      //  std::cout << "Key Callback: Key " << key << " Action " << action << std::endl;
 
         // Ignore unknown keys
         if (key < 0) return;
@@ -108,7 +108,7 @@ namespace lof {
         // Retrieve the GLFW window from the current context
         GLFWwindow* window = glfwGetCurrentContext();
         if (!window) {
-            LM.write_log("Input_Manager::start_up(): No current GLFW window context.");
+          //  LM.write_log("Input_Manager::start_up(): No current GLFW window context.");
             return -1;
         }
 
@@ -118,8 +118,8 @@ namespace lof {
         // Set the mouse button callback
         glfwSetMouseButtonCallback(window, Input_Manager::mouse_button_callback);
 
-        LM.write_log("Input_Manager::start_up(): Input_Manager started and callbacks set.");
-        std::cout << "Input_Manager started and callbacks set." << std::endl;
+      //  LM.write_log("Input_Manager::start_up(): Input_Manager started and callbacks set.");
+       // std::cout << "Input_Manager started and callbacks set." << std::endl;
         return 0;
     }
 
@@ -130,8 +130,8 @@ namespace lof {
         if (window) {
             glfwSetKeyCallback(window, nullptr);
             glfwSetMouseButtonCallback(window, nullptr);
-            LM.write_log("Input_Manager::shut_down(): Input_Manager shut down and callbacks removed.");
-            std::cout << "Input_Manager shut down and callbacks removed." << std::endl;
+          //  LM.write_log("Input_Manager::shut_down(): Input_Manager shut down and callbacks removed.");
+            //std::cout << "Input_Manager shut down and callbacks removed." << std::endl;
         }
     }
 
@@ -226,8 +226,8 @@ namespace lof {
     void Input_Manager::reset() {
         key_states.clear();
         mouse_button_states.clear();
-        LM.write_log("Input_Manager::reset(): All key and mouse button states reset.");
-        std::cout << "Input_Manager::reset(): All key and mouse button states reset." << std::endl;
+       // LM.write_log("Input_Manager::reset(): All key and mouse button states reset.");
+       // std::cout << "Input_Manager::reset(): All key and mouse button states reset." << std::endl;
     }
 
     void Input_Manager::get_mouse_position(double& x, double& y) const {

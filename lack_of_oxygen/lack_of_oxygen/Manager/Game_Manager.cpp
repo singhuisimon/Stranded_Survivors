@@ -67,57 +67,58 @@ namespace lof {
             return -1;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): Log_Manager start_up() successful");
+            //LM.write_log("Game_Manager::start_up(): Log_Manager start_up() successful");
         }
 
         // -------------------------- ECS Manager Start Up --------------------------
         if (ECSM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() failed");
             LM.shut_down();
             return -2;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() successful");
+            //
+            // LM.write_log("Game_Manager::start_up(): ECS_Manager start_up() successful");
         }
 
         // -------------------------- Serialization Manager Start Up -----------------
         if (SM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Serialization_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): Serialization_Manager start_up() failed");
             ECSM.shut_down();
             LM.shut_down();
             return -3;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): Serialization_Manager start_up() successful");
+            //LM.write_log("Game_Manager::start_up(): Serialization_Manager start_up() successful");
         }
 
         // -------------------------- FPS Manager Start Up --------------------------
         if (FPSM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() failed");
             SM.shut_down();
             ECSM.shut_down();
             LM.shut_down();
             return -4;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() successful");
+            //LM.write_log("Game_Manager::start_up(): FPS_Manager start_up() successful");
         }
 
         // -------------------------- Input Manager Start Up --------------------------
         if (IM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Input_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): Input_Manager start_up() failed");
             FPSM.shut_down();
             SM.shut_down();
             ECSM.shut_down();
-            LM.shut_down();
+            //LM.shut_down();
             return -5;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
+            //LM.write_log("Game_Manager::start_up(): Input_Manager start_up() successful");
         }
         // -------------------------- Logic Manager Start Up --------------------------
         if (LGM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() failed");
             IM.shut_down();
             FPSM.shut_down();
             SM.shut_down();
@@ -126,11 +127,11 @@ namespace lof {
             return -6;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() successful");
+            //LM.write_log("Game_Manager::start_up(): Logic_Manager start_up() successful");
         }
         // ---------------------------- Audio Manager Start Up ---------------------------
         if (ADM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): Audio_Manager start_up() failed");
             LGM.shut_down();
             IM.shut_down();
             FPSM.shut_down();
@@ -141,7 +142,7 @@ namespace lof {
         }
         // -------------------------- Graphics Manager Start Up --------------------------
         if (GFXM.start_up() != 0) {
-            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
+            //LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() failed");
             ADM.shut_down();
             LGM.shut_down();
             IM.shut_down();
@@ -152,12 +153,12 @@ namespace lof {
             return -8;
         }
         else {
-            LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
+           // LM.write_log("Game_Manager::start_up(): Graphics_Manager start_up() successful");
         }
 
         m_is_started = true;
-        LM.write_log("Game_Manager::start_up(): Game_Manager started");
-        std::cout << "Game_Manager started successfully." << std::endl;
+        //LM.write_log("Game_Manager::start_up(): Game_Manager started");
+        //std::cout << "Game_Manager started successfully." << std::endl;
 
         return 0;
     }
@@ -191,7 +192,9 @@ namespace lof {
 
         // Check if the game manager is started
         if (!is_started()) {
-            LM.write_log("Game_Manager::update(): Game_Manager not started");
+           
+            
+            //LM.write_log("Game_Manager::update(): Game_Manager not started");
             return;
         }
 
@@ -210,38 +213,44 @@ namespace lof {
         // Check for game over condition based on input, before IM update
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             set_game_over(true);
-            LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
+            //LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
             //std::cout << "Escape key pressed. Closing the game." << std::endl;
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
-            ADM.pause_resume_mastergroup();
-        }
+        //if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+        //    ADM.pause_resume_mastergroup();
+        //}
 
-        //to ensure sound pause during level_editor_mode
-        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
-            ADM.pause_resume_mastergroup();
-        }
+        ////to ensure sound pause during level_editor_mode
+        //if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        //    ADM.pause_resume_mastergroup();
+        //}
 
         //commented out this is for me to test - Amanda
-        if (IM.is_key_held(GLFW_KEY_J)) {
-            current_oxygen_level--;
-            //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-            increasing = false;
-        }
+        //if (IM.is_key_held(GLFW_KEY_J)) {
+        //    /*if (current_oxygen_level > 0) {
+        //        current_oxygen_level--;
+        //    }*/
+        //    //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
+        //    //increasing = false;
+        //}
 
-        if (IM.is_key_held(GLFW_KEY_K)) {
-            current_oxygen_level++;
-            //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-            increasing = true;
-        }
-        //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
-        if (current_scene == 2 || current_scene == 1)
-        {
-            ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
+    //    if (IM.is_key_held(GLFW_KEY_K)) {
 
-        }
+    ////        if (current_oxygen_level < 100) {
+				//////current_oxygen_level++;
+    ////        }
+    //       // current_oxygen_level++;
+    //        //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
+    //       // increasing = true;
+    //    }
+    //    //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
+    //    if (current_scene == 2 || current_scene == 1)
+    //    {
+    //     //   ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
+
+    //    }
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -556,8 +565,8 @@ namespace lof {
                     if (system->get_type() == "Particle_System") {
                         auto* particle_system = static_cast<Particle_System*>(system.get());
                         if (!particle_system) {
-                            LM.write_log("Game_Manager::update(): Fail to get particle system");
-                            std::cerr << "Failed to get particle system" << std::endl;
+                           // LM.write_log("Game_Manager::update(): Fail to get particle system");
+                           // std::cerr << "Failed to get particle system" << std::endl;
                             return;
                         }
 
@@ -753,7 +762,7 @@ namespace lof {
 
                                                     // Destroy the entity
                                                     ECSM.destroy_entity(entity_id);
-                                                    LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
+                                                   // LM.write_log("Game_Manager::update: Removed block (Entity %u)", entity_id);
                                                 }
                                                 else {
                                                     // Check if tnt is activated to prevent activation again
@@ -780,7 +789,7 @@ namespace lof {
                                         for (auto& systems_gui : ECSM.get_systems()) {
                                             if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
                                                 gui_system->reset_all_game_state();
-                                                LM.write_log("Game_Manager::update(): Reset GUI state after player death");
+                                                //LM.write_log("Game_Manager::update(): Reset GUI state after player death");
                                                 break;
                                             }
                                         }
@@ -795,7 +804,7 @@ namespace lof {
 
                                         // Try to load the new scene
                                         if (SM.load_scene(scene_path.c_str())) {
-                                            LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
+                                            //LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
 
                                             // Reset camera position only if not in main menu
                                             auto& camera = GFXM.get_camera();
@@ -824,7 +833,7 @@ namespace lof {
                                             }
                                         }
                                         else {
-                                            LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+                                            //LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
 
                                             // Revert to main menu since load failed
                                             current_scene = 0;
@@ -835,13 +844,13 @@ namespace lof {
                                     // Check if player is dead to reset the scene
                                     if (is_player_dead == true) {
                                         tnt_to_destroy.clear();
-                                        IMGUIM.set_current_file_shown("scene2.scn");
+                                        //IMGUIM.set_current_file_shown("scene2.scn");
                                         break;
                                     } else {
                                         // Destroy tnt and remove it from the list of tnt to destroy
                                         ECSM.destroy_entity(tnt_id);
                                         tnt_to_destroy.erase(current->first);
-                                        LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
+                                        //LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
                                     }
                                 }
                             }
@@ -918,8 +927,8 @@ namespace lof {
 
                                             // Destroy the entity
                                             ECSM.destroy_entity(block_to_remove);
-                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                                block_to_remove, mineral_value);
+                                            //LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                                //block_to_remove, mineral_value);
                                         }
                                     }
                                     else { // TNT's logic
@@ -1006,8 +1015,8 @@ namespace lof {
 
                                             // Destroy the entity
                                             ECSM.destroy_entity(block_to_remove);
-                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                                block_to_remove, mineral_value);
+                                           // LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                              //  block_to_remove, mineral_value);
                                         }
                                     }
                                     else {
@@ -1093,8 +1102,8 @@ namespace lof {
 
                                             // Destroy the entity
                                             ECSM.destroy_entity(block_to_remove);
-                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                                block_to_remove, mineral_value);
+                                            //LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                                //block_to_remove, mineral_value);
                                         }
                                     }
                                     else {
@@ -1178,8 +1187,8 @@ namespace lof {
 
                                             // Destroy the entity
                                             ECSM.destroy_entity(block_to_remove);
-                                            LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
-                                                block_to_remove, mineral_value);
+                                            //LM.write_log("Game_Manager::update: Removed block (Entity %u) with value %d",
+                                              //  block_to_remove, mineral_value);
                                         }
                                     }
                                     else {
@@ -1296,97 +1305,97 @@ namespace lof {
 
         // Check if the left mouse button was pressed
         //EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        //if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
-            if (selectedEntityInfo.isSelected) {
-                select_entity = true;
-                selectedID = selectedEntityInfo.selectedEntity;
+        //    if (selectedEntityInfo.isSelected) {
+        //        //select_entity = true;
+        //        selectedID = selectedEntityInfo.selectedEntity;
 
-            /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
+        //    /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+        //        std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+        //        std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+        //        LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
 
-            }
-            else {
-                select_entity = false;
-                selectedID = static_cast<EntityID>(-1);
+        //    }
+        //    else {
+        //        //select_entity = false;
+        //        selectedID = static_cast<EntityID>(-1);
 
-            }
-        }
+        //    }
+        //}
 
         
-        if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
-        {
-            // First check if entity has required components
-            if (!ECSM.has_component<Transform2D>(selectedID)) {
-                //std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
-                return;
-            }
+        //if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
+        //{
+        //    // First check if entity has required components
+        //    if (!ECSM.has_component<Transform2D>(selectedID)) {
+        //        //std::cout << "Selected entity " << selectedID << " has no Transform2D component\n";
+        //        return;
+        //    }
 
-            auto& transform = ECSM.get_component<Transform2D>(selectedID);
-            GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-            GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+        //    auto& transform = ECSM.get_component<Transform2D>(selectedID);
+        //    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+        //    GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
 
-            // Check if entity has collision component before using it
-            bool has_collision = ECSM.has_component<Collision_Component>(selectedID);
-            Collision_Component* collision = nullptr;
-            if (has_collision) {
-                collision = &ECSM.get_component<Collision_Component>(selectedID);
-            }
+        //    // Check if entity has collision component before using it
+        //    bool has_collision = ECSM.has_component<Collision_Component>(selectedID);
+        //    Collision_Component* collision = nullptr;
+        //    if (has_collision) {
+        //        collision = &ECSM.get_component<Collision_Component>(selectedID);
+        //    }
 
-            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
-            {
-                std::cout << selectedID << " scaling up in level editor\n";
-                transform.scale.x += scale_change;
-                transform.scale.y += scale_change;
+        //    if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
+        //    {
+        //        std::cout << selectedID << " scaling up in level editor\n";
+        //        transform.scale.x += scale_change;
+        //        transform.scale.y += scale_change;
 
-                if (collision) {
-                    collision->width += scale_change;
-                    collision->height += scale_change;
-                }
-            }
-            else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP)))
-            {
+        //        if (collision) {
+        //            collision->width += scale_change;
+        //            collision->height += scale_change;
+        //        }
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_UP)))
+        //    {
 
-                if (transform.scale.x > 0.0f) {
-                    transform.scale.x -= scale_change;
-                    if (collision) {
-                        collision->width -= scale_change;
-                    }
-                }
-                else {
-                    transform.scale.x = 0.0f;
-                    if (collision) {
-                        collision->width = 0.0f;
-                    }
-                }
+        //        if (transform.scale.x > 0.0f) {
+        //            transform.scale.x -= scale_change;
+        //            if (collision) {
+        //                collision->width -= scale_change;
+        //            }
+        //        }
+        //        else {
+        //            transform.scale.x = 0.0f;
+        //            if (collision) {
+        //                collision->width = 0.0f;
+        //            }
+        //        }
 
-                if (transform.scale.y > 0.0f) {
-                    transform.scale.y -= scale_change;
-                    if (collision) {
-                        collision->height -= scale_change;
-                    }
-                }
-                else {
-                    transform.scale.y = 0.0f;
-                    if (collision) {
-                        collision->height = 0.0f;
-                    }
-                }
-            }
-            else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
-            {
-                transform.orientation.x += rot_change;
-            }
-            else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
-            {
-                transform.orientation.x -= rot_change;
-            }
-        }
+        //        if (transform.scale.y > 0.0f) {
+        //            transform.scale.y -= scale_change;
+        //            if (collision) {
+        //                collision->height -= scale_change;
+        //            }
+        //        }
+        //        else {
+        //            transform.scale.y = 0.0f;
+        //            if (collision) {
+        //                collision->height = 0.0f;
+        //            }
+        //        }
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT)))
+        //    {
+        //        transform.orientation.x += rot_change;
+        //    }
+        //    else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
+        //    {
+        //        transform.orientation.x -= rot_change;
+        //    }
+        //}
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #endif
-        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        /*if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE) {
                 camera.is_free_cam = GL_TRUE;
@@ -1402,162 +1411,162 @@ namespace lof {
             else {
                 editor_mode = 1;
             }
-        }
+        }*/
 
         // Camera up-down scrolling when I or K pressed
-        if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
-            camera_up_down_scroll_flag = GLFW_KEY_I;
-            auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == GL_TRUE) {
-                camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camera_pos_y = camera.pos_y;
-                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
-            }
-        }
-        else if (IM.is_key_held(GLFW_KEY_K) && !(IM.is_key_held(GLFW_KEY_I))) {
-            camera_up_down_scroll_flag = GLFW_KEY_K;
-            auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == GL_TRUE) {
-                camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camera_pos_y = camera.pos_y;
-                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
-            }
-        }
-        else if (IM.is_key_held(GLFW_KEY_I) && IM.is_key_held(GLFW_KEY_K)) {
-            auto& camera = GFXM.get_camera();
-            if (camera_up_down_scroll_flag == GLFW_KEY_I) {
-                camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camera_pos_y = camera.pos_y;
-                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
-            }
-            else {
-                camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camera_pos_y = camera.pos_y;
-                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
-            }
-        }
-        else {
-            camera_up_down_scroll_flag = 0;
-        }
+        //if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
+        //    camera_up_down_scroll_flag = GLFW_KEY_I;
+        //    auto& camera = GFXM.get_camera();
+        //    if (camera.is_free_cam == GL_TRUE) {
+        //        camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camera_pos_y = camera.pos_y;
+        //        LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //}
+        //else if (IM.is_key_held(GLFW_KEY_K) && !(IM.is_key_held(GLFW_KEY_I))) {
+        //    camera_up_down_scroll_flag = GLFW_KEY_K;
+        //    auto& camera = GFXM.get_camera();
+        //    if (camera.is_free_cam == GL_TRUE) {
+        //        camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camera_pos_y = camera.pos_y;
+        //        LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //}
+        //else if (IM.is_key_held(GLFW_KEY_I) && IM.is_key_held(GLFW_KEY_K)) {
+        //    auto& camera = GFXM.get_camera();
+        //    if (camera_up_down_scroll_flag == GLFW_KEY_I) {
+        //        camera.pos_y += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camera_pos_y = camera.pos_y;
+        //        LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //    else {
+        //        camera.pos_y -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camera_pos_y = camera.pos_y;
+        //        LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //}
+        //else {
+        //    camera_up_down_scroll_flag = 0;
+        //}
 
-        // Camera left-right scrolling when J or L pressed
-        if (IM.is_key_held(GLFW_KEY_J) && !(IM.is_key_held(GLFW_KEY_L))) {
-            camera_left_right_scroll_flag = GLFW_KEY_J;
-            auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == GL_TRUE) {
-                camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camara_pos_x = camera.pos_x;
-                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
-            }
-        }
-        else if (IM.is_key_held(GLFW_KEY_L) && !(IM.is_key_held(GLFW_KEY_J))) {
-            camera_left_right_scroll_flag = GLFW_KEY_L;
-            auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == GL_TRUE) {
-                camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camara_pos_x = camera.pos_x;
-                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
-            }
-        }
-        else if (IM.is_key_held(GLFW_KEY_J) && IM.is_key_held(GLFW_KEY_L)) {
-            auto& camera = GFXM.get_camera();
-            if (camera_left_right_scroll_flag == GLFW_KEY_J) {
-                camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camara_pos_x = camera.pos_x;
-                LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
-            }
-            else {
-                camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
-                imgui_camara_pos_x = camera.pos_x;
-                LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
-            }
-        }
-        else {
-            camera_left_right_scroll_flag = 0;
-        }
+        //// Camera left-right scrolling when J or L pressed
+        //if (IM.is_key_held(GLFW_KEY_J) && !(IM.is_key_held(GLFW_KEY_L))) {
+        //    camera_left_right_scroll_flag = GLFW_KEY_J;
+        //    auto& camera = GFXM.get_camera();
+        //    if (camera.is_free_cam == GL_TRUE) {
+        //        camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camara_pos_x = camera.pos_x;
+        //        LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //}
+        //else if (IM.is_key_held(GLFW_KEY_L) && !(IM.is_key_held(GLFW_KEY_J))) {
+        //    camera_left_right_scroll_flag = GLFW_KEY_L;
+        //    auto& camera = GFXM.get_camera();
+        //    if (camera.is_free_cam == GL_TRUE) {
+        //        camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camara_pos_x = camera.pos_x;
+        //        LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //}
+        //else if (IM.is_key_held(GLFW_KEY_J) && IM.is_key_held(GLFW_KEY_L)) {
+        //    auto& camera = GFXM.get_camera();
+        //    if (camera_left_right_scroll_flag == GLFW_KEY_J) {
+        //        camera.pos_x -= (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camara_pos_x = camera.pos_x;
+        //        LM.write_log("Render_System::update(): 'Keypad 8' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //    else {
+        //        camera.pos_x += (DEFAULT_CAMERA_SPEED * static_cast<GLfloat>(delta_time));
+        //        imgui_camara_pos_x = camera.pos_x;
+        //        LM.write_log("Render_System::update(): 'Keypad 2' key held, camera position is now %f.", camera.pos_y);
+        //    }
+        //}
+        //else {
+        //    camera_left_right_scroll_flag = 0;
+        //}
 
-        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
-            LM.write_log("Game_Manager::update(): Toggling between scenes");
+        //if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
+        //    LM.write_log("Game_Manager::update(): Toggling between scenes");
 
-            // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
-            if (current_scene == 0) {
-                current_scene = 1; // Switch to scene1
-            }
-            else if (current_scene == 1) {
-                current_scene = 2; // Switch to scene2
-            }
-            else {
-                current_scene = 0; // Switch back to main_menu
-            }
+        //    // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
+        //    if (current_scene == 0) {
+        //        current_scene = 1; // Switch to scene1
+        //    }
+        //    else if (current_scene == 1) {
+        //        current_scene = 2; // Switch to scene2
+        //    }
+        //    else {
+        //        current_scene = 0; // Switch back to main_menu
+        //    }
 
-            for (auto& system : ECSM.get_systems()) {
-                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                    movement_system->clear_dynamic_entities();
-                    break;
-                }
-            }
+        //    for (auto& system : ECSM.get_systems()) {
+        //        if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+        //            movement_system->clear_dynamic_entities();
+        //            break;
+        //        }
+        //    }
 
-            // Define scene file names
-            const std::string SCENES = "Scenes";
-            std::string scene_file;
+        //    // Define scene file names
+        //    const std::string SCENES = "Scenes";
+        //    std::string scene_file;
 
-            if (current_scene == 0) {
-                scene_file = "main_menu.scn";
-            }
-            else {
-                scene_file = "scene" + std::to_string(current_scene) + ".scn";
-            }
+        //    if (current_scene == 0) {
+        //        scene_file = "main_menu.scn";
+        //    }
+        //    else {
+        //        scene_file = "scene" + std::to_string(current_scene) + ".scn";
+        //    }
 
-            // Create full path to the scene file
-            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+        //    // Create full path to the scene file
+        //    std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
-            // Try to load the new scene
-            if (SM.load_scene(scene_path.c_str())) {
-                LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
+        //    // Try to load the new scene
+        //    if (SM.load_scene(scene_path.c_str())) {
+        //        LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
 
-                // Reset camera position only if not in main menu
-                auto& camera = GFXM.get_camera();
-                if (current_scene != 0) {
-                    camera.pos_x = DEFAULT_CAMERA_POS_X;
-                    camera.pos_y = DEFAULT_CAMERA_POS_Y;
-                }
+        //        // Reset camera position only if not in main menu
+        //        auto& camera = GFXM.get_camera();
+        //        if (current_scene != 0) {
+        //            camera.pos_x = DEFAULT_CAMERA_POS_X;
+        //            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+        //        }
 
-                // Stop all audio currently playing
-                ADM.stop_mastergroup();
+        //        // Stop all audio currently playing
+        //        ADM.stop_mastergroup();
 
-                // Reset player position only if in scene1 or scene2
-                if (current_scene != 0) {
-                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                    if (playerId != INVALID_ENTITY_ID) {
-                        if (ECSM.has_component<Transform2D>(playerId)) {
-                            auto& transform = ECSM.get_component<Transform2D>(playerId);
-                            transform.position = Vec2D(0.0f, 0.0f);
-                            transform.prev_position = transform.position;
-                        }
-                        if (ECSM.has_component<Velocity_Component>(playerId)) {
-                            auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                            velocity.velocity = Vec2D(0.0f, 0.0f);
-                        }
-                    }
-                }
-            }
-            else {
-                LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+        //        // Reset player position only if in scene1 or scene2
+        //        if (current_scene != 0) {
+        //            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        //            if (playerId != INVALID_ENTITY_ID) {
+        //                if (ECSM.has_component<Transform2D>(playerId)) {
+        //                    auto& transform = ECSM.get_component<Transform2D>(playerId);
+        //                    transform.position = Vec2D(0.0f, 0.0f);
+        //                    transform.prev_position = transform.position;
+        //                }
+        //                if (ECSM.has_component<Velocity_Component>(playerId)) {
+        //                    auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+        //                    velocity.velocity = Vec2D(0.0f, 0.0f);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else {
+        //        LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
 
-                // Revert scene number since load failed
-                if (current_scene == 0) {
-                    current_scene = 2;
-                }
-                else if (current_scene == 1) {
-                    current_scene = 0;
-                }
-                else {
-                    current_scene = 1;
-                }
-            }
+        //        // Revert scene number since load failed
+        //        if (current_scene == 0) {
+        //            current_scene = 2;
+        //        }
+        //        else if (current_scene == 1) {
+        //            current_scene = 0;
+        //        }
+        //        else {
+        //            current_scene = 1;
+        //        }
+        //    }
 
-            IMGUIM.set_current_file_shown(scene_file);
-        }
+        //    IMGUIM.set_current_file_shown(scene_file);
+        //}
 
 
         // Getting delta time for Input Manager
@@ -1587,7 +1596,7 @@ namespace lof {
         // Update game world state
         ECSM.update(delta_time);
 
-        IMGUIM.update_buttons_and_batches();
+        //IMGUIM.update_buttons_and_batches();
 
         end_time = std::chrono::steady_clock::now();
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
@@ -1597,7 +1606,7 @@ namespace lof {
 
     void Game_Manager::set_game_over(bool new_game_over) {
         m_game_over = new_game_over;
-        LM.write_log("Game_Manager::set_game_over(): game_over set to %s", new_game_over ? "true" : "false");
+       // LM.write_log("Game_Manager::set_game_over(): game_over set to %s", new_game_over ? "true" : "false");
         std::cout << "Game_Manager::set_game_over(): game_over set to " << (new_game_over ? "true" : "false") << std::endl;
     }
 
@@ -1620,47 +1629,47 @@ namespace lof {
         }
 
         const std::string& name = entity->get_name();
-        LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
+       // LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
 
         // Match the prefab names with their corresponding values
         if (name.find("quartz") != std::string::npos) {
-            LM.write_log("Found quartz mineral, value: 100");
+           // LM.write_log("Found quartz mineral, value: 100");
             return 100;
         }
         if (name.find("emerald") != std::string::npos) {
-            LM.write_log("Found emerald mineral, value: 800");
+          //  LM.write_log("Found emerald mineral, value: 800");
             return 800;
         }
         if (name.find("sapphire") != std::string::npos) {
-            LM.write_log("Found sapphire mineral, value: 1600");
+          //  LM.write_log("Found sapphire mineral, value: 1600");
             return 1600;
         }
         if (name.find("amethyst") != std::string::npos) {
-            LM.write_log("Found amethyst mineral, value: 2400");
+          //  LM.write_log("Found amethyst mineral, value: 2400");
             return 2400;
         }
         if (name.find("citrine") != std::string::npos) {
-            LM.write_log("Found citrine mineral, value: 3200");
+          //  LM.write_log("Found citrine mineral, value: 3200");
             return 3200;
         }
         if (name.find("alexandrite") != std::string::npos) {
-            LM.write_log("Found alexandrite mineral, value: 4000");
+          //  LM.write_log("Found alexandrite mineral, value: 4000");
             return 4000;
         }
 
-        LM.write_log("No mineral value found for this entity");
+       // LM.write_log("No mineral value found for this entity");
         return 0;
     }
 
     void Game_Manager::update_mineral_count_text(int value_to_add) {
         EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
         if (text_entity == INVALID_ENTITY_ID) {
-            LM.write_log("Could not find mineral count text entity");
+           // LM.write_log("Could not find mineral count text entity");
             return;
         }
 
         if (!ECSM.has_component<Text_Component>(text_entity)) {
-            LM.write_log("Mineral count entity does not have Text_Component");
+           // LM.write_log("Mineral count entity does not have Text_Component");
             return;
         }
 
@@ -1675,10 +1684,10 @@ namespace lof {
             ss << std::setw(6) << std::setfill('0') << current_value;
             text_comp.text = ss.str();
 
-            LM.write_log("Updated mineral count to: %06d", current_value);
+           // LM.write_log("Updated mineral count to: %06d", current_value);
         }
         catch (const std::exception& e) {
-            LM.write_log("Error updating mineral count: %s", e.what());
+           // LM.write_log("Error updating mineral count: %s", e.what());
         }
     }
 
@@ -1701,15 +1710,15 @@ namespace lof {
         }
 
         const std::string& name = entity->get_name();
-        LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
+      //  LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
 
         // Match the prefab names with their corresponding values
         if (name.find(block_name) != std::string::npos) {
-            LM.write_log("Found quartz mineral, value: 100");
+         //   LM.write_log("Found quartz mineral, value: 100");
             return true;
         }
 
-        LM.write_log("Block isn't %s but %s", block_name.c_str(), name.c_str());
+      //  LM.write_log("Block isn't %s but %s", block_name.c_str(), name.c_str());
         return false;
     }
 

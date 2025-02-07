@@ -43,7 +43,7 @@ namespace lof {
 		}
 
 		if (initialize()) {
-			LM.write_log("successfully initialize audio manager.");
+			//LM.write_log("successfully initialize audio manager.");
 		}
 
 		m_is_started = true;
@@ -52,7 +52,8 @@ namespace lof {
 
 	int Audio_Manager::errorcheck(FMOD_RESULT result, const std::string& function_name, const std::string& function_purpose) {
 		if (result != FMOD_OK) {
-			LM.write_log("%s failed to %s. FMOD Error: %s.", function_name.c_str(), function_purpose.c_str(), FMOD_ErrorString(result));
+			//
+			// LM.write_log("%s failed to %s. FMOD Error: %s.", function_name.c_str(), function_purpose.c_str(), FMOD_ErrorString(result));
 			return -1;
 		}
 		//LM.write_log("%s successfully executed %s.", function_name.c_str(), function_purpose.c_str());
@@ -79,7 +80,7 @@ namespace lof {
 	void Audio_Manager::shut_down() {
 
 		if (!core_system) {
-			LM.write_log("Audio_Manager::shut_down: core_system not even initialize and still nullptr");
+			//LM.write_log("Audio_Manager::shut_down: core_system not even initialize and still nullptr");
 			return;
 		}
 
@@ -118,12 +119,12 @@ namespace lof {
 		}
 
 		if (!ASM.load_audio_file(file_path)) {
-			LM.write_log("Audio_System::load_sound: Failed to find audio file %s", file_path.c_str());
+			//LM.write_log("Audio_System::load_sound: Failed to find audio file %s", file_path.c_str());
 			return;
 		}
 		
 		std::string full_path = ASM.get_audio_path(file_path);
-		LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
+		//LM.write_log("Audio_System::load_sound: Loading sound from %s", full_path.c_str());
 
 
 		FMOD::Sound* sound = nullptr;
@@ -138,18 +139,18 @@ namespace lof {
 			// Log the sound's mode after loading
 			FMOD_MODE loaded_mode;
 			sound->getMode(&loaded_mode);
-			LM.write_log("Sound %s loaded with requested mode: %s, actual mode: %s",
-				file_path.c_str(),
+			//LM.write_log("Sound %s loaded with requested mode: %s, actual mode: %s",
+				/*file_path.c_str(),
 				modeToString(mode1 | mode2).c_str(),
-				modeToString(loaded_mode).c_str());
+				modeToString(loaded_mode).c_str());*/
 		}
 
-		LM.write_log("Loading sound: %s (Resolved Path: %s)", file_path.c_str(), full_path.c_str());
+		//LM.write_log("Loading sound: %s (Resolved Path: %s)", file_path.c_str(), full_path.c_str());
 
 		sound_map[file_path] = sound;
 
 	
-		LM.write_log("Audio_System::load_sound: Successfully loaded sound");
+		//LM.write_log("Audio_System::load_sound: Successfully loaded sound");
 
 		
 	}
@@ -166,7 +167,7 @@ namespace lof {
 		}
 
 		sound_map.erase(it);	//erase it from the map
-		LM.write_log("Audio_System::unload_sound: successfully unloaded the sound %s", file_path.c_str());
+		//LM.write_log("Audio_System::unload_sound: successfully unloaded the sound %s", file_path.c_str());
 	}
 
 	FMOD::Sound* Audio_Manager::get_sound(const std::string& file_path, AudioType audio_type, bool is3d) {
@@ -197,7 +198,7 @@ namespace lof {
 					if (audio_component.get_is3d(audio_key)) {
 						//they should have transform component. all entity should have!
 						if (!ECSM.has_component<Transform2D>(entity_id)) {
-							LM.write_log("Audio_Manager. play now detected 3d sound but no transform component");
+							//LM.write_log("Audio_Manager. play now detected 3d sound but no transform component");
 							continue;
 						}
 
@@ -209,8 +210,8 @@ namespace lof {
 				else {
 
 					if (audio_system->is_sound_playing(channel_key)) {
-						LM.write_log("Audio_Manager::play_now: Skipping sound %s in entity %u as it is already playing and reach max playing channel.",
-							file_path.c_str(), entity_id);
+						//LM.write_log("Audio_Manager::play_now: Skipping sound %s in entity %u as it is already playing and reach max playing channel.",
+							/*file_path.c_str(), entity_id);*/
 						return;
 					}
 
@@ -247,10 +248,10 @@ namespace lof {
 				}
 
 				audio_system->set_channel_mute(channel_key, true);
-				LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u",
-					audio_key.c_str(), file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u",
+					/*audio_key.c_str(), file_path.c_str(), entity_id);*/
 
-				LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
 			}
 		}
 
@@ -277,7 +278,7 @@ namespace lof {
 
 				audio_system->set_channel_mute(channel_key, false);
 
-				LM.write_log("Audio_Manager::unmute_layer: unmuting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::unmute_layer: unmuting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
 			}
 		}
 
@@ -290,7 +291,7 @@ namespace lof {
 			if (system->get_type() == "Audio_System") {
 				auto* audio_system = static_cast<Audio_System*>(system.get());
 				audio_system->stop_sound(channel_key);
-				LM.write_log("Audio_Manager::stop_now: has successfully stop sound %s in enstity %u", file_path.c_str(), entity_id);
+				//LM.write_log("Audio_Manager::stop_now: has successfully stop sound %s in enstity %u", file_path.c_str(), entity_id);
 			}
 			else {
 				//LM.write_log("Audio_Manager::stop_now: looping though system currently %s", system->get_type().c_str());
@@ -400,9 +401,9 @@ namespace lof {
 		bool pause;
 		mastergroup->getPaused(&pause);
 
-		if (level_editor_mode && pause) {
+		/*if (level_editor_mode && pause) {
 			return;
-		}
+		}*/
 
 		if (pause) {
 			errorcheck(mastergroup->setPaused(false), "Audio_System::pause_resume_group", "resume mastergroup");

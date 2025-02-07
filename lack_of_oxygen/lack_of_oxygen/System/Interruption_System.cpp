@@ -43,7 +43,7 @@ namespace lof {
         glfwSetWindowIconifyCallback(window, iconify_callback);
         glfwSetWindowFocusCallback(window, focus_callback);
 
-        LM.write_log("Interruption_System: Initialized with callbacks.");
+       // LM.write_log("Interruption_System: Initialized with callbacks.");
     }
 
     void Interruption_System::update(float delta_time) {
@@ -78,7 +78,7 @@ namespace lof {
                 current_state = WindowState::MINIMIZED; 
                 is_minimized = true;
                 handle_interruption();
-                LM.write_log("Interruption_System: True minimization detected");
+              //  LM.write_log("Interruption_System: True minimization detected");
             }
         }
         // Handle window restoration
@@ -87,7 +87,7 @@ namespace lof {
                 current_state = WindowState::NORMAL;
                 is_minimized = false;
                 handle_restoration();
-                LM.write_log("Interruption_System: Window restored from minimization");
+              //  LM.write_log("Interruption_System: Window restored from minimization");
             }
 
             //update focus state 
@@ -121,7 +121,7 @@ namespace lof {
 
             ADM.pause_resume_mastergroup();
 
-            LM.write_log("Interruption_System: Game interrupted - Input reset, Audio paused");
+          //  LM.write_log("Interruption_System: Game interrupted - Input reset, Audio paused");
         }
     }
 
@@ -158,7 +158,7 @@ namespace lof {
         //pause game logic
         is_paused = false;
 
-        LM.write_log("Interruption_System: Game restored - window restored, input reset");
+      //  LM.write_log("Interruption_System: Game restored - window restored, input reset");
         }
     }
 
@@ -175,7 +175,7 @@ namespace lof {
                   else {
                         //interrupt_system->current_state = WindowState::NORMAL;
                         interrupt_system->restore_window();
-                        LM.write_log("Interruption_System: Window restored via iconify");
+                      //  LM.write_log("Interruption_System: Window restored via iconify");
                   }
                   break;
             
@@ -187,7 +187,7 @@ namespace lof {
     void Interruption_System::focus_callback(GLFWwindow* window, int focused) {
         for (auto const& system : ECSM.get_systems()) {
             if (auto* interrupt_system = dynamic_cast<Interruption_System*>(system.get())) {
-                LM.write_log("Interruption_System: Focus callback - focused: %d", focused);
+              //  LM.write_log("Interruption_System: Focus callback - focused: %d", focused);
 
                  if (!focused) {
                     //check for ALT+TAB
@@ -207,10 +207,10 @@ namespace lof {
                             interrupt_system->handle_interruption();
 
                             if (interrupt_system->ctrl_alt_del_active) {
-                                LM.write_log("Interruption_System: Handling CTRL+ALT+DEL interruption");
+                              //  LM.write_log("Interruption_System: Handling CTRL+ALT+DEL interruption");
                             }
                             else {
-                                LM.write_log("Interruption_System: Handling ALT+TAB interruption");
+                              //  LM.write_log("Interruption_System: Handling ALT+TAB interruption");
                             }
                         }
                     }
@@ -220,7 +220,7 @@ namespace lof {
                             interrupt_system->current_state = WindowState::INTERRUPTED;
                             glfwIconifyWindow(window);
                             interrupt_system->handle_interruption();
-                            LM.write_log("Interruption_System: Handling fullscreen focus loss");
+                           // LM.write_log("Interruption_System: Handling fullscreen focus loss");
                         }
                     }
 
@@ -231,7 +231,7 @@ namespace lof {
                     if (interrupt_system->focus_lost && !interrupt_system->is_minimized) {
                         interrupt_system->focus_lost = false;
                         interrupt_system->current_state = WindowState::NORMAL;
-                        LM.write_log("Interruption_System: Window regained focus");
+                      //  LM.write_log("Interruption_System: Window regained focus");
                     }
                 }
                 break;
@@ -245,7 +245,7 @@ namespace lof {
             is_minimized = true;
             handle_interruption();
             //glfwIconifyWindow(window);
-            LM.write_log("Interruption_System: Window Minimized");
+           // LM.write_log("Interruption_System: Window Minimized");
         }
     } 
 
@@ -253,7 +253,7 @@ namespace lof {
         if (is_minimized) {
             is_minimized = false;
             handle_restoration();
-            LM.write_log("Interruption_System: Window Restored");
+           // LM.write_log("Interruption_System: Window Restored");
         }
     }
 
@@ -295,16 +295,16 @@ namespace lof {
 
         if (potential_ctrl_alt_del) {
             ctrl_alt_del_active = true;
-            LM.write_log("CTRL+ALT+DEL detected (using frame history)");
+           // LM.write_log("CTRL+ALT+DEL detected (using frame history)");
         }
 
 
         //Log Key states for debugging
         if (current_keys.ctrl || current_keys.alt || current_keys.del) {
-            LM.write_log("Raw Key States - CTRL: %d, ALT: %d, DEL: %d",
-                current_keys.ctrl, current_keys.alt, current_keys.del);
-            LM.write_log("Key History States - CTRL: %d, ALT: %d, DEL: %d",
-                current_keys.ctrl_was_pressed, current_keys.alt_was_pressed, current_keys.del_was_pressed);
+           // LM.write_log("Raw Key States - CTRL: %d, ALT: %d, DEL: %d",
+           //     current_keys.ctrl, current_keys.alt, current_keys.del);
+           // LM.write_log("Key History States - CTRL: %d, ALT: %d, DEL: %d",
+           //     current_keys.ctrl_was_pressed, current_keys.alt_was_pressed, current_keys.del_was_pressed);
         }
 
         //reset the history if no keys are pressed 

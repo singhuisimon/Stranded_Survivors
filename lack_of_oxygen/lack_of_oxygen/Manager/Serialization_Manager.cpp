@@ -57,7 +57,7 @@ namespace lof {
         m_fps_display_interval(DEFAULT_FPS_DISPLAY_INTERVAL) {
         set_type("Serialization_Manager");
 
-        LM.write_log("Serialization_Manager::Serialization_Manager(): Initialized with default configurations.");
+        //LM.write_log("Serialization_Manager::Serialization_Manager(): Initialized with default configurations.");
     }
 
     Serialization_Manager& Serialization_Manager::get_instance() {
@@ -74,7 +74,7 @@ namespace lof {
         const std::string confid_folder = "Config";
         std::string config_path = ASM.get_full_path(confid_folder, "config.json");
         if (!load_config(config_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
+            //LM.write_log("Serialization_Manager::start_up(): Failed to load game configuration file: %s", config_path.c_str());
             return -1;
         }
 
@@ -82,34 +82,34 @@ namespace lof {
         const std::string prefabs_folder = "Prefab";
         std::string prefabs_path = ASM.get_full_path(prefabs_folder, "prefab.json");
         if (!load_prefabs(prefabs_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
+           // LM.write_log("Serialization_Manager::start_up(): Failed to load prefab file: %s", prefabs_path.c_str());
             return -2;
         }
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V2.csv");
         if (!load_level_data(level_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
+            //LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
         }
 
         // Load scene file
         const std::string scene_folder = "Scenes";
         std::string loaded_scene = "main_menu.scn";
-        IMGUIM.set_current_file_shown(loaded_scene);
+        //IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
         // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4
         GM.set_current_scene(0);
         if (!load_scene(scene_path.c_str())) {
-            LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
+           // LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
             return -3;
         }
 
         // Debug print level data if loaded successfully
         debug_print_level();
 
-        LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
+      //  LM.write_log("Serialization_Manager::start_up(): Serialization_Manager started successfully.");
         return 0;
     }
 
@@ -117,7 +117,7 @@ namespace lof {
      * @brief Shuts down the Serialization_Manager by clearing loaded data and caches.
      */
     void Serialization_Manager::shut_down() {
-        LM.write_log("Serialization_Manager::shut_down(): Shutting down Serialization_Manager.");
+        //LM.write_log("Serialization_Manager::shut_down(): Shutting down Serialization_Manager.");
         m_document.SetNull();           // Clear the document
         m_prefab_map.clear();           // Clear the prefab cache
         m_is_started = false;
@@ -136,18 +136,18 @@ namespace lof {
             if (destination.HasMember(key)) {
                 // If both values are objects, merge them recursively
                 if (itr->value.IsObject() && destination[key].IsObject()) {
-                    LM.write_log("Serialization_Manager::merge_objects(): Merging object at key '%s'.", key);
+                   // LM.write_log("Serialization_Manager::merge_objects(): Merging object at key '%s'.", key);
                     merge_objects(itr->value, destination[key], allocator);
                 }
                 else {
                     // Overwrite the value in the destination
-                    LM.write_log("Serialization_Manager::merge_objects(): Overwriting key '%s'.", key);
+                   // LM.write_log("Serialization_Manager::merge_objects(): Overwriting key '%s'.", key);
                     destination[key].CopyFrom(itr->value, allocator);
                 }
             }
             else {
                 // Add the new key-value pair to the destination
-                LM.write_log("Serialization_Manager::merge_objects(): Adding key '%s'.", key);
+               // LM.write_log("Serialization_Manager::merge_objects(): Adding key '%s'.", key);
                 rapidjson::Value name(key, allocator);
                 rapidjson::Value value;
                 value.CopyFrom(itr->value, allocator);
@@ -158,12 +158,12 @@ namespace lof {
 
 
     bool Serialization_Manager::load_config(const char* filepath) {
-        LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
+       // LM.write_log("Serialization_Manager::load_config(): Attempting to load configuration file from: %s", filepath);
 
         // Read the JSON file into a string
         std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_config(): Failed to open configuration file: %s", filepath);
+           // LM.write_log("Serialization_Manager::load_config(): Failed to open configuration file: %s", filepath);
             return false;
         }
 
@@ -177,52 +177,52 @@ namespace lof {
         if (m_document.HasParseError()) {
             size_t offset = m_document.GetErrorOffset();
             rapidjson::ParseErrorCode error_code = m_document.GetParseError();
-            LM.write_log("Serialization_Manager::load_config(): JSON parse error at offset %zu: %s", offset, rapidjson::GetParseError_En(error_code));
+            //LM.write_log("Serialization_Manager::load_config(): JSON parse error at offset %zu: %s", offset, rapidjson::GetParseError_En(error_code));
             return false;
         }
 
         if (!m_document.IsObject()) {
-            LM.write_log("Serialization_Manager::load_config(): Invalid JSON format: Root element is not an object.");
+           // LM.write_log("Serialization_Manager::load_config(): Invalid JSON format: Root element is not an object.");
             return false;
         }
 
         // Retrieve and store the configuration values
         if (m_document.HasMember("SCR_WIDTH") && m_document["SCR_WIDTH"].IsUint()) {
             m_scr_width = m_document["SCR_WIDTH"].GetUint();
-            LM.write_log("Serialization_Manager::load_config(): Loaded SCR_WIDTH: %u", m_scr_width);
+           // LM.write_log("Serialization_Manager::load_config(): Loaded SCR_WIDTH: %u", m_scr_width);
         }
         else {
-            LM.write_log("Serialization_Manager::load_config(): SCR_WIDTH is missing or not an unsigned integer. Using default value: %u", m_scr_width);
+            //LM.write_log("Serialization_Manager::load_config(): SCR_WIDTH is missing or not an unsigned integer. Using default value: %u", m_scr_width);
         }
 
         if (m_document.HasMember("SCR_HEIGHT") && m_document["SCR_HEIGHT"].IsUint()) {
             m_scr_height = m_document["SCR_HEIGHT"].GetUint();
-            LM.write_log("Serialization_Manager::load_config(): Loaded SCR_HEIGHT: %u", m_scr_height);
+            //LM.write_log("Serialization_Manager::load_config(): Loaded SCR_HEIGHT: %u", m_scr_height);
         }
         else {
-            LM.write_log("Serialization_Manager::load_config(): SCR_HEIGHT is missing or not an unsigned integer. Using default value: %u", m_scr_height);
+           // LM.write_log("Serialization_Manager::load_config(): SCR_HEIGHT is missing or not an unsigned integer. Using default value: %u", m_scr_height);
         }
 
         if (m_document.HasMember("FPS_DISPLAY_INTERVAL") && m_document["FPS_DISPLAY_INTERVAL"].IsNumber()) {
             m_fps_display_interval = m_document["FPS_DISPLAY_INTERVAL"].GetFloat();
-            LM.write_log("Serialization_Manager::load_config(): Loaded FPS_DISPLAY_INTERVAL: %.2f", m_fps_display_interval);
+           // LM.write_log("Serialization_Manager::load_config(): Loaded FPS_DISPLAY_INTERVAL: %.2f", m_fps_display_interval);
         }
         else {
-            LM.write_log("Serialization_Manager::load_config(): FPS_DISPLAY_INTERVAL is missing or not a number. Using default value: %.2f", m_fps_display_interval);
+           // LM.write_log("Serialization_Manager::load_config(): FPS_DISPLAY_INTERVAL is missing or not a number. Using default value: %.2f", m_fps_display_interval);
         }
 
-        LM.write_log("Serialization_Manager::load_config(): Configuration loaded successfully.");
+       // LM.write_log("Serialization_Manager::load_config(): Configuration loaded successfully.");
         return true;
     }
 
 
     bool Serialization_Manager::load_prefabs(const char* filepath) {
-        LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
+       // LM.write_log("Serialization_Manager::load_prefabs(): Attempting to load prefabs from: %s", filepath);
 
         // Read and parse the prefab file
         std::ifstream ifs(filepath);
         if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_prefabs(): Failed to open prefab file: %s", filepath);
+           // LM.write_log("Serialization_Manager::load_prefabs(): Failed to open prefab file: %s", filepath);
             return false;
         }
 
@@ -236,12 +236,12 @@ namespace lof {
         if (prefab_document.HasParseError()) {
             size_t offset = prefab_document.GetErrorOffset();
             rapidjson::ParseErrorCode error_code = prefab_document.GetParseError();
-            LM.write_log("Serialization_Manager::load_prefabs(): JSON parse error in prefab file at offset %zu: %s", offset, rapidjson::GetParseError_En(error_code));
+           // LM.write_log("Serialization_Manager::load_prefabs(): JSON parse error in prefab file at offset %zu: %s", offset, rapidjson::GetParseError_En(error_code));
             return false;
         }
 
         if (!prefab_document.IsObject() || !prefab_document.HasMember("prefabs") || !prefab_document["prefabs"].IsObject()) {
-            LM.write_log("Serialization_Manager::load_prefabs(): Invalid prefab file format: 'prefabs' object is missing or invalid.");
+           // LM.write_log("Serialization_Manager::load_prefabs(): Invalid prefab file format: 'prefabs' object is missing or invalid.");
             return false;
         }
 
@@ -250,37 +250,37 @@ namespace lof {
         for (auto it = prefabs.MemberBegin(); it != prefabs.MemberEnd(); ++it) {
             std::string prefab_name = it->name.GetString();
             
-            IMGUIM.fill_prefab_names(prefab_name.c_str());
+            //IMGUIM.fill_prefab_names(prefab_name.c_str());
 
             //DEBUG
-            LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());
+            //LM.write_log("DEBUG: Attempting to load prefab: %s", prefab_name.c_str());
 
             // Deep copy the prefab definition into the map
             rapidjson::Value prefab_value(rapidjson::kObjectType);
             prefab_value.CopyFrom(it->value, m_document.GetAllocator());
 
             m_prefab_map.emplace(prefab_name, std::move(prefab_value));
-            LM.write_log("Serialization_Manager::load_prefabs(): Loaded prefab '%s' into cache.", prefab_name.c_str());
+           // LM.write_log("Serialization_Manager::load_prefabs(): Loaded prefab '%s' into cache.", prefab_name.c_str());
         }
 
-        LM.write_log("Serialization_Manager::load_prefabs(): Prefabs loaded successfully.");
+        //LM.write_log("Serialization_Manager::load_prefabs(): Prefabs loaded successfully.");
         return true;
     }
 
     bool Serialization_Manager::load_scene(const char* filename) {
-        LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
+        //LM.write_log("Serialization_Manager::load_scene(): Attempting to load scene file from: %s", filename);
         std::string path(filename);
         if (path.find("main_menu.scn") != std::string::npos) {
             scene_no = 0;
-            LM.write_log("Serialization_Manager::load_scene(): Setting to Main Menu");
+            //LM.write_log("Serialization_Manager::load_scene(): Setting to Main Menu");
         }
         if (path.find("scene1.scn") != std::string::npos) {
             scene_no = 1;
-            LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");
+           // LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");
         }
         else if (path.find("scene2.scn") != std::string::npos) {
             scene_no = 2;
-            LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 2");
+            //LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 2");
         }
         // Clear all existing entities first
         const auto& entities = ECSM.get_entities();
@@ -299,12 +299,12 @@ namespace lof {
             ECSM.destroy_entity(0);
         }
 
-        LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+       // LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
 
         // Read and parse the scene file
         std::ifstream ifs(filename);
         if (!ifs.is_open()) {
-            LM.write_log("Serialization_Manager::load_scene(): Failed to open scene file: %s", filename);
+            //LM.write_log("Serialization_Manager::load_scene(): Failed to open scene file: %s", filename);
             return false;
         }
 
@@ -318,12 +318,12 @@ namespace lof {
         if (scene_document.HasParseError()) {
             size_t offset = scene_document.GetErrorOffset();
             rapidjson::ParseErrorCode error_code = scene_document.GetParseError();
-            LM.write_log("Serialization_Manager::load_scene(): JSON parse error at offset %zu: %s", offset, rapidjson::GetParseError_En(error_code));
+            //LM.write_log("Serialization_Manager::load_scene(): JSON parse error at offset %zu: %s", offset, rapidjson::GetParseError_En(error_code));
             return false;
         }
 
         if (!scene_document.IsObject() || !scene_document.HasMember("objects") || !scene_document["objects"].IsArray()) {
-            LM.write_log("Serialization_Manager::load_scene(): Invalid scene file format: 'objects' array is missing or invalid.");
+          //  LM.write_log("Serialization_Manager::load_scene(): Invalid scene file format: 'objects' array is missing or invalid.");
             return false;
         }
 
@@ -338,7 +338,7 @@ namespace lof {
                 entity_name = obj["name"].GetString();
             }
             else {
-                LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Using default name.", i);
+               // LM.write_log("Serialization_Manager::load_scene(): Entity at index %zu is missing 'name' or 'name' is not a string. Using default name.", i);
                 entity_name = "unnamed_entity_" + std::to_string(i);
             }
 
@@ -348,7 +348,7 @@ namespace lof {
                 std::string prefab_name = obj["prefab"].GetString();
                 eid = ECSM.clone_entity_from_prefab(prefab_name, entity_name);
                 if (eid == INVALID_ENTITY_ID) {
-                    LM.write_log("Serialization_Manager::load_scene(): Failed to create entity from prefab '%s'. Skipping.", prefab_name.c_str());
+                  //  LM.write_log("Serialization_Manager::load_scene(): Failed to create entity from prefab '%s'. Skipping.", prefab_name.c_str());
                     continue;
                 }
             }
@@ -360,7 +360,7 @@ namespace lof {
             // Set the entity's name
             if (auto* entity = ECSM.get_entity(eid)) {
                 entity->set_name(entity_name);
-                LM.write_log("Serialization_Manager::load_scene(): Created entity '%s' with ID %u.", entity_name.c_str(), eid);
+               // LM.write_log("Serialization_Manager::load_scene(): Created entity '%s' with ID %u.", entity_name.c_str(), eid);
             }
 
             // Initialize merged components
@@ -391,9 +391,9 @@ namespace lof {
             // Create level entities only for scene2
             if (i == 4) {
                 if (is_scene2_file(filename)) {
-                    LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
+                  //  LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
                     if (!create_level_entities()) {
-                        LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
+                     //   LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
                         return false;
                     }
                 }
@@ -401,7 +401,7 @@ namespace lof {
 
         }
 
-        LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
+      //  LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
         return true;
     }
 
@@ -770,7 +770,7 @@ namespace lof {
 
     bool Serialization_Manager::save_game_state(const char* filepath) {
         try {
-            LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
+           // LM.write_log("Serialization_Manager::save_game_state(): Starting to save game state to %s", filepath);
 
             // Create document and initialize allocator
             rapidjson::Document save_doc;
@@ -784,7 +784,7 @@ namespace lof {
             // Iterate through all entities
             for (const auto& entity_ptr : ECSM.get_entities()) {
                 if (!entity_ptr) {
-                    LM.write_log("Skipping null entity pointer");
+                   // LM.write_log("Skipping null entity pointer");
                     continue;
                 }
 
@@ -815,7 +815,7 @@ namespace lof {
                         entity_name.find("lava") == 0 ||
                         entity_name.find("obsidian") == 0 ||
                         entity_name.find("ventStrip") == 0)) {
-                    LM.write_log("Skipping level geometry entity: %s", entity_name.c_str());
+                   // LM.write_log("Skipping level geometry entity: %s", entity_name.c_str());
                     continue;
                 }
 
@@ -843,7 +843,7 @@ namespace lof {
                             components_obj.AddMember("Transform2D", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Transform2D for entity %s: %s", entity_name.c_str(), e.what());
+                          //  LM.write_log("Error serializing Transform2D for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -855,7 +855,7 @@ namespace lof {
                             components_obj.AddMember("Graphics_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Graphics_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Graphics_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -867,7 +867,7 @@ namespace lof {
                             components_obj.AddMember("Collision_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Collision_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Collision_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -879,7 +879,7 @@ namespace lof {
                             components_obj.AddMember("Physics_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Physics_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Physics_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -891,7 +891,7 @@ namespace lof {
                             components_obj.AddMember("Velocity_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Velocity_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Velocity_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -903,7 +903,7 @@ namespace lof {
                             components_obj.AddMember("Audio_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Audio_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Audio_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -915,7 +915,7 @@ namespace lof {
                             components_obj.AddMember("Animation_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Animation_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Animation_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -927,7 +927,7 @@ namespace lof {
                             components_obj.AddMember("Logic_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Logic_Component for entity %s: %s", entity_name.c_str(), e.what());
+                           // LM.write_log("Error serializing Logic_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -939,7 +939,7 @@ namespace lof {
                             components_obj.AddMember("Text_Component", comp_value, allocator);
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error serializing Text_Component for entity %s: %s", entity_name.c_str(), e.what());
+                          //  LM.write_log("Error serializing Text_Component for entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
@@ -952,16 +952,16 @@ namespace lof {
                             entity_obj.AddMember("components", components_obj, allocator);
                             objects_array.PushBack(entity_obj, allocator);
 
-                            LM.write_log("Successfully serialized entity %s", entity_name.c_str());
+                           // LM.write_log("Successfully serialized entity %s", entity_name.c_str());
                         }
                         catch (const std::exception& e) {
-                            LM.write_log("Error adding components to entity %s: %s", entity_name.c_str(), e.what());
+                          //  LM.write_log("Error adding components to entity %s: %s", entity_name.c_str(), e.what());
                         }
                     }
 
                 }
                 catch (const std::exception& e) {
-                    LM.write_log("Error processing entity %d: %s", entity_id, e.what());
+                  //  LM.write_log("Error processing entity %d: %s", entity_id, e.what());
                     continue;
                 }
             }
@@ -972,7 +972,7 @@ namespace lof {
             // Write to file
             std::ofstream ofs(filepath);
             if (!ofs.is_open()) {
-                LM.write_log("Failed to open file for writing: %s", filepath);
+               // LM.write_log("Failed to open file for writing: %s", filepath);
                 return false;
             }
 
@@ -983,25 +983,25 @@ namespace lof {
             ofs << buffer.GetString();
             ofs.close();
 
-            LM.write_log("Successfully saved game state to: %s", filepath);
+           // LM.write_log("Successfully saved game state to: %s", filepath);
             return true;
         }
         catch (const std::exception& e) {
-            LM.write_log("Fatal error in save_game_state: %s", e.what());
+          //  LM.write_log("Fatal error in save_game_state: %s", e.what());
             return false;
         }
         catch (...) {
-            LM.write_log("Unknown fatal error in save_game_state");
+           // LM.write_log("Unknown fatal error in save_game_state");
             return false;
         }
     }
 
     bool Serialization_Manager::load_level_data(const char* filepath) {
-        LM.write_log("Serialization_Manager::load_level_data(): Loading level from %s", filepath);
+       // LM.write_log("Serialization_Manager::load_level_data(): Loading level from %s", filepath);
 
         std::ifstream file(filepath);
         if (!file.is_open()) {
-            LM.write_log("Failed to open level file: %s", filepath);
+           // LM.write_log("Failed to open level file: %s", filepath);
             return false;
         }
 
@@ -1041,18 +1041,18 @@ namespace lof {
             current_level.rows = current_level.tiles.size();
             current_level.cols = current_level.tiles.empty() ? 0 : current_level.tiles[0].size();
 
-            LM.write_log("Successfully loaded level data: %zu rows x %zu columns",
-                current_level.rows, current_level.cols);
+           // LM.write_log("Successfully loaded level data: %zu rows x %zu columns",
+              //  current_level.rows, current_level.cols);
 
             // Additional verification logging
-            LM.write_log("First tile type: %c, Last tile type: %c",
-                current_level.tiles[0][0].type,
-                current_level.tiles[current_level.rows - 1][current_level.cols - 1].type);
+           // LM.write_log("First tile type: %c, Last tile type: %c",
+             //   current_level.tiles[0][0].type,
+             //   current_level.tiles[current_level.rows - 1][current_level.cols - 1].type);
 
             return true;
         }
         catch (const std::exception& e) {
-            LM.write_log("Error parsing level data: %s", e.what());
+            //LM.write_log("Error parsing level data: %s", e.what());
             return false;
         }
     }
@@ -1074,8 +1074,8 @@ namespace lof {
 
 
     void Serialization_Manager::debug_print_level() const {
-        LM.write_log("Level Data Debug Print:");
-        LM.write_log("Level dimensions: %zu x %zu", current_level.rows, current_level.cols);
+      //  LM.write_log("Level Data Debug Print:");
+       // LM.write_log("Level dimensions: %zu x %zu", current_level.rows, current_level.cols);
 
         // Print all rows
         for (size_t i = 0; i < current_level.rows; ++i) {
@@ -1085,7 +1085,7 @@ namespace lof {
                 row_str += tile.type;
                 row_str += " ";  // Add space for readability
             }
-            LM.write_log("Row %zu: %s", i, row_str.c_str());
+           // LM.write_log("Row %zu: %s", i, row_str.c_str());
         }
 
         // Print tile type statistics
@@ -1100,11 +1100,11 @@ namespace lof {
 
     bool Serialization_Manager::create_level_entities() {
         if (current_level.tiles.empty()) {
-            LM.write_log("Serialization_Manager::create_level_entities(): No level data loaded");
+           // LM.write_log("Serialization_Manager::create_level_entities(): No level data loaded");
             return false;
         }
 
-        LM.write_log("Serialization_Manager::create_level_entities(): CHECKING IF SCENE 2 IS LOADED TWICE");
+       // LM.write_log("Serialization_Manager::create_level_entities(): CHECKING IF SCENE 2 IS LOADED TWICE");
 
         // Define bounds
         const float LEFT_BOUND = -960.0f;
@@ -1153,8 +1153,8 @@ namespace lof {
                 case 'o': prefab_name = "obsidian_prefab"; break;
                 case 's': prefab_name = "ventStrip_prefab"; break;
                 default:
-                    LM.write_log("Unknown tile type '%c' at position (%zu, %zu)",
-                        tile.type, row, col);
+                 //   LM.write_log("Unknown tile type '%c' at position (%zu, %zu)",
+                //        tile.type, row, col);
                     continue;
                 }
 
@@ -1192,13 +1192,13 @@ namespace lof {
                         //collision.collidable = true;
 
                         // Debug print collision component
-                        LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
-                            x_pos, y_pos, collision.width, collision.height);
+                      //  LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
+                      //      x_pos, y_pos, collision.width, collision.height);
                     }
                    
                 }
                 else {
-                    LM.write_log("Failed to create entity from prefab '%s'", prefab_name.c_str());
+                  //  LM.write_log("Failed to create entity from prefab '%s'", prefab_name.c_str());
                 }
             }
         }
@@ -1224,7 +1224,7 @@ namespace lof {
 
 
     float Serialization_Manager::get_fps_display_interval() const {
-        LM.write_log("Serialization_Manager::get_fps_display_interval(): Returning FPS_DISPLAY_INTERVAL: %.2f", m_fps_display_interval);
+      //  LM.write_log("Serialization_Manager::get_fps_display_interval(): Returning FPS_DISPLAY_INTERVAL: %.2f", m_fps_display_interval);
         return m_fps_display_interval;
     }
 
@@ -1232,10 +1232,10 @@ namespace lof {
     const rapidjson::Value* Serialization_Manager::get_prefab(const std::string& prefab_name) const {
         auto it = m_prefab_map.find(prefab_name);
         if (it != m_prefab_map.end()) {
-            LM.write_log("Serialization_Manager::get_prefab(): Found prefab '%s'.", prefab_name.c_str());
+         //   LM.write_log("Serialization_Manager::get_prefab(): Found prefab '%s'.", prefab_name.c_str());
             return &(it->second);
         }
-        LM.write_log("Serialization_Manager::get_prefab(): Prefab '%s' not found.", prefab_name.c_str());
+       // LM.write_log("Serialization_Manager::get_prefab(): Prefab '%s' not found.", prefab_name.c_str());
         return nullptr;
     }
 

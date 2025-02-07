@@ -33,7 +33,7 @@ namespace lof {
         current_number_of_steps(DEFAULT_NUMBER_OF_STEPS),
         FIXED_DELTA_TIME(DEFAULT_FIXED_DELTA_TIME) {
         set_type("FPS_Manager");
-        LM.write_log("FPS_Manager::FPS_Manager(): Initialized with TARGET_FPS = %d.", TARGET_FPS);
+        //LM.write_log("FPS_Manager::FPS_Manager(): Initialized with TARGET_FPS = %d.", TARGET_FPS);
     }
 
     FPS_Manager& FPS_Manager::get_instance() {
@@ -43,7 +43,7 @@ namespace lof {
 
     int FPS_Manager::start_up() {
         if (is_started()) {
-            LM.write_log("FPS_Manager::start_up(): Already started.");
+            //LM.write_log("FPS_Manager::start_up(): Already started.");
             return 0; // Already started
         }
 
@@ -52,13 +52,13 @@ namespace lof {
         clock.delta(); // Initialize clock
 
         m_is_started = true;
-        LM.write_log("FPS_Manager::start_up(): FPS_Manager started successfully.");
+        //LM.write_log("FPS_Manager::start_up(): FPS_Manager started successfully.");
         return 0;
     }
 
     void FPS_Manager::shut_down() {
         if (!is_started()) {
-            LM.write_log("FPS_Manager::shut_down(): FPS_Manager is not started.");
+            //LM.write_log("FPS_Manager::shut_down(): FPS_Manager is not started.");
             return;
         }
 
@@ -69,7 +69,7 @@ namespace lof {
         fps_calculator.reset();
 
         m_is_started = false;
-        LM.write_log("FPS_Manager::shut_down(): FPS_Manager shut down successfully.");
+        //LM.write_log("FPS_Manager::shut_down(): FPS_Manager shut down successfully.");
     }
 
     void FPS_Manager::frame_start() {

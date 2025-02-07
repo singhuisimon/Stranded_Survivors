@@ -63,7 +63,7 @@ namespace lof {
 
     int ECS_Manager::start_up() {
         if (is_started()) {
-            LM.write_log("ECS_Manager::start_up(): ECS_Manager is already started.");
+            //LM.write_log("ECS_Manager::start_up(): ECS_Manager is already started.");
             return 0; // Already started
         }
 
@@ -73,80 +73,82 @@ namespace lof {
 
         GLFWwindow* window = glfwGetCurrentContext(); 
         if (!window) {
-            LM.write_log("ECS Manager:: start_up(): No current GLFW window context.");
+            //LM.write_log("ECS Manager:: start_up(): No current GLFW window context.");
             return -1;
         }
 
         try {
             // Register all components used in the game
-            LM.write_log("ECS_Manager::start_up(): Registering components.");
+            //LM.write_log("ECS_Manager::start_up(): Registering components.");
 
             register_component<Transform2D>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Transform2D'.");
+            //
+            // \LM.write_log("ECS_Manager::start_up(): Registered component 'Transform2D'.");
 
             register_component<Velocity_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Velocity_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Velocity_Component'.");
 
             register_component<Collision_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Collision_Component'.");
 
             register_component<Physics_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Physics_Component'.");
 
             register_component<Graphics_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
+           // LM.write_log("ECS_Manager::start_up(): Registered component 'Graphics_Component'.");
 
             register_component<Audio_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Audio_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Audio_Component'.");
 
             register_component<GUI_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'GUI_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'GUI_Component'.");
 
             register_component<Animation_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Animation_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Animation_Component'.");
 
             register_component<Logic_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Logic_Component'.");
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Logic_Component'.");
 
             register_component<Text_Component>();
-            LM.write_log("ECS_Manager::start_up(): Registered component 'Text_Component'.");
+            
+            //LM.write_log("ECS_Manager::start_up(): Registered component 'Text_Component'.");
 
             // Register all systems used in the game
-            LM.write_log("ECS_Manager::start_up(): Adding systems.");
+            //LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
             add_system(std::make_unique<Collision_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
             add_system(std::make_unique<Movement_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
             add_system(std::make_unique<Render_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
             add_system(std::make_unique<GUI_System>(*this));
-            LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
 
             add_system(std::make_unique<Audio_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
 
             add_system(std::make_unique<Animation_System>()); 
-            LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
 
             add_system(std::make_unique<Logic_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
             add_system(std::make_unique<Interruption_System>(window)); 
-            LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
 
             add_system(std::make_unique<Particle_System>());
-            LM.write_log("ECS_Manager::start_up(): Added system 'Particle_System'.");
+            //LM.write_log("ECS_Manager::start_up(): Added system 'Particle_System'.");
 
             m_is_started = true;
-            LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");
+            //LM.write_log("ECS_Manager::start_up(): ECS_Manager started successfully.");
             return 0;
         }
         catch (const std::exception& e) {
-            LM.write_log("ECS_Manager::start_up(): Failed to initialize. Error: %s", e.what());
+            //LM.write_log("ECS_Manager::start_up(): Failed to initialize. Error: %s", e.what());
             return -1;
         }
     }
@@ -155,7 +157,7 @@ namespace lof {
     // Update shut_down to clear the name map
     void ECS_Manager::shut_down() {
         if (!is_started()) {
-            LM.write_log("ECS_Manager::shut_down(): ECS_Manager is not started. Nothing to shut down.");
+            //LM.write_log("ECS_Manager::shut_down(): ECS_Manager is not started. Nothing to shut down.");
             return;
         }
 
@@ -168,7 +170,7 @@ namespace lof {
         next_component_id = 0;
 
         m_is_started = false;
-        LM.write_log("ECS_Manager::shut_down(): ECS_Manager shut down successfully.");
+        //LM.write_log("ECS_Manager::shut_down(): ECS_Manager shut down successfully.");
     }
 
     void ECS_Manager::add_components_from_json(EntityID entity, const rapidjson::Value& components) {
@@ -244,7 +246,7 @@ namespace lof {
         if (!name.empty()) {
             // Check if name already exists
             if (entity_names.find(name) != entity_names.end()) {
-                LM.write_log("ECS_Manager::create_entity(): Warning: Entity name '%s' already exists. Using name with ID suffix.", name.c_str());
+                //LM.write_log("ECS_Manager::create_entity(): Warning: Entity name '%s' already exists. Using name with ID suffix.", name.c_str());
                 // If name already exists, append ID to make it unique
                 std::string unique_name = name + "_" + std::to_string(id);
                 entity_names[unique_name] = id;
@@ -254,10 +256,10 @@ namespace lof {
             else {
                 entity_names[name] = id;
             }
-            LM.write_log("ECS_Manager::create_entity(): Created entity '%s' with ID %u.", entities.back()->get_name().c_str(), id);
+            //LM.write_log("ECS_Manager::create_entity(): Created entity '%s' with ID %u.", entities.back()->get_name().c_str(), id);
         }
         else {
-            LM.write_log("ECS_Manager::create_entity(): Created unnamed entity with ID %u.", id);
+            //LM.write_log("ECS_Manager::create_entity(): Created unnamed entity with ID %u.", id);
         }
 
         // Resize component arrays if necessary
@@ -275,26 +277,26 @@ namespace lof {
 
     void ECS_Manager::destroy_entity(EntityID entity) {
         if (entity >= entities.size() || !entities[entity]) {
-            LM.write_log("ECS_Manager::destroy_entity(): Invalid entity ID or already destroyed: %u", entity);
+            //LM.write_log("ECS_Manager::destroy_entity(): Invalid entity ID or already destroyed: %u", entity);
             return;
         }
 
         // Log the entity being destroyed
         const std::string& name = entities[entity]->get_name();
-        LM.write_log("ECS_Manager::destroy_entity(): Starting destruction of entity %u (name: %s)", entity, name.c_str());
+        //LM.write_log("ECS_Manager::destroy_entity(): Starting destruction of entity %u (name: %s)", entity, name.c_str());
 
         // First remove from all systems
         for (auto& system : systems) {
             if (system->has_entity(entity)) {
                 system->remove_entity(entity);
-                LM.write_log("Removed entity %u from system %s", entity, system->get_type().c_str());
+               // LM.write_log("Removed entity %u from system %s", entity, system->get_type().c_str());
             }
         }
 
         // Remove from name lookup if it has a name
         if (!name.empty()) {
             entity_names.erase(name);
-            LM.write_log("Removed name mapping for '%s'", name.c_str());
+            //LM.write_log("Removed name mapping for '%s'", name.c_str());
         }
 
         // Remove all components
@@ -303,14 +305,14 @@ namespace lof {
             if (entity < componentArray.size()) {
                 if (componentArray[entity]) {  // Check if component exists
                     componentArray[entity].reset();
-                    LM.write_log("Reset component for entity %u", entity);
+                    //LM.write_log("Reset component for entity %u", entity);
                 }
             }
         }
 
         // Remove the entity from the entities vector
         entities.erase(entities.begin() + entity);
-        LM.write_log("Removed entity from entities vector");
+       // LM.write_log("Removed entity from entities vector");
 
         // Update the IDs of all entities that come after the removed one
         for (size_t i = entity; i < entities.size(); i++) {
@@ -335,7 +337,7 @@ namespace lof {
                     }
                 }
 
-                LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
+               // LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
             }
         }
 
@@ -347,7 +349,7 @@ namespace lof {
             }
         }
 
-        LM.write_log("ECS_Manager::destroy_entity(): Completed destruction of entity %u", entity);
+        //LM.write_log("ECS_Manager::destroy_entity(): Completed destruction of entity %u", entity);
     }
 
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{
@@ -357,10 +359,10 @@ namespace lof {
     void ECS_Manager::add_system(std::unique_ptr<System> system) {
         // Get the system type before moving
         std::string system_type = system->get_type();
-        LM.write_log("ECS_Manager::add_system(): Adding system '%s'.", system_type.c_str());
+        //LM.write_log("ECS_Manager::add_system(): Adding system '%s'.", system_type.c_str());
 
         systems.emplace_back(std::move(system));
-        LM.write_log("ECS_Manager::add_system(): System '%s' added successfully.", systems.back()->get_type().c_str());
+        //LM.write_log("ECS_Manager::add_system(): System '%s' added successfully.", systems.back()->get_type().c_str());
     }
 
     void ECS_Manager::update(float delta_time) {
@@ -386,10 +388,10 @@ namespace lof {
 
 
 
-                        if (level_editor_mode) {
+                        /*if (level_editor_mode) {
                             system->set_time(0);
                             continue;
-                        }
+                        }*/
 
                     }
                     for (int i = 0; i < steps; ++i) {
@@ -404,10 +406,10 @@ namespace lof {
                     
                   }
                 else { //systems that do not use time in calculations
-                    if (system->get_type() == "Audio_System" && level_editor_mode) {
-                        system->set_time(0);
-                        continue; //skip audio in the level editor mode
-                    }
+                    //if (system->get_type() == "Audio_System" && level_editor_mode) {
+                    //    system->set_time(0);
+                    //    continue; //skip audio in the level editor mode
+                    //}
                     // Getting delta time for each system
                     system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                     // Updating each system
@@ -445,7 +447,7 @@ namespace lof {
         if (auto* entity = get_entity(entity_id)) {
             // First check if new name already exists (unless it's empty)
             if (!new_name.empty() && entity_names.find(new_name) != entity_names.end()) {
-                LM.write_log("ECS_Manager::update_entity_name(): Name '%s' already exists.", new_name.c_str());
+               // LM.write_log("ECS_Manager::update_entity_name(): Name '%s' already exists.", new_name.c_str());
                 return false;
             }
 
@@ -453,22 +455,22 @@ namespace lof {
             const std::string& old_name = entity->get_name();
             if (!old_name.empty()) {
                 entity_names.erase(old_name);
-                LM.write_log("ECS_Manager::update_entity_name(): Removed old name mapping for '%s'", old_name.c_str());
+              //  LM.write_log("ECS_Manager::update_entity_name(): Removed old name mapping for '%s'", old_name.c_str());
             }
 
             // Add new name if provided
             if (!new_name.empty()) {
                 entity_names[new_name] = entity_id;
-                LM.write_log("ECS_Manager::update_entity_name(): Added new name mapping for '%s'", new_name.c_str());
+               // LM.write_log("ECS_Manager::update_entity_name(): Added new name mapping for '%s'", new_name.c_str());
             }
 
             entity->set_name(new_name);
-            LM.write_log("ECS_Manager::update_entity_name(): Updated entity %u name from '%s' to '%s'",
-                entity_id, old_name.c_str(), new_name.c_str());
+            //LM.write_log("ECS_Manager::update_entity_name(): Updated entity %u name from '%s' to '%s'",
+               // entity_id, old_name.c_str(), new_name.c_str());
             return true;
         }
 
-        LM.write_log("ECS_Manager::update_entity_name(): Entity %u not found", entity_id);
+        //LM.write_log("ECS_Manager::update_entity_name(): Entity %u not found", entity_id);
         return false;
     }
 
