@@ -466,6 +466,46 @@ namespace lof {
                     timer_icon_transform.prev_position = timer_icon_transform.position;
                 }
 
+                // Set display fps flag to true or false when key 'F' is pressed
+                if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == false) {
+                    display_fps = true;
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == true) {
+                    display_fps = false;
+                }
+
+                // Display fps if fps flag is true
+                if (display_fps == true) {
+                    EntityID game_fps_counter_id = ECSM.find_entity_by_name("fps_counter_in_game");
+                    if (game_fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(game_fps_counter_id)) {
+                        auto& fps_text_comp = ECSM.get_component<Text_Component>(game_fps_counter_id);
+                        auto& fps_transform_comp = ECSM.get_component<Transform2D>(game_fps_counter_id);
+
+                        // Write the current fps to the text object
+                        float current_fps = FPSM.get_current_fps();
+                        std::stringstream ss;
+                        ss << "FPS: " << std::fixed << std::setprecision(1) << current_fps;
+                        fps_text_comp.text = ss.str();
+
+                        // Set the fps counter position
+                        fps_transform_comp.position = {
+                            base_position.x + 830.0f,       // Right border of the screen
+                            base_position.y - 125.0f        // Below UI overlay
+                        };
+                        fps_transform_comp.prev_position = fps_transform_comp.position;
+
+                    }
+                }
+                else {
+                    EntityID game_fps_counter_id = ECSM.find_entity_by_name("fps_counter_in_game");
+                    if (game_fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(game_fps_counter_id)) {
+                        auto& fps_text_comp = ECSM.get_component<Text_Component>(game_fps_counter_id);
+
+                        // Undo the text for fps
+                        fps_text_comp.text = "";
+                    }
+                }
+
                 // ------------------------- TIMER UPDATE CHANGES -------------------------
                 // 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
                 static float timer_accumulator = 0.0f; // You can make this a class member if you like
