@@ -325,24 +325,25 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_mineral_tank_gui()
     {
-        // Add scene check at the start
+        // Check current scene
         if (GM.get_current_scene() == 4) {  // Win screen
             return;  // Don't show GUI on win screen
         }
 
-        if (mineral_interaction_container != INVALID_ENTITY_ID) {
+        // Check if container already exists
+        if (ecs_manager.find_entity_by_name("mineral_interaction_container") != INVALID_ENTITY_ID) {
             return; // GUI already shown
         }
 
         // 1) Create E prompt
-        mineral_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_e_prompt)) {
+        EntityID e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", "mineral_e_prompt");
+        if (e_prompt != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(e_prompt)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "E_Gold_02_Batch_14";  // E key icon
                 graphics->color = glm::vec4(1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
+            if (auto* transform = get_component_safe<Transform2D>(e_prompt)) {
                 transform->position = Vec2D(mineral_e_prompt_x, original_e_prompt_y);
                 transform->scale = Vec2D(50.0f, 50.0f);
                 e_prompt_animation_timer = 0.0f;
@@ -350,119 +351,94 @@ namespace lof {
         }
 
         // 2) Main container with background texture
-        mineral_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            auto* container_gui = get_component_safe<GUI_Component>(mineral_interaction_container);
+        EntityID container = ecs_manager.clone_entity_from_prefab("gui_container", "mineral_interaction_container");
+        if (container != INVALID_ENTITY_ID) {
+            auto* container_gui = get_component_safe<GUI_Component>(container);
             if (!container_gui) {
                 hide_mineral_tank_gui();
                 return;
             }
             container_gui->is_container = true;
 
-            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_interaction_container)) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(container)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "UI_MineralsFill_1920x1080_v2";
                 graphics->color = glm::vec4(1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_interaction_container)) {
+            if (auto* transform = get_component_safe<Transform2D>(container)) {
                 transform->position = Vec2D(0.0f, 0.0f);
                 transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
-        // 3) Single progress bar
-        mineral_progress_bar = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
-        if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(mineral_progress_bar)) {
+        // 3) Progress bar
+        EntityID progress_bar = ecs_manager.clone_entity_from_prefab("gui_progress_bar", "mineral_progress_bar");
+        if (progress_bar != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(progress_bar)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
-                // White or Gold color for minerals
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
+            if (auto* transform = get_component_safe<Transform2D>(progress_bar)) {
                 float max_width = 600.0f;
                 float current_width = max_width * stored_mineral_progress;
                 transform->position = Vec2D(-642.0f + (current_width / 2.0f), 60.0f);
                 transform->scale = Vec2D(current_width, 42.0f);
             }
-            if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+            if (auto* gui = get_component_safe<GUI_Component>(progress_bar)) {
                 gui->is_progress_bar = true;
                 gui->progress = stored_mineral_progress;
             }
         }
 
-        // 4) Percentage text (xx%)
-        mineral_percentage_text = ecs_manager.clone_entity_from_prefab("text_object");
-        if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            if (auto* text = get_component_safe<Text_Component>(mineral_percentage_text)) {
+        // 4) Percentage text
+        EntityID percentage_text = ecs_manager.clone_entity_from_prefab("text_object", "mineral_percentage_text");
+        if (percentage_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(percentage_text)) {
                 text->font_name = DEFAULT_FONT_NAME;
                 int percentage = static_cast<int>(stored_mineral_progress * 100);
                 text->text = std::to_string(percentage) + "%";
                 text->color = glm::vec3(1.0f);
                 text->scale = glm::vec2(0.5f, 0.5f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_percentage_text)) {
+            if (auto* transform = get_component_safe<Transform2D>(percentage_text)) {
                 transform->position = Vec2D(-350.0f, 10.0f);
                 transform->scale = Vec2D(1.0f, 1.0f);
             }
         }
 
-        // 5) Mineral count text: "currentAmount / 50000"
-        mineral_deposit_count_text = ecs_manager.clone_entity_from_prefab("text_object");
-        if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
+        // 5) Deposit count text
+        EntityID count_text = ecs_manager.clone_entity_from_prefab("text_object", "mineral_deposit_count_text");
+        if (count_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(count_text)) {
                 text->font_name = DEFAULT_FONT_NAME;
-
-                // depositCount = progress * 50000
                 int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
-
-                // Construct the string "1234 / 50000"
                 text->text = std::to_string(depositCount) + " / 50000";
                 text->color = glm::vec3(0.0f, 0.0f, 0.0f);
                 text->scale = glm::vec2(0.38f, 0.38f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(mineral_deposit_count_text)) {
+            if (auto* transform = get_component_safe<Transform2D>(count_text)) {
                 transform->position = Vec2D(-350.0f, 57.0f);
                 transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
     }
 
-
     void GUI_System::hide_mineral_tank_gui() {
-        // (5) Destroy deposit count text
-        if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying mineral deposit count text entity: %d", mineral_deposit_count_text);
-            ecs_manager.destroy_entity(mineral_deposit_count_text);
-            mineral_deposit_count_text = INVALID_ENTITY_ID;
-        }
+        // Order matters for clean removal - destroy from bottom up
+        const std::vector<std::string> entity_names = {
+            "mineral_deposit_count_text",
+            "mineral_percentage_text",
+            "mineral_progress_bar",
+            "mineral_interaction_container",
+            "mineral_e_prompt"
+        };
 
-        // (4) Destroy percentage text
-        if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying mineral percentage text entity: %d", mineral_percentage_text);
-            ecs_manager.destroy_entity(mineral_percentage_text);
-            mineral_percentage_text = INVALID_ENTITY_ID;
-        }
-
-        // (3) Destroy progress bar
-        if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying mineral progress bar entity: %d", mineral_progress_bar);
-            ecs_manager.destroy_entity(mineral_progress_bar);
-            mineral_progress_bar = INVALID_ENTITY_ID;
-        }
-
-        // (2) Destroy container
-        if (mineral_interaction_container != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying mineral container entity: %d", mineral_interaction_container);
-            ecs_manager.destroy_entity(mineral_interaction_container);
-            mineral_interaction_container = INVALID_ENTITY_ID;
-        }
-
-        // (1) Finally, destroy the E prompt
-        if (mineral_e_prompt != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying mineral E prompt entity: %d", mineral_e_prompt);
-            ecs_manager.destroy_entity(mineral_e_prompt);
-            mineral_e_prompt = INVALID_ENTITY_ID;
+        for (const auto& name : entity_names) {
+            EntityID entity = ecs_manager.find_entity_by_name(name);
+            if (entity != INVALID_ENTITY_ID) {
+                ecs_manager.destroy_entity(entity);
+            }
         }
     }
 
@@ -478,34 +454,34 @@ namespace lof {
         stored_mineral_progress = std::clamp(progress, 0.0f, 1.0f);
 
         // 2) Update the progress bar width/position
-        if (mineral_progress_bar != INVALID_ENTITY_ID) {
-            if (auto* transform = get_component_safe<Transform2D>(mineral_progress_bar)) {
+        EntityID progress_bar = ecs_manager.find_entity_by_name("mineral_progress_bar");
+        if (progress_bar != INVALID_ENTITY_ID) {
+            if (auto* transform = get_component_safe<Transform2D>(progress_bar)) {
                 float max_width = 600.0f;
                 float new_width = max_width * stored_mineral_progress;
-
                 transform->scale.x = new_width;
                 transform->position.x = -642.0f + (new_width / 2.0f);
             }
 
-            if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
+            if (auto* gui = get_component_safe<GUI_Component>(progress_bar)) {
                 gui->progress = stored_mineral_progress;
             }
         }
 
-        // 3) Update the percentage text ("xx%")
-        if (mineral_percentage_text != INVALID_ENTITY_ID) {
-            if (auto* text = get_component_safe<Text_Component>(mineral_percentage_text)) {
+        // 3) Update the percentage text
+        EntityID percentage_text = ecs_manager.find_entity_by_name("mineral_percentage_text");
+        if (percentage_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(percentage_text)) {
                 int percentage = static_cast<int>(stored_mineral_progress * 100);
                 text->text = std::to_string(percentage) + "%";
             }
         }
 
-        // 4) Update the deposit count text ("X / 50000")
-        if (mineral_deposit_count_text != INVALID_ENTITY_ID) {
-            if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
-                // Example calculation: depositCount = stored_mineral_progress * 50000
+        // 4) Update the deposit count text
+        EntityID count_text = ecs_manager.find_entity_by_name("mineral_deposit_count_text");
+        if (count_text != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(count_text)) {
                 int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
-                //printf("deposit count %d\n", depositCount);
                 text->text = std::to_string(depositCount) + " / 50000";
             }
         }
