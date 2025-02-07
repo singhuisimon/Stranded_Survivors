@@ -140,8 +140,8 @@ namespace lof {
 			sound->getMode(&loaded_mode);
 			LM.write_log("Sound %s loaded with requested mode: %s, actual mode: %s",
 				file_path.c_str(),
-				modeToString(mode1 | mode2).c_str(),
-				modeToString(loaded_mode).c_str());
+				mode_to_string(mode1 | mode2).c_str(),
+				mode_to_string(loaded_mode).c_str());
 		}
 
 		LM.write_log("Loading sound: %s (Resolved Path: %s)", file_path.c_str(), full_path.c_str());
@@ -522,12 +522,12 @@ namespace lof {
 		return filenames;
 	}
 
-	std::string Audio_Manager::modeToString(FMOD_MODE mode) {
+	std::string Audio_Manager::mode_to_string(FMOD_MODE mode) {
 		// List of FMOD_MODE flags with corresponding string names.
 		static const struct {
 			FMOD_MODE flag;
 			const char* name;
-		} modeFlags[] = {
+		} mode_flags[] = {
 			{ FMOD_DEFAULT, "FMOD_DEFAULT" },
 			{ FMOD_LOOP_OFF, "FMOD_LOOP_OFF" },
 			{ FMOD_LOOP_NORMAL, "FMOD_LOOP_NORMAL" },
@@ -549,9 +549,9 @@ namespace lof {
 
 		std::string result = "Mode Flags: ";
 
-		for (const auto& modeFlag : modeFlags) {
-			if (mode & modeFlag.flag) {
-				result += modeFlag.name;
+		for (const auto& mode_flag : mode_flags) {
+			if (mode & mode_flag.flag) {
+				result += mode_flag.name;
 				result += " ";
 			}
 		}

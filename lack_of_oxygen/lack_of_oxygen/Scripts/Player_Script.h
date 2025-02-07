@@ -17,22 +17,46 @@
 
 namespace lof {
 
+	/**
+	* @class Player_Script
+	* @brief Defines the player script class.
+	*/
 	class Player_Script : public Script {
 
 	public:
+
+		/**
+		 * @brief Constructor for Player_Script.
+		 */
 		Player_Script();
+
+		/**
+		 * @brief Register the script and function as well as implement the function
+		 */
 		void register_script() override;
+
+		/**
+		 * @brief Set the boolean for key press
+		 */
 		void check_keys();
+
+		/**
+		 * @brief Check if key has been pressed last frame.
+		 */
 		bool is_key_just_pressed(int key);
 
 	private:
 
+		//script name
 		const std::string script_name = "player_script";
 
+		//player id
 		EntityID player_id;
 
+		//for forces (movement)
 		int forces_flag;
 
+		//for keys
 		bool key_space_pressed = false;
 		bool key_space_last_frame = false;
 		bool key_a_pressed = false;
@@ -40,32 +64,47 @@ namespace lof {
 		bool key_a_last_frame = false;
 		bool key_d_last_frame = false;
 
+		/**
+		 * @brief Set the force flag for the player.
+		 */
 		void set_force_flag(int flag);
 
+		/**
+		 * @brief Get the force flag
+		 */
 		int get_force_flag() const;
 
+		/**
+		 * @brief Set the player id
+		 */
 		void set_player_id(EntityID entityid);
 
+		/**
+		 * @brief Get the player id
+		 */
 		EntityID get_player_id() const;
 
 		/**
-		* @brief Updates linear movement for a given entity.
-		* @param logic The Logic_Component containing movement parameters.
-		* @param transform The Transform2D to update.
-		* @param delta_time Time elapsed since the last update.
-		*/
+		 * @brief Updates player movement based on input.
+		 * @param physic_comp The Physics_Component to update.
+		 */
 		void update_player_movement(Physics_Component& physic_comp);
 
-		void update_player_animation();
-
 		/**
-		* @brief Updates circular movement for a given entity.
-		* @param logic The Logic_Component containing movement parameters.
-		* @param transform The Transform2D to update.
-		* @param delta_time Time elapsed since the last update.
-		*/
+		 * @brief Updates player animation based on input.
+		 */
+		void update_player_animation();
+		
+		/**
+		 * @brief Updates player audio based on input.
+		 * @param physic_comp The Physics_Component to update.
+		 * @param audio_comp The Audio_Component to update.
+		 */
 		void update_player_audio(Physics_Component& physic_comp, Audio_Component& audio_comp);
 
+		/**
+		 * @brief Updates player walking particle based on input.
+		 */
 		void update_player_walking_particle();
 		
 	};
