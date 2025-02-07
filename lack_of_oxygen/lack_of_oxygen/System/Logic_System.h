@@ -29,6 +29,9 @@ namespace lof {
     class Logic_System : public System {
     public:
 
+		/**
+		 * @brief Get the unique instance of Logic_System.
+		 */
         static Logic_System& get_instance();
 
         /**
@@ -36,6 +39,9 @@ namespace lof {
          */
         Logic_System();
 
+		/**
+		 * @brief Destructor for Logic_System.
+		 */
         ~Logic_System();
 
         /**
@@ -63,6 +69,9 @@ namespace lof {
          */
         void add_script(const std::string& script_name, std::shared_ptr<Script> script);
 
+		/**
+		 * @brief Remove scripts from the scripts_map.
+         */
 		void remove_script(const std::string& script_name);
 
 		/**
@@ -77,8 +86,6 @@ namespace lof {
         std::shared_ptr<Script> get_script(const std::string& script_name);
         
     private:
-
-        
 
         /**
 		 * @brief unique instance of Logic_System.

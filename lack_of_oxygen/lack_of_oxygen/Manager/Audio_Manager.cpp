@@ -1,7 +1,7 @@
 /**
  * @file Audio_Manager.h
  * @brief Declare the Audio Manager class and its member functions
- * @author Amanda Leow Boon Suan (100%)
+ * @author Amanda Leow Boon Suan (95%), Liliana Hanawardani (5%)
  * @date January 15, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

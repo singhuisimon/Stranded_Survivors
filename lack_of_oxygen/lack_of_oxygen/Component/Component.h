@@ -1,9 +1,9 @@
 /**
  * @file Component.h
  * @brief Defines the base Component class and specific component types for the Entity Component System (ECS).
- * @author Simon Chan (49%), Wai Lwin Thit (20%), Amanda Leow Boon Suan (20%), Saw Hui Shan (10%), Liliana Hanawardani (1%)
- * @date September 15, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * @author Simon Chan (40%), Amanda Leow Boon Suan (29%), Wai Lwin Thit (20%), Saw Hui Shan (10%), Liliana Hanawardani (1%)
+ * @date September 15, 2024s
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -681,9 +681,17 @@ namespace lof {
 
     using ScriptData = std::unordered_map<std::string, std::variant<int, float, std::string, bool, Vec2D>>;
 
+    /**
+	* @class Logic_Component
+	* @brief Component representing an entity's logic data.
+    */
     class Logic_Component : public Component {
     public:
 
+        /**
+         * @struct LogicData
+		 * @brief Holds all the details in each logic component currently it has.
+         */
         struct LogicData {
             std::string script_name;
             std::string init_func;
@@ -693,6 +701,9 @@ namespace lof {
             ExecutionState state;
             bool is_active;
 
+            /**
+			 * @brief Constructor for LogicData.
+             */
             LogicData(const std::string& name, const std::string& init, const std::string& update,
                 const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true)
                 : script_name(name), init_func(init), update_func(update),
@@ -702,15 +713,31 @@ namespace lof {
 
         std::vector<std::shared_ptr<LogicData>> logic_datas;
 
+        /**
+         * @brief Default constructor
+         */
         Logic_Component() = default;
 
+		/**
+		 * @brief Destructor
+		 */
         ~Logic_Component() {
             logic_datas.clear();
             //LM.write_log("Logic_Component::clean up complete");
         }
 
+		/**
+		 * @brief Getter for the vector of logic data
+		 * @return The vector of logic data
+		 */
         const std::vector<std::shared_ptr<LogicData>>& get_logic_datas() const { return logic_datas; }
 
+        /**
+		 * @brief Add the script to the logic component
+		 * @param name The name of the script
+		 * @param init The name of the init function
+		 * @param update The name of the update function
+         */
         void add_script(const std::string& name, const std::string& init, const std::string& update,
             const std::string& end, const ScriptData& data, ExecutionState set_state, bool active = true) {
             auto script = std::make_shared<LogicData>(name, init, update, end, data, set_state, active);
@@ -718,6 +745,12 @@ namespace lof {
             logic_datas.push_back(script);
         }
 
+        /**
+		 * @brief Retrieve a logic data from the logic_datas vector.
+		 * @param script_name The name of the script.
+		 * @param update_func The name of the update function.
+		 * @return The logic data if found, nullptr otherwise.
+         */
         std::shared_ptr<LogicData> find_logic_data(const std::string& script_name, const std::string& update_func) const {
             auto it = std::find_if(logic_datas.begin(), logic_datas.end(),
                 [&](const std::shared_ptr<LogicData>& logic_data) {
@@ -728,6 +761,11 @@ namespace lof {
         }
 
         // Getter and Setter for the script data
+        /**
+		 * @brief Retrieve the script data from the logic component.
+		 * @param script_name The name of the script.
+		 * @param update_func The name of the update function.
+         */
         const ScriptData& get_script_data(const std::string& script_name, const std::string& update_func) const {
             auto logic_data = find_logic_data(script_name, update_func);
             if (logic_data) {
@@ -736,6 +774,11 @@ namespace lof {
             throw std::runtime_error("Script not found");
         }
 
+        /**
+		 * @brief Retrieve the individual script data from the logic component.
+		 * @param script_data The script data to retrieve from.
+		 * @param data_name The name of the data to retrieve.
+         */
         template<typename T>
         T get_script_individual_data(const ScriptData& script_data, const std::string& data_name) {
             auto it = script_data.find(data_name);
@@ -750,6 +793,12 @@ namespace lof {
             }
         }
 
+        /**
+		 * @brief Set the script data in the logic component.
+		 * @param script_name The name of the script.
+		 * @param update_func The name of the update function.
+		 * @param new_data The new data to set.
+         */
         void set_script_data(const std::string& script_name, const std::string& update_func, const ScriptData& new_data) {
             auto logic_data = find_logic_data(script_name, update_func);
             if (logic_data) {
@@ -760,6 +809,12 @@ namespace lof {
             }
         }
 
+        /**
+		 * @brief Set the active state of the script.
+         * @param script_name The name of the script.
+         * @param update_func The name of the update function.
+		 * @param active The new active state to set.
+         */
         void set_active(const std::string& script_name, const std::string& update_func, bool active) {
             for (auto& logic_data : logic_datas) {
                 if (logic_data->script_name == script_name && logic_data->update_func == update_func) {
@@ -771,6 +826,11 @@ namespace lof {
             throw std::runtime_error("Script instance not found: " + script_name + "( " + update_func + ")");
         }
 
+        /**
+		 * @brief Remove the script from the logic component.
+         * @param script_name The name of the script.
+         * @param update_func The name of the update function.
+         */
         void remove_script(const std::string& script_name, const std::string& update_func) {
             auto it = std::remove_if(logic_datas.begin(), logic_datas.end(),
                 [&](const std::shared_ptr<LogicData>& logic_data) {
@@ -782,6 +842,12 @@ namespace lof {
             }
         }
 
+        /**
+		 * @brief Get the script state.
+         * @param script_name The name of the script.
+         * @param update_func The name of the update function.
+		 * @return The state of the script.
+         */
         ExecutionState get_state(const std::string& script_name, const std::string& update_func) const {
             for (auto& logic_data : logic_datas) {
                 if (logic_data->script_name == script_name && logic_data->update_func == update_func) {
@@ -791,6 +857,12 @@ namespace lof {
             return ExecutionState::Terminated;
         }
 
+        /**
+         * @brief Set the script state
+         * @param script_name The name of the script.
+         * @param update_func The name of the update function.
+		 * @param new_state The new state to set.
+         */
         void set_state(const std::string& script_name, const std::string& update_func, ExecutionState new_state) {
             for (auto& logic_data : logic_datas) {
                 if (logic_data->script_name == script_name && logic_data->update_func == update_func) {

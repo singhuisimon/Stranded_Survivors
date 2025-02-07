@@ -1,4 +1,12 @@
-
+/**
+ * @file Logic_Manager.cpp
+ * @brief Declare the logic manager class
+ * @author Simon Chan (60%), Amanda Leow Boon Suan (40%)
+ * @date February 2, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
 #include "../Scripts/Object_Moving_Script.h"
 #include "../Scripts/Player_Script.h"

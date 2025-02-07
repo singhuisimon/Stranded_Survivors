@@ -1204,55 +1204,6 @@ namespace lof {
                             int val_to_add = 500;
                             update_mineral_count_text(val_to_add);
                         }
-
-
-                        //just for testing
-                        //remember to remove the s inside the top_ui_timer_count_text for scene 1 & 2
-                        //if (IM.is_key_held(GLFW_KEY_U)) {
-                        //    int time_deduction = -1;
-                        //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                        //        auto& oxygen_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                        //        if (std::stoi(oxygen_text.text) > 0) {
-                        //            int current_value = std::stoi(oxygen_text.text);
-                        //            current_value += time_deduction;
-                        //            oxygen_text.text = std::to_string(current_value);
-                        //            //ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
-                        //        }
-                        //    }
-                        //}
-
-
-                        // Get and set mining status for animation
-                       /* if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_LEFT;
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_LEFT;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_UP)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_UP;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_DOWN;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_RIGHT;
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_RIGHT;
-
-                        }
-                        else {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = NO_ACTION;
-                        }*/
-
-
                     }
                 }
             }

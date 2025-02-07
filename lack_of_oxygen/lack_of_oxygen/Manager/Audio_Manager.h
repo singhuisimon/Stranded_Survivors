@@ -1,7 +1,7 @@
 /**
  * @file Audio_Manager.h
  * @brief Defines the Audio Manager class.
- * @author Amanda Leow Boon Suan (100%)
+ * @author Amanda Leow Boon Suan (98%), Liliana Hanawardani (2%)
  * @date January 15, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -42,7 +42,7 @@ namespace lof {
 	public:
 
 		/**
-		 * @brief Initialize one instance of the Audio Manager
+		 * @brief Get the unique instance of Audio_Manager.
 		 */
 		static Audio_Manager& get_instance();
 		
