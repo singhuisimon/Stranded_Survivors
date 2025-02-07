@@ -251,15 +251,34 @@ namespace lof {
             return font_storage;
         }
 
+        /**
+        * @brief Unload the fonts that store in the font storage.
+        */
         void unload_fonts();
 
+        /**
+        * @brief Unload the models that store in the model storage.
+        */
         void unload_models();
 
+        /**
+        * @brief Unload the texture that store in the texture storage.
+        */
         void unload_textures();
 
+        /**
+        * @brief Unload the animation that store in the animation storage.
+        */
         void unload_animations();
 
-        void store_font(const std::string& font_name, const Font& font);
+        /**
+        * @brief Stores a font in the font storage.
+        * @param font_name The name to associate with the font.
+        * @param font The Font object to store.
+        */
+        //void store_font(const std::string& font_name, const Font& font);
+
+
 
         std::unordered_map<std::string, Animation>& get_animation_storage() {
             return animation_storage;
@@ -273,66 +292,111 @@ namespace lof {
             return model_storage;
         }
 
-        //void unload_models();
-
+        /**
+        * @brief Track the entity of the texture assets with entity and component.
+        * @param entity_id The ID of the entity.
+        * @param component_name The name of the component using the asset.
+        * @param asset_name The name of the asset being tracked.
+        */
         void track_entity_asset(EntityID entity_id, const std::string& component_name, const std::string& asset_name);
 
+        /**
+        * @brief Registers an asset by name in the asset manager.
+        * @param asset_name The name of the asset to register.
+        */
         void register_asset(const std::string& asset_name);
 
+        /**
+        * @brief Lists all assets in the texture folder and registers them.
+        */
         void all_assets_in_file();
 
+        /**
+        * @brief Shuts down the asset manager by unloading all asset types.
+        */
         void shut_down() override;
+
+        /**
+        * @brief Deletes a texture by its name and delete the graphic component if the texture being delete
+        * @param texture_name The name of the texture to delete.
+        */
         void delete_texture(const std::string& texture_name);
 
+        /**
+        * @brief Registers a new asset from a given file path.
+        * @param file_path The path to the asset file to be registered.
+        */
         void register_assets_from_file(const std::string& file_path);
-
-        //std::string open_file_explorer();
-
-        //void delete_audio(const std::string& audio_name);
      
+        /**
+        * @brief Get the set of all registered asset names.
+        * @return A reference to the unordered set containing all registered asset names.
+        */
         std::unordered_set<std::string>& get_all_assets() { return all_assets; };
 
+        /**
+        * @brief Adds the assets from file extension and copy the asset to the correct destination folder in the asset directory.
+        * @param filePath The path of the file to add.
+        */
         void AddAsset(const std::string& filePath);
+
+        /**
+        * @brief Copy a file from the source path to the destination path.
+        * @param destinationPath The target location for the copied file.
+        * @param sourcePath The source file location.
+        * @return True if the copy was successful, false otherwise.
+        */
         bool CopyFileTo(const std::string& destinationPath, const std::string& sourcePath);
 
+        /**
+        * @brief Checks if an entity has an audio component.
+        * @param entity The ID of the entity to check.
+        * @return True if the entity has an audio component, false otherwise.
+        */
         bool has_audio_component(const EntityID& entity);
 
-       bool is_entity_using_audio(const EntityID& entity, const std::string target_audio);
+        /**
+        * @brief Checks if an entity is using a specific audio file.
+        * @param entity The entity ID.
+        * @param target_audio The audio file path to check.
+        * @return True if the entity is using the target audio, false otherwise.
+        */
+        bool is_entity_using_audio(const EntityID& entity, const std::string target_audio);
 
-        //void print_track_audio();
-        //EntityID is_entity_using_audio(const std::string target_audio);
-
-       // std::vector<EntityID>get_entities_using_audio(const std::string target_audio);
-        //bool is_entity_using_audio(const std::string& target_audio);
-
-        //std::vector<EntityID>get_entity_audio();
-
-
-        // EntityID find_entity_with_audio(const std::string& audio_filename);
-
+        /**
+        * @brief Finds and removes a specific audio file from the systema and stops sound associated with the file and removes it from storage.
+        * @param target_audio The target audio file path to remove.
+        * @return True if the audio was successfully removed, false otherwise.
+        */
         bool find_and_remove_audio(const std::string& target_audio);
 
-        void delete_font(const std::string& text_name);
-
+        
+        /**
+        * @brief Gets the entity that is using a specific audio file.
+        * @param target_audio The target audio file path.
+        * @return The ID of the entity using the target audio, or INVALID_ENTITY_ID if none is found.
+        */
         EntityID get_entity_with_audio(const std::string& target_audio);
 
+        /**
+        * @brief Retrieves all entities that have an audio component.
+        * @return A vector containing the IDs of entities with audio components.
+        */
         std::vector<EntityID> get_all_entities_with_audio();
-
-
 
     private:
 
-        ////std::unordered_map<EntityID, std::unordered_set<std::string>> tracked_assets;
+       // Tracks assets with entity and component pair
         std::unordered_map<EntityID, std::unordered_map<std::string, std::unordered_set<std::string>>> tracked_assets;
-        std::unordered_set<std::string> all_assets;
-        std::unordered_set<std::string> loaded_assets;
-        std::unordered_set<std::string> unused_assets;
+        std::unordered_set<std::string> all_assets; // Stores the name of all the register assets in the system
+        //std::unordered_set<std::string> loaded_assets; // store the currrent loaded assets
+        //std::unordered_set<std::string> unused_assets; // unused texture assets
 
-        std::map<std::string, Font> font_storage;
-        std::unordered_map<std::string, GLuint> texture_storage;
-        std::unordered_map<std::string, Animation> animation_storage;
+        std::map<std::string, Font> font_storage; // storage for font
+        std::unordered_map<std::string, GLuint> texture_storage;  // storage for texture
+        std::unordered_map<std::string, Animation> animation_storage; // storage for animation 
 
-        std::unordered_map<EntityID, std::string> track_audio_usage;
+        std::unordered_map<EntityID, std::string> track_audio_usage; // audio usage
 
         //std::unordered_map<EntityID, Audio_Component> asset_audio_component;
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -357,12 +421,8 @@ namespace lof {
         // A list of ShaderProgram objects, likely to manage all loaded shader programs
         std::vector<ShaderProgram> shader_programs;
 
-        std::vector<EntityID> entities_with_audio;
+        //std::vector<EntityID> entities_with_audio;
 
-        
-
-        
-       
        /**
        * @brief See if the file is valid 
        * @param file_path
@@ -401,11 +461,6 @@ namespace lof {
        * @brief Prevents assignment between Assets_Manager instances.
        */
         Assets_Manager& operator=(const Assets_Manager&) = delete;
-
-
-
-
-
 
         // All the necessary file path 
         const std::string AUDIO_PATH = "Audio";

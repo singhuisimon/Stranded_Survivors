@@ -121,7 +121,7 @@ namespace lof {
 		FMOD::System* get_core_system();
 
 		//TODO::APPLY CONST ON NON-EDITABLE DATA!!
-		Vec3D get_channel_pos(const std::string& channel_key);
+		//Vec3D get_channel_pos(const std::string& channel_key);
 		Vec3D get_listener_pos();
 		void update_audio_for_listener(const Vec3D& listener_pos);
 		void set_sound_position(const std::string& channel_key, const Vec3D position);

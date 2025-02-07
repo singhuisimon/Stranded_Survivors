@@ -22,10 +22,18 @@
 namespace lof {
     GUI_System::GUI_System(ECS_Manager& ecs_manager)
         : ecs_manager(ecs_manager)
+        , warning_text_50_name("")
+        , warning_container_50_name("")
+        , warning_text_20_name("")
+        , warning_container_20_name("")
+        , warning_text_5_name("")
+        , warning_container_5_name("")
     {
         container_id = INVALID_ENTITY_ID;
         background_bar_id = INVALID_ENTITY_ID;
         progress_bar_id = INVALID_ENTITY_ID;
+
+
 
         // Set up the required components
         signature.set(ecs_manager.get_component_id<Transform2D>());
@@ -497,6 +505,7 @@ namespace lof {
             if (auto* text = get_component_safe<Text_Component>(mineral_deposit_count_text)) {
                 // Example calculation: depositCount = stored_mineral_progress * 50000
                 int depositCount = static_cast<int>(stored_mineral_progress * 50000.0f);
+                //printf("deposit count %d\n", depositCount);
                 text->text = std::to_string(depositCount) + " / 50000";
             }
         }
@@ -783,29 +792,19 @@ namespace lof {
     // OXYGEN WARNING GUI
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_warning(float percent) {
-        // Determine which warning flags to use
-        bool& warning_active = (percent == 50.0f) ? warning_50_active :
-            (percent == 20.0f) ? warning_20_active :
-            warning_5_active;
-        bool& warning_shown = (percent == 50.0f) ? warning_50_shown :
-            (percent == 20.0f) ? warning_20_shown :
-            warning_5_shown;
+        // Determine which warning names to use
+        std::string& text_name = (percent == 50.0f) ? warning_text_50_name :
+            (percent == 20.0f) ? warning_text_20_name :
+            warning_text_5_name;
 
-        // If warning is already active, don't restart it
-        if (warning_active) {
+        std::string& container_name = (percent == 50.0f) ? warning_container_50_name :
+            (percent == 20.0f) ? warning_container_20_name :
+            warning_container_5_name;
+
+        // If warning is already active, don't recreate it
+        if (!text_name.empty() || !container_name.empty()) {
             return;
         }
-
-        warning_active = true;
-        warning_shown = true;
-
-        EntityID& container_id = (percent == 50.0f) ? warning_container_50 :
-            (percent == 20.0f) ? warning_container_20 :
-            warning_container_5;
-
-        EntityID& text_id = (percent == 50.0f) ? warning_text_50 :
-            (percent == 20.0f) ? warning_text_20 :
-            warning_text_5;
 
         // Get the appropriate texture and message based on warning level
         std::string texture_name;
@@ -813,9 +812,11 @@ namespace lof {
         glm::vec3 text_color;
 
         if (percent == 50.0f) {
-            texture_name = "Purple_Oxy_Warning_Batch_14";
-            warning_message = "WARNING: OXYGEN LEVEL 50%";
-            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+            if (percent == 50.0f) {
+                texture_name = "Purple_Oxy_Warning_Batch_14";  // Fixed typo here
+                warning_message = "WARNING: OXYGEN LEVEL 50%";
+                text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+            }
         }
         else if (percent == 20.0f) {
             texture_name = "Red_Oxy_Warning_Batch_14";
@@ -828,9 +829,13 @@ namespace lof {
             text_color = glm::vec3(1.0f, 1.0f, 1.0f);
         }
 
-        // Create warning container
-        container_id = ecs_manager.clone_entity_from_prefab("gui_container");
+        // Create warning container with unique name
+        EntityID container_id = ecs_manager.clone_entity_from_prefab("gui_container");
         if (container_id != INVALID_ENTITY_ID) {
+            std::string unique_name = "warning_container_" + std::to_string(static_cast<int>(percent));
+            ecs_manager.update_entity_name(container_id, unique_name);
+            container_name = unique_name;
+
             auto* container_gui = get_component_safe<GUI_Component>(container_id);
             if (!container_gui) {
                 hide_oxygen_warning(percent);
@@ -844,25 +849,28 @@ namespace lof {
                 graphics->color = glm::vec4(1.0f);
             }
 
-            // Position warning - same for all levels
             if (auto* transform = get_component_safe<Transform2D>(container_id)) {
                 transform->position = Vec2D(0.0f, 200.0f);
                 transform->scale = Vec2D(2000.0f, 50.0f);
             }
         }
 
-        // Create warning text
-        text_id = ecs_manager.clone_entity_from_prefab("text_object");
+        // Create warning text with unique name
+        EntityID text_id = ecs_manager.clone_entity_from_prefab("text_object");
         if (text_id != INVALID_ENTITY_ID) {
+            std::string unique_name = "warning_text_" + std::to_string(static_cast<int>(percent));
+            ecs_manager.update_entity_name(text_id, unique_name);
+            text_name = unique_name;
+
             if (auto* text = get_component_safe<Text_Component>(text_id)) {
-                text->font_name = DEFAULT_FONT_NAME;  // Added font name
+                text->font_name = DEFAULT_FONT_NAME;
                 text->text = warning_message;
                 text->color = text_color;
-                text->scale = glm::vec2(0.7f, 0.7f);  // Matched scale style
+                text->scale = glm::vec2(0.7f, 0.7f);
             }
             if (auto* transform = get_component_safe<Transform2D>(text_id)) {
                 transform->position = Vec2D(0.0f, 195.0f);
-                transform->scale = Vec2D(0.7f, 0.7f);  // Matched transform scale
+                transform->scale = Vec2D(0.7f, 0.7f);
             }
         }
 
@@ -872,22 +880,45 @@ namespace lof {
     }
 
     void GUI_System::hide_oxygen_warning(float percent) {
-        EntityID& text_id = (percent == 50.0f) ? warning_text_50 :
-            (percent == 20.0f) ? warning_text_20 :
-            warning_text_5;
+        // Get the appropriate warning names
+        std::string& text_name = (percent == 50.0f) ? warning_text_50_name :
+            (percent == 20.0f) ? warning_text_20_name :
+            warning_text_5_name;
 
-        EntityID& container_id = (percent == 50.0f) ? warning_container_50 :
-            (percent == 20.0f) ? warning_container_20 :
-            warning_container_5;
+        std::string& container_name = (percent == 50.0f) ? warning_container_50_name :
+            (percent == 20.0f) ? warning_container_20_name :
+            warning_container_5_name;
 
+        // Look up current entity IDs by name
+        EntityID text_id = ecs_manager.find_entity_by_name(text_name);
+        EntityID container_id = ecs_manager.find_entity_by_name(container_name);
+
+        // Destroy text entity if it exists
         if (text_id != INVALID_ENTITY_ID) {
             ecs_manager.destroy_entity(text_id);
-            text_id = INVALID_ENTITY_ID;
         }
+
+        // Destroy container entity if it exists
         if (container_id != INVALID_ENTITY_ID) {
             ecs_manager.destroy_entity(container_id);
-            container_id = INVALID_ENTITY_ID;
+        }
+
+        // Clear the stored names
+        text_name.clear();
+        container_name.clear();
+
+        // Reset the corresponding warning flags
+        if (percent == 50.0f) {
+            warning_50_active = false;
+            warning_50_shown = false;
+        }
+        else if (percent == 20.0f) {
+            warning_20_active = false;
+            warning_20_shown = false;
+        }
+        else if (percent == 5.0f) {
+            warning_5_active = false;
+            warning_5_shown = false;
         }
     }
-
 } // namespace lof

@@ -77,6 +77,9 @@ namespace lof {
         rapidjson::Value serialize_audio_component(const Audio_Component& component, rapidjson::Document::AllocatorType& allocator);
         rapidjson::Value serialize_animation_component(const Animation_Component& component, rapidjson::Document::AllocatorType& allocator);
         rapidjson::Value serialize_logic_component(const Logic_Component& component, rapidjson::Document::AllocatorType& allocator);
+        template<typename T>
+        void add_logic_member(rapidjson::Value& obj, const std::string& key, const T& value, rapidjson::Document::AllocatorType& allocator);
+        void add_logic_vec2d_member(rapidjson::Value& obj, const std::string& key, const Vec2D& value, rapidjson::Document::AllocatorType& allocator);
         rapidjson::Value serialize_text_component(const Text_Component& component, rapidjson::Document::AllocatorType& allocator);
 
         // ---------------------------- LEVEL CONFIG LOGIC ---------------------------- //

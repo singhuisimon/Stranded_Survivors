@@ -50,9 +50,12 @@
     <ClCompile Include="Manager\Graphics_Manager.cpp" />
     <ClCompile Include="Manager\IMGUI_Manager.cpp" />
     <ClCompile Include="Manager\Input_Manager.cpp" />
+    <ClCompile Include="Manager\Logic_Manager.cpp" />
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
+    <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
+    <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
@@ -85,6 +88,7 @@
     <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="Manager\Graphics_Manager.h" />
     <ClInclude Include="Manager\IMGUI_Manager.h" />
+    <ClInclude Include="Manager\Logic_Manager.h" />
     <ClInclude Include="Manager\Serialization_Manager.h" />
     <ClInclude Include="Manager\ECS_Manager.h" />
     <ClInclude Include="Manager\FPS_Manager.h" />
@@ -92,6 +96,9 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="Scripts\Object_Moving_Script.h" />
+    <ClInclude Include="Scripts\Player_Script.h" />
+    <ClInclude Include="Scripts\Script.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
@@ -120,6 +127,7 @@
     <None Include="Assets\Config\config.json" />
     <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Level_Design\Level_Design_Small.csv" />
+    <None Include="Assets\Level_Design\Level_Design_V2.csv" />
     <None Include="Assets\Prefab\prefab.json" />
     <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\main_menu.scn" />
@@ -197,6 +205,7 @@
     <Image Include="Assets\Textures\oxygen_tank_batch_4.png" />
     <Image Include="Assets\Textures\Prisoner.png" />
     <Image Include="Assets\Textures\Prisoner_Spritesheet.png" />
+    <Image Include="Assets\Textures\Purple_Oxy_Warning_Batch_14.png" />
     <Image Include="Assets\Textures\Quartz_001_Batch_4.png" />
     <Image Include="Assets\Textures\Quartz_002_Batch 4.png" />
     <Image Include="Assets\Textures\Quartz_Geode.png" />

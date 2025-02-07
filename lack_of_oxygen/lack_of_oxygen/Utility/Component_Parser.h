@@ -11,6 +11,8 @@
 #ifndef COMPONENT_PARSER_H
 #define COMPONENT_PARSER_H
 
+#include <memory>
+
 // Include Managers
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Log_Manager.h"

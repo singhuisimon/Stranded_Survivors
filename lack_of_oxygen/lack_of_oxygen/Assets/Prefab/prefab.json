@@ -299,13 +299,28 @@
           "collidable": true
         },
         "Logic_Component": {
-          "logic_type": 0,
-          "movement_pattern": 0,
-          "is_active": true,
-          "movement_speed": 1.0,
-          "movement_range": 200.0,
-          "reverse_direction": false,
-          "rotate_with_motion": false
+          "scripts": [
+            {
+              "script_name": "object_moving_script",
+              "init": "init",
+              "update": "update",
+              "end": "end",
+              "data": {
+                "logic_type": 0,
+                "movement_pattern": 0,
+                "movement_speed": 1.100000023841858,
+                "movement_range": 300.0,
+                "reverse_direction": false,
+                "rotate_with_motion": false,
+                "origin_pos": [
+                  -500.0,
+                  600.0
+                ]
+              },
+              "state": 0,
+              "is_active": true
+            }
+          ]
         }
       }
     },
@@ -343,7 +358,7 @@
           "position": [ 0.0, 0.0 ],
           "prev_position": [ 0.0, 0.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 100.0, 100.0 ]
+          "scale": [ 10.0, 10.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",

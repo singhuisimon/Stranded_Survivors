@@ -3,7 +3,7 @@
  * @brief Implements the declaration of collsion system.
  * @author Saw Hui Shan (100%)
  * @date September 21, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -71,6 +71,15 @@ namespace lof {
         static AABB from_transform(const Transform2D& transform, const Collision_Component& collision);
     };
 
+    
+    struct PointLine{
+        Vec2D center; //this will be player's center
+        Vec2D edge; //this is the edge extending the player 
+
+        PointLine(const Vec2D& center, const Vec2D& edge); 
+
+       // PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
+    };
 
     // extern SelectedEntityInfo g_selected_Entity_Info;
      /**
@@ -142,6 +151,9 @@ namespace lof {
         EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
         EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
+        /**
+        * @brief Ensure that the player does not go outside the game world boundaries horizontally.
+        */
         void Boundary_Check();
       
         void reset_deposited_minerals() {
@@ -166,7 +178,10 @@ namespace lof {
         static EntityID right_collision_entity;
         static EntityID top_collision_entity;
 
-
+        //int previous_value = 0;
+        bool deposit = false;
+        bool e_press = false;
+        bool e_last_frame = false;
 
         static EntityID check_non_collidable_entities;
         static bool entites_detect;

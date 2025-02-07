@@ -315,12 +315,6 @@ namespace lof {
                             // Get the full path using Assets Manager
                             std::string full_filepath = ASM.get_audio_path(filepath);
 
-                            // Get other properties with defaults
-                            /*PlayState play_state = NONE;
-                            if (sound.HasMember("audio_state") && sound["audio_state"].IsInt()) {
-                                play_state = static_cast<PlayState>(sound["audio_state"].GetInt());
-                            }*/
-
                             AudioType audio_type = SFX;
                             if (sound.HasMember("audio_type") && sound["audio_type"].IsInt()) {
                                 audio_type = static_cast<AudioType>(sound["audio_type"].GetInt());
@@ -345,9 +339,6 @@ namespace lof {
                             if (sound.HasMember("islooping") && sound["islooping"].IsBool()) {
                                 islooping = sound["islooping"].GetBool();
                             }
-                            //else if (sound.HasMember("is_looping") && sound["is_looping"].IsBool()) {
-                            //    islooping = sound["is_looping"].GetBool();
-                            //}
 
                             bool is3d = false;
                             if (sound.HasMember("is3d") && sound["is3d"].IsBool()) {
@@ -355,11 +346,8 @@ namespace lof {
                             }
 
                             // Add sound to component
-                            //audio_component.add_sound(key, filepath, play_state, audio_type, volume, pitch, islooping);
                             audio_component.add_sound(key, filepath, audio_type, max_simultaneous, volume, pitch, islooping, is3d);
 
-                            //LM.write_log("Added sound - Key: %s, Path: %s, State: %d, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d",
-                            //    key.c_str(), filepath.c_str(), play_state, audio_type, volume, pitch, islooping);
                             LM.write_log("Added sound - Key: %s, Path: %s, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d, is3D: %d",
                                 key.c_str(), filepath.c_str(), audio_type, volume, pitch, islooping, is3d);
                         }
@@ -368,11 +356,6 @@ namespace lof {
                         }
                     }
                 }
-
-                // Handle 3D audio properties
-                /*if (component_data.HasMember("is_3d")) {
-                    audio_component.set_is3d(component_data["is_3d"].GetBool());
-                }*/
 
                 if (component_data.HasMember("position") && component_data["position"].IsArray()) {
                     const auto& pos = component_data["position"];
@@ -505,46 +488,110 @@ namespace lof {
                 }
             // ------------------------------------ Logic_Component -------------------------------------------
             else if (component_name == "Logic_Component") {
-                // Log the raw value from JSON
-                int pattern_value = component_data["movement_pattern"].GetInt();
-                LM.write_log("Parsing Logic Component - Raw movement pattern value: %d", pattern_value);
 
-                Logic_Component logic(
-                    static_cast<Logic_Component::LogicType>(component_data["logic_type"].GetInt()),
-                    static_cast<Logic_Component::MovementPattern>(pattern_value)
-                );
+                Logic_Component logic_component;
 
-                // Set other properties
-                if (component_data.HasMember("is_active")) {
-                    logic.is_active = component_data["is_active"].GetBool();
-                }
-                if (component_data.HasMember("movement_speed")) {
-                    logic.movement_speed = component_data["movement_speed"].GetFloat();
-                }
-                if (component_data.HasMember("movement_range")) {
-                    logic.movement_range = component_data["movement_range"].GetFloat();
-                }
-                if (component_data.HasMember("reverse_direction")) {
-                    logic.reverse_direction = component_data["reverse_direction"].GetBool();
-                }
-                if (component_data.HasMember("rotate_with_motion")) {
-                    logic.rotate_with_motion = component_data["rotate_with_motion"].GetBool();
-                }
-                if (component_data.HasMember("origin_pos") && component_data["origin_pos"].IsArray()) {
-                    logic.origin_pos.x = component_data["origin_pos"][0].GetFloat();
-                    logic.origin_pos.y = component_data["origin_pos"][1].GetFloat();
-                }
+                if (component_data.HasMember("scripts") && component_data["scripts"].IsArray()) {
+                    const auto& script_array = component_data["scripts"];
 
-                // Log the final state
-                LM.write_log("Created Logic Component with movement pattern: %d, speed: %.2f, range: %.2f",
-                    static_cast<int>(logic.movement_pattern),
-                    logic.movement_speed,
-                    logic.movement_range);
+                    for (const auto& script : script_array.GetArray()) {
+                        // Extract required script fields
+                        std::string script_name;
+                        std::string init_func;
+                        std::string update_func;
+                        std::string end_func;
+                        bool is_active = true;
+                        ScriptData script_data;
+                        ExecutionState state = ExecutionState::Uninitialized;
+
+                        // Parse basic script properties
+                        if (script.HasMember("script_name") && script["script_name"].IsString()) {
+                            script_name = script["script_name"].GetString();
+                        }
+                        if (script.HasMember("init") && script["init"].IsString()) {
+                            init_func = script["init"].GetString();
+                        }
+                        if (script.HasMember("update") && script["update"].IsString()) {
+                            update_func = script["update"].GetString();
+                        }
+                        if (script.HasMember("end") && script["end"].IsString()) {
+                            end_func = script["end"].GetString();
+                        }
+                        if (script.HasMember("is_active") && script["is_active"].IsBool()) {
+                            is_active = script["is_active"].GetBool();
+                        }
+
+                        // Parse script data (parameters)
+                        if (script.HasMember("data") && script["data"].IsObject()) {
+                            const rapidjson::Value& data_obj = script["data"];
+
+                            for (auto it = data_obj.MemberBegin(); it != data_obj.MemberEnd(); ++it) {
+                                std::string key = it->name.GetString();
+                                const rapidjson::Value& value = it->value;
+
+                                try {
+                                    // Handle different data types with proper variant construction
+                                    if (value.IsInt()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(value.GetInt());
+                                    }
+                                    else if (value.IsFloat() || value.IsDouble()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(
+                                            static_cast<float>(value.GetDouble()));
+                                    }
+                                    else if (value.IsString()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(
+                                            std::string(value.GetString()));
+                                    }
+                                    else if (value.IsBool()) {
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(value.GetBool());
+                                    }
+                                    else if (value.IsArray() && value.Size() == 2 &&
+                                        value[0].IsNumber() && value[1].IsNumber()) {
+                                        Vec2D vec;
+                                        vec.x = static_cast<float>(value[0].GetDouble());
+                                        vec.y = static_cast<float>(value[1].GetDouble());
+                                        script_data[key] = std::variant<int, float, std::string, bool, Vec2D>(vec);
+                                    }
+                                    else {
+                                        LM.write_log("Warning: Unsupported data type for key '%s' in script '%s'",
+                                            key.c_str(), script_name.c_str());
+                                    }
+                                }
+                                catch (const std::exception& e) {
+                                    LM.write_log("Error: Failed to set script data for key '%s' in script '%s': %s",
+                                        key.c_str(), script_name.c_str(), e.what());
+                                }
+                            }
+                        }
+
+                        // Parse execution state
+                        if (script.HasMember("state") && script["state"].IsInt()) {
+                            int state_num = script["state"].GetInt();
+                            switch (state_num) {
+                            case 0: state = ExecutionState::Uninitialized; break;
+                            case 1: state = ExecutionState::Running; break;
+                            case 2: state = ExecutionState::Paused; break;
+                            case 3: state = ExecutionState::Completed; break;
+                            case 4: state = ExecutionState::Terminated; break;
+                            default:
+                                LM.write_log("Warning: Invalid execution state number %d for script '%s', defaulting to Uninitialized",
+                                    state_num, script_name.c_str());
+                                state = ExecutionState::Uninitialized;
+                            }
+                        }
+
+                        // Add script to component
+                        logic_component.add_script(script_name, init_func, update_func, end_func, script_data, state, is_active);
+
+                        LM.write_log("Added script '%s' to Logic_Component for entity %u",
+                            script_name.c_str(), entity);
+                    }
+                }
 
                 // Add component to entity
-                ecs_manager.add_component<Logic_Component>(entity, logic);
-                //LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
-                }
+                ecs_manager.add_component<Logic_Component>(entity, logic_component);
+                LM.write_log("Component_Parser::add_components_from_json(): Added Logic_Component to entity ID %u.", entity);
+            }
             // ------------------------------------ Text_Component -------------------------------------------
             else if (component_name == "Text_Component") {
                 // Parse Text_Component
