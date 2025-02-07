@@ -159,6 +159,7 @@ int main(void) {
     // --------------------------- Start IMGUI_Manager ---------------------------
 
     IMGUIM.start_up(window);
+    IMGUIM.init_buttons_and_batches();
 
     //gets a reference to ImGui's IO structure
     ImGuiIO& io = ImGui::GetIO(); (void)io;

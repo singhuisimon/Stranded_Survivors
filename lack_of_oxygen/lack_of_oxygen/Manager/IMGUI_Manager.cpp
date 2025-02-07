@@ -982,14 +982,21 @@ namespace lof {
                         std::string is_button = "_button";
                         size_t found = Name.find(is_button);
                         if (found != std::string::npos) {
-                                               
-                            /*for (auto& paired : batch_and_button) {
-                                std::cout << paired.first << ", " << paired.second << std::endl;
-                            }*/
+                                
+                            ImGui::NewLine();
+
+                            ImGui::Text("Note: The textures for buttons are in assigned in batches.\nPlease assign textures with these in them:");
+                            for (auto& batch : batches) {
+                                ImGui::Text(batch.c_str());
+                            }
+
+                            ImGui::NewLine();
+
+                            ImGui::Separator();
 
                             size_t pos = texture_name.find_last_of('_');  // Find first underscore
                             std::string batch_name = texture_name.substr(0, pos);
-                            ImGui::Text("Batch: %s", batch_name.c_str());
+                            ImGui::Text("Current Batch: %s", batch_name.c_str());
 
                             char buffer_graphics[128];
                             strncpy_s(buffer_graphics, texture_name.c_str(), sizeof(buffer_graphics));
@@ -1080,16 +1087,11 @@ namespace lof {
                             }
                         }
 
-                        
-
                         auto& shd_ref = graphics.shd_ref;
                         ImGui::BeginDisabled();
                         ImGui::InputInt("shd_ref", reinterpret_cast<int*>(&shd_ref));
                         ImGui::EndDisabled();
 
-                        for (auto& button : batch_and_button) {
-                            ImGui::Text("%s, %s", button.first.c_str(), button.second.c_str());
-                        }
                     }
                 }
 
@@ -1160,6 +1162,12 @@ namespace lof {
                             IMGUIM.text_input(it->second, selected_ani_condition);
                         }
 
+                        ImGui::Text("Possible Animation Options:");
+                        ImGui::Text("vent_strip");
+                        ImGui::Text("prisoner_idle_left");
+                        ImGui::Text("prisoner_running_right");
+
+                        ImGui::Separator();
 
                         auto& curr = animation.curr_animation_idx;
 
@@ -1526,8 +1534,15 @@ namespace lof {
                             const auto& component_name = missing_components[selected];
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
-                                    add_func();
-                                    LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added %s to %s", name, entities[selected_object_index]->get_name().c_str());
+
+                                    if (name == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                        ;
+                                    }
+                                    else {
+                                        add_func();
+                                        LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added %s to %s", name, entities[selected_object_index]->get_name().c_str());
+                                    }
+
                                     break;
                                 }
                             }
@@ -1580,8 +1595,15 @@ namespace lof {
                             const auto& component_name = present_components[selected_to_remove];
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
-                                    remove_func();
-                                    LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed %s to %s", name, entities[selected_object_index]->get_name().c_str());
+
+                                    if (name == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                        ;
+                                    }
+                                    else {
+                                        remove_func();
+                                        LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed %s to %s", name, entities[selected_object_index]->get_name().c_str());
+                                    }
+
                                     break;
                                 }
                             }
@@ -2487,6 +2509,51 @@ namespace lof {
 
     std::vector<std::pair<std::string, std::string>>& IMGUI_Manager::return_buttons_and_batches() {
         return batch_and_button;
+    }
+
+    void IMGUI_Manager::init_buttons_and_batches() {
+
+        batch_and_button = { {"play_button", "Main_Menu_Play_Batch_14"},
+        { "credit_button", "Main_Menu_Credits_Batch_14" },
+        { "quit_button", "Main_Menu_Quit_Batch_14" },
+        { "back_button", "Back_Batch_14" },
+        { "restart_button", "Restart_Batch_14" },
+        { "main_menu_button", "Main_Menu_Batch_14" } };
+
+    }
+    void IMGUI_Manager::update_buttons_and_batches() {
+
+        const auto& entities = ECSM.get_entities();
+        std::string is_button = "_button";
+        for (auto& entity : entities) {
+            size_t found = entity.get()->get_name().find(is_button);
+            if (found != std::string::npos) {
+
+                if (entity->has_component(ecs.get_component_id<Graphics_Component>())) {
+                    Graphics_Component& graphics = ecs.get_component<Graphics_Component>(entity.get()->get_id());
+                    std::string base_texture_name = graphics.texture_name;
+
+                    size_t pos = base_texture_name.find_last_of('_');
+
+                    if (pos != std::string::npos) {
+                        base_texture_name.erase(pos);
+
+                        /* std::pair<std::string, std::string> paired = std::make_pair(entity.get()->get_name(), base_texture_name);
+                         batch_and_button.push_back(paired);*/
+
+                        for (auto& pair : batch_and_button) {
+                            if (pair.first == entity.get()->get_name()) {
+                                pair.second = base_texture_name;  // Modify the second element
+                                break;  // Stop iterating once found
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+
     }
 
 

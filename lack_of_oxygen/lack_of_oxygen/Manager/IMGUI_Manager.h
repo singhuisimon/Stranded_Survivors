@@ -69,14 +69,7 @@ namespace lof {
         //String holding the name of the current file loaded
         std::string current_file_shown;
 
-        std::vector<std::pair<std::string, std::string>> batch_and_button{
-            {"play_button", "Main_Menu_Play_Batch_14"},
-            {"credit_button", "Main_Menu_Credits_Batch_14"},
-            {"quit_button", "Main_Menu_Quit_Batch_14"},
-            {"back_button", "Back_Batch_14"},
-            {"restart_button", "Restart_Batch_14"},
-            {"main_menu_button", "Main_Menu_Batch_14"}
-        };
+        std::vector<std::pair<std::string, std::string>> batch_and_button;
 
         std::vector<std::string> batches {
             {"Main_Menu_Play_Batch_14"},
@@ -246,6 +239,10 @@ namespace lof {
         void load_scene(const std::string& file_name);
 
         std::vector<std::pair<std::string, std::string>>& return_buttons_and_batches();
+
+        void init_buttons_and_batches();
+
+        void update_buttons_and_batches();
 };
 
 } // namespace lof

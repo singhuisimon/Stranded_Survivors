@@ -1586,6 +1586,9 @@ namespace lof {
 
         // Update game world state
         ECSM.update(delta_time);
+
+        IMGUIM.update_buttons_and_batches();
+
         end_time = std::chrono::steady_clock::now();
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
