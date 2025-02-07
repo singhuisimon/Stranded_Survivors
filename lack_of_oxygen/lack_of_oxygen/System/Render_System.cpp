@@ -244,7 +244,7 @@ namespace lof {
             // Render only what is on the viewport
             int current_scene = GM.get_current_scene(); // Get the current scene number
             auto& camera = GFXM.get_camera();
-            if (camera.is_free_cam == GL_FALSE && current_scene != 0 && current_scene != 1) {
+            if (camera.is_free_cam == GL_FALSE && current_scene == 1 && current_scene == 2) {
                 EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                 if (entity_id != 0 && entity_id != player_id) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
