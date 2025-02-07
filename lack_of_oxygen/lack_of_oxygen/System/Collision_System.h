@@ -151,6 +151,7 @@ namespace lof {
         EntityID mineral_tank_detected() const { return static_cast<int>(mineral_tank); }
         EntityID oxygen_tank_detected() const { return static_cast<int>(oxygen_tank); }
 
+       
         /**
         * @brief Ensure that the player does not go outside the game world boundaries horizontally.
         */
@@ -202,6 +203,8 @@ namespace lof {
         std::unordered_map<std::string, bool> button_hover_states;
         std::unordered_map<std::string, bool> main_menu_sound_playing;
 
+        // to get oxygen
+        //static bool oxygen_increasing;
         //static bool collision_handled;
         //float accumulated_time = 0.0f;
 

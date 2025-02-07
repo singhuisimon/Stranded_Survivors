@@ -1015,6 +1015,11 @@ namespace lof {
     float previous_oxygen = 0;
     int oxygen_count = 0; 
 
+
+    bool increasing = false;
+    bool bgm_oxygen_increasing = false;  // Separate flag for BGM state
+    float last_oxygen_level = 0.0f;
+
     void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
     {
        
@@ -1246,6 +1251,19 @@ namespace lof {
                 }
                 else {
                     gui_system->hide_oxygen_tank_gui();
+                }
+                float current_oxygen = GM.get_current_oxygen_level();
+                if (current_oxygen > last_oxygen_level) {
+                    bgm_oxygen_increasing = true;
+                }
+                else if (current_oxygen < last_oxygen_level) {
+                    bgm_oxygen_increasing = false;
+                }
+                last_oxygen_level = current_oxygen;
+
+                int current_scene = GM.get_current_scene();
+                if (current_scene == 1 || current_scene == 2) {
+                    ADM.update_bgm_layering(current_scene, current_oxygen, bgm_oxygen_increasing);
                 }
 
                 break;
@@ -1918,6 +1936,7 @@ namespace lof {
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
                 button_hover_states[entity_name] = false;
+                
 
             }
         }

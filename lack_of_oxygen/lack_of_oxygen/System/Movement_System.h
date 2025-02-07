@@ -85,8 +85,8 @@ namespace lof {
         void clear_dynamic_entities(); 
 #endif
 
-        void reset_jump_timer() { jump_timer = 0.0f; };
-        float get_max_jump_time() const { return MAX_JUMP_TIME; };
+        //void reset_jump_timer() { jump_timer = 0.0f; };
+        //float get_max_jump_time() const { return MAX_JUMP_TIME; };
 
 
 
