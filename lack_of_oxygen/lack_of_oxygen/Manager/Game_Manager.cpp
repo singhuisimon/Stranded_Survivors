@@ -177,6 +177,7 @@ namespace lof {
         SM.shut_down();   // Serialization_Manager
         ECSM.shut_down(); // ECS_Manager
         LM.shut_down();   // Log_Manager
+        //ASM.shut_down();  //Assets_Manager
 
         m_is_started = false;
         std::cout << "Game_Manager shut down successfully." << std::endl;
@@ -210,6 +211,17 @@ namespace lof {
         //    LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
         //}
 
+        if (current_scene != 2) {
+            EntityID fps_counter_id = ECSM.find_entity_by_name("fps_counter");
+            if (fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(fps_counter_id)) {
+                auto& text_comp = ECSM.get_component<Text_Component>(fps_counter_id);
+                float current_fps = FPSM.get_current_fps();
+                std::stringstream ss;
+                ss << "FPS: " << std::fixed << std::setprecision(1) << current_fps;
+                text_comp.text = ss.str();
+            }
+        }
+
         // Check for game over condition based on input, before IM update
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             set_game_over(true);
@@ -227,30 +239,26 @@ namespace lof {
         //    ADM.pause_resume_mastergroup();
         //}
 
-        //commented out this is for me to test - Amanda
+        ////commented out this is for me to test - Amanda
         //if (IM.is_key_held(GLFW_KEY_J)) {
-        //    /*if (current_oxygen_level > 0) {
-        //        current_oxygen_level--;
-        //    }*/
+        //    current_oxygen_level--;
         //    //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
         //    //increasing = false;
         //}
 
-    //    if (IM.is_key_held(GLFW_KEY_K)) {
+        //if (IM.is_key_held(GLFW_KEY_K)) {
+        //    current_oxygen_level++;
+        //    //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
+        //    //increasing = true;
+        //}
+         
+        //printf("bool check: %d\n", CS.is_oxygen_increase());
+        //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
+       /* if (current_scene == 2 || current_scene == 1)
+        {
+            ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
 
-    ////        if (current_oxygen_level < 100) {
-				//////current_oxygen_level++;
-    ////        }
-    //       // current_oxygen_level++;
-    //        //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-    //       // increasing = true;
-    //    }
-    //    //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
-    //    if (current_scene == 2 || current_scene == 1)
-    //    {
-    //     //   ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
-
-    //    }
+        }*/
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -459,6 +467,46 @@ namespace lof {
                         base_position.y - METER_SPACING / 1.5f   // Vertically centered between meters
                     };
                     timer_icon_transform.prev_position = timer_icon_transform.position;
+                }
+
+                // Set display fps flag to true or false when key 'F' is pressed
+                if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == false) {
+                    display_fps = true;
+                }
+                else if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == true) {
+                    display_fps = false;
+                }
+
+                // Display fps if fps flag is true
+                if (display_fps == true) {
+                    EntityID game_fps_counter_id = ECSM.find_entity_by_name("fps_counter_in_game");
+                    if (game_fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(game_fps_counter_id)) {
+                        auto& fps_text_comp = ECSM.get_component<Text_Component>(game_fps_counter_id);
+                        auto& fps_transform_comp = ECSM.get_component<Transform2D>(game_fps_counter_id);
+
+                        // Write the current fps to the text object
+                        float current_fps = FPSM.get_current_fps();
+                        std::stringstream ss;
+                        ss << "FPS: " << std::fixed << std::setprecision(1) << current_fps;
+                        fps_text_comp.text = ss.str();
+
+                        // Set the fps counter position
+                        fps_transform_comp.position = {
+                            base_position.x + 830.0f,       // Right border of the screen
+                            base_position.y - 125.0f        // Below UI overlay
+                        };
+                        fps_transform_comp.prev_position = fps_transform_comp.position;
+
+                    }
+                }
+                else {
+                    EntityID game_fps_counter_id = ECSM.find_entity_by_name("fps_counter_in_game");
+                    if (game_fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(game_fps_counter_id)) {
+                        auto& fps_text_comp = ECSM.get_component<Text_Component>(game_fps_counter_id);
+
+                        // Undo the text for fps
+                        fps_text_comp.text = "";
+                    }
                 }
 
                 // ------------------------- TIMER UPDATE CHANGES -------------------------
@@ -856,7 +904,6 @@ namespace lof {
                             }
                         }
 
-                        auto& physics = ECSM.get_component<Physics_Component>(player_id);
                         auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
 
                         if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
@@ -1213,55 +1260,6 @@ namespace lof {
                             int val_to_add = 500;
                             update_mineral_count_text(val_to_add);
                         }
-
-
-                        //just for testing
-                        //remember to remove the s inside the top_ui_timer_count_text for scene 1 & 2
-                        //if (IM.is_key_held(GLFW_KEY_U)) {
-                        //    int time_deduction = -1;
-                        //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                        //        auto& oxygen_text = ECSM.get_component<Text_Component>(timer_count_text_id);
-                        //        if (std::stoi(oxygen_text.text) > 0) {
-                        //            int current_value = std::stoi(oxygen_text.text);
-                        //            current_value += time_deduction;
-                        //            oxygen_text.text = std::to_string(current_value);
-                        //            //ADM.stop_now(player_id, "refilling oxygen", audio_player.get_filepath("refilling oxygen"));
-                        //        }
-                        //    }
-                        //}
-
-
-                        // Get and set mining status for animation
-                        if (IM.is_key_held(GLFW_KEY_LEFT)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_LEFT;
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_LEFT;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_UP)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_UP;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_DOWN;
-
-                        }
-                        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = MINE_RIGHT;
-                            int& direction = GFXM.get_player_direction();
-                            direction = FACE_RIGHT;
-
-                        }
-                        else {
-                            auto& mining_status = GFXM.get_mining_status();
-                            mining_status = NO_ACTION;
-                        }
-
-
                     }
                 }
             }

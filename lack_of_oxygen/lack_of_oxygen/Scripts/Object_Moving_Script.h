@@ -17,9 +17,17 @@
 #include "../Component/Component.h"
 
 namespace lof {
+	/**
+	 * @class Object_Moving_Script
+	 * @brief Defines the object moving script class.
+	 */
 	class Object_Moving_Script : public Script {
 
     public:
+        /**
+         * @struct MovementData
+         * @brief Defines the object moving script class.
+         */
         struct MovementData {
             int movement_pattern = 0;
             float movement_speed = 0.0;
@@ -33,12 +41,24 @@ namespace lof {
 
     public:
 
+		/**
+		 * @brief Register the script and function as well as implement the function
+		 */
         void register_script() override;
 
+		/**
+		 * @brief Default constructor
+		 */
         Object_Moving_Script();
 
+        /**
+		 * @brief Destructor
+         */
         ~Object_Moving_Script() override;
 
+        /**
+		 * @brief Cleans up the unordered map of entity data.
+         */
         void cleanup();
 
     private:
@@ -48,8 +68,25 @@ namespace lof {
         //mutable std::mutex entity_data_mutex;
         std::unordered_map<EntityID, MovementData> entity_data;
 
+        /**
+         * @brief Add entity data to the unordered mao
+		 * @param id The entity id
+		 * @param data The MovementData to be added
+         */
         void add_entity_data(EntityID id, const MovementData& data);
+
+        /**
+		 * @brief Retrieve the entity data from the unordered map
+		 * @param id The entity id
+		 * @param out_data The MovementData to be retrieved
+		 * @return True if the entity data is found, false otherwise.
+         */
         bool get_entity_data(EntityID id, MovementData& out_data) const;
+
+        /**
+		 * @brief Remove entity data from the unordered map
+		 * @param id The entity id
+         */
         void remove_entity_data(EntityID id);
 
         /**

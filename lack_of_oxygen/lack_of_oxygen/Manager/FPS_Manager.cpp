@@ -82,7 +82,7 @@ namespace lof {
             delta_time = static_cast<float>(frame_duration) / MICROSECONDS_PER_SECOND;
             //LM.write_log("FPS_Manager::frame_start(): Calculated delta_time = %.6f seconds.", delta_time);
 
-            //calculate fixed delta_time stpes
+            //calculate fixed delta_time steps
             calculate_steps();
         }
 

@@ -1,4 +1,12 @@
-
+/**
+ * @file Player_Script.h
+ * @brief Define the player_script class
+ * @author Amanda Leow Boon Suan (60%), Wai Lwin Thit (20%), Chua Wen Bin Kenny (20%)
+ * @date February 2, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
 #include "../Scripts/Player_Script.h"
 #include "../System/Particle_System.h"
@@ -27,6 +35,7 @@ namespace lof {
         std::weak_ptr<Player_Script> weak_script = player_script;
 
         player_script->add_function("init", [weak_script](EntityID entity_id) {
+            (void)entity_id;
 			auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);

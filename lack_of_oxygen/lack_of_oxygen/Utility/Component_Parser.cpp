@@ -525,9 +525,9 @@ namespace lof {
                         if (script.HasMember("data") && script["data"].IsObject()) {
                             const rapidjson::Value& data_obj = script["data"];
 
-                            for (auto it = data_obj.MemberBegin(); it != data_obj.MemberEnd(); ++it) {
-                                std::string key = it->name.GetString();
-                                const rapidjson::Value& value = it->value;
+                            for (auto it1 = data_obj.MemberBegin(); it1 != data_obj.MemberEnd(); ++it1) {
+                                std::string key = it1->name.GetString();
+                                const rapidjson::Value& value = it1->value;
 
                                 try {
                                     // Handle different data types with proper variant construction

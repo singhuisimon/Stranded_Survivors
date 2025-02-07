@@ -1,3 +1,13 @@
+/**
+ * @file Logic_Manager.h
+ * @brief Define the logic manager class
+ * @author Simon Chan (60%), Amanda Leow Boon Suan (40%)
+ * @date February 2, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #pragma once
 #ifndef LOF_LOGIC_MANAGER_H
 #define LOF_LOGIC_MANAGER_H
@@ -16,55 +26,48 @@
 
 namespace lof {
 
+	/**
+	* @class Logic_Manager
+	* @brief Defines the logic manager class.
+	*/
 	class Logic_Manager : public Manager {
 
 	public:
+		/**
+		 * @brief Get the unique instance of Logic_Manager.
+		 */
 		static Logic_Manager& get_instance();
 
+		/**
+		 * @brief Initialize the logic manager
+		 */
 		int start_up() override; //register the script into logic system
 
+		/**
+		 * @brief Update the logic manager
+		 * @param delta_time The time elapsed since the last update
+		 */
 		void update(float delta_time);
 
-		void shut_down(); //shutdown aka save all the modified script data maybe? idk:">
+		/**
+		 * @brief Shutdown the logic manager
+		 */
+		void shut_down();
 
 	private:
+		/**
+		 * @brief Default constructor
+		 */
 		Logic_Manager() = default;
 		static std::unique_ptr<Logic_Manager> instance;
 		static std::once_flag once_flag;
 
-		// Helper function to register all available scripts
+		/**
+		 * @brief Register all the scripts in the engine.
+		 */
 		void register_all_scripts();
 
 	};
-
-	/*class Logic_Manager : public Manager {
-	private:
-		std::unordered_map<Entity*, std::vector<std::unique_ptr<Logic_System>>> active_scripts;
-
-		Logic_Manager() = default;
-
-	public:
-		static Logic_Manager& get_instance();
-
-		void add_script(Entity* entity, std::unique_ptr<Logic_System> scripts);
-
-		void remove_script(Entity* entity, const LogicSystemType& script_name);
-
-		void update(float delta_time);
-
-		Logic_Manager(const Logic_Manager&) = delete;
-		Logic_Manager& operator=(const Logic_Manager&) = delete;
-
-		~Logic_Manager() = default;
-	};*/
-
-	/*void set_state(EntityID entityid, const std::string& script, const std::string& state);
-
-	std::string get_state(EntityID entityid) const;*/
-
-	//see if there is a way i can do enum for all the script essentially 1 entity can have multiple script
-		//with each script having it's own state if possible
-		//std::unordered_map<EntityID, std::unordered_map<std::string, std::string>> entity_states; 
 
 }
 

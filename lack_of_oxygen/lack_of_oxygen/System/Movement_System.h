@@ -51,15 +51,42 @@ namespace lof {
         */
 
 #if 1
+
+        /**
+         * @brief Adds an entity to the movement system and dynamic entities list if eligible
+         *
+         * This function first adds the entity through the base System class, then checks if the entity
+         * has all required components (Physics, Transform2D, Velocity). If the entity has all components
+         * and is non-static, it is added to the dynamic_entities list, provided the maximum limit has
+         * not been reached.
+         *
+         * @param entity The EntityID to be added to the system
+         */
+
         void add_entity(EntityID entity) override;
+
+        /**
+         * @brief Removes an entity from both the system and dynamic entities list
+         *
+         * Removes the entity from the base System class and searches for it in the dynamic_entities list.
+         * If found in dynamic_entities, removes it from there as well and logs the updated count.
+         *
+         * @param entity The EntityID to be removed from the system
+         */
 
         void remove_entity(EntityID entity) override;
 
+        /**
+        * @brief Clears all entities from the dynamic entities list
+        *
+        * Empties the dynamic_entities vector, removing all stored entity references.
+        * Used when resetting the system or clearing all dynamic entities at once.
+        */
         void clear_dynamic_entities(); 
 #endif
 
-        void reset_jump_timer() { jump_timer = 0.0f; };
-        float get_max_jump_time() const { return MAX_JUMP_TIME; };
+        //void reset_jump_timer() { jump_timer = 0.0f; };
+        //float get_max_jump_time() const { return MAX_JUMP_TIME; };
 
 
 

@@ -49,6 +49,17 @@ namespace lof {
     }
 
 #if 1
+
+    /**
+     * @brief Adds an entity to the movement system and dynamic entities list if eligible
+     *
+     * This function first adds the entity through the base System class, then checks if the entity
+     * has all required components (Physics, Transform2D, Velocity). If the entity has all components
+     * and is non-static, it is added to the dynamic_entities list, provided the maximum limit has
+     * not been reached.
+     *
+     * @param entity The EntityID to be added to the system
+     */
     void Movement_System::add_entity(EntityID entity) {
         System::add_entity(entity); 
 
@@ -63,25 +74,38 @@ namespace lof {
 
         if (!physics.get_is_static() && (dynamic_entities.size() < MAX_DYNAMIC_ENTITIES)) {
             dynamic_entities.push_back(entity); 
-            LM.write_log("Movement_System: Added Dynamic Entity %u. Total %zu/%zu",
-                entity, dynamic_entities.size(), MAX_DYNAMIC_ENTITIES); 
+            //LM.write_log("Movement_System: Added Dynamic Entity %u. Total %zu/%zu",
+            //    entity, dynamic_entities.size(), MAX_DYNAMIC_ENTITIES); 
         }
         else if (!physics.get_is_static()) {
-            LM.write_log("Movement_System: Could not add Entity %u - MAX DYNAMIC ENTITIES REACHED (%zu)",
-                entity, MAX_DYNAMIC_ENTITIES);
+           /* LM.write_log("Movement_System: Could not add Entity %u - MAX DYNAMIC ENTITIES REACHED (%zu)",
+                entity, MAX_DYNAMIC_ENTITIES);*/
         }
     }
 
+    /**
+     * @brief Removes an entity from both the system and dynamic entities list
+     *
+     * Removes the entity from the base System class and searches for it in the dynamic_entities list.
+     * If found in dynamic_entities, removes it from there as well and logs the updated count.
+     *
+     * @param entity The EntityID to be removed from the system
+     */
     void Movement_System::remove_entity(EntityID entity) {
         System::remove_entity(entity); 
         auto it = std::find(dynamic_entities.begin(), dynamic_entities.end(), entity); 
         if (it != dynamic_entities.end()) {
             dynamic_entities.erase(it); 
-            LM.write_log("Movement_System: Removed Dynamic Entity %u. Total %zu/%zu, ",
-                entity, dynamic_entities.size(), MAX_DYNAMIC_ENTITIES);
+            //LM.write_log("Movement_System: Removed Dynamic Entity %u. Total %zu/%zu, ",
+            //    entity, dynamic_entities.size(), MAX_DYNAMIC_ENTITIES);
         }
     }
-
+    /**
+     * @brief Clears all entities from the dynamic entities list
+     *
+     * Empties the dynamic_entities vector, removing all stored entity references.
+     * Used when resetting the system or clearing all dynamic entities at once.
+     */
     void Movement_System::clear_dynamic_entities() {
         dynamic_entities.clear(); 
     }
@@ -95,13 +119,8 @@ namespace lof {
 
         // Iterate through entities matching the system's signature
 
-        //LM.write_log("Movement system start update");
-
-       // int counter{ 0 };
-
         for (EntityID entity_id : dynamic_entities) {
-            // std::cout << entity_id << "in physic \n\n";
-           // ++counter; 
+       
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);

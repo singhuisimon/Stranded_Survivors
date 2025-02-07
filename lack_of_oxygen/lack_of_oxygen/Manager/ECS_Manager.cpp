@@ -229,7 +229,7 @@ namespace lof {
             //    unique_name.c_str(), eid, prefab_name.c_str());
         }
         catch (const std::exception& e) {
-            //LM.write_log("ECS_Manager::clone_entity_from_prefab(): Error adding components to entity: %s", e.what());
+            LM.write_log("ECS_Manager::clone_entity_from_prefab(): Error adding components to entity: %s", e.what());
             destroy_entity(eid); // Clean up the partially created entity
             return INVALID_ENTITY_ID;
         }
@@ -375,18 +375,12 @@ namespace lof {
             for (auto& system : systems) {
 
 
+                bool is_physics = system->get_type() == "Movement_System" || system->get_type() == "Collision_System"; 
                 //system that use time in the update
-                if(system->get_type() == "Movement_System" ||
-                    system->get_type() == "Collision_System" ||
-                    system->get_type() == "Animation_System" ||
-                    system->get_type() == "Logic_System" ||
-                    system->get_type() == "Render_System")
+                if(is_physics || system->get_type() == "Logic_System")
                     {
                     //system that use time in the update
-                    if (system->get_type() == "Movement_System" ||
-                        system->get_type() == "Collision_System") {
-
-
+                    if (is_physics) {
 
                         /*if (level_editor_mode) {
                             system->set_time(0);

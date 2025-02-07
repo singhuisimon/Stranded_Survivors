@@ -58,10 +58,11 @@ namespace lof {
     }
 
     void Logic_System::update(float delta_time) {
+        (void)delta_time;
         //keeping this empty
     }
 
-    void Logic_System::update_script(float delta_time) {
+    void Logic_System::update_script() {
         // Loop over each script in the map and update
         //loop over the entity
         //check for those that have logic component
