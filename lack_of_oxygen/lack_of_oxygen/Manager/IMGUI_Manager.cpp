@@ -1010,9 +1010,9 @@ namespace lof {
                                 for (std::string name : batches) {
 
                                     //std::cout << name << " " << texture_name << std::endl;
-                                    size_t found = texture_name.find(name);
+                                    size_t name_found = texture_name.find(name);
 
-                                    if (found != std::string::npos) {
+                                    if (name_found != std::string::npos) {
 
                                         //std::cout << "found " << std::endl;
                                         for (auto& paired : batch_and_button) {
@@ -1040,9 +1040,9 @@ namespace lof {
                                     for (std::string name : batches) {
 
                                         //std::cout << name << " " << texture_name << std::endl;
-                                        size_t found = texture_name.find(name);
+                                        size_t batch_found = texture_name.find(name);
 
-                                        if (found != std::string::npos) {
+                                        if (batch_found != std::string::npos) {
 
                                             //std::cout << "found " << std::endl;
                                             for (auto& paired : batch_and_button) {
@@ -1535,7 +1535,7 @@ namespace lof {
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
 
-                                    if (name == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                    if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
                                         ;
                                     }
                                     else {
@@ -1596,7 +1596,7 @@ namespace lof {
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
 
-                                    if (name == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                    if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
                                         ;
                                     }
                                     else {
@@ -2439,8 +2439,8 @@ namespace lof {
         return current_file_shown;
     }
 
-    void IMGUI_Manager::asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message) {
-        if (show_msg) {
+    void IMGUI_Manager::asset_browser_pop_up(bool& show_popup, const char* popup_name, const char* message) {
+        if (show_popup) {
             ImGui::OpenPopup(popup_name);
 
             ImVec2 popup_position = ImVec2(750, 750);
