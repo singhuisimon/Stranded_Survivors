@@ -2,8 +2,8 @@
  * @file IMGUI_Manager.h
  * @brief Declaration of the IMGUI_Manager class for running the IMGUI level editor.
  * @author Liliana Hanawardani (100%)
- * @date November 8, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * @date February 7, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -69,15 +69,10 @@ namespace lof {
         //String holding the name of the current file loaded
         std::string current_file_shown;
 
-        std::vector<std::pair<std::string, std::string>> batch_and_button{
-            {"play_button", "Main_Menu_Play_Batch_14"},
-            {"credit_button", "Main_Menu_Credits_Batch_14"},
-            {"quit_button", "Main_Menu_Quit_Batch_14"},
-            {"back_button", "Back_Batch_14"},
-            {"restart_button", "Restart_Batch_14"},
-            {"main_menu_button", "Main_Menu_Batch_14"}
-        };
+        //Vector to hold the pairs of buttons and their associated buttons
+        std::vector<std::pair<std::string, std::string>> batch_and_button;
 
+        //Vector to hold all current batches
         std::vector<std::string> batches {
             {"Main_Menu_Play_Batch_14"},
             {"Main_Menu_Credits_Batch_14"},
@@ -175,12 +170,22 @@ namespace lof {
          */
         void fill_prefab_names(const char* prefab_name);
 
-        //void drop_callback(GLFWwindow* window, int count, const char** paths);
-
+        /**
+         * @brief Set the drag_drop source of the asset
+         * @param current_directory directory the browser is showing
+         * @param folder_name name of folder
+         * @param file_path filepath of the asset
+         * @param payload_name name set to the payload
+         */
         void set_drag_drop_source(std::string current_directory, std::string folder_name, std::string file_path, std::string payload_name);
 
+        /**
+         * @brief Gets the filename from the filepath
+         * @param file_path filepath of the file
+         * @param folder_name name of the folder of the file
+         * @return Filename
+         */
         std::string get_filename_from_filepath(std::string file_path, std::string folder_name);
-
 
         /**
          * @brief Calls functions from IMGUI that renders the level editor in an OpenGL and GLFW context
@@ -230,22 +235,48 @@ namespace lof {
          */
         void disable_GUI();
 
+        /**
+         * @brief Function handle logic of asset browser.
+         */
         void asset_browser();
 
-        void render_asset_browser();
-
-        std::string open_file_explorer();
-
-        //void drop_callback(GLFWwindow* window, int count, const char** paths);
+        /**
+         * @brief Function handle logic of dropping of file from outside engine to browser.
+         */
         void Handle_Dropped_File(const std::string filePath);
-        //void render_asset_browser();
-        void asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message);
 
+        /**
+         * @brief Function handle logic of warning message of browser.
+         */
+        void asset_browser_pop_up(bool& show_popup, const char* popup_name, const char* message);
+
+        /**
+         * @brief Get files in scene folder
+         * @return Vector of strings that contain scene file names
+         */
         std::vector<std::string> get_scene_files();
 
+        /**
+         * @brief Activate the loading of the specified scene file
+         * @param file_name Name of the scene file.
+         */
         void load_scene(const std::string& file_name);
 
+        /**
+         * @brief Get buttons_and_batches vector
+         * @return Vector of pairs of strings that contain the names of buttons and the name of the associated base texture batch
+         */
         std::vector<std::pair<std::string, std::string>>& return_buttons_and_batches();
+
+        /**
+         * @brief Initalise buttons_and_batches vector with values
+         */
+        void init_buttons_and_batches();
+
+        /**
+         * @brief Update changes of values in buttons_and_batches vector
+         */
+        void update_buttons_and_batches();
 };
 
 } // namespace lof

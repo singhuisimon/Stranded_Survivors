@@ -60,28 +60,6 @@ namespace lof {
          */
         Graphics_Manager& operator=(const Graphics_Manager&) = delete;
 
-        //// Struct of data to create a model
-        //struct Model {
-        //    GLenum primitive_type;
-        //    GLuint vaoid;
-        //    GLuint draw_cnt;
-        //};
-
-        //// Struct of a frame for animation
-        //struct Frame {
-        //    unsigned int frame_number;
-        //    float time_delay;
-        //};
-
-        //// Struct of an animation
-        //struct Animation {
-        //    std::vector<Frame> frames;  // Collection of frames time_delay 
-        //    std::string texture_name;
-        //    unsigned int curr_frame_index{ DEFAULT_FRAME_INDEX };
-        //    float frame_elapsed_time{ DEFAULT_FRAME_TIME_ELAPSED };        // Time elapsed for current frame
-        //    bool is_updated{ false };
-        //};
-
         // Struct of a camera
         struct Camera2D {
             GLfloat pos_x, pos_y;
@@ -93,32 +71,6 @@ namespace lof {
             Camera2D() : pos_x(DEFAULT_CAMERA_POS_X), pos_y(DEFAULT_CAMERA_POS_Y), view_xform(0),
                         camwin_to_ndc_xform(0), world_to_ndc_xform(0), is_free_cam(GL_FALSE) {};
         };
-
-        //// Struct of a character
-        //struct Character {
-        //    unsigned int TextureID; // ID handle of the glyph texture
-        //    glm::ivec2   Size;      // Size of glyph
-        //    glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
-        //    unsigned int Advance;   // Horizontal offset to advance to next glyph
-        //};
-
-        //// Struct of a font
-        //struct Font {
-        //    GLuint vaoid{ 0 };
-        //    GLuint vboid{ 0 };
-        //    std::map<GLchar, Character> characters; // Store the full range of characters
-        //};
-
-        // Storages
- /*       using MODELS = std::map<std::string, Graphics_Manager::Model>;
-        using TEXTURES = std::map<std::string, GLuint>;
-        using ANIMATIONS = std::unordered_map<std::string, Animation>;
-        using FONTS = std::map<std::string, Font>;
-
-        MODELS model_storage;
-        TEXTURES texture_storage;
-        ANIMATIONS  animation_storage;
-        FONTS font_storage;*/
 
         std::unordered_map<std::string, Assets_Manager::Model> models;
 
@@ -174,9 +126,12 @@ namespace lof {
          */
         GLboolean add_model(std::string const& file_name);
 
-
+        /**
+         * @brief Gets a reference to the model container.
+         *
+         * @return An unordered map as the model container
+         */
         std::unordered_map<std::string, Assets_Manager::Model>& get_models();
-
 
         /**
          * @brief Add a texture into the texture storage.
@@ -201,26 +156,6 @@ namespace lof {
          * @return True if the fonts are added successfully, false otherwise.
          */
         GLboolean add_fonts(std::string const& file_name);
-
-        /**
-         * @brief Get a reference to the model container.
-         */
-        //MODELS& get_model_storage();
-
-        /**
-         * @brief Get a reference to the texture container.
-         */
-        //TEXTURES& get_texture_storage();
-
-        /**
-         * @brief Get a reference to the texture container.
-         */
-        //ANIMATIONS& get_animation_storage();
-
-        /**
-         * @brief Get a reference to the texture container.
-         */
-        //FONTS& get_font_storage();
 
         /**
          * @brief Get a reference to the rendering mode.

@@ -792,7 +792,7 @@ namespace lof {
     // OXYGEN WARNING GUI
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_warning(float percent) {
-        // Determine which warning names to use
+        // Get the appropriate warning names references
         std::string& text_name = (percent == 50.0f) ? warning_text_50_name :
             (percent == 20.0f) ? warning_text_20_name :
             warning_text_5_name;
@@ -809,66 +809,63 @@ namespace lof {
         // Get the appropriate texture and message based on warning level
         std::string texture_name;
         std::string warning_message;
-        glm::vec3 text_color;
+        glm::vec3 text_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
         if (percent == 50.0f) {
-            if (percent == 50.0f) {
-                texture_name = "Purple_Oxy_Warning_Batch_14";  // Fixed typo here
-                warning_message = "WARNING: OXYGEN LEVEL 50%";
-                text_color = glm::vec3(1.0f, 1.0f, 1.0f);
-            }
+            texture_name = "Purple_Oxy_Warning_Batch_14";
+            warning_message = "WARNING: OXYGEN LEVEL 50%";
         }
         else if (percent == 20.0f) {
             texture_name = "Red_Oxy_Warning_Batch_14";
             warning_message = "WARNING: OXYGEN CRITICAL! REFILL OXYGEN!";
-            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
         }
         else { // 5%
             texture_name = "Black Oxy Warning_Batch 14";
-            warning_message = "WARNING: OXYGEN CRTICAL!";
-            text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+            warning_message = "WARNING: OXYGEN CRITICAL!";
         }
 
-        // Create warning container with unique name
-        EntityID container_id = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (container_id != INVALID_ENTITY_ID) {
-            std::string unique_name = "warning_container_" + std::to_string(static_cast<int>(percent));
-            ecs_manager.update_entity_name(container_id, unique_name);
-            container_name = unique_name;
+        // Create warning container
+        EntityID warning_container_id = ecs_manager.clone_entity_from_prefab("gui_container");
+        if (warning_container_id != INVALID_ENTITY_ID) {
+            // Create unique name for container
+            std::string unique_container_name = "warning_container_" + std::to_string(static_cast<int>(percent));
+            ecs_manager.update_entity_name(warning_container_id, unique_container_name);
+            container_name = unique_container_name;
 
-            auto* container_gui = get_component_safe<GUI_Component>(container_id);
+            auto* container_gui = get_component_safe<GUI_Component>(warning_container_id);
             if (!container_gui) {
                 hide_oxygen_warning(percent);
                 return;
             }
             container_gui->is_container = true;
 
-            if (auto* graphics = get_component_safe<Graphics_Component>(container_id)) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(warning_container_id)) {
                 graphics->model_name = "square";
                 graphics->texture_name = texture_name;
                 graphics->color = glm::vec4(1.0f);
             }
 
-            if (auto* transform = get_component_safe<Transform2D>(container_id)) {
+            if (auto* transform = get_component_safe<Transform2D>(warning_container_id)) {
                 transform->position = Vec2D(0.0f, 200.0f);
                 transform->scale = Vec2D(2000.0f, 50.0f);
             }
         }
 
-        // Create warning text with unique name
-        EntityID text_id = ecs_manager.clone_entity_from_prefab("text_object");
-        if (text_id != INVALID_ENTITY_ID) {
-            std::string unique_name = "warning_text_" + std::to_string(static_cast<int>(percent));
-            ecs_manager.update_entity_name(text_id, unique_name);
-            text_name = unique_name;
+        // Create warning text
+        EntityID warning_text_id = ecs_manager.clone_entity_from_prefab("text_object");
+        if (warning_text_id != INVALID_ENTITY_ID) {
+            // Create unique name for text
+            std::string unique_text_name = "warning_text_" + std::to_string(static_cast<int>(percent));
+            ecs_manager.update_entity_name(warning_text_id, unique_text_name);
+            text_name = unique_text_name;
 
-            if (auto* text = get_component_safe<Text_Component>(text_id)) {
+            if (auto* text = get_component_safe<Text_Component>(warning_text_id)) {
                 text->font_name = DEFAULT_FONT_NAME;
                 text->text = warning_message;
                 text->color = text_color;
                 text->scale = glm::vec2(0.7f, 0.7f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(text_id)) {
+            if (auto* transform = get_component_safe<Transform2D>(warning_text_id)) {
                 transform->position = Vec2D(0.0f, 195.0f);
                 transform->scale = Vec2D(0.7f, 0.7f);
             }
@@ -880,7 +877,7 @@ namespace lof {
     }
 
     void GUI_System::hide_oxygen_warning(float percent) {
-        // Get the appropriate warning names
+        // Get the appropriate names
         std::string& text_name = (percent == 50.0f) ? warning_text_50_name :
             (percent == 20.0f) ? warning_text_20_name :
             warning_text_5_name;
@@ -889,25 +886,22 @@ namespace lof {
             (percent == 20.0f) ? warning_container_20_name :
             warning_container_5_name;
 
-        // Look up current entity IDs by name
-        EntityID text_id = ecs_manager.find_entity_by_name(text_name);
-        EntityID container_id = ecs_manager.find_entity_by_name(container_name);
-
-        // Destroy text entity if it exists
-        if (text_id != INVALID_ENTITY_ID) {
-            ecs_manager.destroy_entity(text_id);
+        // Find and destroy entities by name
+        EntityID warning_text_id = ecs_manager.find_entity_by_name(text_name);
+        if (warning_text_id != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(warning_text_id);
         }
 
-        // Destroy container entity if it exists
-        if (container_id != INVALID_ENTITY_ID) {
-            ecs_manager.destroy_entity(container_id);
+        EntityID warning_container_id = ecs_manager.find_entity_by_name(container_name);
+        if (warning_container_id != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(warning_container_id);
         }
 
         // Clear the stored names
         text_name.clear();
         container_name.clear();
 
-        // Reset the corresponding warning flags
+        // Reset the appropriate warning flags
         if (percent == 50.0f) {
             warning_50_active = false;
             warning_50_shown = false;

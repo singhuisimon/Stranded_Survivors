@@ -90,6 +90,9 @@ namespace lof {
 
         bool check_non_mineral(EntityID block_id, std::string block_name) const;
 
+        // Flag for displaying fps in game
+        bool display_fps = false;
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
