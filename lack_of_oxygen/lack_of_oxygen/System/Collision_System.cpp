@@ -2170,6 +2170,7 @@ namespace lof {
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
                 button_hover_states[entity_name] = false;
+                
 
             }
         }
