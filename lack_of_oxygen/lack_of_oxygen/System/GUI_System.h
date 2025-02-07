@@ -37,6 +37,13 @@ namespace lof {
         EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
         float oxygen_e_prompt_x = 800.0f;  // X position for 'E' prompt
 
+        std::string oxygen_e_prompt_name;            // Entity name for oxygen E prompt
+        std::string oxygen_container_name;          // Entity name for oxygen container
+        std::string oxygen_progress_bar1_name;      // Entity name for player oxygen progress bar
+        std::string oxygen_percentage_text1_name;   // Entity name for player oxygen percentage text
+        std::string oxygen_progress_bar2_name;      // Entity name for ship oxygen progress bar
+        std::string oxygen_percentage_text2_name;   // Entity name for ship oxygen percentage text
+
         static constexpr float OXYGEN_BAR_MAX_WIDTH = 630.0f;
         static constexpr float OXYGEN_BAR_HEIGHT = 15.0f;
         static constexpr float OXYGEN_BAR_PLAYER_Y = 78.0f;

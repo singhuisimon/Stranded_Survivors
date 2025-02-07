@@ -492,236 +492,185 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_tank_gui()
     {
-        // If the oxygen GUI is already shown, do nothing
-        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
+        // Check if the oxygen GUI is already shown
+        if (!oxygen_container_name.empty()) {
             return;
         }
 
+        // Generate unique names for this instance
+        oxygen_e_prompt_name = "oxygen_e_prompt";
+        oxygen_container_name = "oxygen_container";
+        oxygen_progress_bar1_name = "oxygen_progress_bar1";
+        oxygen_percentage_text1_name = "oxygen_percentage_text1";
+        oxygen_progress_bar2_name = "oxygen_progress_bar2";
+        oxygen_percentage_text2_name = "oxygen_percentage_text2";
+
         // 1) Create E prompt
-        oxygen_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_e_prompt)) {
+        EntityID e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", oxygen_e_prompt_name);
+        if (e_prompt != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(e_prompt)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "E_Gold_02_Batch_14"; // E key icon
+                graphics->texture_name = "E_Gold_02_Batch_14";
                 graphics->color = glm::vec4(1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
+            if (auto* transform = get_component_safe<Transform2D>(e_prompt)) {
                 transform->position = Vec2D(oxygen_e_prompt_x, original_e_prompt_y);
                 transform->scale = Vec2D(50.0f, 50.0f);
             }
-            // Reset its animation timer
             oxygen_e_prompt_animation_timer = 0.0f;
         }
 
         // 2) Main container
-        oxygen_interaction_container = ecs_manager.clone_entity_from_prefab("gui_container");
-        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            auto* container_gui = get_component_safe<GUI_Component>(oxygen_interaction_container);
+        EntityID container = ecs_manager.clone_entity_from_prefab("gui_container", oxygen_container_name);
+        if (container != INVALID_ENTITY_ID) {
+            auto* container_gui = get_component_safe<GUI_Component>(container);
             if (!container_gui) {
                 hide_oxygen_tank_gui();
                 return;
             }
             container_gui->is_container = true;
 
-            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_interaction_container)) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(container)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "UI_OxygenRefill_1920x1080_v2";
                 graphics->color = glm::vec4(1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_interaction_container)) {
+            if (auto* transform = get_component_safe<Transform2D>(container)) {
                 transform->position = Vec2D(0.0f, 0.0f);
                 transform->scale = Vec2D(1980.0f, 1020.0f);
             }
         }
 
-        // == Player Oxygen Bar 
-        float playerOxygen = GM.get_current_oxygen_level(); // 0..100
-        float playerFraction = playerOxygen / 100.0f;       // 0..1
+        // == Player Oxygen Bar
+        float playerOxygen = GM.get_current_oxygen_level();
+        float playerFraction = playerOxygen / 100.0f;
         stored_oxygen_progress1 = playerFraction;
 
-        // Set a consistent bar width & height for both bars
-        const float BAR_MAX_WIDTH = 620.0f; // same as ship bar
+        const float BAR_MAX_WIDTH = 620.0f;
         const float BAR_HEIGHT = 14.0f;
         constexpr float SHIP_MAX = 400.0f;
 
-        //
         // 3) First progress bar (Player Oxygen)
-        //
-        oxygen_progress_bar1 = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
-        if (oxygen_progress_bar1 != INVALID_ENTITY_ID)
-        {
-            if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar1)) {
+        EntityID progress_bar1 = ecs_manager.clone_entity_from_prefab("gui_progress_bar", oxygen_progress_bar1_name);
+        if (progress_bar1 != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(progress_bar1)) {
                 graphics->model_name = "square";
                 graphics->texture_name = "NoTexture";
                 graphics->color = glm::vec4(0.0f, 0.68f, 1.0f, 1.0f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
+            if (auto* transform = get_component_safe<Transform2D>(progress_bar1)) {
                 float current_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
-                float bar_y = 78.5f; // Some Y offset
-
+                float bar_y = 78.5f;
                 transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y);
                 transform->scale = Vec2D(current_width, BAR_HEIGHT);
             }
-            if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar1)) {
+            if (auto* gui = get_component_safe<GUI_Component>(progress_bar1)) {
                 gui->is_progress_bar = true;
                 gui->progress = stored_oxygen_progress1;
             }
         }
 
-        //
         // 4) Text for first bar (Player Oxygen %)
-        //
-        oxygen_percentage_text1 = ecs_manager.clone_entity_from_prefab("text_object");
-        if (oxygen_percentage_text1 != INVALID_ENTITY_ID)
-        {
-            if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text1)) {
+        EntityID percentage_text1 = ecs_manager.clone_entity_from_prefab("text_object", oxygen_percentage_text1_name);
+        if (percentage_text1 != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(percentage_text1)) {
                 text->font_name = DEFAULT_FONT_NAME;
-
-                // stored_oxygen_progress1 = 1.0 => "100%"
                 int percentage = static_cast<int>(stored_oxygen_progress1 * 100);
                 text->text = std::to_string(percentage) + "%";
                 text->color = glm::vec3(1.0f);
                 text->scale = glm::vec2(0.4f, 0.4f);
             }
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text1)) {
+            if (auto* transform = get_component_safe<Transform2D>(percentage_text1)) {
                 transform->position = Vec2D(-623.0f, 100.0f);
                 transform->scale = Vec2D(0.5f, 0.5f);
             }
         }
 
-        // 5) Second progress bar (Ship Oxygen) in YELLOW
-        {
-            float currentShipOxy = GM.get_ship_oxygen_level();
-            // "Used fraction" => how much we've consumed.
-            // If ship is still at 400 => used fraction=0 => bar is full
-            float usedFraction = (SHIP_MAX - currentShipOxy) / SHIP_MAX;
-            // Then "reversed_value" for the fill:
-            float reversed_value = 1.0f - usedFraction; // if usedFraction=0 => reversed_value=1 => 100% fill
-            float current_width = BAR_MAX_WIDTH * reversed_value;
+        // 5) Second progress bar (Ship Oxygen)
+        float currentShipOxy = GM.get_ship_oxygen_level();
+        float usedFraction = (SHIP_MAX - currentShipOxy) / SHIP_MAX;
+        float reversed_value = 1.0f - usedFraction;
+        float current_width = BAR_MAX_WIDTH * reversed_value;
 
-            // Create the bar
-            oxygen_progress_bar2 = ecs_manager.clone_entity_from_prefab("gui_progress_bar");
-            if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
-                if (auto* graphics = get_component_safe<Graphics_Component>(oxygen_progress_bar2)) {
-                    graphics->model_name = "square";
-                    graphics->texture_name = "NoTexture";
-                    graphics->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f); // Yellow
-                }
-                if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
-                    float bar_y_ship = 53.3f;
-                    transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y_ship);
-                    transform->scale = Vec2D(current_width, BAR_HEIGHT);
-                }
-                if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar2)) {
-                    gui->is_progress_bar = true;
-                    // You could store the "usedFraction" or something else if needed,
-                    // but it's not strictly required for just drawing the bar.
-                }
+        EntityID progress_bar2 = ecs_manager.clone_entity_from_prefab("gui_progress_bar", oxygen_progress_bar2_name);
+        if (progress_bar2 != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(progress_bar2)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "NoTexture";
+                graphics->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
             }
+            if (auto* transform = get_component_safe<Transform2D>(progress_bar2)) {
+                float bar_y_ship = 53.3f;
+                transform->position = Vec2D(-657.0f + (current_width / 2.0f), bar_y_ship);
+                transform->scale = Vec2D(current_width, BAR_HEIGHT);
+            }
+            if (auto* gui = get_component_safe<GUI_Component>(progress_bar2)) {
+                gui->is_progress_bar = true;
+            }
+        }
 
-            // 6) Text for second bar (Ship Oxygen %)
-            // If you want 400 => "100%" on first show, do the same reversed approach:
-            oxygen_percentage_text2 = ecs_manager.clone_entity_from_prefab("text_object");
-            if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-                if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text2)) {
-                    text->font_name = DEFAULT_FONT_NAME;
-
-                    // reversed_value in [0..1], so reversed_value=1 => 100%
-                    int reversed_pct = static_cast<int>(reversed_value * 100);
-                    text->text = std::to_string(reversed_pct) + "%";
-                    text->color = glm::vec3(1.0f);
-                    text->scale = glm::vec2(0.4f, 0.4f);
-                }
-                if (auto* transform = get_component_safe<Transform2D>(oxygen_percentage_text2)) {
-                    transform->position = Vec2D(-620.0f, 25.0f);
-                    transform->scale = Vec2D(0.4f, 0.4f);
-                }
+        // 6) Text for second bar (Ship Oxygen %)
+        EntityID percentage_text2 = ecs_manager.clone_entity_from_prefab("text_object", oxygen_percentage_text2_name);
+        if (percentage_text2 != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(percentage_text2)) {
+                text->font_name = DEFAULT_FONT_NAME;
+                int reversed_pct = static_cast<int>(reversed_value * 100);
+                text->text = std::to_string(reversed_pct) + "%";
+                text->color = glm::vec3(1.0f);
+                text->scale = glm::vec2(0.4f, 0.4f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(percentage_text2)) {
+                transform->position = Vec2D(-620.0f, 25.0f);
+                transform->scale = Vec2D(0.4f, 0.4f);
             }
         }
     }
 
     void GUI_System::hide_oxygen_tank_gui()
     {
-        // The creation order:
-        //   1) oxygen_e_prompt
-        //   2) oxygen_interaction_container
-        //   3) oxygen_progress_bar1
-        //   4) oxygen_percentage_text1
-        //   5) oxygen_progress_bar2
-        //   6) oxygen_percentage_text2
-        // So remove in reverse (LIFO):
+        const std::vector<std::string*> entity_names = {
+            &oxygen_percentage_text2_name,
+            &oxygen_progress_bar2_name,
+            &oxygen_percentage_text1_name,
+            &oxygen_progress_bar1_name,
+            &oxygen_container_name,
+            &oxygen_e_prompt_name
+        };
 
-        // (6) Second bar text
-        if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying oxygen percentage text 2 entity %d", oxygen_percentage_text2);
-            ecs_manager.destroy_entity(oxygen_percentage_text2);
-            oxygen_percentage_text2 = INVALID_ENTITY_ID;
-        }
-
-        // (5) Second progress bar
-        if (oxygen_progress_bar2 != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying oxygen progress bar 2 entity %d", oxygen_progress_bar2);
-            ecs_manager.destroy_entity(oxygen_progress_bar2);
-            oxygen_progress_bar2 = INVALID_ENTITY_ID;
-        }
-
-        // (4) First bar text
-        if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying oxygen percentage text 1 entity %d", oxygen_percentage_text1);
-            ecs_manager.destroy_entity(oxygen_percentage_text1);
-            oxygen_percentage_text1 = INVALID_ENTITY_ID;
-        }
-
-        // (3) First progress bar
-        if (oxygen_progress_bar1 != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying oxygen progress bar 1 entity %d", oxygen_progress_bar1);
-            ecs_manager.destroy_entity(oxygen_progress_bar1);
-            oxygen_progress_bar1 = INVALID_ENTITY_ID;
-        }
-
-        // (2) Main container
-        if (oxygen_interaction_container != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying oxygen container entity %d", oxygen_interaction_container);
-            ecs_manager.destroy_entity(oxygen_interaction_container);
-            oxygen_interaction_container = INVALID_ENTITY_ID;
-        }
-
-        // (1) E prompt
-        if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            //LM.write_log("Destroying oxygen E prompt entity %d", oxygen_e_prompt);
-            ecs_manager.destroy_entity(oxygen_e_prompt);
-            oxygen_e_prompt = INVALID_ENTITY_ID;
+        for (auto* name_ptr : entity_names) {
+            if (!name_ptr->empty()) {
+                EntityID entity = ecs_manager.find_entity_by_name(*name_ptr);
+                if (entity != INVALID_ENTITY_ID) {
+                    ecs_manager.destroy_entity(entity);
+                }
+                name_ptr->clear();
+            }
         }
     }
 
-    //
-    // Player Oxygen (#1) - same anchor, same width as in show_oxygen_tank_gui()
-    //
     void GUI_System::update_oxygen_progress1(float progress)
     {
-        // 'progress' in [0..1]
         stored_oxygen_progress1 = std::clamp(progress, 0.0f, 1.0f);
 
-        if (oxygen_progress_bar1 != INVALID_ENTITY_ID)
-        {
-            // MATCH the logic/anchors from show_oxygen_tank_gui()
+        EntityID progress_bar1 = ecs_manager.find_entity_by_name(oxygen_progress_bar1_name);
+        if (progress_bar1 != INVALID_ENTITY_ID) {
             float BAR_MAX_WIDTH = 620.0f;
-            float bar_y = 78.5f;         // e.g. from show_oxygen_tank_gui() for the player bar
+            float bar_y = 78.5f;
             float new_width = BAR_MAX_WIDTH * stored_oxygen_progress1;
 
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar1)) {
+            if (auto* transform = get_component_safe<Transform2D>(progress_bar1)) {
                 transform->scale.x = new_width;
                 transform->position.x = -657.0f + (new_width / 2.0f);
                 transform->position.y = bar_y;
             }
 
-            if (auto* gui = get_component_safe<GUI_Component>(oxygen_progress_bar1)) {
+            if (auto* gui = get_component_safe<GUI_Component>(progress_bar1)) {
                 gui->progress = stored_oxygen_progress1;
             }
 
-            // Update text for the player bar #1
-            if (oxygen_percentage_text1 != INVALID_ENTITY_ID) {
-                if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text1)) {
+            EntityID percentage_text1 = ecs_manager.find_entity_by_name(oxygen_percentage_text1_name);
+            if (percentage_text1 != INVALID_ENTITY_ID) {
+                if (auto* text = get_component_safe<Text_Component>(percentage_text1)) {
                     int percentage = static_cast<int>(stored_oxygen_progress1 * 100);
                     text->text = std::to_string(percentage) + "%";
                 }
@@ -729,34 +678,26 @@ namespace lof {
         }
     }
 
-
-    //
-    // Ship Oxygen (#2) - same anchor / width as in show_oxygen_tank_gui()
-    //
     void GUI_System::update_oxygen_progress2(float usedFraction)
     {
-        // usedFraction in [0..1], 0 => 0% used => bar is 100% left
-        // 1 => 100% used => bar is 0% left
         stored_oxygen_progress2 = std::clamp(usedFraction, 0.0f, 1.0f);
 
-        if (oxygen_progress_bar2 != INVALID_ENTITY_ID)
-        {
+        EntityID progress_bar2 = ecs_manager.find_entity_by_name(oxygen_progress_bar2_name);
+        if (progress_bar2 != INVALID_ENTITY_ID) {
             float BAR_MAX_WIDTH = 620.0f;
             float bar_y = 53.3f;
-
-            // Reversed fill => 1 - usedFraction
             float reversed_value = 1.0f - stored_oxygen_progress2;
             float new_width = BAR_MAX_WIDTH * reversed_value;
 
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_progress_bar2)) {
+            if (auto* transform = get_component_safe<Transform2D>(progress_bar2)) {
                 transform->scale.x = new_width;
                 transform->position.x = -657.0f + (new_width / 2.0f);
                 transform->position.y = bar_y;
             }
 
-            // Update text (#2)
-            if (oxygen_percentage_text2 != INVALID_ENTITY_ID) {
-                if (auto* text = get_component_safe<Text_Component>(oxygen_percentage_text2)) {
+            EntityID percentage_text2 = ecs_manager.find_entity_by_name(oxygen_percentage_text2_name);
+            if (percentage_text2 != INVALID_ENTITY_ID) {
+                if (auto* text = get_component_safe<Text_Component>(percentage_text2)) {
                     int reversed_pct = static_cast<int>(reversed_value * 100);
                     text->text = std::to_string(reversed_pct) + "%";
                 }
