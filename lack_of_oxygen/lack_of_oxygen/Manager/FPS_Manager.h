@@ -112,9 +112,13 @@ namespace lof {
         @brief get the fixed delta time
         */
         float get_fixed_delta_time() const; 
-
+        /*
+        @brief get the current number of steps
+        */
         int get_current_number_of_steps() const;
-
+        /*
+        @brief calculate the number of step
+        */
         void calculate_steps();
     };
 
