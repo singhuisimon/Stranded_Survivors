@@ -224,24 +224,26 @@ namespace lof {
             ADM.pause_resume_mastergroup();
         }
 
-        //commented out this is for me to test - Amanda
+        ////commented out this is for me to test - Amanda
         if (IM.is_key_held(GLFW_KEY_J)) {
             current_oxygen_level--;
             //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-            increasing = false;
+            //increasing = false;
         }
 
         if (IM.is_key_held(GLFW_KEY_K)) {
             current_oxygen_level++;
             //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-            increasing = true;
+            //increasing = true;
         }
+         
+        //printf("bool check: %d\n", CS.is_oxygen_increase());
         //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
-        if (current_scene == 2 || current_scene == 1)
+       /* if (current_scene == 2 || current_scene == 1)
         {
             ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
 
-        }
+        }*/
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
