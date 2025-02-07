@@ -232,7 +232,7 @@ namespace lof {
         //void drop_callback(GLFWwindow* window, int count, const char** paths);
         void Handle_Dropped_File(const std::string filePath);
         //void render_asset_browser();
-        void asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message);
+        void asset_browser_pop_up(bool& show_popup, const char* popup_name, const char* message);
 
         std::vector<std::string> get_scene_files();
 

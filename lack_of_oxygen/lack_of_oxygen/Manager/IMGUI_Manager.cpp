@@ -201,121 +201,6 @@ namespace lof {
             if (GM.get_current_oxygen_level() < 100) {
                 GM.set_current_oxygen_level(100);
             }
-            
-            /*if (selected_file_index == 2) {
-                // Update top UI overlay position to follow player
-                EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
-                EntityID oxygen_meter_id = ECSM.find_entity_by_name("top_ui_oxygen_meter");
-                EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
-                EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
-                EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
-                EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
-                EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-                // Reset player position if exists
-                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (player_id != INVALID_ENTITY_ID && GM.get_current_scene() == 2) {
-                    if (ECSM.has_component<Transform2D>(player_id)) {
-                        auto& transform = ECSM.get_component<Transform2D>(player_id);
-                        transform.position = Vec2D(0.0f, 0.0f);
-                        transform.prev_position = transform.position;
-                    }
-                    if (ECSM.has_component<Velocity_Component>(player_id)) {
-                        auto& velocity = ECSM.get_component<Velocity_Component>(player_id);
-                        velocity.velocity = Vec2D(0.0f, 0.0f);
-                    }
-                }
-                if (ui_overlay_id != INVALID_ENTITY_ID) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-                    auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
-                    // Define layout constants for vertical stacking
-                    constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
-                    constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
-                    constexpr float METER_WIDTH = 400.0f;            // Width of the meters
-                    constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
-                    //constexpr float TEXT_OFFSET_X = 300.0f;           // Horizontal offset from the UI element
-                    constexpr float TEXT_OFFSET_Y = 10.0f;            // Vertical offset from the UI element
-                    // Calculate base position for UI elements
-                    Vec2D base_position{
-                        0.0f,
-                        player_transform.position.y + VERTICAL_OFFSET
-                    };
-                    // Update main UI overlay position
-                    ui_transform.position = base_position;
-                    ui_transform.prev_position = ui_transform.position;
-                    // Position oxygen meter (top meter)
-                    if (oxygen_meter_id != INVALID_ENTITY_ID &&
-                        ECSM.has_component<Transform2D>(oxygen_meter_id)) {
-                        auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
-                        // Set position and scale for oxygen meter
-                        oxygen_transform.position = {
-                            base_position.x - METER_WIDTH,  // Center horizontally
-                            base_position.y                 // Top position
-                        };
-                        oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
-                        oxygen_transform.prev_position = oxygen_transform.position;
-                    }
-                    // Position oxygen text
-                    if (oxygen_text_id != INVALID_ENTITY_ID &&
-                        ECSM.has_component<Transform2D>(oxygen_text_id)) {
-                        auto& oxygen_text_transform = ECSM.get_component<Transform2D>(oxygen_text_id);
-                        //auto& oxygen_text = ECSM.get_component<Text_Component>(oxygen_text_id); 
-                        auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
-                        // Position text to the left of the oxygen meter
-                        oxygen_text_transform.position = {
-                            (oxygen_transform.position.x - (oxygen_transform.scale.x / 2.0f) - (oxygen_text_transform.scale.x / 2.0f)), // Left of meter
-                            oxygen_transform.position.y // Vertically centered with oxygen meter
-                        };
-                        oxygen_text_transform.prev_position = oxygen_text_transform.position;
-                    }
-                    // Position panic meter (bottom meter)
-                    if (panic_meter_id != INVALID_ENTITY_ID &&
-                        ECSM.has_component<Transform2D>(panic_meter_id)) {
-                        auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
-                        // Set position and scale for panic meter
-                        panic_transform.position = {
-                            base_position.x - METER_WIDTH,          // Center horizontally
-                            base_position.y - METER_SPACING         // Below oxygen meter
-                        };
-                        panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
-                        panic_transform.prev_position = panic_transform.position;
-                    }
-                    // Position panic text
-                    if (panic_text_id != INVALID_ENTITY_ID &&
-                        ECSM.has_component<Transform2D>(panic_text_id)) {
-                        auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
-                        auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
-                        // Position text to the left of the panic meter
-                        panic_text_transform.position = {
-                            (panic_transform.position.x - (panic_transform.scale.x / 2.0f) - (panic_text_transform.scale.x / 2.0f)),  // Left of meter
-                            panic_transform.position.y  // Vertically centered with panic meter
-                        };
-                        panic_text_transform.prev_position = panic_text_transform.position;
-                    }
-                    // Position mineral texture on the right side
-                    if (mineral_texture_id != INVALID_ENTITY_ID &&
-                        ECSM.has_component<Transform2D>(mineral_texture_id)) {
-                        auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-                        mineral_transform.position = {
-                            base_position.x,                         // Center position
-                            base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
-                        };
-                        mineral_transform.prev_position = mineral_transform.position;
-                    }
-                    // Position mineral count text
-                    if (mineral_count_text_id != INVALID_ENTITY_ID &&
-                        ECSM.has_component<Transform2D>(mineral_count_text_id) &&
-                        ECSM.has_component<Transform2D>(mineral_texture_id)) {
-                        auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
-                        auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-                        // Position text to the right of the mineral texture
-                        mineral_count_text_transform.position = {
-                            (mineral_transform.position.x + (mineral_transform.scale.x)) ,  // Right of icon
-                            mineral_transform.position.y - TEXT_OFFSET_Y  // Vertically centered with mineral icon
-                        };
-                        mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
-                    }
-                }
-            }*/
  
             //Note down current file
             set_current_file_shown(file_name);
@@ -527,17 +412,6 @@ namespace lof {
             }
 
             ImVec2 mouse_pos = ImGui::GetIO().MousePos;
-
-            //Display debug information
-            /*ImGui::Text("Screen Dimensions: (%u, %u)", SCR_WIDTH, SCR_HEIGHT);
-            ImGui::Separator();
-            ImGui::Text("Texture starts at: (%.2f, %.2f)", texture_pos.x, texture_pos.y);
-            ImGui::Text("Texture ends at: (%.2f, %.2f)", (texture_pos.x + SCR_WIDTH / 2), (texture_pos.y + SCR_HEIGHT / 2));
-            ImGui::Text("Texture size: (%u, %u)", SCR_WIDTH / 2, SCR_HEIGHT / 2);
-            ImGui::Separator();
-            ImGui::Text("Mouse in terms of screen at: (%.2f, %.2f)", mouse_pos.x, mouse_pos.y);
-            ImGui::Separator();*/
-
             mouse_pos_game = get_imgui_mouse_pos(texture_pos, mouse_pos, SCR_WIDTH, SCR_HEIGHT);
             if (mouse_in_window) {
                 ImGui::Text("Mouse in terms of world at: (%.2f, %.2f)", mouse_pos_game.x, mouse_pos_game.y);
@@ -569,14 +443,6 @@ namespace lof {
                         mouse_clicked_or_dragged = false;
                         select_entity = false;
                     }
-
-                    /*if (selectedEntityInfo.selectedEntity == 5) {
-                        ImGui::Text("Returned True");
-                        ImGui::Text("Position: %.2f, %.2f", selectedEntityInfo.entitypos.x, selectedEntityInfo.entitypos.y);
-                    }
-                    else {
-                        ImGui::Text("Not True");
-                    }*/
 
                     // Show context menu on right click when an entity is selected
                     if (selectedEntityID != INVALID_ENTITY_ID && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
@@ -639,23 +505,6 @@ namespace lof {
                         case 1: // Drag
                         {
                             ImVec2 dragged_offset;
-
-                            /*unsigned int game_scale_width = SM.get_scr_width();
-                            unsigned int game_scale_height = SM.get_scr_height();
-                            unsigned int window_width = WC.get_win_width();
-                            unsigned int window_height = WC.get_win_height();
-                            float ratio_width = static_cast<float>(game_scale_width) / window_width;
-                            float ratio_height = static_cast<float>(game_scale_height) / window_height;
-
-                            if (is_full_screen) {
-                                dragged_offset.x = (mouse_pos_game.x - mouse_pos_before_press.x) * ratio_width;
-                                dragged_offset.y = (mouse_pos_game.y - mouse_pos_before_press.y) * ratio_height;
-                            }
-                            else {
-                                dragged_offset.x = mouse_pos_game.x - mouse_pos_before_press.x;
-                                dragged_offset.y = mouse_pos_game.y - mouse_pos_before_press.y;
-                            }*/
-
                             dragged_offset.x = mouse_pos_game.x - mouse_pos_before_press.x;
                             dragged_offset.y = mouse_pos_game.y - mouse_pos_before_press.y;
 
@@ -1010,9 +859,9 @@ namespace lof {
                                 for (std::string name : batches) {
 
                                     //std::cout << name << " " << texture_name << std::endl;
-                                    size_t found = texture_name.find(name);
+                                    size_t name_found = texture_name.find(name);
 
-                                    if (found != std::string::npos) {
+                                    if (name_found != std::string::npos) {
 
                                         //std::cout << "found " << std::endl;
                                         for (auto& paired : batch_and_button) {
@@ -1040,9 +889,9 @@ namespace lof {
                                     for (std::string name : batches) {
 
                                         //std::cout << name << " " << texture_name << std::endl;
-                                        size_t found = texture_name.find(name);
+                                        size_t batch_found = texture_name.find(name);
 
-                                        if (found != std::string::npos) {
+                                        if (batch_found != std::string::npos) {
 
                                             //std::cout << "found " << std::endl;
                                             for (auto& paired : batch_and_button) {
@@ -1155,7 +1004,6 @@ namespace lof {
                         //        }
                         //    }
                         //}
-
 
                         for (auto it = animation_list.begin(); it != animation_list.end(); ++it) {
                             std::string selected_ani_condition = "Animation For: " + it->first;
@@ -1535,7 +1383,7 @@ namespace lof {
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
 
-                                    if (name == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                    if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
                                         ;
                                     }
                                     else {
@@ -1596,7 +1444,7 @@ namespace lof {
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
 
-                                    if (name == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                    if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
                                         ;
                                     }
                                     else {
@@ -1832,29 +1680,6 @@ namespace lof {
 #if 0
                     else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Audio", ""))) != std::string::npos) {
 
-                        //AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
-                        /*std::cout << "------------------------------------" << std::endl;
-                        std::cout << "BEFORE DELETION" << std::endl;
-                        for (auto& system : ECSM.get_systems()) {
-                            if (system->get_type() == "Audio_System") {
-                                auto* audio_system = static_cast<Audio_System*>(system.get());
-
-                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
-                                for (auto& channel : audio_system->get_channel_map()) {
-                                    std::cout << channel.first << std::endl;
-                                }
-
-                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
-                                audio_system->get_active_channels();
-                            }
-                        }
-                        std::cout << "CHECKING SOUND MAP" << std::endl;
-                        auto& sound_map = ADM.get_sound_map();
-                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
-                            std::cout << it->first << std::endl;
-                        }
-                        std::cout << "------------------------------------" << std::endl;*/
-
                         //Get the filepath
                         std::string filepath = temp;
 
@@ -1953,27 +1778,6 @@ namespace lof {
                             std::cerr << "File does not exist.\n";
                         }
 
-                        /*std::cout << "------------------------------------" << std::endl;
-                        std::cout << "AFTER DELETION" << std::endl;
-                        for (auto& system : ECSM.get_systems()) {
-                            if (system->get_type() == "Audio_System") {
-                                auto* audio_system = static_cast<Audio_System*>(system.get());
-
-                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
-                                for (auto& channel : audio_system->get_channel_map()) {
-                                    std::cout << channel.first << std::endl;
-                                }
-
-                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
-                                audio_system->get_active_channels();
-                            }
-                        }
-                        std::cout << "CHECKING SOUND MAP" << std::endl;
-                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
-                            std::cout << it->first << std::endl;
-                        }
-                        std::cout << "------------------------------------" << std::endl;*/
-
                     }
 
 #endif 
@@ -2004,30 +1808,6 @@ namespace lof {
                             }
                         }
 
-
-                        ////AUDIO - Channel Map Not Working (Repetition Issue); Sound map Working
-                        //std::cout << "------------------------------------" << std::endl;
-                        //std::cout << "BEFORE DELETION" << std::endl;
-                        //for (auto& system : ECSM.get_systems()) {
-                        //    if (system->get_type() == "Audio_System") {
-                        //        auto* audio_system = static_cast<Audio_System*>(system.get());
-
-                        //        std::cout << "CHECKING CHANNEL MAP" << std::endl;
-                        //        for (auto& channel : audio_system->get_channel_map()) {
-                        //            std::cout << channel.first << std::endl;
-                        //        }
-
-                        //        std::cout << "GET ACTIVE CHANNELS" << std::endl;
-                        //        audio_system->get_active_channels();
-                        //    }
-                        //}
-                        //std::cout << "CHECKING SOUND MAP" << std::endl;
-                        //auto& sound_map = ADM.get_sound_map();
-                        //for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
-                        //    std::cout << it->first << std::endl;
-                        //}
-                        //std::cout << "------------------------------------" << std::endl;
-
                         //try to find and remove audio
                         ASM.find_and_remove_audio(filename);
 
@@ -2048,46 +1828,10 @@ namespace lof {
                             std::cerr << "Failed to remove file: " << filename << std::endl;
                         }
 
-                        /*std::cout << "------------------------------------" << std::endl;
-                        std::cout << "AFTER DELETION" << std::endl;
-                        for (auto& system : ECSM.get_systems()) {
-                            if (system->get_type() == "Audio_System") {
-                                auto* audio_system = static_cast<Audio_System*>(system.get());
-
-                                std::cout << "CHECKING CHANNEL MAP" << std::endl;
-                                for (auto& channel : audio_system->get_channel_map()) {
-                                    std::cout << channel.first << std::endl;
-                                }
-
-                                std::cout << "GET ACTIVE CHANNELS" << std::endl;
-                                audio_system->get_active_channels();
-                            }
-                        }
-                        std::cout << "CHECKING SOUND MAP" << std::endl;
-                        for (auto it = sound_map.begin(); it != sound_map.end(); ++it) {
-                            std::cout << it->first << std::endl;
-                        }
-                        std::cout << "------------------------------------" << std::endl;*/
-
                     }
-                    /*else if ((start_pos_of_folder_filepath = temp.find(ASM.get_full_path("Scenes", ""))) != std::string::npos) {
-                        std::filesystem::remove(temp);
-                    }*/
                     else {
 
                         std::filesystem::remove(temp);
-
-                        /*ImGui::OpenPopup("Warning Message");
-                        if (ImGui::BeginPopup("Warning Message")) {
-                            ImVec4 text_color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-                            ImGui::PushStyleColor(ImGuiCol_Text, text_color);
-                            ImGui::Text("Note: If file is deleted, game will not work when reloaded!");
-                            if (ImGui::Button("Delete Anyway")) {
-                                std::filesystem::remove(temp);
-                            }
-                            ImGui::PopStyleColor();
-                            ImGui::EndPopup();
-                        }*/
                     }
 
                 }
@@ -2230,30 +1974,6 @@ namespace lof {
                             current_directory == ASM.get_full_path("Level_Design", "")) {
 
                             asset_browser_pop_up(show_msg, "N/A Message", "  Dragging Not Available For Asset Type  ");
-
-                            //if (show_msg) {
-                            //    ImGui::OpenPopup("N/A Message");
-                            //    ImVec2 popup_position = ImVec2(750, 750);  // Choose a fixed position
-                            //    ImGui::SetNextWindowPos(popup_position);
-                            //    if (ImGui::BeginPopup("N/A Message")) {
-                            //        // Customizing the text size and color
-                            //        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); // Use a custom or default font with larger size (if desired)
-                            //        ImVec4 text_color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red color for the text
-                            //        ImGui::PushStyleColor(ImGuiCol_Text, text_color);
-                            //        ImGui::NewLine();
-                            //        // Show the message
-                            //        ImGui::Text("  Dragging Not Available For Asset Type  ");
-                            //        ImGui::NewLine();
-                            //        // Reset styles to default
-                            //        ImGui::PopStyleColor();
-                            //        ImGui::PopFont();
-                            //        // Close button
-                            //        if (ImGui::Button("Close Message")) {
-                            //            show_msg = false;  // Close the message popup
-                            //        }
-                            //        ImGui::EndPopup();
-                            //    }
-                            //}
                         }
 
                         //accessing each file in the current directory
@@ -2439,8 +2159,8 @@ namespace lof {
         return current_file_shown;
     }
 
-    void IMGUI_Manager::asset_browser_pop_up(bool& show_msg, const char* popup_name, const char* message) {
-        if (show_msg) {
+    void IMGUI_Manager::asset_browser_pop_up(bool& show_popup, const char* popup_name, const char* message) {
+        if (show_popup) {
             ImGui::OpenPopup(popup_name);
 
             ImVec2 popup_position = ImVec2(750, 750);
@@ -2537,9 +2257,6 @@ namespace lof {
 
                     if (pos != std::string::npos) {
                         base_texture_name.erase(pos);
-
-                        /* std::pair<std::string, std::string> paired = std::make_pair(entity.get()->get_name(), base_texture_name);
-                         batch_and_button.push_back(paired);*/
 
                         for (auto& pair : batch_and_button) {
                             if (pair.first == entity.get()->get_name()) {
