@@ -15,8 +15,6 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
 #include "../Manager/Game_Manager.h"
-//#include "Collision_System.h"
-//#include "../System/GUI_System.h"  // Add this for GUI system access
 #include "../Utility/globals.h"    // To access level_editor_mode
 
 namespace lof {
