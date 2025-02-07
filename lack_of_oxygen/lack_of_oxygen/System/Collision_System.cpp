@@ -1154,6 +1154,7 @@ namespace lof {
                             }
                             catch (const std::exception& e) {
                                 // Handle exception
+                                LM.write_log("Error processing mineral deposit: %s", e.what());
                             }
                         }
                     }
@@ -1446,6 +1447,8 @@ namespace lof {
 
 
     void Collision_System::check_main_menu_button_collision(float delta_time) {
+        (void)delta_time;  // Mark as intentionally unused
+
         if (current_cooldown > 0.0f) {
             return;  // Still in cooldown
         }
@@ -1571,9 +1574,9 @@ namespace lof {
                             EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                             if (playerId != INVALID_ENTITY_ID) {
                                 if (ECSM.has_component<Transform2D>(playerId)) {
-                                    auto& transform = ECSM.get_component<Transform2D>(playerId);
-                                    transform.position = Vec2D(0.0f, 0.0f);
-                                    transform.prev_position = transform.position;
+                                    auto& player_transform = ECSM.get_component<Transform2D>(playerId);
+                                    player_transform.position = Vec2D(0.0f, 0.0f);
+                                    player_transform.prev_position = player_transform.position;
                                 }
                                 if (ECSM.has_component<Velocity_Component>(playerId)) {
                                     auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
@@ -1655,6 +1658,7 @@ namespace lof {
     }
 
     void Collision_System::check_credits_back_button_collision(float delta_time) {
+        (void)delta_time;  // Mark as intentionally unused
 
         if (current_cooldown > 0.0f) {
             return;  // Still in cooldown
@@ -1777,9 +1781,6 @@ namespace lof {
 
         // Return early if we're transitioning
         if (is_transitioning) return;
-
-        static float transition_cooldown = 0.5f;  // Add a cooldown timer
-        static float current_cooldown = 0.0f;     // Track current cooldown
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 

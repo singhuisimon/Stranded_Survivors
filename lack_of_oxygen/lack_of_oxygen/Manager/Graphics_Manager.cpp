@@ -139,10 +139,6 @@ namespace lof {
         ASM.unload_models();
         ASM.unload_textures();
         ASM.unload_animations();
-        /*model_storage.clear();
-        texture_storage.clear();
-        animation_storage.clear();
-        font_storage.clear();*/
 
         // Free imgui framebuffer and tex object
         glDeleteFramebuffers(1, &imgui_fbo);
@@ -378,18 +374,6 @@ namespace lof {
     GLboolean Graphics_Manager::add_animations(const std::string& file_name) {
         return ASM.load_animations(file_name);
     }
-
-    // Return reference to model storage
-    //Graphics_Manager::MODELS& Graphics_Manager::get_model_storage() { return model_storage; }
-
-    // Return reference to texture storage
-    //Graphics_Manager::TEXTURES& Graphics_Manager::get_texture_storage() { return texture_storage; }
-
-    // Return reference to animation storage
-    //Graphics_Manager::ANIMATIONS& Graphics_Manager::get_animation_storage() { return animation_storage; }
-
-    // Return reference to font storage
-    //Graphics_Manager::FONTS& Graphics_Manager::get_font_storage() { return font_storage; }
 
     // Return state of current render mode
     GLenum& Graphics_Manager::get_render_mode() { return render_mode; }

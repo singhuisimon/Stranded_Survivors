@@ -207,6 +207,17 @@ namespace lof {
         //    LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
         //}
 
+        if (current_scene != 2) {
+            EntityID fps_counter_id = ECSM.find_entity_by_name("fps_counter");
+            if (fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(fps_counter_id)) {
+                auto& text_comp = ECSM.get_component<Text_Component>(fps_counter_id);
+                float current_fps = FPSM.get_current_fps();
+                std::stringstream ss;
+                ss << "FPS: " << std::fixed << std::setprecision(1) << current_fps;
+                text_comp.text = ss.str();
+            }
+        }
+
         // Check for game over condition based on input, before IM update
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             set_game_over(true);
