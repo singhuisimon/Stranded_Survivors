@@ -208,7 +208,16 @@ namespace lof {
         //    LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
         //}
 
-        if (current_scene != 2) {
+        // Set display fps flag to true or false when key 'F' is pressed
+        if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == false) {
+            display_fps = true;
+        }
+        else if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == true) {
+            display_fps = false;
+        }
+
+        // Display fps only when fps flag is true for menu and other non-game scenes
+        if (current_scene != 2 && display_fps == true) {
             EntityID fps_counter_id = ECSM.find_entity_by_name("fps_counter");
             if (fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(fps_counter_id)) {
                 auto& text_comp = ECSM.get_component<Text_Component>(fps_counter_id);
@@ -216,6 +225,13 @@ namespace lof {
                 std::stringstream ss;
                 ss << "FPS: " << std::fixed << std::setprecision(1) << current_fps;
                 text_comp.text = ss.str();
+            }
+        }
+        else {
+            EntityID fps_counter_id = ECSM.find_entity_by_name("fps_counter");
+            if (fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(fps_counter_id)) {
+                auto& text_comp = ECSM.get_component<Text_Component>(fps_counter_id);
+                text_comp.text = "";
             }
         }
 
@@ -464,14 +480,6 @@ namespace lof {
                         base_position.y - METER_SPACING / 1.5f   // Vertically centered between meters
                     };
                     timer_icon_transform.prev_position = timer_icon_transform.position;
-                }
-
-                // Set display fps flag to true or false when key 'F' is pressed
-                if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == false) {
-                    display_fps = true;
-                }
-                else if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == true) {
-                    display_fps = false;
                 }
 
                 // Display fps if fps flag is true
