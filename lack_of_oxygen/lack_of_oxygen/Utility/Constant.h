@@ -205,7 +205,7 @@ namespace lof {
 	constexpr unsigned int GOD_STRENGTH = 20;			//extra god strength
 
 	// ------------------------------ Particle_System.cpp --------------------------------
-	constexpr const unsigned int MAX_PARTICLES = 1000;
+	constexpr const unsigned int MAX_PARTICLES = 2000;
 
 	enum ParticleType {
 		walking = 1,

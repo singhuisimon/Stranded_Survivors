@@ -72,14 +72,14 @@ namespace lof {
     };
 
     
-    struct PointLine{
-        Vec2D center; //this will be player's center
-        Vec2D edge; //this is the edge extending the player 
+    //struct PointLine{
+    //    Vec2D center; //this will be player's center
+    //    Vec2D edge; //this is the edge extending the player 
 
-        PointLine(const Vec2D& center, const Vec2D& edge); 
+    //    PointLine(const Vec2D& center, const Vec2D& edge); 
 
-       // PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
-    };
+    //   // PointLine create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision);
+    //};
 
     // extern SelectedEntityInfo g_selected_Entity_Info;
      /**
@@ -226,9 +226,20 @@ namespace lof {
 
 
         /*
-        @brief Checks if an entity is a vent
+        * @brief Checks if an entity is a vent type object by check its name 
+        * @param id the EntityID to check
+        * @return true if the entity's name contains "vent"
+        * @return false otherwise
         */
         bool is_vent_entity(EntityID id) const;
+
+        /*
+        * @brief Handles collision interactions between an entity and a vent
+        * @param entity The EntityID of the entity interacting with the vent
+        * @param vent The EntityID of the vent being interacted with 
+        * @param delta_time fixed delta_time
+        * @param is_grounded Reference to flage indicating if entity is on the ground
+        */
         void handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded);
 
         /**

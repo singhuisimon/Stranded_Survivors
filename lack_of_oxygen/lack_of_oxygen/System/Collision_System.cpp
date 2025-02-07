@@ -56,9 +56,9 @@ namespace lof {
         return AABB(min, max);
     }
 
+    /*
     PointLine::PointLine(const Vec2D& center, const Vec2D& edge) 
         : center(center), edge(edge){}
-    /*
     //to be emerged from the player 
     PointLine PointLine::create_Line(const Transform2D& transform, const CollisionSide side, const Collision_Component& collision) {
         Vec2D center {transform.position.x, transform.position.y};
@@ -327,6 +327,10 @@ namespace lof {
             collision_check_scene2(collisions, delta_time);
         }
     }
+
+    /*
+    * @brief Checks whether the entity has vent in their names, vent_prefab, vent_strip
+    */
 
     bool Collision_System::is_vent_entity(EntityID id) const {
         auto* entity = ECSM.get_entity(id); 
@@ -1150,6 +1154,7 @@ namespace lof {
                             }
                             catch (const std::exception& e) {
                                 // Handle exception
+                                LM.write_log("Error processing mineral deposit: %s", e.what());
                             }
                         }
                     }
@@ -1263,248 +1268,9 @@ namespace lof {
     * @param collisions A vector of `CollisionPair` objects representing collisions between entities.
     */
 
-#if 0
-   // ASH OLD CODE
-    //this baby got some TOP COLLISION RESOLUTION PROBLEMS BOI
-    void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
-        // Store the last frame's collision states
-        static bool had_left_collision = false;
-        static bool had_right_collision = false;
-        static float last_collision_time = 0.0f;
-        static const float COLLISION_MEMORY_TIME = 0.1f;
-
-        // Constants for collision response tuning
-        const float PENETRATION_TOLERANCE = 0.005f;   // Reduced from 0.01f for less sinking
-        const float CORRECTION_FACTOR = 0.15f;        // Reduced from 0.2f for gentler correction
-        const float VELOCITY_DAMPING = 0.8f;          // Added to smooth out collision responses
-        //const float MIN_VELOCITY = 0.01f;             // Threshold for zeroing out small velocities
-
-        // Update collision states
-        for (const auto& collision : collisions) {
-
-            if (collision.side == CollisionSide::LEFT) {
-                had_left_collision = true;
-                last_collision_time = collision.collide_time; 
-            }
-            if (collision.side == CollisionSide::RIGHT) {
-                had_right_collision = true;
-                last_collision_time = collision.collide_time;
-            }
-        }
-
-        // Reset states if too much time has passed
-
-        if (frame_counter - last_collision_time > COLLISION_MEMORY_TIME) {
-            had_left_collision = false;
-            had_right_collision = false;
-        }
-
-        // Check for vertical gap scenario
-        bool is_in_vertical_gap = had_left_collision && had_right_collision;
-
-        // Process collisions
-        for (const auto& collision : collisions) {
-            EntityID entityA = collision.entity1;
-            auto& physicsA = ECSM.get_component<Physics_Component>(entityA);
-            auto& transformA = ECSM.get_component<Transform2D>(entityA);
-            auto& velocityA = ECSM.get_component<Velocity_Component>(entityA);
-
-
-
-            if (!physicsA.get_is_static()) {
-                Vec2D normal(0.0f, 0.0f);
-                if (collision.side == CollisionSide::LEFT) normal = Vec2D(1.0f, 0.0f);
-                else if (collision.side == CollisionSide::RIGHT) normal = Vec2D(-1.0f, 0.0f);
-                else if (collision.side == CollisionSide::TOP) normal = Vec2D(0.0f, -1.0f);
-                else if (collision.side == CollisionSide::BOTTOM) normal = Vec2D(0.0f, 1.0f);
-
-                if (is_in_vertical_gap && (collision.side == CollisionSide::LEFT || collision.side == CollisionSide::RIGHT) && (SM.scene_switch() == 2)) {
-                    // Special handling for vertical gap
-                    velocityA.velocity.x = 0.0f;
-                    physicsA.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-                    physicsA.set_is_grounded(false);
-
-                    float minimal_correction = 0.05f; // Reduced from 0.1f
-                    // Minimal position correction to prevent sticking
-                    float correction_x = (collision.side == CollisionSide::LEFT) ? minimal_correction : -minimal_correction;
-                    transformA.position.x += correction_x;
-                    continue;
-                }
-
-                // Normal collision handling
-                Vec2D relative_velocity = velocityA.velocity * VELOCITY_DAMPING;
-
-                float restitution = (collision.side == CollisionSide::BOTTOM) ? 0.0f : 0.05f; //reduced from 0.1f to 0.05f
-
-                float impulse_scalar = -(1.0f + restitution) * dot_product_vec2d(relative_velocity, normal);
-                impulse_scalar /= physicsA.get_inv_mass();
-                Vec2D impulse = normal * impulse_scalar;
-                velocityA.velocity += impulse * physicsA.get_inv_mass();
-
-  
-                Vec2D correction(0.0f, 0.0f);
-
-                if (collision.overlap.y > PENETRATION_TOLERANCE) {
-
-                    float correction_magnitude = (collision.overlap.y - PENETRATION_TOLERANCE) * CORRECTION_FACTOR;
-                    correction = normal * correction_magnitude;
-
-                    if (collision.side == CollisionSide::BOTTOM) {
-                        correction.x = 0.0f;
-                        physicsA.set_is_grounded(true);
-                        physicsA.set_has_jumped(false);
-                        physicsA.set_gravity(Vec2D(0.0f, 0.0f));
-
-                        //zero out very small vertical velocity
-                        if (std::abs(velocityA.velocity.y) < 0.1f) {
-                            velocityA.velocity.y = 0.0f;
-                        }
-                    }
-                    //for side collisions, reduce horizontal correction
-                    else if (collision.side == CollisionSide::LEFT ||
-                        collision.side == CollisionSide::RIGHT) {
-                        correction *= 0.1f; //reduce horizontal push back
-                    }
-                    else if (collision.side == CollisionSide::TOP) {
-                        //stop the upward movement
-                        velocityA.velocity.y = 0.0f; 
-                        correction.y = -10.0f; 
-
-                        // Cancel any upward forces
-                        Vec2D acc_force = physicsA.get_accumulated_force();
-                        if (acc_force.y > 0) acc_force.y = 0.0f;
-                        physicsA.set_accumulated_force(acc_force);
-
-                        // Reset jump state
-                        physicsA.set_has_jumped(false);
-                        physicsA.reset_jump_request();
-                    }
-                }
-
-                transformA.position += correction;
-
-                //additional velocity dampening for horizontal collisions
-                if (collision.side == CollisionSide::LEFT ||
-                    collision.side == CollisionSide::RIGHT) {
-                    velocityA.velocity.x = 0.0f; //reduce horizontal velocity
-                }
-            }
-        }
-    }
-
-#endif
-
-#if 0
-    //bottom bouncy code but other sides work fine. ;-;
-    void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
-        // Constants for collision response
-        const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
-        const float MIN_PENETRATION = 0.001f; // Minimum penetration to respond to
-        const float POSITION_CORRECTION = 1.5f; // Increased from 0.8f for more immediate correction
-
-        for (const auto& collision : collisions) {
-            EntityID entity1 = collision.entity1;
-            EntityID entity2 = collision.entity2;
-
-            auto& transform1 = ECSM.get_component<Transform2D>(entity1);
-            auto& velocity1 = ECSM.get_component<Velocity_Component>(entity1);
-            auto& physics1 = ECSM.get_component<Physics_Component>(entity1);
-
-            // Skip if entity is static
-            if (physics1.get_is_static()) continue;
-
-            // Get collision normal based on collision side
-            Vec2D normal(0.0f, 0.0f);
-            switch (collision.side) {
-            case CollisionSide::LEFT:   normal = Vec2D(1.0f, 0.0f); break;
-            case CollisionSide::RIGHT:  normal = Vec2D(-1.0f, 0.0f); break;
-            case CollisionSide::TOP:    normal = Vec2D(0.0f, -1.0f); break;
-            case CollisionSide::BOTTOM: normal = Vec2D(0.0f, 1.0f); break;
-            default: continue;
-            }
-
-            // Calculate relative velocity
-            Vec2D relative_velocity = velocity1.velocity;
-
-            // Handle specific collision sides
-            if (collision.side == CollisionSide::BOTTOM) {
-                // Ground collision - completely stop vertical movement
-                physics1.set_is_grounded(true);
-                physics1.set_has_jumped(false);
-                physics1.set_gravity(Vec2D(0.0f, 0.0f));
-                velocity1.velocity.y = 0.0f;
-
-
-                // Position correction
-                if (collision.overlap.y > MIN_PENETRATION) {
-                    transform1.position.y += collision.overlap.y * POSITION_CORRECTION;
-                }
-
-
-                // Zero out accumulated vertical force
-                Vec2D acc_force = physics1.get_accumulated_force();
-                acc_force.y = 0.0f;
-                physics1.set_accumulated_force(acc_force);
-            }
-            else if (collision.side == CollisionSide::TOP) {
-                // Ceiling collision - immediately stop upward movement and forces
-                velocity1.velocity.y = 0.0f;
-                physics1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-
-                // Immediate position correction for ceiling
-                if (collision.overlap.y > MIN_PENETRATION) {
-                    transform1.position.y -= collision.overlap.y * POSITION_CORRECTION;
-                }
-
-                // Cancel all upward forces and jumping state
-                Vec2D acc_force = physics1.get_accumulated_force();
-                acc_force.y = 0.0f;  // Zero out vertical force
-                physics1.set_accumulated_force(acc_force);
-                physics1.set_has_jumped(false);  // Reset jump state
-                physics1.reset_jump_request();    // Reset any pending jump request
-
-                // Reset jump-related forces
-                physics1.force_helper.deactivate_force(JUMP_UP);
-            }
-            else {
-                // Side collisions (LEFT/RIGHT)
-                velocity1.velocity.x = 0.0f;
-
-                // Position correction for walls
-                if (collision.overlap.x > MIN_PENETRATION) {
-                    float correction = collision.overlap.x * POSITION_CORRECTION;
-                    if (collision.side == CollisionSide::LEFT) {
-                        transform1.position.x += correction;
-                    }
-                    else {
-                        transform1.position.x -= correction;
-                    }
-                }
-
-                // Cancel horizontal forces in collision direction
-                Vec2D acc_force = physics1.get_accumulated_force();
-                if (collision.side == CollisionSide::LEFT && acc_force.x < 0) {
-                    acc_force.x = 0.0f;
-                }
-                else if (collision.side == CollisionSide::RIGHT && acc_force.x > 0) {
-                    acc_force.x = 0.0f;
-                }
-                physics1.set_accumulated_force(acc_force);
-            }
-
-            // Update previous position to match corrected position
-            transform1.prev_position = transform1.position;
-        }
-    }
-
-#endif
-
 #if 1
-    //first and second one combined. 
-    //bottom bouncy code but other sides work fine. ;-;
     void Collision_System::resolve_collision_event(const std::vector<CollisionPair>& collisions) {
         // Constants for collision response
-        //const float RESTITUTION = 0.0f;  // Perfect inelastic collision for platformer feel
         const float MIN_PENETRATION = 0.001f; // Minimum penetration to respond to
         const float TOP_POSITION_CORRECTION = 2.f; 
         const float POSITION_CORRECTION = 1.0f; // Increased from 0.8f for more immediate correction
@@ -1681,6 +1447,8 @@ namespace lof {
 
 
     void Collision_System::check_main_menu_button_collision(float delta_time) {
+        (void)delta_time;  // Mark as intentionally unused
+
         if (current_cooldown > 0.0f) {
             return;  // Still in cooldown
         }
@@ -1806,9 +1574,9 @@ namespace lof {
                             EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                             if (playerId != INVALID_ENTITY_ID) {
                                 if (ECSM.has_component<Transform2D>(playerId)) {
-                                    auto& transform = ECSM.get_component<Transform2D>(playerId);
-                                    transform.position = Vec2D(0.0f, 0.0f);
-                                    transform.prev_position = transform.position;
+                                    auto& player_transform = ECSM.get_component<Transform2D>(playerId);
+                                    player_transform.position = Vec2D(0.0f, 0.0f);
+                                    player_transform.prev_position = player_transform.position;
                                 }
                                 if (ECSM.has_component<Velocity_Component>(playerId)) {
                                     auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
@@ -1890,6 +1658,7 @@ namespace lof {
     }
 
     void Collision_System::check_credits_back_button_collision(float delta_time) {
+        (void)delta_time;  // Mark as intentionally unused
 
         if (current_cooldown > 0.0f) {
             return;  // Still in cooldown
@@ -2012,9 +1781,6 @@ namespace lof {
 
         // Return early if we're transitioning
         if (is_transitioning) return;
-
-        static float transition_cooldown = 0.5f;  // Add a cooldown timer
-        static float current_cooldown = 0.0f;     // Track current cooldown
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 

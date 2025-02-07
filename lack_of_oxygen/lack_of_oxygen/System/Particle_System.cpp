@@ -14,6 +14,7 @@
 
 namespace lof {
 
+	// Constructor for Particle_System
 	Particle_System::Particle_System() {
 
 		// Begin the counter for number of active particles
@@ -219,10 +220,12 @@ namespace lof {
 		particle_base.emplace("TNT_VFX", tnt_vfx);
 	}
 
+	// Returns the system's type
     std::string Particle_System::get_type() const {
         return "Particle_System";
     }
 
+	// Updates the particles' data based on time
 	void Particle_System::update(float delta_time) {
 		
 		// Update every particles
@@ -289,7 +292,7 @@ namespace lof {
 
 	}
 
-	// This destroys a particle once its lifetime is over
+	// Destroys a particle
 	void Particle_System::particle_destroy(int destroy_id) {
 		particles_storage[active_particles - 1].id = particles_storage[destroy_id].id;
 		particles_storage[destroy_id] = particles_storage[active_particles - 1];
@@ -298,16 +301,13 @@ namespace lof {
 		LM.write_log("Particle ID %d is destroyed. Particle count is %d", destroy_id, active_particles);
 	}
 
-	// Returns the particle count
-	unsigned int Particle_System::get_particles_count() {
-		return active_particles;
-	}
+	// Returns the count of particles
+	unsigned int Particle_System::get_particles_count() { return active_particles; }
 
-	Particle_System::PARTICLES& Particle_System::get_particle_storage() {
-		return particles_storage;
-	}
+	// Returns a reference to the particle storage
+	Particle_System::PARTICLES& Particle_System::get_particle_storage() { return particles_storage; }
 
-	// Returns a random value between 0.0f to 1.0f
+	// Gets a random float value between 0.0f to 1.0f
 	float Particle_System::get_rand_float() {
 		return (float)rand_distribution(part_rand_engine) / (float)std::numeric_limits<uint32_t>::max(); 
 	}

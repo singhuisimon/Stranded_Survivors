@@ -12,8 +12,6 @@
 #ifndef LOF_PARTICLE_SYSTEM_H
 #define LOF_PARTICLE_SYSTEM_H
 
-
-
  // Include file dependencies
 #include "System.h"
 #include "../Manager/ECS_Manager.h"
@@ -24,8 +22,8 @@
 #include "../Utility/constant.h"    // To access constants 
 #include "../Utility/Clock.h"       // To monitor time delay
 
-#include <array>
-#include <random>
+#include <array>    // To store particle objects
+#include <random>   // For getting random values
 
 
 namespace lof {
@@ -34,7 +32,6 @@ namespace lof {
      * @brief System responsible for updating animation and frames sequence.
      */
     class Particle_System : public System {
-        //friend class Render_System;
 
         // Data for the particles
         struct Particle_Data {
@@ -79,19 +76,37 @@ namespace lof {
          */
         void update(float delta_time) override;
 
-        // This creates and sets the parameters needed to emit particles for an event
+        /**
+         * @brief Creates a particle for emission
+         * @param type Particle type
+         * @param pos Particle position
+         * @param col Particle color
+         * @param lifespan Particle's lifespan. Defaulted to 0.0f to take base particles' lifespan
+         */
         void particle_emit(std::string type, Vec2D pos, Vec3D col, float lifespan = 0.0f);
 
-        // This destroys a particle once its lifetime is over
+        /**
+         * @brief Destroys a particle
+         * @param destroy_id The id of the particle to be destroyed
+         */
         void particle_destroy(int destroy_id);
 
-        // Returns the particle count
+        /**
+         * @brief Returns the count of particles
+         * @return The particle count
+         */
         unsigned int get_particles_count();
 
-        // Returns the particle storage
+        /**
+         * @brief Returns a reference to the particle storage
+         * @return Reference to particle storage
+         */
         PARTICLES& get_particle_storage();
 
-        // Returns a random value between 0.0f to 1.0f
+        /**
+         * @brief Gets a random float value between 0.0f to 1.0f
+         * @return A random float value between 0.0f to 1.0f
+         */
         float get_rand_float();
 
     };
