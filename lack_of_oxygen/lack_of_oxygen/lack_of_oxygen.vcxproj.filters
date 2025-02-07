@@ -47,8 +47,6 @@
     <ClCompile Include="System\Particle_System.cpp" />
     <ClCompile Include="Manager\Logic_Manager.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
-    <ClCompile Include="Scripts\Mining_Script.cpp" />
-    <ClCompile Include="Scripts\TNT_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -94,12 +92,9 @@
     <ClInclude Include="Utility\Win_Control.h" />
     <ClInclude Include="Manager\Audio_Manager.h" />
     <ClInclude Include="System\Particle_System.h" />
-    <ClInclude Include="Component\Logic_Components.h" />
     <ClInclude Include="Manager\Logic_Manager.h" />
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
-    <ClInclude Include="Scripts\Mining_Script.h" />
-    <ClInclude Include="Scripts\TNT_Script.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +109,7 @@
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\win_screen.scn" />
+    <None Include="Assets\Level_Design\Level_Design_V2.csv" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -140,6 +136,12 @@
     <Media Include="Assets\Audio\sfx_mineral_block_hit.wav" />
     <Media Include="Assets\Audio\sfx_mineral_deposit.wav" />
     <Media Include="Assets\Audio\sfx_oxygen_refill.wav" />
+    <Media Include="Assets\Audio\sfx_air_vent_in.wav" />
+    <Media Include="Assets\Audio\sfx_air_vent_out.wav" />
+    <Media Include="Assets\Audio\sfx_button_hover.wav" />
+    <Media Include="Assets\Audio\sfx_mainmenu_button.wav" />
+    <Media Include="Assets\Audio\sfx_tnt_boom.wav" />
+    <Media Include="Assets\Audio\sfx_tnt_fuse.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />
@@ -213,6 +215,7 @@
     <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
     <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
     <Image Include="..\..\..\..\Users\shsim\Downloads\ART - ALL UI ASSETS FROM UNITY - 31 Jan 2025\ALL UI ASSETS FROM UNITY - 31 Jan 2025\GAME UI\Pop Up Stations - GAME_UI\Minerals Station\Mineral Deposit UI_BG_Batch 14.png" />
+    <Image Include="Assets\Textures\Purple_Oxy_Warning_Batch_14.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />
