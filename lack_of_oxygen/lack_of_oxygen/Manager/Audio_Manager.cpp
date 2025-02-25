@@ -400,7 +400,7 @@ namespace lof {
 		bool pause;
 		mastergroup->getPaused(&pause);
 
-		if (level_editor_mode && pause) {
+		if (!game_playing && pause) {
 			return;
 		}
 

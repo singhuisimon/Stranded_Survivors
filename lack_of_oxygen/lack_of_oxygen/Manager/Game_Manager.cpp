@@ -43,6 +43,7 @@
 
 namespace lof {
 
+    static bool prev_pasued = false;
     float imgui_camara_pos_x = 0.0f;
     float imgui_camera_pos_y = 0.0f;
     unsigned int mining_strength = DEFAULT_STRENGTH;
@@ -183,7 +184,7 @@ namespace lof {
     }
 
   
-
+    
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
@@ -247,9 +248,19 @@ namespace lof {
             ADM.pause_resume_mastergroup();
         }
 
+        ////to ensure sound pause during level_editor_mode
+        //if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        //    ADM.pause_resume_mastergroup();
+        //}
+
         //to ensure sound pause during level_editor_mode
-        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        if (!game_playing) {
             ADM.pause_resume_mastergroup();
+            prev_pasued = true;
+        }
+        else if (prev_pasued){
+            ADM.pause_resume_mastergroup();
+            prev_pasued = false;
         }
 
         ////commented out this is for me to test - Amanda
@@ -277,7 +288,7 @@ namespace lof {
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
         // Code portion if in gameplay mode or player exists
-        if (player_id != INVALID_ENTITY_ID && !level_editor_mode) {  // If player entity exists
+        if (player_id != INVALID_ENTITY_ID && game_playing) {  // If player entity exists
 
             // Add oxygen update logic here, before the UI positioning
             oxygen_update_timer += delta_time;
@@ -1347,7 +1358,7 @@ namespace lof {
                 collision = &ECSM.get_component<Collision_Component>(selectedID);
             }
 
-            if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
+            /*if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_DOWN)))
             {
                 std::cout << selectedID << " scaling up in level editor\n";
                 transform.scale.x += scale_change;
@@ -1394,7 +1405,7 @@ namespace lof {
             else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT)))
             {
                 transform.orientation.x -= rot_change;
-            }
+            }*/
         }
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #endif

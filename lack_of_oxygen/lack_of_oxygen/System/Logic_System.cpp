@@ -68,7 +68,12 @@ namespace lof {
         //check for those that have logic component
         //after that loop to get the script name and ensure to update or based off entity state to call upon the script function
         
-        if (level_editor_mode) {
+        //if (level_editor_mode) {
+        //    //LM.write_log("Logic_System updating script in level editor mode");
+        //    return;
+        //}
+
+        if (!game_playing) {
             //LM.write_log("Logic_System updating script in level editor mode");
             return;
         }

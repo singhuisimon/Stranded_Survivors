@@ -32,6 +32,7 @@
 using namespace lof;
 
 bool level_editor_mode = false;
+bool game_playing = true;
 GLFWwindow* window = nullptr;
 //float delta_time = 0.0f;
 bool is_full_screen = true;
@@ -283,6 +284,9 @@ int main(void) {
 
             //Ensures in game GUI is disabled when in level editor
             IMGUIM.disable_GUI();
+        }
+        else if (game_playing == false) {
+            game_playing = true;
         }
 
         // Rendering IMGUI

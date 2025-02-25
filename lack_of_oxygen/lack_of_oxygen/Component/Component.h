@@ -385,8 +385,8 @@ namespace lof {
          */
         /*void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
             float volume, float pitch, bool islooping) {*/
-        void add_sound(const std::string & key, const std::string & filepath, AudioType type, int num,
-            float volume, float pitch, bool islooping, bool is3d) {
+        void add_sound(const std::string & key = "", const std::string& filepath = "", AudioType type = SFX, int num = 1,
+            float volume = 1.0f, float pitch = 1.0f, bool islooping = false, bool is3d = false) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
                     //if key already exist update properties
