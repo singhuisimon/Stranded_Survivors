@@ -308,14 +308,14 @@ namespace lof {
             EntityID panic_meter_fill_id = ECSM.find_entity_by_name("top_ui_panik_meter_fill");
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
 
-            EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
+            //EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
             EntityID timer_icon_id = ECSM.find_entity_by_name("top_ui_timer");
-            EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
+            //EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
 
             EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
             EntityID oxygen_percentage_text_id = ECSM.find_entity_by_name("top_ui_oxygen_percentage_text");
             EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
-            EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+            //EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
             EntityID timer_count_text_id = ECSM.find_entity_by_name("top_ui_timer_count_text");
             EntityID goal_percentage_count_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
 
@@ -335,10 +335,6 @@ namespace lof {
                     player_transform.position.y + VERTICAL_OFFSET
                 };
 
-                // Update main UI overlay position
-                ui_transform.position = base_position;
-                ui_transform.prev_position = ui_transform.position;
-
                 // Position oxygen meter and fill (top meter)
                 if (oxygen_meter_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(oxygen_meter_id) &&
@@ -346,14 +342,6 @@ namespace lof {
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
                     auto& oxygen_fill_transform = ECSM.get_component<Transform2D>(oxygen_meter_fill_id);
                     auto& oxygen_fill_graphics = ECSM.get_component<Graphics_Component>(oxygen_meter_fill_id);
-
-                    // Position and scale for meter stays the same
-                    oxygen_transform.position = {
-                        base_position.x - 573.0f,
-                        base_position.y
-                    };
-                    oxygen_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
-                    oxygen_transform.prev_position = oxygen_transform.position;
 
                     // Calculate the new width of the fill bar
                     float new_width = METER_WIDTH * (current_oxygen_level / 100.0f);
@@ -391,13 +379,6 @@ namespace lof {
                     auto& oxygen_percentage_text_transform = ECSM.get_component<Transform2D>(oxygen_percentage_text_id);
                     auto& oxygen_transform = ECSM.get_component<Transform2D>(oxygen_meter_id);
 
-                    // Position oxygen text to the left of the oxygen meter
-                    oxygen_text_transform.position = {
-                        (oxygen_transform.position.x - 288.0f), // Left of meter
-                        oxygen_transform.position.y             // Vertically centered with oxygen meter
-                    };
-                    oxygen_text_transform.prev_position = oxygen_text_transform.position;
-
                     // Position oxygen percentage to the middle of oxygen meter
                     oxygen_percentage_text_transform.position = {
                         oxygen_transform.position.x,
@@ -419,14 +400,6 @@ namespace lof {
                     auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
                     auto& panic_fill_transform = ECSM.get_component<Transform2D>(panic_meter_fill_id);
 
-                    // Set position and scale for panic meter
-                    panic_transform.position = {
-                        base_position.x - 575.0f,          // Left of UI overlay
-                        base_position.y - METER_SPACING    // Below oxygen meter
-                    };
-                    panic_transform.scale = Vec2D(METER_WIDTH, METER_HEIGHT);
-                    panic_transform.prev_position = panic_transform.position;
-
                     // Calculate the new width of the panic fill bar
                     float new_width = METER_WIDTH * (current_panic_level / 100.0f);
 
@@ -438,59 +411,7 @@ namespace lof {
                         panic_transform.position.y
                     };
                     panic_fill_transform.prev_position = panic_fill_transform.position;
-                }
 
-                // Position panic text
-                if (panic_text_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(panic_text_id)) {
-                    auto& panic_text_transform = ECSM.get_component<Transform2D>(panic_text_id);
-                    auto& panic_transform = ECSM.get_component<Transform2D>(panic_meter_id);
-
-                    // Position text to the left of the panic meter
-                    panic_text_transform.position = {
-                        (panic_transform.position.x - 300.0f),  // Left of meter
-                        panic_transform.position.y              // Vertically centered with panic meter
-                    };
-                    panic_text_transform.prev_position = panic_text_transform.position;
-                }
-
-                // Position mineral texture on the right side
-                if (mineral_texture_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(mineral_texture_id)) {
-                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-
-                    mineral_transform.position = {
-                        base_position.x + 450.0f,                         // Center position
-                        base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
-                    };
-                    mineral_transform.prev_position = mineral_transform.position;
-                }
-
-                // Position mineral count text
-                if (mineral_count_text_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(mineral_count_text_id) &&
-                    ECSM.has_component<Transform2D>(mineral_texture_id)) {
-                    auto& mineral_count_text_transform = ECSM.get_component<Transform2D>(mineral_count_text_id);
-                    auto& mineral_transform = ECSM.get_component<Transform2D>(mineral_texture_id);
-
-                    // Position text to the right of the mineral texture
-                    mineral_count_text_transform.position = {
-                        (mineral_transform.position.x + (mineral_transform.scale.x * 2.0f) - 20.0f) ,  // Right of icon
-                        mineral_transform.position.y                        // Vertically centered with mineral icon
-                    };
-                    mineral_count_text_transform.prev_position = mineral_count_text_transform.position;
-                }
-
-                // Position timer icon on the left side
-                if (timer_icon_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(timer_icon_id)) {
-                    auto& timer_icon_transform = ECSM.get_component<Transform2D>(timer_icon_id);
-
-                    timer_icon_transform.position = {
-                        base_position.x,                         // Center position
-                        base_position.y - METER_SPACING / 1.5f   // Vertically centered between meters
-                    };
-                    timer_icon_transform.prev_position = timer_icon_transform.position;
                 }
 
                 // Display fps if fps flag is true
@@ -498,20 +419,13 @@ namespace lof {
                     EntityID game_fps_counter_id = ECSM.find_entity_by_name("fps_counter_in_game");
                     if (game_fps_counter_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(game_fps_counter_id)) {
                         auto& fps_text_comp = ECSM.get_component<Text_Component>(game_fps_counter_id);
-                        auto& fps_transform_comp = ECSM.get_component<Transform2D>(game_fps_counter_id);
+                        //auto& fps_transform_comp = ECSM.get_component<Transform2D>(game_fps_counter_id);
 
                         // Write the current fps to the text object
                         float current_fps = FPSM.get_current_fps();
                         std::stringstream ss;
                         ss << "FPS: " << std::fixed << std::setprecision(1) << current_fps;
                         fps_text_comp.text = ss.str();
-
-                        // Set the fps counter position
-                        fps_transform_comp.position = {
-                            base_position.x + 830.0f,       // Right border of the screen
-                            base_position.y - 125.0f        // Below UI overlay
-                        };
-                        fps_transform_comp.prev_position = fps_transform_comp.position;
 
                     }
                 }
@@ -542,16 +456,6 @@ namespace lof {
                     ECSM.has_component<Transform2D>(timer_count_text_id) &&
                     ECSM.has_component<Transform2D>(timer_icon_id))
                 {
-                    auto& timer_count_text_transform = ECSM.get_component<Transform2D>(timer_count_text_id);
-                    auto& timer_icon_transform = ECSM.get_component<Transform2D>(timer_icon_id);
-
-                    // Position the timer text
-                    timer_count_text_transform.position = {
-                        timer_icon_transform.position.x + (timer_icon_transform.scale.x * 1.5f), // Right of icon
-                        base_position.y - METER_SPACING / 2.0f                                   // Vertically centered
-                    };
-                    timer_count_text_transform.prev_position = timer_count_text_transform.position;
-
                     // If it has a Text_Component, update the visible text to show the integer countdown
                     if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
                         auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
@@ -560,33 +464,9 @@ namespace lof {
                 }
                 // ------------------------- END TIMER UPDATE CHANGES -------------------------
 
-                // Position goal text on the right side
-                if (goal_text_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(goal_text_id)) {
-                    auto& goal_text_transform = ECSM.get_component<Transform2D>(goal_text_id);
-
-                    goal_text_transform.position = {
-                        base_position.x + 775.0f,                         // Center position
-                        base_position.y - METER_SPACING / 2.0f   // Vertically centered between meters
-                    };
-                    goal_text_transform.prev_position = goal_text_transform.position;
-                }
-
-                
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(goal_percentage_count_text_id) &&
                     ECSM.has_component<Text_Component>(goal_percentage_count_text_id)) {
-
-                    // Get the goal percentage transform
-                    auto& goal_percentage_count_transform = ECSM.get_component<Transform2D>(goal_percentage_count_text_id);
-                    auto& goal_text_transform = ECSM.get_component<Transform2D>(goal_text_id);
-
-                    // Position text
-                    goal_percentage_count_transform.position = {
-                        goal_text_transform.position.x + 120.0f,  // Right of icon
-                        goal_text_transform.position.y           // Vertically centered with goal text
-                    };
-                    goal_percentage_count_transform.prev_position = goal_percentage_count_transform.position;
 
                     // Update the text value based on mineral progress
                     auto& text_comp = ECSM.get_component<Text_Component>(goal_percentage_count_text_id);

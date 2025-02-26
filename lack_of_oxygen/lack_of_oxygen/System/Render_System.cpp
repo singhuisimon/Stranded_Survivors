@@ -1,4 +1,3 @@
-
 /**
  * @file Render_System.cpp
  * @brief Implements the Render_System class for the ECS that
@@ -29,42 +28,61 @@ namespace lof {
         return "Render_System";
     }
 
-    // Updates the model-to-world-to-NDC transformation matrix of the entity per frame.
+    // Updates the model-to-world-to-NDC transformation matrix of the entity per frame.sti
     void Render_System::update(float delta_time) {
 
         // Get screen width and height
         GLfloat screen_width = static_cast<GLfloat>(SM.get_scr_width());
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
 
+        // Update objects position with reference to camera type
+        auto& camera = GFXM.get_camera();
+
+        // Get the current scene number
+        int current_scene = GM.get_current_scene();
+
+        // Set up iterators for entities
+        auto& all_entities = get_entities();
+        auto start = all_entities.begin();
+        auto end = all_entities.end();
+
+        // Access player's ID
+        EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
+        // Separate UI entities from other entities in scene 2
+        if (current_scene == 2) {
+
+            // Find position of ui_overlay to indicate end of first iteration of objects
+            EntityID ui_overlay = ECSM.find_entity_by_name("top_ui_overlay");
+            size_t entities_size = all_entities.size();
+            end = std::prev(end, entities_size - ui_overlay);
+        }
+
         // Loop over the entities that match the system's signature
-        for (EntityID entity_id : get_entities()) {
+        for (; start != end; ++start) {
+            auto& graphics = ECSM.get_component<Graphics_Component>(*start);
+            auto& transform = ECSM.get_component<Transform2D>(*start);
 
-            auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-            auto& transform = ECSM.get_component<Transform2D>(entity_id);
-
-            // Access player's ID
-            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-
-            if (entity_id != 0) { // Background object unaffected
+            if (*start != 0) { // Background object unaffected
 
                 // Scaling update when up or down arrow key pressed
                 GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
 
                 // Check if the entity has Collision_Component
-                if (ECSM.has_component<Collision_Component>(entity_id)) {
+                if (ECSM.has_component<Collision_Component>(*start)) {
 
-                    auto& collision = ECSM.get_component<Collision_Component>(entity_id);
+                    auto& collision = ECSM.get_component<Collision_Component>(*start);
 
                     int scale_flag = GFXM.get_scale_flag();
                     if (scale_flag == GLFW_KEY_UP) {
-                        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", entity_id, scale_change);
+                        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", *start, scale_change);
                         transform.scale.x += scale_change;
                         transform.scale.y += scale_change;
                         collision.width += scale_change;
                         collision.height += scale_change;
                     }
                     else if (scale_flag == GLFW_KEY_DOWN) {
-                        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", entity_id, scale_change);
+                        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", *start, scale_change);
                         if (transform.scale.x > 0.0f) {
                             transform.scale.x -= scale_change;
                             collision.width -= scale_change;
@@ -87,15 +105,15 @@ namespace lof {
 
                     // Rotation update when left or right arrow key pressed
                     int rotation_flag = GFXM.get_rotation_flag();
-                    if (rotation_flag == GLFW_KEY_LEFT) {  
+                    if (rotation_flag == GLFW_KEY_LEFT) {
                         GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
                         transform.orientation.x += rot_change;
-                        LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                        LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", *start, rot_change);
                     }
                     else if (rotation_flag == GLFW_KEY_RIGHT) {
                         GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
                         transform.orientation.x -= rot_change;
-                        LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", entity_id, rot_change);
+                        LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", *start, rot_change);
                     }
 
                 }
@@ -103,9 +121,7 @@ namespace lof {
             }
 
             // Update camera bounded to player
-            auto& camera = GFXM.get_camera();
-
-            if (entity_id == player_id && camera.is_free_cam == GL_FALSE) {
+            if (*start == player_id && camera.is_free_cam == GL_FALSE) {
 
                 // Update world-to-camera view transformation matrix
                 camera.pos_y = transform.position.y;
@@ -137,8 +153,6 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
-            int current_scene = GM.get_current_scene(); // Get the current scene number
-
             if (camera.is_free_cam == GL_FALSE && current_scene != 1 && current_scene != 2) {
 
                 // Update world-to-camera view transformation matrix
@@ -159,9 +173,9 @@ namespace lof {
             // Compute object scale matrix
             // Special case for text objects
             float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
-            if (ECSM.has_component<Text_Component>(entity_id)) {
+            if (ECSM.has_component<Text_Component>(*start)) {
                 // Get text component's scaling factor
-                auto& text = ECSM.get_component<Text_Component>(entity_id);
+                auto& text = ECSM.get_component<Text_Component>(*start);
                 scale_x = text.scale.x;
                 scale_y = text.scale.y;
                 translate_x = transform.position.x - (transform.position.x * text.scale.x);  // Translate text back to original position based on scale
@@ -194,6 +208,118 @@ namespace lof {
             graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
         }
 
+        // Update the UI entities 
+        if (current_scene == 2) {
+            start = end;
+            end = all_entities.end();
+
+            // UI entities own world to ndc xform
+            glm::mat3 ui_view_xform = glm::mat3{ 1, 0, 0,
+                                           0, 1, 0,
+                                           -1, 102, 1 };
+
+            glm::mat3 ui_win_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                   0, 2.f / screen_height, 0,
+                                                   0, 0, 1 };
+
+            glm::mat3 ui_world_to_ndc_xform = ui_win_to_ndc_xform * ui_view_xform;
+
+            for (; start != end; ++start) {
+                auto& graphics = ECSM.get_component<Graphics_Component>(*start);
+                auto& transform = ECSM.get_component<Transform2D>(*start);
+
+                //// Scaling update when up or down arrow key pressed
+                //GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+
+                //// Check if the entity has Collision_Component
+                //if (ECSM.has_component<Collision_Component>(*start)) {
+
+                //    auto& collision = ECSM.get_component<Collision_Component>(*start);
+
+                //    int scale_flag = GFXM.get_scale_flag();
+                //    if (scale_flag == GLFW_KEY_UP) {
+                //        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", *start, scale_change);
+                //        transform.scale.x += scale_change;
+                //        transform.scale.y += scale_change;
+                //        collision.width += scale_change;
+                //        collision.height += scale_change;
+                //    }
+                //    else if (scale_flag == GLFW_KEY_DOWN) {
+                //        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", *start, scale_change);
+                //        if (transform.scale.x > 0.0f) {
+                //            transform.scale.x -= scale_change;
+                //            collision.width -= scale_change;
+                //        }
+                //        else {
+                //            transform.scale.x = 0.0f;
+                //            collision.width = 0.0f;
+                //        }
+
+                //        if (transform.scale.y > 0.0f) {
+                //            transform.scale.y -= scale_change;
+                //            collision.height -= scale_change;
+                //        }
+                //        else {
+                //            transform.scale.y = 0.0f;
+                //            collision.height = 0.0f;
+                //        }
+                //    }
+
+                //    // Rotation update when left or right arrow key pressed
+                //    int rotation_flag = GFXM.get_rotation_flag();
+                //    if (rotation_flag == GLFW_KEY_LEFT) {
+                //        GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                //        transform.orientation.x += rot_change;
+                //        LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", *start, rot_change);
+                //    }
+                //    else if (rotation_flag == GLFW_KEY_RIGHT) {
+                //        GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+                //        transform.orientation.x -= rot_change;
+                //        LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", *start, rot_change);
+                //    }
+
+                //}
+
+                // Compute object scale matrix
+                // Special case for text objects
+                float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
+                if (ECSM.has_component<Text_Component>(*start)) {
+                    // Get text component's scaling factor
+                    auto& text = ECSM.get_component<Text_Component>(*start);
+                    scale_x = text.scale.x;
+                    scale_y = text.scale.y;
+                    translate_x = transform.position.x - (transform.position.x * text.scale.x);  // Translate text back to original position based on scale
+                    translate_y = transform.position.y - (transform.position.y * text.scale.y);
+                }
+                else {
+                    scale_x = transform.scale.x;
+                    scale_y = transform.scale.y;
+                    translate_x = transform.position.x;
+                    translate_y = transform.position.y;
+                }
+
+                glm::mat3 scale_mat{ scale_x, 0, 0,
+                                     0, scale_y, 0,
+                                     0, 0, 1 };
+
+                // Compute current orientation of object
+                GLfloat rad_disp = glm::radians(transform.orientation.x);
+
+                // Compute object rotational matrix 
+                glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
+                                    -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
+                                    0,                   0,                  1 };
+
+                // Compute object translation matrix
+                glm::mat3 trans_mat{ 1, 0, 0,
+                                        0, 1, 0,
+                                        translate_x, translate_y, 1 };
+
+                graphics.mdl_to_ndc_xform = ui_world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
+            }
+
+        }
+
         // Render polygon according to rendering mode 
         glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode());
         switch (GFXM.get_render_mode()) {
@@ -213,7 +339,7 @@ namespace lof {
 
         // Set up the imgui framebuffer when entering editor mode
         if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer()); 
+            glBindFramebuffer(GL_FRAMEBUFFER, GFXM.get_framebuffer());
         }
 
         // Set up for the drawing of objects
@@ -233,6 +359,9 @@ namespace lof {
         auto& models = GFXM.get_models();
         auto& textures = ASM.get_texture_storage();
 
+        // Get camera
+        auto& camera = GFXM.get_camera();
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
@@ -241,7 +370,6 @@ namespace lof {
 
             // Render only what is on the viewport
             int current_scene = GM.get_current_scene(); // Get the current scene number
-            auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE && current_scene == 1 && current_scene == 2) {
                 EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                 if (entity_id != 0 && entity_id != player_id) {
@@ -373,7 +501,8 @@ namespace lof {
                 // is not loaded, render with default black texture
                 if (textures.find(graphics.texture_name) == textures.end()) {
                     glBindTextureUnit(5, 0);
-                } else {
+                }
+                else {
                     glBindTextureUnit(5, textures[graphics.texture_name]);
                 }
 
@@ -793,7 +922,7 @@ namespace lof {
 
         // Bind framebuffer if program is in editor mode
         if (GFXM.get_editor_mode() == 1) {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0); 
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }
 } // namespace lof
