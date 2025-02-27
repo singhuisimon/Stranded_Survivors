@@ -424,50 +424,29 @@ namespace lof {
                                     continue;
                                 }
 							}
-							else {
-								LM.write_log("Using default filepath");
-							}
 
 							if (sound.HasMember("audio_type") && sound["audio_type"].IsInt()) {
 								audio_type = static_cast<AudioType>(sound["audio_type"].GetInt());
-                            }
-                            else {
-								LM.write_log("Using default audio_type");
                             }
 
 							if (sound.HasMember("max_simultaneous") && sound["max_simultaneous"].IsInt()) {
 								max_simultaneous = sound["max_simultaneous"].GetInt();
 							}
-                            else {
-                                LM.write_log("Using default max_simultaneous");
-                            }
 
 							if (sound.HasMember("volume") && sound["volume"].IsFloat()) {
 								volume = sound["volume"].GetFloat();
-                            }
-                            else {
-								LM.write_log("Using default volume");
                             }
 
 							if (sound.HasMember("pitch") && sound["pitch"].IsFloat()) {
 								pitch = sound["pitch"].GetFloat();
 							}
-							else {
-								LM.write_log("Using default pitch");
-							}
 
 							if (sound.HasMember("islooping") && sound["islooping"].IsBool()) {
 								islooping = sound["islooping"].GetBool();
                             }
-                            else {
-								LM.write_log("Using default islooping");
-                            }
 
 							if (sound.HasMember("isactive") && sound["isactive"].IsBool()) {
 								isactive = sound["isactive"].GetBool();
-                            }
-                            else {
-								LM.write_log("Using default isactive");
                             }
 
 							/*if (sound.HasMember("playcount") && sound["playcount"].IsUint()) {
@@ -482,9 +461,6 @@ namespace lof {
 
                             if (sound.HasMember("is3d") && sound["is3d"].IsBool()) {
                                 is3d = sound["is3d"].GetBool();
-                            }
-                            else {
-								LM.write_log("Using default is3d");
                             }
 
 
