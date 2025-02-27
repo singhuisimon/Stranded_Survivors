@@ -359,6 +359,17 @@ namespace lof {
         std::string system_type = system->get_type();
         LM.write_log("ECS_Manager::add_system(): Adding system '%s'.", system_type.c_str());
 
+        //for future logic purpose - Amanda.
+        /*if (system_type == "Logic_System") {
+            systems.insert(systems.begin(), std::move(system));
+            LM.write_log("ECS_Manager::add_system(): Logic system added to the front of the vector.");
+        }
+        else {
+            systems.emplace_back(std::move(system));
+            LM.write_log("ECS_Manager::add_system(): System '%s' added successfully.", systems.back()->get_type().c_str());
+
+        }*/
+
         systems.emplace_back(std::move(system));
         LM.write_log("ECS_Manager::add_system(): System '%s' added successfully.", systems.back()->get_type().c_str());
     }
@@ -372,6 +383,7 @@ namespace lof {
 
             for (auto& system : systems) {
 
+                LM.write_log("system updating %s", system->get_type().c_str());
 
                 bool is_physics = system->get_type() == "Movement_System" || system->get_type() == "Collision_System"; 
                 //system that use time in the update

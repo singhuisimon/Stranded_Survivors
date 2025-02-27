@@ -344,23 +344,21 @@ namespace lof {
         * @brief Holds all the details in each sound component currently it has.
         */
         struct SoundConfig {
-            std::string key = "";
-            std::string filepath = "";
-            //PlayState audio_state = NONE;
-            AudioType audio_type = NIL;
-            int max_simultaneous = 0;
-            float volume = 0.0f;
-            float pitch = 1.0f;
-            bool islooping = false;
-            bool is3d = false;
+            std::string key = DEFAULT_AUDIO_KEY;
+            std::string filepath = DEFAULT_AUDIO_FILEPATH;
+            AudioType audio_type = DEFAULT_AUDIO_TYPE;
+            int max_simultaneous = MIN_SIMULTANEOUS;
+            float volume = DEFAULT_AUDIO_FLOAT;
+            float pitch = DEFAULT_AUDIO_FLOAT;
+            bool islooping = DEFAULT_LOOP;
+            //bool isactive = DEFAULT_ACTIVE;
+            //unsigned int playcount = DEFAULT_PLAYCOUNT;
+            bool is3d = DEFAULT_IS_3D;
         };
 
         std::vector<SoundConfig> sounds; ///< vectors of sound details
 
-
         //for future implementation
-        //bool is3d;      ///<check if the sound is 3D or 2D.
-
         Vec3D position; ///<position of where the sound is emitting from
         float mindist;  ///<the min range for listener to be in to hear the sound (closer)
         float maxdist;  ///<the max range for listener to be in to hear the sound (further)
@@ -385,43 +383,72 @@ namespace lof {
          */
         /*void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
             float volume, float pitch, bool islooping) {*/
-        void add_sound(const std::string & key = "", const std::string& filepath = "", AudioType type = SFX, int num = 1,
-            float volume = 1.0f, float pitch = 1.0f, bool islooping = false, bool is3d = false) {
-            for (auto& sound : sounds) {
-                if (sound.key == key) {
-                    //if key already exist update properties
-                    sound.filepath = filepath;
-                    //sound.audio_state = state;
-                    sound.audio_type = type;
-                    sound.max_simultaneous = num;
-                    sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
-                    sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
-                    sound.islooping = islooping;
-                    sound.is3d = is3d;
-                    return;
-                }
+        /*void add_sound(const std::string & key, const std::string & filepath, AudioType type, int num,
+            float volume, float pitch, bool islooping, bool isactive, unsigned int playcount, bool is3d) {*/
+        void add_sound(const std::string& key, const std::string& filepath, AudioType type, int num,
+            float volume, float pitch, bool islooping, bool is3d) {
+
+            // Check if the sound key already exists in the list
+            auto it = std::find_if(sounds.begin(), sounds.end(), [&](const SoundConfig& sound) {
+                return sound.key == key;
+            });
+
+            if (it != sounds.end()) {
+                // Key already exists, update existing sound properties
+                it->filepath = filepath;
+                it->audio_type = type;
+                it->max_simultaneous = num;
+                it->volume = std::clamp(volume, 0.0f, 1.0f);
+                it->pitch = std::clamp(pitch, 0.5f, 2.0f);
+                it->islooping = islooping;
+                //it->isactive = isactive;
+                //it->playcount = playcount;
+                it->is3d = is3d;
+                return;  // Exit since we updated an existing sound
             }
 
-            SoundConfig new_sound;
-            new_sound.key = key;
-            new_sound.filepath = filepath;
-            //new_sound.audio_state = state;
-            new_sound.audio_type = type;
-            new_sound.max_simultaneous = num;
-            new_sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
-            new_sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
-            new_sound.islooping = islooping;
-            new_sound.is3d = is3d;
+            sounds.push_back({ key, filepath, type, num, std::clamp(volume, 0.0f, 1.0f), std::clamp(pitch, 0.5f, 2.0f),
+                islooping, is3d });
 
-            sounds.push_back(new_sound);
+            /*sounds.push_back({ key, filepath, type, num, std::clamp(volume, 0.0f, 1.0f), std::clamp(pitch, 0.5f, 2.0f),
+                islooping, isactive, playcount, is3d });*/
+
+     //       for (auto& sound : sounds) {
+     //           if (sound.key == key) {
+     //               //if key already exist update properties
+     //               sound.filepath = filepath;
+     //               sound.audio_type = type;
+     //               sound.max_simultaneous = num;
+     //               sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
+     //               sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
+     //               sound.islooping = islooping;
+					//sound.isactive = isactive;
+					//sound.toplay = toplay;
+     //               sound.is3d = is3d;
+     //               return;
+     //           }
+     //       }
+
+   //         SoundConfig new_sound;
+   //         new_sound.key = key;
+   //         new_sound.filepath = filepath;
+   //         //new_sound.audio_state = state;
+   //         new_sound.audio_type = type;
+   //         new_sound.max_simultaneous = num;
+   //         new_sound.volume = std::clamp(volume, 0.0f, 1.0f);  //FMOD can only take value 0.0 to 1.0f
+   //         new_sound.pitch = std::clamp(pitch, 0.5f, 2.0f);    //FMOD can only take pitch 0.5 to 2.0f (with 1.0f being normal)
+   //         new_sound.islooping = islooping;
+			//new_sound.isactive = isactive;
+   //         new_sound.toplay = toplay;
+   //         new_sound.is3d = is3d;
+
+            //sounds.push_back(new_sound);
         }
 
         /**
         * @brief Getters for the vector of soundconfig
         */
         const std::vector<SoundConfig>& get_sounds() const { return sounds; }
-
-        std::vector<SoundConfig>& get_sounds() { return sounds; }
 
         /**
         * @brief Getter for the soundconfig using param key
@@ -441,12 +468,11 @@ namespace lof {
         * @param old_key The old unique identifier of soundconfig to be repalced.
         * @param new_key The new unique identifier of soundconfig to replace the old one.
         */
-        void set_key(const std::string& old_key, std::string& new_key) {
+        void set_key(const std::string& old_key, const std::string& new_key) {
 
             for (auto& sound : sounds) {
                 if (sound.key == old_key) {
                     sound.key = new_key;
-
                 }
             }
         }
@@ -456,7 +482,7 @@ namespace lof {
         * @param key The unique identifier of soundconfig
         * @param path The new path.
         */
-        void set_filepath(const std::string& key, std::string& path) {
+        void set_filepath(const std::string& key, const std::string& path) {
             for (auto& sound : sounds) {
                 if (sound.key == key) {
                     sound.filepath = path;
@@ -469,7 +495,8 @@ namespace lof {
         * @param key The unique identifier of soundconfig
         */
         std::string get_filepath(const std::string& key) const {
-            return get_sound_by_key(key)->filepath;
+            const SoundConfig* sound = get_sound_by_key(key);
+            return sound ? sound->filepath : "";
         }
 
         /**
@@ -577,6 +604,59 @@ namespace lof {
         bool get_loop(const std::string& key) const {
             return get_sound_by_key(key)->islooping;
         }
+
+        ///**
+        //* @brief Getter for active in soundconfig
+        //* @param key The unique identifier for soundconfig
+        //*/
+        //bool get_active(const std::string& key) const {
+        //    return get_sound_by_key(key)->isactive;
+        //}
+
+        ///**
+        //* @brief Setter for isactive
+        //* @param is_active The new boolean value for isactive
+        //*/
+        //void set_isactive(const std::string& key, bool is_active) {
+        //    for (auto& sound : sounds) {
+        //        if (sound.key == key) {
+        //            sound.isactive = is_active;
+        //        }
+        //    }
+        //}
+
+        ///**
+        //* @brief Getter for toplay in soundconfig
+        //* @param key The unique identifier for soundconfig
+        //*/
+        //unsigned int get_playcount(const std::string& key) const {
+        //    return get_sound_by_key(key)->playcount;
+        //}
+
+        ///**
+        //* @brief Increase playcount
+        //* @param playcount The new unsigned int value for playcount
+        //*/
+        //void increase_playcount(const std::string& key) {
+        //    for (auto& sound : sounds) {
+        //        if (sound.key == key) {
+        //            sound.playcount++;
+        //        }
+        //    }
+        //}
+
+        ///**
+        //* @brief Setter for is toplay
+        //* @param key The unique identifier for soundconfig
+        //* @param new_count The new unsigned int value for playcount
+        //*/
+        //void set_playcount(const std::string& key, unsigned int new_count) {
+        //    for (auto& sound : sounds) {
+        //        if (sound.key == key) {
+        //            sound.playcount = new_count;
+        //        }
+        //    }
+        //}
 
         /**
         * @brief Setter for is 3D
@@ -771,7 +851,8 @@ namespace lof {
             if (logic_data) {
                 return logic_data->script_data;
             }
-            throw std::runtime_error("Script not found");
+            //throw std::runtime_error("Script not found");
+            LM.write_log("get_script_data in logic component: script not found");
         }
 
         /**
@@ -805,7 +886,8 @@ namespace lof {
                 logic_data->script_data = new_data;
             }
             else {
-                throw std::runtime_error("Script not found");
+                //throw std::runtime_error("Script not found");
+                LM.write_log("set_script_data in logic component: script not found");
             }
         }
 
@@ -823,7 +905,7 @@ namespace lof {
                 }
             }
 
-            throw std::runtime_error("Script instance not found: " + script_name + "( " + update_func + ")");
+            //throw std::runtime_error("Script instance not found: " + script_name + "( " + update_func + ")");
         }
 
         /**

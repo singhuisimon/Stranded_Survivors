@@ -1199,8 +1199,13 @@ namespace lof {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
 
-                        if (ImGui::Button("Add Sound")) {
-                            audio.add_sound();
+                        //Added by amanda. somehow only this works? idk :">
+                        if (ImGui::Button("Add New Audio")) {
+                            const std::string DEFAULT_KEY = DEFAULT_AUDIO_KEY + std::to_string(audio.get_sounds().size());
+                            /*audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
+                                DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_PLAYCOUNT, DEFAULT_IS_3D);*/
+                            audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
+                                DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_IS_3D);
                         }
 
                         //gets a collection of sounds from audio component (not sound map)

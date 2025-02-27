@@ -240,6 +240,8 @@ namespace lof {
                 if (forces_flag == MOVE_RIGHT || forces_flag == MOVE_LEFT) {
 
                     ADM.play_now(player_id, "moving", audio_comp);
+                    //audio_comp.set_isactive("moving", true);
+                    //audio_comp.increase_playcount("moving");
                     update_player_walking_particle();
                 }
             }
@@ -247,6 +249,7 @@ namespace lof {
         else {
             if (!is_key_just_pressed(GLFW_KEY_D) || !is_key_just_pressed(GLFW_KEY_A)) {
                 ADM.stop_now(player_id, "moving", audio_comp.get_filepath("moving"));
+                //audio_comp.set_isactive("moving", false);
             }
         }
     }

@@ -149,14 +149,8 @@ namespace lof {
                 
                 auto& audio = ECSM.get_component<Audio_Component>(entity_id);
                 ADM.play_now(entity_id, "jumping", audio);
-                /*if (GM.get_current_scene() == 1) {
-                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping", PLAYING);
-
-                }
-                else {
-                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping1", PLAYING);
-                    ECSM.get_component<Audio_Component>(entity_id).set_audio_state("jumping2", PLAYING);
-                }*/
+                //audio.set_isactive("jumping", true);
+                //audio.increase_playcount("jumping");
                 
             }
 

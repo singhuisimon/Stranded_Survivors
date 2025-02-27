@@ -533,6 +533,8 @@ namespace lof {
                                     if (ECSM.has_component<Audio_Component>(tnt_id)) {
                                         auto& audio = ECSM.get_component<Audio_Component>(tnt_id);
                                         ADM.play_now(tnt_id, "TNT_Explosion_Sound", audio);
+                                        //audio.set_isactive("TNT Explosion Sound", true);
+                                        //audio.increase_playcount("TNT_Explosion_Sound");
                                     }
 
                                     // Emit fuse sparks particles
@@ -566,6 +568,8 @@ namespace lof {
                                     if (ECSM.has_component<Audio_Component>(tnt_id)) {
                                         auto& audio = ECSM.get_component<Audio_Component>(tnt_id);
                                         ADM.play_now(tnt_id, "TNT_Boom", audio);
+                                        //audio.set_isactive("TNT_Boom", true);
+                                        //audio.increase_playcount("TNT_Boom");
                                     }
                                     
                                     // Emit explosion particles in a circular pattern
@@ -887,7 +891,8 @@ namespace lof {
                                     // Determine sound based on mineral value
                                     std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
                                     ADM.play_now(player_id, sound_key, audio_player);
-
+                                    //audio_player.set_isactive(sound_key, true);
+                                    //audio_player.increase_playcount(sound_key);
                                 }
                             }
                         }
@@ -975,6 +980,8 @@ namespace lof {
                                     // Determine sound based on mineral value
                                     std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
                                     ADM.play_now(player_id, sound_key, audio_player);
+                                    //audio_player.set_isactive(sound_key, true);
+                                    //audio_player.increase_playcount(sound_key);
                                 }
                             }
                         }
@@ -1062,6 +1069,8 @@ namespace lof {
                                     // Determine sound based on mineral value
                                     std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
                                     ADM.play_now(player_id, sound_key, audio_player);
+                                    //audio_player.set_isactive(sound_key, true);
+                                    //audio_player.increase_playcount(sound_key);
                                 }
                             }
                         }
@@ -1147,6 +1156,8 @@ namespace lof {
                                     // Determine sound based on mineral value
                                     std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
                                     ADM.play_now(player_id, sound_key, audio_player);
+                                    //audio_player.set_isactive(sound_key, true);
+                                    //audio_player.increase_playcount(sound_key);
                                 }
                             }
                         }
