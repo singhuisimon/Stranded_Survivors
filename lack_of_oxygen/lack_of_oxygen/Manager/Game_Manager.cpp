@@ -839,13 +839,6 @@ namespace lof {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
 
-                                            // play the tnt destroyed sound
-                                            /*if (ECSM.has_component<Audio_Component>(block_to_remove)) {
-                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
-                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
-                                            }*/
-
-
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -854,6 +847,9 @@ namespace lof {
                                                 float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
                                                 particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
                                             }
+
+                                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                            ADM.play_now(player_id, sound_key, audio_player);
                                         }
                                         else {
                                              //Get mineral value before destroying the entity
@@ -863,6 +859,9 @@ namespace lof {
                                             if (mineral_value > 0) {
                                                 update_mineral_count_text(mineral_value);
                                             }
+
+                                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mineral destroy" : "mining normal";
+                                            ADM.play_now(player_id, sound_key, audio_player);
 
                                             // Emit final particles after destroying tile
                                             for (int i = 0; i < 6; ++i) {
@@ -889,11 +888,14 @@ namespace lof {
                                     }
 
                                     // Determine sound based on mineral value
-                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                                    ADM.play_now(player_id, sound_key, audio_player);
+                                    /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);*/
                                     //audio_player.set_isactive(sound_key, true);
                                     //audio_player.increase_playcount(sound_key);
                                 }
+                            }
+                            else {
+                                ADM.play_now(player_id, "mining air", audio_player);
                             }
                         }
                         else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
@@ -929,12 +931,6 @@ namespace lof {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
 
-                                            // play the tnt destroyed sound
-                                           /* if (ECSM.has_component<Audio_Component>(block_to_remove)) {
-                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
-                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
-                                            }*/
-
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -943,6 +939,9 @@ namespace lof {
                                                 float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
                                                 particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
                                             }
+
+                                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                            ADM.play_now(player_id, sound_key, audio_player);
                                         }
                                         else {
                                             // Get mineral value before destroying the entity
@@ -952,6 +951,9 @@ namespace lof {
                                             if (mineral_value > 0) {
                                                 update_mineral_count_text(mineral_value);
                                             }
+
+                                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mineral destroy" : "mining normal";
+                                            ADM.play_now(player_id, sound_key, audio_player);
 
                                             // Emit final particles after destroying tile
                                             for (int i = 0; i < 6; ++i) {
@@ -978,11 +980,14 @@ namespace lof {
                                     }
 
                                     // Determine sound based on mineral value
-                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                                    ADM.play_now(player_id, sound_key, audio_player);
+                                    /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);*/
                                     //audio_player.set_isactive(sound_key, true);
                                     //audio_player.increase_playcount(sound_key);
                                 }
+                            }
+                            else {
+                                ADM.play_now(player_id, "mining air", audio_player);
                             }
                         }
                         else if (IM.is_key_pressed(GLFW_KEY_UP)) {
@@ -1018,12 +1023,6 @@ namespace lof {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
 
-                                            // play the tnt destroyed sound
-                                            /*if (ECSM.has_component<Audio_Component>(block_to_remove)) {
-                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
-                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
-
-                                            }*/
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -1031,6 +1030,13 @@ namespace lof {
                                                 float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
                                                 float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
                                                 particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+
+                                            if (animation.animations["0"] == "dirt" || animation.animations["0"] == "rock") {
+                                                ADM.play_now(player_id, "mining normal", audio_player);
+                                            }
+                                            else {
+                                                ADM.play_now(player_id, "mining mineral", audio_player);
                                             }
                                         }
                                         else {
@@ -1041,6 +1047,9 @@ namespace lof {
                                             if (mineral_value > 0) {
                                                 update_mineral_count_text(mineral_value);
                                             }
+
+                                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mineral destroy" : "mining normal";
+                                            ADM.play_now(player_id, sound_key, audio_player);
 
                                             // Emit final particles after destroying tile
                                             for (int i = 0; i < 6; ++i) {
@@ -1067,11 +1076,14 @@ namespace lof {
                                     }
 
                                     // Determine sound based on mineral value
-                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                                    ADM.play_now(player_id, sound_key, audio_player);
+                                    /*std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    ADM.play_now(player_id, sound_key, audio_player);*/
                                     //audio_player.set_isactive(sound_key, true);
                                     //audio_player.increase_playcount(sound_key);
                                 }
+                            }
+                            else {
+                                ADM.play_now(player_id, "mining air", audio_player);
                             }
                         }
                         else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
@@ -1106,11 +1118,7 @@ namespace lof {
                                     if (animation.animations["0"] != "TNT") {
                                         // Emit particles, destroy the block and update mineral count when health reaches 0
                                         if (animation.curr_tile_health != 0) {
-                                            // play the tnt destroyed sound
-                                           /* if (ECSM.has_component<Audio_Component>(block_to_remove)) {
-                                                auto& audio = ECSM.get_component<Audio_Component>(block_to_remove);
-                                                ADM.play_now(player_id, "TNT_Explosion_Sound", audio);
-                                            }*/
+
                                             // Randomize particle emit count
                                             int rand_part_cnt = 2 + static_cast<int>(std::floorf(particle_system->get_rand_float() * 3.0f));
                                             for (int i = 0; i < rand_part_cnt; ++i) {
@@ -1118,6 +1126,13 @@ namespace lof {
                                                 float part_x = block_transform.position.x - (block_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.x);
                                                 float part_y = block_transform.position.y - (block_transform.scale.y / 2.0f) + (particle_system->get_rand_float() * block_transform.scale.y);
                                                 particle_system->particle_emit(animation.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                            }
+
+                                            if (animation.animations["0"] == "dirt" || animation.animations["0"] == "rock") {
+                                                ADM.play_now(player_id, "mining normal", audio_player);
+                                            }
+                                            else {
+                                                ADM.play_now(player_id, "mining mineral", audio_player);
                                             }
                                         }
                                         else {
@@ -1128,6 +1143,9 @@ namespace lof {
                                             if (mineral_value > 0) {
                                                 update_mineral_count_text(mineral_value);
                                             }
+
+                                            std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mineral destroy" : "mining normal";
+                                            ADM.play_now(player_id, sound_key, audio_player);
 
                                             // Emit final particles after destroying tile
                                             for (int i = 0; i < 6; ++i) {
@@ -1154,11 +1172,14 @@ namespace lof {
                                     }
 
                                     // Determine sound based on mineral value
-                                    std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
-                                    ADM.play_now(player_id, sound_key, audio_player);
+                                    //std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? "mining mineral" : "mining normal";
+                                    //ADM.play_now(player_id, sound_key, audio_player);
                                     //audio_player.set_isactive(sound_key, true);
                                     //audio_player.increase_playcount(sound_key);
                                 }
+                            }
+                            else {
+                                ADM.play_now(player_id, "mining air", audio_player);
                             }
                         }
 

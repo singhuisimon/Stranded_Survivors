@@ -1205,7 +1205,7 @@ namespace lof {
                             /*audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
                                 DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_PLAYCOUNT, DEFAULT_IS_3D);*/
                             audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
-                                DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_IS_3D);
+                                DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_IS_3D);
                         }
 
                         //gets a collection of sounds from audio component (not sound map)

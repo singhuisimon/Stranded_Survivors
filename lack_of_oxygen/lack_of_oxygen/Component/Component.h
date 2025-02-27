@@ -351,7 +351,7 @@ namespace lof {
             float volume = DEFAULT_AUDIO_FLOAT;
             float pitch = DEFAULT_AUDIO_FLOAT;
             bool islooping = DEFAULT_LOOP;
-            //bool isactive = DEFAULT_ACTIVE;
+            bool isactive = DEFAULT_ACTIVE;
             //unsigned int playcount = DEFAULT_PLAYCOUNT;
             bool is3d = DEFAULT_IS_3D;
         };
@@ -386,7 +386,7 @@ namespace lof {
         /*void add_sound(const std::string & key, const std::string & filepath, AudioType type, int num,
             float volume, float pitch, bool islooping, bool isactive, unsigned int playcount, bool is3d) {*/
         void add_sound(const std::string& key, const std::string& filepath, AudioType type, int num,
-            float volume, float pitch, bool islooping, bool is3d) {
+            float volume, float pitch, bool islooping, bool isactive, bool is3d) {
 
             // Check if the sound key already exists in the list
             auto it = std::find_if(sounds.begin(), sounds.end(), [&](const SoundConfig& sound) {
@@ -401,14 +401,14 @@ namespace lof {
                 it->volume = std::clamp(volume, 0.0f, 1.0f);
                 it->pitch = std::clamp(pitch, 0.5f, 2.0f);
                 it->islooping = islooping;
-                //it->isactive = isactive;
+                it->isactive = isactive;
                 //it->playcount = playcount;
                 it->is3d = is3d;
                 return;  // Exit since we updated an existing sound
             }
 
             sounds.push_back({ key, filepath, type, num, std::clamp(volume, 0.0f, 1.0f), std::clamp(pitch, 0.5f, 2.0f),
-                islooping, is3d });
+                islooping, isactive, is3d });
 
             /*sounds.push_back({ key, filepath, type, num, std::clamp(volume, 0.0f, 1.0f), std::clamp(pitch, 0.5f, 2.0f),
                 islooping, isactive, playcount, is3d });*/
@@ -605,25 +605,25 @@ namespace lof {
             return get_sound_by_key(key)->islooping;
         }
 
-        ///**
-        //* @brief Getter for active in soundconfig
-        //* @param key The unique identifier for soundconfig
-        //*/
-        //bool get_active(const std::string& key) const {
-        //    return get_sound_by_key(key)->isactive;
-        //}
+        /**
+        * @brief Getter for active in soundconfig
+        * @param key The unique identifier for soundconfig
+        */
+        bool get_active(const std::string& key) const {
+            return get_sound_by_key(key)->isactive;
+        }
 
-        ///**
-        //* @brief Setter for isactive
-        //* @param is_active The new boolean value for isactive
-        //*/
-        //void set_isactive(const std::string& key, bool is_active) {
-        //    for (auto& sound : sounds) {
-        //        if (sound.key == key) {
-        //            sound.isactive = is_active;
-        //        }
-        //    }
-        //}
+        /**
+        * @brief Setter for isactive
+        * @param is_active The new boolean value for isactive
+        */
+        void set_isactive(const std::string& key, bool is_active) {
+            for (auto& sound : sounds) {
+                if (sound.key == key) {
+                    sound.isactive = is_active;
+                }
+            }
+        }
 
         ///**
         //* @brief Getter for toplay in soundconfig

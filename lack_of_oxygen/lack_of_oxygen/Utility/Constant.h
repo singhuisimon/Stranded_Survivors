@@ -103,7 +103,7 @@ namespace lof {
 	constexpr float DEFAULT_AUDIO_FLOAT = 1.0f;
 	constexpr bool DEFAULT_LOOP = false;
 	constexpr bool DEFAULT_ACTIVE = true;
-	constexpr int DEFAULT_PLAYCOUNT = 0;
+	//constexpr int DEFAULT_PLAYCOUNT = 0;
 	constexpr bool DEFAULT_IS_3D = false;
 	constexpr float DEFAULT_MIN_DISTANCE = 1.0f;
 	constexpr float DEFAULT_MAX_DISTANCE = 100.0f;

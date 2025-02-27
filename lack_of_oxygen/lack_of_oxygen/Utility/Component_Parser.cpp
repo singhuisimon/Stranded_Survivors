@@ -399,7 +399,7 @@ namespace lof {
 							float pitch = DEFAULT_AUDIO_FLOAT;
 							bool islooping = DEFAULT_LOOP;
 							bool isactive = DEFAULT_ACTIVE;
-							bool playcount = DEFAULT_PLAYCOUNT;
+							//bool playcount = DEFAULT_PLAYCOUNT;
 							bool is3d = DEFAULT_IS_3D;
 
                             if ((sound.HasMember("key") && sound["key"].IsString())) {
@@ -463,14 +463,14 @@ namespace lof {
 								LM.write_log("Using default islooping");
                             }
 
-							/*if (sound.HasMember("isactive") && sound["isactive"].IsBool()) {
+							if (sound.HasMember("isactive") && sound["isactive"].IsBool()) {
 								isactive = sound["isactive"].GetBool();
                             }
                             else {
 								LM.write_log("Using default isactive");
                             }
 
-							if (sound.HasMember("playcount") && sound["playcount"].IsUint()) {
+							/*if (sound.HasMember("playcount") && sound["playcount"].IsUint()) {
 								playcount = sound["playcount"].GetUint();
 							}
 							else {
@@ -490,24 +490,24 @@ namespace lof {
 
                             // Add sound to component
                             //audio_component.add_sound(key, filepath, audio_type, max_simultaneous, volume, pitch, islooping, isactive, playcount, is3d);
-                            audio_component.add_sound(key, filepath, audio_type, max_simultaneous, volume, pitch, islooping, is3d);
+                            audio_component.add_sound(key, filepath, audio_type, max_simultaneous, volume, pitch, islooping, isactive, is3d);
 
-                            LM.write_log("Added sound - Key: %s, Path: %s, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d, Active: %d, playcount: %d is3D: %d",
-                                key.c_str(), filepath.c_str(), audio_type, volume, pitch, islooping, isactive, playcount, is3d);
+                            LM.write_log("Added sound - Key: %s, Path: %s, Type: %d, Volume: %.2f, Pitch: %.2f, Loop: %d, Active: %d, is3D: %d",
+                                key.c_str(), filepath.c_str(), audio_type, volume, pitch, islooping, isactive, is3d);
                         
                         }
                     }
                     else {
                         //default sound
                         //audio_component.add_sound(DEFAULT_AUDIO_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT, DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_PLAYCOUNT, DEFAULT_IS_3D);
-                        audio_component.add_sound(DEFAULT_AUDIO_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT, DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_IS_3D);
+                        audio_component.add_sound(DEFAULT_AUDIO_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT, DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_IS_3D);
                     }
 
                 }
                 else {
                     //default sound
                     //audio_component.add_sound(DEFAULT_AUDIO_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT, DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_PLAYCOUNT, DEFAULT_IS_3D);
-                    audio_component.add_sound(DEFAULT_AUDIO_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT, DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_IS_3D);
+                    audio_component.add_sound(DEFAULT_AUDIO_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT, DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_IS_3D);
 					
                 }
 

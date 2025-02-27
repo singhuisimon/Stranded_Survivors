@@ -142,6 +142,7 @@
     <Media Include="Assets\Audio\sfx_mainmenu_button.wav" />
     <Media Include="Assets\Audio\sfx_tnt_boom.wav" />
     <Media Include="Assets\Audio\sfx_tnt_fuse.wav" />
+    <Media Include="Assets\Audio\sfx_mineral_destroy.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />

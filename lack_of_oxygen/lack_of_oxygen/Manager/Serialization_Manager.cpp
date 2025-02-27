@@ -582,7 +582,7 @@ namespace lof {
             sound_obj.AddMember("pitch", sound.pitch, allocator);
             // Use "islooping" to match original format
             sound_obj.AddMember("islooping", sound.islooping, allocator);
-			//sound_obj.AddMember("isactive", sound.isactive, allocator);
+			sound_obj.AddMember("isactive", sound.isactive, allocator);
 			//sound_obj.AddMember("playcount", sound.playcount, allocator);
             sound_obj.AddMember("is3d", sound.is3d, allocator);
 
