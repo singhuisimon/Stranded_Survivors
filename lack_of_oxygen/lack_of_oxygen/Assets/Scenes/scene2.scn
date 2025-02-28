@@ -411,7 +411,7 @@
           ],
           "damping_factor": 0.949999988079071,
           "max_velocity": 20000.0,
-          "mass":10.0,
+          "mass": 10.0,
           "jump_force": 2000.0,
           "is_static": false,
           "is_grounded": true,
@@ -617,7 +617,7 @@
       "name": "top_ui_overlay",
       "components": {
         "Transform2D": {
-          "position": [ 600.0, 100.0 ],
+          "position": [ 0.0, 398.0 ],
           "prev_position": [ 600.0, 100.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1920.0, 175.0 ]
@@ -670,20 +670,20 @@
       "components": {
         "Transform2D": {
           "position": [
-            800.0,
-            -100.0
+            -573.0,
+            398.0
           ],
           "prev_position": [
-            800.0,
-            -100.0
+            -573.0,
+            398.0
           ],
           "orientation": [
             0.0,
             0.0
           ],
           "scale": [
-            200.0,
-            30.0
+            400.0,
+            40.0
           ]
         },
         "Graphics_Component": {
@@ -764,20 +764,20 @@
       "components": {
         "Transform2D": {
           "position": [
-            800.0,
-            -100.0
+            -575.0,
+            348.0
           ],
           "prev_position": [
-            800.0,
-            -100.0
+            -575.0,
+            348.0
           ],
           "orientation": [
             0.0,
             0.0
           ],
           "scale": [
-            200.0,
-            30.0
+            400.0,
+            40.0
           ]
         },
         "Graphics_Component": {
@@ -811,12 +811,12 @@
       "components": {
         "Transform2D": {
           "position": [
-            800.0,
-            -100.0
+            450.0,
+            373.0
           ],
           "prev_position": [
-            800.0,
-            -100.0
+            450.0,
+            373.0
           ],
           "orientation": [
             0.0,
@@ -856,8 +856,8 @@
       "name": "top_ui_timer",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ 0.0, 365.0 ],
+          "prev_position": [ 0.0, 365.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -883,8 +883,8 @@
       "name": "top_ui_goal_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ 775.0, 373.0 ],
+          "prev_position": [ 775.0, 373.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -911,8 +911,8 @@
       "name": "top_ui_oxygen_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ -861.0, 398.0 ],
+          "prev_position": [ -861.0, 398.0 ],
           "orientation": [ 0.0, 30.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -965,8 +965,8 @@
       "name": "top_ui_panic_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ -875.0, 348.0 ],
+          "prev_position": [ -875.0, 348.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -992,8 +992,8 @@
       "name": "top_ui_mineral_count_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ 590.0, 373.0 ],
+          "prev_position": [ 590.0, 373.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -1019,8 +1019,8 @@
       "name": "top_ui_timer_count_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ 72.0, 373.0 ],
+          "prev_position": [ 72.0, 373.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -1046,8 +1046,8 @@
       "name": "top_ui_goal_percentage_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
+          "position": [ 895.0, 373.0 ],
+          "prev_position": [ 895.0, 373.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]
         },
@@ -1073,7 +1073,7 @@
       "name": "fps_counter_in_game",
       "components": {
         "Transform2D": {
-          "position": [ -200.0, 364.0 ],
+          "position": [ 830.0, 273.0 ],
           "prev_position": [ -200.0, 364.0 ],
           "orientation": [ 0.0, 0.0 ],
           "scale": [ 1.0, 1.0 ]

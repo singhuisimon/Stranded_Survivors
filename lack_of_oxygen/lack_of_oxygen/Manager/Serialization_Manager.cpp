@@ -707,7 +707,7 @@ namespace lof {
             }
 
             //add state
-            script_obj.AddMember("state", rapidjson::Value(static_cast<int>(scripts->state)), allocator);
+            //script_obj.AddMember("state", rapidjson::Value(static_cast<int>(scripts->state)), allocator);
 
             //boolean isactive
             script_obj.AddMember("is_active", scripts->is_active, allocator);

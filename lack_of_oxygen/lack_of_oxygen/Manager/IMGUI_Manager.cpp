@@ -396,6 +396,35 @@ namespace lof {
         if (GFXM.get_editor_mode() == 1) {
             ImGui::Begin("Game Viewport", nullptr);
 
+
+            if (game_playing) {
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 1.0, 0.0, 1.0));
+                ImGui::Text("GAME IS PLAYING");
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
+                if (ImGui::Button("PAUSE")) {
+                    game_playing = false;
+                }
+
+                ImGui::PopStyleColor();
+                ImGui::PopStyleColor();
+            }
+            else {
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 0.0, 0.0, 1.0));
+                ImGui::Text("GAME IS PAUSED");
+
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 1.0, 0.0, 1.0));
+                if (ImGui::Button("PLAY")) {
+                    game_playing = true;
+                }
+
+                ImGui::PopStyleColor();
+                ImGui::PopStyleColor();
+
+            }
+
             auto texture = GFXM.get_framebuffer_texture();
             ImVec2 texture_pos = ImGui::GetCursorScreenPos();
 
@@ -650,38 +679,38 @@ namespace lof {
             ++current_object_index;
         }
 
-        //Edit button
-        ImGui::Text("\n");
-        if (ImGui::Button("Edit Game Object")) {
-            show_window = !show_window;
-        }
+        ////Edit button
+        //ImGui::Text("\n");
+        //if (ImGui::Button("Edit Game Object")) {
+        //    show_window = !show_window;
+        //}
 
-        //Remove button; Disabled for when the Player entity is selected
-        ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
-        if (ImGui::Button("Remove Game Object")) {
-            remove_game_obj = !remove_game_obj;
-        }
-        ImGui::EndDisabled();
+        ////Remove button; Disabled for when the Player entity is selected
+        //ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
+        //if (ImGui::Button("Remove Game Object")) {
+        //    remove_game_obj = !remove_game_obj;
+        //}
+        //ImGui::EndDisabled();
 
-        //Create Game Object button
-        ImGui::Text("\n");
-        if (ImGui::Button("Create Game Object From Prefab")) {
+        ////Create Game Object button
+        //ImGui::Text("\n");
+        //if (ImGui::Button("Create Game Object From Prefab")) {
 
-            create_game_obj = !create_game_obj;
-        }
+        //    create_game_obj = !create_game_obj;
+        //}
 
-        //Save Changes button
-        if (ImGui::Button("Save Changes")) {
-            const std::string SCENES = "Scenes";
+        ////Save Changes button
+        //if (ImGui::Button("Save Changes")) {
+        //    const std::string SCENES = "Scenes";
 
-            std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
-            if (SM.save_game_state(scene_path.c_str())) {
-                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
-            }
-            else {
-                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Failed saved game state");
-            }
-        }
+        //    std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
+        //    if (SM.save_game_state(scene_path.c_str())) {
+        //        LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
+        //    }
+        //    else {
+        //        LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Failed saved game state");
+        //    }
+        //}
 
         ImGui::End();
 
@@ -717,11 +746,46 @@ namespace lof {
 
         ImGui::Begin("Edit Object Properties");
 
+        const auto& entities = ecs.get_entities();
+
+        //Edit button
+        ImGui::Text("Selected Game Object Functionalities:\n");
+        if (ImGui::Button("Edit Game Object")) {
+            show_window = !show_window;
+        }
+
+        //Remove button; Disabled for when the Player entity is selected
+        ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
+        if (ImGui::Button("Remove Game Object")) {
+            remove_game_obj = !remove_game_obj;
+        }
+        ImGui::EndDisabled();
+
+        //Create Game Object button
+        if (ImGui::Button("Create Game Object From Prefab")) {
+
+            create_game_obj = !create_game_obj;
+        }
+
+        //Save Changes button
+        if (ImGui::Button("Save Changes")) {
+            const std::string SCENES = "Scenes";
+
+            std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
+            if (SM.save_game_state(scene_path.c_str())) {
+                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
+            }
+            else {
+                LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Failed saved game state");
+            }
+        }
+
+        
         if (!show_window) {
-            ImGui::Text("Select a game object to edit it.");
+            //ImGui::Text("Select a game object to edit it.");
         }
         else {
-            const auto& entities = ecs.get_entities();
+            //const auto& entities = ecs.get_entities();
 
             //For animation dropdown
             //If the selected object has changed, reset filled and clear assigned names for new object
@@ -733,10 +797,12 @@ namespace lof {
             }
 
             if (selected_object_index == -1) {
-                ImGui::Text("Select a game object to edit it.");
+                //ImGui::Text("Select a game object to edit it.");
             }
             else {
 
+                ImGui::NewLine();
+                ImGui::Separator();
                 std::string Name = entities[selected_object_index]->get_name();
                 std::string condition_name_model = "Name of Entity";
 
@@ -1132,6 +1198,10 @@ namespace lof {
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
+
+                        if (ImGui::Button("Add Sound")) {
+                            audio.add_sound();
+                        }
 
                         //gets a collection of sounds from audio component (not sound map)
                         auto& sounds = audio.get_sounds();

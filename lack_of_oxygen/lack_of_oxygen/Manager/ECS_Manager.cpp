@@ -380,7 +380,7 @@ namespace lof {
                     //system that use time in the update
                     if (is_physics) {
 
-                        if (level_editor_mode) {
+                        if (!game_playing) {
                             system->set_time(0);
                             continue;
                         }
@@ -398,7 +398,7 @@ namespace lof {
                     
                   }
                 else { //systems that do not use time in calculations
-                    if (system->get_type() == "Audio_System" && level_editor_mode) {
+                    if ((system->get_type() == "Audio_System" || system->get_type() == "Animation_System") && !game_playing) {
                         system->set_time(0);
                         continue; //skip audio in the level editor mode
                     }
