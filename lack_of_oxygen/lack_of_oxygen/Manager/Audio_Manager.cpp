@@ -186,6 +186,11 @@ namespace lof {
 	}
 
 	void Audio_Manager::play_now(EntityID entity_id, const std::string& audio_key, Audio_Component& audio_component, bool bgm) {
+
+		if (audio_component.get_sound_by_key(audio_key) == nullptr) {
+			return; //does nothing.
+		}
+
 		std::string file_path = audio_component.get_filepath(audio_key);
 		std::string channel_key = file_path + std::to_string(entity_id) + audio_key;
 

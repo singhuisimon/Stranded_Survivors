@@ -381,8 +381,6 @@ namespace lof {
          * @param pitch Contains the pitch level for the sound.
          * @param islooping Contains the loop state of the sound
          */
-        /*void add_sound(const std::string& key, const std::string& filepath, PlayState state, AudioType type,
-            float volume, float pitch, bool islooping) {*/
         /*void add_sound(const std::string & key, const std::string & filepath, AudioType type, int num,
             float volume, float pitch, bool islooping, bool isactive, unsigned int playcount, bool is3d) {*/
         void add_sound(const std::string& key, const std::string& filepath, AudioType type, int num,
@@ -443,6 +441,20 @@ namespace lof {
    //         new_sound.is3d = is3d;
 
             //sounds.push_back(new_sound);
+        }
+
+        /**
+        * @brief Remove a soundconfig from sound vector
+        * @param key The unique identifier of soundconfig
+        */
+        void remove_sound(const std::string& key) {
+            auto it = std::find_if(sounds.begin(), sounds.end(),
+                [&](const SoundConfig& sound) { return sound.key == key; });
+
+            if (it != sounds.end()) {
+                sounds.erase(it); // Erase the found element
+                std::cout << "erase the key " << key << std::endl;
+            }
         }
 
         /**
@@ -551,7 +563,7 @@ namespace lof {
                 if (sound.key == key) {
                     sound.volume = std::clamp(volume, 0.0f, 1.0f);
                 }
-                std::cout << sound.volume << std::endl; LM.write_log("volume change %f", sound.volume);
+                //std::cout << sound.volume << std::endl; LM.write_log("volume change %f", sound.volume);
             }
         }
 
@@ -624,39 +636,6 @@ namespace lof {
                 }
             }
         }
-
-        ///**
-        //* @brief Getter for toplay in soundconfig
-        //* @param key The unique identifier for soundconfig
-        //*/
-        //unsigned int get_playcount(const std::string& key) const {
-        //    return get_sound_by_key(key)->playcount;
-        //}
-
-        ///**
-        //* @brief Increase playcount
-        //* @param playcount The new unsigned int value for playcount
-        //*/
-        //void increase_playcount(const std::string& key) {
-        //    for (auto& sound : sounds) {
-        //        if (sound.key == key) {
-        //            sound.playcount++;
-        //        }
-        //    }
-        //}
-
-        ///**
-        //* @brief Setter for is toplay
-        //* @param key The unique identifier for soundconfig
-        //* @param new_count The new unsigned int value for playcount
-        //*/
-        //void set_playcount(const std::string& key, unsigned int new_count) {
-        //    for (auto& sound : sounds) {
-        //        if (sound.key == key) {
-        //            sound.playcount = new_count;
-        //        }
-        //    }
-        //}
 
         /**
         * @brief Setter for is 3D
