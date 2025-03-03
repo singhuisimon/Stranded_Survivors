@@ -133,7 +133,12 @@ namespace lof {
 		/**
 		 * @brief Unmute the sound layer.
 		 * @param entity_id The entity id of the entity playing the sound.
-		 * @param audio_key The key of the audio to be unmuted.
+		 * @param audio_key The key of the audio to be 
+		 
+		 
+		 
+		 
+		 .
 		 * @param file_path The file path of the audio to be unmuted.
 		 */
 		void unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
@@ -235,9 +240,9 @@ namespace lof {
 		 * @brief Set the new_scene flag
 		 * @param new_scene_state The new state of the new_scene flag
 		 */
-		void set_new_scene(bool new_scene_state) {
-			new_scene = new_scene_state;
-		}
+		void set_new_scene(bool new_scene_state);
+
+		bool get_new_scene();
 
 	private:
 

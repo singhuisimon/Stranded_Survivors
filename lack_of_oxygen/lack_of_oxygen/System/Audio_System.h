@@ -75,7 +75,7 @@ namespace lof {
 		 * @param audio_key The unique identifier of the soundconfig
 		 * @param entity A reference to a Audio Component.
 		 */
-		void play_sfx_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio);
+		void play_sfx_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio, bool play_once_only = false);
 
 		/**
 		 * @brief Plays the provided FMOD::Sound object.
@@ -143,6 +143,8 @@ namespace lof {
 		
 
 	private:
+
+		void new_load_scene();
 
 		FMOD::System* core_system;	///<Core audio system
 

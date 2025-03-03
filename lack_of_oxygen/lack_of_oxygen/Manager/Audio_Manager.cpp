@@ -209,7 +209,12 @@ namespace lof {
 						Transform2D& transform = ECSM.get_component<Transform2D>(entity_id);
 						audio_component.set_position(vec2d_to_vec3d(transform.position));
 					}
-					audio_system->play_sfx_sound(file_path, channel_key, audio_key, audio_component);
+					if (audio_component.get_audio_type(audio_key) == AudioType::UI) {
+						audio_system->play_sfx_sound(file_path, channel_key, audio_key, audio_component, true);
+					}
+					else {
+						audio_system->play_sfx_sound(file_path, channel_key, audio_key, audio_component);
+					}
 				}
 				else {
 
@@ -232,61 +237,61 @@ namespace lof {
 		}
 	}
 
-	void Audio_Manager::mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
-		//TODO IMPLEMENT A MUTE FUNCTION/FADE OUT FUNCTION INSIDE THE AUDIO SYSTEM AND USE IT TO ADJUST THE AUDIO TO MINIMUM.
-		
-		for (auto& system : ECSM.get_systems()) {
-			if (system->get_type() == "Audio_System") {
-				auto* audio_system = static_cast<Audio_System*>(system.get());
-				std::string channel_key = audio_system->generate_channel_key(entity_id, file_path, audio_key);
+	//void Audio_Manager::mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
+	//	//TODO IMPLEMENT A MUTE FUNCTION/FADE OUT FUNCTION INSIDE THE AUDIO SYSTEM AND USE IT TO ADJUST THE AUDIO TO MINIMUM.
+	//	
+	//	for (auto& system : ECSM.get_systems()) {
+	//		if (system->get_type() == "Audio_System") {
+	//			auto* audio_system = static_cast<Audio_System*>(system.get());
+	//			std::string channel_key = audio_system->generate_channel_key(entity_id, file_path, audio_key);
 
-				if (!audio_system->is_sound_playing(channel_key)) {
-					play_now(entity_id, audio_key, ECSM.get_component<Audio_Component>(entity_id), true);
-				}
+	//			if (!audio_system->is_sound_playing(channel_key)) {
+	//				play_now(entity_id, audio_key, ECSM.get_component<Audio_Component>(entity_id), true);
+	//			}
 
-				bool muted = false;
-				audio_system->get_channel_mute(channel_key, muted);
+	//			bool muted = false;
+	//			audio_system->get_channel_mute(channel_key, muted);
 
-				if (muted) {
-					return;
-				}
+	//			if (muted) {
+	//				return;
+	//			}
 
-				audio_system->set_channel_mute(channel_key, true);
-				LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u",
-					audio_key.c_str(), file_path.c_str(), entity_id);
+	//			audio_system->set_channel_mute(channel_key, true);
+	//			LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u",
+	//				audio_key.c_str(), file_path.c_str(), entity_id);
 
-				LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
-			}
-		}
+	//			LM.write_log("Audio_Manager::mute_layer: muting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
+	//		}
+	//	}
 
-	}
+	//}
 
-	void Audio_Manager::unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
-		//TODO IMPLEMENT A MUTE FUNCTION/FADE OUT FUNCTION INSIDE THE AUDIO SYSTEM AND USE IT TO ADJUST THE AUDIO TO MINIMUM.
+	//void Audio_Manager::unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
+	//	//TODO IMPLEMENT A MUTE FUNCTION/FADE OUT FUNCTION INSIDE THE AUDIO SYSTEM AND USE IT TO ADJUST THE AUDIO TO MINIMUM.
 
-		for (auto& system : ECSM.get_systems()) {
-			if (system->get_type() == "Audio_System") {
-				auto* audio_system = static_cast<Audio_System*>(system.get());
-				std::string channel_key = audio_system->generate_channel_key(entity_id, file_path, audio_key);
+	//	for (auto& system : ECSM.get_systems()) {
+	//		if (system->get_type() == "Audio_System") {
+	//			auto* audio_system = static_cast<Audio_System*>(system.get());
+	//			std::string channel_key = audio_system->generate_channel_key(entity_id, file_path, audio_key);
 
-				if (!audio_system->is_sound_playing(channel_key)) {
-					play_now(entity_id, audio_key, ECSM.get_component<Audio_Component>(entity_id), true);
-				}
+	//			if (!audio_system->is_sound_playing(channel_key)) {
+	//				play_now(entity_id, audio_key, ECSM.get_component<Audio_Component>(entity_id), true);
+	//			}
 
-				bool muted = false;
-				audio_system->get_channel_mute(channel_key, muted);
+	//			bool muted = false;
+	//			audio_system->get_channel_mute(channel_key, muted);
 
-				if (!muted) {
-					return;
-				}
+	//			if (!muted) {
+	//				return;
+	//			}
 
-				audio_system->set_channel_mute(channel_key, false);
+	//			audio_system->set_channel_mute(channel_key, false);
 
-				LM.write_log("Audio_Manager::unmute_layer: unmuting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
-			}
-		}
+	//			LM.write_log("Audio_Manager::unmute_layer: unmuting layer %s (filepath: %s) for entity %u", audio_key.c_str(), file_path.c_str(), entity_id);
+	//		}
+	//	}
 
-	}
+	//}
 
 	void Audio_Manager::stop_now(EntityID entity_id, const std::string& audio_key, const std::string& file_path) {
 		std::string channel_key = file_path + std::to_string(entity_id) + audio_key;
@@ -314,56 +319,99 @@ namespace lof {
 
 		auto& audio_background = ECSM.get_component<Audio_Component>(background_id);
 
-		//Scene 1: play base BGM only once
-		if (current_scene == 1) {
-
-			if (!new_scene) {
-				return;
-			}
-
-			play_now(background_id, "bgm1", audio_background, true);
-			new_scene = false;
-			//std::cout << "file detected for bgm1 in scene 1: " << audio_background.get_filepath("bgm1") << std::endl;
-		}
-		else if (current_scene == 2) {
-
-			if (new_scene) {
+		//new logic
+		if (new_scene) {
+			if (current_scene == 2) {
 				std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3" };
 				for (const auto& layer : base_layers) {
 					if (!is_layer_playing(background_id, layer)) {
-						play_now(background_id, layer, audio_background, true);
+						audio_background.set_isactive(layer, true);
 					}
 				}
 
 				std::vector<std::string> other_layers = { "bgm 80", "bgm 50_1", "bgm 50_2", "bgm 35", "bgm 25", "bgm 20" };
 				for (const auto& layer : other_layers) {
 					if (!is_layer_playing(background_id, layer)) {
-						mute_layer(background_id, layer, audio_background.get_filepath(layer));
+						audio_background.set_isactive(layer, false);
 					}
 				}
-
-				new_scene = false;
 			}
-
-			// A vector of pair for the condition and which the sound is going to be played
-			std::vector<std::pair<float, std::string>> oxygen_layers = {
-				{80, "bgm 80"}, {50, "bgm 50_1"}, {50, "bgm 50_2"},
-				{35, "bgm 35"}, {25, "bgm 25"}, {20, "bgm 20"}
-			};
-
-			for (const auto& [condition, audio_key] : oxygen_layers) {
-				const std::string& filepath = audio_background.get_filepath(audio_key);
-				//if oxygen is increasing and oxygen level is above certain condition mute the bgm layers affected
-				if (increasing && oxygen_level >= condition) {
-					mute_layer(background_id, audio_key, filepath);
-				}
-				//if oxygen is decreasing and oxygen level is below certain condition unmute the bgm layers affected
-				else if (!increasing && oxygen_level <= condition) {
-					unmute_layer(background_id, audio_key, filepath);
-				}
-			}
-
 		}
+
+		// A vector of pair for the condition and which the sound is going to be played
+		std::vector<std::pair<float, std::string>> oxygen_layers = {
+			{80, "bgm 80"}, {50, "bgm 50_1"}, {50, "bgm 50_2"},
+			{35, "bgm 35"}, {25, "bgm 25"}, {20, "bgm 20"}
+		};
+
+		for (const auto& [condition, audio_key] : oxygen_layers) {
+			const std::string& filepath = audio_background.get_filepath(audio_key);
+			//if oxygen is increasing and oxygen level is above certain condition mute the bgm layers affected
+			if (increasing && oxygen_level >= condition) {
+				audio_background.set_isactive(audio_key, false);
+			}
+			//if oxygen is decreasing and oxygen level is below certain condition unmute the bgm layers affected
+			else if (!increasing && oxygen_level <= condition) {
+				audio_background.set_isactive(audio_key, true);
+			}
+		}
+
+		//old logic
+		//Scene 1: play base BGM only once
+		//if (current_scene == 1) {
+
+		//	if (!new_scene) {
+		//		return;
+		//	}
+
+		//	//audio_background.set_isactive("bgm1", true);
+		//	play_now(background_id, "bgm1", audio_background, true);
+		//	new_scene = false;
+		//	//std::cout << "file detected for bgm1 in scene 1: " << audio_background.get_filepath("bgm1") << std::endl;
+		//}
+		//else if (current_scene == 2) {
+
+		//	if (new_scene) {
+		//		std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3" };
+		//		for (const auto& layer : base_layers) {
+		//			if (!is_layer_playing(background_id, layer)) {
+		//				//audio_background.set_isactive(layer, true);
+		//				play_now(background_id, layer, audio_background, true);
+		//			}
+		//		}
+
+		//		std::vector<std::string> other_layers = { "bgm 80", "bgm 50_1", "bgm 50_2", "bgm 35", "bgm 25", "bgm 20" };
+		//		for (const auto& layer : other_layers) {
+		//			if (!is_layer_playing(background_id, layer)) {
+		//				//audio_background.set_isactive(layer, false);
+		//				mute_layer(background_id, layer, audio_background.get_filepath(layer));
+		//			}
+		//		}
+
+		//		new_scene = false;
+		//	}
+
+		//	// A vector of pair for the condition and which the sound is going to be played
+		//	std::vector<std::pair<float, std::string>> oxygen_layers = {
+		//		{80, "bgm 80"}, {50, "bgm 50_1"}, {50, "bgm 50_2"},
+		//		{35, "bgm 35"}, {25, "bgm 25"}, {20, "bgm 20"}
+		//	};
+
+		//	for (const auto& [condition, audio_key] : oxygen_layers) {
+		//		const std::string& filepath = audio_background.get_filepath(audio_key);
+		//		//if oxygen is increasing and oxygen level is above certain condition mute the bgm layers affected
+		//		if (increasing && oxygen_level >= condition) {
+		//			//audio_background.set_isactive(audio_key, false);
+		//			mute_layer(background_id, audio_key, filepath);
+		//		}
+		//		//if oxygen is decreasing and oxygen level is below certain condition unmute the bgm layers affected
+		//		else if (!increasing && oxygen_level <= condition) {
+		//			//audio_background.set_isactive(audio_key, true);
+		//			unmute_layer(background_id, audio_key, filepath);
+		//		}
+		//	}
+
+		//}
 
 	}
 
@@ -396,7 +444,7 @@ namespace lof {
 		mastergroup->isPlaying(&playing);
 		if (playing) {
 			errorcheck(mastergroup->stop(), "Audio_System::stop_mastergroup", "stop master group");
-			new_scene = true;
+			//new_scene = true;
 		}
 	}
 
@@ -562,5 +610,13 @@ namespace lof {
 		}
 
 		return result.empty() ? "Unknown Mode" : result;
+	}
+
+	void Audio_Manager::set_new_scene(bool new_scene_state) {
+		new_scene = new_scene_state;
+	}
+
+	bool Audio_Manager::get_new_scene() {
+		return new_scene;
 	}
 }
