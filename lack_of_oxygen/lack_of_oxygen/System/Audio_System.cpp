@@ -126,21 +126,12 @@ namespace lof {
 
 				//play logic
 				if ((audio_type == AudioType::BGM && ADM.get_new_scene()) && audio.get_loop(audio_key)) {
-					std::cout << "hello " << file_path << " " << audio_key << std::endl;
+					//std::cout << "hello " << file_path << " " << audio_key << std::endl;
 					play_bgm_sound(file_path, channel_key, audio_key, audio);
 				}
 
 				//Handle mute sound if isactive == false
-				/*if (channel_map.find(channel_key) != channel_map.end()) {
-					
-				}*/
 				if (!audio.get_active(audio_key)) {
-					//check if the channel is in the channel_map
-					/*if (channel_map.find(channel_key) != channel_map.end()) {
-						set_channel_mute(channel_key, true);
-					}*/
-					//channel not found, meaning sound is not playing
-					//continue;
 					set_channel_mute(channel_key, true);
 				}
 				else {
@@ -204,8 +195,8 @@ namespace lof {
 		core_system->update();
 
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
-		get_active_channels();
-		get_muted_channels();
+		//get_active_channels();
+		//get_muted_channels();
 
 		if (ADM.get_new_scene()) {
 			ADM.set_new_scene(false);
@@ -555,11 +546,11 @@ namespace lof {
 			}*/
 
 			if (mute && !muted) {
-				LM.write_log("Muting Channel: %s", channel_key.c_str());
+				//LM.write_log("Muting Channel: %s", channel_key.c_str());
 				channel->setMute(true);
 			}
 			else if (!mute && muted) {
-				LM.write_log("Unmuting Channel: %s", channel_key.c_str());
+				//LM.write_log("Unmuting Channel: %s", channel_key.c_str());
 				channel->setMute(false);
 			}
 		}
@@ -676,7 +667,7 @@ namespace lof {
 				}
 			}
 
-			std::cout << key << " channel size: " << channels.size() << std::endl;
+			//std::cout << key << " channel size: " << channels.size() << std::endl;
 		}
 	}
 
@@ -696,7 +687,7 @@ namespace lof {
 
 			}
 
-			std::cout << key << " channel size: " << channels.size() << std::endl;
+			//std::cout << key << " channel size: " << channels.size() << std::endl;
 		}
 	}
 
