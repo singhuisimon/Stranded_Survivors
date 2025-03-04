@@ -25,6 +25,23 @@ namespace lof {
 		shutdown();
 	}
 
+	void Audio_System::new_load_scene() {
+		LM.write_log("Clearing all audio channels on scene change.");
+
+		// Stop all sounds before clearing
+		for (auto& [key, channels] : channel_map) {
+			for (FMOD::Channel* channel : channels) {
+				if (channel) {
+					channel->stop();
+				}
+			}
+		}
+
+		// Clear the channel map
+		channel_map.clear();
+
+	}
+
 	bool Audio_System::initialize() {
 		FMOD_RESULT result;
 
@@ -45,30 +62,9 @@ namespace lof {
 
 		(void)delta_time;
 
-		/*while (!sound_queue.empty()) {
-			auto request = sound_queue.front();
-			sound_queue.pop();
-
-			if (!ECSM.has_component<Audio_Component>(request.entityID)) {
-				continue;
-			}
-
-			Audio_Component& audio = ECSM.get_component<Audio_Component>(request.entityID);
-
-			if (!ASM.load_audio_file(audio.get_filepath(request.audio_key)) || !audio.get_active(request.audio_key)) {
-				continue;
-			}
-
-			std::string filepath = audio.get_filepath(request.audio_key);
-			std::string channel_key = filepath + std::to_string(request.entityID) + request.audio_key;
-			AudioType audiotype = audio.get_audio_type(request.audio_key);
-			if (audiotype == AudioType::BGM) {
-				play_bgm_sound(filepath, channel_key, request.audio_key, audio);
-			}
-			else if (audiotype == AudioType::SFX || audiotype == AudioType::UI) {
-				play_sfx_sound(filepath, channel_key, request.audio_key, audio);
-			}
-		}*/
+		if (ADM.get_new_scene()) {
+			new_load_scene(); //erase channel map and stop all sound.
+		}
 
 		const auto& entityids = get_entities();
 
@@ -128,32 +124,26 @@ namespace lof {
 					}
 				}
 
+				//play logic
+				if ((audio_type == AudioType::BGM && ADM.get_new_scene()) && audio.get_loop(audio_key)) {
+					//std::cout << "hello " << file_path << " " << audio_key << std::endl;
+					play_bgm_sound(file_path, channel_key, audio_key, audio);
+				}
+
+				//Handle mute sound if isactive == false
+				if (!audio.get_active(audio_key)) {
+					set_channel_mute(channel_key, true);
+				}
+				else {
+					//if its not active means its not to be heard.
+					set_channel_mute(channel_key, false);
+				}
+
+
 				if (channel_map.find(channel_key) == channel_map.end()) {
 					//channel not found, meaning sound is not playing and has been safely removed.
 					continue;
 				}
-
-				//play logic
-				//Handle stopping sound if isactive == false
-				//if (!audio.get_active(audio_key)) {
-				//	if (channel_map.find(channel_key) == channel_map.end()) {
-				//		//channel not found, meaning sound is not playing
-				//		continue;
-				//	}
-				//	stop_sound(channel_key);
-				//	continue;
-				//}
-
-				//while (audio.get_playcount(audio_key) > 0) {
-				//	if (audio_type == BGM) {
-				//		play_bgm_sound(file_path, channel_key, audio_key, audio);
-				//	}
-				//	else if (audio_type == SFX || audio_type == UI) {
-				//		play_sfx_sound(file_path, channel_key, audio_key, audio);
-				//	}
-
-				//	audio.set_playcount(audio_key, audio.get_playcount(audio_key) - 1);
-				//}
 
 				//remove finished playing logic
 				std::vector<FMOD::Channel*> to_remove;
@@ -207,6 +197,10 @@ namespace lof {
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
 		//get_active_channels();
 		//get_muted_channels();
+
+		if (ADM.get_new_scene()) {
+			ADM.set_new_scene(false);
+		}
 	}
 
 	void Audio_System::shutdown() {
@@ -229,7 +223,7 @@ namespace lof {
 		return file_path + std::to_string(entity_id) + audio_key;
 	}
 
-	void Audio_System::play_sfx_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio) {
+	void Audio_System::play_sfx_sound(const std::string& file_path, std::string& cskey, const std::string& audio_key, const Audio_Component& audio, bool play_once_only) {
 
 		auto it1 = all_prev_filepath_map.find(audio_key);
 		if (it1 == all_prev_filepath_map.end()) {
@@ -261,10 +255,12 @@ namespace lof {
 				bool playing = false;
 				existing_channel->isPlaying(&playing);
 				if (playing) {
-					int get_current_loop_count;
-					existing_channel->getLoopCount(&get_current_loop_count);
-					existing_channel->setLoopCount(get_current_loop_count + 1);
-					//LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
+					if (play_once_only) {
+						int get_current_loop_count;
+						existing_channel->getLoopCount(&get_current_loop_count);
+						existing_channel->setLoopCount(get_current_loop_count + 1);
+						//LM.write_log("Audio_System::play_sfx_sound: Loop count increased for %s", cskey.c_str());
+					}
 					return;
 				}
 				else {
@@ -345,8 +341,8 @@ namespace lof {
 				stop_sound(cskey);
 			}
 
-			LM.write_log("BGM %s is already playing", cskey.c_str());
-			return;
+			//LM.write_log("BGM %s is already playing", cskey.c_str());
+			//return;
 		}
 
 		//check has the sound filepath has been changed
@@ -400,7 +396,7 @@ namespace lof {
 			channel->setPitch(audio.get_pitch(audio_key));
 			channel->setVolume(audio.get_volume(audio_key));
 
-			std::cout << "bgm is playing at " << audio.get_volume(audio_key) << std::endl;
+			//std::cout << "bgm is playing at " << audio.get_volume(audio_key) << std::endl;
 
 			//debug_list_active_sounds();
 		}
@@ -454,9 +450,11 @@ namespace lof {
 				return;
 			}
 
-			bool playstate_currchannel = false;
-			ADM.errorcheck(channel->isPlaying(&playstate_currchannel), "Audio_System::stop_sound", "check sound playing");
-			if (playstate_currchannel) {
+			bool playing_currchannel = false;
+			bool paused_currchannel = false;
+			ADM.errorcheck(channel->isPlaying(&playing_currchannel), "Audio_System::stop_sound", "check sound playing");
+			ADM.errorcheck(channel->isPlaying(&paused_currchannel), "Audio_System::stop_sound", "check sound paused");
+			if (playing_currchannel || paused_currchannel) {
 				ADM.errorcheck(channel->stop(), "Audio_System::stop_sound", "stop channel" + channel_key); //if the channel is playing stop it
 			}
 			else {
@@ -516,7 +514,11 @@ namespace lof {
 		auto it = channel_map.find(channel_key);
 		
 		if (it == channel_map.end()) {
-			LM.write_log("Audio_System::set_channel_mute: failed to set channel mute as channel is not in channel map.");
+			if (channel_key.find("bgm") != std::string::npos) {
+				LM.write_log("Audio_System::set_channel_mute: failed to set channel %s mute as channel is not in channel map.", channel_key.c_str());
+			}
+			
+			//debug_list_active_sounds();
 			return;
 		}
 
@@ -526,7 +528,7 @@ namespace lof {
 
 		for (FMOD::Channel* channel : channels) {
 			channel->getMute(&muted);
-			if (mute) {
+			/*if (mute) {
 				if (!muted) {
 					channel->setMute(true);
 				}
@@ -541,6 +543,15 @@ namespace lof {
 				else {
 					channel->setMute(false);
 				}
+			}*/
+
+			if (mute && !muted) {
+				//LM.write_log("Muting Channel: %s", channel_key.c_str());
+				channel->setMute(true);
+			}
+			else if (!mute && muted) {
+				//LM.write_log("Unmuting Channel: %s", channel_key.c_str());
+				channel->setMute(false);
 			}
 		}
 	}
@@ -650,7 +661,10 @@ namespace lof {
 				channel->isPlaying(&playing);
 				if (playing) {
 					LM.write_log("Active channel %s", key.c_str());
-				}				
+				}
+				else {
+					LM.write_log("InActive channel %s", key.c_str());
+				}
 			}
 
 			//std::cout << key << " channel size: " << channels.size() << std::endl;
@@ -666,6 +680,9 @@ namespace lof {
 				channel->getMute(&muted);
 				if (muted) {
 					LM.write_log("Current channek %s is muted", key.c_str());
+				}
+				else {
+					LM.write_log("Current channek %s is unmuted", key.c_str());
 				}
 
 			}
@@ -698,10 +715,12 @@ namespace lof {
 		}
 
 		bool isplaying = false;
+		bool paused = false;
 
 		for (FMOD::Channel* channel : it->second) {
 			channel->isPlaying(&isplaying);
-			if (isplaying) {
+			channel->getPaused(&paused);
+			if (isplaying && !paused) {
 				return true;
 			}
 		}
