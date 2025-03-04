@@ -114,31 +114,31 @@ namespace lof {
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
-            add_system(std::make_unique<Collision_System>());
+            add_system(std::make_unique<Collision_System>(), true, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
-            add_system(std::make_unique<Movement_System>());
+            add_system(std::make_unique<Movement_System>(), true, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
-            add_system(std::make_unique<Render_System>());
+            add_system(std::make_unique<Render_System>(), false, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<GUI_System>(*this));
+            add_system(std::make_unique<GUI_System>(*this), false, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
 
-            add_system(std::make_unique<Audio_System>());
+            add_system(std::make_unique<Audio_System>(), false, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
 
-            add_system(std::make_unique<Animation_System>()); 
+            add_system(std::make_unique<Animation_System>(), false, false); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
 
-            add_system(std::make_unique<Logic_System>());
+            add_system(std::make_unique<Logic_System>(), false, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
-            add_system(std::make_unique<Interruption_System>(window)); 
+            add_system(std::make_unique<Interruption_System>(window), false, false); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
 
-            add_system(std::make_unique<Particle_System>());
+            add_system(std::make_unique<Particle_System>(), false, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Particle_System'.");
 
             m_is_started = true;
@@ -353,7 +353,7 @@ namespace lof {
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{
         return systems;
     }
-
+#if 0
     void ECS_Manager::add_system(std::unique_ptr<System> system) {
         // Get the system type before moving
         std::string system_type = system->get_type();
@@ -362,16 +362,15 @@ namespace lof {
         systems.emplace_back(std::move(system));
         LM.write_log("ECS_Manager::add_system(): System '%s' added successfully.", systems.back()->get_type().c_str());
     }
-
+#endif
     void ECS_Manager::update(float delta_time) {
 
         //get the fixed time and step count
         int steps = std::min(FPSM.get_current_number_of_steps(), DEFAULT_MAX_STEPS); 
         float fixed_dt = FPSM.get_fixed_delta_time(); 
 
-
+#if 0
             for (auto& system : systems) {
-
 
                 bool is_physics = system->get_type() == "Movement_System" || system->get_type() == "Collision_System"; 
                 //system that use time in the update
@@ -413,7 +412,33 @@ namespace lof {
                
                
             }
+#endif
 
+            if (level_editor_mode) {
+                for (auto system : gameplay_dependent_systems) {
+                    system->set_time(0);
+                }
+            }
+            else {
+                //update fixed dt systems
+                for (int i = 0; i < steps; ++i) {
+                    for (auto system : fixed_dt_systems) {
+                        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                        // Updating each system 
+                        system->update(fixed_dt);
+                        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+
+                    }
+                }
+            }
+
+            for (auto system : dt_update_systems) {
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+
+            }
     }
 
     Entity* ECS_Manager::get_entity(EntityID entity_id) {
@@ -486,4 +511,27 @@ namespace lof {
         }
     }
 
+
+    void ECS_Manager::add_system(std::unique_ptr<System> system, bool uses_fixed_update, bool depends_on_gameplay) {
+
+        //get the system type for logging
+        std::string system_type = system->get_type();
+        LM.write_log("ECS_Manager::add_system(): Adding system %s.", system_type.c_str());
+
+        //Add to appropriate category lists. 
+        if (uses_fixed_update) {
+            fixed_dt_systems.push_back(system.get()); 
+        }
+        else {
+            dt_update_systems.push_back(system.get());
+        }
+
+        if (depends_on_gameplay) {
+            gameplay_dependent_systems.push_back(system.get()); 
+        }
+
+        //Add to the main systems 
+        systems.emplace_back(std::move(system));
+        LM.write_log("ECS_Manager::add_system(): System '%s' added successfully.", systems.back()->get_type().c_str());
+    }
 } // namespace lof
