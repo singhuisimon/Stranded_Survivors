@@ -40,17 +40,44 @@ namespace lof {
 
 		return true;
 	}
+
 	void Audio_System::update(float delta_time) {
 
 		(void)delta_time;
+
+		/*while (!sound_queue.empty()) {
+			auto request = sound_queue.front();
+			sound_queue.pop();
+
+			if (!ECSM.has_component<Audio_Component>(request.entityID)) {
+				continue;
+			}
+
+			Audio_Component& audio = ECSM.get_component<Audio_Component>(request.entityID);
+
+			if (!ASM.load_audio_file(audio.get_filepath(request.audio_key)) || !audio.get_active(request.audio_key)) {
+				continue;
+			}
+
+			std::string filepath = audio.get_filepath(request.audio_key);
+			std::string channel_key = filepath + std::to_string(request.entityID) + request.audio_key;
+			AudioType audiotype = audio.get_audio_type(request.audio_key);
+			if (audiotype == AudioType::BGM) {
+				play_bgm_sound(filepath, channel_key, request.audio_key, audio);
+			}
+			else if (audiotype == AudioType::SFX || audiotype == AudioType::UI) {
+				play_sfx_sound(filepath, channel_key, request.audio_key, audio);
+			}
+		}*/
+
 		const auto& entityids = get_entities();
 
 		std::vector<std::string> channels_to_remove;
 
 		for (EntityID entityID : entityids) {
-			if (!ECSM.has_component<Audio_Component>(entityID)) {
+			/*if (!ECSM.has_component<Audio_Component>(entityID)) {
 				continue;
-			}
+			}*/
 
 			Audio_Component& audio = ECSM.get_component<Audio_Component>(entityID);
 			const auto& sounds = audio.get_sounds();
@@ -70,8 +97,9 @@ namespace lof {
 				std::string audio_key = sound.key;
 				std::string file_path = audio.get_filepath(audio_key);
 				std::string channel_key = file_path + std::to_string(entityID) + audio_key;
+				AudioType audio_type = audio.get_audio_type(audio_key);
 
-				//check if the file exist, if it no longer does stop and release the sound immediately if it is still playing
+				//check if the file exist, if it no longer does stop the sound immediately if it is still playing and release it as the file no longer exist.
 				if (!ASM.load_audio_file(audio.get_filepath(audio_key))) {
 					LM.write_log("Audio_System::update Audio File %s no longer exist", audio.get_filepath(audio_key).c_str());
 					if (channel_map.find(channel_key) != channel_map.end()) {
@@ -82,7 +110,7 @@ namespace lof {
 				}
 
 				// essentially ensure when sound is loaded it gets checked. if its not loaded then skip the check
-				//check if the filepath for the specific sound/audio key has been changed
+				//check if the filepath for the specific sound/audio key has been changed -main point-
 				auto it1 = all_prev_filepath_map.find(audio_key);
 				//if it cannot be find means it have yet to be initialize in the filepath and its the first instance of it
 				if (it1 == all_prev_filepath_map.end()) {
@@ -101,10 +129,33 @@ namespace lof {
 				}
 
 				if (channel_map.find(channel_key) == channel_map.end()) {
-					//channel not found, meaning sound is not playing
+					//channel not found, meaning sound is not playing and has been safely removed.
 					continue;
 				}
 
+				//play logic
+				//Handle stopping sound if isactive == false
+				//if (!audio.get_active(audio_key)) {
+				//	if (channel_map.find(channel_key) == channel_map.end()) {
+				//		//channel not found, meaning sound is not playing
+				//		continue;
+				//	}
+				//	stop_sound(channel_key);
+				//	continue;
+				//}
+
+				//while (audio.get_playcount(audio_key) > 0) {
+				//	if (audio_type == BGM) {
+				//		play_bgm_sound(file_path, channel_key, audio_key, audio);
+				//	}
+				//	else if (audio_type == SFX || audio_type == UI) {
+				//		play_sfx_sound(file_path, channel_key, audio_key, audio);
+				//	}
+
+				//	audio.set_playcount(audio_key, audio.get_playcount(audio_key) - 1);
+				//}
+
+				//remove finished playing logic
 				std::vector<FMOD::Channel*> to_remove;
 
 				//to retrieve the vector of channels in channel map data
@@ -689,5 +740,4 @@ namespace lof {
 		std::cout << "======================================\n";
 	}
 
-	
 }

@@ -68,6 +68,7 @@
               "volume": 1.0,
               "pitch": 1.0,
               "islooping": false,
+              "isactive": true,
               "is3d": false
             },
             {
@@ -78,6 +79,7 @@
               "volume": 1.0,
               "pitch": 1.0,
               "islooping": false,
+              "isactive": true,
               "is3d": false
             }
           ],

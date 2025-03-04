@@ -431,6 +431,8 @@ namespace lof {
                     if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
                         if (!is_in_air_vent) {
                             ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
+                            //ECSM.get_component<Audio_Component>(playerId).set_isactive("air vent in", true);
+                            //ECSM.get_component<Audio_Component>(playerId).increase_playcount("air vent in");
                             is_in_air_vent = true;
                         }
                     }
@@ -448,6 +450,10 @@ namespace lof {
                         if (is_in_air_vent) {
                             ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
                             ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
+                            //ECSM.get_component<Audio_Component>(playerId).set_isactive("air vent in", false);
+                            //ECSM.get_component<Audio_Component>(playerId).set_isactive("air vent out", true);
+                            //ECSM.get_component<Audio_Component>(playerId).increase_playcount("air vent out");
+                            //ECSM.get_component<Audio_Component>(playerId).
                             is_in_air_vent = false;
                         }
                     }
@@ -920,6 +926,7 @@ namespace lof {
                                     if (is_e_pressed || is_e_held)
                                     {
                                         ADM.play_now(player_ID, "mineral deposit", player_audio);
+                                        //player_audio.increase_playcount("mineral deposit");
                                     }
                                 }
                                 //update previous minerals 
@@ -1171,6 +1178,8 @@ namespace lof {
                     if ((is_e_pressed || is_e_held) && deposit_count > 0)
                     {
                         ADM.play_now(playerId, "deposit mineral", ECSM.get_component<Audio_Component>(playerId));
+                        //ECSM.get_component<Audio_Component>(playerId).set_isactive("deposit_mineral", true);
+                        //ECSM.get_component<Audio_Component>(playerId).increase_playcount("deposit mineral");
                         deposit_count--;
                     }
                     else if (!(e_press && e_last_frame))
@@ -1240,6 +1249,8 @@ namespace lof {
                             if (playerOxy > previous_oxygen && increasing) {
                                 EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                                 ADM.play_now(playerId, "refilling oxygen", ECSM.get_component<Audio_Component>(playerId));
+                                //ECSM.get_component<Audio_Component>(playerId).set_isactive("refilling oxygen", true);
+                                //ECSM.get_component<Audio_Component>(playerId).increase_playcount("refilling oxygen");
 							}
                             else if (!increasing && !(e_press && e_last_frame)) {
                                 EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1537,6 +1548,9 @@ namespace lof {
                 if (!button_hover_states[entity_name]) {
                     // Play the hover sound once when hovering
                     ADM.play_now(entity_id, hover_sound, audio);
+                    //audio.set_isactive(hover_sound, true);
+                    //audio.increase_playcount(hover_sound);
+
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
 
@@ -1545,7 +1559,9 @@ namespace lof {
                     if (main_menu_sound_playing[entity_name] == false) {
                         // Play the main menu sound if it's not already playing
                         ADM.play_now(entity_id, main_menu_sound, audio);
+                        //audio.set_isactive(main_menu_sound, true);
                         main_menu_sound_playing[entity_name] = true;  // Mark sound as playing
+                        //audio.increase_playcount(main_menu_sound);
                     }
 
 
@@ -1731,11 +1747,14 @@ namespace lof {
                 if (!button_hover_states[entity_name]) {
                     // Play hover sound
                     ADM.play_now(entity_id, "button_hover", audio);
+                    //audio.set_isactive("button_hover", true);
+                    //audio.increase_playcount("button_hover");
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
+                    //audio.increase_playcount(click_sound);
                     LM.write_log("Back button held - returning to main menu");
 
                     // Clear dynamic entities first
@@ -1854,12 +1873,15 @@ namespace lof {
                 if (!button_hover_states[entity_name]) {
                     // Play hover sound
                     ADM.play_now(entity_id, hover_sound, audio);
+                    //audio.set_isactive(hover_sound, true);
+                    //audio.increase_playcount(hover_sound);
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
 
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
+                    //audio.increase_playcount(click_sound);
 
                     // Handle button click logic
                     if (entity_name == "restart_button") {
