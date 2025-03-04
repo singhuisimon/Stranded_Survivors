@@ -622,7 +622,7 @@ namespace lof {
         const float CELL_WIDTH = (RIGHT_BOUND - LEFT_BOUND) / TOTAL_COLS;
         const float CELL_HEIGHT = CELL_WIDTH;
 
-        const float SIDE_COLLISION_THRESHOLD = CELL_WIDTH * 0.9f; //reduced from 1.5f
+        const float SIDE_COLLISION_THRESHOLD = CELL_WIDTH * 1.1f; //reduced from 1.5f
 
         for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1) {
             EntityID entity_ID1 = *iter1;
