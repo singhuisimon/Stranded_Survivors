@@ -105,16 +105,6 @@ namespace lof {
             return entities.find(entity) != entities.end();
         }
 
-        //flags for system categorization
-        bool uses_fixed_dt = false;
-        bool gameplay_dependent = false;
-
-        // getters and setters for the flags 
-        bool get_uses_fixed_dt() const { return uses_fixed_dt; }
-        bool get_gameplay_dependent() const { return gameplay_dependent; }
-
-        void set_uses_fixed_dt(bool value) { uses_fixed_dt = value;  }
-        void set_gameplay_dependent(bool value)  { gameplay_dependent = value; }
     };
 } // namespace lof
 
