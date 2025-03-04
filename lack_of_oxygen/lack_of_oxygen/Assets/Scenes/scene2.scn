@@ -541,7 +541,7 @@
               "key": "mineral destroy",
               "filepath": "sfx_mineral_destroy",
               "audio_type": 1,
-              "max_simultaneous": 1,
+              "max_simultaneous": 5,
               "volume": 1.0,
               "pitch": 1.0,
               "islooping": false,
