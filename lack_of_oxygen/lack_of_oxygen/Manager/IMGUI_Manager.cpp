@@ -153,7 +153,8 @@ namespace lof {
         //Fill in audio_types vector 
         audio_types.push_back(std::make_pair("BGM", (AudioType)0));
         audio_types.push_back(std::make_pair("SFX", (AudioType)1));
-        audio_types.push_back(std::make_pair("NIL", (AudioType)2));
+        audio_types.push_back(std::make_pair("UI", (AudioType)2));
+        audio_types.push_back(std::make_pair("NIL", (AudioType)3));
     }
 
     //Function to get scene files from the scene folder
@@ -1199,8 +1200,13 @@ namespace lof {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
 
-                        if (ImGui::Button("Add Sound")) {
-                            audio.add_sound();
+                        //Added by amanda. somehow only this works? idk :">
+                        if (ImGui::Button("Add New Audio")) {
+                            const std::string DEFAULT_KEY = DEFAULT_AUDIO_KEY + std::to_string(audio.get_sounds().size());
+                            /*audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
+                                DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_PLAYCOUNT, DEFAULT_IS_3D);*/
+                            audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
+                                DEFAULT_AUDIO_FLOAT, DEFAULT_LOOP, DEFAULT_ACTIVE, DEFAULT_IS_3D);
                         }
 
                         //gets a collection of sounds from audio component (not sound map)
@@ -1385,6 +1391,45 @@ namespace lof {
                                 }
                             }
                         }
+
+                        //remove audio.
+                        static size_t selected_audio_index = -1;
+
+                        std::string remove_audio = "Remove Audio";
+                        const char* remove_audio_button = remove_audio.c_str();
+                        if (ImGui::Button(remove_audio_button)) {
+                            ImGui::OpenPopup("Remove Audio");
+                        }
+
+                        if (ImGui::BeginPopup("Remove Audio")) {
+                            ImGui::Text("Remove Audio");
+                            ImGui::Separator();
+
+                            for (size_t i = 0; i < sounds.size(); i++) {
+                                if (ImGui::Selectable(sounds[i].key.c_str())) {
+                                    selected_audio_index = i;
+                                }
+                            }
+                            ImGui::EndPopup();
+                        }
+
+                        if (selected_audio_index != -1) {
+                            if (selected_audio_index >= 0 && selected_audio_index < sounds.size()) {  // Bounds check
+                                const auto& audio_key = sounds[selected_audio_index].key;
+                                audio.remove_sound(audio_key);
+                            }
+                            
+                            selected_audio_index = static_cast<size_t>(-1);
+                        }
+
+                        //for debug purpose to be remove b4 M5 submission
+                        /*if (selected_audio_index == -1) {
+                            std::cout << "index is -1" << std::endl;
+                        }
+
+                        for (size_t i = 0; i < sounds.size(); i++) {
+                            std::cout << sounds[i].key << std::endl;
+                        }*/
                     }
                 }
 

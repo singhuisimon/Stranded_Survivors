@@ -1,226 +1,587 @@
 {
-    "objects": [
-        {
-            "name": "background",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        -4740.0
-                    ],
-                    "prev_position": [
-                        0.0,
-                        -4740.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        1920.0,
-                        16128.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "skybox_batch_4",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            2.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            29.866666793823242,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.5377311706542969,
-                            1.0
-                        ]
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "bgm surface",
-                            "filepath": "bgm_surface_music",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.800000011920929,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm base_1",
-                            "filepath": "bgm_100_base_pulse",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm base_2",
-                            "filepath": "bgm_100_chords",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm base_3",
-                            "filepath": "bgm_100_melody",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm 80",
-                            "filepath": "bgm_80_clock_ticking",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm 50_1",
-                            "filepath": "bgm_50_digging_pulse",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm 50_2",
-                            "filepath": "bgm_50_roll",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm 35",
-                            "filepath": "bgm_35_stinger",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm 25",
-                            "filepath": "bgm_25_sprint",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "bgm 20",
-                            "filepath": "bgm_20_tension_melody",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "game over",
-                            "filepath": "bgm_game_over",
-                            "audio_type": 0,
-                            "max_simultaneous": 1,
-                            "volume": 0.5,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "is3d": false
-                        }
-                    ],
-                    "position": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "min_distance": 1.0,
-                    "max_distance": 100.0
-                }
+  "objects": [
+    {
+      "name": "background",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            -4740.0
+          ],
+          "prev_position": [
+            0.0,
+            -4740.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            16128.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "skybox_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              4.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              42.0,
+              0.0
+            ],
+            [
+              0.0,
+              -18.908308029174805,
+              1.0
+            ]
+          ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "bgm surface",
+              "filepath": "bgm_surface_music",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.8,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive" : true,
+              "is3d": false
+            },
+            {
+              "key": "bgm base_1",
+              "filepath": "bgm_100_base_pulse",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm base_2",
+              "filepath": "bgm_100_chords",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm base_3",
+              "filepath": "bgm_100_melody",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "bgm 80",
+              "filepath": "bgm_80_clock_ticking",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": false,
+              "is3d": false
+            },
+            {
+              "key": "bgm 50_1",
+              "filepath": "bgm_50_digging_pulse",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": false,
+              "is3d": false
+            },
+            {
+              "key": "bgm 50_2",
+              "filepath": "bgm_50_roll",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": false,
+              "is3d": false
+            },
+            {
+              "key": "bgm 35",
+              "filepath": "bgm_35_stinger",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": false,
+              "is3d": false
+            },
+            {
+              "key": "bgm 25",
+              "filepath": "bgm_25_sprint",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": false,
+              "is3d": false
+            },
+            {
+              "key": "bgm 20",
+              "filepath": "bgm_20_tension_melody",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": false,
+              "is3d": false
+            },
+            {
+              "key": "game over",
+              "filepath": "bgm_game_over",
+              "audio_type": 0,
+              "max_simultaneous": 1,
+              "volume": 0.5,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": false,
+              "is3d": false
             }
         },
-        {
-            "name": "ship",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        600.0,
-                        100.0
-                    ],
-                    "prev_position": [
-                        600.0,
-                        100.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        576.0,
-                        576.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "ship_open_batch_2",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.6000000238418579,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            1.066666603088379,
-                            0.0
-                        ],
-                        [
-                            0.6250000596046448,
-                            9.500694274902344,
-                            1.0
-                        ]
-                    ]
-                }
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "ship_open_batch_2",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "mineral_hopper_conveyor",
+      "components": {
+        "Transform2D": {
+          "position": [
+            550.0,
+            -60.0
+          ],
+          "prev_position": [
+            550.0,
+            -60.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            180.0,
+            180.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "mineral_hopper_conveyor_empty_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 120.0,
+          "collidable": false
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        }
+
+      }
+    },
+
+    {
+      "name": "Oxygen_Tank",
+      "components": {
+        "Transform2D": {
+          "position": [
+            800.0,
+            -100.0
+          ],
+          "prev_position": [
+            800.0,
+            -100.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            100.0,
+            100.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "oxygen_tank_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.1953125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.26250001788139343,
+              0.0
+            ],
+            [
+              -1.0663578510284424,
+              1.6541926860809326,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 100.0,
+          "height": 100.0,
+          "collidable": false
+        },
+        "Physics_Component": {
+          "gravity": [ 0.0, 0.0 ],
+          "damping_factor": 0.0,
+          "max_velocity": 0.0,
+          "mass": 0.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [ 0.0, 0.0 ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [ 0.0, 0.0 ]
+        }
+      }
+    },
+
+    {
+      "name": "player1",
+      "components": {
+        "Transform2D": {
+          "position": [
+            -110.5577392578125,
+            -35.20999526977539
+          ],
+          "prev_position": [
+            -110.5577392578125,
+            -35.20999526977539
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            96.0,
+            96.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "spritesheet_player",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.20000000298023224,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.40000003576278687,
+              0.0
+            ],
+            [
+              -0.21593308448791504,
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 75.0,
+          "height": 96.0,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            0.0
+          ],
+          "damping_factor": 0.949999988079071,
+          "max_velocity": 20000.0,
+          "mass": 10.0,
+          "jump_force": 2000.0,
+          "is_static": false,
+          "is_grounded": true,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": [
+              {
+                "direction": [
+                  -1.0,
+                  0.0
+                ],
+                "type": "MOVE_LEFT",
+                "magnitude": 10000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [
+                  1.0,
+                  0.0
+                ],
+                "type": "MOVE_RIGHT",
+                "magnitude": 10000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [
+                  0.0,
+                  1.0
+                ],
+                "type": "JUMP_UP",
+                "magnitude": 2000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              },
+              {
+                "direction": [ 0.0, 1.0 ],
+                "type": "VENT_FORCE",
+                "magnitude": 1000.0,
+                "lifetime": 0.0,
+                "is_active": false
+              }
+            ]
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            11.195076942443848,
+            0.0
+          ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "jumping",
+              "filepath": "sfx_jumping",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "moving",
+              "filepath": "sfx_walking",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "mining normal",
+              "filepath": "sfx_general_block_hit",
+              "audio_type": 1,
+              "max_simultaneous": 10,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "mining mineral",
+              "filepath": "sfx_mineral_block_hit",
+              "audio_type": 1,
+              "max_simultaneous": 10,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "deposit mineral",
+              "filepath": "sfx_mineral_deposit",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "mineral destroy",
+              "filepath": "sfx_mineral_destroy",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "mining air",
+              "filepath": "sfx_empty_laser_hit",
+              "audio_type": 1,
+              "max_simultaneous": 5,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "refilling oxygen",
+              "filepath": "sfx_oxygen_refill",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "air vent in",
+              "filepath": "sfx_air_vent_in",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "air vent out",
+              "filepath": "sfx_air_vent_out",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "tunneling",
+              "filepath": "sfx_tunneling",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "lava siren",
+              "filepath": "sfx_lava_siren",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": true,
+              "isactive": true,
+              "is3d": false
             }
         },
         {

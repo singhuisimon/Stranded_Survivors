@@ -89,15 +89,26 @@ namespace lof {
 	constexpr const char* DEFAULT_ANIMATION_NAME = "NoAnimation";
 	constexpr unsigned int DEFAULT_TILE_HEALTH = 2;
 
-
-	//Audio component constants
 	enum AudioType {
 		BGM = 0,    ///<background music
-		SFX = 1,		///<Sound Effect
+		SFX = 1,	///<Sound Effect
 		UI = 2,
 		NIL = 3
 	};
 
+	//Audio component constants
+	constexpr const char* DEFAULT_AUDIO_KEY = "default";
+	constexpr const char* DEFAULT_AUDIO_FILEPATH = "";
+	constexpr AudioType DEFAULT_AUDIO_TYPE = AudioType::SFX;
+	constexpr float DEFAULT_AUDIO_FLOAT = 1.0f;
+	constexpr bool DEFAULT_LOOP = false;
+	constexpr bool DEFAULT_ACTIVE = true;
+	//constexpr int DEFAULT_PLAYCOUNT = 0;
+	constexpr bool DEFAULT_IS_3D = false;
+	constexpr float DEFAULT_MIN_DISTANCE = 1.0f;
+	constexpr float DEFAULT_MAX_DISTANCE = 100.0f;
+
+	//Logic component constants
 	enum class ExecutionState { 
 		Uninitialized, 
 		Running, 

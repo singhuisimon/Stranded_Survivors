@@ -161,6 +161,7 @@
     <Media Include="Assets\Audio\sfx_mainmenu_button.wav" />
     <Media Include="Assets\Audio\sfx_mineral_block_hit.wav" />
     <Media Include="Assets\Audio\sfx_mineral_deposit.wav" />
+    <Media Include="Assets\Audio\sfx_mineral_destroy.wav" />
     <Media Include="Assets\Audio\sfx_oxygen_refill.wav" />
     <Media Include="Assets\Audio\sfx_tnt_boom.wav" />
     <Media Include="Assets\Audio\sfx_tnt_fuse.wav" />

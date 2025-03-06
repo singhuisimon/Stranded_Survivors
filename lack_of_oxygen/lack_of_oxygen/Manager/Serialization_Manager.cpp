@@ -26,6 +26,7 @@
 //#include "ECS_Manager.h"
 #include "IMGUI_Manager.h"
 #include "Assets_Manager.h"
+#include "Audio_Manager.h"
 
 // Include all component headers
 #include "../Component/Component.h"
@@ -88,7 +89,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_M4.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -399,6 +400,8 @@ namespace lof {
                 }
             }
 
+            ADM.set_new_scene(true);
+
         }
 
         LM.write_log("Serialization_Manager::load_scene(): Scene loaded successfully from %s.", filename);
@@ -582,6 +585,8 @@ namespace lof {
             sound_obj.AddMember("pitch", sound.pitch, allocator);
             // Use "islooping" to match original format
             sound_obj.AddMember("islooping", sound.islooping, allocator);
+			sound_obj.AddMember("isactive", sound.isactive, allocator);
+			//sound_obj.AddMember("playcount", sound.playcount, allocator);
             sound_obj.AddMember("is3d", sound.is3d, allocator);
 
             // Add the serialized sound object to the sounds array
@@ -593,7 +598,7 @@ namespace lof {
         // Add other audio component properties
         //comp_obj.AddMember("is_3d", component.get_is3d(), allocator);
 
-        rapidjson::Value position(rapidjson::kArrayType);
+        /*rapidjson::Value position(rapidjson::kArrayType);
         Vec3D pos = component.get_position();
         position.PushBack(pos.x, allocator);
         position.PushBack(pos.y, allocator);
@@ -601,7 +606,7 @@ namespace lof {
         comp_obj.AddMember("position", position, allocator);
 
         comp_obj.AddMember("min_distance", component.get_min_distance(), allocator);
-        comp_obj.AddMember("max_distance", component.get_max_distance(), allocator);
+        comp_obj.AddMember("max_distance", component.get_max_distance(), allocator);*/
 
         return comp_obj;
     }

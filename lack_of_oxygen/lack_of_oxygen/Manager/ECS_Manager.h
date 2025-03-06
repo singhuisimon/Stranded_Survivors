@@ -49,6 +49,11 @@ namespace lof {
         // System storage
         std::vector<std::unique_ptr<System>> systems;
 
+        // System storage based on collection 
+        std::vector<System*> fixed_dt_systems; 
+        std::vector<System*> dt_update_systems;
+        std::vector<System*> gameplay_dependent_systems;
+
         // Component storage
         std::unordered_map<std::type_index, std::vector<std::unique_ptr<Component>>> component_arrays;
         // Component identification
@@ -68,6 +73,12 @@ namespace lof {
          * @param entity The ID of the entity to update.
          */
         void update_entity_in_systems(EntityID entity);
+
+        /**
+        * @brief Categorize the systems 
+        * 
+        */
+        bool systems_categorized = false;
 
     public:
         /**
@@ -156,7 +167,8 @@ namespace lof {
         std::size_t get_component_id() const;
 
         // System management
-        void add_system(std::unique_ptr<System> system);
+       // void add_system(std::unique_ptr<System> system);
+        void add_system(std::unique_ptr<System> system, bool uses_fixed_dt = false, bool gameplay_dependent = false);
         void update(float delta_time);
 
         // Accessing each system

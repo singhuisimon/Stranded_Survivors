@@ -104,6 +104,7 @@ namespace lof {
         bool has_entity(EntityID entity) const {
             return entities.find(entity) != entities.end();
         }
+
     };
 } // namespace lof
 
