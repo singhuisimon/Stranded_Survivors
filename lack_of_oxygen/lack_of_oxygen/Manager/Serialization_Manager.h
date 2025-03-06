@@ -16,9 +16,13 @@
 
 // Include base headers
 #include "Manager.h"
+//#include "ECS_Manager.h"
+//#include "ECS_Manager.h"
 
 // Include component headers
 #include "../Component/Component.h"
+#include "../Utility/Type.h"
+
 
 // Include RapidJSON headers
 #include "rapidjson/document.h"
@@ -27,6 +31,7 @@
 // Include standard headers
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace lof {
 
@@ -40,6 +45,8 @@ namespace lof {
     private:
         // Private constructor for singleton pattern
         Serialization_Manager();
+        //std::vector<EntityID> wormholes;
+        //std::vector<EntityID> wormholes;
 
         // Member variables
         unsigned int m_scr_width;
@@ -97,6 +104,10 @@ namespace lof {
 
         LevelData current_level;
         static int scene_no;
+
+        // ----------------------------------------------------------//
+        std::vector<EntityID> wormholes; // store wormhole entity ID
+        std::unordered_map<EntityID, EntityID> wormhole_pairs;
 
     public:
 
@@ -183,6 +194,11 @@ namespace lof {
         size_t get_level_rows() const { return current_level.rows; }
         size_t get_level_cols() const { return current_level.cols; }
         int scene_switch() const { return scene_no; }
+
+        std::vector<EntityID>& get_wormholes_id() { return wormholes; }
+        
+        //const std::vector<EntityID> get_wormholes_id() const { return wormholes; };
+
     };
 
 } // namespace lof

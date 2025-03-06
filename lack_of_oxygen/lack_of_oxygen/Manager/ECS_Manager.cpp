@@ -283,6 +283,9 @@ namespace lof {
         const std::string& name = entities[entity]->get_name();
         LM.write_log("ECS_Manager::destroy_entity(): Starting destruction of entity %u (name: %s)", entity, name.c_str());
 
+
+        remove_wormhole_entity(entity);
+
         // First remove from all systems
         for (auto& system : systems) {
             if (system->has_entity(entity)) {
@@ -335,6 +338,18 @@ namespace lof {
                     }
                 }
 
+                // update wormholes vector
+                std::vector<EntityID>& wormholes = SM.get_wormholes_id();
+                for (auto& wormhole : wormholes)
+                {
+                    if (wormhole == old_id)
+                    {
+                        wormhole = new_id;
+                        //printf("Updated wormhole entity ID from %u to %u\n", old_id, new_id);
+                    
+                    }
+                }
+
                 LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
             }
         }
@@ -348,6 +363,16 @@ namespace lof {
         }
 
         LM.write_log("ECS_Manager::destroy_entity(): Completed destruction of entity %u", entity);
+    }
+
+    void ECS_Manager::remove_wormhole_entity(EntityID entity)
+    {
+        std::vector<EntityID>&wormholes = SM.get_wormholes_id();
+        auto it = std::find(wormholes.begin(), wormholes.end(), entity);
+        if (it != wormholes.end()) {
+            wormholes.erase(it);
+            printf("Removed wormhole entity %u from wormholes vector", entity);
+        }
     }
 
     const std::vector<std::unique_ptr<System>>& ECS_Manager::get_systems() const{

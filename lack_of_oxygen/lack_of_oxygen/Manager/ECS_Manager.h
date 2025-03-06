@@ -76,6 +76,11 @@ namespace lof {
          */
         static ECS_Manager& get_instance();
 
+        //std::unordered_map<EntityID, EntityID> wormhole_pairs;
+        
+
+        void remove_wormhole_entity(EntityID entity);
+
         // Delete copy constructor and assignment operator
         ECS_Manager(const ECS_Manager&) = delete;
         ECS_Manager& operator=(const ECS_Manager&) = delete;
