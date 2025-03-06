@@ -31,6 +31,7 @@ namespace lof {
 
         key_e_last_frame = false;
         key_e_pressed = false;
+        teleport_flag = false;
     }
 
     void Player_Script::register_script() {
@@ -250,6 +251,7 @@ namespace lof {
         }
     }
 
+    float teleport_audio_end_time = 0.0f;
     void Player_Script::update_player_audio(Physics_Component& physic_comp, Audio_Component& audio_comp) {
         //audio logic is here.
         if (forces_flag != -1) {
@@ -269,6 +271,19 @@ namespace lof {
                 //audio_comp.set_isactive("moving", false);
             }
         }
+
+        float current_time = glfwGetTime();
+        if (teleport_flag) {
+            ADM.play_now(player_id, "tunneling", audio_comp);
+            teleport_audio_end_time = current_time + 1.5f;  // set a 1.5 seconds for the sound to finish
+            teleport_flag = false;  // Reset teleport flag immediately to prevent retriggering
+        }
+
+        // **Stop the teleport sound after it has played fully
+        if (current_time >= teleport_audio_end_time) {
+            ADM.stop_now(player_id, "tunneling", audio_comp.get_filepath("tunneling"));
+        }
+
     }
 
     void Player_Script::update_player_walking_particle() {
@@ -286,6 +301,7 @@ namespace lof {
                 float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
                 float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
                 particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                
             }
 
         }
@@ -343,10 +359,14 @@ namespace lof {
         {
             teleport_player(wormhole_id, player_id, linked_wormhole);
             last_teleport_time = current_time;  // Update teleport time
+            //tunneling
+            teleport_flag = true;
+            
 
             std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
             std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
         }
+        
     }
 #endif
 
@@ -388,7 +408,7 @@ namespace lof {
             last_wormhole_position = paired_wormhole_transform;
             std::cout << "Teleported to: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
 
-        }
+        } 
 #endif 
     }
 

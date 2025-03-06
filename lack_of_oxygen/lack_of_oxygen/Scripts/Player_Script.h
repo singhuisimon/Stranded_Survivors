@@ -114,6 +114,7 @@ namespace lof {
 		
 		float teleport_cooldown = 0.5f;
 		float last_teleport_time = -teleport_cooldown;
+		bool teleport_flag;
 
 		std::unordered_map<EntityID, EntityID> wormhole_pairs;
 		Transform2D last_wormhole_position; // to store the last wormhole
