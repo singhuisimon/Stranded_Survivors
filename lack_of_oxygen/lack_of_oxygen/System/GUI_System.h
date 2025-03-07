@@ -95,6 +95,10 @@ namespace lof {
         float current_oxygen_level = 100.0f; // Track oxygen level
         float current_mineral_count = 0.0f;  // Track mineral count
 
+        // PAUSE MENU MEMBERS
+        std::unordered_map<std::string, EntityID> pause_menu_entities;
+        std::unordered_map<std::string, bool> pause_button_hover_states;
+
         /**
          * @brief Clamps a value between a minimum and maximum range.
          */
@@ -184,6 +188,11 @@ namespace lof {
         // == OXYGEN WARNING FUNCTIONS ==
         void show_oxygen_warning(float percent);
         void hide_oxygen_warning(float percent);
+
+        // == PAUSE MENU FUNCTIONS ==
+        void show_pause_menu();
+        void hide_pause_menu();
+        void check_pause_menu_button_collision(float delta_time);
 
         /**
          * @brief Checks if a general container is currently visible.

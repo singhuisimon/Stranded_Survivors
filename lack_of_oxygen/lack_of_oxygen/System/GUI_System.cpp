@@ -15,6 +15,7 @@
 #include "../Manager/IMGUI_Manager.h"
 #include "../System/Movement_System.h"
 #include "../System/Collision_System.h"
+#include "../Utility/Entity_Selector_Helper.h"
 
 // Include Utility headers
 #include "../Utility/Constant.h"
@@ -140,6 +141,11 @@ namespace lof {
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
             return;  // Skip all GUI updates on win screen
+        }
+
+        // Update pause menu button interactions if the game is paused
+        if (GM.is_paused()) {
+            check_pause_menu_button_collision(delta_time);
         }
 
         // == Mineral E prompt bobbing ==
@@ -830,6 +836,323 @@ namespace lof {
         else if (percent == 5.0f) {
             warning_5_active = false;
             warning_5_shown = false;
+        }
+    }
+
+    void GUI_System::show_pause_menu() {
+        // Don't show if already shown
+        if (!pause_menu_entities.empty()) {
+            return;
+        }
+
+        LM.write_log("GUI_System::show_pause_menu(): Creating pause menu UI");
+
+        // Create a semi-transparent background overlay
+        EntityID overlay = ecs_manager.clone_entity_from_prefab("gui_container", "pause_overlay");
+        if (overlay != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(overlay)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Pause_Screen_Batch_19";
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(overlay)) {
+                transform->position = Vec2D(0.0f, -50.0f);
+                transform->scale = Vec2D(1980.0f, 1180.0f);
+            }
+            pause_menu_entities["overlay"] = overlay;
+        }
+
+        // Create Resume button
+        EntityID resume_button = ecs_manager.clone_entity_from_prefab("gui_container", "resume_button");
+        if (resume_button != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(resume_button)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Resume_Batch_14_NORMAL";
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(resume_button)) {
+                transform->position = Vec2D(0.0f, 100.0f);
+                transform->scale = Vec2D(200.0f, 80.0f);
+            }
+            if (auto* collision = get_component_safe<Collision_Component>(resume_button)) {
+                collision->width = 200.0f;
+                collision->height = 80.0f;
+                collision->collidable = true;
+            }
+            if (auto* physics = get_component_safe<Physics_Component>(resume_button)) {
+                physics->set_is_static(true);
+            }
+            if (auto* velocity = get_component_safe<Velocity_Component>(resume_button)) {
+                velocity->velocity = Vec2D(0.0f, 0.0f);
+            }
+
+            pause_menu_entities["resume"] = resume_button;
+        }
+
+        // Create Restart button
+        EntityID restart_button = ecs_manager.clone_entity_from_prefab("gui_container", "restart_button");
+        if (restart_button != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(restart_button)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Restart_Batch_14_NORMAL";
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(restart_button)) {
+                transform->position = Vec2D(0.0f, 0.0f);
+                transform->scale = Vec2D(200.0f, 80.0f);
+            }
+            if (auto* collision = get_component_safe<Collision_Component>(restart_button)) {
+                collision->width = 200.0f;
+                collision->height = 80.0f;
+                collision->collidable = true;
+            }
+            if (auto* physics = get_component_safe<Physics_Component>(restart_button)) {
+                physics->set_is_static(true);
+            }
+            if (auto* velocity = get_component_safe<Velocity_Component>(restart_button)) {
+                velocity->velocity = Vec2D(0.0f, 0.0f);
+            }
+
+            pause_menu_entities["restart"] = restart_button;
+        }
+
+        // Create Main Menu button
+        EntityID main_menu_button = ecs_manager.clone_entity_from_prefab("gui_container", "main_menu_button");
+        if (main_menu_button != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(main_menu_button)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Main_Menu_Batch_14_NORMAL";
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(main_menu_button)) {
+                transform->position = Vec2D(0.0f, -100.0f);
+                transform->scale = Vec2D(200.0f, 80.0f);
+            }
+            if (auto* collision = get_component_safe<Collision_Component>(main_menu_button)) {
+                collision->width = 200.0f;
+                collision->height = 80.0f;
+                collision->collidable = true;
+            }
+            if (auto* physics = get_component_safe<Physics_Component>(main_menu_button)) {
+                physics->set_is_static(true);
+            }
+            if (auto* velocity = get_component_safe<Velocity_Component>(main_menu_button)) {
+                velocity->velocity = Vec2D(0.0f, 0.0f);
+            }
+
+            pause_menu_entities["main_menu"] = main_menu_button;
+        }
+    }
+
+    void GUI_System::hide_pause_menu() {
+        LM.write_log("GUI_System::hide_pause_menu(): Removing pause menu UI in specific order");
+
+        // First remove the overlay/background texture
+        if (pause_menu_entities.find("overlay") != pause_menu_entities.end()) {
+            EntityID overlay_id = pause_menu_entities["overlay"];
+            if (overlay_id != INVALID_ENTITY_ID) {
+                ecs_manager.destroy_entity(overlay_id);
+                LM.write_log("Destroyed pause menu overlay (ID: %u)", overlay_id);
+            }
+        }
+
+        // Then remove buttons in specific order
+        const std::vector<std::string> button_order = {
+            "resume",
+            "restart",
+            "main_menu"
+        };
+
+        for (const auto& button_key : button_order) {
+            if (pause_menu_entities.find(button_key) != pause_menu_entities.end()) {
+                EntityID button_id = pause_menu_entities[button_key];
+                if (button_id != INVALID_ENTITY_ID) {
+                    ecs_manager.destroy_entity(button_id);
+                    LM.write_log("Destroyed %s button (ID: %u)", button_key.c_str(), button_id);
+                }
+            }
+        }
+
+        // Also try to find buttons by their entity names
+        const std::vector<std::string> button_names = {
+            "resume_button",
+            "restart_button",
+            "main_menu_button"
+        };
+
+        for (const auto& name : button_names) {
+            EntityID entity_id = ecs_manager.find_entity_by_name(name);
+            if (entity_id != INVALID_ENTITY_ID) {
+                ecs_manager.destroy_entity(entity_id);
+                LM.write_log("Destroyed %s by name (ID: %u)", name.c_str(), entity_id);
+            }
+        }
+
+        // Clear the map after removing all entities
+        pause_menu_entities.clear();
+    }
+
+    void GUI_System::check_pause_menu_button_collision(float delta_time) {
+        (void)delta_time;  // Mark as intentionally unused
+
+        // Return early if we're not paused
+        if (!GM.is_paused()) return;
+
+        // Get mouse position in world coordinates
+        Vec2D world_mouse_pos = ESS.Get_World_MousePos();
+
+        for (auto& [name, entity_id] : pause_menu_entities) {
+            // Skip non-button entities
+            if (name != "resume" && name != "restart" && name != "main_menu") {
+                continue;
+            }
+
+            if (entity_id == INVALID_ENTITY_ID) continue;
+
+            auto* entity = ecs_manager.get_entity(entity_id);
+            if (!entity) continue;
+
+            std::string entity_name = entity->get_name();
+
+            if (!ecs_manager.has_component<Transform2D>(entity_id) ||
+                !ecs_manager.has_component<Graphics_Component>(entity_id) ||
+                !ecs_manager.has_component<Audio_Component>(entity_id)) continue;
+
+            auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
+            auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
+            auto& audio = ecs_manager.get_component<Audio_Component>(entity_id);
+
+            // Check if mouse is hovering over the button
+            bool is_hovered = ESS.Mouse_Over_AABB(
+                transform.position.x,
+                transform.position.y,
+                transform.scale.x,
+                transform.scale.y,
+                world_mouse_pos.x,
+                world_mouse_pos.y
+            );
+
+            // Define the base texture name for each button
+            std::string base_texture;
+            std::string hover_sound = "button_hover";
+            std::string click_sound = "main_menu";
+
+            if (entity_name == "resume_button") {
+                base_texture = "Resume_Batch_14";
+            }
+            else if (entity_name == "restart_button") {
+                base_texture = "Restart_Batch_14";
+            }
+            else if (entity_name == "main_menu_button") {
+                base_texture = "Main_Menu_Batch_14";
+            }
+
+            if (is_hovered) {
+                if (!pause_button_hover_states[entity_name]) {
+                    // Play the hover sound once when hovering
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    pause_button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                }
+
+                if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                    graphics.texture_name = base_texture + "_PRESSED";
+                    ADM.play_now(entity_id, click_sound, audio);
+
+                    // Handle button click actions
+                    if (entity_name == "resume_button") {
+                        GM.set_paused(false);
+                    }
+                    else if (entity_name == "restart_button") {
+                        LM.write_log("Restart button pressed - reloading current scene");
+
+                        // Unpause first
+                        GM.set_paused(false);
+
+                        // Clear dynamic entities
+                        for (auto& system : ecs_manager.get_systems()) {
+                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                movement_system->clear_dynamic_entities();
+                                break;
+                            }
+                        }
+
+                        // Reload current scene
+                        const std::string SCENES = "Scenes";
+                        std::string scene_file = "scene" + std::to_string(GM.get_current_scene()) + ".scn";
+                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+                        if (SM.load_scene(scene_path.c_str())) {
+                            // Reset camera position
+                            auto& camera = GFXM.get_camera();
+                            camera.pos_x = DEFAULT_CAMERA_POS_X;
+                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                            // Stop all audio
+                            ADM.stop_mastergroup();
+
+                            // Reset player position
+                            EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                            if (playerId != INVALID_ENTITY_ID) {
+                                if (ecs_manager.has_component<Transform2D>(playerId)) {
+                                    auto& transform = ecs_manager.get_component<Transform2D>(playerId);
+                                    transform.position = Vec2D(0.0f, 0.0f);
+                                    transform.prev_position = transform.position;
+                                }
+                                if (ecs_manager.has_component<Velocity_Component>(playerId)) {
+                                    auto& velocity = ecs_manager.get_component<Velocity_Component>(playerId);
+                                    velocity.velocity = Vec2D(0.0f, 0.0f);
+                                }
+                            }
+
+                            IMGUIM.set_current_file_shown(scene_file);
+                        }
+                    }
+                    else if (entity_name == "main_menu_button") {
+                        LM.write_log("Main Menu button pressed - returning to main menu");
+
+                        // Unpause first
+                        GM.set_paused(false);
+
+                        // Clear dynamic entities
+                        for (auto& system : ecs_manager.get_systems()) {
+                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                movement_system->clear_dynamic_entities();
+                                break;
+                            }
+                        }
+
+                        // Load main menu
+                        const std::string SCENES = "Scenes";
+                        std::string scene_file = "main_menu.scn";
+                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+                        if (SM.load_scene(scene_path.c_str())) {
+                            // Reset camera position
+                            auto& camera = GFXM.get_camera();
+                            camera.pos_x = DEFAULT_CAMERA_POS_X;
+                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                            // Stop all audio
+                            ADM.stop_mastergroup();
+
+                            // Update current scene in Game Manager
+                            GM.set_current_scene(0);
+                            IMGUIM.set_current_file_shown(scene_file);
+                        }
+                    }
+
+                    return; // Button was clicked, no need to check others
+                }
+                else {
+                    // Set highlighted state when just hovering
+                    graphics.texture_name = base_texture + "_HIGHLIGHTED";
+                }
+            }
+            else {
+                // Reset to normal state texture
+                graphics.texture_name = base_texture + "_NORMAL";
+                pause_button_hover_states[entity_name] = false; // Reset hover state
+            }
         }
     }
 } // namespace lof

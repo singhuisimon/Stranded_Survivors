@@ -14,6 +14,8 @@
 // Include FPS Manager
 #include "FPS_Manager.h"
 
+#include "Game_Manager.h"
+
 // Include for components
 #include "../Component/Component.h"
 
@@ -450,7 +452,7 @@ namespace lof {
             }
 #endif
 
-            if (level_editor_mode && !game_playing) {
+            if ((level_editor_mode && !game_playing) || GM.is_paused()) {
                 for (auto system : gameplay_dependent_systems) {
                     system->set_time(0);
                 }
@@ -469,21 +471,19 @@ namespace lof {
             }
             
 
-                for (auto system : dt_update_systems) {
-                    //skip the systems found in the gameplay_dependent_systems
-                    if ( (level_editor_mode && !game_playing) &&
-                        std::find(gameplay_dependent_systems.begin(),
-                            gameplay_dependent_systems.end(),
-                            system) != gameplay_dependent_systems.end()) {
-                        continue;
-                    }
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-                    // Updating each system
-                    system->update(delta_time);
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            for (auto system : dt_update_systems) {
 
+                //skip the systems found in the gameplay_dependent_systems
+                if (((level_editor_mode && !game_playing) || GM.is_paused()) &&
+                    std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end())
+                {
+                    continue;
                 }
-            
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            }
     }
 
     Entity* ECS_Manager::get_entity(EntityID entity_id) {

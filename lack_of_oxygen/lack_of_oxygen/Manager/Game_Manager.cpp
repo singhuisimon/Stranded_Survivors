@@ -48,7 +48,7 @@ namespace lof {
     float imgui_camera_pos_y = 0.0f;
     unsigned int mining_strength = DEFAULT_STRENGTH;
     Game_Manager::Game_Manager()
-        : m_game_over(false), m_step_count(0) {
+        : m_game_over(false), m_step_count(0), m_is_paused(false) {
         set_type("Game_Manager");
     }
 
@@ -182,11 +182,41 @@ namespace lof {
         m_is_started = false;
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
-
-  
     
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
+
+    void Game_Manager::set_paused(bool paused) {
+        if (paused == m_is_paused) return; // No change needed
+
+        m_is_paused = paused;
+
+        // Find GUI System to show/hide pause menu
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                if (m_is_paused) {
+                    gui_system->show_pause_menu();
+
+                    // Pause audio
+                    ADM.pause_resume_mastergroup();
+                }
+                else {
+                    gui_system->hide_pause_menu();
+
+                    // Resume audio
+                    ADM.pause_resume_mastergroup();
+                }
+                break;
+            }
+        }
+
+        LM.write_log("Game_Manager::set_paused(): Game %s", m_is_paused ? "paused" : "resumed");
+    }
+
+    void Game_Manager::toggle_pause() {
+        set_paused(!m_is_paused);
+    }
+
 
     //EntityID selectedID = static_cast<EntityID>(-1); // for imgui
     void Game_Manager::update(float delta_time) {
@@ -236,11 +266,16 @@ namespace lof {
             }
         }
 
-        // Check for game over condition based on input, before IM update
+        // Pause Logic
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
-            set_game_over(true);
-            LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
-            //std::cout << "Escape key pressed. Closing the game." << std::endl;
+            // Only toggle pause in gameplay scenes
+            if (current_scene == 1 || current_scene == 2) {
+                toggle_pause();
+            }
+            else {
+                set_game_over(true);
+                LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
+            }
         }
 
         //to pause all the sound that is playing

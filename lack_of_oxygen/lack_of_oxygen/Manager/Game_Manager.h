@@ -75,6 +75,9 @@ namespace lof {
         // Stores the TNTs that are activated with it's entity name and fuse time
         std::unordered_map<std::string, float> tnt_to_destroy;
 
+        // Pause logic
+        bool m_is_paused;
+
         /**
          * @brief Determines the mineral value based on the block entity type
          * @param block_id The EntityID of the block being destroyed
@@ -181,6 +184,10 @@ namespace lof {
 
         float get_stored_goal_percentage() const { return stored_goal_percentage; }
         void set_stored_goal_percentage(float value) { stored_goal_percentage = value; }
+
+        bool is_paused() const { return m_is_paused; }
+        void set_paused(bool paused);
+        void toggle_pause();
     };
 
 } // namespace lof
