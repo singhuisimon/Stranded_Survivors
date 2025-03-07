@@ -713,7 +713,6 @@ namespace lof {
 
                     // Skip wormholes, they are already rendered
                     if (std::find(wormholes.begin(), wormholes.end(), entity_id) != wormholes.end()) {
-                        std::cout << "wormhole entity id" << entity_id << std::endl;
                         continue;
                     }
                 }
