@@ -345,7 +345,7 @@ namespace lof {
 		};
 
 		for (const auto& [condition, audio_key] : oxygen_layers) {
-			const std::string& filepath = audio_background.get_filepath(audio_key);
+			//const std::string& filepath = audio_background.get_filepath(audio_key);
 			//if oxygen is increasing and oxygen level is above certain condition mute the bgm layers affected
 			if (increasing && oxygen_level >= condition) {
 				audio_background.set_isactive(audio_key, false);

@@ -10,6 +10,7 @@
 
 #include "../Scripts/Object_Moving_Script.h"
 #include "../Scripts/Player_Script.h"
+#include "../Scripts/Mining_Script.h"
 
 #include "../Manager/Logic_Manager.h"
 #include "../Manager/ECS_Manager.h"
@@ -62,6 +63,10 @@ namespace lof {
 		Player_Script player_script;
 		player_script.register_script();
 		LM.write_log("Registered Player Script");
+
+		Mining_Script mining_script;
+		mining_script.register_script();
+		LM.write_log("Registered Mining Script");
 
 		// Register other scripts here as they are added.
 	}

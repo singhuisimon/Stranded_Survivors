@@ -234,6 +234,10 @@ namespace lof {
 		tnt_vfx
 	};
 
+
+	// ------------------------------ Mining_Script.cpp --------------------------------
+	constexpr const float MINING_COOLDOWN_TIMER = 0.2f;
+
 } // namespace lof
 
 #endif // CONSTANTS_H
