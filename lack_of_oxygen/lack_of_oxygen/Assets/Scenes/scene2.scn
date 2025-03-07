@@ -54,7 +54,7 @@
               "volume": 0.8,
               "pitch": 1.0,
               "islooping": true,
-              "isactive" : true,
+              "isactive": true,
               "is3d": false
             },
             {

@@ -23,7 +23,7 @@
 #include "Game_Manager.h"
 
 // Include ECS_Manager for entity creation
-#include "ECS_Manager.h"
+//#include "ECS_Manager.h"
 #include "IMGUI_Manager.h"
 #include "Assets_Manager.h"
 #include "Audio_Manager.h"
@@ -89,7 +89,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V2.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -1102,7 +1102,7 @@ namespace lof {
         }
     }
 
-
+    //std::vector<EntityID> wormholes;
     bool Serialization_Manager::create_level_entities() {
         if (current_level.tiles.empty()) {
             LM.write_log("Serialization_Manager::create_level_entities(): No level data loaded");
@@ -1120,7 +1120,8 @@ namespace lof {
         float total_width = RIGHT_BOUND - LEFT_BOUND;
         float tile_width = total_width / current_level.cols;
         float tile_height = tile_width; // Keep tiles square
- 
+        
+        bool is_wormhole = false;
 
         //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
         //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
@@ -1163,6 +1164,8 @@ namespace lof {
                     continue;
                 }
 
+                is_wormhole = (tile.type == 't');
+                
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
                 float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
@@ -1200,16 +1203,34 @@ namespace lof {
                         LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
                             x_pos, y_pos, collision.width, collision.height);
                     }
-                   
+
+                  
+                    if (is_wormhole)
+                    {
+                        wormholes.push_back(entity);
+                        //std::cout << "wormhole entity " << entity << "\n";
+
+                        
+                    }
+
+
                 }
                 else {
                     LM.write_log("Failed to create entity from prefab '%s'", prefab_name.c_str());
                 }
             }
         }
+
+       /* for (EntityID wormhole : wormholes)
+        {
+            std::cout << "wormhole entity " << wormhole << "\n";
+        }*/
+
       
         return true;
     }
+
+ 
 
     bool Serialization_Manager::is_scene2_file(const char* filepath) const {
         std::string path(filepath);
