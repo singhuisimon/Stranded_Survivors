@@ -111,6 +111,9 @@ namespace lof {
 		//---------------------------------------------------------------------------//
 		bool key_e_last_frame = false; // for tunnel
 		bool key_e_pressed = false;
+
+		bool key_t_last_frame = false;
+		bool key_t_pressed = false;
 		
 		float teleport_cooldown = 0.5f;
 		float last_teleport_time = -teleport_cooldown;
@@ -123,6 +126,8 @@ namespace lof {
 		bool is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole);
 
 		void teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole);
+
+		void Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y);
 		
 	};
 

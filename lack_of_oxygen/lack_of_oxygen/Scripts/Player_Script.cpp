@@ -31,6 +31,9 @@ namespace lof {
 
         key_e_last_frame = false;
         key_e_pressed = false;
+
+        key_t_last_frame = false;
+        key_t_pressed = false;
         teleport_flag = false;
     }
 
@@ -91,6 +94,9 @@ namespace lof {
         key_e_last_frame = key_e_pressed;
         key_e_pressed = IM.is_key_held(GLFW_KEY_E);
 
+        key_t_last_frame = key_t_pressed;
+        key_t_pressed = IM.is_key_held(GLFW_KEY_T); //cheap code for teleport
+
 
     }
 
@@ -107,6 +113,10 @@ namespace lof {
         else if (key == GLFW_KEY_E) {
             return key_e_pressed && !key_e_last_frame;
             
+        }
+        else if (key == GLFW_KEY_T)
+        {
+            return key_t_pressed && !key_e_last_frame;
         }
         return false;
     }
@@ -366,6 +376,9 @@ namespace lof {
             std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
             std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
         }
+
+        Cheap_Code_Teleport_Wormhole(-522.0f, -3654.0f);
+        
         
     }
 #endif
@@ -411,6 +424,19 @@ namespace lof {
         } 
 #endif 
     }
+
+    void Player_Script::Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y)
+    {
+        // cheap code for teleport 
+        if (is_key_just_pressed(GLFW_KEY_T))
+        {
+            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+            player_transform.position.x = pos_x;
+            player_transform.position.y = pos_y;
+
+        }
+    }
+
 
 
 }
