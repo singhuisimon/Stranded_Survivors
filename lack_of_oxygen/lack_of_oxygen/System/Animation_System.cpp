@@ -34,23 +34,22 @@ namespace lof {
 
         // Get camera
         auto& camera = GFXM.get_camera();
-        
+
         // Get screen height
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
-        
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
-        
+
             // Update only what is on the viewport
             if (camera.is_free_cam == GL_FALSE) {
-                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
                 if (entity_id != 0 && entity_id != player_id && player_id != INVALID_ENTITY_ID) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     auto& transform = ECSM.get_component<Transform2D>(entity_id);
-        
+
                     float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
                     float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
-        
+
                     if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
                         continue;
                     }
@@ -94,22 +93,6 @@ namespace lof {
                     player_action = IDLE;
                     has_mined = false;
                 }
-
-                //////////// TESTING ////////////////////
-                //std::unordered_set<std::string> player_animation_set;
-                //for (const auto& [key, value] : animation_comp.animations) {
-                //    player_animation_set.insert(value); 
-                //}
-
-                //unsigned int next_animation_index = 0;
-                //if (player_animation_set.find(check_animation) != player_animation_set.end()) {
-                //    std::cout << *player_animation_set.find(check_animation) << std::endl;
-                //    next_animation_index = std::stoi(*player_animation_set.find(check_animation));
-                //}
-
-
-                // Check what is the animation to check
-
 
                 // Moving-only animations
                 if (player_action == MOVING) {
@@ -561,30 +544,10 @@ namespace lof {
                         animations_storage[animation_comp.animations[std::to_string(running_index)]].frame_elapsed_time = 0.0f; // Reset running_right animation frame_time_elapsed
                         animation_comp.curr_animation_idx = idle_index;  // Set idle right
                     }
-
-                    //// (When changing animation index, reset previous animation curr_frame_idx and frame_time_elapsed to 0)
-                    //    // Check last direction based on last animation
-                    //    if (player_direction == FACE_LEFT) {
-                    //        animation_comp.curr_frame_index = 0;    // Reset running_left animation curr_frame_idx  
-                    //        animations_storage[animation_comp.animations["2"]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
-                    //        animation_comp.curr_animation_idx = 0;  // Set idle left
-                    //    } else if (player_direction == FACE_RIGHT) { 
-                    //        animation_comp.curr_frame_index = 0;    // Reset running_right animation curr_frame_idx 
-                    //        animations_storage[animation_comp.animations["3"]].frame_elapsed_time = 0.0f; // Reset running_right animation frame_time_elapsed
-                    //        animation_comp.curr_animation_idx = 1;  // Set idle right
-                    //    }
                 }
-
-
-
 
                 // Retrieve the time delay of the current frame in the current animation
                 std::string const& curr_animation_name = animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)];
-                // TESTING
-                /*std::cout << "Entity ID: " << entity_id << std::endl;
-                std::cout << "Current animation Name: " << curr_animation_name << std::endl;
-                std::cout << "Current animation idx: " << animation_comp.curr_animation_idx << std::endl;
-                std::cout << "Current frame idx: " << animation_comp.curr_frame_index << std::endl;*/
                 float delay = animations_storage[curr_animation_name].frames[animation_comp.curr_frame_index].time_delay;
 
                 // Calculate the time delay to determine current frame index of current animation

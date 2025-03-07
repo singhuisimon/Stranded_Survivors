@@ -55,7 +55,9 @@ namespace lof {
             // Find position of ui_overlay to indicate end of first iteration of objects
             EntityID ui_overlay = ECSM.find_entity_by_name("top_ui_overlay");
             size_t entities_size = all_entities.size();
-            end = std::prev(end, entities_size - ui_overlay);
+            if (ui_overlay != INVALID_ENTITY_ID) {
+                end = std::prev(end, entities_size - ui_overlay);
+            }
         }
 
         // Loop over the entities that match the system's signature
@@ -213,6 +215,9 @@ namespace lof {
             start = end;
             end = all_entities.end();
 
+            // Store start index of UIs
+            UI_start = *start;
+
             // UI entities own world to ndc xform
             glm::mat3 ui_view_xform = glm::mat3{ 1, 0, 0,
                                            0, 1, 0,
@@ -225,6 +230,7 @@ namespace lof {
             glm::mat3 ui_world_to_ndc_xform = ui_win_to_ndc_xform * ui_view_xform;
 
             for (; start != end; ++start) {
+
                 auto& graphics = ECSM.get_component<Graphics_Component>(*start);
                 auto& transform = ECSM.get_component<Transform2D>(*start);
 
@@ -362,23 +368,357 @@ namespace lof {
         // Get camera
         auto& camera = GFXM.get_camera();
 
+        // Get player id
+        EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+
+        // Get wormhole IDs and add background to it
+        auto wormholes = SM.get_wormholes_id();
+        wormholes.insert(wormholes.begin(), 0);
+
+        // Loop over the wormhole entities
+        for (auto itr = wormholes.begin(); itr != wormholes.end(); ++itr) {
+            //for (EntityID entity_id : get_entities()) {
+
+            auto& graphics = ECSM.get_component<Graphics_Component>(*itr);
+            auto& transform = ECSM.get_component<Transform2D>(*itr);
+
+            // Render only what is on the viewport
+            int current_scene = GM.get_current_scene(); // Get the current scene number
+            if (camera.is_free_cam == GL_FALSE && current_scene == 2) {
+                if (*itr != 0) { // Skip background
+                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
+                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+
+                    // Skip if object not in viewport
+                    if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+                        continue;
+                    }
+                }
+            }
+
+            // Get shader program
+            Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(graphics.shd_ref);
+
+            // Start the shader program that the entity will use for rendering 
+            GFXM.program_use(shader->program_handle);
+
+            // Bind object's VAO handle
+            glBindVertexArray(models[graphics.model_name].vaoid);
+
+            // Check if entity has a texture
+            if (graphics.texture_name != DEFAULT_TEXTURE_NAME) {
+
+                ASM.track_entity_asset(*itr, "Graphics_Component", graphics.texture_name);
+                // Look for texture in texture storage. If not found, load texture 
+                if (textures.find(graphics.texture_name) == textures.end()) {
+                    GFXM.load_texture(graphics.texture_name);
+                }
+
+                // Assign texture object to use texture image unit 5. If texture
+                // is not loaded, render with default black texture
+                if (textures.find(graphics.texture_name) == textures.end()) {
+                    glBindTextureUnit(5, 0);
+                }
+                else {
+                    glBindTextureUnit(5, textures[graphics.texture_name]);
+                }
+
+                // Set texture flag to true
+                GLuint tex_flag_true_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
+                if (tex_flag_true_loc >= 0) {
+                    glUniform1ui(tex_flag_true_loc, GL_TRUE);
+                }
+                else {
+                    LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // Set texture unit in fragment shader
+                GLuint tex_uniform_loc = glGetUniformLocation(shader->program_handle, "uTex2d");
+                if (tex_uniform_loc >= 0) {
+                    glUniform1i(tex_uniform_loc, 5);
+                }
+                else {
+                    LM.write_log("Render_System::draw(): Texture uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+
+                // If entity has animation that is not default, pass animation data to fragment shader
+                bool has_animation = ECSM.has_component<Animation_Component>(*itr);
+                if (has_animation == true) {
+
+                    // Get animation storage
+                    auto& animations = ASM.get_animation_storage();
+
+                    auto& animation = ECSM.get_component<Animation_Component>(*itr);
+                    std::string const& curr_animation_name = animation.animations[std::to_string(animation.curr_animation_idx)];
+                    if ((curr_animation_name != DEFAULT_ANIMATION_NAME) && (animations.find(curr_animation_name) != animations.end())) {
+                        // Set animation flag to be true
+                        GLuint animate_flag_true_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
+                        if (animate_flag_true_loc >= 0) {
+                            glUniform1ui(animate_flag_true_loc, GL_TRUE);
+                        }
+                        else {
+                            LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+
+                        // Pass frame number of current frame
+                        GLuint frame_no_loc = glGetUniformLocation(shader->program_handle, "uFrameNo");
+                        if (frame_no_loc >= 0) {
+                            if (curr_animation_name == "vent_strip" || curr_animation_name == "lava_animate") {
+                                glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animations[curr_animation_name].curr_frame_index].frame_number);
+                            }
+                            else {
+                                glUniform1i(frame_no_loc, animations[curr_animation_name].frames[animation.curr_frame_index].frame_number);
+                            }
+                        }
+                        else {
+                            LM.write_log("Render_System::draw(): Frame number value doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+                    }
+                    else {
+                        // Set animation flag to be false
+                        GLuint animate_flag_false_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
+                        if (animate_flag_false_loc >= 0) {
+                            glUniform1ui(animate_flag_false_loc, GL_FALSE);
+                        }
+                        else {
+                            LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+                    }
+                }
+                else {
+                    // Set animation flag to be false
+                    GLuint animate_flag_false_loc = glGetUniformLocation(shader->program_handle, "uAnimateFlag");
+                    if (animate_flag_false_loc >= 0) {
+                        glUniform1ui(animate_flag_false_loc, GL_FALSE);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Animation flag boolean doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+                }
+            }
+            else {
+                // Set texture flag to false
+                GLuint tex_flag_false_loc = glGetUniformLocation(shader->program_handle, "uTexFlag");
+                if (tex_flag_false_loc >= 0) {
+                    glUniform1ui(tex_flag_false_loc, GL_FALSE);
+                }
+                else {
+                    LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
+                    std::exit(EXIT_FAILURE);
+                }
+            }
+
+            // Pass object's color to fragment shader uniform variable uColor
+            GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
+            if (color_uniform_loc >= 0) {
+                glUniform4fv(color_uniform_loc, 1, &graphics.color[0]);
+            }
+            else {
+                LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
+                std::exit(EXIT_FAILURE);
+            }
+
+            // Pass object's mdl_to_ndc_xform to vertex shader to compute object's final position
+            GLint mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
+            if (mat_uniform_loc >= 0) {
+                glUniformMatrix3fv(mat_uniform_loc, 1, GL_FALSE, &graphics.mdl_to_ndc_xform[0][0]);
+            }
+            else {
+                LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                std::exit(EXIT_FAILURE);
+            }
+
+            // Render objects
+            if (*itr == 0) { // Set background object to always render in fill mode
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode());
+            }
+            else {
+                glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+            }
+
+#if _DEBUG
+            // Draw debugging features if debug mode is ON 
+            if (*itr != 0) { // Background object unaffected 
+                if (GFXM.get_debug_mode() == GL_TRUE) {
+
+                    // Check if entity has Velocity_Component and Collision_Component
+                    bool has_velocity = ECSM.has_component<Velocity_Component>(*itr);
+                    bool has_collision = ECSM.has_component<Collision_Component>(*itr);
+
+                    if (has_velocity || has_collision) {
+
+                        // Free texture shader program to allow models shader program to bind and start  
+                        GFXM.program_free();
+                        int safe_shd_ref = static_cast<int>(graphics.shd_ref) + 1; // prevent overflow
+                        Assets_Manager::ShaderProgram* debug_shader = ASM.get_shader_program(safe_shd_ref);
+                        GFXM.program_use(debug_shader->program_handle);
+
+                        // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
+                        GLint debug_color_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uColor");
+                        glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
+                        if (debug_color_uniform_loc >= 0) {
+                            glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
+                        }
+                        else {
+                            LM.write_log("Render_System::draw(): Debug color uniform variable doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+
+                        // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
+                        GLint debug_mat_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uModel_to_NDC_Mat");
+                        if (debug_mat_uniform_loc < 0) {
+                            LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
+                            std::exit(EXIT_FAILURE);
+                        }
+
+                        // Drawing collision box if entity has Collision_Component
+                        if (has_collision) {
+                            auto& collision = ECSM.get_component<Collision_Component>(*itr);
+
+                            std::vector<glm::mat3> box_mdl_to_ndc_xform;
+
+                            // Compute mdl_to_ndc_xform for each line of AABB box
+                            for (std::size_t i = 0; i < 4; ++i) {
+                                GLfloat scale_width = collision.width;
+                                GLfloat scale_height = collision.height;
+                                if (i == 1 || i == 3) {
+                                    scale_width = collision.height;
+                                    scale_height = collision.width;
+                                }
+
+                                // Compute line's scale matrix
+                                glm::mat3 AABB_scale_mat{ scale_width, 0, 0,
+                                                          0, scale_height, 0,
+                                                          0, 0, 1 };
+
+                                // Compute current orientation of each line 
+                                GLfloat AABB_rad_disp = glm::radians(i * DEFAULT_ROTATION);
+
+                                // Compute line rotational matrix 
+                                glm::mat3 AABB_rot_mat{ glm::cos(AABB_rad_disp),  glm::sin(AABB_rad_disp), 0,
+                                                        -glm::sin(AABB_rad_disp),  glm::cos(AABB_rad_disp), 0,
+                                                         0,                   0,                  1 };
+
+                                // Compute line translation matrix
+                                glm::mat3 AABB_trans_mat{ 1, 0, 0,
+                                                          0, 1, 0,
+                                                          transform.position.x, transform.position.y, 1 };
+
+                                // Compute model-to-world-to-NDC transformation matrix for line and store it
+                                glm::mat3 result_xform = camera.world_to_ndc_xform * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
+                                box_mdl_to_ndc_xform.emplace_back(result_xform);
+
+                                // Drawing AABB box line by line
+                                glLineWidth(DEFAULT_AABB_WIDTH);
+                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
+                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                            }
+                        }
+
+                        // Drawing velocity vector if entity has Velocity_Component
+                        if (has_velocity) {
+                            auto& velocity = ECSM.get_component<Velocity_Component>(*itr);
+
+                            // Compute line scale matrix
+                            glm::mat3 scale_mat{ transform.scale.x * DEFAULT_VELOCITY_LINE_LENGTH, 0, 0,
+                                                 0, transform.scale.y * DEFAULT_VELOCITY_LINE_LENGTH, 0,
+                                                 0, 0, 1 };
+
+                            // Compute current orientation of line
+                            GLfloat direction{ 0.0f };
+                            if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
+                                if (velocity.velocity.x > 0.0f) {
+                                    direction = -DEFAULT_ROTATION; // Move right 
+                                }
+                                else {
+                                    direction = DEFAULT_ROTATION; // Move left 
+                                }
+                            }
+                            else if (velocity.velocity.y && (velocity.velocity.x == 0.0f)) {
+                                if (velocity.velocity.y > 0.0f) {
+                                    direction = 0.0f; // Move up 
+                                }
+                                else {
+                                    direction = 2.0f * DEFAULT_ROTATION; // Move down 
+                                }
+                            }
+                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y > 0.0f) { // Top right
+                                direction = -DEFAULT_ROTATION / 2.0f;
+                            }
+                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y > 0.0f) { // Top left
+                                direction = DEFAULT_ROTATION / 2.0f;
+                            }
+                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                                direction = -DEFAULT_ROTATION * 1.5f;
+                            }
+                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                                direction = DEFAULT_ROTATION * 1.5f;
+                            }
+
+                            // Convert direction to radians
+                            GLfloat rad_disp = glm::radians(direction);
+
+                            // Compute line rotational matrix 
+                            glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
+                                               -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
+                                                0,                   0,                  1 };
+
+                            // Compute line translation matrix
+                            glm::mat3 trans_mat{ 1, 0, 0,
+                                                 0, 1, 0,
+                                                 transform.position.x, transform.position.y, 1 };
+
+                            // Compute model-to-world-to-NDC transformation matrix for the velocity line
+                            glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
+                            glBindVertexArray(models["debug_line"].vaoid);
+                            glLineWidth(DEFAULT_LINE_WIDTH);
+                            glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
+                            glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                        }
+                    }
+                }
+            }
+#endif
+            // Clean up by unbinding the VAO and ending the shader program
+            glBindVertexArray(0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            GFXM.program_free();
+        }
+
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
+
+            // Skip background
+            if (entity_id == 0) { continue; }
 
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
             // Render only what is on the viewport
             int current_scene = GM.get_current_scene(); // Get the current scene number
-            if (camera.is_free_cam == GL_FALSE && current_scene == 1 && current_scene == 2) {
-                EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                if (entity_id != 0 && entity_id != player_id) {
+            if (camera.is_free_cam == GL_FALSE && current_scene == 2) {
+                if (entity_id != 0 && entity_id != player_id && (entity_id < UI_start)) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-
                     float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
                     float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
 
+                    // Skip if object not in viewport
                     if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
+                        continue;
+                    }
+
+                    // Skip wormholes, they are already rendered
+                    if (std::find(wormholes.begin(), wormholes.end(), entity_id) != wormholes.end()) {
+                        std::cout << "wormhole entity id" << entity_id << std::endl;
                         continue;
                     }
                 }
@@ -619,156 +959,148 @@ namespace lof {
             }
 
             // Render objects
-            if (entity_id == 0) { // Set background object to always render in fill mode
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                glPolygonMode(GL_FRONT_AND_BACK, GFXM.get_render_mode());
-            }
-            else {
-                glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-            }
+            glDrawElements(models[graphics.model_name].primitive_type, models[graphics.model_name].draw_cnt, GL_UNSIGNED_SHORT, NULL);
 #if _DEBUG
             // Draw debugging features if debug mode is ON 
-            if (entity_id != 0) { // Background object unaffected 
-                if (GFXM.get_debug_mode() == GL_TRUE) {
+            if (GFXM.get_debug_mode() == GL_TRUE) {
 
-                    // Check if entity has Velocity_Component and Collision_Component
-                    bool has_velocity = ECSM.has_component<Velocity_Component>(entity_id);
-                    bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
+                // Check if entity has Velocity_Component and Collision_Component
+                bool has_velocity = ECSM.has_component<Velocity_Component>(entity_id);
+                bool has_collision = ECSM.has_component<Collision_Component>(entity_id);
 
-                    if (has_velocity || has_collision) {
+                if (has_velocity || has_collision) {
 
-                        // Free texture shader program to allow models shader program to bind and start  
-                        GFXM.program_free();
-                        int safe_shd_ref = static_cast<int>(graphics.shd_ref) + 1; // prevent overflow
-                        Assets_Manager::ShaderProgram* debug_shader = ASM.get_shader_program(safe_shd_ref);
-                        GFXM.program_use(debug_shader->program_handle);
+                    // Free texture shader program to allow models shader program to bind and start  
+                    GFXM.program_free();
+                    int safe_shd_ref = static_cast<int>(graphics.shd_ref) + 1; // prevent overflow
+                    Assets_Manager::ShaderProgram* debug_shader = ASM.get_shader_program(safe_shd_ref);
+                    GFXM.program_use(debug_shader->program_handle);
 
-                        // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
-                        GLint debug_color_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uColor");
-                        glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
-                        if (debug_color_uniform_loc >= 0) {
-                            glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
-                        }
-                        else {
-                            LM.write_log("Render_System::draw(): Debug color uniform variable doesn't exist.");
-                            std::exit(EXIT_FAILURE);
-                        }
+                    // Set draw color for debug shapes to black and pass to fragment shader uniform variable uColor
+                    GLint debug_color_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uColor");
+                    glm::vec4 debug_color{ 0.0f, 0.0f, 0.0f, 1.0f };
+                    if (debug_color_uniform_loc >= 0) {
+                        glUniform4fv(debug_color_uniform_loc, 1, &debug_color[0]);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Debug color uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
 
-                        // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
-                        GLint debug_mat_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uModel_to_NDC_Mat");
-                        if (debug_mat_uniform_loc < 0) {
-                            LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
-                            std::exit(EXIT_FAILURE);
-                        }
+                    // Pass debug object's mdl_to_ndc_xform to vertex shader to compute final position
+                    GLint debug_mat_uniform_loc = glGetUniformLocation(debug_shader->program_handle, "uModel_to_NDC_Mat");
+                    if (debug_mat_uniform_loc < 0) {
+                        LM.write_log("Render_System::draw(): Debug matrix uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
 
-                        // Drawing collision box if entity has Collision_Component
-                        if (has_collision) {
-                            auto& collision = ECSM.get_component<Collision_Component>(entity_id);
+                    // Drawing collision box if entity has Collision_Component
+                    if (has_collision) {
+                        auto& collision = ECSM.get_component<Collision_Component>(entity_id);
 
-                            std::vector<glm::mat3> box_mdl_to_ndc_xform;
+                        std::vector<glm::mat3> box_mdl_to_ndc_xform;
 
-                            // Compute mdl_to_ndc_xform for each line of AABB box
-                            for (std::size_t i = 0; i < 4; ++i) {
-                                GLfloat scale_width = collision.width;
-                                GLfloat scale_height = collision.height;
-                                if (i == 1 || i == 3) {
-                                    scale_width = collision.height;
-                                    scale_height = collision.width;
-                                }
-
-                                // Compute line's scale matrix
-                                glm::mat3 AABB_scale_mat{ scale_width, 0, 0,
-                                                          0, scale_height, 0,
-                                                          0, 0, 1 };
-
-                                // Compute current orientation of each line 
-                                GLfloat AABB_rad_disp = glm::radians(i * DEFAULT_ROTATION);
-
-                                // Compute line rotational matrix 
-                                glm::mat3 AABB_rot_mat{ glm::cos(AABB_rad_disp),  glm::sin(AABB_rad_disp), 0,
-                                                        -glm::sin(AABB_rad_disp),  glm::cos(AABB_rad_disp), 0,
-                                                         0,                   0,                  1 };
-
-                                // Compute line translation matrix
-                                glm::mat3 AABB_trans_mat{ 1, 0, 0,
-                                                          0, 1, 0,
-                                                          transform.position.x, transform.position.y, 1 };
-
-                                // Compute model-to-world-to-NDC transformation matrix for line and store it
-                                glm::mat3 result_xform = camera.world_to_ndc_xform * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
-                                box_mdl_to_ndc_xform.emplace_back(result_xform);
-
-                                // Drawing AABB box line by line
-                                glLineWidth(DEFAULT_AABB_WIDTH);
-                                glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
-                                glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
-                            }
-                        }
-
-                        // Drawing velocity vector if entity has Velocity_Component
-                        if (has_velocity) {
-                            auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);
-
-                            // Compute line scale matrix
-                            glm::mat3 scale_mat{ transform.scale.x * DEFAULT_VELOCITY_LINE_LENGTH, 0, 0,
-                                                 0, transform.scale.y * DEFAULT_VELOCITY_LINE_LENGTH, 0,
-                                                 0, 0, 1 };
-
-                            // Compute current orientation of line
-                            GLfloat direction{ 0.0f };
-                            if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
-                                if (velocity.velocity.x > 0.0f) {
-                                    direction = -DEFAULT_ROTATION; // Move right 
-                                }
-                                else {
-                                    direction = DEFAULT_ROTATION; // Move left 
-                                }
-                            }
-                            else if (velocity.velocity.y && (velocity.velocity.x == 0.0f)) {
-                                if (velocity.velocity.y > 0.0f) {
-                                    direction = 0.0f; // Move up 
-                                }
-                                else {
-                                    direction = 2.0f * DEFAULT_ROTATION; // Move down 
-                                }
-                            }
-                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y > 0.0f) { // Top right
-                                direction = -DEFAULT_ROTATION / 2.0f;
-                            }
-                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y > 0.0f) { // Top left
-                                direction = DEFAULT_ROTATION / 2.0f;
-                            }
-                            else if (velocity.velocity.x > 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
-                                direction = -DEFAULT_ROTATION * 1.5f;
-                            }
-                            else if (velocity.velocity.x < 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
-                                direction = DEFAULT_ROTATION * 1.5f;
+                        // Compute mdl_to_ndc_xform for each line of AABB box
+                        for (std::size_t i = 0; i < 4; ++i) {
+                            GLfloat scale_width = collision.width;
+                            GLfloat scale_height = collision.height;
+                            if (i == 1 || i == 3) {
+                                scale_width = collision.height;
+                                scale_height = collision.width;
                             }
 
-                            // Convert direction to radians
-                            GLfloat rad_disp = glm::radians(direction);
+                            // Compute line's scale matrix
+                            glm::mat3 AABB_scale_mat{ scale_width, 0, 0,
+                                                        0, scale_height, 0,
+                                                        0, 0, 1 };
+
+                            // Compute current orientation of each line 
+                            GLfloat AABB_rad_disp = glm::radians(i * DEFAULT_ROTATION);
 
                             // Compute line rotational matrix 
-                            glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
-                                               -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
-                                                0,                   0,                  1 };
+                            glm::mat3 AABB_rot_mat{ glm::cos(AABB_rad_disp),  glm::sin(AABB_rad_disp), 0,
+                                                    -glm::sin(AABB_rad_disp),  glm::cos(AABB_rad_disp), 0,
+                                                        0,                   0,                  1 };
 
                             // Compute line translation matrix
-                            glm::mat3 trans_mat{ 1, 0, 0,
-                                                 0, 1, 0,
-                                                 transform.position.x, transform.position.y, 1 };
+                            glm::mat3 AABB_trans_mat{ 1, 0, 0,
+                                                        0, 1, 0,
+                                                        transform.position.x, transform.position.y, 1 };
 
-                            // Compute model-to-world-to-NDC transformation matrix for the velocity line
-                            glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
-                            glBindVertexArray(models["debug_line"].vaoid);
-                            glLineWidth(DEFAULT_LINE_WIDTH);
-                            glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
+                            // Compute model-to-world-to-NDC transformation matrix for line and store it
+                            glm::mat3 result_xform = camera.world_to_ndc_xform * AABB_trans_mat * AABB_rot_mat * AABB_scale_mat;
+                            box_mdl_to_ndc_xform.emplace_back(result_xform);
+
+                            // Drawing AABB box line by line
+                            glLineWidth(DEFAULT_AABB_WIDTH);
+                            glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &box_mdl_to_ndc_xform[i][0][0]);
                             glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
                         }
                     }
+
+                    // Drawing velocity vector if entity has Velocity_Component
+                    if (has_velocity) {
+                        auto& velocity = ECSM.get_component<Velocity_Component>(entity_id);
+
+                        // Compute line scale matrix
+                        glm::mat3 scale_mat{ transform.scale.x * DEFAULT_VELOCITY_LINE_LENGTH, 0, 0,
+                                                0, transform.scale.y * DEFAULT_VELOCITY_LINE_LENGTH, 0,
+                                                0, 0, 1 };
+
+                        // Compute current orientation of line
+                        GLfloat direction{ 0.0f };
+                        if (velocity.velocity.x && (velocity.velocity.y == 0.0f)) {
+                            if (velocity.velocity.x > 0.0f) {
+                                direction = -DEFAULT_ROTATION; // Move right 
+                            }
+                            else {
+                                direction = DEFAULT_ROTATION; // Move left 
+                            }
+                        }
+                        else if (velocity.velocity.y && (velocity.velocity.x == 0.0f)) {
+                            if (velocity.velocity.y > 0.0f) {
+                                direction = 0.0f; // Move up 
+                            }
+                            else {
+                                direction = 2.0f * DEFAULT_ROTATION; // Move down 
+                            }
+                        }
+                        else if (velocity.velocity.x > 0.0f && velocity.velocity.y > 0.0f) { // Top right
+                            direction = -DEFAULT_ROTATION / 2.0f;
+                        }
+                        else if (velocity.velocity.x < 0.0f && velocity.velocity.y > 0.0f) { // Top left
+                            direction = DEFAULT_ROTATION / 2.0f;
+                        }
+                        else if (velocity.velocity.x > 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                            direction = -DEFAULT_ROTATION * 1.5f;
+                        }
+                        else if (velocity.velocity.x < 0.0f && velocity.velocity.y < 0.0f) { // Bottom right
+                            direction = DEFAULT_ROTATION * 1.5f;
+                        }
+
+                        // Convert direction to radians
+                        GLfloat rad_disp = glm::radians(direction);
+
+                        // Compute line rotational matrix 
+                        glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
+                                            -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
+                                            0,                   0,                  1 };
+
+                        // Compute line translation matrix
+                        glm::mat3 trans_mat{ 1, 0, 0,
+                                                0, 1, 0,
+                                                transform.position.x, transform.position.y, 1 };
+
+                        // Compute model-to-world-to-NDC transformation matrix for the velocity line
+                        glm::mat3 line_mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
+                        glBindVertexArray(models["debug_line"].vaoid);
+                        glLineWidth(DEFAULT_LINE_WIDTH);
+                        glUniformMatrix3fv(debug_mat_uniform_loc, 1, GL_FALSE, &line_mdl_to_ndc_xform[0][0]);
+                        glDrawElements(models["debug_line"].primitive_type, models["debug_line"].draw_cnt, GL_UNSIGNED_SHORT, NULL);
+                    }
                 }
             }
+
 #endif
             // Clean up by unbinding the VAO and ending the shader program
             glBindVertexArray(0);
@@ -789,6 +1121,11 @@ namespace lof {
                 // Get number of active particles and the particle storage
                 int particle_cnt = particle_system->get_particles_count();
                 auto& particles_storage = particle_system->get_particle_storage();
+
+                // Break loop if no particles to render
+                if (particle_cnt < 0) {
+                    break;
+                }
 
                 // Get shader program 
                 Assets_Manager::ShaderProgram* shader = ASM.get_shader_program(0);
