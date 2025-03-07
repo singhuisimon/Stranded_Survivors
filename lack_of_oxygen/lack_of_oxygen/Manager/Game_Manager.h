@@ -65,6 +65,9 @@ namespace lof {
         float current_oxygen_level = 100.0f;  // Start at 100%
         float ship_oxygen_level = 400.0f;     // [0..400]
 
+        // Flags to indicate the panic trigger
+        bool panic_triggered = false;
+
         float oxygen_drain_rate = 1.0f;     // Drain 5% per second
         float oxygen_update_timer = 0.0f;   // Track time for updates
         float current_panic_level = 0.0f;  // Starts at 0%
@@ -167,6 +170,26 @@ namespace lof {
         void  set_current_oxygen_level(float value) {
             current_oxygen_level = std::clamp(value, 0.0f, 100.0f);
         }
+
+        //ash
+
+        /**
+        * @brief Get current panic level
+        * @return the panic level
+        */
+        float get_current_panic_level() const { return current_panic_level; }
+        void set_current_panic_level(float value) { 
+            current_panic_level = std::clamp(value, 0.0f, 100.0f); 
+        }
+        /**
+        * @brief Get panic triggered boolean
+        * @return boolean that indicates whether panic triggered or not
+        */
+        bool get_panic_triggered() const { return panic_triggered; }
+        void set_panic_triggered(bool value) { panic_triggered = value; }
+
+        //ash
+        
 
         /**
 		 * @brief Returns the ship's current oxygen level in the range [0..400].
