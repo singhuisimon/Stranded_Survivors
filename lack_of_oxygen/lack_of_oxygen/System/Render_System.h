@@ -14,7 +14,7 @@
 
 
 #define GLFW_INCLUDE_NONE
-// Include file dependencies
+ // Include file dependencies
 #include "System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Component/Component.h"
@@ -55,6 +55,9 @@ namespace lof {
          * @brief Renders entities onto the window based on their components.
          */
         void draw();
+
+        // Entity ID of start of UI
+        EntityID UI_start;
     };
 
 } // namespace lof
