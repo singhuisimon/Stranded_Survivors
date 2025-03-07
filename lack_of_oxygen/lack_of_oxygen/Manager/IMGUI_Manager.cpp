@@ -1502,7 +1502,7 @@ namespace lof {
                         }
 
                         //remove audio.
-                        static size_t selected_audio_index = -1;
+                        static size_t selected_audio_index = static_cast<size_t>(-1);
 
                         std::string remove_audio = "Remove Audio";
                         const char* remove_audio_button = remove_audio.c_str();

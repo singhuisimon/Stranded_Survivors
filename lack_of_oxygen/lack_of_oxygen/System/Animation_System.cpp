@@ -581,10 +581,10 @@ namespace lof {
                 // Retrieve the time delay of the current frame in the current animation
                 std::string const& curr_animation_name = animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)];
                 // TESTING
-                std::cout << "Entity ID: " << entity_id << std::endl;
+                /*std::cout << "Entity ID: " << entity_id << std::endl;
                 std::cout << "Current animation Name: " << curr_animation_name << std::endl;
                 std::cout << "Current animation idx: " << animation_comp.curr_animation_idx << std::endl;
-                std::cout << "Current frame idx: " << animation_comp.curr_frame_index << std::endl;
+                std::cout << "Current frame idx: " << animation_comp.curr_frame_index << std::endl;*/
                 float delay = animations_storage[curr_animation_name].frames[animation_comp.curr_frame_index].time_delay;
 
                 // Calculate the time delay to determine current frame index of current animation
