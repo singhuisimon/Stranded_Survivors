@@ -78,7 +78,6 @@ namespace lof {
                     // Moving and not mining
                     if (moving_status != NO_ACTION && mining_status == NO_ACTION) {
                         player_action = MOVING;
-                        has_mined = false;
                     }
                     // Mining and not moving
                     else if (moving_status == NO_ACTION && mining_status != NO_ACTION) {
@@ -91,7 +90,6 @@ namespace lof {
                 }
                 else {
                     player_action = IDLE;
-                    has_mined = false;
                 }
 
                 // Moving-only animations
@@ -138,106 +136,72 @@ namespace lof {
 
                         // Check if mining left animation exists
                         std::string mining_animation = "prisoner_mining_left";
-                        std::string idle_animation = "prisoner_idle_left";
-                        unsigned int mining_index = 0, idle_index = 0;
+                        unsigned int mining_index = 0;
                         for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                             if (mining_animation == itr->second) {
                                 mining_index = std::stoi(itr->first);
                             }
-                            else if (idle_animation == itr->second) {
-                                idle_index = std::stoi(itr->first);
-                            }
                         }
 
-                        if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining left animation
+                        if (animation_comp.curr_animation_idx != mining_index) { // Set mining left animation
                             animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                             animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
                             animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining left
                         }
-                        //else if (has_mined == true) {
-                        //    animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx  
-                        //    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
-                        //    animation_comp.curr_animation_idx = idle_index;  // Set idle left after mining animation
-                        //}
+
                     }
                     else if (mining_status == MINE_RIGHT) {
 
                         // Check if mining right animation exists
                         std::string mining_animation = "prisoner_mining_right";
-                        std::string idle_animation = "prisoner_idle_right";
-                        unsigned int mining_index = 0, idle_index = 0;
+                        unsigned int mining_index = 0;
                         for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                             if (mining_animation == itr->second) {
                                 mining_index = std::stoi(itr->first);
                             }
-                            else if (idle_animation == itr->second) {
-                                idle_index = std::stoi(itr->first);
-                            }
                         }
 
-                        if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining right animation
+                        if (animation_comp.curr_animation_idx != mining_index) { // Set mining right animation
                             animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                             animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                             animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining right
                         }
-                        //else if (has_mined == true) {
-                        //    animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx  
-                        //    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset running_left animation frame_time_elapsed
-                        //    animation_comp.curr_animation_idx = idle_index;  // Set idle right after mining animation
-                        //}
                     }
                     else if (mining_status == MINE_UP) {
                         if (player_direction == FACE_LEFT) {
 
                             // Check if mining up-left animation exists
                             std::string mining_animation = "prisoner_mining_up_left";
-                            std::string idle_animation = "prisoner_idle_left";
-                            unsigned int mining_index = 0, idle_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (idle_animation == itr->second) {
-                                    idle_index = std::stoi(itr->first);
-                                }
+
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining up and left animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining up and left animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining up and left
                             }
-                            //else if (has_mined == true) {
-                            //    animation_comp.curr_frame_index = 1;    // Fix on idle frame
-                            //    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
-                            //    animation_comp.curr_animation_idx = mining_index;  // Maintain mining up and left animation
-                            //}
                         }
                         else if (player_direction == FACE_RIGHT) {
 
                             // Check if mining up-right animation exists
                             std::string mining_animation = "prisoner_mining_up_right";
-                            std::string idle_animation = "prisoner_idle_right";
-                            unsigned int mining_index = 0, idle_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (idle_animation == itr->second) {
-                                    idle_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining up and right animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining up and right animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining up and right
                             }
-                            //else if (has_mined == true) {
-                            //    animation_comp.curr_frame_index = 1;    // Fix on idle frame
-                            //    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
-                            //    animation_comp.curr_animation_idx = mining_index;  // Maintain mining up and right animation
-                            //}
                         }
                     }
                     else if (mining_status == MINE_DOWN) {
@@ -245,53 +209,35 @@ namespace lof {
 
                             // Check if mining down-left animation exists
                             std::string mining_animation = "prisoner_mining_down_left";
-                            std::string idle_animation = "prisoner_idle_left";
-                            unsigned int mining_index = 0, idle_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (idle_animation == itr->second) {
-                                    idle_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining down and left animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining down and left animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining down and left
                             }
-                            //else if (has_mined == true) {
-                            //    animation_comp.curr_frame_index = 1;    // Fix on idle frame
-                            //    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
-                            //    animation_comp.curr_animation_idx = mining_index;  // Maintain current animation
-                            //}
                         }
                         else if (player_direction == FACE_RIGHT) {
 
                             // Check if mining down-right animation exists
                             std::string mining_animation = "prisoner_mining_down_right";
-                            std::string idle_animation = "prisoner_idle_right";
-                            unsigned int mining_index = 0, idle_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (idle_animation == itr->second) {
-                                    idle_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining down and right animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining down and right animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining down and right
                             }
-                            //else if (has_mined == true) {
-                            //    animation_comp.curr_frame_index = 1;    // Fix on idle frame
-                            //    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
-                            //    animation_comp.curr_animation_idx = mining_index;  // Maintain current animation
-                            //}
                         }
                     }
                 } // Moving & Mining combined animations
@@ -300,137 +246,69 @@ namespace lof {
 
                         // Check if respective mining and running animation exists
                         std::string mining_animation = "prisoner_mining_left";
-                        std::string running_animation;
-                        //if (moving_status == RUN_LEFT) {
-                        //    running_animation = "prisoner_running_left";
-                        //}
-                        //else {
-                        //    running_animation = "prisoner_running_right";
-                        //}
-                        unsigned int mining_index = 0/*, running_index = 0*/;
+                        unsigned int mining_index = 0;
                         for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                             if (mining_animation == itr->second) {
                                 mining_index = std::stoi(itr->first);
                             }
-                            //else if (running_animation == itr->second) {
-                            //    running_index = std::stoi(itr->first);
-                            //}
                         }
 
-                        if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining left animation
+                        if (animation_comp.curr_animation_idx != mining_index) { // Set mining left animation
                             animation_comp.curr_frame_index = 2;    // Reset previous animation curr_frame_idx
                             animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
                             animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining left
                         }
-                        //else if (has_mined == true) {
-                        //    if (animation_comp.curr_animation_idx != running_index) { // Set running animation
-                        //        animation_comp.curr_frame_index = 0;      // Reset previous animation curr_frame_idx
-                        //        animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
-                        //        animation_comp.curr_animation_idx = running_index;
-                        //    }
-                        //}
                     }
                     else if (mining_status == MINE_RIGHT) {
 
                         // Check if respective mining and running animation exists
                         std::string mining_animation = "prisoner_mining_right";
-                        //std::string running_animation;
-                        //if (moving_status == RUN_LEFT) {
-                        //    running_animation = "prisoner_running_left";
-                        //}
-                        //else {
-                        //    running_animation = "prisoner_running_right";
-                        //}
-                        unsigned int mining_index = 0/*, running_index = 0*/;
+                        unsigned int mining_index = 0;
                         for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                             if (mining_animation == itr->second) {
                                 mining_index = std::stoi(itr->first);
                             }
-                            //else if (running_animation == itr->second) {
-                            //    running_index = std::stoi(itr->first);
-                            //}
                         }
 
-                        if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining right animation
+                        if (animation_comp.curr_animation_idx != mining_index) { // Set mining right animation
                             animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                             animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                             animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining RIGHT
                         }
-                        //else if (has_mined == true) {
-                        //    if (animation_comp.curr_animation_idx != running_index) { // Set running animation
-                        //        animation_comp.curr_frame_index = 0;      // Reset previous animation curr_frame_idx
-                        //        animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
-                        //        animation_comp.curr_animation_idx = running_index;
-                        //    }
-                        //}
                     }
                     else if (mining_status == MINE_UP) {
                         if (player_direction == FACE_LEFT) {
 
                             // Check if respective mining and running animation exists
                             std::string mining_animation = "prisoner_mining_up_left";
-                            std::string running_animation;
-                            if (moving_status == RUN_LEFT) {
-                                running_animation = "prisoner_running_left";
-                            }
-                            else {
-                                running_animation = "prisoner_running_right";
-                            }
-                            unsigned int mining_index = 0, running_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (running_animation == itr->second) {
-                                    running_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining up and left animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining up and left animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining up and left
-                            }
-                            else if (has_mined == true) {
-                                if (animation_comp.curr_animation_idx != running_index) { // Set running animation
-                                    animation_comp.curr_frame_index = 0;      // Reset previous animation curr_frame_idx
-                                    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
-                                    animation_comp.curr_animation_idx = running_index;
-                                }
                             }
                         }
                         else if (player_direction == FACE_RIGHT) {
 
                             // Check if respective mining and running animation exists
                             std::string mining_animation = "prisoner_mining_up_right";
-                            std::string running_animation;
-                            if (moving_status == RUN_LEFT) {
-                                running_animation = "prisoner_running_left";
-                            }
-                            else {
-                                running_animation = "prisoner_running_right";
-                            }
-                            unsigned int mining_index = 0, running_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (running_animation == itr->second) {
-                                    running_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining up and right animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining up and right animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining up and left 
-                            }
-                            else if (has_mined == true) {
-                                if (animation_comp.curr_animation_idx != running_index) { // Set running animation
-                                    animation_comp.curr_frame_index = 0;      // Reset previous animation curr_frame_idx
-                                    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
-                                    animation_comp.curr_animation_idx = running_index;
-                                }
                             }
                         }
                     }
@@ -439,68 +317,34 @@ namespace lof {
 
                             // Check if respective mining and running animation exists
                             std::string mining_animation = "prisoner_mining_down_left";
-                            std::string running_animation;
-                            if (moving_status == RUN_LEFT) {
-                                running_animation = "prisoner_running_left";
-                            }
-                            else {
-                                running_animation = "prisoner_running_right";
-                            }
-                            unsigned int mining_index = 0, running_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (running_animation == itr->second) {
-                                    running_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining down and left animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining down and left animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining down and left
-                            }
-                            else if (has_mined == true) {
-                                if (animation_comp.curr_animation_idx != running_index) { // Set running animation
-                                    animation_comp.curr_frame_index = 0;      // Reset previous animation curr_frame_idx
-                                    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
-                                    animation_comp.curr_animation_idx = running_index;
-                                }
                             }
                         }
                         else if (player_direction == FACE_RIGHT) {
 
                             // Check if respective mining and running animation exists
                             std::string mining_animation = "prisoner_mining_down_right";
-                            std::string running_animation;
-                            if (moving_status == RUN_LEFT) {
-                                running_animation = "prisoner_running_left";
-                            }
-                            else {
-                                running_animation = "prisoner_running_right";
-                            }
-                            unsigned int mining_index = 0, running_index = 0;
+                            unsigned int mining_index = 0;
                             for (auto itr = animation_comp.animations.begin(); itr != animation_comp.animations.end(); ++itr) {
                                 if (mining_animation == itr->second) {
                                     mining_index = std::stoi(itr->first);
                                 }
-                                else if (running_animation == itr->second) {
-                                    running_index = std::stoi(itr->first);
-                                }
                             }
 
-                            if (animation_comp.curr_animation_idx != mining_index && has_mined == false) { // Set mining down and right animation
+                            if (animation_comp.curr_animation_idx != mining_index) { // Set mining down and right animation
                                 animation_comp.curr_frame_index = 0;    // Reset previous animation curr_frame_idx
                                 animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed 
                                 animation_comp.curr_animation_idx = mining_index;  // Set current animation to mining down and right 
-                            }
-                            else if (has_mined == true) {
-                                if (animation_comp.curr_animation_idx != running_index) { // Set running animation
-                                    animation_comp.curr_frame_index = 0;      // Reset previous animation curr_frame_idx
-                                    animations_storage[animation_comp.animations[std::to_string(animation_comp.curr_animation_idx)]].frame_elapsed_time = 0.0f; // Reset previous animation frame_time_elapsed
-                                    animation_comp.curr_animation_idx = running_index;
-                                }
                             }
                         }
                     }
@@ -558,27 +402,33 @@ namespace lof {
                     animations_storage[curr_animation_name].frame_elapsed_time += delta_time * MILLISECONDS_PER_SECOND;
                 }
                 else { // Frame elapsed time has surpassed frame's delay time, time to change frame
-                    if (mining_status != NO_ACTION) {
-                        has_mined = true;
-                    }
                     animations_storage[curr_animation_name].frame_elapsed_time = DEFAULT_FRAME_TIME_ELAPSED;
 
-                    if (player_action == MOVING_N_MINING) {
+                    if (player_action == MINING) {
+                        animation_comp.curr_frame_index = animation_comp.curr_frame_index < 1 ? 1 : 0;
+                    }
+                    else if (player_action == MOVING_N_MINING) {
                         if (mining_status == MINE_LEFT) {
                             if (moving_status == RUN_LEFT) {
                                 animation_comp.curr_frame_index = animation_comp.curr_frame_index < 3 ? 3 : 2;
                             }
-                            else {
-                                animation_comp.curr_frame_index = animation_comp.curr_frame_index < 1 ? 1 : 0;
+                            else if(moving_status == RUN_RIGHT) {
+                                animation_comp.curr_frame_index = animation_comp.curr_frame_index < 5 ? 5 : 4;
                             }
                         }
                         else if (mining_status == MINE_RIGHT) {
                             if (moving_status == RUN_RIGHT) {
                                 animation_comp.curr_frame_index = animation_comp.curr_frame_index < 3 ? 3 : 2;
                             }
-                            else {
-                                animation_comp.curr_frame_index = animation_comp.curr_frame_index < 1 ? 1 : 0;
+                            else if(moving_status == RUN_LEFT){
+                                animation_comp.curr_frame_index = animation_comp.curr_frame_index < 5 ? 5 : 4;
                             }
+                        }
+                        else if (mining_status == MINE_UP) {
+                            animation_comp.curr_frame_index = animation_comp.curr_frame_index < 3 ? 3 : 2;
+                        }
+                        else if (mining_status == MINE_DOWN) {
+                            animation_comp.curr_frame_index = animation_comp.curr_frame_index < 3 ? 3 : 2;
                         }
                     }
                     else {

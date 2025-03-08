@@ -688,7 +688,7 @@
         "Collision_Component": {
           "width": 1920.0,
           "height": 96.0,
-          "collidable": false
+          "collidable": true
         },
         "Physics_Component": {
           "gravity": [ 0.0, 0.0 ],

@@ -235,8 +235,6 @@
     <Image Include="Assets\Textures\skybox_batch_4.png" />
     <Image Include="Assets\Textures\snowflake.png" />
     <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
-    <Image Include="Assets\Textures\Sprite sheet Compressed_Batch 19.png" />
-    <Image Include="Assets\Textures\Sprite sheet_Compressed Hold Controls_Batch 19.png" />
     <Image Include="Assets\Textures\Spritesheet_Animate.png" />
     <Image Include="Assets\Textures\spritesheet_map.png" />
     <Image Include="Assets\Textures\spritesheet_player.png" />
@@ -449,4 +447,9 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\Freetype API\*.dll" "$(OutDir)
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Assets_4Scenes_4scene2_1scn__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

@@ -6,92 +6,128 @@ EF							// Indicate end of frame data
 EA							// Indicate end of animation data
 name prisoner_idle_left
 texture Spritesheet_Player
-frame_no 14
+frame_no 28
 time_delay 0.0
 EF
 EA
 name prisoner_running_right
 texture Spritesheet_Player
 frame_no 3
-time_delay 100.0
+time_delay 50.0
 EF
 frame_no 4
-time_delay 100.0
+time_delay 50.0
 EF
 EA
 name prisoner_running_left
 texture Spritesheet_Player
-frame_no 17
+frame_no 31
+time_delay 50.0
+EF
+frame_no 32
+time_delay 50.0
+EF
+EA
+name prisoner_mining_left
+texture Spritesheet_Player
+frame_no 43
+time_delay 100.0
+EF
+frame_no 42
+time_delay 100.0
+EF
+frame_no 48
+time_delay 50.0
+EF
+frame_no 49
+time_delay 50.0
+EF
+frame_no 54
+time_delay 50.0
+EF
+frame_no 55
+time_delay 50.0
+EF
+EA
+name prisoner_mining_right
+texture Spritesheet_Player
+frame_no 15
+time_delay 100.0
+EF
+frame_no 14
+time_delay 100.0
+EF
+frame_no 20
+time_delay 50.0
+EF
+frame_no 21
+time_delay 50.0
+EF
+frame_no 26
+time_delay 50.0
+EF
+frame_no 27
+time_delay 50.0
+EF
+EA
+name prisoner_mining_up_left
+texture Spritesheet_Player
+frame_no 47
+time_delay 100.0
+EF
+frame_no 46
+time_delay 100.0
+EF
+frame_no 53
+time_delay 50.0
+EF
+frame_no 52
+time_delay 50.0
+EF
+EA
+name prisoner_mining_up_right
+texture Spritesheet_Player
+frame_no 19
 time_delay 100.0
 EF
 frame_no 18
 time_delay 100.0
 EF
-EA
-name prisoner_mining_left
-texture Spritesheet_Player
-frame_no 23
-time_delay 150.0
+frame_no 25
+time_delay 50.0
 EF
-frame_no 22
-time_delay 150.0
-EF
-frame_no 30
-time_delay 100.0
-EF
-frame_no 31
-time_delay 100.0
-EF
-EA
-name prisoner_mining_right
-texture Spritesheet_Player
-frame_no 9
-time_delay 150.0
-EF
-frame_no 8
-time_delay 150.0
-EF
-frame_no 28
-time_delay 100.0
-EF
-frame_no 29
-time_delay 100.0
-EF
-EA
-name prisoner_mining_up_left
-texture Spritesheet_Player
-frame_no 27
-time_delay 150.0
-EF
-frame_no 26
-time_delay 150.0
-EF
-EA
-name prisoner_mining_up_right
-texture Spritesheet_Player
-frame_no 13
-time_delay 150.0
-EF
-frame_no 12
-time_delay 150.0
+frame_no 24
+time_delay 50.0
 EF
 EA
 name prisoner_mining_down_left
 texture Spritesheet_Player
-frame_no 25
-time_delay 150.0
+frame_no 45
+time_delay 100.0
 EF
-frame_no 24
-time_delay 150.0
+frame_no 44
+time_delay 100.0
+EF
+frame_no 51
+time_delay 50.0
+EF
+frame_no 50
+time_delay 50.0
 EF
 EA
 name prisoner_mining_down_right
 texture Spritesheet_Player
-frame_no 11
-time_delay 150.0
+frame_no 17
+time_delay 100.0
 EF
-frame_no 10
-time_delay 150.0
+frame_no 16
+time_delay 100.0
+EF
+frame_no 23
+time_delay 50.0
+EF
+frame_no 22
+time_delay 50.0
 EF
 EA
 name vent_strip_up
