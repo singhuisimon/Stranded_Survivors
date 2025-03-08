@@ -234,7 +234,8 @@ namespace lof {
                             auto& entity_animation = ECSM.get_component<Animation_Component>(entity_id);
 
                             // Skip for these entities
-                            if (entity_animation.animations["0"] == "vent_strip" || entity_animation.animations["0"] == "vent" ||
+                            if (entity_animation.animations["0"] == "vent_strip_up" || entity_animation.animations["0"] == "vent_strip_right" ||
+                                entity_animation.animations["0"] == "vent_strip_left" || entity_animation.animations["0"] == "vent" ||
                                 entity_animation.animations["0"] == "wormhole" || entity_animation.animations["0"] == "lava" ||
                                 entity_animation.animations["0"] == "lava_animate") {
                                 continue;
