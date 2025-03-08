@@ -77,6 +77,9 @@ namespace lof {
         // Flag for displaying fps in game
         bool display_fps = false;
 
+        // Pause Logic 
+        bool m_is_paused;
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.

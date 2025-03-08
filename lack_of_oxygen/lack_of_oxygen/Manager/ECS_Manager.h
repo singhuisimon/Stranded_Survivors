@@ -52,7 +52,8 @@ namespace lof {
         // System storage based on collection 
         std::vector<System*> fixed_dt_systems; 
         std::vector<System*> dt_update_systems;
-        std::vector<System*> gameplay_dependent_systems;
+        std::vector<System*> performance_viewer_systems;
+        std::vector<System*> pause_play_systems;
 
         // Component storage
         std::unordered_map<std::type_index, std::vector<std::unique_ptr<Component>>> component_arrays;
@@ -168,7 +169,7 @@ namespace lof {
 
         // System management
        // void add_system(std::unique_ptr<System> system);
-        void add_system(std::unique_ptr<System> system, bool uses_fixed_dt = false, bool gameplay_dependent = false);
+        void add_system(std::unique_ptr<System> system, bool uses_fixed_dt, bool performance_viewer, bool play_pause);
         void update(float delta_time);
 
         // Accessing each system

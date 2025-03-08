@@ -116,31 +116,33 @@ namespace lof {
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
-            add_system(std::make_unique<Collision_System>(), true, true);
+            //uses fixed dt, performance viewer, play pause
+
+            add_system(std::make_unique<Collision_System>(), true, true, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
-            add_system(std::make_unique<Movement_System>(), true, true);
+            add_system(std::make_unique<Movement_System>(), true, true, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Movement_System'.");
 
-            add_system(std::make_unique<Render_System>(), false, false);
+            add_system(std::make_unique<Render_System>(), false, false, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<GUI_System>(*this), false, false);
+            add_system(std::make_unique<GUI_System>(*this), false, false, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
 
-            add_system(std::make_unique<Audio_System>(), false, true);
+            add_system(std::make_unique<Audio_System>(), false, true, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Audio_System'.");
 
-            add_system(std::make_unique<Animation_System>(), false, true); 
+            add_system(std::make_unique<Animation_System>(), false, true, false); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
 
-            add_system(std::make_unique<Logic_System>(), false, true);
+            add_system(std::make_unique<Logic_System>(), false, true, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
-            add_system(std::make_unique<Interruption_System>(window), false, false); 
+            add_system(std::make_unique<Interruption_System>(window), false, false, false); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
 
-            add_system(std::make_unique<Particle_System>(), false, false);
+            add_system(std::make_unique<Particle_System>(), false, false, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Particle_System'.");
 
             m_is_started = true;
@@ -407,54 +409,24 @@ namespace lof {
         int steps = std::min(FPSM.get_current_number_of_steps(), DEFAULT_MAX_STEPS); 
         float fixed_dt = FPSM.get_fixed_delta_time(); 
 
-#if 0
-            for (auto& system : systems) {
+        //runs GUI system and Render System when the game is paused
+        if (GM.is_paused()) {
+            for (auto system : pause_play_systems) { //GUI_System and Render_System
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
 
-                bool is_physics = system->get_type() == "Movement_System" || system->get_type() == "Collision_System"; 
-                //system that use time in the update
-                if(is_physics || system->get_type() == "Logic_System")
-                    {
-                    //system that use time in the update
-                    if (is_physics) {
-
-                        if (!game_playing) {
-                            system->set_time(0);
-                            continue;
-                        }
-
-                    }
-                    for (int i = 0; i < steps; ++i) {
-                        // Getting delta time for each system
-                        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-                        // Updating each system 
-                        system->update(fixed_dt);
-                        system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
-
-                    }
-                    
-                    
-                  }
-                else { //systems that do not use time in calculations
-                    if ((system->get_type() == "Audio_System" || system->get_type() == "Animation_System") && !game_playing) {
-                        system->set_time(0);
-                        continue; //skip audio in the level editor mode
-                    }
-                    // Getting delta time for each system
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-                    // Updating each system
-                    system->update(delta_time);
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
-
-                }
-
-               
-               
             }
-#endif
+            
+        }
+        else {
 
-            if ((level_editor_mode && !game_playing) || GM.is_paused()) {
-                for (auto system : gameplay_dependent_systems) {
+
+            if ((level_editor_mode && !game_playing)) {
+                for (auto system : performance_viewer_systems) {
                     system->set_time(0);
+
                 }
             }
             else {
@@ -469,13 +441,13 @@ namespace lof {
                     }
                 }
             }
-            
+
 
             for (auto system : dt_update_systems) {
 
                 //skip the systems found in the gameplay_dependent_systems
-                if (((level_editor_mode && !game_playing) || GM.is_paused()) &&
-                    std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end())
+                if ((level_editor_mode && !game_playing) &&
+                    std::find(performance_viewer_systems.begin(), performance_viewer_systems.end(), system) != performance_viewer_systems.end())
                 {
                     continue;
                 }
@@ -484,6 +456,8 @@ namespace lof {
                 system->update(delta_time);
                 system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
             }
+
+        }
     }
 
     Entity* ECS_Manager::get_entity(EntityID entity_id) {
@@ -557,7 +531,7 @@ namespace lof {
     }
 
 
-    void ECS_Manager::add_system(std::unique_ptr<System> system, bool uses_fixed_update, bool depends_on_gameplay) {
+    void ECS_Manager::add_system(std::unique_ptr<System> system, bool uses_fixed_update, bool performance_viewer, bool play_pause) {
 
         //get the system type for logging
         std::string system_type = system->get_type();
@@ -571,8 +545,12 @@ namespace lof {
             dt_update_systems.push_back(system.get());
         }
 
-        if (depends_on_gameplay) {
-            gameplay_dependent_systems.push_back(system.get()); 
+        if (performance_viewer) {
+            performance_viewer_systems.push_back(system.get()); 
+        }
+
+        if (play_pause) {
+            pause_play_systems.push_back(system.get());
         }
 
         //Add to the main systems 
