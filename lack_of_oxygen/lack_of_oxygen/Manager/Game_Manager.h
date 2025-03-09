@@ -63,14 +63,22 @@ namespace lof {
         bool increasing = false;
         // Top UI variables
         float current_oxygen_level = 100.0f;  // Start at 100%
+        float current_panic_level = 0.0f;  // Starts at 0%
         float ship_oxygen_level = 400.0f;     // [0..400]
 
-        // Flags to indicate the panic trigger
+        // Flags to indicate the panic trigger and for panic 
         bool panic_triggered = false;
+        bool no_panic = false;
+
+        float panic_timer = 0.0f; //time for panic level changes
+        float panic_current = 0.0f; 
+        float panic_increase_amount = 1.7f; //amount to increase panic every 0.5 sec
+        float panic_timer_increase_delay = 0.5f; //delay between panic increases
+        float panic_decrease_amount = 5.0f; //amount to decrease panic every 1 sec
+        float panic_timer_decrease_delay = 1.0f; //delay between panic decreases
 
         float oxygen_drain_rate = 1.0f;     // Drain 5% per second
         float oxygen_update_timer = 0.0f;   // Track time for updates
-        float current_panic_level = 0.0f;  // Starts at 0%
         int timer_remaining = 300; // or any desired starting value
 
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
@@ -95,6 +103,13 @@ namespace lof {
 
         // Flag for displaying fps in game
         bool display_fps = false;
+
+        /**
+        *@brief helper functions to increase and decrease panic 
+        * 
+        */
+        void add_panic(float dt); 
+        void drop_panic(float dt); 
 
     public:
         /**
