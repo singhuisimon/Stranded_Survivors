@@ -49,14 +49,19 @@ namespace lof {
     bool show_window = false;
     bool remove_game_obj = false;
     bool create_game_obj = false;
-    bool filled = false;
+
+    //bool filled = false;
+
     static bool mouse_clicked_or_dragged = false;
 
     //Mouse position in terms of game world
     ImVec2 mouse_texture_coord_world{};
 
-    //Vector of assigned names
-    std::vector<std::string> assigned_names;
+    //vectors for Animations
+    //std::vector<std::string> assigned_names;
+    std::vector<std::string> loaded_animations;
+    //Converts all of the names to c-string
+    std::vector<const char*> c_str_animation_storage;
 
     //Booleans to note down mouse behaviour
     static bool mouse_was_down = false;
@@ -128,6 +133,16 @@ namespace lof {
         throw std::runtime_error("No-parameter start_up() is disabled in IMGUI_Manager. start_up() now has a parameter GLFWwindow*& window");
     }
 
+    void IMGUI_Manager::fill_up_animation_storage() {
+        /*std::string no_animation = "NoAnimation";
+        c_str_animation_storage.push_back(no_animation.c_str());*/
+
+        auto& animation_storage = ASM.get_animation_storage();
+        for (auto& animation : animation_storage) {
+            c_str_animation_storage.push_back(animation.first.c_str());
+        }
+    }
+
     //Start up function
     int IMGUI_Manager::start_up(GLFWwindow*& glfwindow) {
         if (is_started()) {
@@ -143,6 +158,7 @@ namespace lof {
         LM.write_log("IMGUI_Manager::start_up(): IMGUI_Manager started successfully.");
         fill_up_sound_names();
         fill_component_checks();
+        fill_up_animation_storage();
 
         return 0;
     }
@@ -397,6 +413,7 @@ namespace lof {
         if (GFXM.get_editor_mode() == 1) {
             ImGui::Begin("Game Viewport", nullptr);
 
+            ImGui::SameLine();
 
             if (game_playing) {
 
@@ -425,6 +442,16 @@ namespace lof {
                 ImGui::PopStyleColor();
 
             }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("STOP")) {
+                std::cout << get_current_file_shown() << std::endl;
+                load_scene(get_current_file_shown());
+                game_playing = false;
+            }
+
+            ImGui::NewLine();
 
             auto texture = GFXM.get_framebuffer_texture();
             ImVec2 texture_pos = ImGui::GetCursorScreenPos();
@@ -685,25 +712,20 @@ namespace lof {
         //if (ImGui::Button("Edit Game Object")) {
         //    show_window = !show_window;
         //}
-
         ////Remove button; Disabled for when the Player entity is selected
         //ImGui::BeginDisabled(selected_object_index != -1 && entities[selected_object_index].get()->get_name() == "player1");
         //if (ImGui::Button("Remove Game Object")) {
         //    remove_game_obj = !remove_game_obj;
         //}
         //ImGui::EndDisabled();
-
         ////Create Game Object button
         //ImGui::Text("\n");
         //if (ImGui::Button("Create Game Object From Prefab")) {
-
         //    create_game_obj = !create_game_obj;
         //}
-
         ////Save Changes button
         //if (ImGui::Button("Save Changes")) {
         //    const std::string SCENES = "Scenes";
-
         //    std::string scene_path = ASM.get_full_path(SCENES, get_current_file_shown());
         //    if (SM.save_game_state(scene_path.c_str())) {
         //        LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Successfully saved game state");
@@ -739,6 +761,11 @@ namespace lof {
 
     //Static map to store buffers for each sound by index or key
     static std::unordered_map<int, std::string> buffer_map;
+
+    static std::string requested_animation = "";
+    //static std::string test_search = "";
+
+    static int selecetd_index = 0; //Default to "Drag"
 
     //Function to handle edit object properties window
     void IMGUI_Manager::imgui_game_objects_edit() {
@@ -781,6 +808,10 @@ namespace lof {
             }
         }
 
+        auto& animation_storage = ASM.get_animation_storage();
+        for (auto& animation : animation_storage) {
+            loaded_animations.push_back(animation.first);
+        }
         
         if (!show_window) {
             //ImGui::Text("Select a game object to edit it.");
@@ -788,13 +819,15 @@ namespace lof {
         else {
             //const auto& entities = ecs.get_entities();
 
-            //For animation dropdown
             //If the selected object has changed, reset filled and clear assigned names for new object
             if (selected_object_index != last_selected_object_index) {
                 last_selected_object_index = selected_object_index;
-                assigned_names.clear();
+                
+                //assigned_names.clear();
+                
                 buffer_map.clear();
-                filled = false;
+                
+                //filled = false;
             }
 
             if (selected_object_index == -1) {
@@ -1035,90 +1068,166 @@ namespace lof {
                 //Animation Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Animation_Component>())) {
                     Animation_Component& animation = ecs.get_component<Animation_Component>(entities[selected_object_index].get()->get_id());
-
+   
                     //If the animation names have not been filled
-                    if (!filled) {
-
+                    /*if (!filled) {
                         auto& animation_list = animation.animations;
                         for (const auto& it : animation_list) {
                             assigned_names.push_back(it.second);
                         }
-
                         filled = true;
 
-                    }
+                    }*/
+                    
 
-                    if (ImGui::CollapsingHeader("Animation") && filled) {
+                    //if (ImGui::CollapsingHeader("Animation") && filled) {
+                    if (ImGui::CollapsingHeader("Animation")) {
 
-                        //Converts all of the names to c-string
-                        std::vector<const char*> animation_names_c_str;
-                        for (const auto& name : assigned_names) {
-                            animation_names_c_str.push_back(name.c_str());
-                        }
+                        auto& curr = animation.curr_animation_idx;
+                        ImGui::Text("Current Animation Index Playing %i", curr);
+                        ImGui::NewLine();
+
+                        ImGui::Separator();
 
                         auto& animation_list = animation.animations;
 
-                        //Animation drop-down has been changed to a text input to accomodate adding of audio component. Will be adding back next milestone
-                        
+                        //Animation drop-down has been changed to a text input to accomodate adding of audio component. Will be adding back next milestone          
                         //vector to keep track of selected items for each animation
                         //initialized with -1 for each item, no selection
-                        //static std::vector<int> selected_items(animation_list.size(), -1);
-                        ////index of the action to select animation for
-                        //int index = 0;
-                        //for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
-                        //    //ensures the selected_items vector is the same size as the animation_list
-                        //    if (selected_items.size() != animation_list.size()) {
-                        //        selected_items.resize(animation_list.size(), -1);
-                        //    }
-                        //    ImGui::Text("Selected Animation for %i: %s", index, it->second.c_str());
-                        //    std::string label = "Choose Animation for " + std::to_string(index);
-                        //    //Dropdown for the animation
-                        //    if (ImGui::Combo(label.c_str(), &selected_items[index], animation_names_c_str.data(), static_cast<int>(assigned_names.size()))) {
-                        //        //If valid animation is selected, update the animation.
-                        //        if (selected_items[index] >= 0 && selected_items[index] < assigned_names.size()) {
-                        //            //Update the animation's name
-                        //            it->second = assigned_names[selected_items[index]];
-                        //        }
-                        //    }
+
+                        static std::vector<int> selected_items(animation_list.size(), -1);
+                        //index of the action to select animation for
+                        int index = 0;
+                        for (auto it = animation_list.begin(); it != animation_list.end(); ++it, ++index) {
+                            //ensures the selected_items vector is the same size as the animation_list
+                            if (selected_items.size() != animation_list.size()) {
+                                selected_items.resize(animation_list.size(), -1);
+                            }
+                            ImGui::Text("Selected Animation for Index %s: %s", it->first.c_str(), it->second.c_str());
+                            std::string label = "Index " + std::to_string(index);
+                            //Dropdown for the animation
+                            if (ImGui::Combo(label.c_str(), &selected_items[index], c_str_animation_storage.data(), static_cast<int>(c_str_animation_storage.size()))) {
+                                //If valid animation is selected, update the animation.
+                                if (selected_items[index] >= 0 && selected_items[index] < c_str_animation_storage.size()) {
+                                    //Update the animation's name
+                                    it->second = c_str_animation_storage[selected_items[index]];
+                                }
+                            }
+                        }
+
+                        ////The text input that the drop-down has been changed to
+                        //for (auto it = animation_list.begin(); it != animation_list.end(); ++it) {
+                        //    std::string selected_ani_condition = "Animation Index: " + it->first;
+                        //    IMGUIM.text_input(it->second, selected_ani_condition);
                         //}
 
-                        //The text input that the drop-down has been chnaged to
-                        for (auto it = animation_list.begin(); it != animation_list.end(); ++it) {
-                            std::string selected_ani_condition = "Animation For: " + it->first;
-                            IMGUIM.text_input(it->second, selected_ani_condition);
-                        }
-
-                        ImGui::Text("Possible Animation Options:");
+                        //Need to make better way to display all loaded animations
+                        /*ImGui::Text("Possible Animation Options:");
                         ImGui::Text("vent_strip");
                         ImGui::Text("prisoner_idle_left");
-                        ImGui::Text("prisoner_running_right");
+                        ImGui::Text("prisoner_running_right");*/
+                        //ImGui::Text("requested_animation: %s", requested_animation.c_str());
+                        //ImGui::Text("test_search: %s", test_search.c_str());
 
                         ImGui::Separator();
+                        ImGui::NewLine();
+                        //char buffer_animation[128] = {};
+                        //strncpy_s(buffer_animation, requested_animation.c_str(), _TRUNCATE);
 
-                        auto& curr = animation.curr_animation_idx;
+                        //// Fixed label to avoid conflicting ID issue
+                        //if (ImGui::InputText("Search Animation##search_animation_input", buffer_animation, sizeof(buffer_animation))) {
+                        //    requested_animation = buffer_animation;
+                        //}
 
-                        ImGui::Text("Current Animation Index: %i", curr);
-
-                        ImGui::Separator();
-                        ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
-
-                        ImGui::Separator();
-                        int temp_value = static_cast<int>(curr);
-                        if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, static_cast<int>(animation_list.size()) - 1)) {
-
-                            if (temp_value < 0) {
-                                temp_value = 0;
-                            }
-                            else if (temp_value >= static_cast<int>(animation_list.size())) {
-                                temp_value = static_cast<int>(animation_list.size()) - 1;
-                            }
-
-                            //Only update curr_animation_idx if temp_value is within valid bounds
-                            if (temp_value >= 0 && temp_value < static_cast<int>(animation_list.size())) {
-                                curr = static_cast<unsigned int>(temp_value);
+                        ImGui::Text("Add Animation Index:");
+                        ImGui::Text("Select an animation and click add to add it as another animation index");
+                        static int selected_animation_idx = -1;
+                        // Dropdown for selecting an animation
+                        std::string combo_label = "Select Animation##combo";  // You can add any unique label here.
+                        if (ImGui::Combo(combo_label.c_str(), &selected_animation_idx, c_str_animation_storage.data(), static_cast<int>(c_str_animation_storage.size()))) {
+                            // If the user selects an animation from the dropdown, set requested_animation accordingly
+                            if (selected_animation_idx >= 0 && selected_animation_idx < c_str_animation_storage.size()) {
+                                requested_animation = c_str_animation_storage[selected_animation_idx];
                             }
                         }
 
+                        if (ImGui::Button("Add Animation and Index")) {
+
+                            int missing_index = animation_list.size();
+                            int prev_index_check = -1;
+                            for (auto& animation_indexes: animation_list) {
+                                int index = std::stoi(animation_indexes.first);
+                                if (index - 1 != prev_index_check) {
+                                    missing_index = prev_index_check + 1;
+                                }
+                                prev_index_check = index;
+                            }
+
+                            if (missing_index >= 10) {
+                                missing_index = 0;
+                            }
+
+                            auto& animation_storage = ASM.get_animation_storage();
+                            for (auto& animation_info : animation_storage) {
+                                
+                                //std::cout << animation_info.first << std::endl;
+                                
+                                if (requested_animation == animation_info.first) {
+                                    animation_list.insert({ std::to_string(missing_index), requested_animation });
+                                    break;
+                                }
+                            }
+
+                        }
+
+                        ImGui::NewLine();
+                        
+                        ImGui::Text("Remove Animation Index:");
+                        if (ImGui::Button("Remove Index")) {
+                            ImGui::OpenPopup("Animation Index Removal"); //Open the popup when the button is clicked
+                        }
+
+                        //Position the context menu at the mouse position
+                        if (ImGui::BeginPopup("Animation Index Removal")) {
+                            ImGui::Text("Select Animation Index to Remove");
+                            ImGui::Separator();
+
+                            int index = 0;
+                            for (const auto& animation : animation_list) {
+                                if (ImGui::Selectable(animation.first.c_str())) {
+                                    
+                                    if (index != 0) {
+                                        animation_list.erase(animation.first); //Remove selected animation except the first
+                                    }
+                                    break; //Exit loop to avoid iterator invalidation
+                                }
+                                index++;
+                            }
+
+                            ImGui::EndPopup();
+                        }
+          
+                        //ImGui::Separator();
+                        /*auto& curr = animation.curr_animation_idx;
+                        ImGui::BeginDisabled();
+                        ImGui::Text("Current Animation Index Playing: %i", curr);
+                        ImGui::EndDisabled();*/
+                        //ImGui::Separator();
+                        //ImGui::Text("Note: The animation index depends on movement.\n\nWhile moving, only indexes 3 and 4 can play;\nWhile stationary, only indexes 0 and 1 are allowed.\n\nIn the Level Editor, objects are stationary by default,\nso only animations 0 and 1 are available.\nIf an out - of - range index is entered, \nit snaps to 0 for even values and 1 for odd values.");
+                        //ImGui::Separator();
+                        //int temp_value = static_cast<int>(curr);
+                        //if (ImGui::DragInt("Current Animation Index", &temp_value, 0.1f, 0, static_cast<int>(animation_list.size()) - 1)) {
+                        //    if (temp_value < 0) {
+                        //        temp_value = 0;
+                        //    }
+                        //    else if (temp_value >= static_cast<int>(animation_list.size())) {
+                        //        temp_value = static_cast<int>(animation_list.size()) - 1;
+                        //    }
+                        //    //Only update curr_animation_idx if temp_value is within valid bounds
+                        //    if (temp_value >= 0 && temp_value < static_cast<int>(animation_list.size())) {
+                        //        curr = static_cast<unsigned int>(temp_value);
+                        //    }
+                        //}
                     }
                 }
 
@@ -1393,7 +1502,7 @@ namespace lof {
                         }
 
                         //remove audio.
-                        static size_t selected_audio_index = -1;
+                        static size_t selected_audio_index = static_cast<size_t>(-1);
 
                         std::string remove_audio = "Remove Audio";
                         const char* remove_audio_button = remove_audio.c_str();
@@ -1507,16 +1616,16 @@ namespace lof {
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
 
-                                    //If entity is player, block it from adding back its animation component 
-                                    if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
-                                        ;
-                                    }
-                                    else {
+                                    ////If entity is player, block it from adding back its animation component 
+                                    //if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                    //    ;
+                                    //}
+                                    //else {
 
                                         //Execute its add function
                                         add_func();
                                         LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Added %s to %s", name, entities[selected_object_index]->get_name().c_str());
-                                    }
+                                    //}
 
                                     break;
                                 }
@@ -1572,16 +1681,16 @@ namespace lof {
                             for (const auto& [name, id, add_func, remove_func] : component_checks) {
                                 if (std::string(component_name) == name) {
 
-                                    //If entity is player, block it from removing its animation component 
-                                    if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
-                                        ;
-                                    }
-                                    else {
+                                    ////If entity is player, block it from removing its animation component 
+                                    //if (std::string(name) == "Animation Component" && entities[selected_object_index].get()->get_name() == "player1") {
+                                    //    ;
+                                    //}
+                                    //else {
 
                                         //Execute its remove function
                                         remove_func();
                                         LM.write_log("IMGUI_Manager::imgui_game_objects_list(): Removed %s to %s", name, entities[selected_object_index]->get_name().c_str());
-                                    }
+                                    //}
 
                                     break;
                                 }

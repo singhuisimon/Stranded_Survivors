@@ -221,33 +221,36 @@ namespace lof {
 
 
         //player mining animation
-        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))
+            && !(IM.is_key_held(GLFW_KEY_UP)) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             auto& mining_status = GFXM.get_mining_status();
             mining_status = MINE_LEFT;
-            int& direction = GFXM.get_player_direction();
-            direction = FACE_LEFT;
 
         }
-        else if (IM.is_key_held(GLFW_KEY_UP)) {
+        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))
+            && !(IM.is_key_held(GLFW_KEY_UP)) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = MINE_RIGHT;
+
+        }
+        else if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_LEFT))
+            && !(IM.is_key_held(GLFW_KEY_RIGHT)) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             auto& mining_status = GFXM.get_mining_status();
             mining_status = MINE_UP;
 
         }
-        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_LEFT))
+            && !(IM.is_key_held(GLFW_KEY_RIGHT)) && !(IM.is_key_held(GLFW_KEY_UP))) {
             auto& mining_status = GFXM.get_mining_status();
             mining_status = MINE_DOWN;
 
         }
-        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-            auto& mining_status = GFXM.get_mining_status();
-            mining_status = MINE_RIGHT;
-            int& direction = GFXM.get_player_direction();
-            direction = FACE_RIGHT;
-
-        }
         else {
-            auto& mining_status = GFXM.get_mining_status();
-            mining_status = NO_ACTION;
+            if (!IM.is_key_held(GLFW_KEY_RIGHT) && !IM.is_key_held(GLFW_KEY_LEFT) &&
+                !IM.is_key_held(GLFW_KEY_UP) && !IM.is_key_held(GLFW_KEY_DOWN)) {
+                auto& mining_status = GFXM.get_mining_status();
+                mining_status = NO_ACTION;
+            }
         }
     }
 
