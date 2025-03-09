@@ -227,18 +227,6 @@ namespace lof {
             return;
         }
 
-        ////std::cout << "This is seleteed entity id no: " << selectedEntityID << "\n";
-        //try {
-        //    // Simulate a crash when the 'P' key is pressed
-        //    if (IM.is_key_pressed(GLFW_KEY_P)) {
-        //        LM.write_log("Game_Manager::update(): Simulated crash. 'P' key was pressed.");
-        //        throw std::runtime_error("Simulated crash: 'P' key was pressed.");
-        //    }
-        //}
-        //catch (const std::exception& e) {
-        //    LM.write_log("Game_Manager::update(): Exception caught: %s", e.what());
-        //}
-
         // Set display fps flag to true or false when key 'F' is pressed
         if (IM.is_key_pressed(GLFW_KEY_F) && display_fps == false) {
             display_fps = true;
@@ -842,6 +830,10 @@ namespace lof {
                         auto& audio_player = ECSM.get_component<Audio_Component>(player_id);
 
                         if (IM.is_key_pressed(GLFW_KEY_LEFT)) {
+                            // Check if game is paused first
+                            if (GM.is_paused()) {
+                                return; // Skip mining logic if game is paused
+                            }
 
                             // Emit mining sparks particles
                             for (int i = 0; i < 10; ++i) {
@@ -934,6 +926,10 @@ namespace lof {
                             }
                         }
                         else if (IM.is_key_pressed(GLFW_KEY_RIGHT)) {
+                            // Check if game is paused first
+                            if (GM.is_paused()) {
+                                return; // Skip mining logic if game is paused
+                            }
 
                             // Emit mining sparks particles
                             for (int i = 0; i < 10; ++i) {
@@ -1026,6 +1022,10 @@ namespace lof {
                             }
                         }
                         else if (IM.is_key_pressed(GLFW_KEY_UP)) {
+                            // Check if game is paused first
+                            if (GM.is_paused()) {
+                                return; // Skip mining logic if game is paused
+                            }
 
                             // Emit mining sparks particles
                             for (int i = 0; i < 10; ++i) {
@@ -1122,6 +1122,10 @@ namespace lof {
                             }
                         }
                         else if (IM.is_key_pressed(GLFW_KEY_DOWN)) {
+                            // Check if game is paused first
+                            if (GM.is_paused()) {
+                                return; // Skip mining logic if game is paused
+                            }
 
                             // Emit mining sparks particles
                             for (int i = 0; i < 10; ++i) {

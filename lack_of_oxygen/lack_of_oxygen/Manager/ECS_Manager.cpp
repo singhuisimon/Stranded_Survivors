@@ -125,7 +125,7 @@ namespace lof {
             add_system(std::make_unique<Render_System>(), false, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<GUI_System>(*this), false, false);
+            add_system(std::make_unique<GUI_System>(*this), false, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
 
             add_system(std::make_unique<Audio_System>(), false, true);
@@ -474,11 +474,18 @@ namespace lof {
             for (auto system : dt_update_systems) {
 
                 //skip the systems found in the gameplay_dependent_systems
-                if (((level_editor_mode && !game_playing) || GM.is_paused()) &&
+                if (((level_editor_mode && !game_playing)) &&
                     std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end())
                 {
                     continue;
                 }
+
+                if (GM.is_paused() &&
+                    std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end()) {
+                    // allow gui_system to update
+                    continue;
+                }
+
                 system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                 // Updating each system
                 system->update(delta_time);
