@@ -118,6 +118,10 @@ namespace lof {
 		float teleport_cooldown = 0.5f;
 		float last_teleport_time = -teleport_cooldown;
 		bool teleport_flag;
+		bool is_inside = false; // to check if player is inside 
+		EntityID active_wormhole = - 1;
+
+		bool found_wormhole = false;
 
 		std::unordered_map<EntityID, EntityID> wormhole_pairs;
 		Transform2D last_wormhole_position; // to store the last wormhole
@@ -128,7 +132,7 @@ namespace lof {
 		void teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole);
 
 		void Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y);
-		
+		//void Show_E_Prompt_UI(bool show_ui, Transform2D& prompt_pos);
 	};
 
 }

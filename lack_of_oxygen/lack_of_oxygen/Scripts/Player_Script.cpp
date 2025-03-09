@@ -13,6 +13,7 @@
 #include "../Manager/Audio_Manager.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Graphics_Manager.h"
+#include "../System/GUI_System.h"
 
 #include <GLFW/glfw3.h>
 
@@ -21,13 +22,13 @@ namespace lof {
     Player_Script::Player_Script() {
         //entity_data = std::unordered_map<EntityID, MovementData>();
         key_space_last_frame = false;
-		key_space_pressed = false;
-		key_a_pressed = false;
-		key_d_pressed = false;
-		key_a_last_frame = false;
-		key_d_last_frame = false;
-		forces_flag = -1;
-		player_id = 0;
+        key_space_pressed = false;
+        key_a_pressed = false;
+        key_d_pressed = false;
+        key_a_last_frame = false;
+        key_d_last_frame = false;
+        forces_flag = -1;
+        player_id = 0;
 
         key_e_last_frame = false;
         key_e_pressed = false;
@@ -35,6 +36,9 @@ namespace lof {
         key_t_last_frame = false;
         key_t_pressed = false;
         teleport_flag = false;
+
+        is_inside = false;
+        found_wormhole = false;
     }
 
     void Player_Script::register_script() {
@@ -45,10 +49,10 @@ namespace lof {
 
         player_script->add_function("init", [weak_script](EntityID entity_id) {
             (void)entity_id;
-			auto player_script = weak_script.lock();
+            auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);
-        });
+            });
 
         player_script->add_function("movement", [weak_script](EntityID entity_id) {
             auto player_script = weak_script.lock();
@@ -76,20 +80,20 @@ namespace lof {
 
 
             player_script->handle_teleportation(entity_id);
-        });
+            });
 
         LGS.add_script("player_script", player_script);
     }
 
     void Player_Script::check_keys() {
-		//check for keys here
-		key_space_last_frame = key_space_pressed;
-		key_a_last_frame = key_a_pressed;
-		key_d_last_frame = key_d_pressed;
-        
+        //check for keys here
+        key_space_last_frame = key_space_pressed;
+        key_a_last_frame = key_a_pressed;
+        key_d_last_frame = key_d_pressed;
+
         key_space_pressed = IM.is_key_held(GLFW_KEY_SPACE);
-		key_a_pressed = IM.is_key_held(GLFW_KEY_A);
-		key_d_pressed = IM.is_key_held(GLFW_KEY_D);
+        key_a_pressed = IM.is_key_held(GLFW_KEY_A);
+        key_d_pressed = IM.is_key_held(GLFW_KEY_D);
 
         key_e_last_frame = key_e_pressed;
         key_e_pressed = IM.is_key_held(GLFW_KEY_E);
@@ -105,14 +109,14 @@ namespace lof {
             return key_space_pressed && !key_space_last_frame;
         }
         else if (key == GLFW_KEY_A) {
-			return key_a_pressed && !key_a_last_frame;
+            return key_a_pressed && !key_a_last_frame;
         }
         else if (key == GLFW_KEY_D) {
             return key_d_pressed && !key_d_last_frame;
-        } 
+        }
         else if (key == GLFW_KEY_E) {
             return key_e_pressed && !key_e_last_frame;
-            
+
         }
         else if (key == GLFW_KEY_T)
         {
@@ -121,20 +125,20 @@ namespace lof {
         return false;
     }
 
-	void Player_Script::set_force_flag(int flag) {
-		forces_flag = flag;
-	}
+    void Player_Script::set_force_flag(int flag) {
+        forces_flag = flag;
+    }
 
-    int Player_Script::get_force_flag() const{
+    int Player_Script::get_force_flag() const {
         return forces_flag;
     }
 
     void Player_Script::set_player_id(EntityID entityid) {
-		player_id = entityid;
+        player_id = entityid;
     }
 
-    EntityID Player_Script::get_player_id() const{
-		return player_id;
+    EntityID Player_Script::get_player_id() const {
+        return player_id;
     }
 
     void Player_Script::update_player_movement(Physics_Component& physic_comp) {
@@ -311,7 +315,7 @@ namespace lof {
                 float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
                 float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
                 particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
-                
+
             }
 
         }
@@ -319,71 +323,237 @@ namespace lof {
     }
 
     //==============================================================//
-   
 
+#if 1
     void Player_Script::handle_teleportation(EntityID player_id)
     {
         auto& player_transform = ECSM.get_component<Transform2D>(player_id);
 
         std::vector<EntityID>& wormhole_entity = SM.get_wormholes_id();
-       /* for (auto wormhole : wormhole_entity)
-        {
-            printf("Wormhole entities: %u\n", wormhole);
+        /* for (auto wormhole : wormhole_entity)
+         {
+             printf("Wormhole entities: %u\n", wormhole);
 
-        }
-        std::cout << "end of wormhole list\n";*/
-        
+         }
+         std::cout << "end of wormhole list\n";*/
+        //ECSM.create_entity();
         // clear the previous pair clear the old IDs 
         wormhole_pairs.clear();
+
         if (wormhole_entity.size() % 2 == 0)
         {
-        for (size_t i = 0; i < wormhole_entity.size(); i += 2)
+            for (size_t i = 0; i < wormhole_entity.size(); i += 2)
+            {
+                wormhole_pairs[wormhole_entity[i]] = wormhole_entity[i + 1];
+                wormhole_pairs[wormhole_entity[i + 1]] = wormhole_entity[i];
+
+            }
+            //std::cout << "wormholes pairs successfully set up.\n";
+        }
+
+        is_inside = false;
+        active_wormhole = INVALID_ENTITY_ID;
+
+        //std::cout << "bool for player inside wormhole " << is_inside << "\n";
+        for (const auto& pair : wormhole_pairs)
         {
-            wormhole_pairs[wormhole_entity[i]] = wormhole_entity[i + 1];
-            wormhole_pairs[wormhole_entity[i + 1]] = wormhole_entity[i];
+            EntityID wormhole_id = pair.first;
+            auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
 
+            if (is_player_inside_wormhole(player_transform, wormhole_transform)) {
+                is_inside = true; // Set the flag if the player is inside any wormhole
+                found_wormhole = true;
+                active_wormhole = wormhole_id;
+                break; // Exit the loop early since we only need to know if the player is inside any wormhole
+            }
         }
-        //std::cout << "wormholes pairs successfully set up.\n";
+        std::cout << "Player is inside wormhole: " << active_wormhole << "\n";
+        //std::cout << "Player is inside wormhole: " << is_inside << "\n";
+        Transform2D dummy_transform;
+         // Show or hide the E prompt based on whether the player is inside a wormhole
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                if (is_inside) {
+                    auto& wormhole_transform = ECSM.get_component<Transform2D>(active_wormhole);
+                    gui_system->show_wormhole_e_prompt_gui(wormhole_transform);
+                }
+                else {
+                    gui_system->hide_wormhole_gui();
+                }
+            }
         }
-
-        /*std::cout << "Wormhole pairs:\n";
-        for (const auto& pair : wormhole_pairs) {
-            std::cout << "Wormhole " << pair.first << " <-> " << pair.second << "\n";
-        }
-
-        std::cout << "End of wormhole pairs list\n\n";*/
-
+        
+       
 
 #if 1
-    float current_time = glfwGetTime();
-    for (const auto& pair : wormhole_pairs)
-    {
-        EntityID wormhole_id = pair.first;
-        EntityID linked_wormhole = pair.second;
-        auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
-
-        // **Instead of checking movement, check cooldown**
-        if ((current_time - last_teleport_time) >= teleport_cooldown &&
-            is_player_inside_wormhole(player_transform, wormhole_transform) &&
-            is_key_just_pressed(GLFW_KEY_E))
+        float current_time = glfwGetTime();
+        for (const auto& pair : wormhole_pairs)
         {
-            teleport_player(wormhole_id, player_id, linked_wormhole);
-            last_teleport_time = current_time;  // Update teleport time
-            //tunneling
-            teleport_flag = true;
-            
+            EntityID wormhole_id = pair.first;
+            EntityID linked_wormhole = pair.second;
+            auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
 
-            std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
-            std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
+            if (is_player_inside_wormhole(player_transform, wormhole_transform))
+            {
+                // **Instead of checking movement, check cooldown**
+                if ((current_time - last_teleport_time) >= teleport_cooldown &&
+                    is_key_just_pressed(GLFW_KEY_E))
+                {
+                    teleport_player(wormhole_id, player_id, linked_wormhole);
+                    last_teleport_time = current_time;  // Update teleport time
+                    //tunneling
+                    teleport_flag = true;
+
+
+                    std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
+                    std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
+                }
+            }
         }
 
         Cheap_Code_Teleport_Wormhole(-522.0f, -3654.0f);
-        
-        
+#endif
+
     }
 #endif
 
-    } 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+#if 0
+    void Player_Script::handle_teleportation(EntityID player_id)
+    {
+        auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+        std::vector<EntityID>& wormhole_entity = SM.get_wormholes_id();
+        wormhole_pairs.clear();
+        if (wormhole_entity.size() % 2 == 0) {
+            for (size_t i = 0; i < wormhole_entity.size(); i += 2) {
+                wormhole_pairs[wormhole_entity[i]] = wormhole_entity[i + 1];
+                wormhole_pairs[wormhole_entity[i + 1]] = wormhole_entity[i];
+            }
+        }
+        bool is_inside = false;
+        EntityID active_wormhole = INVALID_ENTITY_ID;
+        for (const auto& pair : wormhole_pairs) {
+            EntityID wormhole_id = pair.first;
+            auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
+            if (is_player_inside_wormhole(player_transform, wormhole_transform)) {
+                is_inside = true;
+                active_wormhole = wormhole_id;
+                break;
+            }
+        }
+        // Show or hide the E prompt based on whether the player is inside a wormhole
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                if (is_inside) {
+                    auto& wormhole_transform = ECSM.get_component<Transform2D>(active_wormhole);
+                    std::cout << "yes!!!!is inside\n";
+                    gui_system->show_wormhole_e_prompt_gui(wormhole_transform); // Show the E prompt
+                }
+                else {
+                    gui_system->hide_wormhole_gui(); // Hide the E prompt
+                    std::cout << "noooo!!! is not inside\n";
+                }
+            }
+        }
+        // Handle teleportation logic
+        float current_time = glfwGetTime();
+        for (const auto& pair : wormhole_pairs) {
+            EntityID wormhole_id = pair.first;
+            EntityID linked_wormhole = pair.second;
+            auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
+            if (is_player_inside_wormhole(player_transform, wormhole_transform)) {
+                // **Instead of checking movement, check cooldown**
+                if ((current_time - last_teleport_time) >= teleport_cooldown &&
+                    is_key_just_pressed(GLFW_KEY_E))
+                {
+                    //// Hide the prompt at the source wormhole
+                    //for (auto& system : ECSM.get_systems()) {
+                    //    if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                    //        gui_system->hide_wormhole_gui();
+                    //    }
+                    //}
+
+                    // Teleport the player
+                    teleport_player(wormhole_id, player_id, linked_wormhole);
+                    last_teleport_time = current_time;  // Update teleport time
+                    //tunneling
+                    teleport_flag = true;
+                    std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
+                    std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
+                }
+            }
+        }
+        Cheap_Code_Teleport_Wormhole(-522.0f, -3654.0f);
+    }
+
+#endif
+    //=======================================================================================================//
+
+
+#if 0
+    for (const auto& pair : wormhole_pairs)
+    {
+        EntityID wormhole_id = pair.first;
+        auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
+
+        bool in_this_wormhole = is_player_inside_wormhole(player_transform, wormhole_transform);
+        //is_inside = is_player_inside_wormhole(player_transform , wormhole_transform);
+        if (in_this_wormhole) {
+            is_inside = true;
+        }
+
+        for (auto& system : ECSM.get_systems())
+        {
+            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get()))
+            {
+                gui_system->show_womrhole_e_prompt_gui(wormhole_transform, is_inside);
+            }
+        }
+    }
+#endif
+
+#if 0
+    for (const auto& pair : wormhole_pairs)
+    {
+        EntityID wormhole_id = pair.first;
+        auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
+
+        if (is_player_inside_wormhole(player_transform, wormhole_transform)) {
+            is_inside = true; // Set the flag if the player is inside any wormhole
+            break; // Exit the loop early since we only need to know if the player is inside any wormhole
+        }
+    }
+    std::cout << "Player is inside wormhole: " << is_inside << "\n";
+    for (const auto& pair : wormhole_pairs)
+    {
+        EntityID wormhole_id = pair.first;
+        auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
+
+        bool in_this_wormhole = is_player_inside_wormhole(player_transform, wormhole_transform);
+        std::cout << "Wormhole ID: " << wormhole_id << ", Player inside: " << in_this_wormhole << "\n"; // will be everyentitites
+
+
+        if (in_this_wormhole) {
+            for (auto& system : ECSM.get_systems())
+            {
+                if (auto* gui_system = dynamic_cast<GUI_System*>(system.get()))
+                {
+                    gui_system->show_womrhole_e_prompt_gui(wormhole_transform, true); // Show UI for this wormhole
+                }
+            }
+        }
+        else {
+            for (auto& system : ECSM.get_systems())
+            {
+                if (auto* gui_system = dynamic_cast<GUI_System*>(system.get()))
+                {
+                    gui_system->show_womrhole_e_prompt_gui(wormhole_transform, false); // Hide UI for this wormhole
+                }
+            }
+        }
+    }
+#endif 
+
 
     bool Player_Script::is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole)
     {
@@ -421,7 +591,7 @@ namespace lof {
             last_wormhole_position = paired_wormhole_transform;
             std::cout << "Teleported to: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
 
-        } 
+        }
 #endif 
     }
 
@@ -436,6 +606,9 @@ namespace lof {
 
         }
     }
+
+
+
 
 
 

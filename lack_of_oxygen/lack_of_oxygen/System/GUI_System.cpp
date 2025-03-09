@@ -63,6 +63,7 @@ namespace lof {
         hide_oxygen_warning(50.0f);
         hide_oxygen_warning(20.0f);
         hide_oxygen_warning(5.0f);
+        hide_wormhole_gui();
 
         // Log initial state of entities before reset
         LM.write_log("GUI_System::reset_all_game_state(): Current entity states - "
@@ -78,6 +79,7 @@ namespace lof {
         oxygen_progress_bar2 = INVALID_ENTITY_ID;
         oxygen_percentage_text1 = INVALID_ENTITY_ID;
         oxygen_percentage_text2 = INVALID_ENTITY_ID;
+        wormhole_e_prompt = INVALID_ENTITY_ID;
 
         // Reset gameplay values with logging
         LM.write_log("GUI_System::reset_all_game_state(): Resetting gameplay values...");
@@ -139,6 +141,8 @@ namespace lof {
             oxygen_progress_bar2 = INVALID_ENTITY_ID;
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
+
+            wormhole_e_prompt = INVALID_ENTITY_ID;
             return;  // Skip all GUI updates on win screen
         }
 
@@ -159,6 +163,19 @@ namespace lof {
                 float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                 transform->position.y = original_e_prompt_y + offset;
                 transform->position.x = oxygen_e_prompt_x; // keep X constant
+            }
+        }
+
+        // == Wormhole E prompt bobbing ==
+        if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+            wormhole_e_prompt_animation_timer += delta_time;
+            if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+                float base_y = wormhole_pos.position.y + 50.0f; // Offset above the wormhole
+                float offset = std::sin(wormhole_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                transform->position.y = base_y + offset;
+                transform->position.x = wormhole_pos.position.x; // Keep X position constant
+
+                std::cout << "E prompt position: (" << transform->position.x << ", " << transform->position.y << ")\n";
             }
         }
 
@@ -832,4 +849,199 @@ namespace lof {
             warning_5_shown = false;
         }
     }
+
+    // ---------------------------------------------------------
+    // Wormhole E Prompt
+    // ---------------------------------------------------------\
+
+
+#if 0
+    void GUI_System::show_wormhole_e_prompt_gui(Transform2D& wormhole_pos, bool show_ui)
+    {
+#if 1
+        if (show_ui) {
+            if (wormhole_e_prompt == INVALID_ENTITY_ID) {
+                wormhole_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", "wormhole_e_prompt");
+                if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+                    std::cout << "E prompt entity created: " << wormhole_e_prompt << "\n";
+
+                    if (auto* graphics = get_component_safe<Graphics_Component>(wormhole_e_prompt)) {
+                        graphics->model_name = "square";
+                        graphics->texture_name = "E_Gold_02_Batch_14";
+                        graphics->color = glm::vec4(1.0f);
+                        std::cout << "Graphics component set up.\n";
+                    }
+                    if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+                        transform->position = Vec2D(wormhole_pos.position.x, wormhole_pos.position.y + 50.0f);
+                        transform->scale = Vec2D(500.0f, 500.0f);
+                        std::cout << "Transform component set up.\n";
+                    }
+                    wormhole_e_prompt_animation_timer = 0.0f;
+                }
+            }
+        }
+        else {
+            if (wormhole_e_prompt != INVALID_ENTITY_ID ) {
+                std::cout << "Destroying E prompt entity: " << wormhole_e_prompt << "\n";
+                ecs_manager.destroy_entity(wormhole_e_prompt);
+                wormhole_e_prompt = INVALID_ENTITY_ID;
+            }
+        }
+
+#endif
+
+      
+    } // end of shows wormhole ui
+
+
+#endif
+
+#if 1
+    void GUI_System::show_wormhole_e_prompt_gui(const Transform2D& wormhole_pos)
+    {
+        this->wormhole_pos = wormhole_pos;
+
+        std::cout << "Wormhole position: (" << wormhole_pos.position.x << ", " << wormhole_pos.position.y << ")\n";
+
+        if (wormhole_e_prompt == INVALID_ENTITY_ID) {
+            wormhole_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", "wormhole_e_prompt");
+            if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+                std::cout << "E prompt created at: (" << wormhole_pos.position.x << ", " << wormhole_pos.position.y + 50.0f << ")\n";
+
+                // Set up the Graphics_Component
+                if (auto* graphics = get_component_safe<Graphics_Component>(wormhole_e_prompt)) {
+                    graphics->model_name = "square";
+                    graphics->texture_name = "E_Gold_02_Batch_14";
+                    graphics->color = glm::vec4(1.0f);
+                    std::cout << "Graphics component set up for E prompt.\n";
+                    LM.write_log("Graphics component set up for E prompt wormhole");
+
+                    // Verify texture and model
+                    if (graphics->texture_name.empty()) {
+                        std::cout << "Texture not set for E prompt.\n";
+                        LM.write_log("Texture not set for E prompt. wormhole");
+                    }
+                    if (graphics->model_name.empty()) {
+                        std::cout << "Model not set for E prompt.\n";
+                    }
+                }
+                else {
+                    std::cout << "Failed to set up Graphics_Component for E prompt.\n";
+                    LM.write_log("Failed to set up Graphics_Component for E prompt. wormhole");
+                }
+
+                // Set up the Transform2D component
+                if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+                    transform->position = Vec2D(wormhole_pos.position.x, wormhole_pos.position.y + 50.0f);
+                    transform->scale = Vec2D(50.0f, 50.0f);
+                    std::cout << "Transform component set up for E prompt.\n";
+                }
+                else {
+                    std::cout << "Failed to set up Transform2D for E prompt.\n";
+                }
+
+                // Reset the animation timer
+                wormhole_e_prompt_animation_timer = 0.0f;
+            }
+            else {
+                std::cout << "Failed to create E prompt entity.\n";
+            }
+        }
+        else {
+            // Update the position of the existing E prompt
+            if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+                transform->position = Vec2D(wormhole_pos.position.x, wormhole_pos.position.y + 50.0f);
+                std::cout << "E prompt position updated.\n";
+            }
+            else {
+                std::cout << "Failed to update Transform2D for E prompt.\n";
+            }
+        }
+    }
+
+#endif
+
+    //////////////////////////////////////////////////////
+#if 0
+    void GUI_System::show_wormhole_e_prompt_gui(const Transform2D& wormhole_pos)
+    {
+        // Check if the E prompt is already shown
+        if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+            // Update the position of the existing E prompt
+            if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+                transform->position = Vec2D(wormhole_pos.position.x, wormhole_pos.position.y + 50.0f);
+                std::cout << "E prompt position updated.\n";
+            }
+            else {
+                std::cout << "Failed to update Transform2D for E prompt.\n";
+            }
+            return;
+        }
+
+        // Create the E prompt entity
+        wormhole_e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", "wormhole_e_prompt");
+        if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+            std::cout << "E prompt created at: (" << wormhole_pos.position.x << ", " << wormhole_pos.position.y + 50.0f << ")\n";
+
+            // Set up the Graphics_Component
+            if (auto* graphics = get_component_safe<Graphics_Component>(wormhole_e_prompt)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "E_Gold_02_Batch_14";
+                graphics->color = glm::vec4(1.0f);
+                std::cout << "Graphics component set up for E prompt.\n";
+
+                // Verify texture and model
+                if (graphics->texture_name.empty()) {
+                    std::cout << "Texture not set for E prompt.\n";
+                }
+                if (graphics->model_name.empty()) {
+                    std::cout << "Model not set for E prompt.\n";
+                }
+            }
+            else {
+                std::cout << "Failed to set up Graphics_Component for E prompt.\n";
+            }
+
+            // Set up the Transform2D component
+            if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+                transform->position = Vec2D(wormhole_pos.position.x, wormhole_pos.position.y + 50.0f);
+                transform->scale = Vec2D(50.0f, 50.0f);
+                std::cout << "Transform component set up for E prompt.\n";
+            }
+            else {
+                std::cout << "Failed to set up Transform2D for E prompt.\n";
+            }
+
+            // Reset the animation timer
+            wormhole_e_prompt_animation_timer = 0.0f;
+        }
+        else {
+            std::cout << "Failed to create E prompt entity.\n";
+        }
+    }
+
+#endif 
+    
+
+    void GUI_System::hide_wormhole_gui()
+    {
+#if 0
+        // Store pointers to the entity IDs
+        const std::vector<EntityID*> entity_ids = {
+            &wormhole_e_prompt
+        };
+
+        for (auto* entity_ptr : entity_ids) {
+            if (*entity_ptr != INVALID_ENTITY_ID) { // Check if the entity exists
+                ecs_manager.destroy_entity(*entity_ptr);
+                *entity_ptr = INVALID_ENTITY_ID; // Reset to indicate it's destroyed
+            }
+        }
+#endif
+        if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+            ecs_manager.destroy_entity(wormhole_e_prompt);
+            wormhole_e_prompt = INVALID_ENTITY_ID;
+        }
+    }
 } // namespace lof
+

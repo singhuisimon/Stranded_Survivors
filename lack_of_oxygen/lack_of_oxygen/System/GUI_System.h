@@ -44,6 +44,8 @@ namespace lof {
         std::string oxygen_progress_bar2_name;      // Entity name for ship oxygen progress bar
         std::string oxygen_percentage_text2_name;   // Entity name for ship oxygen percentage text
 
+        std::string wormhole_e_prompt_name;
+
         static constexpr float OXYGEN_BAR_MAX_WIDTH = 630.0f;
         static constexpr float OXYGEN_BAR_HEIGHT = 15.0f;
         static constexpr float OXYGEN_BAR_PLAYER_Y = 78.0f;
@@ -85,6 +87,14 @@ namespace lof {
         float e_prompt_animation_timer = 0.0f;
         float original_e_prompt_y = 30.0f;   // The base Y position for 'E' prompt
         float oxygen_e_prompt_animation_timer = 0.0f; // Separate timer if you want separate animation
+
+
+        float wormhole_e_prompt_animation_timer = 0.0f; // for wormhole
+        EntityID wormhole_e_prompt = INVALID_ENTITY_ID; 
+        //float wormhole_e_prompt_x = 800.0f;
+        Transform2D wormhole_pos;
+
+
         const float E_PROMPT_AMPLITUDE = 10.0f;  // How far it moves up/down
         const float E_PROMPT_SPEED = 2.0f;       // How fast it bobs
 
@@ -184,6 +194,13 @@ namespace lof {
         // == OXYGEN WARNING FUNCTIONS ==
         void show_oxygen_warning(float percent);
         void hide_oxygen_warning(float percent);
+
+        // == WORMHOLE GUI SHOW == 
+        //void show_wormhole_e_prompt_gui(Transform2D& wormhole_pos, bool show_ui);
+
+        void show_wormhole_e_prompt_gui(const Transform2D& wormhole_pos);
+        void hide_wormhole_gui();
+        
 
         /**
          * @brief Checks if a general container is currently visible.

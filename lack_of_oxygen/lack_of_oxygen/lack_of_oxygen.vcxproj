@@ -54,6 +54,7 @@
     <ClCompile Include="Manager\Log_Manager.cpp" />
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
+    <ClCompile Include="Scripts\Mini_Map_Player.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
@@ -96,6 +97,7 @@
     <ClInclude Include="Manager\Input_Manager.h" />
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
+    <ClInclude Include="Scripts\Mini_Map_Player.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />

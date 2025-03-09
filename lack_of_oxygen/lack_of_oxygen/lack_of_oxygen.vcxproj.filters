@@ -48,6 +48,7 @@
     <ClCompile Include="Manager\Logic_Manager.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
+    <ClCompile Include="Scripts\Mini_Map_Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
+    <ClInclude Include="Scripts\Mini_Map_Player.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
