@@ -55,6 +55,7 @@
     <ClCompile Include="Manager\Manager.cpp" />
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="Scripts\Mini_Map_Player.cpp" />
+    <ClCompile Include="Scripts\Mining_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
@@ -98,6 +99,7 @@
     <ClInclude Include="Manager\Log_Manager.h" />
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="Scripts\Mini_Map_Player.h" />
+    <ClInclude Include="Scripts\Mining_Script.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
@@ -130,6 +132,7 @@
     <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Level_Design\Level_Design_Small.csv" />
     <None Include="Assets\Level_Design\Level_Design_V2.csv" />
+    <None Include="Assets\Level_Design\Level_Design_V5.csv" />
     <None Include="Assets\Prefab\prefab.json" />
     <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\main_menu.scn" />
@@ -205,6 +208,7 @@
     <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch 4.png" />
     <Image Include="Assets\Textures\mineral_deposit_ui_text_batch_4.png" />
     <Image Include="Assets\Textures\mineral_hopper_conveyor_empty_batch_4.png" />
+    <Image Include="Assets\Textures\obsidian_bottom_line_batch_19.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Green_circle.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Red_circle.png" />
     <Image Include="Assets\Textures\oxygen_refill_ui_bg_batch_4.png" />
@@ -226,8 +230,10 @@
     <Image Include="Assets\Textures\Sapphire_001_Batch_4.png" />
     <Image Include="Assets\Textures\Sapphire_002_Batch 4.png" />
     <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
+    <Image Include="Assets\Textures\ship_open_batch_15.png" />
     <Image Include="Assets\Textures\ship_open_batch_2.png" />
     <Image Include="Assets\Textures\Skybox_ALL.png" />
+    <Image Include="Assets\Textures\skybox_batch_19.png" />
     <Image Include="Assets\Textures\skybox_batch_4.png" />
     <Image Include="Assets\Textures\snowflake.png" />
     <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
@@ -443,4 +449,9 @@ xcopy /y /d "$(SolutionDir)External_Libraries\lib\Freetype API\*.dll" "$(OutDir)
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Assets_4Scenes_4scene2_1scn__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

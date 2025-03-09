@@ -49,6 +49,7 @@
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Mini_Map_Player.cpp" />
+    <ClCompile Include="Scripts\Mining_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="Scripts\Script.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
     <ClInclude Include="Scripts\Mini_Map_Player.h" />
+    <ClInclude Include="Scripts\Mining_Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -112,6 +114,7 @@
     <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Assets\Level_Design\Level_Design_V2.csv" />
+    <None Include="Assets\Level_Design\Level_Design_V5.csv" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -219,6 +222,11 @@
     <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
     <Image Include="..\..\..\..\Users\shsim\Downloads\ART - ALL UI ASSETS FROM UNITY - 31 Jan 2025\ALL UI ASSETS FROM UNITY - 31 Jan 2025\GAME UI\Pop Up Stations - GAME_UI\Minerals Station\Mineral Deposit UI_BG_Batch 14.png" />
     <Image Include="Assets\Textures\Purple_Oxy_Warning_Batch_14.png" />
+    <Image Include="Assets\Textures\ship_open_batch_15.png" />
+    <Image Include="Assets\Textures\skybox_batch_19.png" />
+    <Image Include="Assets\Textures\obsidian_bottom_line_batch_19.png" />
+    <Image Include="Assets\Textures\Sprite sheet Compressed_Batch 19.png" />
+    <Image Include="Assets\Textures\Sprite sheet_Compressed Hold Controls_Batch 19.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />

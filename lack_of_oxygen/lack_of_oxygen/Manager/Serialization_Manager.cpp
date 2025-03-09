@@ -89,7 +89,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V2.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -816,10 +816,15 @@ namespace lof {
                         entity_name.find("citrine") == 0 ||
                         entity_name.find("alexandrite") == 0 ||
                         entity_name.find("tunnel") == 0 ||
-                        entity_name.find("vent") == 0 ||
+                        entity_name.find("ventUp") == 0 ||
+                        entity_name.find("ventLeft") == 0 ||
+                        entity_name.find("ventRight") == 0 ||
+                        entity_name.find("ventUp") == 0 ||
                         entity_name.find("lava") == 0 ||
                         entity_name.find("obsidian") == 0 ||
-                        entity_name.find("ventStrip") == 0)) {
+                        entity_name.find("ventStripUp") == 0 ||
+                        entity_name.find("ventStripLeft") == 0 ||
+                        entity_name.find("ventStripRight") == 0)) {
                     LM.write_log("Skipping level geometry entity: %s", entity_name.c_str());
                     continue;
                 }
@@ -1154,10 +1159,14 @@ namespace lof {
                 case '5': prefab_name = "citrine_prefab"; break;
                 case '*': prefab_name = "alexandrite_prefab"; break;
                 case 't': prefab_name = "tunnel_prefab"; break;
-                case 'v': prefab_name = "vent_prefab"; break;
+                case 'v': prefab_name = "ventUp_prefab"; break;
+                case ']': prefab_name = "ventLeft_prefab"; break;
+                case '[': prefab_name = "ventRight_prefab"; break;
                 case 'l': prefab_name = "lava_prefab"; break;
                 case 'o': prefab_name = "obsidian_prefab"; break;
-                case 's': prefab_name = "ventStrip_prefab"; break;
+                case 's': prefab_name = "ventStripUp_prefab"; break;
+                case '<': prefab_name = "ventStripLeft_prefab"; break;
+                case '>': prefab_name = "ventStripRight_prefab"; break;
                 default:
                     LM.write_log("Unknown tile type '%c' at position (%zu, %zu)",
                         tile.type, row, col);
