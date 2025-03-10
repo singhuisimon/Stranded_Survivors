@@ -60,7 +60,8 @@ namespace lof {
             auto& physics_comp = ECSM.get_component<Physics_Component>(entity_id);
             auto& audio_comp = ECSM.get_component<Audio_Component>(entity_id);
 
-            player_script->update_panic_level(physics_comp); 
+            //update the player's movement forces before updating the player's movement
+            player_script->update_player_panic_speed(physics_comp);
 
             player_script->check_keys();
 
@@ -281,8 +282,8 @@ namespace lof {
     }
 
 
-    //Panic Script
-    void Player_Script::update_panic_level(Physics_Component& physics_comp) {
+    //Panic Script for movement speed
+    void Player_Script::update_player_panic_speed(Physics_Component& physics_comp) {
         //get the panic level fro Game Manager
         panic_level = GM.get_current_panic_level();
         update_movement_forces(physics_comp);
@@ -301,9 +302,6 @@ namespace lof {
                 const_cast<Force&>(force).magnitude = new_force_magnitude;
             }
         }
-
-        //std::cout << "new_force_magnitude : " << new_force_magnitude << std::endl;
-
     }
 
 }

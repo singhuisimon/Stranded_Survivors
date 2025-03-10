@@ -99,7 +99,7 @@ namespace lof {
 		 */
 		EntityID get_player_id() const;
 
-		void update_panic_level(Physics_Component& physics_comp); 
+		void update_player_panic_speed(Physics_Component& physics_comp); 
 
 		void update_movement_forces(Physics_Component& physics_comp); 
 		/**
