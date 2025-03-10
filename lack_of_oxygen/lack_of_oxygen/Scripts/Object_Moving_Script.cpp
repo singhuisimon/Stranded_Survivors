@@ -43,10 +43,6 @@ namespace lof {
     }
 
     void Object_Moving_Script::register_script() {
-        std::cout << "hi" << std::endl;
-        //std::shared_ptr<Object_Moving_Script> object_moving_script = std::make_shared<Object_Moving_Script>();
-        //static auto maintained_script = object_moving_script;
-        //std::weak_ptr<Object_Moving_Script> weak_script = object_moving_script;
 
         auto object_moving_script = shared_from_this();
 

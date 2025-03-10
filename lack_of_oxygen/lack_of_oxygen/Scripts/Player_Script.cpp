@@ -40,10 +40,6 @@ namespace lof {
 
     void Player_Script::register_script() {
 
-        //std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
-        //static auto maintained_script = player_script;
-        //std::weak_ptr<Player_Script> weak_script = player_script;
-
         auto player_script = shared_from_this();
 
         player_script->add_function("init", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
@@ -281,7 +277,7 @@ namespace lof {
             }
         }
 
-        float current_time = glfwGetTime();
+        float current_time = static_cast<float>(glfwGetTime());
         if (teleport_flag) {
             ADM.play_now(player_id, "tunneling", audio_comp);
             teleport_audio_end_time = current_time + 1.5f;  // set a 1.5 seconds for the sound to finish
@@ -354,7 +350,7 @@ namespace lof {
 
 
 #if 1
-    float current_time = glfwGetTime();
+    float current_time = static_cast<float>(glfwGetTime());
     for (const auto& pair : wormhole_pairs)
     {
         EntityID wormhole_id = pair.first;
@@ -400,6 +396,7 @@ namespace lof {
 
     void Player_Script::teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole)
     {
+        (void)wormhole_id;
 #if 1
         if (ECSM.has_component<Transform2D>(linked_wormhole))
         {

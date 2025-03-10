@@ -29,10 +29,6 @@ namespace lof {
     }
 
     void Mining_Script::register_script() {
-        //std::shared_ptr<Mining_Script> mining_script = std::make_shared<Mining_Script>();
-        //static auto maintained_script = mining_script;
-        //std::weak_ptr<Mining_Script> weak_script = maintained_script;
-
 		auto mining_script = shared_from_this();
 
         mining_script->add_function("init", [weak_script = std::weak_ptr<Mining_Script>(mining_script)](EntityID entity_id) {
