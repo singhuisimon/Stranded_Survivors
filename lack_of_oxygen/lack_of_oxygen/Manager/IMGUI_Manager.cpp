@@ -1261,7 +1261,7 @@ namespace lof {
                             //Retrieve the sound map filenames from Audio_System
                             script_list = LGM.get_script_names();
                             for (const auto& name : script_list) {
-                                std::cout << "script name retrieved " << name << std::endl;
+                                //std::cout << "script name retrieved " << name << std::endl;
                                 script_name_cstr.push_back(name.c_str());
                             }
 
@@ -1276,7 +1276,25 @@ namespace lof {
                                 if (button_toggle(s_label, &is_active_on)) {
                                     is_active = !is_active;
                                 }
+                                //not sure up or down which one u want use its both provided by chatgpt.
+                                // Display and toggle the active state
+                                if (ImGui::Checkbox("Active", &is_active)) {
+                                    logic.set_active(script_name, is_active);
+                                }
 
+                                // Display Execution State (Read-Only)
+                                const char* execution_state_str = "";
+                                switch (script->state) {
+                                case ExecutionState::Uninitialized: execution_state_str = "Uninitialized"; break;
+                                case ExecutionState::Running: execution_state_str = "Running"; break;
+                                case ExecutionState::Paused: execution_state_str = "Paused"; break;
+                                case ExecutionState::Terminated: execution_state_str = "Terminated"; break;
+                                default: execution_state_str = "Unknown"; break;
+                                }
+                                ImGui::Text("Execution State: %s", execution_state_str);
+
+                                //need to cap increase and decrease for the movement pattern for now i think only 0 and 1? 
+								// or was it 1 or 2 u need check. - Amanda
                                 // Display and allow modification of the ScriptData
                                 ImGui::Text("Script Data:");
                                 for (auto& [key, value] : script->script_data) {

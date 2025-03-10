@@ -81,8 +81,16 @@ namespace lof {
             for (auto& logic_data : logic.get_logic_datas()) {
                 // Skip inactive logic data
                 if (!logic_data->is_active) {
+                    if (logic_data->state == ExecutionState::Running) {
+                        logic_data->state = ExecutionState::Terminated;;
+                    }
                     LM.write_log("Logic_System::update_script, entity %u logic is not active", entity_id);
                     continue;
+                }
+                else {
+                    if (logic_data->state == ExecutionState::Terminated) {
+                        logic_data->state = ExecutionState::Uninitialized;
+                    }
                 }
 
                 auto script = LGM.get_script(logic_data->script_name);
