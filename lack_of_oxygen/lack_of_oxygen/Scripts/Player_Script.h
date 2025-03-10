@@ -21,7 +21,7 @@ namespace lof {
 	* @class Player_Script
 	* @brief Defines the player script class.
 	*/
-	class Player_Script : public Script {
+	class Player_Script : public Script, public std::enable_shared_from_this<Player_Script> {
 
 	public:
 
@@ -44,6 +44,8 @@ namespace lof {
 		 * @brief Check if key has been pressed last frame.
 		 */
 		bool is_key_just_pressed(int key);
+
+		std::string get_type() const override;
 
 	private:
 

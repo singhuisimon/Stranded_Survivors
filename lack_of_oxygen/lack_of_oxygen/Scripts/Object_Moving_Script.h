@@ -12,7 +12,9 @@
 #ifndef LOF_OBJECT_MOVING_SCRIPT_H
 #define LOF_OBJECT_MOVING_SCRIPT_H
 
+#include <memory>
 #include <unordered_map>
+#include <functional>
 #include "../Scripts/Script.h"
 #include "../Component/Component.h"
 
@@ -21,7 +23,7 @@ namespace lof {
 	 * @class Object_Moving_Script
 	 * @brief Defines the object moving script class.
 	 */
-	class Object_Moving_Script : public Script {
+	class Object_Moving_Script : public Script, public std::enable_shared_from_this<Object_Moving_Script> {
 
     public:
         /**
@@ -55,6 +57,11 @@ namespace lof {
 		 * @brief Destructor
          */
         ~Object_Moving_Script() override;
+
+        /**
+        *
+        */
+		std::string get_type() const override;
 
         /**
 		 * @brief Cleans up the unordered map of entity data.

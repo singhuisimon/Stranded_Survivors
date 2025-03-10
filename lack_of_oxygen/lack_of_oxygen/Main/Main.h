@@ -37,6 +37,7 @@
 #include "../Manager/Game_Manager.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/FPS_Manager.h"
+#include "../Manager/Logic_Manager.h"
 #include "../Manager/Serialization_Manager.h"
 #include "../Manager/Graphics_Manager.h"
 #include "../Manager/IMGUI_Manager.h"

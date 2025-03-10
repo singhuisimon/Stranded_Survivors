@@ -7,11 +7,13 @@
 #include "../System/Particle_System.h"
 
 namespace lof {
-	class Mining_Script : public Script {
+	class Mining_Script : public Script, public std::enable_shared_from_this<Mining_Script> {
 	public:
 		Mining_Script();
 
 		void register_script() override;
+
+		std::string get_type() const override;
 
 	private:
 

@@ -37,20 +37,22 @@ namespace lof {
         key_t_pressed = false;
     }
 
+    std::string Player_Script::get_type() const {
+        return script_name;
+    }
+
     void Player_Script::register_script() {
 
-        std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
-        static auto maintained_script = player_script;
-        std::weak_ptr<Player_Script> weak_script = player_script;
+        auto player_script = shared_from_this();
 
-        player_script->add_function("init", [weak_script](EntityID entity_id) {
+        player_script->add_function("init", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
             (void)entity_id;
 			auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);
         });
 
-        player_script->add_function("movement", [weak_script](EntityID entity_id) {
+        player_script->add_function("update", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
             auto player_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Physics_Component>(entity_id) || !ECSM.has_component<Audio_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {
@@ -78,7 +80,7 @@ namespace lof {
             player_script->handle_teleportation(entity_id);
         });
 
-        LGS.add_script("player_script", player_script);
+        //LGS.add_script("player_script", player_script);
     }
 
     void Player_Script::check_keys() {
@@ -406,6 +408,7 @@ namespace lof {
 
     void Player_Script::teleport_player( EntityID player_entity, EntityID linked_wormhole)
     {
+        (void)wormhole_id;
 #if 1
         if (ECSM.has_component<Transform2D>(linked_wormhole))
         {

@@ -113,9 +113,10 @@ namespace lof {
 		Uninitialized, 
 		Running, 
 		Paused, 
-		Completed, 
 		Terminated 
 	};
+
+	constexpr const char* DEFAULT_SCRIPT = "HI";
 
 	// ------------------------- Audio_Manager.cpp constants ---------------------------
 	enum GroupType {

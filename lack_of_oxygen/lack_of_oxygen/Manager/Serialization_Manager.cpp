@@ -676,15 +676,6 @@ namespace lof {
             //Add script name
             script_obj.AddMember("script_name", rapidjson::Value(scripts->script_name.c_str(), allocator), allocator);
 
-            //Add init
-            script_obj.AddMember("init", rapidjson::Value(scripts->init_func.c_str(), allocator), allocator);
-
-            //Add update
-            script_obj.AddMember("update", rapidjson::Value(scripts->update_func.c_str(), allocator), allocator);
-
-            //Add end
-            script_obj.AddMember("end", rapidjson::Value(scripts->end_func.c_str(), allocator), allocator);
-
             //Add script details
             rapidjson::Value script_data_obj(rapidjson::kObjectType);
             for (const auto& [key, value] : scripts->script_data) {
