@@ -107,7 +107,7 @@ namespace lof {
 	std::shared_ptr<Script> Logic_Manager::get_script(const std::string& script_name) {
 		auto it = scripts_map.find(script_name);
 		if (it != scripts_map.end()) {
-			LM.write_log("Logic_Manager::get_script(): Script '%s' found", script_name.c_str());
+			//LM.write_log("Logic_Manager::get_script(): Script '%s' found", script_name.c_str());
 			return it->second;
 		}
 		LM.write_log("Logic_Manager::get_script(): Script '%s' not found", script_name.c_str());
