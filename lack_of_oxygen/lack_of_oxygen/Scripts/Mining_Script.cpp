@@ -41,7 +41,7 @@ namespace lof {
             mining_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
         });
 
-        mining_script->add_function("mining", [weak_script = std::weak_ptr<Mining_Script>(mining_script)](EntityID entity_id) {
+        mining_script->add_function("update", [weak_script = std::weak_ptr<Mining_Script>(mining_script)](EntityID entity_id) {
             auto mining_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Audio_Component>(entity_id) || !ECSM.has_component<Animation_Component>(entity_id)) {
                 LM.write_log("Mining_Script::register_script(): Entity %d does not have required components.", entity_id);

@@ -53,7 +53,7 @@ namespace lof {
             player_script->set_force_flag(-1);
         });
 
-        player_script->add_function("movement", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
+        player_script->add_function("update", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
             auto player_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Physics_Component>(entity_id) || !ECSM.has_component<Audio_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {

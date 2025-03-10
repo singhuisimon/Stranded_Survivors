@@ -63,7 +63,7 @@ namespace lof {
             }
 
             auto& logic_comp = ECSM.get_component<Logic_Component>(entity_id);
-            ScriptData script_data = logic_comp.get_script_data("object_moving_script", "update");
+            ScriptData script_data = logic_comp.get_script_data("object_moving_script");
 
             try {
                 MovementData data;

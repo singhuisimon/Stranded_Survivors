@@ -113,7 +113,6 @@ namespace lof {
 		Uninitialized, 
 		Running, 
 		Paused, 
-		Completed, 
 		Terminated 
 	};
 

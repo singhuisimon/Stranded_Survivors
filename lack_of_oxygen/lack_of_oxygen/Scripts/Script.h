@@ -68,7 +68,7 @@ namespace lof {
 		 */
 		void add_function(const std::string& function_name, ScriptFunction func) {
 			LM.write_log("Script %p is adding function %s", this, function_name.c_str());
-			std::cout << "Registering function init for script: " << script_name << "\n";
+			//std::cout << "Registering function init for script: " << script_name << "\n";
 			functions_map[function_name] = func;
 		}
 
@@ -78,7 +78,7 @@ namespace lof {
 		*/
 		ScriptFunction get_function(const std::string& function_name) const {
 
-			std::cout << "function map size " << functions_map.size() << std::endl;
+			//std::cout << "function map size " << functions_map.size() << std::endl;
 
 			auto it = functions_map.find(function_name);
 			if (it != functions_map.end()) {
@@ -94,6 +94,30 @@ namespace lof {
 		 * @return Name of the script
 		 */
 		const std::string& get_name() const { return script_name; }
+
+		/**
+		* @brief Check if script has init
+		* @return True if script has init, false otherwise
+		*/
+		bool has_init() const {
+			return functions_map.find("init") != functions_map.end();
+		}
+
+		/**
+		* @brief Check if script has update
+		* @return True if script has update, false otherwise
+		*/
+		bool has_update() const {
+			return functions_map.find("update") != functions_map.end();
+		}
+
+		/**
+		* @brief Check if script has end
+		* @return True if script has end, false otherwise
+		*/
+		bool has_end() const {
+			return functions_map.find("end") != functions_map.end();
+		}
 
 	private:
 

@@ -59,9 +59,14 @@ namespace lof {
         /**
          * @brief Updates the scripts for all relevant entities.
          */
-        void update_script();
+        void process_script();
 
+        void initialize_script(EntityID entity_id, std::shared_ptr<Logic_Component::LogicData> logic_data, std::shared_ptr<Script> script);
         
+        void update_script(EntityID entity_id, std::shared_ptr<Logic_Component::LogicData> logic_data, std::shared_ptr<Script> script);
+
+        void terminate_script(EntityID entity_id, std::shared_ptr<Logic_Component::LogicData> logic_data, std::shared_ptr<Script> script);
+
     private:
 
         /**
@@ -76,5 +81,3 @@ namespace lof {
     };
 } // namespace lof
 #endif // LOF_LOGIC_SYSTEM_H
-
-//~Logic_System();
