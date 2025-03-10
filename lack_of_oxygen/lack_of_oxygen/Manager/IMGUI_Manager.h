@@ -277,6 +277,8 @@ namespace lof {
          * @brief Update changes of values in buttons_and_batches vector
          */
         void update_buttons_and_batches();
+
+        void fill_up_animation_storage();
 };
 
 } // namespace lof

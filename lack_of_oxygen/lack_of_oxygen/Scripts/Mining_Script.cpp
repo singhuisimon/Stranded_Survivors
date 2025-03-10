@@ -234,7 +234,8 @@ namespace lof {
                             auto& entity_animation = ECSM.get_component<Animation_Component>(entity_id);
 
                             // Skip for these entities
-                            if (entity_animation.animations["0"] == "vent_strip" || entity_animation.animations["0"] == "vent" ||
+                            if (entity_animation.animations["0"] == "vent_strip_up" || entity_animation.animations["0"] == "vent_strip_right" ||
+                                entity_animation.animations["0"] == "vent_strip_left" || entity_animation.animations["0"] == "vent" ||
                                 entity_animation.animations["0"] == "wormhole" || entity_animation.animations["0"] == "lava" ||
                                 entity_animation.animations["0"] == "lava_animate") {
                                 continue;
@@ -535,33 +536,43 @@ namespace lof {
         new_direction = "none";
 
         //check for new key press
-        if (is_key_just_pressed("left")) {
-            new_direction = "left";
-        }
-        else if (is_key_just_pressed("right")) {
-            new_direction = "right";
-        }
-        else if (is_key_just_pressed("up")) {
-            new_direction = "up";
-        }
-        else if (is_key_just_pressed("down")) {
-            new_direction = "down";
+        if (current_mining_direction == "none") {
+            if (is_key_just_pressed("left")) {
+                new_direction = "left";
+            }
+            else if (is_key_just_pressed("right")) {
+                new_direction = "right";
+            }
+            else if (is_key_just_pressed("up")) {
+                new_direction = "up";
+            }
+            else if (is_key_just_pressed("down")) {
+                new_direction = "down";
+            }
         }
         //if no new key press continue iwth current held direction
-        else if (left_key_pressed) {
+        else if (left_key_pressed && !right_key_pressed &&
+                !up_key_pressed && !down_key_pressed) {
             new_direction = "left";
         }
-        else if (right_key_pressed) {
+        else if (right_key_pressed && !left_key_pressed &&
+                !up_key_pressed && !down_key_pressed) {
             new_direction = "right";
-		}
-		else if (up_key_pressed) {
-			new_direction = "up";
-		}
-		else if (down_key_pressed) {
-			new_direction = "down";
-		}
+        }
+        else if (up_key_pressed && !left_key_pressed &&
+                !right_key_pressed && !down_key_pressed) {
+            new_direction = "up";
+        }
+        else if (down_key_pressed && !left_key_pressed &&
+                !right_key_pressed && !up_key_pressed) {
+            new_direction = "down";
+        }
+        else if(down_key_pressed || left_key_pressed ||
+                right_key_pressed || up_key_pressed) {
+            new_direction = current_mining_direction;
+        }
 
-		current_mining_direction = new_direction;
+        current_mining_direction = new_direction;
     }
 
     void Mining_Script::update_tile(int block_to_remove, Particle_System* particle_system) {
