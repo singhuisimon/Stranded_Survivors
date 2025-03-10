@@ -95,6 +95,13 @@ namespace lof {
 
             for (auto& logic_data : logic.logic_datas) {
 
+                // ================================= PAUSE CHECK =================================
+                // Check if game is paused first
+                if (GM.is_paused()) {
+                    continue; // Skip this script update if game is paused
+                }
+                // =================================================================================
+
                 //this is keep for in the future when level editor disable it.
                 if (!logic_data->is_active) {
                     LM.write_log("Logic_System::update_script, entity %u logic is not active", entityid);

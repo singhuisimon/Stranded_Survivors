@@ -34,7 +34,9 @@ namespace lof {
         background_bar_id = INVALID_ENTITY_ID;
         progress_bar_id = INVALID_ENTITY_ID;
 
-
+        pause_button_hover_states["resume_button"] = false;
+        pause_button_hover_states["restart_button"] = false;
+        pause_button_hover_states["main_menu_button"] = false;
 
         // Set up the required components
         signature.set(ecs_manager.get_component_id<Transform2D>());
@@ -1001,26 +1003,40 @@ namespace lof {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
-        for (auto& [name, entity_id] : pause_menu_entities) {
-            // Skip non-button entities
-            if (name != "resume" && name != "restart" && name != "main_menu") {
-                continue;
-            }
+        // Debug logging to verify coordinates
+        LM.write_log("Pause menu check - Mouse position: (%.2f, %.2f)", world_mouse_pos.x, world_mouse_pos.y);
 
-            if (entity_id == INVALID_ENTITY_ID) continue;
-
+        // Iterate through ALL entities in this system instead of using map lookup
+        for (EntityID entity_id : entities) {
             auto* entity = ecs_manager.get_entity(entity_id);
             if (!entity) continue;
 
             std::string entity_name = entity->get_name();
 
+            // Debug logging
+            // LM.write_log("Checking entity: %s (ID: %u)", entity_name.c_str(), entity_id);
+
+            // Only check for pause menu buttons with consistent naming
+            if (entity_name != "resume_button" &&
+                entity_name != "restart_button" &&
+                entity_name != "main_menu_button") continue;
+
             if (!ecs_manager.has_component<Transform2D>(entity_id) ||
                 !ecs_manager.has_component<Graphics_Component>(entity_id) ||
-                !ecs_manager.has_component<Audio_Component>(entity_id)) continue;
+                !ecs_manager.has_component<Audio_Component>(entity_id)) {
+                // Debug logging
+                LM.write_log("Missing required component on entity: %s", entity_name.c_str());
+                continue;
+            }
 
             auto& transform = ecs_manager.get_component<Transform2D>(entity_id);
             auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
             auto& audio = ecs_manager.get_component<Audio_Component>(entity_id);
+
+            // Debug button position and size
+            // LM.write_log("Button %s position: (%.2f, %.2f), size: (%.2f, %.2f)",
+            //     entity_name.c_str(), transform.position.x, transform.position.y,
+            //     transform.scale.x, transform.scale.y);
 
             // Check if mouse is hovering over the button
             bool is_hovered = ESS.Mouse_Over_AABB(
@@ -1047,19 +1063,29 @@ namespace lof {
                 base_texture = "Main_Menu_Batch_14";
             }
 
+            // Check map initialization
+            if (pause_button_hover_states.find(entity_name) == pause_button_hover_states.end()) {
+                pause_button_hover_states[entity_name] = false;
+            }
+
             if (is_hovered) {
+                // Debug logging for hover state
+                LM.write_log("Mouse is hovering over %s", entity_name.c_str());
+
+                // Play hover sound when first hovering
                 if (!pause_button_hover_states[entity_name]) {
-                    // Play the hover sound once when hovering
                     ADM.play_now(entity_id, hover_sound, audio);
-                    pause_button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                    pause_button_hover_states[entity_name] = true;
                 }
 
                 if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
+                    LM.write_log("Button clicked: %s", entity_name.c_str());
 
                     // Handle button click actions
                     if (entity_name == "resume_button") {
+                        LM.write_log("Resume button pressed - unpausing game");
                         GM.set_paused(false);
                     }
                     else if (entity_name == "restart_button") {
@@ -1082,6 +1108,8 @@ namespace lof {
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
                         if (SM.load_scene(scene_path.c_str())) {
+                            LM.write_log("Successfully reloaded scene: %s", scene_file.c_str());
+
                             // Reset camera position
                             auto& camera = GFXM.get_camera();
                             camera.pos_x = DEFAULT_CAMERA_POS_X;
@@ -1104,7 +1132,14 @@ namespace lof {
                                 }
                             }
 
+                            // Reset game state values
+                            reset_all_game_state();
+
+                            // Update IMGUI
                             IMGUIM.set_current_file_shown(scene_file);
+                        }
+                        else {
+                            LM.write_log("Failed to reload scene: %s", scene_path.c_str());
                         }
                     }
                     else if (entity_name == "main_menu_button") {
@@ -1127,6 +1162,8 @@ namespace lof {
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
                         if (SM.load_scene(scene_path.c_str())) {
+                            LM.write_log("Successfully loaded main menu");
+
                             // Reset camera position
                             auto& camera = GFXM.get_camera();
                             camera.pos_x = DEFAULT_CAMERA_POS_X;
@@ -1135,9 +1172,15 @@ namespace lof {
                             // Stop all audio
                             ADM.stop_mastergroup();
 
+                            // Reset game state
+                            reset_all_game_state();
+
                             // Update current scene in Game Manager
                             GM.set_current_scene(0);
                             IMGUIM.set_current_file_shown(scene_file);
+                        }
+                        else {
+                            LM.write_log("Failed to load main menu: %s", scene_path.c_str());
                         }
                     }
 
@@ -1149,9 +1192,9 @@ namespace lof {
                 }
             }
             else {
-                // Reset to normal state texture
+                // Reset to normal state texture when not hovering
                 graphics.texture_name = base_texture + "_NORMAL";
-                pause_button_hover_states[entity_name] = false; // Reset hover state
+                pause_button_hover_states[entity_name] = false;
             }
         }
     }
