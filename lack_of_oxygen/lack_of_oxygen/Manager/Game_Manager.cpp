@@ -213,6 +213,7 @@ namespace lof {
         LM.write_log("Game_Manager::set_paused(): Game %s", m_is_paused ? "paused" : "resumed");
     }
 
+
     void Game_Manager::toggle_pause() {
         set_paused(!m_is_paused);
     }

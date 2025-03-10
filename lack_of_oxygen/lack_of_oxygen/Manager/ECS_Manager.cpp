@@ -352,7 +352,7 @@ namespace lof {
                     }
                 }
 
-                LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
+                //LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
             }
         }
 
