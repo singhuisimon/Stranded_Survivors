@@ -166,9 +166,6 @@
           "scripts": [
             {
               "script_name": "object_moving_script",
-              "init": "init",
-              "update": "update",
-              "end": "end",
               "data": {
                 "logic_type": 0,
                 "movement_pattern": 0,

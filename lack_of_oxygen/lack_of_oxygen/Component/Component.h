@@ -793,7 +793,7 @@ namespace lof {
          * @param set_state The state of the script
 		 * @param active The active state of the script
          */
-        void add_script(const std::string& name, const ScriptData& data, ExecutionState set_state, bool active = true) {
+        void add_script(const std::string& name, const ScriptData& data = {}, ExecutionState set_state = ExecutionState::Uninitialized, bool active = true) {
             auto script = std::make_shared<LogicData>(name, data, set_state, active);
 
             logic_datas.push_back(script);
@@ -846,6 +846,24 @@ namespace lof {
         }
 
         /**
+         * @brief Add or update a specific key in the script data of the logic component.
+         * @param script_name The name of the script.
+         * @param data_name The key in the ScriptData to modify or add.
+         * @param new_value The new value to set for the given key in the ScriptData.
+         */
+        template <typename T>
+        void update_script_individual_data(const std::string& script_name, const std::string& data_name, const T& new_value) {
+            auto logic_data = find_logic_data(script_name);
+            if (logic_data) {
+                auto& script_data = logic_data->script_data;
+                script_data[data_name] = new_value;  // Add or update the entry in ScriptData
+            }
+            else {
+                LM.write_log("update_script_data: Script not found for " + script_name);
+            }
+        }
+
+        /**
 		 * @brief Set the script data in the logic component.
 		 * @param script_name The name of the script.
 		 * @param new_data The new data to set.
@@ -873,8 +891,6 @@ namespace lof {
                     return;
                 }
             }
-
-            //throw std::runtime_error("Script instance not found: " + script_name + "( " + update_func + ")");
         }
 
         /**
