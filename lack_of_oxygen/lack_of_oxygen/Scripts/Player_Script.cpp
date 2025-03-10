@@ -408,7 +408,7 @@ namespace lof {
 
     void Player_Script::teleport_player( EntityID player_entity, EntityID linked_wormhole)
     {
-        (void)wormhole_id;
+        //(void)wormhole_id;
 #if 1
         if (ECSM.has_component<Transform2D>(linked_wormhole))
         {
