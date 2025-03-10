@@ -93,12 +93,12 @@ int main(void) {
     // --------------------------- Create GLFW Window ---------------------------
 
     // Create a windowed mode window and its OpenGL context using default values
-    //window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
 
 
     // Create a fullscreen window
     // Change to windowed mode window and its OpenGL context using NULL for fourth option
-    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
+    //window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
     glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
 
     if (!window) {
@@ -265,7 +265,7 @@ int main(void) {
 
         //Dispalys the % of the manager and system's time in the game loop in an IMGUI window
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-        //system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
+        system_performance(GM.get_time(), LGM.get_time(), LGM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
         ImGui::Separator();
         ImGui::Text("In ECS Manager: \n");

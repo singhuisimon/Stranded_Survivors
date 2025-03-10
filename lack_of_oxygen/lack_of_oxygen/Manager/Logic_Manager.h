@@ -58,7 +58,7 @@ namespace lof {
 		/**
 		 * @brief Default constructor
 		 */
-		Logic_Manager() = default;
+		Logic_Manager();
 		static std::unique_ptr<Logic_Manager> instance;
 		static std::once_flag once_flag;
 

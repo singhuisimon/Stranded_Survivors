@@ -22,6 +22,10 @@ namespace lof {
 	std::unique_ptr<Logic_Manager> Logic_Manager::instance;
 	std::once_flag Logic_Manager::once_flag;
 
+	Logic_Manager::Logic_Manager() {
+		set_type("Logic_Manager");
+	}
+
 	Logic_Manager& Logic_Manager::get_instance() {
 		std::call_once(once_flag, []() {
 			instance.reset(new Logic_Manager);

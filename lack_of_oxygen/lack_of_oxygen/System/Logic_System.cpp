@@ -60,6 +60,7 @@ namespace lof {
     void Logic_System::update(float delta_time) {
         (void)delta_time;
         //keeping this empty
+        update_script();
     }
 
     void Logic_System::update_script() {
