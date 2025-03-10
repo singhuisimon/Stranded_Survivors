@@ -234,6 +234,9 @@ namespace lof {
 		tnt_vfx
 	};
 
+	// ------------------------------ Player_Script.cpp --------------------------------
+
+	constexpr const unsigned int DEFAULT_LR_FORCE_MAG = 10000.0f; 
 } // namespace lof
 
 #endif // CONSTANTS_H

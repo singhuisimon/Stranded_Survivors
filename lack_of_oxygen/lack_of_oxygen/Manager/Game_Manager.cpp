@@ -1678,7 +1678,7 @@ namespace lof {
             panic_triggered = false;
             panic_current = 100.0f;
         }
-        std::cout << "Panici current level: " << panic_current << std::endl;
+        //std::cout << "Panici current level: " << panic_current << std::endl;
     }
 
     void Game_Manager::drop_panic(float dt) {

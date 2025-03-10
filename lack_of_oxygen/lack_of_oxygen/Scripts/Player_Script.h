@@ -14,6 +14,7 @@
 
 #include "../Scripts/Script.h"
 #include "../Component/Component.h"
+#include "../Utility/Constant.h"
 
 namespace lof {
 
@@ -45,6 +46,14 @@ namespace lof {
 		 */
 		bool is_key_just_pressed(int key);
 
+		/**
+		*@brief increase player movement speed based on the panic level
+		* @param current panic (0-100)
+		*/
+		void add_panic_movespeed(float panic_amount); 
+
+		void drop_panic_movespeed(float panic_amount); 
+
 	private:
 
 		//script name
@@ -63,6 +72,12 @@ namespace lof {
 		bool key_d_pressed = false;
 		bool key_a_last_frame = false;
 		bool key_d_last_frame = false;
+
+
+		//for panic 
+		float panic_level; 
+		float f_mag_original; 
+
 
 		/**
 		 * @brief Set the force flag for the player.
@@ -84,6 +99,9 @@ namespace lof {
 		 */
 		EntityID get_player_id() const;
 
+		void update_panic_level(Physics_Component& physics_comp); 
+
+		void update_movement_forces(Physics_Component& physics_comp); 
 		/**
 		 * @brief Updates player movement based on input.
 		 * @param physic_comp The Physics_Component to update.
