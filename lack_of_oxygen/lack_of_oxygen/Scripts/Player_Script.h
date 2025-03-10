@@ -124,6 +124,23 @@ namespace lof {
 		 * @brief Updates player walking particle based on input.
 		 */
 		void update_player_walking_particle();
+
+
+		//---------------------------------------------------------------------------//
+		bool key_e_last_frame = false; // for tunnel
+		bool key_e_pressed = false;
+		
+		float teleport_cooldown = 0.5f;
+		float last_teleport_time = -teleport_cooldown;
+		bool teleport_flag;
+
+		std::unordered_map<EntityID, EntityID> wormhole_pairs;
+		Transform2D last_wormhole_position; // to store the last wormhole
+
+		void handle_teleportation(EntityID player_id);
+		bool is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole);
+
+		void teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole);
 		
 	};
 

@@ -14,6 +14,8 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Graphics_Manager.h"
 
+#include <GLFW/glfw3.h>
+
 namespace lof {
 
     Player_Script::Player_Script() {
@@ -29,6 +31,10 @@ namespace lof {
 
         f_mag_original = DEFAULT_LR_FORCE_MAG;
         panic_level = 0.0f;
+        
+        key_e_last_frame = false;
+        key_e_pressed = false;
+        teleport_flag = false;
     }
 
     void Player_Script::register_script() {
@@ -69,7 +75,10 @@ namespace lof {
             player_script->update_player_movement(physics_comp);
             player_script->update_player_audio(physics_comp, audio_comp);
             player_script->update_player_animation();
+            //std::cout << "Wormhole pair erased for entity " << entity_id << "\n";
 
+
+            player_script->handle_teleportation(entity_id);
         });
 
         LGS.add_script("player_script", player_script);
@@ -84,6 +93,11 @@ namespace lof {
         key_space_pressed = IM.is_key_held(GLFW_KEY_SPACE);
 		key_a_pressed = IM.is_key_held(GLFW_KEY_A);
 		key_d_pressed = IM.is_key_held(GLFW_KEY_D);
+
+        key_e_last_frame = key_e_pressed;
+        key_e_pressed = IM.is_key_held(GLFW_KEY_E);
+
+
     }
 
     bool Player_Script::is_key_just_pressed(int key) {
@@ -95,6 +109,10 @@ namespace lof {
         }
         else if (key == GLFW_KEY_D) {
             return key_d_pressed && !key_d_last_frame;
+        } 
+        else if (key == GLFW_KEY_E) {
+            return key_e_pressed && !key_e_last_frame;
+            
         }
         return false;
     }
@@ -209,36 +227,40 @@ namespace lof {
 
 
         //player mining animation
-        if (IM.is_key_held(GLFW_KEY_LEFT)) {
+        if (IM.is_key_held(GLFW_KEY_LEFT) && !(IM.is_key_held(GLFW_KEY_RIGHT))
+            && !(IM.is_key_held(GLFW_KEY_UP)) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             auto& mining_status = GFXM.get_mining_status();
             mining_status = MINE_LEFT;
-            int& direction = GFXM.get_player_direction();
-            direction = FACE_LEFT;
 
         }
-        else if (IM.is_key_held(GLFW_KEY_UP)) {
+        else if (IM.is_key_held(GLFW_KEY_RIGHT) && !(IM.is_key_held(GLFW_KEY_LEFT))
+            && !(IM.is_key_held(GLFW_KEY_UP)) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
+            auto& mining_status = GFXM.get_mining_status();
+            mining_status = MINE_RIGHT;
+
+        }
+        else if (IM.is_key_held(GLFW_KEY_UP) && !(IM.is_key_held(GLFW_KEY_LEFT))
+            && !(IM.is_key_held(GLFW_KEY_RIGHT)) && !(IM.is_key_held(GLFW_KEY_DOWN))) {
             auto& mining_status = GFXM.get_mining_status();
             mining_status = MINE_UP;
 
         }
-        else if (IM.is_key_held(GLFW_KEY_DOWN)) {
+        else if (IM.is_key_held(GLFW_KEY_DOWN) && !(IM.is_key_held(GLFW_KEY_LEFT))
+            && !(IM.is_key_held(GLFW_KEY_RIGHT)) && !(IM.is_key_held(GLFW_KEY_UP))) {
             auto& mining_status = GFXM.get_mining_status();
             mining_status = MINE_DOWN;
 
         }
-        else if (IM.is_key_held(GLFW_KEY_RIGHT)) {
-            auto& mining_status = GFXM.get_mining_status();
-            mining_status = MINE_RIGHT;
-            int& direction = GFXM.get_player_direction();
-            direction = FACE_RIGHT;
-
-        }
         else {
-            auto& mining_status = GFXM.get_mining_status();
-            mining_status = NO_ACTION;
+            if (!IM.is_key_held(GLFW_KEY_RIGHT) && !IM.is_key_held(GLFW_KEY_LEFT) &&
+                !IM.is_key_held(GLFW_KEY_UP) && !IM.is_key_held(GLFW_KEY_DOWN)) {
+                auto& mining_status = GFXM.get_mining_status();
+                mining_status = NO_ACTION;
+            }
         }
     }
 
+    float teleport_audio_end_time = 0.0f;
     void Player_Script::update_player_audio(Physics_Component& physic_comp, Audio_Component& audio_comp) {
         //audio logic is here.
         if (forces_flag != -1) {
@@ -258,6 +280,19 @@ namespace lof {
                 //audio_comp.set_isactive("moving", false);
             }
         }
+
+        float current_time = glfwGetTime();
+        if (teleport_flag) {
+            ADM.play_now(player_id, "tunneling", audio_comp);
+            teleport_audio_end_time = current_time + 1.5f;  // set a 1.5 seconds for the sound to finish
+            teleport_flag = false;  // Reset teleport flag immediately to prevent retriggering
+        }
+
+        // **Stop the teleport sound after it has played fully
+        if (current_time >= teleport_audio_end_time) {
+            ADM.stop_now(player_id, "tunneling", audio_comp.get_filepath("tunneling"));
+        }
+
     }
 
     void Player_Script::update_player_walking_particle() {
@@ -275,6 +310,7 @@ namespace lof {
                 float part_x = player_transform.position.x - (player_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * player_transform.scale.x);
                 float part_y = player_transform.position.y - (player_transform.scale.y * 0.45f);
                 particle_system->particle_emit("walking", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                
             }
 
         }
@@ -303,5 +339,110 @@ namespace lof {
             }
         }
     }
+
+    //==============================================================//
+   
+
+    void Player_Script::handle_teleportation(EntityID player_id)
+    {
+        auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+
+        std::vector<EntityID>& wormhole_entity = SM.get_wormholes_id();
+       /* for (auto wormhole : wormhole_entity)
+        {
+            printf("Wormhole entities: %u\n", wormhole);
+
+        }
+        std::cout << "end of wormhole list\n";*/
+        
+        // clear the previous pair clear the old IDs 
+        wormhole_pairs.clear();
+        if (wormhole_entity.size() % 2 == 0)
+        {
+        for (size_t i = 0; i < wormhole_entity.size(); i += 2)
+        {
+            wormhole_pairs[wormhole_entity[i]] = wormhole_entity[i + 1];
+            wormhole_pairs[wormhole_entity[i + 1]] = wormhole_entity[i];
+
+        }
+        //std::cout << "wormholes pairs successfully set up.\n";
+        }
+
+        /*std::cout << "Wormhole pairs:\n";
+        for (const auto& pair : wormhole_pairs) {
+            std::cout << "Wormhole " << pair.first << " <-> " << pair.second << "\n";
+        }
+
+        std::cout << "End of wormhole pairs list\n\n";*/
+
+
+#if 1
+    float current_time = glfwGetTime();
+    for (const auto& pair : wormhole_pairs)
+    {
+        EntityID wormhole_id = pair.first;
+        EntityID linked_wormhole = pair.second;
+        auto& wormhole_transform = ECSM.get_component<Transform2D>(wormhole_id);
+
+        // **Instead of checking movement, check cooldown**
+        if ((current_time - last_teleport_time) >= teleport_cooldown &&
+            is_player_inside_wormhole(player_transform, wormhole_transform) &&
+            is_key_just_pressed(GLFW_KEY_E))
+        {
+            teleport_player(wormhole_id, player_id, linked_wormhole);
+            last_teleport_time = current_time;  // Update teleport time
+            //tunneling
+            teleport_flag = true;
+            
+
+            std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
+            std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
+        }
+        
+    }
+#endif
+
+    } 
+
+    bool Player_Script::is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole)
+    {
+        float wormhole_half_width = wormhole.scale.x / 2.0f;
+        float wormhole_half_height = wormhole.scale.y / 2.0f;
+
+        /*std::cout << "Player Position: (" << player.position.x << ", " << player.position.y << ")\n";
+        std::cout << "Wormhole Position: (" << wormhole.position.x << ", " << wormhole.position.y << ")\n";*/
+        //std::cout << "Wormhole Half Width: " << wormhole_half_width << ", Half Height: " << wormhole_half_height << "\n";
+
+        return (player.position.x >= wormhole.position.x - wormhole_half_width &&
+            player.position.x <= wormhole.position.x + wormhole_half_width &&
+            player.position.y >= wormhole.position.y - wormhole_half_height &&
+            player.position.y <= wormhole.position.y + wormhole_half_height);
+    }
+
+
+
+    void Player_Script::teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole)
+    {
+#if 1
+        if (ECSM.has_component<Transform2D>(linked_wormhole))
+        {
+
+            auto& paired_wormhole_transform = ECSM.get_component<Transform2D>(linked_wormhole);
+            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+
+            player_transform.position = paired_wormhole_transform.position;
+
+            std::cout << "Teleporting player to: (" << paired_wormhole_transform.position.x << ", " << paired_wormhole_transform.position.y << ")\n";
+            // Small offset to prevent instant re-triggering (optional)
+            //player_transform.position.y += 0.1f;  // If needed
+
+            //just_teleport = true;
+            last_wormhole_position = paired_wormhole_transform;
+            std::cout << "Teleported to: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
+
+        } 
+#endif 
+    }
+
 
 }

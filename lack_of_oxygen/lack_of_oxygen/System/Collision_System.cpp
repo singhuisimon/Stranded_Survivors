@@ -1460,6 +1460,9 @@ namespace lof {
 
  
         resolve_collision_event(collisions);
+
+        //EntityID wormhole = ECSM.find_entity_by_name("spritesheet_map");
+        //std::cout << "this is wormhole entity " << wormhole << "\n";
     
     }
 

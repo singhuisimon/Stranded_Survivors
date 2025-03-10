@@ -23,7 +23,7 @@
 #include "Game_Manager.h"
 
 // Include ECS_Manager for entity creation
-#include "ECS_Manager.h"
+//#include "ECS_Manager.h"
 #include "IMGUI_Manager.h"
 #include "Assets_Manager.h"
 #include "Audio_Manager.h"
@@ -89,7 +89,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -816,10 +816,15 @@ namespace lof {
                         entity_name.find("citrine") == 0 ||
                         entity_name.find("alexandrite") == 0 ||
                         entity_name.find("tunnel") == 0 ||
-                        entity_name.find("vent") == 0 ||
+                        entity_name.find("ventUp") == 0 ||
+                        entity_name.find("ventLeft") == 0 ||
+                        entity_name.find("ventRight") == 0 ||
+                        entity_name.find("ventUp") == 0 ||
                         entity_name.find("lava") == 0 ||
                         entity_name.find("obsidian") == 0 ||
-                        entity_name.find("ventStrip") == 0)) {
+                        entity_name.find("ventStripUp") == 0 ||
+                        entity_name.find("ventStripLeft") == 0 ||
+                        entity_name.find("ventStripRight") == 0)) {
                     LM.write_log("Skipping level geometry entity: %s", entity_name.c_str());
                     continue;
                 }
@@ -1102,7 +1107,7 @@ namespace lof {
         }
     }
 
-
+    //std::vector<EntityID> wormholes;
     bool Serialization_Manager::create_level_entities() {
         if (current_level.tiles.empty()) {
             LM.write_log("Serialization_Manager::create_level_entities(): No level data loaded");
@@ -1120,7 +1125,8 @@ namespace lof {
         float total_width = RIGHT_BOUND - LEFT_BOUND;
         float tile_width = total_width / current_level.cols;
         float tile_height = tile_width; // Keep tiles square
- 
+        
+        bool is_wormhole = false;
 
         //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
         //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
@@ -1153,16 +1159,22 @@ namespace lof {
                 case '5': prefab_name = "citrine_prefab"; break;
                 case '*': prefab_name = "alexandrite_prefab"; break;
                 case 't': prefab_name = "tunnel_prefab"; break;
-                case 'v': prefab_name = "vent_prefab"; break;
+                case 'v': prefab_name = "ventUp_prefab"; break;
+                case ']': prefab_name = "ventLeft_prefab"; break;
+                case '[': prefab_name = "ventRight_prefab"; break;
                 case 'l': prefab_name = "lava_prefab"; break;
                 case 'o': prefab_name = "obsidian_prefab"; break;
-                case 's': prefab_name = "ventStrip_prefab"; break;
+                case 's': prefab_name = "ventStripUp_prefab"; break;
+                case '<': prefab_name = "ventStripLeft_prefab"; break;
+                case '>': prefab_name = "ventStripRight_prefab"; break;
                 default:
                     LM.write_log("Unknown tile type '%c' at position (%zu, %zu)",
                         tile.type, row, col);
                     continue;
                 }
 
+                is_wormhole = (tile.type == 't');
+                
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
                 float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
@@ -1200,16 +1212,34 @@ namespace lof {
                         LM.write_log("Set collision for tile at (%.2f, %.2f): width=%.2f, height=%.2f",
                             x_pos, y_pos, collision.width, collision.height);
                     }
-                   
+
+                  
+                    if (is_wormhole)
+                    {
+                        wormholes.push_back(entity);
+                        //std::cout << "wormhole entity " << entity << "\n";
+
+                        
+                    }
+
+
                 }
                 else {
                     LM.write_log("Failed to create entity from prefab '%s'", prefab_name.c_str());
                 }
             }
         }
+
+       /* for (EntityID wormhole : wormholes)
+        {
+            std::cout << "wormhole entity " << wormhole << "\n";
+        }*/
+
       
         return true;
     }
+
+ 
 
     bool Serialization_Manager::is_scene2_file(const char* filepath) const {
         std::string path(filepath);
