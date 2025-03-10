@@ -32,6 +32,9 @@ namespace lof {
         key_e_last_frame = false;
         key_e_pressed = false;
         teleport_flag = false;
+
+        key_t_last_frame = false;
+        key_t_pressed = false;
     }
 
     void Player_Script::register_script() {
@@ -91,6 +94,9 @@ namespace lof {
         key_e_last_frame = key_e_pressed;
         key_e_pressed = IM.is_key_held(GLFW_KEY_E);
 
+        key_t_last_frame = key_t_pressed;
+        key_t_pressed = IM.is_key_held(GLFW_KEY_T); //cheap code for teleport
+
 
     }
 
@@ -107,6 +113,10 @@ namespace lof {
         else if (key == GLFW_KEY_E) {
             return key_e_pressed && !key_e_last_frame;
             
+        }
+        else if (key == GLFW_KEY_T)
+        {
+            return key_t_pressed && !key_e_last_frame;
         }
         return false;
     }
@@ -275,7 +285,7 @@ namespace lof {
             }
         }
 
-        float current_time = glfwGetTime();
+        float current_time = static_cast<float>(glfwGetTime());
         if (teleport_flag) {
             ADM.play_now(player_id, "tunneling", audio_comp);
             teleport_audio_end_time = current_time + 1.5f;  // set a 1.5 seconds for the sound to finish
@@ -314,9 +324,9 @@ namespace lof {
     //==============================================================//
    
 
-    void Player_Script::handle_teleportation(EntityID player_id)
+    void Player_Script::handle_teleportation(EntityID player_entity)
     {
-        auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+        auto& player_transform = ECSM.get_component<Transform2D>(player_entity);
 
         std::vector<EntityID>& wormhole_entity = SM.get_wormholes_id();
        /* for (auto wormhole : wormhole_entity)
@@ -348,7 +358,7 @@ namespace lof {
 
 
 #if 1
-    float current_time = glfwGetTime();
+    float current_time = static_cast<float>(glfwGetTime());
     for (const auto& pair : wormhole_pairs)
     {
         EntityID wormhole_id = pair.first;
@@ -360,15 +370,17 @@ namespace lof {
             is_player_inside_wormhole(player_transform, wormhole_transform) &&
             is_key_just_pressed(GLFW_KEY_E))
         {
-            teleport_player(wormhole_id, player_id, linked_wormhole);
+            teleport_player(player_entity, linked_wormhole);
             last_teleport_time = current_time;  // Update teleport time
             //tunneling
             teleport_flag = true;
             
 
-            std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
-            std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
+            //std::cout << "Player Position: (" << player_transform.position.x << ", " << player_transform.position.y << ")\n";
+            //std::cout << "Wormhole Position: (" << wormhole_id << ": " << wormhole_transform.position.x << ", " << wormhole_transform.position.y << ")\n";
         }
+
+        Cheap_Code_Teleport_Wormhole(685.0f, -3790.0f);
         
     }
 #endif
@@ -392,14 +404,14 @@ namespace lof {
 
 
 
-    void Player_Script::teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole)
+    void Player_Script::teleport_player( EntityID player_entity, EntityID linked_wormhole)
     {
 #if 1
         if (ECSM.has_component<Transform2D>(linked_wormhole))
         {
 
             auto& paired_wormhole_transform = ECSM.get_component<Transform2D>(linked_wormhole);
-            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+            auto& player_transform = ECSM.get_component<Transform2D>(player_entity);
 
             player_transform.position = paired_wormhole_transform.position;
 
@@ -413,6 +425,18 @@ namespace lof {
 
         } 
 #endif 
+    }
+
+    void Player_Script::Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y)
+    {
+        // cheap code for teleport 
+        if (is_key_just_pressed(GLFW_KEY_T))
+        {
+            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+            player_transform.position.x = pos_x;
+            player_transform.position.y = pos_y;
+
+        }
     }
 
 

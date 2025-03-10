@@ -40,14 +40,14 @@ GLFWmonitor* monitor = nullptr;
 const GLFWvidmode* mode = nullptr;
 
 
-void drop_callback(GLFWwindow* window, int count, const char** paths)
+void drop_callback(GLFWwindow* callback_window, int count, const char** paths)
 {
-
+    (void)callback_window;
     for (int i = 0; i < count; ++i)
     {
         const char* filePath = paths[i];
 
-        printf("Dropped file: %s\n", filePath);
+        //printf("Dropped file: %s\n", filePath);
         ASM.AddAsset(filePath);
 
     }
