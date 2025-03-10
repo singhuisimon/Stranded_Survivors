@@ -44,9 +44,6 @@ namespace lof {
 
     Logic_System::~Logic_System() {
 
-        // Clean up
-        cleanup();
-
         if (instance) {
             instance.reset();
 			LM.write_log("Logic_System::instance reset");
@@ -59,7 +56,12 @@ namespace lof {
 
     void Logic_System::update(float delta_time) {
         (void)delta_time;
-        //keeping this empty
+
+        if (!game_playing) {
+            LM.write_log("Logic_System updating script in level editor mode");
+            return;
+        }
+
         update_script();
     }
 
@@ -68,16 +70,6 @@ namespace lof {
         //loop over the entity
         //check for those that have logic component
         //after that loop to get the script name and ensure to update or based off entity state to call upon the script function
-        
-        //if (level_editor_mode) {
-        //    //LM.write_log("Logic_System updating script in level editor mode");
-        //    return;
-        //}
-
-        if (!game_playing) {
-            //LM.write_log("Logic_System updating script in level editor mode");
-            return;
-        }
 
         auto& entityids = ECSM.get_entities();
 
@@ -103,9 +95,9 @@ namespace lof {
                 }
 
                 //gets the script based off the script name
-                auto script = get_script(logic_data->script_name);
+                auto script = LGM.get_script(logic_data->script_name);
                 if (!script) {
-                    LM.write_log("Logic_System::update_script script not found");
+                    //LM.write_log("Logic_System::update_script script %s not found", logic_data->script_name.c_str());
                     continue;
                 }
 
@@ -148,35 +140,14 @@ namespace lof {
         }
     }
 
-    void Logic_System::cleanup() {
-        for (auto& script_pair : script_map) {
-            script_pair.second.reset(); // reset each shared_ptr
-            LM.write_log("Logic_System::cleanup() resetting shared_ptr");
-        }
+    //void Logic_System::cleanup() {
+    //    //for (auto& script_pair : script_map) {
+    //    //    script_pair.second.reset(); // reset each shared_ptr
+    //    //    LM.write_log("Logic_System::cleanup() resetting shared_ptr");
+    //    //}
 
-        script_map.clear();
+    //    //script_map.clear();
 		
-    }
-
-    void Logic_System::add_script(const std::string& script_name, std::shared_ptr<Script> script) {
-        script_map[script_name] = script;
-        LM.write_log("registered %s script into script map", script_name.c_str());
-    }
-
-    std::shared_ptr<Script> Logic_System::get_script(const std::string& script_name) {
-
-        auto it = script_map.find(script_name);
-        if (it != script_map.end()) {
-            return it->second.lock();
-        }
-        return nullptr;
-    }
-
-	void Logic_System::remove_script(const std::string& script_name) {
-		auto it = script_map.find(script_name);
-		if (it != script_map.end()) {
-			script_map.erase(it);
-		}
-	}
+    //}
 
 }

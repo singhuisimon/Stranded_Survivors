@@ -25,6 +25,7 @@ namespace lof {
 
     Object_Moving_Script::Object_Moving_Script(){
         entity_data = std::unordered_map<EntityID, MovementData>();
+        //register_script();
     }
 
     Object_Moving_Script::~Object_Moving_Script() {
@@ -37,16 +38,27 @@ namespace lof {
 		entity_data.clear();
 	}
 
-    void Object_Moving_Script::register_script() {
-        std::shared_ptr<Object_Moving_Script> object_moving_script = std::make_shared<Object_Moving_Script>();
-        static auto maintained_script = object_moving_script;
-        std::weak_ptr<Object_Moving_Script> weak_script = object_moving_script;
+    std::string Object_Moving_Script::get_type() const {
+        return script_name;
+    }
 
-        object_moving_script->add_function("init", [weak_script](EntityID entity_id) {
+    void Object_Moving_Script::register_script() {
+        std::cout << "hi" << std::endl;
+        //std::shared_ptr<Object_Moving_Script> object_moving_script = std::make_shared<Object_Moving_Script>();
+        //static auto maintained_script = object_moving_script;
+        //std::weak_ptr<Object_Moving_Script> weak_script = object_moving_script;
+
+        auto object_moving_script = shared_from_this();
+
+        object_moving_script->add_function("init", [weak_script = std::weak_ptr<Object_Moving_Script>(object_moving_script)](EntityID entity_id) {
 		    auto object_moving_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Logic_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {
 		    	LM.write_log("Object_Moving_Script::register_script(): Entity %d does not have required components.", entity_id);
+                return;
+            }
+            if (!object_moving_script) {
+                LM.write_log("Weak pointer is expired!");
                 return;
             }
 
@@ -87,10 +99,14 @@ namespace lof {
             
         });
 
-        object_moving_script->add_function("update", [weak_script](EntityID entity_id) {
+        object_moving_script->add_function("update", [weak_script = std::weak_ptr<Object_Moving_Script>(object_moving_script)](EntityID entity_id) {
 			auto object_moving_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Logic_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {
+                return;
+            }
+            if (!object_moving_script) {
+                LM.write_log("Weak pointer is expired!");
                 return;
             }
 
@@ -124,9 +140,14 @@ namespace lof {
             });
 
         // End Function (Cleanup)
-        object_moving_script->add_function("end", [weak_script](EntityID entity_id) {
+        object_moving_script->add_function("end", [weak_script = std::weak_ptr<Object_Moving_Script>(object_moving_script)](EntityID entity_id) {
 			auto object_moving_script = weak_script.lock();
             if (!entity_id) {
+                LM.write_log("invalid entity id in the script");
+                return;
+            }
+            if (!object_moving_script) {
+                LM.write_log("Weak pointer is expired!");
                 return;
             }
 
@@ -138,7 +159,7 @@ namespace lof {
             });
 
 
-        LGS.add_script("object_moving_script", object_moving_script);
+        //LGS.add_script("object_moving_script", object_moving_script);
     }
 
     void Object_Moving_Script::update_linear_movement(MovementData& data, Transform2D& transform_comp) {

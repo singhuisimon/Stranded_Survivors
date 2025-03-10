@@ -265,7 +265,6 @@ int main(void) {
 
         //Dispalys the % of the manager and system's time in the game loop in an IMGUI window
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-        system_performance(GM.get_time(), LGM.get_time(), LGM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
         ImGui::Separator();
         ImGui::Text("In ECS Manager: \n");

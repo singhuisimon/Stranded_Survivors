@@ -24,18 +24,24 @@ namespace lof {
         mining_cooldown = MINING_COOLDOWN_TIMER;
     }
 
-    void Mining_Script::register_script() {
-        std::shared_ptr<Mining_Script> mining_script = std::make_shared<Mining_Script>();
-        static auto maintained_script = mining_script;
-        std::weak_ptr<Mining_Script> weak_script = maintained_script;
+    std::string Mining_Script::get_type() const {
+        return script_name;
+    }
 
-        mining_script->add_function("init", [weak_script](EntityID entity_id) {
+    void Mining_Script::register_script() {
+        //std::shared_ptr<Mining_Script> mining_script = std::make_shared<Mining_Script>();
+        //static auto maintained_script = mining_script;
+        //std::weak_ptr<Mining_Script> weak_script = maintained_script;
+
+		auto mining_script = shared_from_this();
+
+        mining_script->add_function("init", [weak_script = std::weak_ptr<Mining_Script>(mining_script)](EntityID entity_id) {
             (void)entity_id;
             auto mining_script = weak_script.lock();
             mining_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
         });
 
-        mining_script->add_function("mining", [weak_script](EntityID entity_id) {
+        mining_script->add_function("mining", [weak_script = std::weak_ptr<Mining_Script>(mining_script)](EntityID entity_id) {
             auto mining_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Audio_Component>(entity_id) || !ECSM.has_component<Animation_Component>(entity_id)) {
                 LM.write_log("Mining_Script::register_script(): Entity %d does not have required components.", entity_id);
@@ -70,7 +76,7 @@ namespace lof {
 
         });
 
-        LGS.add_script("mining_script", mining_script);
+        //LGS.add_script("mining_script", mining_script);
     }
 
     void Mining_Script::set_player_id(EntityID entityid) {

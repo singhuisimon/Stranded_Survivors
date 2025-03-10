@@ -161,6 +161,30 @@
           ],
           "min_distance": 1.0,
           "max_distance": 100.0
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "object_moving_script",
+              "init": "init",
+              "update": "update",
+              "end": "end",
+              "data": {
+                "logic_type": 0,
+                "movement_pattern": 0,
+                "movement_speed": 1.100000,
+                "movement_range": 100.0,
+                "reverse_direction": false,
+                "rotate_with_motion": false,
+                "origin_pos": [
+                  0.0,
+                  -200.0
+                ]
+              },
+              "state": 0,
+              "is_active": true
+            }
+          ]
         }
       }
     },

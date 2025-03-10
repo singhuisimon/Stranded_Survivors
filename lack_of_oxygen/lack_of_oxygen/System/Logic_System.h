@@ -61,28 +61,6 @@ namespace lof {
          */
         void update_script();
 
-        /**
-         * @brief Add scripts to the scripts_map.
-		 * @param script_name The name of the script.
-		 * @param script The script to be added.
-         */
-        void add_script(const std::string& script_name, std::shared_ptr<Script> script);
-
-		/**
-		 * @brief Remove scripts from the scripts_map.
-         */
-		void remove_script(const std::string& script_name);
-
-		/**
-		 * @brief Cleanup the scripts_map.
-		 */
-        void cleanup();
-
-        /**
-		 * @brief Retrieve a script from the scripts_map.
-		 * @param script_name The name of the script to retrieve.
-         */
-        std::shared_ptr<Script> get_script(const std::string& script_name);
         
     private:
 
@@ -95,10 +73,6 @@ namespace lof {
 		 * @brief set the flag to create the instance of Logic_System.
          */
         static std::once_flag once_flag;
-
-        
-        std::unordered_map <std::string, std::weak_ptr<Script>> script_map; //using script name to access the scripts
-
     };
 } // namespace lof
 #endif // LOF_LOGIC_SYSTEM_H

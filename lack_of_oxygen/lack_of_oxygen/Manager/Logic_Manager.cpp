@@ -52,25 +52,28 @@ namespace lof {
 		return 0;
 	}
 
-	void Logic_Manager::update(float delta_time) {
-		(void)delta_time;
-		//LM.write_log("Logic_Manager:: updating");
-		LGS.update_script();
-	}
-
 	void Logic_Manager::register_all_scripts() {
+
+		scripts_map.clear();
+
+		add_script(std::make_shared<Object_Moving_Script>());
+		add_script(std::make_shared<Player_Script>());
+		add_script(std::make_shared<Mining_Script>());
+		LM.write_log("Logic_Manager::register_all_scripts(): Registered built-in scripts.");
+
+
 		// Register Object Moving Script
-		Object_Moving_Script object_moving_script;
-		object_moving_script.register_script();
-		LM.write_log("Registered Object Moving Script");
+		//Object_Moving_Script object_moving_script;
+		//object_moving_script.register_script();
+		//LM.write_log("Registered Object Moving Script");
 
-		Player_Script player_script;
-		player_script.register_script();
-		LM.write_log("Registered Player Script");
+		//Player_Script player_script;
+		//player_script.register_script();
+		//LM.write_log("Registered Player Script");
 
-		Mining_Script mining_script;
-		mining_script.register_script();
-		LM.write_log("Registered Mining Script");
+		//Mining_Script mining_script;
+		//mining_script.register_script();
+		//LM.write_log("Registered Mining Script");
 
 		// Register other scripts here as they are added.
 	}
@@ -81,7 +84,10 @@ namespace lof {
 			return;
 		}
 
-		LGS.cleanup();
+		scripts_map.clear();
+		m_is_started = false;
+
+		//LGS.cleanup();
 		if (instance) {
 			instance.reset();
 			LM.write_log("Logic_Manager::shut_down(): Logic_Manager instance deleted.");
@@ -89,5 +95,36 @@ namespace lof {
 
 		LM.write_log("Logic_Manager::shut_down(): Logic_Manager shut down.");
 		
+	}
+
+	void Logic_Manager::add_script(std::shared_ptr<Script> script) {
+		if (!script) return;
+		scripts_map[script->get_type()] = script;
+		script->register_script();
+		LM.write_log("Logic_Manager::add_script(): Registered script '%s'", script->get_type().c_str());
+	}
+
+	std::shared_ptr<Script> Logic_Manager::get_script(const std::string& script_name) {
+		auto it = scripts_map.find(script_name);
+		if (it != scripts_map.end()) {
+			LM.write_log("Logic_Manager::get_script(): Script '%s' found", script_name.c_str());
+			return it->second;
+		}
+		LM.write_log("Logic_Manager::get_script(): Script '%s' not found", script_name.c_str());
+		return nullptr;
+	}
+
+	void Logic_Manager::remove_script(const std::string& script_name) {
+		if (scripts_map.erase(script_name)) {
+			LM.write_log("Logic_Manager::remove_script(): Removed script '%s'", script_name.c_str());
+		}
+	}
+
+	std::vector<std::string> Logic_Manager::get_script_names() {
+		std::vector<std::string> script_names;
+		for (const auto& pair : scripts_map) {
+			script_names.push_back(pair.first);
+		}
+		return script_names;
 	}
 }
