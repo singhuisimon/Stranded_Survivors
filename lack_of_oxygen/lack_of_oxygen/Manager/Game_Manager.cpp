@@ -821,11 +821,6 @@ namespace lof {
         auto end_time = std::chrono::steady_clock::now();
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
-        start_time = std::chrono::steady_clock::now();
-        LGM.update(delta_time);
-        end_time = std::chrono::steady_clock::now();
-        LGM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
-
         //No Graphics Manager Update
         //// Getting delta time for Graphics Manager
         //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

@@ -40,14 +40,14 @@ GLFWmonitor* monitor = nullptr;
 const GLFWvidmode* mode = nullptr;
 
 
-void drop_callback(GLFWwindow* window, int count, const char** paths)
+void drop_callback(GLFWwindow* callback_window, int count, const char** paths)
 {
-
+    (void)callback_window;
     for (int i = 0; i < count; ++i)
     {
         const char* filePath = paths[i];
 
-        printf("Dropped file: %s\n", filePath);
+        //printf("Dropped file: %s\n", filePath);
         ASM.AddAsset(filePath);
 
     }
@@ -265,7 +265,6 @@ int main(void) {
 
         //Dispalys the % of the manager and system's time in the game loop in an IMGUI window
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
-        //system_performance(GM.get_time(), GFXM.get_time(), GFXM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
         ImGui::Separator();
         ImGui::Text("In ECS Manager: \n");
