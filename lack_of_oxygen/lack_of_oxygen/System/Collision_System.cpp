@@ -334,7 +334,7 @@ namespace lof {
 
     bool Collision_System::is_vent_entity(EntityID id) const {
         auto* entity = ECSM.get_entity(id); 
-        return entity && entity->get_name().find("vent") != std::string::npos;
+        return entity && ( entity->get_name().find("ventUp_prefab") != std::string::npos || entity->get_name().find("ventStripUp_prefab") != std::string::npos);
     }
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {

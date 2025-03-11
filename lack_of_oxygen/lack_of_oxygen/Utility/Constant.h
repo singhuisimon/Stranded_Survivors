@@ -217,7 +217,7 @@ namespace lof {
 	constexpr unsigned int GOD_STRENGTH = 20;			//extra god strength
 
 	// ------------------------------ Particle_System.cpp --------------------------------
-	constexpr const unsigned int MAX_PARTICLES = 2000;
+	constexpr const unsigned int MAX_PARTICLES = 5000;
 
 	enum ParticleType {
 		walking = 1,
@@ -235,9 +235,15 @@ namespace lof {
 		tnt_vfx
 	};
 
+	// ------------------------------ Player_Script.cpp --------------------------------
+
+	constexpr const unsigned int DEFAULT_LR_FORCE_MAG = 10000.0f; 
 
 	// ------------------------------ Mining_Script.cpp --------------------------------
 	constexpr const float MINING_COOLDOWN_TIMER = 0.2f;
+
+	// ------------------------------ Cloud_Script.cpp --------------------------------
+	constexpr const float CLOUD_MOVING_SPEED = 32.0f;
 
 } // namespace lof
 
