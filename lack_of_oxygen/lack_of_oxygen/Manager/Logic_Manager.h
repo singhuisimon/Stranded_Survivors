@@ -44,21 +44,23 @@ namespace lof {
 		int start_up() override; //register the script into logic system
 
 		/**
-		 * @brief Update the logic manager
-		 * @param delta_time The time elapsed since the last update
-		 */
-		void update(float delta_time);
-
-		/**
 		 * @brief Shutdown the logic manager
 		 */
 		void shut_down();
+
+		void add_script(std::shared_ptr<Script> script);
+
+		std::shared_ptr<Script> get_script(const std::string& script_name);
+
+		void remove_script(const std::string& script_name);
+
+		std::vector<std::string> get_script_names();
 
 	private:
 		/**
 		 * @brief Default constructor
 		 */
-		Logic_Manager() = default;
+		Logic_Manager();
 		static std::unique_ptr<Logic_Manager> instance;
 		static std::once_flag once_flag;
 
@@ -66,6 +68,8 @@ namespace lof {
 		 * @brief Register all the scripts in the engine.
 		 */
 		void register_all_scripts();
+
+		std::unordered_map<std::string, std::shared_ptr<Script>> scripts_map;
 
 	};
 

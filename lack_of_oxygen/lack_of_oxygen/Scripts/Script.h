@@ -56,11 +56,19 @@ namespace lof {
 		virtual void register_script() = 0;
 
 		/**
+		 * @brief Pure virtual function to get the script's type as a string.
+		 * @return The script's type name.
+		 */
+		virtual std::string get_type() const = 0;
+
+		/**
 		 * @brief Add function to the functions_map
 		 * @param function_name Name of the function
 		 * @param func Function to be added
 		 */
 		void add_function(const std::string& function_name, ScriptFunction func) {
+			LM.write_log("Script %p is adding function %s", this, function_name.c_str());
+			//std::cout << "Registering function init for script: " << script_name << "\n";
 			functions_map[function_name] = func;
 		}
 
@@ -69,6 +77,9 @@ namespace lof {
 		* @param function_name Name of the function
 		*/
 		ScriptFunction get_function(const std::string& function_name) const {
+
+			//std::cout << "function map size " << functions_map.size() << std::endl;
+
 			auto it = functions_map.find(function_name);
 			if (it != functions_map.end()) {
 				//LM.write_log("FOUND FUNCTION %s", function_name.c_str());
@@ -83,6 +94,30 @@ namespace lof {
 		 * @return Name of the script
 		 */
 		const std::string& get_name() const { return script_name; }
+
+		/**
+		* @brief Check if script has init
+		* @return True if script has init, false otherwise
+		*/
+		bool has_init() const {
+			return functions_map.find("init") != functions_map.end();
+		}
+
+		/**
+		* @brief Check if script has update
+		* @return True if script has update, false otherwise
+		*/
+		bool has_update() const {
+			return functions_map.find("update") != functions_map.end();
+		}
+
+		/**
+		* @brief Check if script has end
+		* @return True if script has end, false otherwise
+		*/
+		bool has_end() const {
+			return functions_map.find("end") != functions_map.end();
+		}
 
 	private:
 

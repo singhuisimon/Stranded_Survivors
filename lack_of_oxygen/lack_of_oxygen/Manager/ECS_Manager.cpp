@@ -116,6 +116,9 @@ namespace lof {
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
+            add_system(std::make_unique<Logic_System>(), false, true);
+            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
+
             add_system(std::make_unique<Collision_System>(), true, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
@@ -133,9 +136,6 @@ namespace lof {
 
             add_system(std::make_unique<Animation_System>(), false, true); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
-
-            add_system(std::make_unique<Logic_System>(), false, true);
-            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
             add_system(std::make_unique<Interruption_System>(window), false, false); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");

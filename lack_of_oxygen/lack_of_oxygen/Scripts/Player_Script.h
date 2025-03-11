@@ -21,7 +21,7 @@ namespace lof {
 	* @class Player_Script
 	* @brief Defines the player script class.
 	*/
-	class Player_Script : public Script {
+	class Player_Script : public Script, public std::enable_shared_from_this<Player_Script> {
 
 	public:
 
@@ -44,6 +44,8 @@ namespace lof {
 		 * @brief Check if key has been pressed last frame.
 		 */
 		bool is_key_just_pressed(int key);
+
+		std::string get_type() const override;
 
 	private:
 
@@ -111,6 +113,10 @@ namespace lof {
 		//---------------------------------------------------------------------------//
 		bool key_e_last_frame = false; // for tunnel
 		bool key_e_pressed = false;
+
+		bool key_t_last_frame = false; // for tunnel
+		bool key_t_pressed = false;
+
 		
 		float teleport_cooldown = 0.5f;
 		float last_teleport_time = -teleport_cooldown;
@@ -122,7 +128,8 @@ namespace lof {
 		void handle_teleportation(EntityID player_id);
 		bool is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole);
 
-		void teleport_player(EntityID wormhole_id, EntityID player_id, EntityID linked_wormhole);
+		void teleport_player( EntityID player_id, EntityID linked_wormhole);
+		void Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y);
 		
 	};
 

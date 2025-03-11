@@ -1231,78 +1231,183 @@ namespace lof {
                     }
                 }
 
-                const char* logic_behaviour[] = { "Horizontal", "Circular" };
-                static std::vector<const char*> chosen_logic_behaviour;
+                //const char* logic_behaviour[] = { "Horizontal", "Circular" };
+                //static std::vector<const char*> chosen_logic_behaviour;
 
                 //Removed logic component due to logic system major revamp. Will be completed next milestone
                 
-                //if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
-                //    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
-                //    if (ImGui::CollapsingHeader("Logic")) {
-                //        auto& is_active = logic.is_active;
-                //        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                //        if (button_toggle(s_label, &is_active_on)) {
-                //            is_active = !is_active;
-                //        }
-                //        auto& movement_pattern = logic.movement_pattern;
-                //        //Update logic behavior, corresponds the string to the movement_pattern value
-                //        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
-                //        ImGui::Text("Choose Logic Behaviour");
-                //        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
-                //            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
-                //        }
-                //        auto& movement_speed = logic.movement_speed;
-                //        ImGui::InputFloat("Movement Speed", &movement_speed);
-                //        auto& movement_range = logic.movement_range;
-                //        ImGui::InputFloat("Movement Range", &movement_range);
-                //        auto& reverse_direction = logic.reverse_direction;
-                //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
-                //        if (button_toggle(reverse_dir, &is_reverse_on)) {
-                //            reverse_direction = !reverse_direction;
-                //        }
-                //        auto& is_rotate = logic.rotate_with_motion;
-                //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
-                //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
-                //            is_rotate = !is_rotate;
-                //        }
-                //        auto& original_position = logic.origin_pos;
-                //        ImGui::InputFloat2("Original Position", &original_position.x);
-                //        for (const char* behaviour_here : chosen_logic_behaviour) {
-                //            ImGui::Text(behaviour_here);
-                //            ImGui::NewLine;
-                //        }
-                //        if (ImGui::Button("Add Logic Behaviour")) {
-                //            ImGui::OpenPopup("Add Behaviour Options");
-                //        }
-                //        if (ImGui::BeginPopup("Add Behaviour Options")) {
-                //            ImGui::Text("Select Operation");
-                //            ImGui::Separator();
-                //            for (const char* behaviour : logic_behaviour) {
-                //                if (ImGui::Selectable(behaviour)) {
-                //                    chosen_logic_behaviour.push_back(behaviour);
-                //                }
-                //            }
-                //            ImGui::EndPopup();
-                //        }
-                //        if (ImGui::Button("Remove Logic Behaviour")) {
-                //            ImGui::OpenPopup("Remove Behaviour Options");
-                //        }
-                //        if (ImGui::BeginPopup("Remove Behaviour Options")) {
-                //            ImGui::Text("Select Operation");
-                //            ImGui::Separator();
-                //            for (const char* behaviour : logic_behaviour) {
-                //                if (ImGui::Selectable(behaviour)) {
-                //                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
-                //                    if (it != chosen_logic_behaviour.end()) {
-                //                        chosen_logic_behaviour.erase(it);
-                //                    }
-                //                }
-                //            }
-                //            ImGui::EndPopup();
-                //        }
-                //        ImGui::Separator();
-                //    }
-                //}
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+                    if (ImGui::CollapsingHeader("Logic")) {
+
+                        if (ImGui::Button("Add New Script")) {
+                            //ok this works to a certain extend. take note the script_size results in
+                            //duplicate header which when u hover over it imgui gives a warning
+                            //will screenshot and show u. but its uty if you want to do it like this
+                            //feel free also to change the default script naming. - Amanda
+							const std::string DEFAULT_SCRIPT_HEADER = DEFAULT_SCRIPT + std::to_string(logic.get_logic_datas().size());
+                            logic.add_script(DEFAULT_SCRIPT);
+                        }
+
+                        auto scripts = logic.get_logic_datas();
+
+                        std::vector<const char*> script_name_cstr;
+
+                        for (auto& script : scripts) {
+                            std::string script_name = script->script_name;
+
+                            std::vector<std::string> script_list;
+
+                            //Retrieve the sound map filenames from Audio_System
+                            script_list = LGM.get_script_names();
+                            for (const auto& name : script_list) {
+                                //std::cout << "script name retrieved " << name << std::endl;
+                                script_name_cstr.push_back(name.c_str());
+                            }
+
+
+                            //gotten it from chatgpt mostly. i havent done anything such as saving etc. so i 
+                            //need ur help to check - Amanda
+							std::string script_header = "Script: " + std::to_string(scripts.size());
+							if (ImGui::CollapsingHeader(script_header.c_str())) {
+								ImGui::Text("Script Name: %s", script_name.c_str());
+                                auto& is_active = script->is_active;
+                                std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                                if (button_toggle(s_label, &is_active_on)) {
+                                    is_active = !is_active;
+                                }
+                                //not sure up or down which one u want use its both provided by chatgpt.
+                                // Display and toggle the active state
+                                if (ImGui::Checkbox("Active", &is_active)) {
+                                    logic.set_active(script_name, is_active);
+                                }
+
+                                // Display Execution State (Read-Only)
+                                const char* execution_state_str = "";
+                                switch (script->state) {
+                                case ExecutionState::Uninitialized: execution_state_str = "Uninitialized"; break;
+                                case ExecutionState::Running: execution_state_str = "Running"; break;
+                                case ExecutionState::Paused: execution_state_str = "Paused"; break;
+                                case ExecutionState::Terminated: execution_state_str = "Terminated"; break;
+                                default: execution_state_str = "Unknown"; break;
+                                }
+                                ImGui::Text("Execution State: %s", execution_state_str);
+
+                                //need to cap increase and decrease for the movement pattern for now i think only 0 and 1? 
+								// or was it 1 or 2 u need check. - Amanda
+                                // Display and allow modification of the ScriptData
+                                ImGui::Text("Script Data:");
+                                for (auto& [key, value] : script->script_data) {
+                                    std::string value_str;
+
+                                    // Handle different types in the ScriptData variant
+                                    if (std::holds_alternative<int>(value)) {
+                                        value_str = std::to_string(std::get<int>(value));
+                                        if (ImGui::InputInt(key.c_str(), &std::get<int>(value))) {
+                                            // ScriptData has been updated when the input is modified
+                                            logic.set_script_data(script_name, script->script_data);
+                                        }
+                                    }
+                                    else if (std::holds_alternative<float>(value)) {
+                                        value_str = std::to_string(std::get<float>(value));
+                                        if (ImGui::InputFloat(key.c_str(), &std::get<float>(value))) {
+                                            // ScriptData has been updated when the input is modified
+                                            logic.set_script_data(script_name, script->script_data);
+                                        }
+                                    }
+                                    else if (std::holds_alternative<std::string>(value)) {
+                                        value_str = std::get<std::string>(value);
+										char string_value[128];
+                                        if (ImGui::InputText(key.c_str(), string_value, sizeof(string_value))) {
+                                            // ScriptData has been updated when the input is modified
+                                            logic.set_script_data(script_name, script->script_data);
+                                        }
+                                    }
+                                    else if (std::holds_alternative<bool>(value)) {
+                                        value_str = std::get<bool>(value) ? "True" : "False";
+                                        if (ImGui::Checkbox(key.c_str(), &std::get<bool>(value))) {
+                                            // ScriptData has been updated when the checkbox is toggled
+                                            logic.set_script_data(script_name, script->script_data);
+                                        }
+                                    }
+                                    else if (std::holds_alternative<Vec2D>(value)) {
+                                        value_str = std::to_string(std::get<Vec2D>(value).x) + ", " + std::to_string(std::get<Vec2D>(value).y);
+                                        if (ImGui::InputFloat2(key.c_str(), &std::get<Vec2D>(value).x)) {
+                                            // ScriptData has been updated when the input is modified
+                                            logic.set_script_data(script_name, script->script_data);
+                                        }
+                                    }
+
+                                    // Display the value
+                                    ImGui::Text("%s: %s", key.c_str(), value_str.c_str());
+                                }
+							}
+                        }
+
+                        //auto& is_active = logic.is_active;
+                        //std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                        //if (button_toggle(s_label, &is_active_on)) {
+                        //    is_active = !is_active;
+                        //}
+                        //auto& movement_pattern = logic.movement_pattern;
+                        ////Update logic behavior, corresponds the string to the movement_pattern value
+                        //int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
+                        //ImGui::Text("Choose Logic Behaviour");
+                        //if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
+                        //    movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
+                        //}
+                        //auto& movement_speed = logic.movement_speed;
+                        //ImGui::InputFloat("Movement Speed", &movement_speed);
+                        //auto& movement_range = logic.movement_range;
+                        //ImGui::InputFloat("Movement Range", &movement_range);
+                        //auto& reverse_direction = logic.reverse_direction;
+                        //std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                        //if (button_toggle(reverse_dir, &is_reverse_on)) {
+                        //    reverse_direction = !reverse_direction;
+                        //}
+                        //auto& is_rotate = logic.rotate_with_motion;
+                        //std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                        //if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                        //    is_rotate = !is_rotate;
+                        //}
+                        //auto& original_position = logic.origin_pos;
+                        //ImGui::InputFloat2("Original Position", &original_position.x);
+                        //for (const char* behaviour_here : chosen_logic_behaviour) {
+                        //    ImGui::Text(behaviour_here);
+                        //    ImGui::NewLine;
+                        //}
+                        //if (ImGui::Button("Add Logic Behaviour")) {
+                        //    ImGui::OpenPopup("Add Behaviour Options");
+                        //}
+                        //if (ImGui::BeginPopup("Add Behaviour Options")) {
+                        //    ImGui::Text("Select Operation");
+                        //    ImGui::Separator();
+                        //    for (const char* behaviour : logic_behaviour) {
+                        //        if (ImGui::Selectable(behaviour)) {
+                        //            chosen_logic_behaviour.push_back(behaviour);
+                        //        }
+                        //    }
+                        //    ImGui::EndPopup();
+                        //}
+                        //if (ImGui::Button("Remove Logic Behaviour")) {
+                        //    ImGui::OpenPopup("Remove Behaviour Options");
+                        //}
+                        //if (ImGui::BeginPopup("Remove Behaviour Options")) {
+                        //    ImGui::Text("Select Operation");
+                        //    ImGui::Separator();
+                        //    for (const char* behaviour : logic_behaviour) {
+                        //        if (ImGui::Selectable(behaviour)) {
+                        //            auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
+                        //            if (it != chosen_logic_behaviour.end()) {
+                        //                chosen_logic_behaviour.erase(it);
+                        //            }
+                        //        }
+                        //    }
+                        //    ImGui::EndPopup();
+                        //}
+                        //ImGui::Separator();
+                    }
+                }
 
                 //Audio Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
