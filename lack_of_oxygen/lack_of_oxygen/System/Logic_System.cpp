@@ -79,9 +79,6 @@ namespace lof {
             Logic_Component& logic = ECSM.get_component<Logic_Component>(entity_id);
 
             for (auto& logic_data : logic.get_logic_datas()) {
-                // Skip inactive logic data
-            for (auto& logic_data : logic.logic_datas) {
-
                 // ================================= PAUSE CHECK =================================
                 // Check if game is paused first
                 if (GM.is_paused()) {
@@ -89,10 +86,10 @@ namespace lof {
                 }
                 // =================================================================================
 
-                //this is keep for in the future when level editor disable it.
+                // If logic data isn't active, handle that
                 if (!logic_data->is_active) {
                     if (logic_data->state == ExecutionState::Running) {
-                        logic_data->state = ExecutionState::Terminated;;
+                        logic_data->state = ExecutionState::Terminated;
                     }
                     LM.write_log("Logic_System::update_script, entity %u logic is not active", entity_id);
                     continue;
@@ -103,12 +100,15 @@ namespace lof {
                     }
                 }
 
+                // Grab the script object
                 auto script = LGM.get_script(logic_data->script_name);
                 if (!script) {
-                    LM.write_log("Logic_System::update_script script %s not found", logic_data->script_name.c_str());
+                    LM.write_log("Logic_System::update_script script %s not found",
+                        logic_data->script_name.c_str());
                     return;
                 }
 
+                // If the game is not playing, set the logic to paused
                 if (!game_playing) {
                     logic_data->state = ExecutionState::Paused;
                 }
@@ -118,22 +118,17 @@ namespace lof {
                 case ExecutionState::Uninitialized:
                     initialize_script(entity_id, logic_data, script);
                     break;
-
                 case ExecutionState::Running:
                     update_script(entity_id, logic_data, script);
                     break;
-
                 case ExecutionState::Paused:
-                    // Future handling for completed state
                     if (game_playing) {
                         logic_data->state = ExecutionState::Running;
                     }
                     break;
-
                 case ExecutionState::Terminated:
                     terminate_script(entity_id, logic_data, script);
                     break;
-
                 default:
                     break;
                 }
@@ -160,7 +155,7 @@ namespace lof {
             //LM.write_log("Update function %s not found", logic_data->update_func.c_str());
             return;
         }
-        
+
         auto update_func = script->get_function("update");
         update_func(entity_id);
 
@@ -182,5 +177,4 @@ namespace lof {
         logic_data->is_active = false;
         LM.write_log("Logic_System::terminate_script completed script for entity %u", entity_id);
     }
-
 }
