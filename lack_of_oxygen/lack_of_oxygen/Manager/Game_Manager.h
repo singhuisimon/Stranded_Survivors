@@ -63,11 +63,22 @@ namespace lof {
         bool increasing = false;
         // Top UI variables
         float current_oxygen_level = 100.0f;  // Start at 100%
+        float current_panic_level = 0.0f;  // Starts at 0%
         float ship_oxygen_level = 400.0f;     // [0..400]
+
+        // Flags to indicate the panic trigger and for panic 
+        bool panic_triggered = false;
+        bool no_panic = false;
+
+        float panic_timer = 0.0f; //time for panic level changes
+        float panic_current = 0.0f; 
+        float panic_increase_amount = 1.7f; //amount to increase panic every 0.5 sec
+        float panic_timer_increase_delay = 0.5f; //delay between panic increases
+        float panic_decrease_amount = 5.0f; //amount to decrease panic every 1 sec
+        float panic_timer_decrease_delay = 1.0f; //delay between panic decreases
 
         float oxygen_drain_rate = 1.0f;     // Drain 5% per second
         float oxygen_update_timer = 0.0f;   // Track time for updates
-        float current_panic_level = 0.0f;  // Starts at 0%
         int timer_remaining = 300; // or any desired starting value
 
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
@@ -82,6 +93,13 @@ namespace lof {
 
         // Flag for displaying fps in game
         bool display_fps = false;
+
+        /**
+        *@brief helper functions to increase and decrease panic 
+        * 
+        */
+        void add_panic(float dt); 
+        void drop_panic(float dt); 
 
     public:
         /**
@@ -157,6 +175,26 @@ namespace lof {
         void  set_current_oxygen_level(float value) {
             current_oxygen_level = std::clamp(value, 0.0f, 100.0f);
         }
+
+        //ash
+
+        /**
+        * @brief Get current panic level
+        * @return the panic level
+        */
+        float get_current_panic_level() const { return current_panic_level; }
+        void set_current_panic_level(float value) { 
+            current_panic_level = std::clamp(value, 0.0f, 100.0f); 
+        }
+        /**
+        * @brief Get panic triggered boolean
+        * @return boolean that indicates whether panic triggered or not
+        */
+        bool get_panic_triggered() const { return panic_triggered; }
+        void set_panic_triggered(bool value) { panic_triggered = value; }
+
+        //ash
+        
 
         /**
 		 * @brief Returns the ship's current oxygen level in the range [0..400].

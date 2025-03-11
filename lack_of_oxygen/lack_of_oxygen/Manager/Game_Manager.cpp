@@ -318,12 +318,29 @@ namespace lof {
 
             // Add oxygen update logic here, before the UI positioning
             oxygen_update_timer += delta_time;
-            if (oxygen_update_timer >= 1.0f) { // Every second
+            if (oxygen_update_timer >= 1.2f) { // Every second
                 oxygen_update_timer = 0.0f;
                 current_oxygen_level = std::max(0.0f, current_oxygen_level - oxygen_drain_rate);
                 // Update panic level inversely to oxygen level
-                current_panic_level = 100.0f - current_oxygen_level;
+                //current_panic_level = 100.0f - current_oxygen_level;
+
+                if (current_oxygen_level < 50.0f) {
+                    panic_triggered = true; 
+                    no_panic = false;
+                }
+                else {
+                    panic_triggered = false;
+                    no_panic = true;
+                }
             }
+            if (panic_triggered) {
+                add_panic(DEFAULT_FIXED_DELTA_TIME); 
+            }
+            if (no_panic) {
+                drop_panic(DEFAULT_FIXED_DELTA_TIME);
+            }
+            //update the current panic level
+            current_panic_level = panic_current; 
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -966,6 +983,34 @@ namespace lof {
 
         LM.write_log("Block isn't %s but %s", block_name.c_str(), name.c_str());
         return false;
+    }
+
+
+    void Game_Manager::add_panic(float dt) {
+        panic_timer += dt; 
+        if ((panic_timer >= panic_timer_increase_delay) && (panic_current < 100.0f)) {
+            panic_current += panic_increase_amount; 
+            panic_timer = 0.0f; //reset the timer
+
+            if (panic_current > 100.0f) panic_current = 100.0f; 
+        }
+        else if (panic_current >= 100.0f) {
+            panic_triggered = false;
+            panic_current = 100.0f;
+        }
+        //std::cout << "Panici current level: " << panic_current << std::endl;
+    }
+
+    void Game_Manager::drop_panic(float dt) {
+        panic_timer += dt; 
+        if (panic_timer >= panic_timer_decrease_delay && panic_current > 0) {
+            panic_current -= panic_decrease_amount; 
+            panic_timer = 0.0f; //reset the timer
+            if (panic_current <= 0.0f) {
+                panic_current = 0.0f;
+                no_panic = false;
+            }
+        }
     }
 
 } // namespace lof

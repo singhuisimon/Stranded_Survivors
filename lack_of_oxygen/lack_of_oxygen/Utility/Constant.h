@@ -235,6 +235,9 @@ namespace lof {
 		tnt_vfx
 	};
 
+	// ------------------------------ Player_Script.cpp --------------------------------
+
+	constexpr const unsigned int DEFAULT_LR_FORCE_MAG = 10000.0f; 
 
 	// ------------------------------ Mining_Script.cpp --------------------------------
 	constexpr const float MINING_COOLDOWN_TIMER = 0.2f;
