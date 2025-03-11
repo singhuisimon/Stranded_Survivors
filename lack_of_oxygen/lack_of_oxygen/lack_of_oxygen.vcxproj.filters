@@ -113,6 +113,7 @@
     <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Assets\Level_Design\Level_Design_V2.csv" />
     <None Include="Assets\Level_Design\Level_Design_V5.csv" />
+    <None Include="Assets\Scenes\tutorial.scn" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -146,6 +147,11 @@
     <Media Include="Assets\Audio\sfx_tnt_boom.wav" />
     <Media Include="Assets\Audio\sfx_tnt_fuse.wav" />
     <Media Include="Assets\Audio\sfx_mineral_destroy.wav" />
+    <Media Include="Assets\Audio\sfx_empty_laser_hit.wav" />
+    <Media Include="Assets\Audio\sfx_tunneling.wav" />
+    <Media Include="Assets\Audio\sfx_tutorial_button.wav" />
+    <Media Include="Assets\Audio\sfx_tutorial_lights.wav" />
+    <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />
@@ -223,8 +229,6 @@
     <Image Include="Assets\Textures\ship_open_batch_15.png" />
     <Image Include="Assets\Textures\skybox_batch_19.png" />
     <Image Include="Assets\Textures\obsidian_bottom_line_batch_19.png" />
-    <Image Include="Assets\Textures\Sprite sheet Compressed_Batch 19.png" />
-    <Image Include="Assets\Textures\Sprite sheet_Compressed Hold Controls_Batch 19.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />

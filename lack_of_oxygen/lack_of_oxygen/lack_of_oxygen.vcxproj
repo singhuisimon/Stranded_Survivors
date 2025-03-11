@@ -136,6 +136,7 @@
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
+    <None Include="Assets\Scenes\tutorial.scn" />
     <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Data\square.msh" />
     <None Include="Data\triangle.msh" />
@@ -156,9 +157,11 @@
     <Media Include="Assets\Audio\bgm_50_roll.wav" />
     <Media Include="Assets\Audio\bgm_80_clock_ticking.wav" />
     <Media Include="Assets\Audio\bgm_surface_music.wav" />
+    <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
     <Media Include="Assets\Audio\sfx_air_vent_in.wav" />
     <Media Include="Assets\Audio\sfx_air_vent_out.wav" />
     <Media Include="Assets\Audio\sfx_button_hover.wav" />
+    <Media Include="Assets\Audio\sfx_empty_laser_hit.wav" />
     <Media Include="Assets\Audio\sfx_general_block_hit.wav" />
     <Media Include="Assets\Audio\sfx_jumping.wav" />
     <Media Include="Assets\Audio\sfx_mainmenu_button.wav" />
@@ -168,6 +171,9 @@
     <Media Include="Assets\Audio\sfx_oxygen_refill.wav" />
     <Media Include="Assets\Audio\sfx_tnt_boom.wav" />
     <Media Include="Assets\Audio\sfx_tnt_fuse.wav" />
+    <Media Include="Assets\Audio\sfx_tunneling.wav" />
+    <Media Include="Assets\Audio\sfx_tutorial_button.wav" />
+    <Media Include="Assets\Audio\sfx_tutorial_lights.wav" />
     <Media Include="Assets\Audio\sfx_walking.wav" />
     <Media Include="Data\audio_test1.wav" />
     <Media Include="Data\audio_test2.wav" />

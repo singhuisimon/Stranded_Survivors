@@ -275,9 +275,9 @@ namespace lof {
             scene_no = 0;
             LM.write_log("Serialization_Manager::load_scene(): Setting to Main Menu");
         }
-        if (path.find("scene1.scn") != std::string::npos) {
+        if (path.find("tutorial.scn") != std::string::npos) {
             scene_no = 1;
-            LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Tutorial");
         }
         else if (path.find("scene2.scn") != std::string::npos) {
             scene_no = 2;
