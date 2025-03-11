@@ -323,7 +323,6 @@ namespace lof {
     }
 
 
-
     void GUI_System::debug_entity(const char* prefix, EntityID id) {
         if (id == INVALID_ENTITY_ID) {
             LM.write_log("%s: Invalid entity ID", prefix);
@@ -1543,7 +1542,7 @@ namespace lof {
                 }
 
                 // Check for click
-                if (IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     LM.write_log("CLICK DETECTED on button: %s", key.c_str());
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(button_id, "main_menu", audio);

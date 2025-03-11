@@ -397,6 +397,41 @@ namespace lof {
                         LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
                         return false;
                     }
+
+                    // Create lava pool
+                    // Calculate tile size
+                    float tile_width = (960.0f - (-960.0f)) / current_level.cols;
+                    float tile_height = tile_width;
+
+                    // Set the start Y position (top of the map)
+                    float START_Y = -150.0f;
+
+                    // Calculate position for tile 107 (27 tiles below the 80-tile map)
+                    float lava_pool_y = START_Y - (107 * tile_height);
+
+                    // Create the lava pool entity
+                    EntityID lava_pool_id = ECSM.create_entity("lava_pool");
+
+                    // Add Transform2D component
+                    Transform2D transform;
+                    transform.position = Vec2D(0.0f, lava_pool_y); // X at middle of screen
+                    transform.prev_position = transform.position;
+                    transform.scale = Vec2D(1920.0f, 6480.0f); // As specified
+                    ECSM.add_component(lava_pool_id, transform);
+
+                    // Add Graphics_Component
+                    Graphics_Component graphics;
+                    graphics.model_name = "square";
+                    graphics.texture_name = "Lava_Pool_Batch_19";
+                    graphics.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+                    ECSM.add_component(lava_pool_id, graphics);
+
+                    // Initialize the lava timer in Game_Manager
+                    GM.reset_lava_timer();
+                    GM.set_tile_height(tile_height);
+
+                    LM.write_log("Serialization_Manager::load_scene(): Created lava pool at position (0.0, %.2f) - starting at tile 107", lava_pool_y);
+
                 }
             }
 

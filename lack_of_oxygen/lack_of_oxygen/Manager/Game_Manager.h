@@ -101,6 +101,12 @@ namespace lof {
         void add_panic(float dt); 
         void drop_panic(float dt); 
 
+
+        // Lava logic
+        float lava_timer = 0.0f;
+        const float LAVA_RISE_INTERVAL = 4.5f; // Time in seconds for lava to rise 1 tile
+        float tile_height = 0.0f; // Store the height of each tile for movement calculations
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
@@ -213,6 +219,9 @@ namespace lof {
         bool is_paused() const { return m_is_paused; }
         void set_paused(bool paused);
         void toggle_pause();
+
+        void reset_lava_timer() { lava_timer = 0.0f; }
+        void set_tile_height(float height) { tile_height = height; }
     };
 
 } // namespace lof

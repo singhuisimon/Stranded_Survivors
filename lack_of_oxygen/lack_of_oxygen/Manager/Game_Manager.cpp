@@ -182,7 +182,7 @@ namespace lof {
         m_is_started = false;
         std::cout << "Game_Manager shut down successfully." << std::endl;
     }
-    
+
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
     EntityID selectedID = INVALID_ENTITY_ID; // for imgui
 
@@ -255,17 +255,33 @@ namespace lof {
             }
         }
 
-        // Pause Logic
-        if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
-            // Only toggle pause in gameplay scenes
-            if (current_scene == 1 || current_scene == 2) {
-                LM.write_log("ESC pressed, current pause state: %d", m_is_paused);
-                toggle_pause();
-                LM.write_log("New pause state: %d", m_is_paused);
+        // 1) Obtain a pointer to the GUI_System
+        GUI_System* gui_system = nullptr;
+        for (auto& sys : ECSM.get_systems()) {
+            if (auto* gs = dynamic_cast<GUI_System*>(sys.get())) {
+                gui_system = gs;
+                break;
             }
-            else {
-                set_game_over(true);
-                LM.write_log("Game_Manager::update(): Escape key pressed. Setting game_over to true.");
+        }
+        // 2) Check if the game-over screen is currently shown
+        bool isGameOverShown = false;
+        if (gui_system) {
+            isGameOverShown = gui_system->is_game_over_shown();
+        }
+
+        // Pause Logic
+        if (!isGameOverShown) {
+            if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
+                // Only toggle pause in gameplay scenes
+                if (current_scene == 1 || current_scene == 2) {
+                    LM.write_log("ESC pressed, current pause state: %d", m_is_paused);
+                    toggle_pause();
+                    LM.write_log("New pause state: %d", m_is_paused);
+                }
+                else {
+                    set_game_over(true);
+                    LM.write_log("Escape pressed outside gameplay, setting game_over = true.");
+                }
             }
         }
 
@@ -284,7 +300,7 @@ namespace lof {
             ADM.pause_resume_mastergroup();
             prev_pasued = true;
         }
-        else if (prev_pasued){
+        else if (prev_pasued) {
             ADM.pause_resume_mastergroup();
             prev_pasued = false;
         }
@@ -301,7 +317,7 @@ namespace lof {
         //    //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
         //    //increasing = true;
         //}
-         
+
         //printf("bool check: %d\n", CS.is_oxygen_increase());
         //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
        /* if (current_scene == 2 || current_scene == 1)
@@ -315,32 +331,31 @@ namespace lof {
 
         // Code portion if in gameplay mode or player exists
         if (player_id != INVALID_ENTITY_ID && game_playing) {  // If player entity exists
+            if (!is_paused() && !isGameOverShown) {
+                oxygen_update_timer += delta_time;
+                if (oxygen_update_timer >= 1.2f) {
+                    oxygen_update_timer = 0.0f;
+                    current_oxygen_level = std::max(0.0f, current_oxygen_level - oxygen_drain_rate);
 
-            // Add oxygen update logic here, before the UI positioning
-            oxygen_update_timer += delta_time;
-            if (oxygen_update_timer >= 1.2f) { // Every second
-                oxygen_update_timer = 0.0f;
-                current_oxygen_level = std::max(0.0f, current_oxygen_level - oxygen_drain_rate);
-                // Update panic level inversely to oxygen level
-                //current_panic_level = 100.0f - current_oxygen_level;
-
-                if (current_oxygen_level < 50.0f) {
-                    panic_triggered = true; 
-                    no_panic = false;
-                }
-                else {
-                    panic_triggered = false;
-                    no_panic = true;
+                    if (current_oxygen_level < 50.0f) {
+                        panic_triggered = true;
+                        no_panic = false;
+                    }
+                    else {
+                        panic_triggered = false;
+                        no_panic = true;
+                    }
                 }
             }
+
             if (panic_triggered) {
-                add_panic(DEFAULT_FIXED_DELTA_TIME); 
+                add_panic(DEFAULT_FIXED_DELTA_TIME);
             }
             if (no_panic) {
                 drop_panic(DEFAULT_FIXED_DELTA_TIME);
             }
             //update the current panic level
-            current_panic_level = panic_current; 
+            current_panic_level = panic_current;
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -532,9 +547,91 @@ namespace lof {
                     }
                 }
             }
-
         }
+
         // == End PLAYER CODE PORTION ==
+
+        if (current_scene == 2) {
+            // Check for oxygen level first - if it reaches zero, show game over screen
+            if (current_oxygen_level <= 0.0f) {
+                // Player is out of oxygen - show game over screen
+                bool is_player_dead = true;
+
+                // Stop all audio first
+                ADM.stop_mastergroup();
+
+                // Find GUI System and show game over screen
+                for (auto& systems_gui : ECSM.get_systems()) {
+                    if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                        // First reset all GUI states
+                        gui_system->reset_all_game_state();
+
+                        // Then show the game over screen
+                        gui_system->show_game_over_menu();
+                        LM.write_log("Game over screen displayed - player ran out of oxygen");
+                        break;
+                    }
+                }
+            }
+
+            EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
+            if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
+                lava_timer += delta_time;
+
+                // Check if it's time to move the lava pool up
+                if (lava_timer >= LAVA_RISE_INTERVAL) {
+                    auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
+
+                    // Move lava up by one tile height
+                    transform.position.y += tile_height;
+                    transform.prev_position = transform.position;
+
+                    // Reset timer but keep remainder for smoother timing
+                    lava_timer -= LAVA_RISE_INTERVAL;
+
+                    LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f", transform.position.y);
+
+                    // Check if player is colliding with lava
+                    EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                    if (player_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(player_id)) {
+                        auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+
+                        // Simple AABB check for collision with lava
+                        float player_half_height = player_transform.scale.y / 2.0f;
+                        float player_bottom = player_transform.position.y - player_half_height;
+                        float lava_top = transform.position.y + (transform.scale.y / 2.0f);
+
+                        if (player_bottom <= lava_top) {
+                            // Player touched lava, reset the level
+                            LM.write_log("Game_Manager::update(): Player touched lava, resetting level");
+
+                            // Reset all GUI states first
+                            for (auto& systems_gui : ECSM.get_systems()) {
+                                if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                                    gui_system->reset_all_game_state();
+                                    LM.write_log("Game_Manager::update(): Reset GUI state after lava death");
+                                    break;
+                                }
+                            }
+
+                            // Reload the scene
+                            std::string scene_file = "scene2.scn";
+
+                            // Create full path to the scene file
+                            std::string scene_path = ASM.get_full_path("Scenes", scene_file);
+
+                            // Try to load the new scene
+                            if (SM.load_scene(scene_path.c_str())) {
+                                LM.write_log("Game_Manager::update(): Successfully reloaded scene2 after lava death");
+                                IMGUIM.set_current_file_shown(scene_file);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+                
+
 
 #if _DEBUG
         // Change render mode with 1 (FILL), 2 (LINE), 3 (POINT) 
@@ -866,6 +963,7 @@ namespace lof {
 
         m_step_count++;
     }
+
 
     void Game_Manager::set_game_over(bool new_game_over) {
         m_game_over = new_game_over;
