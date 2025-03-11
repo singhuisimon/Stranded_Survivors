@@ -234,7 +234,16 @@ namespace lof {
         * @return true if the entity's name contains "vent"
         * @return false otherwise
         */
-        bool is_vent_entity(EntityID id) const;
+        bool is_ventUp(EntityID id) const;
+        bool is_ventLeft(EntityID id) const;
+        bool is_ventRight(EntityID id) const;
+
+        //specific movement based on vent types
+        void apply_vent_up(EntityID id, bool has_vertical_overlap, bool found_next_vent, bool& is_grounded);
+        void apply_vent_left(EntityID id, bool found_next_vent, bool& is_grounded);
+        void apply_vent_right(EntityID id, bool found_next_vent, bool& is_grounded);
+
+
 
         /*
         * @brief Handles collision interactions between an entity and a vent
