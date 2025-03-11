@@ -75,7 +75,7 @@ namespace lof {
     //Locally stored vector to store all the component checks (add and remove component functions)
     std::vector<std::tuple<const char*, ComponentID, std::function<void()>, std::function<void()>>> component_checks;
 
-    //Locally stored fucntion to fill component check (Logic component commented out)
+    //Locally stored function to fill component check (Logic component commented out)
     void fill_component_checks() {
         auto& entities = ECSM.get_entities();
         component_checks = {
@@ -924,7 +924,7 @@ namespace lof {
                     }
                 }
 
-                //Grpahics Component
+                //Graphics Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Graphics_Component>())) {
                     Graphics_Component& graphics = ecs.get_component<Graphics_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Graphics")) {
@@ -983,7 +983,7 @@ namespace lof {
                                 
                             }
 
-                            //For the drag srop target of the texture for button entity
+                            //For the drag drop target of the texture for button entity
                             if (ImGui::BeginDragDropTarget()) {
 
                                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
@@ -1091,7 +1091,7 @@ namespace lof {
 
                         auto& animation_list = animation.animations;
 
-                        //Animation drop-down has been changed to a text input to accomodate adding of audio component. Will be adding back next milestone          
+                        //Animation drop-down has been changed to a text input to accommodate adding of audio component. Will be adding back next milestone          
                         //vector to keep track of selected items for each animation
                         //initialized with -1 for each item, no selection
 
@@ -1153,21 +1153,21 @@ namespace lof {
 
                         if (ImGui::Button("Add Animation and Index")) {
 
-                            int missing_index = animation_list.size();
+                            int missing_index = static_cast<int>(animation_list.size());
                             int prev_index_check = -1;
                             for (auto& animation_indexes: animation_list) {
-                                int index = std::stoi(animation_indexes.first);
-                                if (index - 1 != prev_index_check) {
+                                int index_animation = std::stoi(animation_indexes.first);
+                                if (index_animation - 1 != prev_index_check) {
                                     missing_index = prev_index_check + 1;
                                 }
-                                prev_index_check = index;
+                                prev_index_check = index_animation;
                             }
 
                             if (missing_index >= 10) {
                                 missing_index = 0;
                             }
 
-                            auto& animation_storage = ASM.get_animation_storage();
+                            //auto& animation_storage = ASM.get_animation_storage();
                             for (auto& animation_info : animation_storage) {
                                 
                                 //std::cout << animation_info.first << std::endl;
@@ -1192,16 +1192,16 @@ namespace lof {
                             ImGui::Text("Select Animation Index to Remove");
                             ImGui::Separator();
 
-                            int index = 0;
-                            for (const auto& animation : animation_list) {
-                                if (ImGui::Selectable(animation.first.c_str())) {
+                            int removal_index = 0;
+                            for (const auto& remove_animation : animation_list) {
+                                if (ImGui::Selectable(remove_animation.first.c_str())) {
                                     
-                                    if (index != 0) {
-                                        animation_list.erase(animation.first); //Remove selected animation except the first
+                                    if (removal_index != 0) {
+                                        animation_list.erase(remove_animation.first); //Remove selected animation except the first
                                     }
                                     break; //Exit loop to avoid iterator invalidation
                                 }
-                                index++;
+                                removal_index++;
                             }
 
                             ImGui::EndPopup();
@@ -1319,8 +1319,6 @@ namespace lof {
 
                             ImGui::EndPopup();
                         }
-
-                        //auto& scripts = logic.get_logic_datas();
 
                         int i = 0;
                         for (auto& script : scripts) {
@@ -1502,7 +1500,7 @@ namespace lof {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
 
-                        //Added by amanda. somehow only this works? idk :">
+                        //Added by amanda
                         if (ImGui::Button("Add New Audio")) {
                             const std::string DEFAULT_KEY = DEFAULT_AUDIO_KEY + std::to_string(audio.get_sounds().size());
                             /*audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
@@ -2032,7 +2030,7 @@ namespace lof {
 
     static bool show_msg = true;
 
-    //Function to handle sset browser
+    //Function to handle asset browser
     void IMGUI_Manager::asset_browser() {
 
         ImGui::Begin("Asset Browser");
@@ -2238,14 +2236,14 @@ namespace lof {
     }
 
     //For all text input (includes buffer)
-    void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
+    void IMGUI_Manager::text_input(std::string& data_name, std::string& condition_name) {
 
         char Buffer[128];
         //strncpy_s is safer
         strncpy_s(Buffer, data_name.c_str(), sizeof(Buffer));
         Buffer[sizeof(Buffer) - 1] = '\0';
 
-        if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
+        if (ImGui::InputText(condition_name.c_str(), Buffer, sizeof(Buffer))) {
 
             //replaces the data with the input
             data_name = std::string(Buffer);
@@ -2351,7 +2349,7 @@ namespace lof {
         return batch_and_button;
     }
 
-    //Function to first initalise buttons_and_batches vector
+    //Function to first initialise buttons_and_batches vector
     void IMGUI_Manager::init_buttons_and_batches() {
 
         batch_and_button = { {"play_button", "Main_Menu_Play_Batch_14"},
