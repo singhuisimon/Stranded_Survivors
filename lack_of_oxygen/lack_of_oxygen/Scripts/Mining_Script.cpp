@@ -349,6 +349,15 @@ namespace lof {
                         // Player is caught in the TNT blast - show game over screen
                         is_player_dead = true;
 
+                    }
+
+                    // Check if player is dead to reset the scene
+                    if (is_player_dead == true) {
+                        
+                        ECSM.destroy_entity(tnt_id);
+                        tnt_to_destroy.erase(current->first);
+                        tnt_to_destroy.clear();
+
                         // Stop all audio first
                         ADM.stop_mastergroup();
 
@@ -365,14 +374,16 @@ namespace lof {
                                 break;
                             }
                         }
-                    }
 
-                    // Check if player is dead to reset the scene
-                    if (is_player_dead == true) {
-                        tnt_to_destroy.clear();
                         // No need to immediately reload the scene or set current file
                         // The user will choose restart or main menu from the game over screen
                         break;
+                    }
+                    else {
+                        // Destroy tnt and remove it from the list of tnt to destroy
+                        ECSM.destroy_entity(tnt_id);
+                        tnt_to_destroy.erase(current->first);
+                        LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
                     }
                 }
             }
