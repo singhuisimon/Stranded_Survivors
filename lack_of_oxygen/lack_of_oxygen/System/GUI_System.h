@@ -95,9 +95,14 @@ namespace lof {
         float current_oxygen_level = 100.0f; // Track oxygen level
         float current_mineral_count = 0.0f;  // Track mineral count
 
-        // PAUSE MENU MEMBERS
+        // == PAUSE MENU MEMBERS ==
         std::unordered_map<std::string, EntityID> pause_menu_entities;
         std::unordered_map<std::string, bool> pause_button_hover_states;
+
+        // == GAME OVER SCREEN MEMBERS ==
+        std::unordered_map<std::string, EntityID> game_over_entities;
+        std::unordered_map<std::string, bool> game_over_button_hover_states;
+        bool game_over_shown = false;
 
         /**
          * @brief Clamps a value between a minimum and maximum range.
@@ -193,6 +198,12 @@ namespace lof {
         void show_pause_menu();
         void hide_pause_menu();
         void check_pause_menu_button_collision(float delta_time);
+
+        // == GAME OVER MENU FUNCTIONS ==
+        void show_game_over_menu();
+        void hide_game_over_menu();
+        void check_game_over_button_collision(float delta_time);
+        bool is_game_over_shown() const { return game_over_shown; }
 
         /**
          * @brief Checks if a general container is currently visible.

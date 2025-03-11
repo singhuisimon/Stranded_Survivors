@@ -259,7 +259,9 @@ namespace lof {
         if (IM.is_key_pressed(GLFW_KEY_ESCAPE)) {
             // Only toggle pause in gameplay scenes
             if (current_scene == 1 || current_scene == 2) {
+                LM.write_log("ESC pressed, current pause state: %d", m_is_paused);
                 toggle_pause();
+                LM.write_log("New pause state: %d", m_is_paused);
             }
             else {
                 set_game_over(true);

@@ -480,12 +480,6 @@ namespace lof {
                     continue;
                 }
 
-                if (GM.is_paused() &&
-                    std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end()) {
-                    // allow gui_system to update
-                    continue;
-                }
-
                 system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                 // Updating each system
                 system->update(delta_time);

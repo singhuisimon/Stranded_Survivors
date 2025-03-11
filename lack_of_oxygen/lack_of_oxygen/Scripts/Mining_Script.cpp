@@ -344,75 +344,33 @@ namespace lof {
                     if ((boundary_left <= player_transform.position.x && player_transform.position.x <= boundary_right) &&
                         (boundary_bottom <= player_transform.position.y && player_transform.position.y <= boundary_top)) {
 
-                        // Reset all GUI states first
+                        // Player is caught in the TNT blast - show game over screen
+                        is_player_dead = true;
+
+                        // Stop all audio first
+                        ADM.stop_mastergroup();
+
+                        // Find GUI System and show game over screen
                         for (auto& systems_gui : ECSM.get_systems()) {
                             if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                                // First reset all GUI states
                                 gui_system->reset_all_game_state();
-                                LM.write_log("Game_Manager::update(): Reset GUI state after player death");
+
+                                // Then show the game over screen
+                                gui_system->show_game_over_menu();
+
+                                LM.write_log("Game over screen displayed - player killed by TNT");
                                 break;
                             }
                         }
-
-                        // Reset player to starting point if within TNT blast boundary
-                        is_player_dead = true;
-                        std::string scene_file{ "scene2.scn" };
-                        GM.set_current_scene(2);
-                        //current_scene = 2;
-
-                        // Create full path to the scene file
-                        std::string scene_path = ASM.get_full_path("Scenes", scene_file);
-
-                        // Try to load the new scene
-                        if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
-
-                            // Reset camera position only if not in main menu
-                            auto& camera = GFXM.get_camera();
-                            if (GM.get_current_scene() != 0) {
-                                camera.pos_x = DEFAULT_CAMERA_POS_X;
-                                camera.pos_y = DEFAULT_CAMERA_POS_Y;
-                            }
-
-                            // Stop all audio currently playing
-                            ADM.stop_mastergroup();
-
-                            // Reset player position only if in scene1 or scene2
-                            if (GM.get_current_scene() != 0) {
-                                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                                if (playerId != INVALID_ENTITY_ID) {
-                                    if (ECSM.has_component<Transform2D>(playerId)) {
-                                        auto& transform = ECSM.get_component<Transform2D>(playerId);
-                                        transform.position = Vec2D(0.0f, 0.0f);
-                                        transform.prev_position = transform.position;
-                                    }
-                                    if (ECSM.has_component<Velocity_Component>(playerId)) {
-                                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                                        velocity.velocity = Vec2D(0.0f, 0.0f);
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
-
-                            // Revert to main menu since load failed
-                            GM.set_current_scene(0);
-                            //current_scene = 0;
-                        }
-
                     }
 
                     // Check if player is dead to reset the scene
                     if (is_player_dead == true) {
                         tnt_to_destroy.clear();
-                        IMGUIM.set_current_file_shown("scene2.scn");
+                        // No need to immediately reload the scene or set current file
+                        // The user will choose restart or main menu from the game over screen
                         break;
-                    }
-                    else {
-                        // Destroy tnt and remove it from the list of tnt to destroy
-                        ECSM.destroy_entity(tnt_id);
-                        tnt_to_destroy.erase(current->first);
-                        LM.write_log("Game_Manager::update: Removed block (Entity %u)", tnt_id);
                     }
                 }
             }
