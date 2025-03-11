@@ -102,10 +102,10 @@ namespace lof {
         void drop_panic(float dt); 
 
 
-        // Lava logic
+        // Lava rise related variables
         float lava_timer = 0.0f;
-        const float LAVA_RISE_INTERVAL = 4.5f; // Time in seconds for lava to rise 1 tile
-        float tile_height = 0.0f; // Store the height of each tile for movement calculations
+        float tile_height = 0.0f;
+        static constexpr float LAVA_RISE_INTERVAL = 4.5f; // 4.5 seconds per tile
 
     public:
         /**

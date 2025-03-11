@@ -574,60 +574,39 @@ namespace lof {
                 }
             }
 
+            // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
-                lava_timer += delta_time;
+                // Don't process lava in level editor mode
+                if (!level_editor_mode && game_playing) {
+                    // Update lava timer
+                    lava_timer += delta_time;
 
-                // Check if it's time to move the lava pool up
-                if (lava_timer >= LAVA_RISE_INTERVAL) {
-                    auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
+                    // Debug log to verify lava timer is working
+                    LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
 
-                    // Move lava up by one tile height
-                    transform.position.y += tile_height;
-                    transform.prev_position = transform.position;
+                    // Check if it's time to move the lava pool up
+                    if (lava_timer >= LAVA_RISE_INTERVAL) {
+                        auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
 
-                    // Reset timer but keep remainder for smoother timing
-                    lava_timer -= LAVA_RISE_INTERVAL;
+                        // Log current position before moving
+                        LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
 
-                    LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f", transform.position.y);
+                        // Move lava up by exactly one tile height
+                        transform.position.y += tile_height;
+                        transform.prev_position = transform.position;
 
-                    // Check if player is colliding with lava
-                    EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                    if (player_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(player_id)) {
-                        auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+                        // Reset timer but keep remainder for precise timing
+                        lava_timer -= LAVA_RISE_INTERVAL;
 
-                        // Simple AABB check for collision with lava
-                        float player_half_height = player_transform.scale.y / 2.0f;
-                        float player_bottom = player_transform.position.y - player_half_height;
-                        float lava_top = transform.position.y + (transform.scale.y / 2.0f);
-
-                        if (player_bottom <= lava_top) {
-                            // Player touched lava, reset the level
-                            LM.write_log("Game_Manager::update(): Player touched lava, resetting level");
-
-                            // Reset all GUI states first
-                            for (auto& systems_gui : ECSM.get_systems()) {
-                                if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
-                                    gui_system->reset_all_game_state();
-                                    LM.write_log("Game_Manager::update(): Reset GUI state after lava death");
-                                    break;
-                                }
-                            }
-
-                            // Reload the scene
-                            std::string scene_file = "scene2.scn";
-
-                            // Create full path to the scene file
-                            std::string scene_path = ASM.get_full_path("Scenes", scene_file);
-
-                            // Try to load the new scene
-                            if (SM.load_scene(scene_path.c_str())) {
-                                LM.write_log("Game_Manager::update(): Successfully reloaded scene2 after lava death");
-                                IMGUIM.set_current_file_shown(scene_file);
-                            }
-                        }
+                        LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
+                            transform.position.y, tile_height);
                     }
                 }
+            }
+            else {
+                // Log warning if lava pool entity doesn't exist
+                LM.write_log("Lava pool entity not found or missing Transform2D component");
             }
         }
                 
