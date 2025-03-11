@@ -103,9 +103,9 @@ namespace lof {
                 [&]() { ECSM.add_component<Animation_Component>(entities[selected_object_index]->get_id(), Animation_Component()); },
                 [&]() { ECSM.remove_component<Animation_Component>(entities[selected_object_index]->get_id()); }},
 
-            /*{"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
+            {"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
                 [&]() { ECSM.add_component<Logic_Component>(entities[selected_object_index]->get_id(), Logic_Component()); },
-                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},*/
+                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},
 
             {"Audio Component", static_cast<ComponentID>(ECSM.get_component_id<Audio_Component>()),
                 [&]() { ECSM.add_component<Audio_Component>(entities[selected_object_index]->get_id(), Audio_Component()); },
@@ -1233,116 +1233,204 @@ namespace lof {
 
                 //const char* logic_behaviour[] = { "Horizontal", "Circular" };
                 //static std::vector<const char*> chosen_logic_behaviour;
-
-                //Removed logic component due to logic system major revamp. Will be completed next milestone
                 
+                //Removed logic component due to logic system major revamp. Will be completed next milestone
+                //Gets script names in storage
+                std::vector<std::string> lgm_scripts = LGM.get_script_names();
+
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
                     Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+
+                    ////std::vector<std::string> script_list = LGM.get_script_names();
+                    ////std::vector<const char*> script_name_cstr;
+
+                    //Get all logic ASSOCIATED with entity
+                    auto& scripts = logic.get_logic_datas();
+
+                    //for (auto& script : scripts) {
+                    //    for (auto& lgm_script :   ) {
+                    //        if (lgm_script != script->script_name) {
+                    //            script_list.push_back(lgm_script);
+                    //        }
+                    //    }
+                    //}
+
+                    //ALL script names in entities (INCLUDING DEFAULT NAMES)
+                    std::unordered_set<std::string> scripts_in_entity;
+
+                    //tracking used and unused scripts
+                    std::vector<std::string> used_scripts;
+                    std::vector<std::string> unused_scripts;
+
+                    for (const auto& script : scripts) {
+
+                        //Insert All Default Names
+                        scripts_in_entity.insert(script->script_name);
+
+                    }
+
+                    // Only add scripts that are NOT already used
+                    for (const auto& lgm_script : lgm_scripts) {
+                        if (scripts_in_entity.find(lgm_script) == scripts_in_entity.end()) {
+                            unused_scripts.push_back(lgm_script);
+                        }
+                        else {
+                            used_scripts.push_back(lgm_script);
+                        }
+                    }
+
+                    //Retrieve the script names and put into a vector
+                    //script_list = LGM.get_script_names();         
+                    //for (const auto& name : script_list) {
+                    //    //std::cout << "script name retrieved " << name << std::endl;
+                    //    script_name_cstr.push_back(name.c_str());
+                    //}
+
                     if (ImGui::CollapsingHeader("Logic")) {
 
                         if (ImGui::Button("Add New Script")) {
+
                             //ok this works to a certain extend. take note the script_size results in
                             //duplicate header which when u hover over it imgui gives a warning
                             //will screenshot and show u. but its uty if you want to do it like this
                             //feel free also to change the default script naming. - Amanda
+
 							const std::string DEFAULT_SCRIPT_HEADER = DEFAULT_SCRIPT + std::to_string(logic.get_logic_datas().size());
                             logic.add_script(DEFAULT_SCRIPT);
                         }
+                     
+                        if (ImGui::Button("Remove Script")) {
+                            ImGui::OpenPopup("RemoveScript");
+                        }
 
-                        auto scripts = logic.get_logic_datas();
+                        //Position the context menu at the mouse position
+                        if (ImGui::BeginPopup("RemoveScript")) {
+                            ImGui::Text("Select Script");
+                            ImGui::Separator();
 
-                        std::vector<const char*> script_name_cstr;
-
-                        for (auto& script : scripts) {
-                            std::string script_name = script->script_name;
-
-                            std::vector<std::string> script_list;
-
-                            //Retrieve the sound map filenames from Audio_System
-                            script_list = LGM.get_script_names();
-                            for (const auto& name : script_list) {
-                                //std::cout << "script name retrieved " << name << std::endl;
-                                script_name_cstr.push_back(name.c_str());
+                            int index = 0;
+                            for (const auto& script_name_in_entity : scripts_in_entity) {
+                                if (ImGui::Selectable(script_name_in_entity.c_str())) {
+                                    logic.remove_script(script_name_in_entity);
+                                    break;
+                                }
+                                index++;
                             }
 
+                            ImGui::EndPopup();
+                        }
 
-                            //gotten it from chatgpt mostly. i havent done anything such as saving etc. so i 
-                            //need ur help to check - Amanda
-							std::string script_header = "Script: " + std::to_string(scripts.size());
+                        //auto& scripts = logic.get_logic_datas();
+
+                        int i = 0;
+                        for (auto& script : scripts) {
+
+                            std::string& script_name = script->script_name;
+							std::string script_header = "Script: " + std::to_string(i);
 							if (ImGui::CollapsingHeader(script_header.c_str())) {
-								ImGui::Text("Script Name: %s", script_name.c_str());
-                                auto& is_active = script->is_active;
-                                std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                                if (button_toggle(s_label, &is_active_on)) {
-                                    is_active = !is_active;
+
+
+                                ImGui::BeginDisabled();
+
+                                ImGui::Text("Script Name: %s", script->script_name.c_str());
+                                ImGui::EndDisabled();
+
+                                std::string button_label = "Choose Different Script For " + std::to_string(i);
+                                std::string dropdown_label = "ChoosingDiffScriptFor" + std::to_string(i);
+                                if (ImGui::Button(button_label.c_str())) {
+                                    ImGui::OpenPopup(dropdown_label.c_str());
                                 }
-                                //not sure up or down which one u want use its both provided by chatgpt.
+
+                                //Position the context menu at the mouse position
+                                if (ImGui::BeginPopup(dropdown_label.c_str())) {
+                                    ImGui::Text("Select Script");
+                                    ImGui::Separator();
+
+                                    int index = 0;
+                                    for (const auto& script_name_in_list : unused_scripts) {
+                                        if (ImGui::Selectable(script_name_in_list.c_str())) {
+                                            script->script_name = script_name_in_list;
+                                            break; 
+                                        }
+                                        index++;
+                                    }
+
+                                    ImGui::EndPopup();
+                                }
+
+                                auto& is_active = script->is_active;
+                                std::string s_label = "Active for " + std::to_string(i);
+
                                 // Display and toggle the active state
-                                if (ImGui::Checkbox("Active", &is_active)) {
+                                if (ImGui::Checkbox(s_label.c_str(), &is_active)) {
                                     logic.set_active(script_name, is_active);
                                 }
 
                                 // Display Execution State (Read-Only)
                                 const char* execution_state_str = "";
                                 switch (script->state) {
-                                case ExecutionState::Uninitialized: execution_state_str = "Uninitialized"; break;
-                                case ExecutionState::Running: execution_state_str = "Running"; break;
-                                case ExecutionState::Paused: execution_state_str = "Paused"; break;
-                                case ExecutionState::Terminated: execution_state_str = "Terminated"; break;
-                                default: execution_state_str = "Unknown"; break;
+                                    case ExecutionState::Uninitialized: execution_state_str = "Uninitialized"; break;
+                                    case ExecutionState::Running: execution_state_str = "Running"; break;
+                                    case ExecutionState::Paused: execution_state_str = "Paused"; break;
+                                    case ExecutionState::Terminated: execution_state_str = "Terminated"; break;
+                                    default: execution_state_str = "Unknown"; break;
                                 }
                                 ImGui::Text("Execution State: %s", execution_state_str);
 
-                                //need to cap increase and decrease for the movement pattern for now i think only 0 and 1? 
-								// or was it 1 or 2 u need check. - Amanda
-                                // Display and allow modification of the ScriptData
-                                ImGui::Text("Script Data:");
-                                for (auto& [key, value] : script->script_data) {
-                                    std::string value_str;
+        //                        //need to cap increase and decrease for the movement pattern for now i think only 0 and 1? 
+								//// or was it 1 or 2 u need check. - Amanda
+        //                        // Display and allow modification of the ScriptData
+        //                        ImGui::Text("Script Data:");
+        //                        for (auto& [key, value] : script->script_data) {
+        //                            std::string value_str;
 
-                                    // Handle different types in the ScriptData variant
-                                    if (std::holds_alternative<int>(value)) {
-                                        value_str = std::to_string(std::get<int>(value));
-                                        if (ImGui::InputInt(key.c_str(), &std::get<int>(value))) {
-                                            // ScriptData has been updated when the input is modified
-                                            logic.set_script_data(script_name, script->script_data);
-                                        }
-                                    }
-                                    else if (std::holds_alternative<float>(value)) {
-                                        value_str = std::to_string(std::get<float>(value));
-                                        if (ImGui::InputFloat(key.c_str(), &std::get<float>(value))) {
-                                            // ScriptData has been updated when the input is modified
-                                            logic.set_script_data(script_name, script->script_data);
-                                        }
-                                    }
-                                    else if (std::holds_alternative<std::string>(value)) {
-                                        value_str = std::get<std::string>(value);
-										char string_value[128];
-                                        if (ImGui::InputText(key.c_str(), string_value, sizeof(string_value))) {
-                                            // ScriptData has been updated when the input is modified
-                                            logic.set_script_data(script_name, script->script_data);
-                                        }
-                                    }
-                                    else if (std::holds_alternative<bool>(value)) {
-                                        value_str = std::get<bool>(value) ? "True" : "False";
-                                        if (ImGui::Checkbox(key.c_str(), &std::get<bool>(value))) {
-                                            // ScriptData has been updated when the checkbox is toggled
-                                            logic.set_script_data(script_name, script->script_data);
-                                        }
-                                    }
-                                    else if (std::holds_alternative<Vec2D>(value)) {
-                                        value_str = std::to_string(std::get<Vec2D>(value).x) + ", " + std::to_string(std::get<Vec2D>(value).y);
-                                        if (ImGui::InputFloat2(key.c_str(), &std::get<Vec2D>(value).x)) {
-                                            // ScriptData has been updated when the input is modified
-                                            logic.set_script_data(script_name, script->script_data);
-                                        }
-                                    }
+        //                            // Handle different types in the ScriptData variant
+        //                            if (std::holds_alternative<int>(value)) {
+        //                                value_str = std::to_string(std::get<int>(value));
+        //                                if (ImGui::InputInt(key.c_str(), &std::get<int>(value))) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<float>(value)) {
+        //                                value_str = std::to_string(std::get<float>(value));
+        //                                if (ImGui::InputFloat(key.c_str(), &std::get<float>(value))) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<std::string>(value)) {
+        //                                value_str = std::get<std::string>(value);
+								//		char string_value[128];
+        //                                if (ImGui::InputText(key.c_str(), string_value, sizeof(string_value))) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<bool>(value)) {
+        //                                value_str = std::get<bool>(value) ? "True" : "False";
+        //                                if (ImGui::Checkbox(key.c_str(), &std::get<bool>(value))) {
+        //                                    // ScriptData has been updated when the checkbox is toggled
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<Vec2D>(value)) {
+        //                                value_str = std::to_string(std::get<Vec2D>(value).x) + ", " + std::to_string(std::get<Vec2D>(value).y);
+        //                                if (ImGui::InputFloat2(key.c_str(), &std::get<Vec2D>(value).x)) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
 
-                                    // Display the value
-                                    ImGui::Text("%s: %s", key.c_str(), value_str.c_str());
-                                }
+        //                            // Display the value
+        //                            ImGui::Text("%s: %s", key.c_str(), value_str.c_str());
+        //                        }
 							}
+
+                            ++i;
                         }
+
+                        ImGui::NewLine();
 
                         //auto& is_active = logic.is_active;
                         //std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
