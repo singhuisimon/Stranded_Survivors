@@ -43,8 +43,7 @@ namespace lof {
         std::string oxygen_percentage_text1_name;   // Entity name for player oxygen percentage text
         std::string oxygen_progress_bar2_name;      // Entity name for ship oxygen progress bar
         std::string oxygen_percentage_text2_name;   // Entity name for ship oxygen percentage text
-
-        std::string wormhole_e_prompt_name;
+ 
 
         static constexpr float OXYGEN_BAR_MAX_WIDTH = 630.0f;
         static constexpr float OXYGEN_BAR_HEIGHT = 15.0f;
@@ -89,10 +88,12 @@ namespace lof {
         float oxygen_e_prompt_animation_timer = 0.0f; // Separate timer if you want separate animation
 
 
-        float wormhole_e_prompt_animation_timer = 0.0f; // for wormhole
-        EntityID wormhole_e_prompt = INVALID_ENTITY_ID; 
-        //float wormhole_e_prompt_x = 800.0f;
-        Transform2D wormhole_pos;
+        std::string wormhole_e_prompt_name; // Entity name for wormhole E prompt
+        float wormhole_e_prompt_animation_timer = 0.0f; // for wormhole animation
+        EntityID wormhole_e_prompt = INVALID_ENTITY_ID; // for wormhole E prompt entity 
+        float wormhole_e_prompt_x; // position x of the wormhole E prompt
+        float wormhole_e_prompt_y = 5.0f; // position y of the wormhole E prompt
+        //const float WORMHOLE_E_PROMPT_AMPLITUDE = 1.0f;
 
 
         const float E_PROMPT_AMPLITUDE = 10.0f;  // How far it moves up/down
@@ -196,10 +197,10 @@ namespace lof {
         void hide_oxygen_warning(float percent);
 
         // == WORMHOLE GUI SHOW == 
-        //void show_wormhole_e_prompt_gui(Transform2D& wormhole_pos, bool show_ui);
-
-        void show_wormhole_e_prompt_gui(const Transform2D& wormhole_pos);
         void hide_wormhole_gui();
+        void show_wormhole_tank_gui();
+        void set_wormhole_e_prompt_x(float new_x_position);
+
         
 
         /**
