@@ -368,8 +368,9 @@ namespace lof {
         // Get camera
         auto& camera = GFXM.get_camera();
 
-        // Get player id
-        EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        // Access IDs for player and lava
+        EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
+        EntityID lava_pool = ECSM.find_entity_by_name("lava_pool");
 
         // Get wormhole IDs and add background to it
         auto wormholes = SM.get_wormholes_id();
@@ -701,7 +702,9 @@ namespace lof {
             // Render only what is on the viewport
             int current_scene = GM.get_current_scene(); // Get the current scene number
             if (camera.is_free_cam == GL_FALSE && current_scene == 2) {
-                if (entity_id != 0 && entity_id != player_id && (entity_id < UI_start)) {
+                if (entity_id != 0 && entity_id != player_id && 
+                    lava_pool != INVALID_ENTITY_ID && entity_id != lava_pool 
+                    && (entity_id < UI_start)) {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
                     float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
@@ -1151,6 +1154,7 @@ namespace lof {
                     std::exit(EXIT_FAILURE);
                 }
 
+
                 // Container for particle texture
                 std::string particle_tex{};
 
@@ -1198,6 +1202,9 @@ namespace lof {
                     case tnt_vfx:
                         particle_tex = "sparks_red_particle_batch_14";
                         break;
+                    case lava:
+                        particle_tex = "sparks_particle_batch_14";
+                        break;
                     }
 
                     // Look for texture in texture storage. If not found, load texture 
@@ -1228,7 +1235,19 @@ namespace lof {
                                             particles_storage[i].position.x, particles_storage[i].position.y, 1 };
 
                     // Compute final particles transform matrix
-                    glm::mat3 particles_xform = camera.world_to_ndc_xform * trans_mat * scale_mat;
+                    glm::mat3 particles_xform = camera.world_to_ndc_xform * trans_mat * scale_mat; 
+
+                    if (particles_storage[i].type == lava) { 
+                        // Compute current orientation of particle
+                        GLfloat rad_disp = glm::radians(particles_storage[i].direction);
+
+                        // Compute object rotational matrix 
+                        glm::mat3 rot_mat{ glm::cos(rad_disp),  glm::sin(rad_disp), 0,
+                                            -glm::sin(rad_disp),  glm::cos(rad_disp), 0,
+                                            0,                   0,                  1 };
+
+                        particles_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
+                    }
 
                     // Pass particle's mdl_to_ndc_xform to vertex shader to compute object's final position                    
                     GLint mat_uniform_loc = glGetUniformLocation(shader->program_handle, "uModel_to_NDC_Mat");
@@ -1237,6 +1256,18 @@ namespace lof {
                     }
                     else {
                         LM.write_log("Render_System::draw(): Matrix uniform variable doesn't exist.");
+                        std::exit(EXIT_FAILURE);
+                    }
+
+                    // Pass particle's color to fragment shader uniform variable uColor
+                    GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
+                    if (color_uniform_loc >= 0) {
+                        // Converting Vec3D to glm::vec4
+                        glm::vec4 color_vec4 = { particles_storage[i].color.x, particles_storage[i].color.y, particles_storage[i].color.z, 255.0f};
+                        glUniform4fv(color_uniform_loc, 1, &color_vec4[0]);
+                    }
+                    else {
+                        LM.write_log("Render_System::draw(): Color uniform variable doesn't exist.");
                         std::exit(EXIT_FAILURE);
                     }
 

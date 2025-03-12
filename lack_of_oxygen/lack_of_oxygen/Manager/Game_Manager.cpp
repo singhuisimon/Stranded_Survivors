@@ -603,6 +603,32 @@ namespace lof {
                             transform.position.y, tile_height);
                     }
                 }
+
+                // Emit lava splatter particles
+                //if (static_cast<int>(lava_timer) < 1) {
+                    for (auto& system : ECSM.get_systems()) {
+                        if (system->get_type() == "Particle_System") {
+                            auto* particle_system = static_cast<Particle_System*>(system.get());
+                            if (!particle_system) {
+                                LM.write_log("Game_Manager::update(): Fail to get particle system");
+                                std::cerr << "Failed to get particle system" << std::endl;
+                                return;
+                            }
+
+                            if (particle_system->get_rand_float() < 0.05f) {
+                                // Get lava transform and animation components
+                                auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_id); 
+
+                                // Randomize particle emit count
+                                float part_x = lava_transform.position.x - (lava_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * lava_transform.scale.x);
+                                float part_y = lava_transform.position.y + (lava_transform.scale.y / 2.0f);
+                                particle_system->particle_emit("lava", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f), particle_system->get_rand_float() * 5.0f);
+                            }
+
+
+                        }
+                    }
+                //}
             }
             else {
                 // Log warning if lava pool entity doesn't exist

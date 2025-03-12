@@ -390,7 +390,7 @@ namespace lof {
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
 
             // Create level entities only for scene2
-            if (entity_name == DEFAULT_PLAYER_NAME) {
+            if (entity_name == "obsidian_bottom") {
                 if (is_scene2_file(filename)) {
                     LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
                     if (!create_level_entities()) {
