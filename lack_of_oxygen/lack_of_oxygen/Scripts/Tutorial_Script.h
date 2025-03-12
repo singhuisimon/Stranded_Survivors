@@ -55,6 +55,7 @@ namespace lof {
 		void set_tutorial_page(int new_page_num);
 		void update_button_visibility(EntityID entity_id, Graphics_Component& graphic_comp);
 		void update_button(EntityID entity_id);
+		void transit_next_scene();
 
 	};
 }

@@ -47,6 +47,7 @@ namespace lof {
             }
             tutorial_script->check_keys();
             tutorial_script->update_button(entity_id);
+            tutorial_script->transit_next_scene();
 
             });
 
@@ -146,7 +147,7 @@ namespace lof {
         EntityID tutorial_text_id = ECSM.find_entity_by_name("tutorial_background_text");
         auto& tutorial_text_graphic = ECSM.get_component<Graphics_Component>(tutorial_text_id);
         tutorial_text_graphic.texture_name = "tutorial_text_" + std::to_string(tutorial_page);
-        page_transition_cooldown = TUTORIAL_COOLDOWN_TIME;
+        //page_transition_cooldown = TUTORIAL_COOLDOWN_TIME;
         std::cout << tutorial_text_graphic.texture_name << std::endl;
     }
 
@@ -187,11 +188,20 @@ namespace lof {
 
         if (page_transition_cooldown > 0.0f) {
             page_transition_cooldown -= FPSM.get_delta_time();
-            std::cout << "still in cooldown" << page_transition_cooldown << std::endl;
+            //std::cout << "still in cooldown" << page_transition_cooldown << std::endl;
             return;
         }
 
-        transitioning = false;
+        if (transitioning == true) {
+            return;
+        }
+
+        //transitioning = false;
+
+        if (is_key_just_pressed(GLFW_KEY_ESCAPE)) {
+            transitioning = true;
+            return;
+        }
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
@@ -281,16 +291,19 @@ namespace lof {
                 }
             }
             else {
+                tutorial_sound_playing[entity_name] = false;
                 graphics.texture_name = base_texture + "_HIGHLIGHTED";
             }
         }
         
-        else if (is_key_just_pressed(GLFW_KEY_A)) {
+        if (is_key_just_pressed(GLFW_KEY_A)) {
             std::cout << "KEY A IS PRESSED" << std::endl
                 << entity_name << std::endl;
 
+            EntityID entity = ECSM.find_entity_by_name("a_button");
+            std::string name = ECSM.get_entity(entity)->get_name();
         
-            if (entity_name == "a_button") {
+            if (name == "a_button") {
                 std::cout << "a_button press" << std::endl;
                 if (tutorial_sound_playing[entity_name] == false) {
                     ADM.play_now(entity_id, button_audio, audio);
@@ -305,7 +318,10 @@ namespace lof {
             std::cout << "KEY D IS PRESSED" << std::endl
             << entity_name << std::endl;
 
-            if (entity_name == "d_button") {
+            EntityID entity = ECSM.find_entity_by_name("d_button");
+            std::string name = ECSM.get_entity(entity)->get_name();
+
+            if (name == "d_button") {
                 std::cout << "d_button_presS" << std::endl;
                 if (tutorial_sound_playing[entity_name] == false) {
                     ADM.play_now(entity_id, button_audio, audio);
@@ -320,7 +336,10 @@ namespace lof {
             std::cout << "KEY E IS PRESSED" << std::endl
             << entity_name << std::endl;
 
-            if (entity_name == "e_long_button") {
+            EntityID entity = ECSM.find_entity_by_name("e_long_button");
+            std::string name = ECSM.get_entity(entity)->get_name();
+
+            if (name == "e_long_button") {
                 std::cout << "e_button_press" << std::endl;
                 if (tutorial_sound_playing[entity_name] == false) {
                     ADM.play_now(entity_id, button_audio, audio);
@@ -368,6 +387,66 @@ namespace lof {
         //}
         
 
+    }
+
+    void Tutorial_Script::transit_next_scene() {
+        if (transitioning) {
+            // Clear dynamic entities first
+            bool found_movement_system = false;
+            for (auto& system : ECSM.get_systems()) {
+                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                    movement_system->clear_dynamic_entities();
+                    found_movement_system = true;
+                    LM.write_log("Found and cleared Movement System");
+                    break;
+                }
+            }
+            if (!found_movement_system) {
+                LM.write_log("Warning: Movement System not found");
+            }
+
+            // Set up scene loading
+            const std::string SCENES = "Scenes";
+            std::string scene_file = "scene2.scn";
+            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+            LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
+
+            // Try to load scene2
+            if (SM.load_scene(scene_path.c_str())) {
+                LM.write_log("Scene loaded successfully");
+
+                // Reset camera position
+                auto& camera = GFXM.get_camera();
+                camera.pos_x = DEFAULT_CAMERA_POS_X;
+                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                // Reset player position if it exists
+                EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+                if (playerId != INVALID_ENTITY_ID) {
+                    if (ECSM.has_component<Transform2D>(playerId)) {
+                        auto& player_transform = ECSM.get_component<Transform2D>(playerId);
+                        player_transform.position = Vec2D(0.0f, 0.0f);
+                        player_transform.prev_position = player_transform.position;
+                    }
+                    if (ECSM.has_component<Velocity_Component>(playerId)) {
+                        auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+                        velocity.velocity = Vec2D(0.0f, 0.0f);
+                    }
+                }
+
+                // Update current scene in Game Manager
+                GM.set_current_scene(2);
+
+                // Update IMGUI Manager's current file
+                IMGUIM.set_current_file_shown(scene_file);
+                //current_cooldown = transition_cooldown;  // Set the cooldown timer
+                //transitioning = true;
+                return;
+            }
+            else {
+                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+            }
+        }
     }
 
     //void Tutorial_Script::update_button(EntityID entity_id) {
