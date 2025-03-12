@@ -131,6 +131,7 @@ namespace lof {
 		bool key_e_last_frame = false; // for tunnel
 		bool key_e_pressed = false;
 
+	
 		bool key_t_last_frame = false; // for tunnel
 		bool key_t_pressed = false;
 
@@ -138,16 +139,28 @@ namespace lof {
 		float teleport_cooldown = 0.5f;
 		float last_teleport_time = -teleport_cooldown;
 		bool teleport_flag;
+		bool is_inside = false; // to check if player is inside 
+		//float just_teleported = false;
+
+		//bool was_inside_last_frame = false;
+		EntityID active_wormhole = INVALID_ENTITY_ID;
+		//EntityID last_active_wormhole = INVALID_ENTITY_ID;
+
+		//bool found_wormhole = false;
 
 		std::unordered_map<EntityID, EntityID> wormhole_pairs;
-		Transform2D last_wormhole_position; // to store the last wormhole
+		//Transform2D last_wormhole_position; // to store the last wormhole
 
-		void handle_teleportation(EntityID player_id);
+
+		//void handle_teleportation(EntityID player_id);
 		bool is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole);
 
-		void teleport_player( EntityID player_id, EntityID linked_wormhole);
+		void teleport_player(EntityID Player_ID, EntityID linked_wormhole);
+
+		void handle_teleportation(EntityID Player_ID);
+
 		void Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y);
-		
+		//void Show_E_Prompt_UI(bool show_ui, Transform2D& prompt_pos);
 	};
 
 }

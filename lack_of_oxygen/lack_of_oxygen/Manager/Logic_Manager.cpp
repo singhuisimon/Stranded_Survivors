@@ -11,6 +11,7 @@
 #include "../Scripts/Object_Moving_Script.h"
 #include "../Scripts/Player_Script.h"
 #include "../Scripts/Mining_Script.h"
+#include "../Scripts/Cloud_Script.h"
 
 #include "../Manager/Logic_Manager.h"
 #include "../Manager/ECS_Manager.h"
@@ -59,6 +60,7 @@ namespace lof {
 		add_script(std::make_shared<Object_Moving_Script>());
 		add_script(std::make_shared<Player_Script>());
 		add_script(std::make_shared<Mining_Script>());
+		add_script(std::make_shared<Cloud_Script>());
 		LM.write_log("Logic_Manager::register_all_scripts(): Registered built-in scripts.");
 
 

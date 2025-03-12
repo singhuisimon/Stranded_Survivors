@@ -43,6 +43,7 @@ namespace lof {
         std::string oxygen_percentage_text1_name;   // Entity name for player oxygen percentage text
         std::string oxygen_progress_bar2_name;      // Entity name for ship oxygen progress bar
         std::string oxygen_percentage_text2_name;   // Entity name for ship oxygen percentage text
+ 
 
         static constexpr float OXYGEN_BAR_MAX_WIDTH = 630.0f;
         static constexpr float OXYGEN_BAR_HEIGHT = 15.0f;
@@ -85,6 +86,16 @@ namespace lof {
         float e_prompt_animation_timer = 0.0f;
         float original_e_prompt_y = 30.0f;   // The base Y position for 'E' prompt
         float oxygen_e_prompt_animation_timer = 0.0f; // Separate timer if you want separate animation
+
+
+        std::string wormhole_e_prompt_name; // Entity name for wormhole E prompt
+        float wormhole_e_prompt_animation_timer = 0.0f; // for wormhole animation
+        EntityID wormhole_e_prompt = INVALID_ENTITY_ID; // for wormhole E prompt entity 
+        float wormhole_e_prompt_x; // position x of the wormhole E prompt
+        float wormhole_e_prompt_y = 5.0f; // position y of the wormhole E prompt
+        //const float WORMHOLE_E_PROMPT_AMPLITUDE = 1.0f;
+
+
         const float E_PROMPT_AMPLITUDE = 10.0f;  // How far it moves up/down
         const float E_PROMPT_SPEED = 2.0f;       // How fast it bobs
 
@@ -94,6 +105,15 @@ namespace lof {
 
         float current_oxygen_level = 100.0f; // Track oxygen level
         float current_mineral_count = 0.0f;  // Track mineral count
+
+        // == PAUSE MENU MEMBERS ==
+        std::unordered_map<std::string, EntityID> pause_menu_entities;
+        std::unordered_map<std::string, bool> pause_button_hover_states;
+
+        // == GAME OVER SCREEN MEMBERS ==
+        std::unordered_map<std::string, EntityID> game_over_entities;
+        std::unordered_map<std::string, bool> game_over_button_hover_states;
+        bool game_over_shown = false;
 
         /**
          * @brief Clamps a value between a minimum and maximum range.
@@ -184,6 +204,23 @@ namespace lof {
         // == OXYGEN WARNING FUNCTIONS ==
         void show_oxygen_warning(float percent);
         void hide_oxygen_warning(float percent);
+
+        // == WORMHOLE GUI SHOW == 
+        void hide_wormhole_gui();
+        void show_wormhole_tank_gui();
+        void set_wormhole_e_prompt_x(float new_x_position);
+
+        
+        // == PAUSE MENU FUNCTIONS ==
+        void show_pause_menu();
+        void hide_pause_menu();
+        void check_pause_menu_button_collision(float delta_time);
+
+        // == GAME OVER MENU FUNCTIONS ==
+        void show_game_over_menu();
+        void hide_game_over_menu();
+        void check_game_over_button_collision(float delta_time);
+        bool is_game_over_shown() const { return game_over_shown; }
 
         /**
          * @brief Checks if a general container is currently visible.

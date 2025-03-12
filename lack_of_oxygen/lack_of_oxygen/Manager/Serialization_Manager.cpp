@@ -390,13 +390,59 @@ namespace lof {
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
 
             // Create level entities only for scene2
-            if (i == 4) {
+            if (entity_name == "obsidian_bottom") {
                 if (is_scene2_file(filename)) {
                     LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
                     if (!create_level_entities()) {
                         LM.write_log("Serialization_Manager::load_scene(): Failed to create level entities for scene2");
                         return false;
                     }
+
+                    // Create lava pool
+                    // Calculate tile size based on the level dimensions
+                    const float LEFT_BOUND = -960.0f;
+                    const float RIGHT_BOUND = 960.0f;
+                    float total_width = RIGHT_BOUND - LEFT_BOUND;
+                    float tile_width = total_width / current_level.cols;
+                    float tile_height = tile_width; // Keep tiles square
+
+                    // Set the start Y position (top of the map)
+                    float START_Y = -150.0f;
+
+                    // Calculate the bottom of the level (where the last row of tiles ends)
+                    float level_bottom = START_Y - (current_level.rows * tile_height);
+
+                    // Place lava pool 27 tiles below the bottom of the level
+                    float lava_pool_y = level_bottom - (27 * tile_height);
+
+                    // Create the lava pool entity
+                    EntityID lava_pool_id = ECSM.create_entity("lava_pool");
+
+                    if (lava_pool_id != INVALID_ENTITY_ID) {
+                        // Add Transform2D component
+                        Transform2D transform;
+                        transform.position = Vec2D(0.0f, lava_pool_y); // X at middle of screen
+                        transform.prev_position = transform.position;
+                        transform.scale = Vec2D(1920.0f, 1080.0f); // Wide enough to cover screen and tall enough to fill screen
+                        ECSM.add_component(lava_pool_id, transform);
+
+                        // Add Graphics_Component
+                        Graphics_Component graphics;
+                        graphics.model_name = "square";
+                        graphics.texture_name = "Lava_Pool_Batch_19";
+                        graphics.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+                        ECSM.add_component(lava_pool_id, graphics);
+
+                        // Initialize the lava timer in Game_Manager and store the tile height
+                        GM.reset_lava_timer();
+                        GM.set_tile_height(tile_height);
+
+                        LM.write_log("Serialization_Manager::load_scene(): Created lava pool at position (0.0, %.2f)", lava_pool_y);
+                        LM.write_log("Serialization_Manager::load_scene(): Tile height set to %.2f", tile_height);
+                        LM.write_log("Serialization_Manager::load_scene(): Level bottom at %.2f, 27 tiles below is %.2f",
+                            level_bottom, lava_pool_y);
+                    }
+
                 }
             }
 

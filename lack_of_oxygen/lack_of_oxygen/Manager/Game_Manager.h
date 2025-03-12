@@ -83,6 +83,12 @@ namespace lof {
 
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
 
+        // Stores the TNTs that are activated with it's entity name and fuse time
+        std::unordered_map<std::string, float> tnt_to_destroy;
+
+        // Pause logic
+        bool m_is_paused;
+
         bool check_non_mineral(EntityID block_id, std::string block_name) const;
 
         // Flag for displaying fps in game
@@ -94,6 +100,12 @@ namespace lof {
         */
         void add_panic(float dt); 
         void drop_panic(float dt); 
+
+
+        // Lava rise related variables
+        float lava_timer = 0.0f;
+        float tile_height = 0.0f;
+        static constexpr float LAVA_RISE_INTERVAL = 4.5f; // 4.5 seconds per tile
 
     public:
         /**
@@ -203,6 +215,13 @@ namespace lof {
 
         float get_stored_goal_percentage() const { return stored_goal_percentage; }
         void set_stored_goal_percentage(float value) { stored_goal_percentage = value; }
+
+        bool is_paused() const { return m_is_paused; }
+        void set_paused(bool paused);
+        void toggle_pause();
+
+        void reset_lava_timer() { lava_timer = 0.0f; }
+        void set_tile_height(float height) { tile_height = height; }
     };
 
 } // namespace lof
