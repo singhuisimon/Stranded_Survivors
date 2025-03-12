@@ -350,6 +350,7 @@ namespace lof {
                 //////////////////  TESTING /////////////////////////
                 if (IM.is_key_pressed(GLFW_KEY_P)) {
                     add_panic(DEFAULT_FIXED_DELTA_TIME);
+                    current_oxygen_level = 50.0f;
                 }
 
                 // Sweat particles based on panic meter
@@ -402,14 +403,14 @@ namespace lof {
             //update the current panic level
             current_panic_level = panic_current;
 
-            // Display red vignette based on panic level
+            // Display red vignette based on oxygen level
             EntityID red_vignette = ECSM.find_entity_by_name("red_vignette");
             if (red_vignette != INVALID_ENTITY_ID) {
                 
                 // Adjust alpha value of red_vignette
                 auto& red_vignette_graphics = ECSM.get_component<Graphics_Component>(red_vignette);
-                if (current_panic_level >= 50.0f) {
-                    red_vignette_graphics.color.a = 2 * (current_panic_level - 49.0f) / 100.0f;
+                if (current_oxygen_level <= 50.0f) {
+                    red_vignette_graphics.color.a = 2 * (50.0f - current_oxygen_level)  / 100.0f;
                 }
                 else {
                     red_vignette_graphics.color.a = 0.0f;
