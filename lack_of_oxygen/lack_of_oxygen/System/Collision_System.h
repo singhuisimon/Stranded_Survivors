@@ -25,6 +25,14 @@
 namespace lof {
 #define CS lof::Collision_System::get_instance()
 
+    // Enum for vent directiono 
+    enum class VentDirection {
+        NONE, 
+        UP,
+        LEFT, 
+        RIGHT
+    };
+
     // A enum class for the possible collide side 
     enum class CollisionSide {
         NONE,
@@ -237,6 +245,9 @@ namespace lof {
         bool is_ventUp(EntityID id) const;
         bool is_ventLeft(EntityID id) const;
         bool is_ventRight(EntityID id) const;
+
+        VentDirection get_vent_direction(EntityID id) const;
+        void apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded); 
 
         //specific movement based on vent types
         void apply_vent_up(EntityID id, bool has_vertical_overlap, bool found_next_vent, bool& is_grounded);
