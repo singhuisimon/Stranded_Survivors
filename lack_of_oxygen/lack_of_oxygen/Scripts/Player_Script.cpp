@@ -479,16 +479,5 @@ namespace lof {
     }
 
 
-    void Player_Script::Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y)
-    {
-        // cheap code for teleport 
-        if (is_key_just_pressed(GLFW_KEY_T))
-        {
-            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-            player_transform.position.x = pos_x;
-            player_transform.position.y = pos_y;
-
-        }
-    }
 
 }
