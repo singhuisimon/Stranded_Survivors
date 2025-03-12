@@ -233,7 +233,9 @@ namespace lof {
 		tnt,
 		tnt_explode,
 		tnt_vfx,
-		lava
+		lava,
+		sweat_player,
+		sweat_screen
 	};
 
 	// ------------------------------ Player_Script.cpp --------------------------------

@@ -346,6 +346,51 @@ namespace lof {
                         no_panic = true;
                     }
                 }
+
+                //////////////////  TESTING /////////////////////////
+                if (IM.is_key_pressed(GLFW_KEY_P)) {
+                    add_panic(DEFAULT_FIXED_DELTA_TIME);
+                }
+
+                // Sweat particles based on panic meter
+                if (current_panic_level >= 50.0f) {
+                    for (auto& system : ECSM.get_systems()) {
+                        if (system->get_type() == "Particle_System") {
+                            auto* particle_system = static_cast<Particle_System*>(system.get());
+                            if (!particle_system) {
+                                LM.write_log("Mining_Script::update_mining(): Fail to get particle system");
+                                std::cerr << "Failed to get particle system" << std::endl;
+                                return;
+                            }
+
+                            // Emit sweat particles on player (30% rate)
+                            if (particle_system->get_rand_float() < 0.3f) {
+                                auto& player_direction = GFXM.get_player_direction();
+                                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+
+                                // Sweat on player
+                                if (player_direction == FACE_RIGHT) {
+                                    float part_x = player_transform.position.x - 30.0f + (particle_system->get_rand_float() * 60.0f);
+                                    float part_y = player_transform.position.y + 35.0f;
+                                    particle_system->particle_emit("sweat_player", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                }
+                                else {
+                                    float part_x = player_transform.position.x - 25.0f + (particle_system->get_rand_float() * 60.0f);
+                                    float part_y = player_transform.position.y + 35.0f;
+                                    particle_system->particle_emit("sweat_player", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                }
+
+                                // Sweat on the player's helmet from POV
+                                unsigned int screen_width = static_cast<float>(SM.get_scr_width()); 
+                                unsigned int screen_height = static_cast<float>(SM.get_scr_height()); 
+                                float part_x = -(screen_width / 2.0f) + (particle_system->get_rand_float() * screen_width);
+                                float part_y = player_transform.position.y + screen_height / 3.25f;
+                                particle_system->particle_emit("sweat_screen", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+
+                            }
+                        }
+                    }
+                }
             }
 
             if (panic_triggered) {
@@ -356,6 +401,20 @@ namespace lof {
             }
             //update the current panic level
             current_panic_level = panic_current;
+
+            // Display red vignette based on panic level
+            EntityID red_vignette = ECSM.find_entity_by_name("red_vignette");
+            if (red_vignette != INVALID_ENTITY_ID) {
+                
+                // Adjust alpha value of red_vignette
+                auto& red_vignette_graphics = ECSM.get_component<Graphics_Component>(red_vignette);
+                if (current_panic_level >= 50.0f) {
+                    red_vignette_graphics.color.a = 2 * (current_panic_level - 49.0f) / 100.0f;
+                }
+                else {
+                    red_vignette_graphics.color.a = 0.0f;
+                }
+            }
 
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
@@ -463,6 +522,7 @@ namespace lof {
 
                     // Update fill position and scale
                     panic_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+                    
                     // Anchor to left side by offsetting position based on the current width
                     panic_fill_transform.position = {
                         panic_transform.position.x + 3.0f + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
