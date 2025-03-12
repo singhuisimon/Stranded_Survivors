@@ -218,6 +218,21 @@ namespace lof {
 			2.0f						// life left
 		};
 		particle_base.emplace("TNT_VFX", tnt_vfx);
+
+		// lava splatter visual effect particle data
+		Particle_Data lava = {
+			Vec2D(),					// position
+			Vec3D(),					// color
+			ParticleType::lava,			// type
+			0,							// id
+			4.0f,						// current size
+			4.0f,						// starting size
+			1.0f,						// speed
+			90.0f,						// direction
+			5.0f,						// lifespan
+			5.0f						// life left
+		};
+		particle_base.emplace("lava", lava); 
 	}
 
 	// Returns the system's type
@@ -242,23 +257,45 @@ namespace lof {
 				continue;
 			}
 
-			// Decrease particle size by lifespan 
-			if (particles_storage[i].type != tnt_vfx) {
+			// Decrease particle size by lifespan (For all particles except TNT VFX and lava)
+			if (particles_storage[i].type != tnt_vfx /*&& particles_storage[i].type != lava*/) {
 				particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
 			}
 
 			// Update movement and direction
 			float angle{};
-			if (particles_storage[i].type == mining || particles_storage[i].type == tnt_explode) {
+			if (particles_storage[i].type == mining || particles_storage[i].type == tnt_explode) { // Randomize values for mining and TNT explosion
 				angle = (particles_storage[i].direction * get_rand_float()) * (PI_VALUE / 180.0f);
+			} else if (particles_storage[i].type == lava) { // Lava's fixed movement
+				angle = 90.0f * (PI_VALUE / 180.0f);
 			} else {
 				angle = particles_storage[i].direction * (PI_VALUE / 180.0f);
 			}
 
 			// Ensure that particle is set to move
-			if (particles_storage[i].direction != 0.0f) {
+			if (particles_storage[i].direction != 0.0f && particles_storage[i].type != lava) {
 				particles_storage[i].position.x += (cos(angle) * particles_storage[i].speed);
 				particles_storage[i].position.y += (sin(angle) * particles_storage[i].speed);
+			}
+			else if (particles_storage[i].type == lava) { // Lava particle movement logic
+				float life_percentage = particles_storage[i].life_left / particles_storage[i].life_span;
+				if (life_percentage > 0.5f) {
+					particles_storage[i].position.x += (cos(angle) * particles_storage[i].speed);
+					particles_storage[i].position.y += (sin(angle) * particles_storage[i].speed);
+				}
+				else {
+					particles_storage[i].position.x -= (cos(angle) * particles_storage[i].speed);
+					particles_storage[i].position.y -= (sin(angle) * particles_storage[i].speed);
+				}
+
+				// Rotation for lava particle
+				if (particles_storage[i].id % 2 == 0) {
+					particles_storage[i].direction += 180.0f * delta_time;
+				}
+				else {
+					particles_storage[i].direction -= 180.0f * delta_time;
+				}
+
 			}
 		}
 

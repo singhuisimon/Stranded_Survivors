@@ -232,7 +232,8 @@ namespace lof {
 		alexandrite,
 		tnt,
 		tnt_explode,
-		tnt_vfx
+		tnt_vfx,
+		lava
 	};
 
 	// ------------------------------ Player_Script.cpp --------------------------------
