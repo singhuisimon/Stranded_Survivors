@@ -1037,13 +1037,14 @@ namespace lof {
             e_last_frame = e_press;
             e_press = IM.is_key_held(GLFW_KEY_E);
 
-
+            
             EntityID player_ID = *iter1;
             auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
 
             if (physic1.get_is_static()) {
                 continue;
             }
+           
 
             auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
             auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
@@ -1053,6 +1054,11 @@ namespace lof {
 
             auto it_2 = std::next(iter1);
 
+            std::string oxygen_tank_str = "Oxygen_Tank";
+            std::string mineral_hoppper_str = "mineral_hopper_conveyor";
+            EntityID oxygen_tank_entity = ECSM.find_entity_by_name(oxygen_tank_str);
+            EntityID mineral_hopper_str = ECSM.find_entity_by_name(mineral_hoppper_str);
+
             // Check for collisions with other entities
             for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
                 EntityID entities_ID = *iter2;
@@ -1061,7 +1067,7 @@ namespace lof {
                 {
                     continue;
                 }
-
+                
                 auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
                 auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
                 auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
@@ -1069,8 +1075,10 @@ namespace lof {
                 if (entities_collision.collidable) continue;
 
                 AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
-                if (entities_ID == 3) {
+                
+                if (entities_ID == oxygen_tank_entity) {
                     enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
+                    //std::cout << "yes!!!!\n";
                 }
 
                 float collision_time = delta_time;
@@ -1086,11 +1094,11 @@ namespace lof {
                 }
             }
 
-            if (check_non_collidable_entities == 2)
+            if (check_non_collidable_entities == mineral_hopper_str)
             {
                 mineral_tank = check_non_collidable_entities;
             }
-            else if (check_non_collidable_entities == 3)
+            else if (check_non_collidable_entities == oxygen_tank_entity)
             {
                 oxygen_tank = check_non_collidable_entities;
             }
@@ -1110,7 +1118,7 @@ namespace lof {
                 // Check mineral tank collision and handle deposit
                 if (mineral_tank_detected() != -1) {
                     gui_system->show_mineral_tank_gui();
-
+                   
                     // Debug the key state
 
                     // Try both pressed and held states
@@ -1128,7 +1136,7 @@ namespace lof {
                                 int current_minerals = std::stoi(text_comp.text);
                                 
                                 
-                                printf("current minerals is %d\n", current_minerals);
+                               // printf("current minerals is %d\n", current_minerals);
 
                                 if (current_minerals >= 100) {
                                     
