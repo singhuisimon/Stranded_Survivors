@@ -1494,6 +1494,11 @@ namespace lof {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        if (level_editor_mode) {
+            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
+            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
+        }
+
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
@@ -1709,6 +1714,11 @@ namespace lof {
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        if (level_editor_mode) {
+            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
+            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
+        }
+
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
@@ -1823,6 +1833,11 @@ namespace lof {
         if (is_transitioning) return;
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
+
+        if (level_editor_mode) {
+            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
+            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
+        }
 
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
@@ -1961,8 +1976,6 @@ namespace lof {
             else {
                 graphics.texture_name = base_texture + "_NORMAL";
                 button_hover_states[entity_name] = false;
-                
-
             }
         }
     }

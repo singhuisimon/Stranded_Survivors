@@ -51,7 +51,7 @@ namespace lof {
          */
         IMGUI_Manager();
 
-        //Reference to the existing ECS Manager to accses entities
+        //Reference to the existing ECS Manager to access entities
         class ECS_Manager& ecs;
 
         //Vector to get and hold the prefab names for display
@@ -85,12 +85,12 @@ namespace lof {
     public:
 
         /**
-         * @brief Single argument constructor that takes in and initalises a reference to the existing ECS Manager.
-         * @param ecs_manager Reference to the existing ECS Manager to initalise the private member ecs with.
+         * @brief Single argument constructor that takes in and initialises a reference to the existing ECS Manager.
+         * @param ecs_manager Reference to the existing ECS Manager to initialise the private member ecs with.
          */
         IMGUI_Manager(ECS_Manager& ecs_manager);
 
-        //Deleted copy constructor and copy assignmemt to enforce singleton pattern
+        //Deleted copy constructor and copy assignment to enforce singleton pattern
         IMGUI_Manager(const IMGUI_Manager&) = delete;
         IMGUI_Manager& operator=(const IMGUI_Manager&) = delete;
 
@@ -107,9 +107,9 @@ namespace lof {
         int start_up() override;
 
         /**
-         * @brief Redefined start_up function (not inherited from Manager). Calls upon IMGUI's functions for initalization.
+         * @brief Redefined start_up function (not inherited from Manager). Calls upon IMGUI's functions for initialisation.
          * @param window A reference to a pointer to the GLFWwindow window created with the GLFW library in main.
-         * @return Will return 0 after sucessful initalistion.
+         * @return Will return 0 after successful initialisation.
          */
         int start_up(GLFWwindow*& glfwindow);
 
@@ -160,9 +160,9 @@ namespace lof {
         /**
          * @brief Function to create and display a labelled text box that shows the current text and is also able to be typed into to replace it.
          * @param data_name Reference to a string containing the current text data of the the object's condition.
-         * @param codition_name Reference to a string containing the name of the condition.
+         * @param condition Reference to a string containing the name of the condition.
          */
-        void text_input(std::string& data_name, std::string& codition_name);
+        void text_input(std::string& data_name, std::string& condition_name);
 
         /**
          * @brief Pushes back the prefab_name string to the prefab_names vector.
@@ -269,7 +269,7 @@ namespace lof {
         std::vector<std::pair<std::string, std::string>>& return_buttons_and_batches();
 
         /**
-         * @brief Initalise buttons_and_batches vector with values
+         * @brief Initialise buttons_and_batches vector with values
          */
         void init_buttons_and_batches();
 

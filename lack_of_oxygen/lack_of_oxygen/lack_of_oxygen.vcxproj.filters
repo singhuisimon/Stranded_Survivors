@@ -226,7 +226,6 @@
     <Image Include="Assets\Textures\rock_particle_batch_14.png" />
     <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
     <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
-    <Image Include="..\..\..\..\Users\shsim\Downloads\ART - ALL UI ASSETS FROM UNITY - 31 Jan 2025\ALL UI ASSETS FROM UNITY - 31 Jan 2025\GAME UI\Pop Up Stations - GAME_UI\Minerals Station\Mineral Deposit UI_BG_Batch 14.png" />
     <Image Include="Assets\Textures\Purple_Oxy_Warning_Batch_14.png" />
     <Image Include="Assets\Textures\ship_open_batch_15.png" />
     <Image Include="Assets\Textures\skybox_batch_19.png" />
