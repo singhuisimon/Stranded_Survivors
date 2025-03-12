@@ -256,7 +256,7 @@ namespace lof {
         }
 
         if (is_hovered) {
-            if (is_key_just_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                 graphics.texture_name = base_texture + "_PRESSED";
                 if (tutorial_sound_playing[entity_name] == false) {
                     ADM.play_now(entity_id, button_audio, audio);
@@ -286,6 +286,10 @@ namespace lof {
         }
         
         else if (is_key_just_pressed(GLFW_KEY_A)) {
+            std::cout << "KEY A IS PRESSED" << std::endl
+                << entity_name << std::endl;
+
+        
             if (entity_name == "a_button") {
                 std::cout << "a_button press" << std::endl;
                 if (tutorial_sound_playing[entity_name] == false) {
@@ -298,7 +302,9 @@ namespace lof {
         }
 
         else if (is_key_just_pressed(GLFW_KEY_D)) {
-            std::cout << "KEY D IS PRESSED" << std::endl;
+            std::cout << "KEY D IS PRESSED" << std::endl
+            << entity_name << std::endl;
+
             if (entity_name == "d_button") {
                 std::cout << "d_button_presS" << std::endl;
                 if (tutorial_sound_playing[entity_name] == false) {
@@ -311,6 +317,9 @@ namespace lof {
         }
 
         else if (is_key_just_pressed(GLFW_KEY_E)) {
+            std::cout << "KEY E IS PRESSED" << std::endl
+            << entity_name << std::endl;
+
             if (entity_name == "e_long_button") {
                 std::cout << "e_button_press" << std::endl;
                 if (tutorial_sound_playing[entity_name] == false) {
@@ -322,7 +331,7 @@ namespace lof {
             }
         }
         else {
-            std::cout << "no changes is deteced" << std::endl;
+            //std::cout << "no changes is deteced" << std::endl;
             graphics.texture_name = base_texture + "_NORMAL";
             tutorial_sound_playing[entity_name] = false;
         }
