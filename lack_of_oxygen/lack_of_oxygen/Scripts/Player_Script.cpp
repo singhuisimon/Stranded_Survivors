@@ -30,6 +30,9 @@ namespace lof {
         forces_flag = -1;
         player_id = 0;
 
+        f_mag_original = DEFAULT_LR_FORCE_MAG;
+        panic_level = 0.0f;
+        
         key_e_last_frame = false;
         key_e_pressed = false;
 
@@ -39,22 +42,26 @@ namespace lof {
 
         is_inside = false;
         //found_wormhole = false;
+        key_t_last_frame = false;
+        key_t_pressed = false;
+    }
+
+    std::string Player_Script::get_type() const {
+        return script_name;
     }
 
     void Player_Script::register_script() {
 
-        std::shared_ptr<Player_Script> player_script = std::make_shared<Player_Script>();
-        static auto maintained_script = player_script;
-        std::weak_ptr<Player_Script> weak_script = player_script;
+        auto player_script = shared_from_this();
 
-        player_script->add_function("init", [weak_script](EntityID entity_id) {
+        player_script->add_function("init", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
             (void)entity_id;
             auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);
             });
 
-        player_script->add_function("movement", [weak_script](EntityID entity_id) {
+        player_script->add_function("update", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
             auto player_script = weak_script.lock();
             if (!entity_id || !ECSM.has_component<Physics_Component>(entity_id) || !ECSM.has_component<Audio_Component>(entity_id) ||
                 !ECSM.has_component<Transform2D>(entity_id)) {
@@ -70,6 +77,9 @@ namespace lof {
             auto& physics_comp = ECSM.get_component<Physics_Component>(entity_id);
             auto& audio_comp = ECSM.get_component<Audio_Component>(entity_id);
 
+            //update the player's movement forces before updating the player's movement
+            player_script->update_player_panic_speed(physics_comp);
+
             player_script->check_keys();
 
             //update player horizontal movement
@@ -82,7 +92,7 @@ namespace lof {
             player_script->handle_teleportation(entity_id);
             });
 
-        LGS.add_script("player_script", player_script);
+        //LGS.add_script("player_script", player_script);
     }
 
     void Player_Script::check_keys() {
@@ -117,6 +127,10 @@ namespace lof {
         else if (key == GLFW_KEY_E) {
             return key_e_pressed && !key_e_last_frame;
 
+        }
+        else if (key == GLFW_KEY_T)
+        {
+            return key_t_pressed && !key_e_last_frame;
         }
         else if (key == GLFW_KEY_T)
         {
@@ -289,7 +303,7 @@ namespace lof {
             }
         }
 
-        float current_time = glfwGetTime();
+        float current_time = static_cast<float>(glfwGetTime());
         if (teleport_flag) {
             ADM.play_now(player_id, "tunneling", audio_comp);
             teleport_audio_end_time = current_time + 1.5f;  // set a 1.5 seconds for the sound to finish
@@ -323,6 +337,29 @@ namespace lof {
 
         }
 
+    }
+
+
+    //Panic Script for movement speed
+    void Player_Script::update_player_panic_speed(Physics_Component& physics_comp) {
+        //get the panic level fro Game Manager
+        panic_level = GM.get_current_panic_level();
+        update_movement_forces(physics_comp);
+    }
+
+    void Player_Script::update_movement_forces(Physics_Component& physics_comp) {
+       
+        float panic_multiplier = 1.0f + (panic_level / 100.0f);
+        float new_force_magnitude = f_mag_original * panic_multiplier; 
+
+        //update force magnitudes for movement
+        for (auto& force : physics_comp.force_helper.get_forces()) {
+            if (force.type == MOVE_LEFT || force.type == MOVE_RIGHT) {
+
+                //update the magnitude for movement forces
+                const_cast<Force&>(force).magnitude = new_force_magnitude;
+            }
+        }
     }
 
     //==============================================================//
@@ -427,6 +464,18 @@ namespace lof {
 
 
        // std::cout << "Player teleported to wormhole: " << to_wormhole << "\n";
+    }
+
+    void Player_Script::Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y)
+    {
+        // cheap code for teleport 
+        if (is_key_just_pressed(GLFW_KEY_T))
+        {
+            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+            player_transform.position.x = pos_x;
+            player_transform.position.y = pos_y;
+
+        }
     }
 
 

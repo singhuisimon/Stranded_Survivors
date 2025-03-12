@@ -648,15 +648,6 @@ namespace lof {
                         if (script.HasMember("script_name") && script["script_name"].IsString()) {
                             script_name = script["script_name"].GetString();
                         }
-                        if (script.HasMember("init") && script["init"].IsString()) {
-                            init_func = script["init"].GetString();
-                        }
-                        if (script.HasMember("update") && script["update"].IsString()) {
-                            update_func = script["update"].GetString();
-                        }
-                        if (script.HasMember("end") && script["end"].IsString()) {
-                            end_func = script["end"].GetString();
-                        }
                         if (script.HasMember("is_active") && script["is_active"].IsBool()) {
                             is_active = script["is_active"].GetBool();
                         }
@@ -711,8 +702,7 @@ namespace lof {
                             case 0: state = ExecutionState::Uninitialized; break;
                             case 1: state = ExecutionState::Running; break;
                             case 2: state = ExecutionState::Paused; break;
-                            case 3: state = ExecutionState::Completed; break;
-                            case 4: state = ExecutionState::Terminated; break;
+                            case 3: state = ExecutionState::Terminated; break;
                             default:
                                 LM.write_log("Warning: Invalid execution state number %d for script '%s', defaulting to Uninitialized",
                                     state_num, script_name.c_str());
@@ -721,7 +711,7 @@ namespace lof {
                         }
 
                         // Add script to component
-                        logic_component.add_script(script_name, init_func, update_func, end_func, script_data, state, is_active);
+                        logic_component.add_script(script_name, script_data, state, is_active);
 
                         LM.write_log("Added script '%s' to Logic_Component for entity %u",
                             script_name.c_str(), entity);

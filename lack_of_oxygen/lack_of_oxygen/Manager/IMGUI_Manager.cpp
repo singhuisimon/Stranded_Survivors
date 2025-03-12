@@ -75,7 +75,7 @@ namespace lof {
     //Locally stored vector to store all the component checks (add and remove component functions)
     std::vector<std::tuple<const char*, ComponentID, std::function<void()>, std::function<void()>>> component_checks;
 
-    //Locally stored fucntion to fill component check (Logic component commented out)
+    //Locally stored function to fill component check (Logic component commented out)
     void fill_component_checks() {
         auto& entities = ECSM.get_entities();
         component_checks = {
@@ -103,9 +103,9 @@ namespace lof {
                 [&]() { ECSM.add_component<Animation_Component>(entities[selected_object_index]->get_id(), Animation_Component()); },
                 [&]() { ECSM.remove_component<Animation_Component>(entities[selected_object_index]->get_id()); }},
 
-            /*{"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
+            {"Logic Component", static_cast<ComponentID>(ECSM.get_component_id<Logic_Component>()),
                 [&]() { ECSM.add_component<Logic_Component>(entities[selected_object_index]->get_id(), Logic_Component()); },
-                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},*/
+                [&]() { ECSM.remove_component<Logic_Component>(entities[selected_object_index]->get_id()); }},
 
             {"Audio Component", static_cast<ComponentID>(ECSM.get_component_id<Audio_Component>()),
                 [&]() { ECSM.add_component<Audio_Component>(entities[selected_object_index]->get_id(), Audio_Component()); },
@@ -895,18 +895,29 @@ namespace lof {
 
                         auto& gravity = physics.get_gravity();
                         ImGui::InputFloat2("Gravity", &gravity.x);
-
+                       
                         auto& damping_factor = physics.get_damping_factor();
                         ImGui::InputFloat("Damping Factor", &damping_factor);
 
                         auto& max_velocity = physics.get_max_velocity();
                         ImGui::InputFloat("Maximum Velocity", &max_velocity);
 
+                        auto& max_velocity_sq = physics.get_max_velocity_sq();
+                        ImGui::Text("Max Velocity Square: %i", max_velocity_sq);
+
                         auto& accumulated_force = physics.get_accumulated_force();
                         ImGui::InputFloat2("Accumulated Force", &accumulated_force.x);
 
+                        auto& acceleration = physics.get_acceleration();
+                        ImGui::InputFloat2("Acceleration", &acceleration.x);
+
                         auto& mass = physics.get_mass();
                         ImGui::InputFloat("Mass", &mass);
+
+                        ImGui::BeginDisabled();
+                        auto& inv_mass = physics.get_inv_mass();
+                        ImGui::InputFloat("inv_mass", &inv_mass);
+                        ImGui::EndDisabled();
 
                         auto& is_static = physics.get_is_static();
                         std::string s_label = "is_static: " + std::string(is_static_on ? "On" : "Off");
@@ -914,18 +925,33 @@ namespace lof {
                             is_static = !is_static;
                         }
 
-                        auto& is_grounded = physics.get_is_grounded();
-                        std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
-                        if (button_toggle(g_label, &is_grounded_on)) {
-                            is_grounded = !is_grounded;
+                        ImGui::BeginDisabled();
+                        auto& is_has_jumped = physics.get_has_jumped();
+                        std::string j_label = "is_has_jumped: " + std::string(is_has_jumped ? "On" : "Off");
+                        if (button_toggle(j_label, &is_has_jumped)) {
+                            is_has_jumped = !is_has_jumped;
                         }
+
+                        auto& is_jump_requested = physics.get_jump_requested();
+                        std::string jr_label = "is_jump_requested: " + std::string(is_jump_requested ? "On" : "Off");
+                        if (button_toggle(jr_label, &is_jump_requested)) {
+                            is_jump_requested = !is_jump_requested;
+                        }
+                        ImGui::EndDisabled();
 
                         auto& jump = physics.get_jump_force();
                         ImGui::InputFloat("Jump Force", &jump);
+
+                        /*auto& is_grounded = physics.get_is_grounded();
+                        std::string g_label = "is_grounded: " + std::string(is_grounded_on ? "On" : "Off");
+                        if (button_toggle(g_label, &is_grounded_on)) {
+                            is_grounded = !is_grounded;
+                        }*/
+                        
                     }
                 }
 
-                //Grpahics Component
+                //Graphics Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Graphics_Component>())) {
                     Graphics_Component& graphics = ecs.get_component<Graphics_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Graphics")) {
@@ -984,7 +1010,7 @@ namespace lof {
                                 
                             }
 
-                            //For the drag srop target of the texture for button entity
+                            //For the drag drop target of the texture for button entity
                             if (ImGui::BeginDragDropTarget()) {
 
                                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TEXTURE_ITEM")) {
@@ -1092,7 +1118,75 @@ namespace lof {
 
                         auto& animation_list = animation.animations;
 
-                        //Animation drop-down has been changed to a text input to accomodate adding of audio component. Will be adding back next milestone          
+                        ImGui::Text("Add Animation Index:");
+                        ImGui::Text("Select an animation and click add to add it as another animation index");
+                        static int selected_animation_idx = -1;
+                        // Dropdown for selecting an animation
+                        std::string combo_label = "Select Animation##combo";  // You can add any unique label here.
+                        if (ImGui::Combo(combo_label.c_str(), &selected_animation_idx, c_str_animation_storage.data(), static_cast<int>(c_str_animation_storage.size()))) {
+                            // If the user selects an animation from the dropdown, set requested_animation accordingly
+                            if (selected_animation_idx >= 0 && selected_animation_idx < c_str_animation_storage.size()) {
+                                requested_animation = c_str_animation_storage[selected_animation_idx];
+                            }
+                        }
+
+                        if (ImGui::Button("Add Animation and Index")) {
+
+                            int missing_index = static_cast<int>(animation_list.size());
+                            int prev_index_check = -1;
+                            for (auto& animation_indexes : animation_list) {
+                                int index_animation = std::stoi(animation_indexes.first);
+                                if (index_animation - 1 != prev_index_check) {
+                                    missing_index = prev_index_check + 1;
+                                }
+                                prev_index_check = index_animation;
+                            }
+
+                            if (missing_index >= 10) {
+                                missing_index = 0;
+                            }
+
+                            //auto& animation_storage = ASM.get_animation_storage();
+                            for (auto& animation_info : animation_storage) {
+
+                                //std::cout << animation_info.first << std::endl;
+
+                                if (requested_animation == animation_info.first) {
+                                    animation_list.insert({ std::to_string(missing_index), requested_animation });
+                                    break;
+                                }
+                            }
+
+                        }
+
+                        ImGui::Text("Remove Animation Index:");
+                        if (ImGui::Button("Remove Index")) {
+                            ImGui::OpenPopup("Animation Index Removal"); //Open the popup when the button is clicked
+                        }
+
+                        //Position the context menu at the mouse position
+                        if (ImGui::BeginPopup("Animation Index Removal")) {
+                            ImGui::Text("Select Animation Index to Remove");
+                            ImGui::Separator();
+
+                            int removal_index = 0;
+                            for (const auto& remove_animation : animation_list) {
+                                if (ImGui::Selectable(remove_animation.first.c_str())) {
+
+                                    if (removal_index != 0) {
+                                        animation_list.erase(remove_animation.first); //Remove selected animation except the first
+                                    }
+                                    break; //Exit loop to avoid iterator invalidation
+                                }
+                                removal_index++;
+                            }
+
+                            ImGui::EndPopup();
+                        }
+
+                        ImGui::NewLine();
+
+                        //Animation drop-down has been changed to a text input to accommodate adding of audio component. Will be adding back next milestone          
                         //vector to keep track of selected items for each animation
                         //initialized with -1 for each item, no selection
 
@@ -1140,73 +1234,7 @@ namespace lof {
                         //    requested_animation = buffer_animation;
                         //}
 
-                        ImGui::Text("Add Animation Index:");
-                        ImGui::Text("Select an animation and click add to add it as another animation index");
-                        static int selected_animation_idx = -1;
-                        // Dropdown for selecting an animation
-                        std::string combo_label = "Select Animation##combo";  // You can add any unique label here.
-                        if (ImGui::Combo(combo_label.c_str(), &selected_animation_idx, c_str_animation_storage.data(), static_cast<int>(c_str_animation_storage.size()))) {
-                            // If the user selects an animation from the dropdown, set requested_animation accordingly
-                            if (selected_animation_idx >= 0 && selected_animation_idx < c_str_animation_storage.size()) {
-                                requested_animation = c_str_animation_storage[selected_animation_idx];
-                            }
-                        }
-
-                        if (ImGui::Button("Add Animation and Index")) {
-
-                            int missing_index = animation_list.size();
-                            int prev_index_check = -1;
-                            for (auto& animation_indexes: animation_list) {
-                                int index = std::stoi(animation_indexes.first);
-                                if (index - 1 != prev_index_check) {
-                                    missing_index = prev_index_check + 1;
-                                }
-                                prev_index_check = index;
-                            }
-
-                            if (missing_index >= 10) {
-                                missing_index = 0;
-                            }
-
-                            auto& animation_storage = ASM.get_animation_storage();
-                            for (auto& animation_info : animation_storage) {
-                                
-                                //std::cout << animation_info.first << std::endl;
-                                
-                                if (requested_animation == animation_info.first) {
-                                    animation_list.insert({ std::to_string(missing_index), requested_animation });
-                                    break;
-                                }
-                            }
-
-                        }
-
-                        ImGui::NewLine();
                         
-                        ImGui::Text("Remove Animation Index:");
-                        if (ImGui::Button("Remove Index")) {
-                            ImGui::OpenPopup("Animation Index Removal"); //Open the popup when the button is clicked
-                        }
-
-                        //Position the context menu at the mouse position
-                        if (ImGui::BeginPopup("Animation Index Removal")) {
-                            ImGui::Text("Select Animation Index to Remove");
-                            ImGui::Separator();
-
-                            int index = 0;
-                            for (const auto& animation : animation_list) {
-                                if (ImGui::Selectable(animation.first.c_str())) {
-                                    
-                                    if (index != 0) {
-                                        animation_list.erase(animation.first); //Remove selected animation except the first
-                                    }
-                                    break; //Exit loop to avoid iterator invalidation
-                                }
-                                index++;
-                            }
-
-                            ImGui::EndPopup();
-                        }
           
                         //ImGui::Separator();
                         /*auto& curr = animation.curr_animation_idx;
@@ -1232,85 +1260,276 @@ namespace lof {
                     }
                 }
 
-                const char* logic_behaviour[] = { "Horizontal", "Circular" };
-                static std::vector<const char*> chosen_logic_behaviour;
-
-                //Removed logic component due to logic system major revamp. Will be completed next milestone
+                //const char* logic_behaviour[] = { "Horizontal", "Circular" };
+                //static std::vector<const char*> chosen_logic_behaviour;
                 
-                //if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
-                //    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
-                //    if (ImGui::CollapsingHeader("Logic")) {
-                //        auto& is_active = logic.is_active;
-                //        std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
-                //        if (button_toggle(s_label, &is_active_on)) {
-                //            is_active = !is_active;
-                //        }
-                //        auto& movement_pattern = logic.movement_pattern;
-                //        //Update logic behavior, corresponds the string to the movement_pattern value
-                //        int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
-                //        ImGui::Text("Choose Logic Behaviour");
-                //        if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
-                //            movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
-                //        }
-                //        auto& movement_speed = logic.movement_speed;
-                //        ImGui::InputFloat("Movement Speed", &movement_speed);
-                //        auto& movement_range = logic.movement_range;
-                //        ImGui::InputFloat("Movement Range", &movement_range);
-                //        auto& reverse_direction = logic.reverse_direction;
-                //        std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
-                //        if (button_toggle(reverse_dir, &is_reverse_on)) {
-                //            reverse_direction = !reverse_direction;
-                //        }
-                //        auto& is_rotate = logic.rotate_with_motion;
-                //        std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
-                //        if (button_toggle(rotate_w_motion, &is_rotate_on)) {
-                //            is_rotate = !is_rotate;
-                //        }
-                //        auto& original_position = logic.origin_pos;
-                //        ImGui::InputFloat2("Original Position", &original_position.x);
-                //        for (const char* behaviour_here : chosen_logic_behaviour) {
-                //            ImGui::Text(behaviour_here);
-                //            ImGui::NewLine;
-                //        }
-                //        if (ImGui::Button("Add Logic Behaviour")) {
-                //            ImGui::OpenPopup("Add Behaviour Options");
-                //        }
-                //        if (ImGui::BeginPopup("Add Behaviour Options")) {
-                //            ImGui::Text("Select Operation");
-                //            ImGui::Separator();
-                //            for (const char* behaviour : logic_behaviour) {
-                //                if (ImGui::Selectable(behaviour)) {
-                //                    chosen_logic_behaviour.push_back(behaviour);
-                //                }
-                //            }
-                //            ImGui::EndPopup();
-                //        }
-                //        if (ImGui::Button("Remove Logic Behaviour")) {
-                //            ImGui::OpenPopup("Remove Behaviour Options");
-                //        }
-                //        if (ImGui::BeginPopup("Remove Behaviour Options")) {
-                //            ImGui::Text("Select Operation");
-                //            ImGui::Separator();
-                //            for (const char* behaviour : logic_behaviour) {
-                //                if (ImGui::Selectable(behaviour)) {
-                //                    auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
-                //                    if (it != chosen_logic_behaviour.end()) {
-                //                        chosen_logic_behaviour.erase(it);
-                //                    }
-                //                }
-                //            }
-                //            ImGui::EndPopup();
-                //        }
-                //        ImGui::Separator();
-                //    }
-                //}
+                //Removed logic component due to logic system major revamp. Will be completed next milestone
+                //Gets script names in storage
+                std::vector<std::string> lgm_scripts = LGM.get_script_names();
+
+                if (entities[selected_object_index]->has_component(ecs.get_component_id<Logic_Component>())) {
+                    Logic_Component& logic = ecs.get_component<Logic_Component>(entities[selected_object_index].get()->get_id());
+
+                    ////std::vector<std::string> script_list = LGM.get_script_names();
+                    ////std::vector<const char*> script_name_cstr;
+
+                    //Get all logic ASSOCIATED with entity
+                    auto& scripts = logic.get_logic_datas();
+
+                    //for (auto& script : scripts) {
+                    //    for (auto& lgm_script :   ) {
+                    //        if (lgm_script != script->script_name) {
+                    //            script_list.push_back(lgm_script);
+                    //        }
+                    //    }
+                    //}
+
+                    //ALL script names in entities (INCLUDING DEFAULT NAMES)
+                    std::unordered_set<std::string> scripts_in_entity;
+
+                    //tracking used and unused scripts
+                    std::vector<std::string> used_scripts;
+                    std::vector<std::string> unused_scripts;
+
+                    for (const auto& script : scripts) {
+
+                        //Insert All Default Names
+                        scripts_in_entity.insert(script->script_name);
+
+                    }
+
+                    // Only add scripts that are NOT already used
+                    for (const auto& lgm_script : lgm_scripts) {
+                        if (scripts_in_entity.find(lgm_script) == scripts_in_entity.end()) {
+                            unused_scripts.push_back(lgm_script);
+                        }
+                        else {
+                            used_scripts.push_back(lgm_script);
+                        }
+                    }
+
+                    //Retrieve the script names and put into a vector
+                    //script_list = LGM.get_script_names();         
+                    //for (const auto& name : script_list) {
+                    //    //std::cout << "script name retrieved " << name << std::endl;
+                    //    script_name_cstr.push_back(name.c_str());
+                    //}
+
+                    if (ImGui::CollapsingHeader("Logic")) {
+
+                        if (ImGui::Button("Add New Script")) {
+
+                            //ok this works to a certain extend. take note the script_size results in
+                            //duplicate header which when u hover over it imgui gives a warning
+                            //will screenshot and show u. but its uty if you want to do it like this
+                            //feel free also to change the default script naming. - Amanda
+
+							const std::string DEFAULT_SCRIPT_HEADER = DEFAULT_SCRIPT + std::to_string(logic.get_logic_datas().size());
+                            logic.add_script(DEFAULT_SCRIPT);
+                        }
+                     
+                        if (ImGui::Button("Remove Script")) {
+                            ImGui::OpenPopup("RemoveScript");
+                        }
+
+                        //Position the context menu at the mouse position
+                        if (ImGui::BeginPopup("RemoveScript")) {
+                            ImGui::Text("Select Script");
+                            ImGui::Separator();
+
+                            int index = 0;
+                            for (const auto& script_name_in_entity : scripts_in_entity) {
+                                if (ImGui::Selectable(script_name_in_entity.c_str())) {
+                                    logic.remove_script(script_name_in_entity);
+                                    break;
+                                }
+                                index++;
+                            }
+
+                            ImGui::EndPopup();
+                        }
+
+                        int i = 0;
+                        for (auto& script : scripts) {
+
+                            std::string& script_name = script->script_name;
+							std::string script_header = "Script: " + std::to_string(i);
+							if (ImGui::CollapsingHeader(script_header.c_str())) {
+
+
+                                ImGui::BeginDisabled();
+
+                                ImGui::Text("Script Name: %s", script->script_name.c_str());
+                                ImGui::EndDisabled();
+
+                                std::string button_label = "Choose Different Script For " + std::to_string(i);
+                                std::string dropdown_label = "ChoosingDiffScriptFor" + std::to_string(i);
+                                if (ImGui::Button(button_label.c_str())) {
+                                    ImGui::OpenPopup(dropdown_label.c_str());
+                                }
+
+                                //Position the context menu at the mouse position
+                                if (ImGui::BeginPopup(dropdown_label.c_str())) {
+                                    ImGui::Text("Select Script");
+                                    ImGui::Separator();
+
+                                    int index = 0;
+                                    for (const auto& script_name_in_list : unused_scripts) {
+                                        if (ImGui::Selectable(script_name_in_list.c_str())) {
+                                            script->script_name = script_name_in_list;
+                                            break; 
+                                        }
+                                        index++;
+                                    }
+
+                                    ImGui::EndPopup();
+                                }
+
+                                auto& is_active = script->is_active;
+                                std::string s_label = "Active for " + std::to_string(i);
+
+                                // Display and toggle the active state
+                                if (ImGui::Checkbox(s_label.c_str(), &is_active)) {
+                                    logic.set_active(script_name, is_active);
+                                }
+
+                                // Display Execution State (Read-Only)
+                                const char* execution_state_str = "";
+                                switch (script->state) {
+                                    case ExecutionState::Uninitialized: execution_state_str = "Uninitialized"; break;
+                                    case ExecutionState::Running: execution_state_str = "Running"; break;
+                                    case ExecutionState::Paused: execution_state_str = "Paused"; break;
+                                    case ExecutionState::Terminated: execution_state_str = "Terminated"; break;
+                                    default: execution_state_str = "Unknown"; break;
+                                }
+                                ImGui::Text("Execution State: %s", execution_state_str);
+
+        //                        //need to cap increase and decrease for the movement pattern for now i think only 0 and 1? 
+								//// or was it 1 or 2 u need check. - Amanda
+        //                        // Display and allow modification of the ScriptData
+        //                        ImGui::Text("Script Data:");
+        //                        for (auto& [key, value] : script->script_data) {
+        //                            std::string value_str;
+
+        //                            // Handle different types in the ScriptData variant
+        //                            if (std::holds_alternative<int>(value)) {
+        //                                value_str = std::to_string(std::get<int>(value));
+        //                                if (ImGui::InputInt(key.c_str(), &std::get<int>(value))) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<float>(value)) {
+        //                                value_str = std::to_string(std::get<float>(value));
+        //                                if (ImGui::InputFloat(key.c_str(), &std::get<float>(value))) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<std::string>(value)) {
+        //                                value_str = std::get<std::string>(value);
+								//		char string_value[128];
+        //                                if (ImGui::InputText(key.c_str(), string_value, sizeof(string_value))) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<bool>(value)) {
+        //                                value_str = std::get<bool>(value) ? "True" : "False";
+        //                                if (ImGui::Checkbox(key.c_str(), &std::get<bool>(value))) {
+        //                                    // ScriptData has been updated when the checkbox is toggled
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+        //                            else if (std::holds_alternative<Vec2D>(value)) {
+        //                                value_str = std::to_string(std::get<Vec2D>(value).x) + ", " + std::to_string(std::get<Vec2D>(value).y);
+        //                                if (ImGui::InputFloat2(key.c_str(), &std::get<Vec2D>(value).x)) {
+        //                                    // ScriptData has been updated when the input is modified
+        //                                    logic.set_script_data(script_name, script->script_data);
+        //                                }
+        //                            }
+
+        //                            // Display the value
+        //                            ImGui::Text("%s: %s", key.c_str(), value_str.c_str());
+        //                        }
+							}
+
+                            ++i;
+                        }
+
+                        ImGui::NewLine();
+
+                        //auto& is_active = logic.is_active;
+                        //std::string s_label = "is_active: " + std::string(is_active_on ? "On" : "Off");
+                        //if (button_toggle(s_label, &is_active_on)) {
+                        //    is_active = !is_active;
+                        //}
+                        //auto& movement_pattern = logic.movement_pattern;
+                        ////Update logic behavior, corresponds the string to the movement_pattern value
+                        //int current_behaviour = (movement_pattern == Logic_Component::MovementPattern::LINEAR) ? 0 : 1;
+                        //ImGui::Text("Choose Logic Behaviour");
+                        //if (ImGui::Combo(entities[selected_object_index].get()->get_name().c_str(), &current_behaviour, logic_behaviour, IM_ARRAYSIZE(logic_behaviour))) {
+                        //    movement_pattern = (current_behaviour == 0) ? Logic_Component::MovementPattern::LINEAR : Logic_Component::MovementPattern::CIRCULAR;
+                        //}
+                        //auto& movement_speed = logic.movement_speed;
+                        //ImGui::InputFloat("Movement Speed", &movement_speed);
+                        //auto& movement_range = logic.movement_range;
+                        //ImGui::InputFloat("Movement Range", &movement_range);
+                        //auto& reverse_direction = logic.reverse_direction;
+                        //std::string reverse_dir = "reverse_direction: " + std::string(is_reverse_on ? "On" : "Off");
+                        //if (button_toggle(reverse_dir, &is_reverse_on)) {
+                        //    reverse_direction = !reverse_direction;
+                        //}
+                        //auto& is_rotate = logic.rotate_with_motion;
+                        //std::string rotate_w_motion = "rotate_with_motion: " + std::string(is_rotate_on ? "On" : "Off");
+                        //if (button_toggle(rotate_w_motion, &is_rotate_on)) {
+                        //    is_rotate = !is_rotate;
+                        //}
+                        //auto& original_position = logic.origin_pos;
+                        //ImGui::InputFloat2("Original Position", &original_position.x);
+                        //for (const char* behaviour_here : chosen_logic_behaviour) {
+                        //    ImGui::Text(behaviour_here);
+                        //    ImGui::NewLine;
+                        //}
+                        //if (ImGui::Button("Add Logic Behaviour")) {
+                        //    ImGui::OpenPopup("Add Behaviour Options");
+                        //}
+                        //if (ImGui::BeginPopup("Add Behaviour Options")) {
+                        //    ImGui::Text("Select Operation");
+                        //    ImGui::Separator();
+                        //    for (const char* behaviour : logic_behaviour) {
+                        //        if (ImGui::Selectable(behaviour)) {
+                        //            chosen_logic_behaviour.push_back(behaviour);
+                        //        }
+                        //    }
+                        //    ImGui::EndPopup();
+                        //}
+                        //if (ImGui::Button("Remove Logic Behaviour")) {
+                        //    ImGui::OpenPopup("Remove Behaviour Options");
+                        //}
+                        //if (ImGui::BeginPopup("Remove Behaviour Options")) {
+                        //    ImGui::Text("Select Operation");
+                        //    ImGui::Separator();
+                        //    for (const char* behaviour : logic_behaviour) {
+                        //        if (ImGui::Selectable(behaviour)) {
+                        //            auto it = std::find(chosen_logic_behaviour.begin(), chosen_logic_behaviour.end(), behaviour);
+                        //            if (it != chosen_logic_behaviour.end()) {
+                        //                chosen_logic_behaviour.erase(it);
+                        //            }
+                        //        }
+                        //    }
+                        //    ImGui::EndPopup();
+                        //}
+                        //ImGui::Separator();
+                    }
+                }
 
                 //Audio Component
                 if (entities[selected_object_index]->has_component(ecs.get_component_id<Audio_Component>())) {
                     Audio_Component& audio = ecs.get_component<Audio_Component>(entities[selected_object_index].get()->get_id());
                     if (ImGui::CollapsingHeader("Audio")) {
 
-                        //Added by amanda. somehow only this works? idk :">
+                        //Added by amanda
                         if (ImGui::Button("Add New Audio")) {
                             const std::string DEFAULT_KEY = DEFAULT_AUDIO_KEY + std::to_string(audio.get_sounds().size());
                             /*audio.add_sound(DEFAULT_KEY, DEFAULT_AUDIO_FILEPATH, DEFAULT_AUDIO_TYPE, MIN_SIMULTANEOUS, DEFAULT_AUDIO_FLOAT,
@@ -1322,6 +1541,35 @@ namespace lof {
                         //gets a collection of sounds from audio component (not sound map)
                         auto& sounds = audio.get_sounds();
 
+                        static size_t selected_audio_index = static_cast<size_t>(-1);
+
+                        std::string remove_audio = "Remove Audio";
+                        const char* remove_audio_button = remove_audio.c_str();
+                        if (ImGui::Button(remove_audio_button)) {
+                            ImGui::OpenPopup("Remove Audio");
+                        }
+
+                        if (ImGui::BeginPopup("Remove Audio")) {
+                            ImGui::Text("Remove Audio");
+                            ImGui::Separator();
+
+                            for (size_t i = 0; i < sounds.size(); i++) {
+                                if (ImGui::Selectable(sounds[i].key.c_str())) {
+                                    selected_audio_index = i;
+                                }
+                            }
+                            ImGui::EndPopup();
+                        }
+
+                        if (selected_audio_index != -1) {
+                            if (selected_audio_index >= 0 && selected_audio_index < sounds.size()) {  // Bounds check
+                                const auto& audio_key = sounds[selected_audio_index].key;
+                                audio.remove_sound(audio_key);
+                            }
+
+                            selected_audio_index = static_cast<size_t>(-1);
+                        }
+
                         //Static vector to keep track of selected sounds(actions that need sounds)
                         static std::vector<int> selected_sounds;
 
@@ -1332,8 +1580,13 @@ namespace lof {
                         //sound size should be 3
                         selected_sounds.resize(sounds.size(), -1);
 
-                        //Iterate through each sound/action
-                        for (int i = 0; i < sounds.size(); ++i) {
+                        //For Audio Type
+                        static std::vector<int> selected_sounds_type;
+                        selected_sounds_type.clear();
+                        selected_sounds_type.resize(sounds.size(), -1);
+
+                        int type_index = 0;
+                        for (int i = 0; i < sounds.size(); ++i, ++type_index) {
 
                             //Get corresponding filepath for the current sound's key
                             auto sound_filepath = audio.get_filepath(sounds[i].key);
@@ -1431,10 +1684,6 @@ namespace lof {
                                 }
                                 ImGui::EndDragDropTarget();
                             }
-                        }
-
-                        //Updating Audio Key 
-                        for (int i = 0; i < sounds.size(); ++i) {
 
                             std::string old_key_name = sounds[i].key;
                             std::string condition_name_key = "key for " + std::to_string(i);
@@ -1455,16 +1704,6 @@ namespace lof {
                             }
 
 
-                        }
-
-                        //For Audio Type
-                        static std::vector<int> selected_sounds_type;
-                        selected_sounds_type.clear();
-                        selected_sounds_type.resize(sounds.size(), -1);
-
-                        int type_index = 0;
-                        for (int i = 0; i < sounds.size(); ++i, ++type_index) {
-
                             auto audio_type = audio.get_audio_type(sounds[i].key);
                             std::vector<const char*> audio_type_cstr;
 
@@ -1473,23 +1712,23 @@ namespace lof {
                             }
 
                             //Find matching representative string for the file path
-                            auto its = std::find_if(audio_types.begin(), audio_types.end(),
+                            auto type_avail = std::find_if(audio_types.begin(), audio_types.end(),
                                 [&audio_type](const std::pair<std::string, AudioType>& p) {
                                     return p.second == audio_type;
                                 });
 
 
                             //Show the current sound's representative string in a text label
-                            if (its != audio_types.end()) {
-                                ImGui::Text("Audio Type for %s: %s", sounds[i].key.c_str(), its->first.c_str());
+                            if (type_avail != audio_types.end()) {
+                                ImGui::Text("Audio Type for %s: %s", sounds[i].key.c_str(), type_avail->first.c_str());
                             }
                             else {
                                 ImGui::Text("Audio Type for %s: Not Found", sounds[i].key.c_str());
                             }
 
                             //Create a combo box to choose the new representative string for this sound
-                            std::string label = "Choose Audio Type for " + std::to_string(type_index);
-                            if (ImGui::Combo(label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
+                            std::string type_label = "Choose Audio Type for " + std::to_string(type_index);
+                            if (ImGui::Combo(type_label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
 
                                 //Get the selected representative string type_index
                                 int selected_index = selected_sounds_type[type_index];
@@ -1500,37 +1739,109 @@ namespace lof {
 
                                 }
                             }
-                        }
 
-                        //remove audio.
-                        static size_t selected_audio_index = static_cast<size_t>(-1);
-
-                        std::string remove_audio = "Remove Audio";
-                        const char* remove_audio_button = remove_audio.c_str();
-                        if (ImGui::Button(remove_audio_button)) {
-                            ImGui::OpenPopup("Remove Audio");
-                        }
-
-                        if (ImGui::BeginPopup("Remove Audio")) {
-                            ImGui::Text("Remove Audio");
                             ImGui::Separator();
-
-                            for (size_t i = 0; i < sounds.size(); i++) {
-                                if (ImGui::Selectable(sounds[i].key.c_str())) {
-                                    selected_audio_index = i;
-                                }
-                            }
-                            ImGui::EndPopup();
+                            ImGui::NewLine();
                         }
 
-                        if (selected_audio_index != -1) {
-                            if (selected_audio_index >= 0 && selected_audio_index < sounds.size()) {  // Bounds check
-                                const auto& audio_key = sounds[selected_audio_index].key;
-                                audio.remove_sound(audio_key);
-                            }
-                            
-                            selected_audio_index = static_cast<size_t>(-1);
-                        }
+                        ////Updating Audio Key 
+                        //for (int i = 0; i < sounds.size(); ++i) {
+
+                        //    std::string old_key_name = sounds[i].key;
+                        //    std::string condition_name_key = "key for " + std::to_string(i);
+
+                        //    if (buffer_map.find(i) == buffer_map.end()) {
+                        //        buffer_map[i] = old_key_name;
+                        //    }
+
+                        //    text_input(buffer_map[i], condition_name_key);
+
+                        //    //Save button
+                        //    std::string save = "save " + condition_name_key;
+                        //    const char* button_name = save.c_str();
+                        //    if (ImGui::Button(button_name)) {
+                        //        std::string new_key_name = buffer_map[i];
+                        //        audio.set_key(old_key_name, new_key_name);
+
+                        //    }
+
+
+                        //}
+
+                        ////For Audio Type
+                        //static std::vector<int> selected_sounds_type;
+                        //selected_sounds_type.clear();
+                        //selected_sounds_type.resize(sounds.size(), -1);
+
+                        //int type_index = 0;
+                        //for (int i = 0; i < sounds.size(); ++i, ++type_index) {
+
+                        //    auto audio_type = audio.get_audio_type(sounds[i].key);
+                        //    std::vector<const char*> audio_type_cstr;
+
+                        //    for (const auto& fill_audio_type_pair : audio_types) {
+                        //        audio_type_cstr.push_back(fill_audio_type_pair.first.c_str());
+                        //    }
+
+                        //    //Find matching representative string for the file path
+                        //    auto its = std::find_if(audio_types.begin(), audio_types.end(),
+                        //        [&audio_type](const std::pair<std::string, AudioType>& p) {
+                        //            return p.second == audio_type;
+                        //        });
+
+
+                        //    //Show the current sound's representative string in a text label
+                        //    if (its != audio_types.end()) {
+                        //        ImGui::Text("Audio Type for %s: %s", sounds[i].key.c_str(), its->first.c_str());
+                        //    }
+                        //    else {
+                        //        ImGui::Text("Audio Type for %s: Not Found", sounds[i].key.c_str());
+                        //    }
+
+                        //    //Create a combo box to choose the new representative string for this sound
+                        //    std::string label = "Choose Audio Type for " + std::to_string(type_index);
+                        //    if (ImGui::Combo(label.c_str(), &selected_sounds_type[type_index], audio_type_cstr.data(), static_cast<int>(audio_type_cstr.size()))) {
+
+                        //        //Get the selected representative string type_index
+                        //        int selected_index = selected_sounds_type[type_index];
+                        //        if (selected_index >= 0 && selected_index < audio_type_cstr.size()) {
+
+                        //            // Update the sound's file path based on the selected rep string
+                        //            audio.set_audio_type(sounds[i].key, audio_types[selected_index].second);
+
+                        //        }
+                        //    }
+                        //}
+
+                        ////remove audio.
+                        //static size_t selected_audio_index = static_cast<size_t>(-1);
+
+                        //std::string remove_audio = "Remove Audio";
+                        //const char* remove_audio_button = remove_audio.c_str();
+                        //if (ImGui::Button(remove_audio_button)) {
+                        //    ImGui::OpenPopup("Remove Audio");
+                        //}
+
+                        //if (ImGui::BeginPopup("Remove Audio")) {
+                        //    ImGui::Text("Remove Audio");
+                        //    ImGui::Separator();
+
+                        //    for (size_t i = 0; i < sounds.size(); i++) {
+                        //        if (ImGui::Selectable(sounds[i].key.c_str())) {
+                        //            selected_audio_index = i;
+                        //        }
+                        //    }
+                        //    ImGui::EndPopup();
+                        //}
+
+                        //if (selected_audio_index != -1) {
+                        //    if (selected_audio_index >= 0 && selected_audio_index < sounds.size()) {  // Bounds check
+                        //        const auto& audio_key = sounds[selected_audio_index].key;
+                        //        audio.remove_sound(audio_key);
+                        //    }
+                        //    
+                        //    selected_audio_index = static_cast<size_t>(-1);
+                        //}
 
                         //for debug purpose to be remove b4 M5 submission
                         /*if (selected_audio_index == -1) {
@@ -1840,7 +2151,7 @@ namespace lof {
 
     static bool show_msg = true;
 
-    //Function to handle sset browser
+    //Function to handle asset browser
     void IMGUI_Manager::asset_browser() {
 
         ImGui::Begin("Asset Browser");
@@ -2046,14 +2357,14 @@ namespace lof {
     }
 
     //For all text input (includes buffer)
-    void IMGUI_Manager::text_input(std::string& data_name, std::string& codition_name) {
+    void IMGUI_Manager::text_input(std::string& data_name, std::string& condition_name) {
 
         char Buffer[128];
         //strncpy_s is safer
         strncpy_s(Buffer, data_name.c_str(), sizeof(Buffer));
         Buffer[sizeof(Buffer) - 1] = '\0';
 
-        if (ImGui::InputText(codition_name.c_str(), Buffer, sizeof(Buffer))) {
+        if (ImGui::InputText(condition_name.c_str(), Buffer, sizeof(Buffer))) {
 
             //replaces the data with the input
             data_name = std::string(Buffer);
@@ -2159,7 +2470,7 @@ namespace lof {
         return batch_and_button;
     }
 
-    //Function to first initalise buttons_and_batches vector
+    //Function to first initialise buttons_and_batches vector
     void IMGUI_Manager::init_buttons_and_batches() {
 
         batch_and_button = { {"play_button", "Main_Menu_Play_Batch_14"},

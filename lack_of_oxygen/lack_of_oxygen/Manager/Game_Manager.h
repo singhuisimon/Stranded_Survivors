@@ -63,19 +63,49 @@ namespace lof {
         bool increasing = false;
         // Top UI variables
         float current_oxygen_level = 100.0f;  // Start at 100%
+        float current_panic_level = 0.0f;  // Starts at 0%
         float ship_oxygen_level = 400.0f;     // [0..400]
+
+        // Flags to indicate the panic trigger and for panic 
+        bool panic_triggered = false;
+        bool no_panic = false;
+
+        float panic_timer = 0.0f; //time for panic level changes
+        float panic_current = 0.0f; 
+        float panic_increase_amount = 1.7f; //amount to increase panic every 0.5 sec
+        float panic_timer_increase_delay = 0.5f; //delay between panic increases
+        float panic_decrease_amount = 5.0f; //amount to decrease panic every 1 sec
+        float panic_timer_decrease_delay = 1.0f; //delay between panic decreases
 
         float oxygen_drain_rate = 1.0f;     // Drain 5% per second
         float oxygen_update_timer = 0.0f;   // Track time for updates
-        float current_panic_level = 0.0f;  // Starts at 0%
         int timer_remaining = 300; // or any desired starting value
 
         float stored_goal_percentage = 0.0f;  // Store the goal percentage persistently
+
+        // Stores the TNTs that are activated with it's entity name and fuse time
+        std::unordered_map<std::string, float> tnt_to_destroy;
+
+        // Pause logic
+        bool m_is_paused;
 
         bool check_non_mineral(EntityID block_id, std::string block_name) const;
 
         // Flag for displaying fps in game
         bool display_fps = false;
+
+        /**
+        *@brief helper functions to increase and decrease panic 
+        * 
+        */
+        void add_panic(float dt); 
+        void drop_panic(float dt); 
+
+
+        // Lava rise related variables
+        float lava_timer = 0.0f;
+        float tile_height = 0.0f;
+        static constexpr float LAVA_RISE_INTERVAL = 4.5f; // 4.5 seconds per tile
 
     public:
         /**
@@ -152,6 +182,26 @@ namespace lof {
             current_oxygen_level = std::clamp(value, 0.0f, 100.0f);
         }
 
+        //ash
+
+        /**
+        * @brief Get current panic level
+        * @return the panic level
+        */
+        float get_current_panic_level() const { return current_panic_level; }
+        void set_current_panic_level(float value) { 
+            current_panic_level = std::clamp(value, 0.0f, 100.0f); 
+        }
+        /**
+        * @brief Get panic triggered boolean
+        * @return boolean that indicates whether panic triggered or not
+        */
+        bool get_panic_triggered() const { return panic_triggered; }
+        void set_panic_triggered(bool value) { panic_triggered = value; }
+
+        //ash
+        
+
         /**
 		 * @brief Returns the ship's current oxygen level in the range [0..400].
 		 * @return The current ship oxygen level as a float.
@@ -165,6 +215,13 @@ namespace lof {
 
         float get_stored_goal_percentage() const { return stored_goal_percentage; }
         void set_stored_goal_percentage(float value) { stored_goal_percentage = value; }
+
+        bool is_paused() const { return m_is_paused; }
+        void set_paused(bool paused);
+        void toggle_pause();
+
+        void reset_lava_timer() { lava_timer = 0.0f; }
+        void set_tile_height(float height) { tile_height = height; }
     };
 
 } // namespace lof

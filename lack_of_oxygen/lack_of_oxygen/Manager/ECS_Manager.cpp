@@ -14,6 +14,8 @@
 // Include FPS Manager
 #include "FPS_Manager.h"
 
+#include "Game_Manager.h"
+
 // Include for components
 #include "../Component/Component.h"
 
@@ -114,6 +116,9 @@ namespace lof {
             // Register all systems used in the game
             LM.write_log("ECS_Manager::start_up(): Adding systems.");
 
+            add_system(std::make_unique<Logic_System>(), false, true);
+            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
+
             add_system(std::make_unique<Collision_System>(), true, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'Collision_System'.");
 
@@ -123,7 +128,7 @@ namespace lof {
             add_system(std::make_unique<Render_System>(), false, false);
             LM.write_log("ECS_Manager::start_up(): Added system 'Render_System'.");
 
-            add_system(std::make_unique<GUI_System>(*this), false, false);
+            add_system(std::make_unique<GUI_System>(*this), false, true);
             LM.write_log("ECS_Manager::start_up(): Added system 'GUI_System'.");
 
             add_system(std::make_unique<Audio_System>(), false, true);
@@ -131,9 +136,6 @@ namespace lof {
 
             add_system(std::make_unique<Animation_System>(), false, true); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Animation_System'.");
-
-            add_system(std::make_unique<Logic_System>(), false, true);
-            LM.write_log("ECS_Manager::start_up(): Added system 'Logic_System'.");
 
             add_system(std::make_unique<Interruption_System>(window), false, false); 
             LM.write_log("ECS_Manager::start_up(): Added system 'Interruption_System'.");
@@ -350,7 +352,7 @@ namespace lof {
                     }
                 }
 
-                LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
+                //LM.write_log("Updated entity %u to new ID %u", old_id, new_id);
             }
         }
 
@@ -450,7 +452,7 @@ namespace lof {
             }
 #endif
 
-            if (level_editor_mode && !game_playing) {
+            if ((level_editor_mode && !game_playing) || GM.is_paused()) {
                 for (auto system : gameplay_dependent_systems) {
                     system->set_time(0);
                 }
@@ -469,21 +471,20 @@ namespace lof {
             }
             
 
-                for (auto system : dt_update_systems) {
-                    //skip the systems found in the gameplay_dependent_systems
-                    if ( (level_editor_mode && !game_playing) &&
-                        std::find(gameplay_dependent_systems.begin(),
-                            gameplay_dependent_systems.end(),
-                            system) != gameplay_dependent_systems.end()) {
-                        continue;
-                    }
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-                    // Updating each system
-                    system->update(delta_time);
-                    system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            for (auto system : dt_update_systems) {
 
+                //skip the systems found in the gameplay_dependent_systems
+                if (((level_editor_mode && !game_playing)) &&
+                    std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end())
+                {
+                    continue;
                 }
-            
+
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
+                // Updating each system
+                system->update(delta_time);
+                system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - system->get_time());
+            }
     }
 
     Entity* ECS_Manager::get_entity(EntityID entity_id) {

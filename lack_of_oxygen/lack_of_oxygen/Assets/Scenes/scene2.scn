@@ -178,6 +178,97 @@
         }
       }
     },
+
+    {
+      "name": "cloud_1",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            500.0
+          ],
+          "prev_position": [
+            0.0,
+            500.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            576.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "foreground_clouds_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "cloud_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "cloud_2",
+      "components": {
+        "Transform2D": {
+          "position": [
+            -1920.0,
+            500.0
+          ],
+          "prev_position": [
+            -1920.0,
+            500.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            576.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "foreground_clouds_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "cloud_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
+          ]
+        }
+      }
+    },
+
     {
       "name": "ship",
       "components": {
@@ -644,18 +735,12 @@
           "scripts": [
             {
               "script_name": "player_script",
-              "init": "init",
-              "update": "movement",
-              "end": "",
               "data": {},
               "state": 0,
               "is_active": true
             },
             {
               "script_name": "mining_script",
-              "init": "init",
-              "update": "mining",
-              "end": "",
               "data": {},
               "state": 0,
               "is_active": true
