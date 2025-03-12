@@ -311,7 +311,17 @@ namespace lof {
 
 	void Audio_Manager::update_bgm_layering(const int current_scene, const float oxygen_level, bool increasing) {
 		
-		EntityID background_id = ECSM.find_entity_by_name("background");
+		std::string background_name;
+		
+		if (current_scene == 1) {
+			background_name = "tutorial_background";
+		}
+		else if (current_scene == 2){
+			background_name = "background";
+		}
+
+		//EntityID background_id = ECSM.find_entity_by_name("background");
+		EntityID background_id = ECSM.find_entity_by_name(background_name);
 		
 		if (background_id == INVALID_ENTITY_ID && !ECSM.has_component<Audio_Component>(background_id)) {
 			return;

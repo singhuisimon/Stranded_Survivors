@@ -155,7 +155,7 @@ namespace lof {
                 camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
             }
 
-            if (camera.is_free_cam == GL_FALSE && current_scene != 1 && current_scene != 2) {
+            if (camera.is_free_cam == GL_FALSE && current_scene != 2) {
 
                 // Update world-to-camera view transformation matrix
                 camera.view_xform = glm::mat3{ 1, 0, 0,

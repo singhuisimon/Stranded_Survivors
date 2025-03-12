@@ -245,6 +245,10 @@ namespace lof {
 	// ------------------------------ Cloud_Script.cpp --------------------------------
 	constexpr const float CLOUD_MOVING_SPEED = 32.0f;
 
+	// ------------------------------ Tutorial_Script.cpp ------------------------------
+	constexpr const float SIREN_AUDIO_COOLDOWN = 0.4f;
+	constexpr const float TUTORIAL_COOLDOWN_TIME = 1.0f;
+
 } // namespace lof
 
 #endif // CONSTANTS_H
