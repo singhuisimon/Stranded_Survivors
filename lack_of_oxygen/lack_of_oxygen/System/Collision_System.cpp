@@ -332,20 +332,7 @@ namespace lof {
     * @brief Checks the entity's vent type
     */
 
-    bool Collision_System::is_ventUp(EntityID id) const {
-        auto* entity = ECSM.get_entity(id); 
-        return entity && ( (entity->get_name().find("ventUp_prefab") != std::string::npos) || (entity->get_name().find("ventStripUp_prefab") != std::string::npos));
-    }
 
-    bool Collision_System::is_ventLeft(EntityID id) const {
-        auto* entity = ECSM.get_entity(id);
-        return entity && ((entity->get_name().find("ventLeft_prefab") != std::string::npos) || (entity->get_name().find("ventStripLeft_prefab") != std::string::npos));
-    }
-
-    bool Collision_System::is_ventRight(EntityID id) const {
-        auto* entity = ECSM.get_entity(id);
-        return entity && ((entity->get_name().find("ventRight_prefab") != std::string::npos) || (entity->get_name().find("ventStripRight_prefab") != std::string::npos));
-    }
 
     VentDirection Collision_System::get_vent_direction(EntityID id) const {
         auto* entity = ECSM.get_entity(id);
@@ -438,6 +425,13 @@ namespace lof {
         }
 
         if (!found_next_vent) {
+            //vent exit 
+            if (direction == VentDirection::UP) {
+                e_velocity.velocity.y = 700.0f; 
+                e_physics.force_helper.deactivate_force(VENT_FORCE); 
+                e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            }
+
             if (is_in_vent) {
                 ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                 ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
@@ -446,127 +440,7 @@ namespace lof {
         }
     }
 
-    // Specialized movement functions for each vent type
-    void Collision_System::apply_vent_up(EntityID entity, bool has_vertical_overlap, bool found_next_vent, bool& is_grounded) {
-        auto& e_physics = ECSM.get_component<Physics_Component>(entity);
-        auto& e_velocity = ECSM.get_component<Velocity_Component>(entity);
-        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        static bool is_in_air_vent = false;
 
-        if (has_vertical_overlap) {
-            // Add vent force for upward movement
-            e_physics.force_helper.activate_force(VENT_FORCE);
-            // Remove gravity while in vent
-            e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-            // Set upward velocity
-            e_velocity.velocity.y = 300.0f;
-
-            // Play vent entry sound if not already in vent
-            if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                if (!is_in_air_vent) {
-                    ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
-                    is_in_air_vent = true;
-                }
-            }
-        }
-
-        // If we're at the end of the vent system (no more vents above)
-        if (!found_next_vent) {
-            // Apply stronger upward thrust for exit
-            e_velocity.velocity.y = 700.0f;
-            e_physics.force_helper.deactivate_force(VENT_FORCE);
-            e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-
-            // Play vent exit sound
-            if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                if (is_in_air_vent) {
-                    ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
-                    ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
-                    is_in_air_vent = false;
-                }
-            }
-        }
-    }
-
-    void Collision_System::apply_vent_left(EntityID entity, bool found_next_vent, bool& is_grounded) {
-        auto& e_physics = ECSM.get_component<Physics_Component>(entity);
-        auto& e_velocity = ECSM.get_component<Velocity_Component>(entity);
-        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        static bool is_in_left_vent = false;
-
-        // Update player animation flag
-        int& direction = GFXM.get_player_direction();
-        direction = FACE_LEFT;
-        int& moving_status = GFXM.get_moving_status();
-        moving_status = RUN_LEFT;
-     
-        //apply movement force to the left
-        e_physics.force_helper.activate_force(MOVE_LEFT);
-        e_velocity.velocity.x = -300.0f;
-        e_velocity.velocity.y = 0.0f;
-
-
-            // Play vent entry sound if not already in vent
-            if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                if (!is_in_left_vent) {
-                    ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
-                    is_in_left_vent = true;
-                }
-            }
-        
-
-        // If we're at the end of the left vent (no more vents)
-        if (!found_next_vent) {
-            // Play vent exit sound
-            if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                if (is_in_left_vent) {
-                    ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
-                    ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
-                    is_in_left_vent = false;
-                }
-            }
-        }
-    }
-
-    void Collision_System::apply_vent_right(EntityID entity, bool found_next_vent, bool& is_grounded) {
-        auto& e_physics = ECSM.get_component<Physics_Component>(entity);
-        auto& e_velocity = ECSM.get_component<Velocity_Component>(entity);
-        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        static bool is_in_right_vent = false;
-
-        int& direction = GFXM.get_player_direction();
-        direction = FACE_RIGHT;
-        int& moving_status = GFXM.get_moving_status();
-        moving_status = RUN_RIGHT;
-
-        //apply movement force to the left
-        e_physics.force_helper.activate_force(MOVE_RIGHT);
-        e_velocity.velocity.x = 300.0f;
-        e_velocity.velocity.y = 0.0f; 
-        //e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-
-
-        // Play vent entry sound if not already in vent
-        if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-            if (!is_in_right_vent) {
-                ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
-                is_in_right_vent = true;
-            }
-        }
-
-
-        // If we're at the end of the left vent (no more vents)
-        if (!found_next_vent) {
-            // Play vent exit sound
-            if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                if (is_in_right_vent) {
-                    ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
-                    ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
-                    is_in_right_vent = false;
-                }
-            }
-        }
-    }
 
 
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
@@ -644,7 +518,7 @@ namespace lof {
 
                     if (horizontal_distance <= av_collision.width / 2.0f) {
 
-                        apply_vent_up(entity, has_vertical_overlap, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
 
                     }
                     else {
