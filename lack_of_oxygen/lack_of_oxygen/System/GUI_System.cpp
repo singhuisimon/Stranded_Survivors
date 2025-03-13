@@ -1372,6 +1372,7 @@ void GUI_System::hide_wormhole_gui() {
 
                             // Stop all audio
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
 
                             // Reset player position
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1435,6 +1436,7 @@ void GUI_System::hide_wormhole_gui() {
 
                             // Stop all audio
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
 
                             // Update IMGUI
                             IMGUIM.set_current_file_shown(scene_file);
@@ -1785,6 +1787,7 @@ void GUI_System::hide_wormhole_gui() {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
 
                             // Reset player
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1823,6 +1826,7 @@ void GUI_System::hide_wormhole_gui() {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
                             IMGUIM.set_current_file_shown(scene_file);
                         }
                     }

@@ -10,6 +10,7 @@
 
 #include "Audio_Manager.h"
 #include "Assets_Manager.h"
+#include "../System/GUI_System.h"
 
 
 namespace lof {
@@ -18,7 +19,7 @@ namespace lof {
 		return instance;
 	}
 
-	Audio_Manager::Audio_Manager() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr), uigroup(nullptr), new_scene(true) {
+	Audio_Manager::Audio_Manager() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr), uigroup(nullptr), new_scene(true), to_play_gameover(false) {
 		set_type("Audio_Manager");
 	}
 
@@ -328,13 +329,32 @@ namespace lof {
 		}
 
 		auto& audio_background = ECSM.get_component<Audio_Component>(background_id);
+		
+		for (auto& system : ECSM.get_systems()) {
+			if (system->get_type() == "GUI_System") {
+				auto* gui_system = static_cast<GUI_System*>(system.get());
+				to_play_gameover = gui_system->is_game_over_shown();
+			}
+			else {
+				continue;
+			}
+		}
+
+		if (to_play_gameover && yet_to_play) {
+			stop_mastergroup();
+			ADM.play_now(background_id, "game over", audio_background);
+			yet_to_play = false;
+		}
 
 		//new logic
 		if (new_scene) {
 			/*if (current_scene == 1) {
 				audio_background.set_isactive("background", true);
 			}*/
+
 			if (current_scene == 2) {
+				//yet_to_play = true;
+
 				std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3", "lava siren"};
 				for (const auto& layer : base_layers) {
 					if (!is_layer_playing(background_id, layer)) {
@@ -631,5 +651,9 @@ namespace lof {
 
 	bool Audio_Manager::get_new_scene() {
 		return new_scene;
+	}
+
+	void Audio_Manager::set_yet_to_play(bool new_bool) {
+		yet_to_play = new_bool;
 	}
 }

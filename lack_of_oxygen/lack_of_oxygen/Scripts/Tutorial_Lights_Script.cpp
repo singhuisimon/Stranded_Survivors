@@ -8,6 +8,7 @@
 #include "../Manager/Log_Manager.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/FPS_Manager.h"
+#include "../Manager/Audio_Manager.h"
 
 namespace lof {
 
@@ -39,13 +40,21 @@ namespace lof {
         elapsed_frames = 0;
         current_frame_index = 1;
         elapsed_frames = 0;
+        siren_cooldown = SIREN_AUDIO_COOLDOWN;
     }
 
     void Tutorial_Light_Script::update_frame() {
         elapsed_frames++;
 
+        siren_cooldown -= FPSM.get_delta_time();
+
+        if (siren_cooldown <= 0) {
+            play_siren_audio();
+            siren_cooldown = SIREN_AUDIO_COOLDOWN;
+        }
+
         if (current_frame_index == 1) {
-            std::cout << "currently frame 1" << "at update frame" << std::endl;;
+            //std::cout << "currently frame 1" << "at update frame" << std::endl;;
             if (elapsed_frames % 60 == 0) {
                 current_frame_index = 2;
                 elapsed_frames = 0;
@@ -53,7 +62,7 @@ namespace lof {
             }
         }
         else if (current_frame_index == 2) {
-            std::cout << "currently frame 2" << std::endl;
+            //std::cout << "currently frame 2" << std::endl;
             if (elapsed_frames % 8 == 0) {
                 current_frame_index = 3;
                 elapsed_frames = 0;
@@ -61,7 +70,7 @@ namespace lof {
             }
         }
         else if (current_frame_index == 3) {
-            std::cout << "curently frame 3" << std::endl;
+            //std::cout << "curently frame 3" << std::endl;
             if (elapsed_frames % 8 == 0) {
                 current_frame_index = 4;
                 elapsed_frames = 0;
@@ -69,12 +78,28 @@ namespace lof {
             }
         }
         else if (current_frame_index == 4) {
-            std::cout << "currently frame 4" << std::endl;
+            //std::cout << "currently frame 4" << std::endl;
             if (elapsed_frames % 8 == 0) {
                 current_frame_index = 1;
                 elapsed_frames = 0;
                 return;
             }
+        }
+
+    }
+
+    void Tutorial_Light_Script::play_siren_audio() {
+        EntityID light_left = ECSM.find_entity_by_name("siren_bulb_left");
+        //EntityID light_right = ECSM.find_entity_by_name("siren_bulb_right");
+
+        if (light_left != INVALID_ENTITY_ID){//}&& light_right != INVALID_ENTITY_ID) {
+            // Get both clouds transform
+            //auto& light_right_audio = ECSM.get_component<Audio_Component>(light_right);
+            auto& light_left_audio = ECSM.get_component<Audio_Component>(light_left);
+
+            ADM.play_now(light_left, audio_name, light_left_audio);
+            //ADM.play_now(light_right, audio_name, light_right_audio);
+            return;
         }
 
     }
@@ -91,10 +116,10 @@ namespace lof {
 
             light_right_graphics.texture_name = base_texture + std::to_string(current_frame_index);
             light_left_graphics.texture_name = base_texture + std::to_string(current_frame_index);
-            std::cout << "currently both set to frame" << current_frame_index << std::endl;
+            //std::cout << "currently both set to frame" << current_frame_index << std::endl;
             return;
         }
-        std::cout << "didn't update animation" << std::endl;
+        //std::cout << "didn't update animation" << std::endl;
     }
 
 } // namespace lof

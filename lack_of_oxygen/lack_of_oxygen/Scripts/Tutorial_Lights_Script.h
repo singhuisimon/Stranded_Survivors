@@ -17,6 +17,7 @@ namespace lof {
 		int current_frame_index = 0;
 		int elapsed_frames = 0;	//tracks how many frames have passed
 		std::string base_texture = "Siren_Bulb_Batch_14_";
+		std::string audio_name = "tutorial_light";
 
 		Tutorial_Light_Script();
 
@@ -31,8 +32,10 @@ namespace lof {
 	private:
 		const std::string script_name = "tutorial_light_script";
 
-		void lights_animation();
+		float siren_cooldown = SIREN_AUDIO_COOLDOWN;
 
+		void lights_animation();
+		void play_siren_audio();
 		
 
 	};

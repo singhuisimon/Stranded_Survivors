@@ -243,6 +243,7 @@ namespace lof {
 		void set_new_scene(bool new_scene_state);
 
 		bool get_new_scene();
+		void set_yet_to_play(bool new_bool);
 
 	private:
 
@@ -271,6 +272,9 @@ namespace lof {
 
 		//flag for new scene
 		bool new_scene;
+
+		bool to_play_gameover;
+		bool yet_to_play = true;
 
 	};
 }
