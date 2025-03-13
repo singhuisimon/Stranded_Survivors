@@ -1205,6 +1205,12 @@ namespace lof {
                     case lava:
                         particle_tex = "sparks_particle_batch_14";
                         break;
+                    case sweat_player:
+                        particle_tex = "sweat_drop_single_batch_5";
+                        break;
+                    case sweat_screen:
+                        particle_tex = "sweat_drop_single_batch_5";
+                        break;
                     }
 
                     // Look for texture in texture storage. If not found, load texture 
@@ -1263,7 +1269,12 @@ namespace lof {
                     GLint color_uniform_loc = glGetUniformLocation(shader->program_handle, "uColor");
                     if (color_uniform_loc >= 0) {
                         // Converting Vec3D to glm::vec4
-                        glm::vec4 color_vec4 = { particles_storage[i].color.x, particles_storage[i].color.y, particles_storage[i].color.z, 255.0f};
+                        glm::vec4 color_vec4 = { particles_storage[i].color.x, particles_storage[i].color.y, particles_storage[i].color.z, 1.0f};
+                        
+                        if (particles_storage[i].type == sweat_screen) {
+                            color_vec4.a = 0.6f;
+                        }
+
                         glUniform4fv(color_uniform_loc, 1, &color_vec4[0]);
                     }
                     else {

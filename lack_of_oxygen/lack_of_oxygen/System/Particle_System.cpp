@@ -233,6 +233,36 @@ namespace lof {
 			5.0f						// life left
 		};
 		particle_base.emplace("lava", lava); 
+
+		// sweat on player particle data
+		Particle_Data sweat_player = {
+			Vec2D(),					// position
+			Vec3D(),					// color
+			ParticleType::sweat_player,		// type
+			0,							// id
+			2.0f,						// current size
+			2.0f,						// starting size
+			5.0f,						// speed
+			270.0f,						// direction
+			0.1f,						// lifespan
+			0.1f						// life left
+		};
+		particle_base.emplace("sweat_player", sweat_player);
+
+		// sweat on screen particle data
+		Particle_Data sweat_screen = {
+			Vec2D(),					// position
+			Vec3D(),					// color
+			ParticleType::sweat_screen,	// type
+			0,							// id
+			25.0f,						// current size
+			25.0f,						// starting size
+			25.0f,						// speed
+			270.0f,						// direction
+			0.5f,						// lifespan
+			0.5f						// life left
+		};
+		particle_base.emplace("sweat_screen", sweat_screen);
 	}
 
 	// Returns the system's type
