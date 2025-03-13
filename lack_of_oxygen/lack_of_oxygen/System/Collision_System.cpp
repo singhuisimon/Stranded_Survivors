@@ -1714,7 +1714,7 @@ namespace lof {
 
                         // Set up scene loading
                         const std::string SCENES = "Scenes";
-                        std::string scene_file = "scene2.scn";
+                        std::string scene_file = "tutorial.scn";
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
                         LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
 
@@ -1745,7 +1745,7 @@ namespace lof {
                             }
 
                             // Update current scene in Game Manager
-                            GM.set_current_scene(2);
+                            GM.set_current_scene(5);
 
                             // Update IMGUI Manager's current file
                             //IMGUIM.set_current_file_shown(scene_file);

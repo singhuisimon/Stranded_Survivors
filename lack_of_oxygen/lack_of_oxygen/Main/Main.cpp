@@ -226,7 +226,7 @@ int main(void) {
             fps_timer = 0.0f;
 
             // Display FPS in console
-            std::cout << "Current FPS: " << fps << std::endl;
+            //std::cout << "Current FPS: " << fps << std::endl;
         }
 
         // Poll for and process events 
