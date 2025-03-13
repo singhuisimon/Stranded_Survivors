@@ -1122,7 +1122,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(resume_button)) {
                 transform->position = Vec2D(0.0f, 0.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add empty Audio Component - needed for hover detection
@@ -1142,7 +1142,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(restart_button)) {
                 transform->position = Vec2D(0.0f, -100.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add empty Audio Component - needed for hover detection
@@ -1162,7 +1162,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(main_menu_button)) {
                 transform->position = Vec2D(0.0f, -200.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add empty Audio Component - needed for hover detection
@@ -1513,7 +1513,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(restart_button)) {
                 transform->position = Vec2D(0.0f, -100.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add GUI Component if needed
@@ -1546,7 +1546,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(main_menu_button)) {
                 transform->position = Vec2D(0.0f, -200.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add GUI Component if needed
