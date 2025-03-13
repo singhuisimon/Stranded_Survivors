@@ -249,7 +249,7 @@ namespace lof {
         /*
         * apply the force on the player depending on the direction. stop and play the vent audio as well
         */
-        void apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded); 
+        void apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent); 
 
         /*
         * @brief Handles collision interactions between an entity and a vent
