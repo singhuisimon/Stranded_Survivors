@@ -199,6 +199,7 @@ namespace lof {
 
                     // Pause audio
                     ADM.pause_resume_mastergroup();
+
                 }
                 else {
                     gui_system->hide_pause_menu();
@@ -347,6 +348,15 @@ namespace lof {
                     }
                 }
 
+                if (panic_triggered) {
+                    add_panic(DEFAULT_FIXED_DELTA_TIME);
+                }
+                if (no_panic) {
+                    drop_panic(DEFAULT_FIXED_DELTA_TIME);
+                }
+                //update the current panic level
+                current_panic_level = panic_current;
+
                 //////////////////  TESTING /////////////////////////
                 if (IM.is_key_pressed(GLFW_KEY_P)) {
                     add_panic(DEFAULT_FIXED_DELTA_TIME);
@@ -392,15 +402,6 @@ namespace lof {
                     }
                 }
             }
-
-            if (panic_triggered) {
-                add_panic(DEFAULT_FIXED_DELTA_TIME);
-            }
-            if (no_panic) {
-                drop_panic(DEFAULT_FIXED_DELTA_TIME);
-            }
-            //update the current panic level
-            current_panic_level = panic_current;
 
             // Display red vignette based on panic level
             EntityID red_vignette = ECSM.find_entity_by_name("red_vignette");
