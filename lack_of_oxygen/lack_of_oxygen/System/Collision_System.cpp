@@ -1750,7 +1750,7 @@ namespace lof {
                             }
 
                             // Update current scene in Game Manager
-                            GM.set_current_scene(1);
+                            GM.set_current_scene(5);
 
                             // Update IMGUI Manager's current file
                             IMGUIM.set_current_file_shown(scene_file);

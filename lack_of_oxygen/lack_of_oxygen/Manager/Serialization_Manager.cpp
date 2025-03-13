@@ -100,7 +100,7 @@ namespace lof {
         std::string loaded_scene = "main_menu.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
-        // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4
+        // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4, tutorial.scn = 5
         GM.set_current_scene(0);
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
