@@ -290,6 +290,8 @@ namespace lof {
         void check_win_screen_button_collision(float delta_time);
 
         void player_interact_lava(float delta_time);
+
+        void Detect_Obsidian_Bottom(float delta_time);
     };
 
 
