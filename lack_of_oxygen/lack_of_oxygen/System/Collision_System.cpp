@@ -2106,7 +2106,11 @@ namespace lof {
     void Collision_System::player_interact_lava(float delta_time)
     {
         
-        EntityID playerID = ECSM.find_entity_by_name("player1");
+        if (GM.get_current_scene() != 2) {
+            return;
+        }
+
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
         EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
 
      
@@ -2124,15 +2128,15 @@ namespace lof {
         AABB aabb_player = AABB::from_transform(player_transform, player_collision);
         AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
 
-        //float player_bottom = aabb_player.min.y + (aabb_player.max.y - aabb_player.min.y);
-        //float lava_top = aabb_lava.min.y;
+        float player_bottom = aabb_player.min.y + (aabb_player.max.y - aabb_player.min.y);
+        float lava_top = aabb_lava.min.y;
 
-        //// Define a small threshold to account for minor floating-point errors
-        //float threshold = 0.01f;
+        // Define a small threshold to account for minor floating-point errors
+        float threshold = 0.01f;
 
-        //bool is_touching = std::abs(player_bottom - lava_top) < threshold;
+        bool is_touching = std::abs(player_bottom - lava_top) < threshold;
 
-        //if (is_touching) std::cout << "player in touch with lava !!!!\n";
+        if (is_touching) std::cout << "player in touch with lava !!!!\n";
 
 
         //std::cout << "lava pos x:" << lava_transform.position.x << "lava pos y: " << lava_transform.position.y << "\n";
@@ -2140,6 +2144,7 @@ namespace lof {
         bool is_player_dead = false;
         if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
         {
+           // std::cout << "test\n";
             is_player_dead = true;
             GM.set_player_dead_state(true);
         }
@@ -2166,22 +2171,12 @@ namespace lof {
                 }
             }
 
-            // No need to immediately reload the scene or set current file
-            // The user will choose restart or main menu from the game over screen
+           
  
         }
 
-
-        //AABB aabb_player = AABB::from_transform(player_transform, player_collision);
-
         
-        
-
-
-        /*if (laveID)
-        {
-            std::cout << "it is exist\n";
-        }*/
+  
 
     }
 }
