@@ -17,14 +17,18 @@ namespace lof {
 		void check_keys();
 
 		bool is_key_just_pressed(int key);
-
-		bool is_key_being_hold(int key);
-
 		bool is_key_just_released(int key);
+
+		bool is_mouse_just_pressed(int key);
+		bool is_mouse_just_released(int key);
 
 	private:
 
-		std::unordered_map<std::string, bool> tutorial_sound_playing;
+		std::unordered_map<std::string, bool> tutorial_button_playing;
+		std::unordered_map<std::string, bool> tutorial_mouse_playing;
+		std::unordered_map<int, bool> key_previous_state;
+		std::unordered_map<int, bool> mouse_previous_state;
+
 
 		int tutorial_page = 1;
 
@@ -38,23 +42,27 @@ namespace lof {
 		bool key_a_last_frame = false;
 		bool key_d_last_frame = false;
 		bool key_e_last_frame = false;
-		bool key_esc_pressed = false;
-		bool key_esc_last_frame = false;
+		bool key_backslash_pressed = false;
+		bool key_backslash_last_frame = false;
 
 		bool transitioning = false;
-		bool button_e_shown = false;
-		bool button_a_shown = false;
-		bool button_d_shown = false;
+		bool page_change = false;
+		//bool button_e_shown = false;
+		//bool button_a_shown = false;
+		//bool button_d_shown = false;
 
 		float siren_audio_cooldown;
 		//float current_cooldown = 0.0f;
 		//float transition_cooldown = 0.5f;
 		float page_transition_cooldown = 0.0f;
+		int prev_tut_page = 1;
 		//bool page_transition_active = false;
 
 		void set_tutorial_page(int new_page_num);
+		bool get_transitioning();
 		void update_button_visibility(EntityID entity_id, Graphics_Component& graphic_comp);
-		void update_button(EntityID entity_id);
+		void check_clicking_button(EntityID entity_id);
+		void check_pressing_button(EntityID entity_id);
 		void transit_next_scene();
 
 	};

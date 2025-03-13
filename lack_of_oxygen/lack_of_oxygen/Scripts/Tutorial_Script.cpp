@@ -14,7 +14,9 @@
 
 namespace lof {
 
-    Tutorial_Script::Tutorial_Script() : siren_audio_cooldown(SIREN_AUDIO_COOLDOWN) {}
+    Tutorial_Script::Tutorial_Script() : siren_audio_cooldown(SIREN_AUDIO_COOLDOWN) {
+
+    }
 
     std::string Tutorial_Script::get_type() const {
         return script_name;
@@ -46,7 +48,10 @@ namespace lof {
                 return;
             }
             tutorial_script->check_keys();
-            tutorial_script->update_button(entity_id);
+            tutorial_script->check_clicking_button(entity_id);
+            if (!tutorial_script->get_transitioning()) {
+                tutorial_script->check_pressing_button(entity_id);
+            }
             tutorial_script->transit_next_scene();
 
             });
@@ -66,72 +71,81 @@ namespace lof {
         key_e_last_frame = key_e_pressed;
         key_e_pressed = IM.is_key_held(GLFW_KEY_E);
 
-        key_esc_last_frame = key_esc_pressed;
-        key_esc_pressed = IM.is_key_held(GLFW_KEY_ESCAPE); //code for skipping the entire tutorial.
+        key_backslash_last_frame = key_backslash_pressed;
+        key_backslash_pressed = IM.is_key_held(GLFW_KEY_BACKSLASH); //code for skipping the entire tutorial.
     }
 
     bool Tutorial_Script::is_key_just_pressed(int key) {
-        bool just_pressed = false;
-        if (key == GLFW_MOUSE_BUTTON_LEFT) {
-            just_pressed = left_mouse_pressed && !left_mouse_last_frame;
-        }
-        else if (key == GLFW_KEY_A) {
-            just_pressed = key_a_pressed && !key_a_last_frame;
-        }
-        else if (key == GLFW_KEY_D) {
-            just_pressed = key_d_pressed && !key_d_last_frame;
-        }
-        else if (key == GLFW_KEY_E) {
-            just_pressed = key_e_pressed && !key_e_last_frame;
-        }
-        else if (key == GLFW_KEY_ESCAPE)
-        {
-            just_pressed = key_esc_pressed && !key_esc_last_frame;
-        }
+        bool current_state = (glfwGetKey(window, key) == GLFW_PRESS);
+        bool was_pressed = key_previous_state[key];  // Check previous state
+        key_previous_state[key] = current_state;    // Update state
+        return current_state && !was_pressed;
 
-        if (just_pressed) {
-            std::cout << "KEY " << key << " was just pressed" << std::endl;
-        }
+        //bool is_pressed = (glfwGetKey(window, key) == GLFW_PRESS) && !key_previous_state[key];
+        //key_previous_state[key] = (glfwGetKey(window, key) == GLFW_PRESS); // Update state
+        //return is_pressed;
 
-        return just_pressed;
-    }
+        //bool just_pressed = false;
+        //if (key == GLFW_MOUSE_BUTTON_LEFT) {
+        //    just_pressed = left_mouse_pressed && !left_mouse_last_frame;
+        //}
+        //else if (key == GLFW_KEY_A) {
+        //    just_pressed = key_a_pressed && !key_a_last_frame;
+        //}
+        //else if (key == GLFW_KEY_D) {
+        //    just_pressed = key_d_pressed && !key_d_last_frame;
+        //}
+        //else if (key == GLFW_KEY_E) {
+        //    just_pressed = key_e_pressed && !key_e_last_frame;
+        //}
+        //else if (key == GLFW_KEY_BACKSLASH)
+        //{
+        //    just_pressed = key_backslash_pressed && !key_backslash_last_frame;
+        //}
 
-    bool Tutorial_Script::is_key_being_hold(int key) {
-        if (key == GLFW_MOUSE_BUTTON_LEFT) {
-            return left_mouse_pressed && left_mouse_last_frame;
-        }
-        else if (key == GLFW_KEY_A) {
-            return key_a_pressed && key_a_last_frame;
-        }
-        else if (key == GLFW_KEY_D) {
-            return key_d_pressed && key_d_last_frame;
-        }
-        else if (key == GLFW_KEY_E) {
-            return key_e_pressed && key_e_last_frame;
-        }
-        else if (key == GLFW_KEY_ESCAPE) {
-            return key_esc_pressed && key_esc_last_frame;
-        }
-        return false;
+        //if (just_pressed) {
+        //    std::cout << "KEY " << key << " was just pressed" << std::endl;
+        //}
+
+        //return just_pressed;
     }
 
     bool Tutorial_Script::is_key_just_released(int key) {
-        if (key == GLFW_MOUSE_BUTTON_LEFT) {
-            return !left_mouse_pressed && left_mouse_last_frame;
-        }
-        else if (key == GLFW_KEY_A) {
-            return !key_a_pressed && key_a_last_frame;
-        }
-        else if (key == GLFW_KEY_D) {
-            return !key_d_pressed && key_d_last_frame;
-        }
-        else if (key == GLFW_KEY_E) {
-            return !key_e_pressed && key_e_last_frame;
-        }
-        else if (key == GLFW_KEY_ESCAPE) {
-            return !key_esc_pressed && key_esc_last_frame;
-        }
-        return false;
+        bool is_released = (glfwGetKey(window, key) == GLFW_RELEASE) && key_previous_state[key];
+        key_previous_state[key] = (glfwGetKey(window, key) == GLFW_PRESS); // Update state for next check
+        return is_released;
+        //if (key == GLFW_MOUSE_BUTTON_LEFT) {
+        //    return !left_mouse_pressed && left_mouse_last_frame;
+        //}
+        //else if (key == GLFW_KEY_A) {
+        //    return !key_a_pressed && key_a_last_frame;
+        //}
+        //else if (key == GLFW_KEY_D) {
+        //    return !key_d_pressed && key_d_last_frame;
+        //}
+        //else if (key == GLFW_KEY_E) {
+        //    return !key_e_pressed && key_e_last_frame;
+        //}
+        //else if (key == GLFW_KEY_BACKSLASH) {
+        //    return !key_backslash_pressed && key_backslash_last_frame;
+        //}
+        //return false;
+    }
+
+    bool Tutorial_Script::is_mouse_just_pressed(int button) {
+        bool is_pressed = (glfwGetMouseButton(window, button) == GLFW_PRESS) && !mouse_previous_state[button];
+        mouse_previous_state[button] = (glfwGetMouseButton(window, button) == GLFW_PRESS); // Update state
+        return is_pressed;
+    }
+
+    bool Tutorial_Script::is_mouse_just_released(int button) {
+        bool is_released = (glfwGetMouseButton(window, button) == GLFW_RELEASE) && mouse_previous_state[button];
+        mouse_previous_state[button] = (glfwGetMouseButton(window, button) == GLFW_PRESS); // Update state
+        return is_released;
+    }
+
+    bool Tutorial_Script::get_transitioning() {
+        return transitioning;
     }
 
     void Tutorial_Script::set_tutorial_page(int new_page_num) {
@@ -141,13 +155,20 @@ namespace lof {
             return;
         }
 
+        if (new_page_num == 1) {
+            prev_tut_page = 0;
+        }
+        else {
+            prev_tut_page = tutorial_page;
+        }
+
         tutorial_page = new_page_num;
         LM.write_log("Tutorial page set to %d", tutorial_page);
 
         EntityID tutorial_text_id = ECSM.find_entity_by_name("tutorial_background_text");
         auto& tutorial_text_graphic = ECSM.get_component<Graphics_Component>(tutorial_text_id);
         tutorial_text_graphic.texture_name = "tutorial_text_" + std::to_string(tutorial_page);
-        //page_transition_cooldown = TUTORIAL_COOLDOWN_TIME;
+        ////page_transition_cooldown = TUTORIAL_COOLDOWN_TIME;
         std::cout << tutorial_text_graphic.texture_name << std::endl;
     }
 
@@ -184,22 +205,9 @@ namespace lof {
         }
     }
 
-    void Tutorial_Script::update_button(EntityID entity_id) {
-
-        if (page_transition_cooldown > 0.0f) {
-            page_transition_cooldown -= FPSM.get_delta_time();
-            //std::cout << "still in cooldown" << page_transition_cooldown << std::endl;
-            return;
-        }
+    void Tutorial_Script::check_clicking_button(EntityID entity_id) {
 
         if (transitioning == true) {
-            return;
-        }
-
-        //transitioning = false;
-
-        if (is_key_just_pressed(GLFW_KEY_ESCAPE)) {
-            transitioning = true;
             return;
         }
 
@@ -253,7 +261,6 @@ namespace lof {
 
         std::string base_texture = button_textures.at(entity_name);
         std::string button_audio = button_sounds.at(entity_name);
-        bool transit_to_play = false;
 
         update_button_visibility(entity_id, graphics);
 
@@ -261,132 +268,190 @@ namespace lof {
             graphics.texture_name = base_texture + "_NORMAL";
 
             //set it to true to avoid playing the audio
-            tutorial_sound_playing[entity_name] = true;
+            tutorial_mouse_playing[entity_name] = true;
             return;
         }
 
-        if (is_hovered) {
+       if (is_hovered) {
             if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                 graphics.texture_name = base_texture + "_PRESSED";
-                if (tutorial_sound_playing[entity_name] == false) {
+                if (tutorial_mouse_playing[entity_name] == false) {
                     ADM.play_now(entity_id, button_audio, audio);
-                    tutorial_sound_playing[entity_name] = true;
+                    tutorial_mouse_playing[entity_name] = true;
                 }
 
                 if (entity_name == "a_button") {
-                    std::cout << "a_button press" << std::endl;
+                    std::cout << "a_button press" << entity_name << std::endl;
                     set_tutorial_page(tutorial_page - 1);
+                    page_change = true;
                     return;
                 }
                 else if (entity_name == "d_button") {
-                    std::cout << "d_button pressed" << std::endl;
+                    std::cout << "d_button pressed" << entity_name << std::endl;
                     set_tutorial_page(tutorial_page + 1);
+                    page_change = true;
                     return;
                 }
                 else if (entity_name == "e_long_button") {
                     if (tutorial_page == 10) {
+                        std::cout << entity_name << " from transiting" << std::endl;
                         transitioning = true;
                         return;
                     }
                 }
             }
             else {
-                tutorial_sound_playing[entity_name] = false;
+                std::cout << "entity name from highlighted" << entity_name << std::endl;
+                tutorial_mouse_playing[entity_name] = false;
+                page_change = false;
                 graphics.texture_name = base_texture + "_HIGHLIGHTED";
-            }
-        }
-        
-        if (is_key_just_pressed(GLFW_KEY_A)) {
-            std::cout << "KEY A IS PRESSED" << std::endl
-                << entity_name << std::endl;
-
-            EntityID entity = ECSM.find_entity_by_name("a_button");
-            std::string name = ECSM.get_entity(entity)->get_name();
-        
-            if (name == "a_button") {
-                std::cout << "a_button press" << std::endl;
-                if (tutorial_sound_playing[entity_name] == false) {
-                    ADM.play_now(entity_id, button_audio, audio);
-                    tutorial_sound_playing[entity_name] = true;
-                }
-                set_tutorial_page(tutorial_page - 1);
                 return;
-            }
-        }
-
-        else if (is_key_just_pressed(GLFW_KEY_D)) {
-            std::cout << "KEY D IS PRESSED" << std::endl
-            << entity_name << std::endl;
-
-            EntityID entity = ECSM.find_entity_by_name("d_button");
-            std::string name = ECSM.get_entity(entity)->get_name();
-
-            if (name == "d_button") {
-                std::cout << "d_button_presS" << std::endl;
-                if (tutorial_sound_playing[entity_name] == false) {
-                    ADM.play_now(entity_id, button_audio, audio);
-                    tutorial_sound_playing[entity_name] = true;
-                }
-                set_tutorial_page(tutorial_page + 1);
-                return;
-            }
-        }
-
-        else if (is_key_just_pressed(GLFW_KEY_E)) {
-            std::cout << "KEY E IS PRESSED" << std::endl
-            << entity_name << std::endl;
-
-            EntityID entity = ECSM.find_entity_by_name("e_long_button");
-            std::string name = ECSM.get_entity(entity)->get_name();
-
-            if (name == "e_long_button") {
-                std::cout << "e_button_press" << std::endl;
-                if (tutorial_sound_playing[entity_name] == false) {
-                    ADM.play_now(entity_id, button_audio, audio);
-                    tutorial_sound_playing[entity_name] = true;
-                    set_tutorial_page(tutorial_page + 1);
-                    return;
-                }
             }
         }
         else {
             //std::cout << "no changes is deteced" << std::endl;
+            page_change = false;
             graphics.texture_name = base_texture + "_NORMAL";
-            tutorial_sound_playing[entity_name] = false;
+            tutorial_mouse_playing[entity_name] = false;
+        }
+    }
+
+    void Tutorial_Script::check_pressing_button(EntityID entity_id) {
+        if (transitioning == true) {
+            return;
         }
 
-        //if (entity_name == "a_button") {
-        //    if (is_key_just_pressed(GLFW_KEY_A)) {
-        //        graphics.texture_name = base_texture + "_PRESSED";
-        //        if (tutorial_sound_playing[entity_name] == false) {
-        //            ADM.play_now(entity_id, button_audio, audio);
-        //            tutorial_sound_playing[entity_name] = true;
-        //        }
-        //        set_tutorial_page(tutorial_page - 1);
-        //        return;
-        //    }
-        //    else if (is_key_just_released(GLFW_KEY_A)) {
-        //        tutorial_sound_playing[entity_name] = false;
-        //        graphics.texture_name = base_texture + "_NORMAL";
-        //        return;
-        //    }
-        //}
-        //else if (entity_name == "d_button") {
-        //    if (is_key_just_pressed(GLFW_KEY_D)) {
-        //        graphics.texture_name = base_texture + "_PRESSED";
-        //        if (tutorial_sound_playing[entity_name] == false) {
-        //            ADM.play_now(entity_id, button_audio, audio);
-        //            tutorial_sound_playing[entity_name] = true;
-        //        }
-        //        set_tutorial_page(tutorial_page - 1);
-        //    }
-        //    else if (is_key_just_released(GLFW_KEY_D)) {
-        //        tutorial_sound_playing[entity_name] = false;
-        //        graphics.texture_name = base_texture + "_NORMAL";
-        //    }
-        //}
-        
+        if (is_key_just_pressed(GLFW_KEY_BACKSLASH)) {
+            transitioning = true;
+            return;
+        }
 
+        if (page_change == true) {
+            return;
+        }
+
+        auto* entity = ECSM.get_entity(entity_id);
+        if (!entity) {
+            return;
+        }
+
+        std::string entity_name = entity->get_name();
+
+        static const std::unordered_map<std::string, std::string> button_textures = {
+            {"a_button", "A_Batch_16"},
+            {"d_button", "D_Batch_16"},
+            {"e_long_button", "E_To_Begin_Batch_16"}
+        };
+
+        static const std::unordered_map<std::string, std::string> button_sounds = {
+            {"a_button", "tutorial_button"},
+            {"d_button", "tutorial_button"},
+            {"e_long_button", "main_menu"}
+        };
+
+        //return if the entity is not a button.
+        if (button_textures.find(entity_name) == button_textures.end()) {
+            return;
+        }
+
+        if (!ECSM.has_component<Transform2D>(entity_id) ||
+            !ECSM.has_component<Graphics_Component>(entity_id) ||
+            !ECSM.has_component<Audio_Component>(entity_id)) {
+            return;
+        }
+
+        auto& transform = ECSM.get_component<Transform2D>(entity_id);
+        auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
+        auto& audio = ECSM.get_component<Audio_Component>(entity_id);
+
+        std::string base_texture = button_textures.at(entity_name);
+        std::string button_audio = button_sounds.at(entity_name);
+
+        if (graphics.color.a < 1.0f) {
+            graphics.texture_name = base_texture + "_NORMAL";
+
+            //set it to true to avoid playing the audio
+            tutorial_button_playing[entity_name] = true;
+            return;
+        }
+
+        if (entity_name == "a_button") {
+
+            if (is_key_just_released(GLFW_KEY_A)) {
+                std::cout << "a is released" << std::endl;
+                set_tutorial_page(tutorial_page - 1);
+                //page_change = true;
+                tutorial_button_playing[entity_name] = false;
+                graphics.texture_name = base_texture + "_NORMAL";
+                return;
+            }
+            else if (key_a_pressed) {
+                std::cout << "a is held" << std::endl;
+                if (!tutorial_button_playing[entity_name]) {
+                    ADM.play_now(entity_id, button_audio, audio);
+                    tutorial_button_playing[entity_name] = true;
+                }
+                graphics.texture_name = base_texture + "_PRESSED";
+                return;
+            }
+            else {
+                graphics.texture_name = base_texture + "_NORMAL";
+                tutorial_button_playing[entity_name] = false;
+                return;
+            }
+        }
+        
+        else if (entity_name == "d_button") {
+            //std::cout << "correct entity " << entity_name << std::endl;
+            if (is_key_just_released(GLFW_KEY_D)) {
+                std::cout << "d released" << std::endl;
+                set_tutorial_page(tutorial_page + 1);
+                tutorial_button_playing[entity_name] = false;
+                graphics.texture_name = base_texture + "_NORMAL";
+                return;
+            }
+            else if (key_d_pressed) {
+                std::cout << "d is held" << std::endl;
+                if (!tutorial_button_playing[entity_name]) {
+                    ADM.play_now(entity_id, button_audio, audio);
+                    tutorial_button_playing[entity_name] = true;
+                }
+                graphics.texture_name = base_texture + "_PRESSED";
+                return;
+            }
+            else {
+                tutorial_button_playing[entity_name] = false;
+                graphics.texture_name = base_texture + "_NORMAL";
+                return;
+            }
+        }
+        
+        if (entity_name == "e_long_button") {
+            //std::cout << "entity is e" << std::endl;
+            if (is_key_just_released(GLFW_KEY_E)) {
+                std::cout << "e released" << std::endl;
+                transitioning = true;
+                tutorial_button_playing[entity_name] = false;
+                graphics.texture_name = base_texture + "_NORMAL";
+                return;
+            }
+            else if (key_e_pressed) {
+                std::cout << "e is held" << std::endl;
+                if (tutorial_button_playing[entity_name] == false) {
+                    ADM.play_now(entity_id, button_audio, audio);
+                    tutorial_button_playing[entity_name] = true;
+                }
+                graphics.texture_name = base_texture + "_PRESSED";
+                return;
+            }
+            else {
+                tutorial_button_playing[entity_name] = false;
+                graphics.texture_name = base_texture + "_NORMAL";
+                return;
+            }
+
+            
+        }
     }
 
     void Tutorial_Script::transit_next_scene() {
@@ -439,8 +504,6 @@ namespace lof {
 
                 // Update IMGUI Manager's current file
                 IMGUIM.set_current_file_shown(scene_file);
-                //current_cooldown = transition_cooldown;  // Set the cooldown timer
-                //transitioning = true;
                 return;
             }
             else {
@@ -448,373 +511,5 @@ namespace lof {
             }
         }
     }
-
-    //void Tutorial_Script::update_button(EntityID entity_id) {
-
-
-    //    EntityID tutorial_bg = ECSM.find_entity_by_name("tutorial_background");
-
-    //    if (!tutorial_bg) {
-    //        auto& tutorial_bg_graphic = ECSM.get_component<Graphics_Component>(tutorial_bg);
-    //    }
-    //    else {
-    //        std::cout << "fail to find" << std::endl;
-    //    }
-
-    //    if (current_cooldown > 0.0f) {
-    //        //std::cout << "didn't update" << std::endl;
-    //        return;  // Still in cooldown and transitioning
-    //    }
-
-    //    // Reset transition flag at start of frame
-    //    transitioning = false;
-
-    //    // Get mouse position in world coordinates
-    //    Vec2D world_mouse_pos = ESS.Get_World_MousePos();
-
-    //    auto* entity = ECSM.get_entity(entity_id);
-
-    //    if (!entity) {
-    //        return;
-    //    }
-
-    //    std::string entity_name = entity->get_name();
-
-    //    static const std::unordered_map<std::string, std::string> button_textures = {
-    //        {"a_button", "A_Batch_16"},
-    //        {"d_button", "D_Batch_16"},
-    //        {"e_long_button", "E_To_Begin_Batch_16"}
-    //    };
-
-    //    static const std::unordered_map<std::string, std::string> button_sounds = {
-    //        {"a_button", "tutorial_button"},
-    //        {"d_button", "tutorial_button"},
-    //        {"e_long_button", "main_menu"}
-    //    };
-
-    //    //return if the entity is not a button.
-    //    if (button_textures.find(entity_name) == button_textures.end()) {
-    //        return;
-    //    }
-
-    //    if (!ECSM.has_component<Transform2D>(entity_id) ||
-    //        !ECSM.has_component<Graphics_Component>(entity_id) ||
-    //        !ECSM.has_component<Audio_Component>(entity_id)) {
-    //        return;
-    //    }
-
-    //    auto& transform = ECSM.get_component<Transform2D>(entity_id);
-    //    auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
-    //    auto& audio = ECSM.get_component<Audio_Component>(entity_id);
-
-    //    update_button_visibility(entity_id, graphics);
-
-    //    // Check if mouse is hovering over the button
-    //    bool is_hovered = ESS.Mouse_Over_AABB(
-    //        transform.position.x,
-    //        transform.position.y,
-    //        transform.scale.x,
-    //        transform.scale.y,
-    //        world_mouse_pos.x,
-    //        world_mouse_pos.y
-    //    );
-
-    //    std::string base_texture = button_textures.at(entity_name);
-    //    std::string button_audio = button_sounds.at(entity_name);
-
-    //    //dont know where this came or what it does
-    //    //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-    //    //for (auto& base_textures : buttons_and_associated_batches) {
-    //    //    if (entity_name == base_textures.first) {
-    //    //        base_texture = base_textures.second;
-    //    //    }
-    //    //}
-
-    //    bool transit_to_play = false;
-
-    //    //reset the button texture
-    //    if (graphics.color.a < 1.0f) {
-    //        graphics.texture_name = base_texture + "_NORMAL";
-    //        tutorial_sound_playing[entity_name] = false;
-    //        return;
-    //    }
-
-    //    //reset the tutorial sound playing audio
-    //    if (tutorial_sound_playing[entity_name] == true && page_transition_cooldown < 0) {
-    //        tutorial_sound_playing[entity_name] = false;
-    //        return;
-    //    }
-
-    //    //if the entity is a
-    //    if (entity_name == "a_button") {
-    //        //bool audio_play = false;
-    //        if (is_hovered) {
-    //            graphics.texture_name = base_texture + "_HIGHLIGHTED";
-
-    //            if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
-    //                if (tutorial_sound_playing[entity_name] == false) {
-    //                    ADM.play_now(entity_id, button_audio, audio);
-    //                    tutorial_sound_playing[entity_name] = true;
-    //                }
-    //                graphics.texture_name = base_texture + "_PRESSED";
-    //                set_tutorial_page(tutorial_page - 1);
-    //            }
-
-    //            if (left_mouse_pressed) {
-    //                graphics.texture_name = base_texture + "_PRESSED";
-    //            }
-    //        }
-    //        else {
-    //            graphics.texture_name = base_texture + "_NORMAL";
-    //        }
-
-    //        if (is_key_just_pressed(GLFW_KEY_A)) {
-    //            if (tutorial_sound_playing[entity_name] == false) {
-    //                ADM.play_now(entity_id, button_audio, audio);
-    //                tutorial_sound_playing[entity_name] = true;
-    //            }
-    //            graphics.texture_name = base_texture + "_PRESSED";
-    //            set_tutorial_page(tutorial_page - 1);
-    //        }
-
-    //        //this is if it is pressed.
-    //        if (key_a_pressed) {
-    //            graphics.texture_name = base_texture + "_PRESSED";
-    //        }
-
-    //        //check if it is released
-    //        /*if (!key_a_pressed && key_a_last_frame || !left_mouse_pressed && left_mouse_last_frame) {
-    //            std::cout << "detecting a is released" << std::endl;
-    //            tutorial_sound_playing[entity_name] = false;
-    //        }*/
-    //    }
-
-    //    //if the entity is a
-    //    if (entity_name == "d_button") {
-    //        //bool audio_play = false;
-    //        if (is_hovered) {
-    //            graphics.texture_name = base_texture + "_HIGHLIGHTED";
-
-    //            if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
-    //                if (tutorial_sound_playing[entity_name] == false) {
-    //                    ADM.play_now(entity_id, button_audio, audio);
-    //                    tutorial_sound_playing[entity_name] = true;
-    //                }
-    //                graphics.texture_name = base_texture + "_PRESSED";
-    //                set_tutorial_page(tutorial_page - 1);
-    //            }
-
-    //            if (left_mouse_pressed) {
-    //                graphics.texture_name = base_texture + "_PRESSED";
-    //            }
-    //        }
-    //        else {
-    //            graphics.texture_name = base_texture + "_NORMAL";
-    //        }
-
-    //        if (is_key_just_pressed(GLFW_KEY_D)) {
-    //            if (tutorial_sound_playing[entity_name] == false) {
-    //                ADM.play_now(entity_id, button_audio, audio);
-    //                tutorial_sound_playing[entity_name] = true;
-    //            }
-    //            graphics.texture_name = base_texture + "_PRESSED";
-    //            set_tutorial_page(tutorial_page - 1);
-    //        }
-
-    //        //this is if it is pressed.
-    //        if (key_d_pressed) {
-    //            graphics.texture_name = base_texture + "_PRESSED";
-    //        }
-    //    }
-
-    //    if (entity_name == "e_long_button") {
-
-    //        //check if key A is held or pressed
-    //        if (key_e_pressed || is_key_just_pressed(GLFW_KEY_E)) {
-    //            if (tutorial_sound_playing[entity_name] == false) {
-    //                ADM.play_now(entity_id, button_audio, audio);
-    //                tutorial_sound_playing[entity_name] = true;
-    //            }
-    //            graphics.texture_name = base_texture + "_PRESSED";
-    //            transit_to_play = true;
-    //        }
-    //    }
-
-
-        //if (graphics.color.a == 1.0f) {
-            //if (is_hovered) {
-            //    std::cout << "hover " << entity_name << std::endl;
-            //    graphics.texture_name = base_texture + "_HIGHLIGHTED";
-
-            //    if (is_key_just_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
-
-            //        std::cout << "TRUE ------------------------------------------------" << std::endl;
-            //        if (tutorial_sound_playing[entity_name] == false) {
-            //            ADM.play_now(entity_id, button_audio, audio);
-            //            tutorial_sound_playing[entity_name] = true;
-            //        }
-            //        graphics.texture_name = base_texture + "_PRESSED";
-
-            //        std::cout << entity_name << std::endl;
-
-            //        if (entity_name == "a_button") {
-            //            set_tutorial_page(tutorial_page - 1);
-            //        } 
-            //        
-            //        if (entity_name == "d_button") {
-            //            std::cout << "d is detected" << std::endl;
-            //            set_tutorial_page(tutorial_page + 1);
-            //        } 
-            //        
-            //        if (entity_name == "e_long_button") {
-            //            if (tutorial_page == 10) {
-            //                transit_to_play = true;
-            //            }
-            //        }
-            //    }
-            //    else {
-            //        std::cout << "FALSE" << std::endl;
-            //        //mouse is hovering over the button therefore change it to highlight
-            //        //graphics.texture_name = base_texture + "_HIGHLIGHTED";
-            //        //set the audio playing to false as no audio feedback is needed.
-            //        tutorial_sound_playing[entity_name] = false;
-            //        return;
-            //    }
-            //}
-            //else {
-            //    //reset to normal state texture
-            //    tutorial_sound_playing[entity_name] = false;
-            //    graphics.texture_name = base_texture + "_NORMAL";
-            //}
-
-            //if (entity_name == "a_button") {
-
-            //    //check if key A is held or pressed
-            //    /*if (key_a_pressed || is_key_just_pressed(GLFW_KEY_A)) {
-            //        if (tutorial_sound_playing[entity_name] == false) {
-            //            ADM.play_now(entity_id, button_audio, audio);
-            //            tutorial_sound_playing[entity_name] = true;
-            //        }
-            //        graphics.texture_name = base_texture + "_PRESSED";
-            //        set_tutorial_page(tutorial_page - 1);
-            //    }*/
-
-            //    if (tutorial_sound_playing[entity_name] == false) {
-            //        //check if key A is held or pressed
-            //        if (key_a_pressed || is_key_just_pressed(GLFW_KEY_A)) {
-            //            ADM.play_now(entity_id, button_audio, audio);
-            //            tutorial_sound_playing[entity_name] = true;
-            //            graphics.texture_name = base_texture + "_PRESSED";
-            //            set_tutorial_page(tutorial_page - 1);
-            //        }
-            //    }
-            //}
-            //
-            //if (entity_name == "d_button") {
-
-            //    //check if key A is held or pressed
-            //    /*if (key_d_pressed || is_key_just_pressed(GLFW_KEY_D)) {
-            //        if (tutorial_sound_playing[entity_name] == false) {
-            //            ADM.play_now(entity_id, button_audio, audio);
-            //            tutorial_sound_playing[entity_name] = true;
-            //        }
-            //        graphics.texture_name = base_texture + "_PRESSED";
-            //        set_tutorial_page(tutorial_page + 1);
-            //    }*/
-
-            //    if (tutorial_sound_playing[entity_name] == false) {
-            //        //check if key A is held or pressed
-            //        if (key_d_pressed || is_key_just_pressed(GLFW_KEY_D)) {
-            //            ADM.play_now(entity_id, button_audio, audio);
-            //            tutorial_sound_playing[entity_name] = true;
-            //            graphics.texture_name = base_texture + "_PRESSED";
-            //            set_tutorial_page(tutorial_page + 1);
-            //        }
-            //    }
-            //}
-            //
-            //if (entity_name == "e_long_button") {
-
-            //    //check if key A is held or pressed
-            //    if (key_e_pressed || is_key_just_pressed(GLFW_KEY_E)) {
-            //        if (tutorial_sound_playing[entity_name] == false) {
-            //            ADM.play_now(entity_id, button_audio, audio);
-            //            tutorial_sound_playing[entity_name] = true;
-            //        }
-            //        graphics.texture_name = base_texture + "_PRESSED";
-            //        transit_to_play = true;
-            //    }
-            //}
-        //}
-        //else {
-        //    graphics.texture_name = base_texture + "_NORMAL";
-        //    tutorial_sound_playing[entity_name] = false;
-        //}
-
-        //
-
-
-
-    //    if (transit_to_play) {
-    //        //LM.write_log("Play button held - attempting scene transition");
-
-    //        // Clear dynamic entities first
-    //        bool found_movement_system = false;
-    //        for (auto& system : ECSM.get_systems()) {
-    //            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-    //                movement_system->clear_dynamic_entities();
-    //                found_movement_system = true;
-    //                LM.write_log("Found and cleared Movement System");
-    //                break;
-    //            }
-    //        }
-    //        if (!found_movement_system) {
-    //            LM.write_log("Warning: Movement System not found");
-    //        }
-
-    //        // Set up scene loading
-    //        const std::string SCENES = "Scenes";
-    //        std::string scene_file = "scene2.scn";
-    //        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-    //        LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
-
-    //        // Try to load scene2
-    //        if (SM.load_scene(scene_path.c_str())) {
-    //            LM.write_log("Scene loaded successfully");
-
-    //            // Reset camera position
-    //            auto& camera = GFXM.get_camera();
-    //            camera.pos_x = DEFAULT_CAMERA_POS_X;
-    //            camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-    //            // Reset player position if it exists
-    //            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-    //            if (playerId != INVALID_ENTITY_ID) {
-    //                if (ECSM.has_component<Transform2D>(playerId)) {
-    //                    auto& player_transform = ECSM.get_component<Transform2D>(playerId);
-    //                    player_transform.position = Vec2D(0.0f, 0.0f);
-    //                    player_transform.prev_position = player_transform.position;
-    //                }
-    //                if (ECSM.has_component<Velocity_Component>(playerId)) {
-    //                    auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-    //                    velocity.velocity = Vec2D(0.0f, 0.0f);
-    //                }
-    //            }
-
-    //            // Update current scene in Game Manager
-    //            GM.set_current_scene(2);
-
-    //            // Update IMGUI Manager's current file
-    //            IMGUIM.set_current_file_shown(scene_file);
-    //            current_cooldown = transition_cooldown;  // Set the cooldown timer
-    //            transitioning = true;
-    //            return;
-    //        }
-    //        else {
-    //            LM.write_log("Failed to load scene file: %s", scene_path.c_str());
-    //        }
-    //    }
-    //}
-
 
 } // namespace lof
