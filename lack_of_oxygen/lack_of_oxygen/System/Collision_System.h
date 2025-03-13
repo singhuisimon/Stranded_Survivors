@@ -211,6 +211,8 @@ namespace lof {
         std::unordered_map<std::string, bool> button_hover_states;
         std::unordered_map<std::string, bool> main_menu_sound_playing;
 
+        bool is_player_dead = false;
+
         // to get oxygen
         //static bool oxygen_increasing;
         //static bool collision_handled;
