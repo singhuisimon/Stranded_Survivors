@@ -426,14 +426,12 @@ namespace lof {
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
 
             //EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
-            EntityID timer_icon_id = ECSM.find_entity_by_name("top_ui_timer");
             //EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
 
             EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
             EntityID oxygen_percentage_text_id = ECSM.find_entity_by_name("top_ui_oxygen_percentage_text");
             EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
             //EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-            EntityID timer_count_text_id = ECSM.find_entity_by_name("top_ui_timer_count_text");
             EntityID goal_percentage_count_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
 
             if (ui_overlay_id != INVALID_ENTITY_ID) {
@@ -558,28 +556,28 @@ namespace lof {
                 }
 
                 // ------------------------- TIMER UPDATE CHANGES -------------------------
-                // 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
-                static float timer_accumulator = 0.0f; // You can make this a class member if you like
-                timer_accumulator += delta_time;
-                if (timer_accumulator >= 1.0f) {
-                    timer_accumulator = 0.0f;
+                //// 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
+                //static float timer_accumulator = 0.0f; // You can make this a class member if you like
+                //timer_accumulator += delta_time;
+                //if (timer_accumulator >= 1.0f) {
+                //    timer_accumulator = 0.0f;
 
-                    // Only decrease if you haven't hit zero
-                    if (timer_remaining > 0) {
-                        timer_remaining -= 1;
-                    }
-                }
+                //    // Only decrease if you haven't hit zero
+                //    if (timer_remaining > 0) {
+                //        timer_remaining -= 1;
+                //    }
+                //}
 
-                if (timer_count_text_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(timer_count_text_id) &&
-                    ECSM.has_component<Transform2D>(timer_icon_id))
-                {
-                    // If it has a Text_Component, update the visible text to show the integer countdown
-                    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
-                        timer_text_comp.text = std::to_string(timer_remaining);
-                    }
-                }
+                //if (timer_count_text_id != INVALID_ENTITY_ID &&
+                //    ECSM.has_component<Transform2D>(timer_count_text_id) &&
+                //    ECSM.has_component<Transform2D>(timer_icon_id))
+                //{
+                //    // If it has a Text_Component, update the visible text to show the integer countdown
+                //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                //        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
+                //        timer_text_comp.text = std::to_string(timer_remaining);
+                //    }
+                //}
                 // ------------------------- END TIMER UPDATE CHANGES -------------------------
 
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
@@ -615,7 +613,7 @@ namespace lof {
             // Check for oxygen level first - if it reaches zero, show game over screen
             if (current_oxygen_level <= 0.0f) {
                 // Player is out of oxygen - show game over screen
-                bool is_player_dead = true;
+                set_player_dead_state(true);
 
                 // Stop all audio first
                 ADM.stop_mastergroup();

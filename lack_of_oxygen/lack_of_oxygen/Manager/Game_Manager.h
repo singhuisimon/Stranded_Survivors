@@ -222,6 +222,10 @@ namespace lof {
 
         void reset_lava_timer() { lava_timer = 0.0f; }
         void set_tile_height(float height) { tile_height = height; }
+
+        bool is_player_dead = false;
+        bool get_player_dead_state() const { return is_player_dead; }
+        void set_player_dead_state(bool state) { is_player_dead = state; }
     };
 
 } // namespace lof
