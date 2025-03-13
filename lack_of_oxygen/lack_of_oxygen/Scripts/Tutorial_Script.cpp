@@ -25,6 +25,7 @@ namespace lof {
             (void)entity_id;
             auto tutorial_script = weak_script.lock();
             tutorial_script->set_tutorial_page(1);
+            tutorial_script->set_transitioning(false);
 
             if (!ECSM.has_component<Graphics_Component>(entity_id)) {
                 ECSM.get_component<Logic_Component>(entity_id).set_state("tutorial_script", ExecutionState::Terminated);
@@ -81,6 +82,10 @@ namespace lof {
 
     bool Tutorial_Script::get_transitioning() {
         return transitioning;
+    }
+
+    void Tutorial_Script::set_transitioning(bool new_bool) {
+        transitioning = new_bool;
     }
 
     void Tutorial_Script::set_tutorial_page(int new_page_num) {

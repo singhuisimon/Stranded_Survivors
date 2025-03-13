@@ -1,7 +1,7 @@
 {
     "objects": [
         {
-            "name": "tutorial_background",
+            "name": "background",
             "components": {
                 "Transform2D": {
                     "position": [
@@ -95,7 +95,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "tutorial_text_1",
+                    "texture_name": "tutorial_text_3",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [
@@ -378,7 +378,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        0.0
+                        1.0
                     ],
                     "texture_name": "A_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -602,7 +602,7 @@
                         ],
                         [
                             0.0,
-                            0.6481481194496155,
+                            0.2222222238779068,
                             0.0
                         ],
                         [
@@ -839,6 +839,70 @@
                     "velocity": [
                         0.0,
                         0.0
+                    ]
+                }
+            }
+        },
+        {
+            "name": "skip_text",
+            "components": {
+                "Transform2D": {
+                    "position": [
+                        790.0,
+                        -520.0
+                    ],
+                    "prev_position": [
+                        790.0,
+                        -520.0
+                    ],
+                    "orientation": [
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        312.0,
+                        21.0
+                    ]
+                },
+                "Graphics_Component": {
+                    "model_name": "square",
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "texture_name": "NoTexture",
+                    "shd_ref": 2,
+                    "mdl_to_ndc_xform": [
+                        [
+                            0.0005208333604969084,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0009259259095415473,
+                            0.0
+                        ],
+                        [
+                            0.4114583432674408,
+                            -0.4814814627170563,
+                            1.0
+                        ]
+                    ]
+                },
+                "Text_Component": {
+                    "font_name": "PressStart2P",
+                    "text": "[ \\ ] TO SKIP",
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "scale": [
+                        0.5,
+                        0.5
                     ]
                 }
             }

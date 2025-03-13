@@ -44,6 +44,7 @@ namespace lof {
 		int prev_tut_page = 1;
 
 		void set_tutorial_page(int new_page_num);
+		void set_transitioning(bool new_bool);
 		bool get_transitioning();
 		void update_button_visibility(EntityID entity_id, Graphics_Component& graphic_comp);
 
