@@ -100,7 +100,7 @@ namespace lof {
         std::string loaded_scene = "main_menu.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
-        // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4
+        // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4, tutorial.scn = 5
         GM.set_current_scene(0);
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
@@ -275,9 +275,9 @@ namespace lof {
             scene_no = 0;
             LM.write_log("Serialization_Manager::load_scene(): Setting to Main Menu");
         }
-        if (path.find("scene1.scn") != std::string::npos) {
+        if (path.find("tutorial.scn") != std::string::npos) {
             scene_no = 1;
-            LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 1");
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Tutorial");
         }
         else if (path.find("scene2.scn") != std::string::npos) {
             scene_no = 2;
@@ -432,6 +432,20 @@ namespace lof {
                         graphics.texture_name = "Lava_Pool_Batch_19";
                         graphics.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
                         ECSM.add_component(lava_pool_id, graphics);
+
+                        Collision_Component collisions;
+                        collisions.collidable = true;
+                        collisions.height = 1080.0f;
+                        collisions.width = 1920.0f;
+                        ECSM.add_component(lava_pool_id, collisions);
+
+                        Velocity_Component velocity;
+                        velocity.velocity.x = 0.0f;
+                        velocity.velocity.y = 0.0f;
+                        ECSM.add_component(lava_pool_id, velocity);
+
+              
+
 
                         // Initialize the lava timer in Game_Manager and store the tile height
                         GM.reset_lava_timer();
@@ -1164,6 +1178,7 @@ namespace lof {
         float tile_height = tile_width; // Keep tiles square
         
         bool is_wormhole = false;
+        bool is_lava_assets = false; // to get the lava assets
 
         //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
         //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
@@ -1211,7 +1226,8 @@ namespace lof {
                 }
 
                 is_wormhole = (tile.type == 't');
-                
+                is_lava_assets = (tile.type == 'l');
+
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
                 float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
@@ -1255,10 +1271,8 @@ namespace lof {
                     {
                         wormholes.push_back(entity);
                         //std::cout << "wormhole entity " << entity << "\n";
-
-                        
                     }
-
+                   
 
                 }
                 else {

@@ -349,18 +349,21 @@ namespace lof {
 
                         // Player is caught in the TNT blast - show game over screen
                         is_player_dead = true;
-
+                        GM.set_player_dead_state(true);  // Use the setter for better encapsulation
                     }
 
                     // Check if player is dead to reset the scene
                     if (is_player_dead == true) {
-                        
+
                         ECSM.destroy_entity(tnt_id);
                         tnt_to_destroy.erase(current->first);
                         tnt_to_destroy.clear();
 
                         // Stop all audio first
                         ADM.stop_mastergroup();
+
+                        //reset panic
+                        GM.reset_panic();
 
                         // Find GUI System and show game over screen
                         for (auto& systems_gui : ECSM.get_systems()) {
