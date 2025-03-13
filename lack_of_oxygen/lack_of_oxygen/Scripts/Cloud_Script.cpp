@@ -1,9 +1,15 @@
-#include <iostream>
-#include <string>
-#include <random>
-#include <iomanip>  // for std::setw and std::setfill
-#include <sstream>  // for std::stringstream
+/**
+ * @file Cloud_Script.cpp
+ * @brief Implements the script class for the Cloud logic.
+ * @details Initialize and update the script for foreground cloud in the game.
+ * @author Chua Wen Bin Kenny (100%)
+ * @date March 11, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 
+ // Include header file
 #include "../Scripts/Cloud_Script.h"
 #include "../Manager/Log_Manager.h"
 #include "../Manager/ECS_Manager.h"
@@ -11,14 +17,17 @@
 
 namespace lof {
 
+    // Constructor for Cloud_Script
     Cloud_Script::Cloud_Script() {
         moving_speed = CLOUD_MOVING_SPEED;
     }
 
+    // Returns the script name as a string
     std::string Cloud_Script::get_type() const {
         return script_name;
     }
 
+    // Register the script by adding functions into it
     void Cloud_Script::register_script() {
         auto cloud_script = shared_from_this();
 
@@ -36,7 +45,10 @@ namespace lof {
 
     }
 
+    // Controls the cloud movement in the foreground
     void Cloud_Script::cloud_movement_update() const {
+
+        // Get clouds ID
         EntityID cloud_1_id = ECSM.find_entity_by_name("cloud_1");
         EntityID cloud_2_id = ECSM.find_entity_by_name("cloud_2");
 
