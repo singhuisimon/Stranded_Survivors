@@ -257,7 +257,7 @@ namespace lof {
 			0,							// id
 			25.0f,						// current size
 			25.0f,						// starting size
-			25.0f,						// speed
+			20.0f,						// speed
 			270.0f,						// direction
 			0.5f,						// lifespan
 			0.5f						// life left
@@ -288,8 +288,13 @@ namespace lof {
 			}
 
 			// Decrease particle size by lifespan (For all particles except TNT VFX and lava)
-			if (particles_storage[i].type != tnt_vfx /*&& particles_storage[i].type != lava*/) {
+			if (particles_storage[i].type != tnt_vfx && particles_storage[i].type != sweat_screen /*&& particles_storage[i].type != lava*/) {
 				particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
+			}
+			else if (particles_storage[i].type == sweat_screen) {
+				// From full to half size within lifespan
+				float half_size = particles_storage[i].start_size / 2.0f;
+				particles_storage[i].curr_size = half_size + (half_size * particles_storage[i].life_left / particles_storage[i].life_span);
 			}
 
 			// Update movement and direction
