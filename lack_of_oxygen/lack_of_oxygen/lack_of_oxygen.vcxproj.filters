@@ -48,9 +48,10 @@
     <ClCompile Include="Manager\Logic_Manager.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
-    <ClCompile Include="Scripts\Mini_Map_Player.cpp" />
     <ClCompile Include="Scripts\Mining_Script.cpp" />
     <ClCompile Include="Scripts\Cloud_Script.cpp" />
+    <ClCompile Include="Scripts\Tutorial_Script.cpp" />
+    <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -99,9 +100,10 @@
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
-    <ClInclude Include="Scripts\Mini_Map_Player.h" />
     <ClInclude Include="Scripts\Mining_Script.h" />
     <ClInclude Include="Scripts\Cloud_Script.h" />
+    <ClInclude Include="Scripts\Tutorial_Script.h" />
+    <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -234,6 +236,7 @@
     <Image Include="Assets\Textures\obsidian_bottom_line_batch_19.png" />
     <Image Include="Assets\Textures\sweat_drop_single_batch_5.png" />
     <Image Include="Assets\Textures\foreground_clouds_batch_4.png" />
+    <Image Include="Assets\Textures\screen_vignette_red_batch_19.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />

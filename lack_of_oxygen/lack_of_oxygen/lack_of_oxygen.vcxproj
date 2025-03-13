@@ -58,6 +58,7 @@
     <ClCompile Include="Scripts\Mining_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
+    <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Script.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
+    <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Script.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Audio_System.h" />
