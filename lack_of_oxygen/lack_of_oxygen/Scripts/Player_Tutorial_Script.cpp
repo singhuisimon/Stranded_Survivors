@@ -47,22 +47,20 @@ namespace lof {
 
             //Time per frame
             float delta_time = FPSM.get_delta_time();  
-            //Pixels per second
-            float moving_speed = 20.0f;
             float one_way_movement_time = 0.5f;
 
             timer += delta_time;
 
-            if (up_direction) {
-                player_in_chair_transform.position.y += moving_speed * delta_time;
-            }
-            else {
-                player_in_chair_transform.position.y -= moving_speed * delta_time;
-            }
-
             //Switching direction
             if (timer >= one_way_movement_time) {
                 up_direction = !up_direction;
+
+                if (up_direction) {
+                    player_in_chair_transform.position.y += 10;
+                }
+                else {
+                    player_in_chair_transform.position.y -= 10;
+                }
 
                 //Reset timer
                 timer = 0.0f;
