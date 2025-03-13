@@ -1581,6 +1581,8 @@ namespace lof {
  
         resolve_collision_event(collisions);
 
+        player_interact_lava(delta_time);
+
         //EntityID wormhole = ECSM.find_entity_by_name("spritesheet_map");
         //std::cout << "this is wormhole entity " << wormhole << "\n";
     
@@ -2099,6 +2101,83 @@ namespace lof {
                 button_hover_states[entity_name] = false;
             }
         }
+    }
+
+    void Collision_System::player_interact_lava(float delta_time)
+    {
+        
+        if (GM.get_current_scene() != 2) {
+            return;
+        }
+
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
+
+     
+        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player 
+        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
+        //auto& player_physic = ECSM.get_component<Physics_Component>(playerID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
+
+        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
+        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID); // get the position of the player 
+        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID); // get the position of the player 
+
+        float collisions = delta_time;
+        // AABB for player
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
+
+        float player_bottom = aabb_player.min.y + (aabb_player.max.y - aabb_player.min.y);
+        float lava_top = aabb_lava.min.y;
+
+        // Define a small threshold to account for minor floating-point errors
+        float threshold = 0.01f;
+
+        bool is_touching = std::abs(player_bottom - lava_top) < threshold;
+
+        if (is_touching) std::cout << "player in touch with lava !!!!\n";
+
+
+        //std::cout << "lava pos x:" << lava_transform.position.x << "lava pos y: " << lava_transform.position.y << "\n";
+        //std::cout << "lava height: " << lava_collision.height << " lava width: " << lava_collision.width << " collidable: " << lava_collision.collidable << "\n";
+        bool is_player_dead = false;
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
+        {
+           // std::cout << "test\n";
+            is_player_dead = true;
+            GM.set_player_dead_state(true);
+        }
+
+        // Check if player is dead to reset the scene
+        if (is_player_dead == true) {
+            // Stop all audio first
+            ADM.stop_mastergroup();
+
+            //reset panic
+            GM.reset_panic();
+
+            // Find GUI System and show game over screen
+            for (auto& systems_gui : ECSM.get_systems()) {
+                if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                    // First reset all GUI states
+                    gui_system->reset_all_game_state();
+
+                    // Then show the game over screen
+                    gui_system->show_game_over_menu();
+
+                    LM.write_log("Game over screen displayed - player killed by Lava");
+                    break;
+                }
+            }
+
+           
+ 
+        }
+
+        
+  
+
     }
 }
 
