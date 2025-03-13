@@ -1,7 +1,7 @@
 {
     "objects": [
         {
-            "name": "tutorial_background",
+            "name": "background",
             "components": {
                 "Transform2D": {
                     "position": [
@@ -119,135 +119,151 @@
         },
         {
             "name": "siren_bulb_left",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -835.0,
-                        480.0
-                    ],
-                    "prev_position": [
-                        -835.0,
-                        480.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        90.0,
-                        120.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Siren_Bulb_Batch_14_1",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0937500074505806,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.2222222238779068,
-                            0.0
-                        ],
-                        [
-                            -0.8697916865348816,
-                            0.8888888955116272,
-                            1.0
-                        ]
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "tutorial_light",
-                            "filepath": "sfx_tutorial_lights",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        }
-                    ]
+          "components": {
+            "Transform2D": {
+              "position": [
+                -835.0,
+                480.0
+              ],
+              "prev_position": [
+                -835.0,
+                480.0
+              ],
+              "orientation": [
+                0.0,
+                0.0
+              ],
+              "scale": [
+                90.0,
+                120.0
+              ]
+            },
+            "Graphics_Component": {
+              "model_name": "square",
+              "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "texture_name": "Siren_Bulb_Batch_14_1",
+              "shd_ref": 0,
+              "mdl_to_ndc_xform": [
+                [
+                  0.0937500074505806,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.2222222238779068,
+                  0.0
+                ],
+                [
+                  -0.8697916865348816,
+                  0.8888888955116272,
+                  1.0
+                ]
+              ]
+            },
+            "Audio_Component": {
+              "sounds": [
+                {
+                  "key": "tutorial_light",
+                  "filepath": "sfx_tutorial_lights",
+                  "audio_type": 1,
+                  "max_simultaneous": 1,
+                  "volume": 0.6,
+                  "pitch": 1.0,
+                  "islooping": false,
+                  "isactive": true,
+                  "is3d": false
                 }
+              ]
+            },
+            "Logic_Component": {
+              "scripts": [
+                {
+                  "script_name": "tutorial_light_script",
+                  "is_active": true
+                }
+              ]
             }
+          }
         },
         {
             "name": "siren_bulb_right",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        835.0,
-                        480.0
-                    ],
-                    "prev_position": [
-                        835.0,
-                        480.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        90.0,
-                        120.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Siren_Bulb_Batch_14_1",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0937500074505806,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.2222222238779068,
-                            0.0
-                        ],
-                        [
-                            0.8697916865348816,
-                            0.8888888955116272,
-                            1.0
-                        ]
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "tutorial_light",
-                            "filepath": "sfx_tutorial_lights",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        }
-                    ]
+          "components": {
+            "Transform2D": {
+              "position": [
+                835.0,
+                480.0
+              ],
+              "prev_position": [
+                835.0,
+                480.0
+              ],
+              "orientation": [
+                0.0,
+                0.0
+              ],
+              "scale": [
+                90.0,
+                120.0
+              ]
+            },
+            "Graphics_Component": {
+              "model_name": "square",
+              "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "texture_name": "Siren_Bulb_Batch_14_1",
+              "shd_ref": 0,
+              "mdl_to_ndc_xform": [
+                [
+                  0.0937500074505806,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.2222222238779068,
+                  0.0
+                ],
+                [
+                  0.8697916865348816,
+                  0.8888888955116272,
+                  1.0
+                ]
+              ]
+            },
+            "Audio_Component": {
+              "sounds": [
+                {
+                  "key": "tutorial_light",
+                  "filepath": "sfx_tutorial_lights",
+                  "audio_type": 1,
+                  "max_simultaneous": 1,
+                  "volume": 0.6,
+                  "pitch": 1.0,
+                  "islooping": false,
+                  "isactive": true,
+                  "is3d": false
                 }
+              ]
+            },
+            "Logic_Component": {
+              "scripts": [
+                {
+                  "script_name": "tutorial_light_script",
+                  "is_active": true
+                }
+              ]
             }
+          }
         },
         {
             "name": "siren_lights_left",
@@ -378,7 +394,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        0.0
+                        1.0
                     ],
                     "texture_name": "A_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -484,7 +500,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        1.0
+                        0.0
                     ],
                     "texture_name": "D_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -581,7 +597,7 @@
                     ],
                     "scale": [
                         900.0,
-                        120.0
+                        100.0
                     ]
                 },
                 "Graphics_Component": {
@@ -590,7 +606,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        0.0
+                        1.0
                     ],
                     "texture_name": "E_To_Begin_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -602,7 +618,7 @@
                         ],
                         [
                             0.0,
-                            0.6481481194496155,
+                            0.18518517911434174,
                             0.0
                         ],
                         [
@@ -753,8 +769,8 @@
                 "Logic_Component": {
                     "scripts": [
                         {
-                            "script_name": "tutorial_script",
-                            "is_active": true
+                          "script_name": "player_tutorial_script",
+                          "is_active": true
                         }
                     ]
                 }
@@ -839,6 +855,70 @@
                     "velocity": [
                         0.0,
                         0.0
+                    ]
+                }
+            }
+        },
+        {
+            "name": "skip_text",
+            "components": {
+                "Transform2D": {
+                    "position": [
+                        790.0,
+                        -520.0
+                    ],
+                    "prev_position": [
+                        790.0,
+                        -520.0
+                    ],
+                    "orientation": [
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        312.0,
+                        21.0
+                    ]
+                },
+                "Graphics_Component": {
+                    "model_name": "square",
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "texture_name": "NoTexture",
+                    "shd_ref": 2,
+                    "mdl_to_ndc_xform": [
+                        [
+                            0.0005208333604969084,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0009259259095415473,
+                            0.0
+                        ],
+                        [
+                            0.4114583432674408,
+                            -0.4814814627170563,
+                            1.0
+                        ]
+                    ]
+                },
+                "Text_Component": {
+                    "font_name": "PressStart2P",
+                    "text": "[ \\ ] TO SKIP",
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "scale": [
+                        0.5,
+                        0.5
                     ]
                 }
             }

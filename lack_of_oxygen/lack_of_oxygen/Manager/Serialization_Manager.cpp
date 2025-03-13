@@ -433,6 +433,20 @@ namespace lof {
                         graphics.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
                         ECSM.add_component(lava_pool_id, graphics);
 
+                        Collision_Component collisions;
+                        collisions.collidable = true;
+                        collisions.height = 1080.0f;
+                        collisions.width = 1920.0f;
+                        ECSM.add_component(lava_pool_id, collisions);
+
+                        Velocity_Component velocity;
+                        velocity.velocity.x = 0.0f;
+                        velocity.velocity.y = 0.0f;
+                        ECSM.add_component(lava_pool_id, velocity);
+
+              
+
+
                         // Initialize the lava timer in Game_Manager and store the tile height
                         GM.reset_lava_timer();
                         GM.set_tile_height(tile_height);
@@ -1164,6 +1178,7 @@ namespace lof {
         float tile_height = tile_width; // Keep tiles square
         
         bool is_wormhole = false;
+        bool is_lava_assets = false; // to get the lava assets
 
         //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
         //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
@@ -1211,7 +1226,8 @@ namespace lof {
                 }
 
                 is_wormhole = (tile.type == 't');
-                
+                is_lava_assets = (tile.type == 'l');
+
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);
                 float y_pos = START_Y - (row * tile_height) - (tile_height / 2.0f);
@@ -1255,10 +1271,8 @@ namespace lof {
                     {
                         wormholes.push_back(entity);
                         //std::cout << "wormhole entity " << entity << "\n";
-
-                        
                     }
-
+                   
 
                 }
                 else {

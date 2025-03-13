@@ -31,6 +31,7 @@ namespace lof {
         EntityID mineral_deposit_count_text = INVALID_ENTITY_ID;
         float mineral_e_prompt_x = 550.0f;  // X position for 'E' prompt
         float stored_mineral_progress = 0.0f;  // Store progress between [0.0f ... 1.0f]
+        float stored_goal_percentage = 0.0f;
 
         // == OXYGEN TANK MEMBERS ==
         EntityID oxygen_e_prompt = INVALID_ENTITY_ID;  // 'E' prompt entity for Oxygen tank
@@ -91,7 +92,7 @@ namespace lof {
         std::string wormhole_e_prompt_name; // Entity name for wormhole E prompt
         float wormhole_e_prompt_animation_timer = 0.0f; // for wormhole animation
         EntityID wormhole_e_prompt = INVALID_ENTITY_ID; // for wormhole E prompt entity 
-        float wormhole_e_prompt_x; // position x of the wormhole E prompt
+        float wormhole_e_prompt_x = 0.0f; // position x of the wormhole E prompt
         float wormhole_e_prompt_y = 5.0f; // position y of the wormhole E prompt
         //const float WORMHOLE_E_PROMPT_AMPLITUDE = 1.0f;
 
@@ -185,17 +186,18 @@ namespace lof {
         void hide_mineral_tank_gui();
         void update_mineral_progress(float progress);
 
-        /**
-         * @brief Get the current mineral hopper percentage progress.
-         */
         float get_current_hopper_percentage() const {
+            // If we have a progress bar, try to get from component first
             if (mineral_progress_bar != INVALID_ENTITY_ID) {
                 if (auto* gui = get_component_safe<GUI_Component>(mineral_progress_bar)) {
                     return gui->progress;
                 }
             }
-            return 0.0f;
+            // Otherwise return our stored value directly
+            return stored_mineral_progress;
         }
+
+
 
         // == OXYGEN TANK GUI SHOW/HIDE ==
         void show_oxygen_tank_gui();
@@ -232,6 +234,7 @@ namespace lof {
         bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
 
         void reset_all_game_state();
+
 
     };
 
