@@ -1617,11 +1617,6 @@ namespace lof {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
-        if (level_editor_mode) {
-            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
-            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
-        }
-
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
@@ -1666,13 +1661,13 @@ namespace lof {
                 base_texture = "Main_Menu_Quit_Batch_14";
             }
                 
-            //dont know where this came or what it does
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
-                if (entity_name == base_textures.first) {
-                    base_texture = base_textures.second;
-                }
-            }
+            ////dont know where this came or what it does
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            //for (auto& base_textures : buttons_and_associated_batches) {
+            //    if (entity_name == base_textures.first) {
+            //        base_texture = base_textures.second;
+            //    }
+            //}
 
 
             if (is_hovered) {
@@ -1753,7 +1748,7 @@ namespace lof {
                             GM.set_current_scene(2);
 
                             // Update IMGUI Manager's current file
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
@@ -1795,7 +1790,7 @@ namespace lof {
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(3);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
@@ -1837,11 +1832,6 @@ namespace lof {
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
-        if (level_editor_mode) {
-            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
-            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
-        }
-
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
@@ -1871,13 +1861,13 @@ namespace lof {
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
 
-            //is this code from lily??
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
-                if (entity_name == base_textures.first) {
-                    base_texture = base_textures.second;
-                }
-            }
+            ////is this code from lily??
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            //for (auto& base_textures : buttons_and_associated_batches) {
+            //    if (entity_name == base_textures.first) {
+            //        base_texture = base_textures.second;
+            //    }
+            //}
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
@@ -1923,7 +1913,7 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
+                        //IMGUIM.set_current_file_shown(scene_file);
                         current_cooldown = transition_cooldown;  // Set the cooldown timer
                         is_transitioning = true;
                         return;
@@ -1956,11 +1946,6 @@ namespace lof {
         if (is_transitioning) return;
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
-
-        if (level_editor_mode) {
-            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
-            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
-        }
 
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
@@ -1999,13 +1984,13 @@ namespace lof {
             static bool clicked_played = false;
 
 
-            //lily's update/?
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
-                if (entity_name == base_textures.first) {
-                    base_texture = base_textures.second;
-                }
-            }
+            ////lily's update/?
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            //for (auto& base_textures : buttons_and_associated_batches) {
+            //    if (entity_name == base_textures.first) {
+            //        base_texture = base_textures.second;
+            //    }
+            //}
 
            
 
@@ -2083,7 +2068,7 @@ namespace lof {
                             ADM.stop_mastergroup();
 
                             GM.set_current_scene(0);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             current_cooldown = transition_cooldown;
                             grace_timer = post_transition_grace_period; // Set grace period
                             is_transitioning = true;

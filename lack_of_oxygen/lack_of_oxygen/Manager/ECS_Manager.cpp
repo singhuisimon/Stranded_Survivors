@@ -452,7 +452,7 @@ namespace lof {
             }
 #endif
 
-            if ((level_editor_mode && !game_playing) || GM.is_paused()) {
+            if (GM.is_paused()) {
                 for (auto system : gameplay_dependent_systems) {
                     system->set_time(0);
                 }
@@ -474,11 +474,11 @@ namespace lof {
             for (auto system : dt_update_systems) {
 
                 //skip the systems found in the gameplay_dependent_systems
-                if (((level_editor_mode && !game_playing)) &&
+                /*if (((level_editor_mode && !game_playing)) &&
                     std::find(gameplay_dependent_systems.begin(), gameplay_dependent_systems.end(), system) != gameplay_dependent_systems.end())
                 {
                     continue;
-                }
+                }*/
 
                 system->set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
                 // Updating each system
