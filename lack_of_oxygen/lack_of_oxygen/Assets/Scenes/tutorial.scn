@@ -95,7 +95,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "tutorial_text_3",
+                    "texture_name": "tutorial_text_10",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [
@@ -484,7 +484,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        1.0
+                        0.0
                     ],
                     "texture_name": "D_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -581,7 +581,7 @@
                     ],
                     "scale": [
                         900.0,
-                        120.0
+                        100.0
                     ]
                 },
                 "Graphics_Component": {
@@ -590,7 +590,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        0.0
+                        1.0
                     ],
                     "texture_name": "E_To_Begin_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -602,7 +602,7 @@
                         ],
                         [
                             0.0,
-                            0.2222222238779068,
+                            0.18518517911434174,
                             0.0
                         ],
                         [
