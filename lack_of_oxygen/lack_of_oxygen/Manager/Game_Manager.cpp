@@ -200,8 +200,6 @@ namespace lof {
                     // Pause audio
                     ADM.pause_resume_mastergroup();
 
-                    // pause the panic 
-                    current_panic_level = panic_current;
                 }
                 else {
                     gui_system->hide_pause_menu();
