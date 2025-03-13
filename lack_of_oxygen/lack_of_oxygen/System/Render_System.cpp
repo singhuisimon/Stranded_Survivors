@@ -234,58 +234,6 @@ namespace lof {
                 auto& graphics = ECSM.get_component<Graphics_Component>(*start);
                 auto& transform = ECSM.get_component<Transform2D>(*start);
 
-                //// Scaling update when up or down arrow key pressed
-                //GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
-
-                //// Check if the entity has Collision_Component
-                //if (ECSM.has_component<Collision_Component>(*start)) {
-
-                //    auto& collision = ECSM.get_component<Collision_Component>(*start);
-
-                //    int scale_flag = GFXM.get_scale_flag();
-                //    if (scale_flag == GLFW_KEY_UP) {
-                //        LM.write_log("Render_System::update(): 'UP' key held, increasing scale of entity %u by %f.", *start, scale_change);
-                //        transform.scale.x += scale_change;
-                //        transform.scale.y += scale_change;
-                //        collision.width += scale_change;
-                //        collision.height += scale_change;
-                //    }
-                //    else if (scale_flag == GLFW_KEY_DOWN) {
-                //        LM.write_log("Render_System::update(): 'DOWN' key held, decreasing scale of entity %u by %f.", *start, scale_change);
-                //        if (transform.scale.x > 0.0f) {
-                //            transform.scale.x -= scale_change;
-                //            collision.width -= scale_change;
-                //        }
-                //        else {
-                //            transform.scale.x = 0.0f;
-                //            collision.width = 0.0f;
-                //        }
-
-                //        if (transform.scale.y > 0.0f) {
-                //            transform.scale.y -= scale_change;
-                //            collision.height -= scale_change;
-                //        }
-                //        else {
-                //            transform.scale.y = 0.0f;
-                //            collision.height = 0.0f;
-                //        }
-                //    }
-
-                //    // Rotation update when left or right arrow key pressed
-                //    int rotation_flag = GFXM.get_rotation_flag();
-                //    if (rotation_flag == GLFW_KEY_LEFT) {
-                //        GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                //        transform.orientation.x += rot_change;
-                //        LM.write_log("Render_System::update(): 'LEFT' key held, rotating entity %u by %f.", *start, rot_change);
-                //    }
-                //    else if (rotation_flag == GLFW_KEY_RIGHT) {
-                //        GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-                //        transform.orientation.x -= rot_change;
-                //        LM.write_log("Render_System::update(): 'RIGHT' key held, rotating entity %u by %f.", *start, rot_change);
-                //    }
-
-                //}
-
                 // Compute object scale matrix
                 // Special case for text objects
                 float scale_x{ 0 }, scale_y{ 0 }, translate_x{ 0 }, translate_y{ 0 };
@@ -1226,9 +1174,6 @@ namespace lof {
                     else {
                         glBindTextureUnit(5, textures[particle_tex]);
                     }
-
-                    // Get camera for transform
-                    auto& camera = GFXM.get_camera();
 
                     // Compute particle scale matrix
                     glm::mat3 scale_mat{ particles_storage[i].curr_size * 64, 0, 0,
