@@ -170,12 +170,12 @@
             {
               "key": "game over",
               "filepath": "bgm_game_over",
-              "audio_type": 0,
+              "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 0.5,
               "pitch": 1.0,
               "islooping": false,
-              "isactive": false,
+              "isactive": true,
               "is3d": false
             }
           ],
