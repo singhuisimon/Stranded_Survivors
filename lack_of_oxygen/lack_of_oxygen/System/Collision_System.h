@@ -211,6 +211,8 @@ namespace lof {
         std::unordered_map<std::string, bool> button_hover_states;
         std::unordered_map<std::string, bool> main_menu_sound_playing;
 
+        bool is_player_dead = false;
+
         // to get oxygen
         //static bool oxygen_increasing;
         //static bool collision_handled;
@@ -293,6 +295,8 @@ namespace lof {
         void check_win_screen_button_collision(float delta_time);
 
         void player_interact_lava(float delta_time);
+
+        void Detect_Obsidian_Bottom(float delta_time);
     };
 
 

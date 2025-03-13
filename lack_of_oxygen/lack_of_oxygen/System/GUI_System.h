@@ -120,6 +120,8 @@ namespace lof {
         std::unordered_map<std::string, bool> game_over_button_hover_states;
         bool game_over_shown = false;
 
+        bool gameover_audio_played = false;
+
         /**
          * @brief Clamps a value between a minimum and maximum range.
          */
@@ -234,7 +236,6 @@ namespace lof {
         bool is_visible() const { return container_id != INVALID_ENTITY_ID; }
 
         void reset_all_game_state();
-
 
     };
 

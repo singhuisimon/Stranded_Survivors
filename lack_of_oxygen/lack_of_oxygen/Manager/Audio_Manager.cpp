@@ -19,7 +19,7 @@ namespace lof {
 		return instance;
 	}
 
-	Audio_Manager::Audio_Manager() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr), uigroup(nullptr), new_scene(true), to_play_gameover(false) {
+	Audio_Manager::Audio_Manager() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr), uigroup(nullptr), new_scene(true){
 		set_type("Audio_Manager");
 	}
 
@@ -329,22 +329,6 @@ namespace lof {
 		}
 
 		auto& audio_background = ECSM.get_component<Audio_Component>(background_id);
-		
-		for (auto& system : ECSM.get_systems()) {
-			if (system->get_type() == "GUI_System") {
-				auto* gui_system = static_cast<GUI_System*>(system.get());
-				to_play_gameover = gui_system->is_game_over_shown();
-			}
-			else {
-				continue;
-			}
-		}
-
-		if (to_play_gameover && yet_to_play) {
-			stop_mastergroup();
-			ADM.play_now(background_id, "game over", audio_background);
-			yet_to_play = false;
-		}
 
 		//new logic
 		if (new_scene) {
@@ -651,9 +635,5 @@ namespace lof {
 
 	bool Audio_Manager::get_new_scene() {
 		return new_scene;
-	}
-
-	void Audio_Manager::set_yet_to_play(bool new_bool) {
-		yet_to_play = new_bool;
 	}
 }
