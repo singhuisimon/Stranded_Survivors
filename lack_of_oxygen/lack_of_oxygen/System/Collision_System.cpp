@@ -328,11 +328,11 @@ namespace lof {
         }
     }
 
+
+
     /*
-    * @brief Checks the entity's vent type
+    * @brief Checks the entity's vent type, stores the direction and return the vent direction type
     */
-
-
 
     VentDirection Collision_System::get_vent_direction(EntityID id) const {
         auto* entity = ECSM.get_entity(id);
@@ -384,7 +384,7 @@ namespace lof {
                 //apply up movement
                 e_physics.force_helper.activate_force(VENT_FORCE);
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-                e_velocity.velocity.y = 300.0f;
+                e_velocity.velocity.y = 200.0f;
                 break;
             }
             case VentDirection::LEFT: {
@@ -396,8 +396,6 @@ namespace lof {
 
                 //apply force
                 e_physics.force_helper.activate_force(MOVE_LEFT);
-                e_velocity.velocity.x = -300.0f;
-                e_velocity.velocity.y = 0.0f;
                 break;
             }
             case VentDirection::RIGHT: {
@@ -409,8 +407,6 @@ namespace lof {
 
                 //apply force
                 e_physics.force_helper.activate_force(MOVE_RIGHT);
-                e_velocity.velocity.x = 300.0f;
-                e_velocity.velocity.y = 0.0f;
                 break;
             }
             default: 
