@@ -1325,6 +1325,9 @@ void GUI_System::hide_wormhole_gui() {
                         // Unpause first
                         GM.set_paused(false);
 
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
+
                         // Force hide pause menu first
                         hide_pause_menu();
 
@@ -1384,6 +1387,9 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Unpause first
                         GM.set_paused(false);
+
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
 
                         // Force hide pause menu first
                         hide_pause_menu();
@@ -1747,6 +1753,9 @@ void GUI_System::hide_wormhole_gui() {
                     if (key == "restart") {
                         LM.write_log("Game over - Restart button pressed - reloading scene 2");
 
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
+
                         hide_game_over_menu();
                         reset_all_game_state();
 
@@ -1781,6 +1790,9 @@ void GUI_System::hide_wormhole_gui() {
                     }
                     else if (key == "main_menu") {
                         LM.write_log("Game over - Main Menu button pressed - returning to main menu");
+
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
 
                         hide_game_over_menu();
                         reset_all_game_state();
