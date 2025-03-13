@@ -291,6 +291,8 @@ namespace lof {
         void check_credits_back_button_collision(float delta_time);
         // == WIN SCREEN BUTTON COLLISION ==
         void check_win_screen_button_collision(float delta_time);
+
+        void player_interact_lava(float delta_time);
     };
 
 

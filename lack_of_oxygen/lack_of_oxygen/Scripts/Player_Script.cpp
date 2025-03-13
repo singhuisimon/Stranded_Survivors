@@ -44,6 +44,9 @@ namespace lof {
         //found_wormhole = false;
         key_t_last_frame = false;
         key_t_pressed = false;
+
+        key_y_last_frame = false;
+        key_y_pressed = false;
     }
 
     std::string Player_Script::get_type() const {
@@ -111,6 +114,9 @@ namespace lof {
         key_t_last_frame = key_t_pressed;
         key_t_pressed = IM.is_key_held(GLFW_KEY_T); //cheap code for teleport
 
+        key_y_last_frame = key_y_pressed;
+        key_y_pressed = IM.is_key_held(GLFW_KEY_Y); //cheap code for teleport
+
 
     }
 
@@ -135,6 +141,10 @@ namespace lof {
         else if (key == GLFW_KEY_T)
         {
             return key_t_pressed && !key_e_last_frame;
+        }
+        else if (key == GLFW_KEY_Y)
+        {
+            return key_y_pressed && !key_y_last_frame;
         }
         return false;
     }
@@ -417,7 +427,7 @@ namespace lof {
         }
 
         // Handle teleportation based on player input
-        float current_time = glfwGetTime();
+        float current_time = static_cast<float>(glfwGetTime());
         for (const auto& pair : wormhole_pairs) {
             EntityID wormhole_id = pair.first;
             EntityID linked_wormhole = pair.second;
@@ -437,7 +447,14 @@ namespace lof {
             }
         }
 
-        Cheap_Code_Teleport_Wormhole(-522.0f, -3654.0f);
+        if (is_key_just_pressed(GLFW_KEY_T)) {
+
+            Cheap_Code_Teleport_Wormhole(657.0f, -3750.0f);
+        }
+        else if (is_key_just_pressed(GLFW_KEY_Y))
+        {
+            Cheap_Code_Teleport_Wormhole(-741.0f, -7302.0f);
+        }
     }
 
     bool Player_Script::is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole)
@@ -469,13 +486,14 @@ namespace lof {
     void Player_Script::Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y)
     {
         // cheap code for teleport 
-        if (is_key_just_pressed(GLFW_KEY_T))
-        {
+        //if (is_key_just_pressed(GLFW_KEY_T))
+        //{
             auto& player_transform = ECSM.get_component<Transform2D>(player_id);
             player_transform.position.x = pos_x;
             player_transform.position.y = pos_y;
 
-        }
+        //}
+       
     }
 
 

@@ -95,7 +95,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "tutorial_text_3",
+                    "texture_name": "tutorial_text_1",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [
@@ -119,135 +119,151 @@
         },
         {
             "name": "siren_bulb_left",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        -835.0,
-                        480.0
-                    ],
-                    "prev_position": [
-                        -835.0,
-                        480.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        90.0,
-                        120.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Siren_Bulb_Batch_14_1",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0937500074505806,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.2222222238779068,
-                            0.0
-                        ],
-                        [
-                            -0.8697916865348816,
-                            0.8888888955116272,
-                            1.0
-                        ]
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "tutorial_light",
-                            "filepath": "sfx_tutorial_lights",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        }
-                    ]
+          "components": {
+            "Transform2D": {
+              "position": [
+                -835.0,
+                480.0
+              ],
+              "prev_position": [
+                -835.0,
+                480.0
+              ],
+              "orientation": [
+                0.0,
+                0.0
+              ],
+              "scale": [
+                90.0,
+                120.0
+              ]
+            },
+            "Graphics_Component": {
+              "model_name": "square",
+              "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "texture_name": "Siren_Bulb_Batch_14_1",
+              "shd_ref": 0,
+              "mdl_to_ndc_xform": [
+                [
+                  0.0937500074505806,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.2222222238779068,
+                  0.0
+                ],
+                [
+                  -0.8697916865348816,
+                  0.8888888955116272,
+                  1.0
+                ]
+              ]
+            },
+            "Audio_Component": {
+              "sounds": [
+                {
+                  "key": "tutorial_light",
+                  "filepath": "sfx_tutorial_lights",
+                  "audio_type": 1,
+                  "max_simultaneous": 1,
+                  "volume": 0.6,
+                  "pitch": 1.0,
+                  "islooping": false,
+                  "isactive": true,
+                  "is3d": false
                 }
+              ]
+            },
+            "Logic_Component": {
+              "scripts": [
+                {
+                  "script_name": "tutorial_light_script",
+                  "is_active": true
+                }
+              ]
             }
+          }
         },
         {
             "name": "siren_bulb_right",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        835.0,
-                        480.0
-                    ],
-                    "prev_position": [
-                        835.0,
-                        480.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        90.0,
-                        120.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Siren_Bulb_Batch_14_1",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0937500074505806,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.2222222238779068,
-                            0.0
-                        ],
-                        [
-                            0.8697916865348816,
-                            0.8888888955116272,
-                            1.0
-                        ]
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "tutorial_light",
-                            "filepath": "sfx_tutorial_lights",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        }
-                    ]
+          "components": {
+            "Transform2D": {
+              "position": [
+                835.0,
+                480.0
+              ],
+              "prev_position": [
+                835.0,
+                480.0
+              ],
+              "orientation": [
+                0.0,
+                0.0
+              ],
+              "scale": [
+                90.0,
+                120.0
+              ]
+            },
+            "Graphics_Component": {
+              "model_name": "square",
+              "color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+              ],
+              "texture_name": "Siren_Bulb_Batch_14_1",
+              "shd_ref": 0,
+              "mdl_to_ndc_xform": [
+                [
+                  0.0937500074505806,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  0.2222222238779068,
+                  0.0
+                ],
+                [
+                  0.8697916865348816,
+                  0.8888888955116272,
+                  1.0
+                ]
+              ]
+            },
+            "Audio_Component": {
+              "sounds": [
+                {
+                  "key": "tutorial_light",
+                  "filepath": "sfx_tutorial_lights",
+                  "audio_type": 1,
+                  "max_simultaneous": 1,
+                  "volume": 0.6,
+                  "pitch": 1.0,
+                  "islooping": false,
+                  "isactive": true,
+                  "is3d": false
                 }
+              ]
+            },
+            "Logic_Component": {
+              "scripts": [
+                {
+                  "script_name": "tutorial_light_script",
+                  "is_active": true
+                }
+              ]
             }
+          }
         },
         {
             "name": "siren_lights_left",
@@ -484,7 +500,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        1.0
+                        0.0
                     ],
                     "texture_name": "D_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -581,7 +597,7 @@
                     ],
                     "scale": [
                         900.0,
-                        120.0
+                        100.0
                     ]
                 },
                 "Graphics_Component": {
@@ -590,7 +606,7 @@
                         1.0,
                         1.0,
                         1.0,
-                        0.0
+                        1.0
                     ],
                     "texture_name": "E_To_Begin_Batch_16_NORMAL",
                     "shd_ref": 0,
@@ -602,7 +618,7 @@
                         ],
                         [
                             0.0,
-                            0.2222222238779068,
+                            0.18518517911434174,
                             0.0
                         ],
                         [
@@ -753,8 +769,8 @@
                 "Logic_Component": {
                     "scripts": [
                         {
-                            "script_name": "tutorial_script",
-                            "is_active": true
+                          "script_name": "player_tutorial_script",
+                          "is_active": true
                         }
                     ]
                 }

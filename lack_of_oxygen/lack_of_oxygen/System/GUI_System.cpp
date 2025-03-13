@@ -449,6 +449,11 @@ namespace lof {
             return;  // Don't show GUI on win screen
         }
 
+        if (GM.get_current_scene() != 2)
+        {
+            return;
+        }
+
         // Check if container already exists
         if (ecs_manager.find_entity_by_name("mineral_interaction_container") != INVALID_ENTITY_ID) {
             return; // GUI already shown
@@ -625,7 +630,10 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_tank_gui()
     {
-
+        if (GM.get_current_scene() != 2)
+        {
+            return;
+        }
 
         // Check if the oxygen GUI is already shown
         if (!oxygen_container_name.empty()) {
@@ -1372,6 +1380,7 @@ void GUI_System::hide_wormhole_gui() {
 
                             // Stop all audio
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
 
                             // Reset player position
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1435,6 +1444,7 @@ void GUI_System::hide_wormhole_gui() {
 
                             // Stop all audio
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
 
                             // Update IMGUI
                             IMGUIM.set_current_file_shown(scene_file);
@@ -1785,6 +1795,7 @@ void GUI_System::hide_wormhole_gui() {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
 
                             // Reset player
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1823,6 +1834,7 @@ void GUI_System::hide_wormhole_gui() {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             ADM.stop_mastergroup();
+                            ADM.set_yet_to_play(true);
                             IMGUIM.set_current_file_shown(scene_file);
                         }
                     }
