@@ -25,6 +25,14 @@
 namespace lof {
 #define CS lof::Collision_System::get_instance()
 
+    // Enum for vent directiono 
+    enum class VentDirection {
+        NONE, 
+        UP,
+        LEFT, 
+        RIGHT
+    };
+
     // A enum class for the possible collide side 
     enum class CollisionSide {
         NONE,
@@ -234,7 +242,9 @@ namespace lof {
         * @return true if the entity's name contains "vent"
         * @return false otherwise
         */
-        bool is_vent_entity(EntityID id) const;
+
+        VentDirection get_vent_direction(EntityID id) const;
+        void apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded); 
 
         /*
         * @brief Handles collision interactions between an entity and a vent

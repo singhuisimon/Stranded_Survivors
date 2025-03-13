@@ -86,6 +86,13 @@ namespace lof {
                 }
                 // =================================================================================
 
+                 // ================================= PLAYER DEATH CHECK ============================
+                // If player is dead, only process scripts that should continue when player dies
+                if (GM.get_player_dead_state()) {
+                    continue; // Skip scripts that shouldn't run when player is dead
+                }
+                // =================================================================================
+
                 // If logic data isn't active, handle that
                 if (!logic_data->is_active) {
                     if (logic_data->state == ExecutionState::Running) {

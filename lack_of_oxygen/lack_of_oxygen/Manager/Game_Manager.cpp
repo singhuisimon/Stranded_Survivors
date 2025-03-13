@@ -346,6 +346,51 @@ namespace lof {
                         no_panic = true;
                     }
                 }
+
+                //////////////////  TESTING /////////////////////////
+                if (IM.is_key_pressed(GLFW_KEY_P)) {
+                    add_panic(DEFAULT_FIXED_DELTA_TIME);
+                }
+
+                // Sweat particles based on panic meter
+                if (current_panic_level >= 50.0f) {
+                    for (auto& system : ECSM.get_systems()) {
+                        if (system->get_type() == "Particle_System") {
+                            auto* particle_system = static_cast<Particle_System*>(system.get());
+                            if (!particle_system) {
+                                LM.write_log("Mining_Script::update_mining(): Fail to get particle system");
+                                std::cerr << "Failed to get particle system" << std::endl;
+                                return;
+                            }
+
+                            // Emit sweat particles on player (30% rate)
+                            if (particle_system->get_rand_float() < 0.3f) {
+                                auto& player_direction = GFXM.get_player_direction();
+                                auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+
+                                // Sweat on player
+                                if (player_direction == FACE_RIGHT) {
+                                    float part_x = player_transform.position.x - 30.0f + (particle_system->get_rand_float() * 60.0f);
+                                    float part_y = player_transform.position.y + 35.0f;
+                                    particle_system->particle_emit("sweat_player", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                }
+                                else {
+                                    float part_x = player_transform.position.x - 25.0f + (particle_system->get_rand_float() * 60.0f);
+                                    float part_y = player_transform.position.y + 35.0f;
+                                    particle_system->particle_emit("sweat_player", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+                                }
+
+                                // Sweat on the player's helmet from POV
+                                unsigned int screen_width = static_cast<float>(SM.get_scr_width()); 
+                                unsigned int screen_height = static_cast<float>(SM.get_scr_height()); 
+                                float part_x = -(screen_width / 2.0f) + (particle_system->get_rand_float() * screen_width);
+                                float part_y = player_transform.position.y + screen_height / 3.25f;
+                                particle_system->particle_emit("sweat_screen", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+
+                            }
+                        }
+                    }
+                }
             }
 
             if (panic_triggered) {
@@ -357,6 +402,20 @@ namespace lof {
             //update the current panic level
             current_panic_level = panic_current;
 
+            // Display red vignette based on panic level
+            EntityID red_vignette = ECSM.find_entity_by_name("red_vignette");
+            if (red_vignette != INVALID_ENTITY_ID) {
+                
+                // Adjust alpha value of red_vignette
+                auto& red_vignette_graphics = ECSM.get_component<Graphics_Component>(red_vignette);
+                if (current_panic_level >= 50.0f) {
+                    red_vignette_graphics.color.a = 2 * (current_panic_level - 49.0f) / 100.0f;
+                }
+                else {
+                    red_vignette_graphics.color.a = 0.0f;
+                }
+            }
+
             // Update top UI overlay position to follow player
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
 
@@ -367,14 +426,12 @@ namespace lof {
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
 
             //EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
-            EntityID timer_icon_id = ECSM.find_entity_by_name("top_ui_timer");
             //EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
 
             EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
             EntityID oxygen_percentage_text_id = ECSM.find_entity_by_name("top_ui_oxygen_percentage_text");
             EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
             //EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-            EntityID timer_count_text_id = ECSM.find_entity_by_name("top_ui_timer_count_text");
             EntityID goal_percentage_count_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
 
             if (ui_overlay_id != INVALID_ENTITY_ID) {
@@ -463,6 +520,7 @@ namespace lof {
 
                     // Update fill position and scale
                     panic_fill_transform.scale = Vec2D(new_width, METER_HEIGHT);
+                    
                     // Anchor to left side by offsetting position based on the current width
                     panic_fill_transform.position = {
                         panic_transform.position.x + 3.0f + (new_width - METER_WIDTH) / 2.0f,  // Adjust x position to stay anchored left
@@ -498,28 +556,28 @@ namespace lof {
                 }
 
                 // ------------------------- TIMER UPDATE CHANGES -------------------------
-                // 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
-                static float timer_accumulator = 0.0f; // You can make this a class member if you like
-                timer_accumulator += delta_time;
-                if (timer_accumulator >= 1.0f) {
-                    timer_accumulator = 0.0f;
+                //// 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
+                //static float timer_accumulator = 0.0f; // You can make this a class member if you like
+                //timer_accumulator += delta_time;
+                //if (timer_accumulator >= 1.0f) {
+                //    timer_accumulator = 0.0f;
 
-                    // Only decrease if you haven't hit zero
-                    if (timer_remaining > 0) {
-                        timer_remaining -= 1;
-                    }
-                }
+                //    // Only decrease if you haven't hit zero
+                //    if (timer_remaining > 0) {
+                //        timer_remaining -= 1;
+                //    }
+                //}
 
-                if (timer_count_text_id != INVALID_ENTITY_ID &&
-                    ECSM.has_component<Transform2D>(timer_count_text_id) &&
-                    ECSM.has_component<Transform2D>(timer_icon_id))
-                {
-                    // If it has a Text_Component, update the visible text to show the integer countdown
-                    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
-                        timer_text_comp.text = std::to_string(timer_remaining);
-                    }
-                }
+                //if (timer_count_text_id != INVALID_ENTITY_ID &&
+                //    ECSM.has_component<Transform2D>(timer_count_text_id) &&
+                //    ECSM.has_component<Transform2D>(timer_icon_id))
+                //{
+                //    // If it has a Text_Component, update the visible text to show the integer countdown
+                //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
+                //        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
+                //        timer_text_comp.text = std::to_string(timer_remaining);
+                //    }
+                //}
                 // ------------------------- END TIMER UPDATE CHANGES -------------------------
 
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
@@ -555,10 +613,13 @@ namespace lof {
             // Check for oxygen level first - if it reaches zero, show game over screen
             if (current_oxygen_level <= 0.0f) {
                 // Player is out of oxygen - show game over screen
-                bool is_player_dead = true;
+                set_player_dead_state(true);
 
                 // Stop all audio first
                 ADM.stop_mastergroup();
+
+                //reset panic 
+                reset_panic();
 
                 // Find GUI System and show game over screen
                 for (auto& systems_gui : ECSM.get_systems()) {
@@ -603,6 +664,32 @@ namespace lof {
                             transform.position.y, tile_height);
                     }
                 }
+
+                // Emit lava splatter particles
+                //if (static_cast<int>(lava_timer) < 1) {
+                    for (auto& system : ECSM.get_systems()) {
+                        if (system->get_type() == "Particle_System") {
+                            auto* particle_system = static_cast<Particle_System*>(system.get());
+                            if (!particle_system) {
+                                LM.write_log("Game_Manager::update(): Fail to get particle system");
+                                std::cerr << "Failed to get particle system" << std::endl;
+                                return;
+                            }
+
+                            if (particle_system->get_rand_float() < 0.05f) {
+                                // Get lava transform and animation components
+                                auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_id); 
+
+                                // Randomize particle emit count
+                                float part_x = lava_transform.position.x - (lava_transform.scale.x / 2.0f) + (particle_system->get_rand_float() * lava_transform.scale.x);
+                                float part_y = lava_transform.position.y + (lava_transform.scale.y / 2.0f);
+                                particle_system->particle_emit("lava", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f), particle_system->get_rand_float() * 5.0f);
+                            }
+
+
+                        }
+                    }
+                //}
             }
             else {
                 // Log warning if lava pool entity doesn't exist
@@ -878,6 +965,9 @@ namespace lof {
                 // Stop all audio currently playing
                 ADM.stop_mastergroup();
 
+                //reset panic
+                reset_panic();
+
                 // Reset player position only if in scene1 or scene2
                 if (current_scene != 0) {
                     EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1033,6 +1123,11 @@ namespace lof {
 
     void Game_Manager::set_current_scene(int scene_num) {
         current_scene = scene_num;
+
+        //reset panic for gameplay when changing scenes
+        if (scene_num == 1 || scene_num == 2) {
+            reset_panic();
+        }
     }
 
     int Game_Manager::get_current_scene() {

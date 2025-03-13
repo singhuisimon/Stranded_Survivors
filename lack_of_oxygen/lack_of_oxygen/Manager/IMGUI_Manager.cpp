@@ -674,6 +674,7 @@ namespace lof {
 
                 gui_system->hide_mineral_tank_gui();
                 gui_system->hide_oxygen_tank_gui();
+                gui_system->hide_wormhole_gui();
 
             }
         }

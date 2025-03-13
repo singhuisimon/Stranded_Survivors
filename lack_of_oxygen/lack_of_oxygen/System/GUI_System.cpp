@@ -66,6 +66,7 @@ namespace lof {
         hide_oxygen_warning(50.0f);
         hide_oxygen_warning(20.0f);
         hide_oxygen_warning(5.0f);
+        hide_wormhole_gui();
 
         // Log initial state of entities before reset
         LM.write_log("GUI_System::reset_all_game_state(): Current entity states - "
@@ -81,6 +82,7 @@ namespace lof {
         oxygen_progress_bar2 = INVALID_ENTITY_ID;
         oxygen_percentage_text1 = INVALID_ENTITY_ID;
         oxygen_percentage_text2 = INVALID_ENTITY_ID;
+        wormhole_e_prompt = INVALID_ENTITY_ID;
 
         // Reset gameplay values with logging
         LM.write_log("GUI_System::reset_all_game_state(): Resetting gameplay values...");
@@ -101,7 +103,8 @@ namespace lof {
             text_comp.text = "00%";
         }
 
-        // Reset timer text
+        // Reset 
+        // text
         EntityID timer_text_entity = ECSM.find_entity_by_name("top_ui_timer_count_text");
         if (timer_text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(timer_text_entity)) {
             auto& text_comp = ECSM.get_component<Text_Component>(timer_text_entity);
@@ -126,9 +129,6 @@ namespace lof {
 
 
     void GUI_System::update(float delta_time) {
-        // Log to confirm the pause state is being detected
-        LM.write_log("GUI_System::update: is_paused=%d", GM.is_paused());
-
         // Win screen check
         if (GM.get_current_scene() == 4) {  // Win screen
             // Force-invalidate all GUI entity IDs
@@ -143,6 +143,7 @@ namespace lof {
             oxygen_progress_bar2 = INVALID_ENTITY_ID;
             oxygen_percentage_text1 = INVALID_ENTITY_ID;
             oxygen_percentage_text2 = INVALID_ENTITY_ID;
+            wormhole_e_prompt = INVALID_ENTITY_ID;
             return;  // Skip all GUI updates on win screen
         }
 
@@ -150,22 +151,28 @@ namespace lof {
         if (game_over_shown) {
             check_game_over_button_collision(delta_time);
 
-            // Still process E prompt bobbing animations during game over
-            if (mineral_e_prompt != INVALID_ENTITY_ID) {
+            // Still process E prompt bobbing animations during game over using name-based approach
+            // Mineral E prompt bobbing
+            EntityID mineral_prompt_entity = ecs_manager.find_entity_by_name("mineral_e_prompt");
+            if (mineral_prompt_entity != INVALID_ENTITY_ID) {
                 e_prompt_animation_timer += delta_time;
-                if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
+                if (auto* transform = get_component_safe<Transform2D>(mineral_prompt_entity)) {
                     float offset = std::sin(e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                     transform->position.y = original_e_prompt_y + offset;
                     transform->position.x = mineral_e_prompt_x; // keep X constant
                 }
             }
 
-            if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-                oxygen_e_prompt_animation_timer += delta_time;
-                if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
-                    float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
-                    transform->position.y = original_e_prompt_y + offset;
-                    transform->position.x = oxygen_e_prompt_x; // keep X constant
+            // Oxygen E prompt bobbing
+            if (!oxygen_e_prompt_name.empty()) {
+                EntityID oxygen_prompt_entity = ecs_manager.find_entity_by_name(oxygen_e_prompt_name);
+                if (oxygen_prompt_entity != INVALID_ENTITY_ID) {
+                    oxygen_e_prompt_animation_timer += delta_time;
+                    if (auto* transform = get_component_safe<Transform2D>(oxygen_prompt_entity)) {
+                        float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                        transform->position.y = original_e_prompt_y + offset;
+                        transform->position.x = oxygen_e_prompt_x; // keep X constant
+                    }
                 }
             }
 
@@ -176,22 +183,28 @@ namespace lof {
             if (GM.is_paused()) {
                 check_pause_menu_button_collision(delta_time);
 
-                // Process minimal animations during pause
-                if (mineral_e_prompt != INVALID_ENTITY_ID) {
+                // Process minimal animations during pause using name-based approach
+                // Mineral E prompt bobbing
+                EntityID mineral_prompt_entity = ecs_manager.find_entity_by_name("mineral_e_prompt");
+                if (mineral_prompt_entity != INVALID_ENTITY_ID) {
                     e_prompt_animation_timer += delta_time;
-                    if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
+                    if (auto* transform = get_component_safe<Transform2D>(mineral_prompt_entity)) {
                         float offset = std::sin(e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                         transform->position.y = original_e_prompt_y + offset;
                         transform->position.x = mineral_e_prompt_x; // keep X constant
                     }
                 }
 
-                if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-                    oxygen_e_prompt_animation_timer += delta_time;
-                    if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
-                        float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
-                        transform->position.y = original_e_prompt_y + offset;
-                        transform->position.x = oxygen_e_prompt_x; // keep X constant
+                // Oxygen E prompt bobbing
+                if (!oxygen_e_prompt_name.empty()) {
+                    EntityID oxygen_prompt_entity = ecs_manager.find_entity_by_name(oxygen_e_prompt_name);
+                    if (oxygen_prompt_entity != INVALID_ENTITY_ID) {
+                        oxygen_e_prompt_animation_timer += delta_time;
+                        if (auto* transform = get_component_safe<Transform2D>(oxygen_prompt_entity)) {
+                            float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                            transform->position.y = original_e_prompt_y + offset;
+                            transform->position.x = oxygen_e_prompt_x; // keep X constant
+                        }
                     }
                 }
 
@@ -202,24 +215,50 @@ namespace lof {
 
         // Normal gameplay updates (not paused, not game over)
 
-        // == Mineral E prompt bobbing ==
-        if (mineral_e_prompt != INVALID_ENTITY_ID) {
+        // == Mineral E prompt bobbing (name-based approach) ==
+        EntityID mineral_prompt_entity = ecs_manager.find_entity_by_name("mineral_e_prompt");
+        if (mineral_prompt_entity != INVALID_ENTITY_ID) {
             e_prompt_animation_timer += delta_time;
-            if (auto* transform = get_component_safe<Transform2D>(mineral_e_prompt)) {
+            if (auto* transform = get_component_safe<Transform2D>(mineral_prompt_entity)) {
                 float offset = std::sin(e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
                 transform->position.y = original_e_prompt_y + offset;
                 transform->position.x = mineral_e_prompt_x; // keep X constant
             }
         }
 
-        // == Oxygen E prompt bobbing ==
-        if (oxygen_e_prompt != INVALID_ENTITY_ID) {
-            oxygen_e_prompt_animation_timer += delta_time;
-            if (auto* transform = get_component_safe<Transform2D>(oxygen_e_prompt)) {
-                float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
-                transform->position.y = original_e_prompt_y + offset;
-                transform->position.x = oxygen_e_prompt_x; // keep X constant
+        // == Oxygen E prompt bobbing (name-based approach) ==
+        if (!oxygen_e_prompt_name.empty()) {
+            EntityID oxygen_prompt_entity = ecs_manager.find_entity_by_name(oxygen_e_prompt_name);
+            if (oxygen_prompt_entity != INVALID_ENTITY_ID) {
+                oxygen_e_prompt_animation_timer += delta_time;
+                if (auto* transform = get_component_safe<Transform2D>(oxygen_prompt_entity)) {
+                    float offset = std::sin(oxygen_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                    transform->position.y = original_e_prompt_y + offset;
+                    transform->position.x = oxygen_e_prompt_x; // keep X constant
+                }
             }
+        }
+
+        // Animation for wormhole E prompt (name-based approach)
+        if (!wormhole_e_prompt_name.empty()) {
+            EntityID wormhole_entity = ecs_manager.find_entity_by_name(wormhole_e_prompt_name);
+            if (wormhole_entity != INVALID_ENTITY_ID) {
+                wormhole_e_prompt_animation_timer += delta_time;
+                if (auto* transform = get_component_safe<Transform2D>(wormhole_entity)) {
+                    float offset = std::sin(wormhole_e_prompt_animation_timer * E_PROMPT_SPEED) * E_PROMPT_AMPLITUDE;
+                    transform->position.y = wormhole_e_prompt_y + offset;
+                    transform->position.x = wormhole_e_prompt_x; // Use updated x-position
+                }
+            }
+            else {
+                // Entity doesn't exist anymore
+                wormhole_e_prompt = INVALID_ENTITY_ID;
+                wormhole_e_prompt_name.clear();
+            }
+        }
+        else {
+            // Name is empty, so reset the ID too
+            wormhole_e_prompt = INVALID_ENTITY_ID;
         }
 
         // Check if we've reached 100% (50,000 minerals)
@@ -254,10 +293,9 @@ namespace lof {
         // --------------------------------------------------------
         // Update oxygen bars automatically every second
         // --------------------------------------------------------
-        // Only update if the game is not paused (already ensured by the returns above).
-        // However, this extra check ensures that if you later reorganize this code,
-        // we still won't update oxygen while paused.
-        if (!GM.is_paused() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+        // Only update if the game is not paused and player is not dead
+        // Add check for GM.get_player_dead_state() here
+        if (!GM.is_paused() && !GM.get_player_dead_state() && oxygen_interaction_container != INVALID_ENTITY_ID) {
             oxygen_update_accumulator += delta_time;
             if (oxygen_update_accumulator >= 1.0f) {
                 oxygen_update_accumulator = 0.0f;
@@ -270,49 +308,71 @@ namespace lof {
         }
         // --------------------------------------------------------
 
-        // Check oxygen level and update warnings
-        float current_oxygen = GM.get_current_oxygen_level();
+        // Only check oxygen warnings if player is not dead
+        if (!GM.get_player_dead_state()) {
+            // Check oxygen level and update warnings
+            float current_oxygen = GM.get_current_oxygen_level();
 
-        // Handle 50% warning
-        if (current_oxygen == 50.0f && !warning_50_active) {
-            show_oxygen_warning(50.0f);
-            warning_50_display_time = 0.0f;
-        }
-        if (warning_50_shown) {
-            warning_50_display_time += delta_time;
-            if (warning_50_display_time >= WARNING_DURATION) {
-                hide_oxygen_warning(50.0f);
-                warning_50_active = false;
-                warning_50_shown = false;
-            }
-        }
+            // Determine if oxygen is decreasing or increasing
+            oxygen_decreasing = (current_oxygen < previous_oxygen_level);
 
-        // Handle 20% warning
-        if (current_oxygen == 20.0f && !warning_20_active) {
-            show_oxygen_warning(20.0f);
-            warning_20_display_time = 0.0f;
-        }
-        if (warning_20_shown) {
-            warning_20_display_time += delta_time;
-            if (warning_20_display_time >= WARNING_DURATION) {
-                hide_oxygen_warning(20.0f);
-                warning_20_active = false;
-                warning_20_shown = false;
-            }
-        }
+            // Only show warnings when oxygen is decreasing
+            if (oxygen_decreasing) {
+                // Handle 50% warning - only when decreasing
+                if (current_oxygen <= 50.0f && previous_oxygen_level > 50.0f && !warning_50_active) {
+                    show_oxygen_warning(50.0f);
+                    warning_50_display_time = 0.0f;
+                    warning_50_active = true;
+                    warning_50_shown = true;
+                }
 
-        // Handle 5% warning
-        if (current_oxygen == 5.0f && !warning_5_active) {
-            show_oxygen_warning(5.0f);
-            warning_5_display_time = 0.0f;
-        }
-        if (warning_5_shown) {
-            warning_5_display_time += delta_time;
-            if (warning_5_display_time >= WARNING_DURATION) {
-                hide_oxygen_warning(5.0f);
-                warning_5_active = false;
-                warning_5_shown = false;
+                // Handle 20% warning - only when decreasing
+                if (current_oxygen <= 20.0f && previous_oxygen_level > 20.0f && !warning_20_active) {
+                    show_oxygen_warning(20.0f);
+                    warning_20_display_time = 0.0f;
+                    warning_20_active = true;
+                    warning_20_shown = true;
+                }
+
+                // Handle 5% warning - only when decreasing
+                if (current_oxygen <= 5.0f && previous_oxygen_level > 5.0f && !warning_5_active) {
+                    show_oxygen_warning(5.0f);
+                    warning_5_display_time = 0.0f;
+                    warning_5_active = true;
+                    warning_5_shown = true;
+                }
             }
+
+            // Handle warning timers regardless of oxygen trend
+            if (warning_50_shown) {
+                warning_50_display_time += delta_time;
+                if (warning_50_display_time >= WARNING_DURATION) {
+                    hide_oxygen_warning(50.0f);
+                    warning_50_active = false;
+                    warning_50_shown = false;
+                }
+            }
+
+            if (warning_20_shown) {
+                warning_20_display_time += delta_time;
+                if (warning_20_display_time >= WARNING_DURATION) {
+                    hide_oxygen_warning(20.0f);
+                    warning_20_active = false;
+                    warning_20_shown = false;
+                }
+            }
+
+            if (warning_5_shown) {
+                warning_5_display_time += delta_time;
+                if (warning_5_display_time >= WARNING_DURATION) {
+                    hide_oxygen_warning(5.0f);
+                    warning_5_active = false;
+                    warning_5_shown = false;
+                }
+            }
+
+            // Store current oxygen level for next frame comparison
+            previous_oxygen_level = current_oxygen;
         }
 
         auto* container_transform = get_component_safe<Transform2D>(container_id);
@@ -321,7 +381,7 @@ namespace lof {
         }
         Vec2D container_pos = container_transform->position;
     }
-
+ 
 
     void GUI_System::debug_entity(const char* prefix, EntityID id) {
         if (id == INVALID_ENTITY_ID) {
@@ -551,6 +611,8 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_tank_gui()
     {
+
+
         // Check if the oxygen GUI is already shown
         if (!oxygen_container_name.empty()) {
             return;
@@ -891,6 +953,127 @@ namespace lof {
             warning_5_shown = false;
         }
     }
+
+    // ---------------------------------------------------------
+    // Wormhole E Prompt
+    // ---------------------------------------------------------\
+
+#if 0
+    void GUI_System::show_wormhole_tank_gui() {
+        // Check if the entity already exists
+        if (!wormhole_e_prompt_name.empty()) {
+            EntityID existing_entity = ecs_manager.find_entity_by_name(wormhole_e_prompt_name);
+            if (existing_entity != INVALID_ENTITY_ID) {
+                // Entity already exists, so skip creating a new one
+                return;
+            }
+        }
+
+        // Generate unique name for wormhole
+        wormhole_e_prompt_name = "wormhole_e_prompt";
+
+        // Create E prompt
+        EntityID e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", wormhole_e_prompt_name);
+        if (e_prompt != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(e_prompt)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "E_Gold_02_Batch_14";
+                graphics->color = glm::vec4(1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(e_prompt)) {
+                transform->position = Vec2D(wormhole_e_prompt_x, original_e_prompt_y); // Use updated x-position
+             
+                transform->scale = Vec2D(50.0f, 50.0f);
+            }
+            wormhole_e_prompt_animation_timer = 0.0f;
+        }
+
+        std::cout << "update the position for x_axis " << wormhole_e_prompt_x << "\n";
+    }
+
+#endif
+    void GUI_System::show_wormhole_tank_gui() {
+        // Check if the entity already exists
+        if (!wormhole_e_prompt_name.empty()) {
+            EntityID existing_entity = ecs_manager.find_entity_by_name(wormhole_e_prompt_name);
+            if (existing_entity != INVALID_ENTITY_ID) {
+                // Entity already exists, so just update the stored ID and return
+                wormhole_e_prompt = existing_entity;
+
+                // Update position directly
+                if (auto* transform = get_component_safe<Transform2D>(existing_entity)) {
+                    transform->position.x = wormhole_e_prompt_x;
+                }
+                return;
+            }
+        }
+
+        // Generate unique name for wormhole
+        wormhole_e_prompt_name = "wormhole_e_prompt";
+
+        // Create E prompt
+        EntityID e_prompt = ecs_manager.clone_entity_from_prefab("gui_container", wormhole_e_prompt_name);
+        if (e_prompt != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(e_prompt)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "E_Gold_02_Batch_14";
+                graphics->color = glm::vec4(1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(e_prompt)) {
+                transform->position = Vec2D(wormhole_e_prompt_x, wormhole_e_prompt_y);
+                transform->scale = Vec2D(50.0f, 50.0f);
+            }
+
+            // Store the entity ID for future reference
+            wormhole_e_prompt = e_prompt;
+            wormhole_e_prompt_animation_timer = 0.0f;
+        }
+
+        //std::cout << "update the position for x_axis " << wormhole_e_prompt_x << "\n";
+    }
+
+
+#if 0
+    void GUI_System::hide_wormhole_gui() {
+        const std::vector<std::string*> entity_names = {
+            &wormhole_e_prompt_name
+        };
+
+        for (auto* name_ptr : entity_names) {
+            if (!name_ptr->empty()) {
+                EntityID entity = ecs_manager.find_entity_by_name(*name_ptr);
+                if (entity != INVALID_ENTITY_ID) {
+                    ecs_manager.destroy_entity(entity);
+                }
+                // Always clear the name, even if the entity is not found
+                name_ptr->clear();
+            }
+        }
+    }
+
+#endif
+void GUI_System::hide_wormhole_gui() {
+    const std::vector<std::string*> entity_names = {
+        &wormhole_e_prompt_name
+    };
+
+    for (auto* name_ptr : entity_names) {
+        if (!name_ptr->empty()) {
+            EntityID entity = ecs_manager.find_entity_by_name(*name_ptr);
+            if (entity != INVALID_ENTITY_ID) {
+                ecs_manager.destroy_entity(entity);
+
+                // Reset the wormhole_e_prompt ID after destroying the entity
+                if (name_ptr == &wormhole_e_prompt_name) {
+                    wormhole_e_prompt = INVALID_ENTITY_ID;
+                }
+            }
+
+            // Always clear the name, even if the entity is not found
+            name_ptr->clear();
+        }
+    }
+}
 
     void GUI_System::show_pause_menu() {
         // Don't show if already shown
@@ -1254,6 +1437,19 @@ namespace lof {
                 pause_button_hover_states[entity_name] = false;
             }
         }
+    }
+
+    void GUI_System::set_wormhole_e_prompt_x(float new_x_position) {
+        wormhole_e_prompt_x = new_x_position;
+
+        //// Update the position of the E prompt directly
+        //if (wormhole_e_prompt != INVALID_ENTITY_ID) {
+        //    if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
+        //        transform->position.x = wormhole_e_prompt_x; // Update the x-position immediately
+        //    }
+        //}
+
+        
     }
 
 

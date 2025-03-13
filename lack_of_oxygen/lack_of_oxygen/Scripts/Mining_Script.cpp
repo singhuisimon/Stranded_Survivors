@@ -296,7 +296,8 @@ namespace lof {
                             auto& entity_animation = ECSM.get_component<Animation_Component>(entity_id);
 
                             // Skip for these entities
-                            if (entity_animation.animations["0"] == "vent_strip" || entity_animation.animations["0"] == "vent" ||
+                            if (entity_animation.animations["0"] == "vent_strip_up" || entity_animation.animations["0"] == "vent_strip_right" ||
+                                entity_animation.animations["0"] == "vent_strip_left" || entity_animation.animations["0"] == "vent" ||
                                 entity_animation.animations["0"] == "wormhole" || entity_animation.animations["0"] == "lava" ||
                                 entity_animation.animations["0"] == "lava_animate") {
                                 continue;
@@ -348,18 +349,21 @@ namespace lof {
 
                         // Player is caught in the TNT blast - show game over screen
                         is_player_dead = true;
-
+                        GM.set_player_dead_state(true);  // Use the setter for better encapsulation
                     }
 
                     // Check if player is dead to reset the scene
                     if (is_player_dead == true) {
-                        
+
                         ECSM.destroy_entity(tnt_id);
                         tnt_to_destroy.erase(current->first);
                         tnt_to_destroy.clear();
 
                         // Stop all audio first
                         ADM.stop_mastergroup();
+
+                        //reset panic
+                        GM.reset_panic();
 
                         // Find GUI System and show game over screen
                         for (auto& systems_gui : ECSM.get_systems()) {

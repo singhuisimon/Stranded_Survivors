@@ -232,7 +232,10 @@ namespace lof {
 		alexandrite,
 		tnt,
 		tnt_explode,
-		tnt_vfx
+		tnt_vfx,
+		lava,
+		sweat_player,
+		sweat_screen
 	};
 
 	// ------------------------------ Player_Script.cpp --------------------------------

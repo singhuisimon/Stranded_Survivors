@@ -329,48 +329,141 @@ namespace lof {
     }
 
     /*
-    * @brief Checks whether the entity has vent in their names, vent_prefab, vent_strip
+    * @brief Checks the entity's vent type
     */
 
-    bool Collision_System::is_vent_entity(EntityID id) const {
-        auto* entity = ECSM.get_entity(id); 
-        return entity && ( entity->get_name().find("ventUp_prefab") != std::string::npos || entity->get_name().find("ventStripUp_prefab") != std::string::npos);
+
+
+    VentDirection Collision_System::get_vent_direction(EntityID id) const {
+        auto* entity = ECSM.get_entity(id);
+        if (!entity) return VentDirection::NONE;
+
+        //get the name
+        const std::string& name = entity->get_name();
+
+        //check for vents 
+
+        //up air vent
+        if (name.find("ventUp_prefab") != std::string::npos ||
+            name.find("ventStripUp_prefab") != std::string::npos) {
+            return VentDirection::UP;
+        }
+        //left air vents
+        else if (name.find("ventLeft_prefab") != std::string::npos ||
+            name.find("ventStripLeft_prefab") != std::string::npos) {
+            return VentDirection::LEFT;
+        }
+        //right air vents
+        else if (name.find("ventRight_prefab") != std::string::npos ||
+            name.find("ventStripRight_prefab") != std::string::npos) {
+            return VentDirection::RIGHT;
+        }
+        return VentDirection::NONE;
     }
 
+
+    void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded) {
+        auto& e_physics = ECSM.get_component<Physics_Component>(id);
+        auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
+
+        //separate audio state tracking for each type
+        static bool is_in_up_vent = false;
+        static bool is_in_left_vent = false;
+        static bool is_in_right_vent = false;
+
+        bool& is_in_vent = (direction == VentDirection::UP) ? is_in_up_vent :
+            (direction == VentDirection::LEFT) ? is_in_left_vent :
+            is_in_right_vent;
+
+        //apply force based on direction 
+
+        switch (direction) {
+
+            case VentDirection::UP: {
+                //apply up movement
+                e_physics.force_helper.activate_force(VENT_FORCE);
+                e_physics.set_gravity(Vec2D(0.0f, 0.0f));
+                e_velocity.velocity.y = 300.0f;
+                break;
+            }
+            case VentDirection::LEFT: {
+                //update player animation 
+                int& player_direction = GFXM.get_player_direction();
+                player_direction = FACE_LEFT;
+                int& moving_status = GFXM.get_moving_status(); 
+                moving_status = RUN_LEFT;
+
+                //apply force
+                e_physics.force_helper.activate_force(MOVE_LEFT);
+                e_velocity.velocity.x = -300.0f;
+                e_velocity.velocity.y = 0.0f;
+                break;
+            }
+            case VentDirection::RIGHT: {
+                //Update player animation
+                int& player_direction = GFXM.get_player_direction();
+                player_direction = FACE_RIGHT;
+                int& moving_status = GFXM.get_moving_status();
+                moving_status = RUN_RIGHT;
+
+                //apply force
+                e_physics.force_helper.activate_force(MOVE_RIGHT);
+                e_velocity.velocity.x = 300.0f;
+                e_velocity.velocity.y = 0.0f;
+                break;
+            }
+            default: 
+                return;
+        }
+
+        //handle audio 
+        //audio for vent in 
+        if (!is_in_vent) {
+            ADM.play_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID));
+            is_in_vent = true;
+        }
+
+        if (!found_next_vent) {
+            //vent exit 
+            if (direction == VentDirection::UP) {
+                e_velocity.velocity.y = 700.0f; 
+                e_physics.force_helper.deactivate_force(VENT_FORCE); 
+                e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            }
+
+            if (is_in_vent) {
+                ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
+                ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
+                is_in_vent = false;
+            }
+        }
+    }
+
+
+
+
     void Collision_System::handle_vent_collision(EntityID entity, EntityID vent, float delta_time, bool& is_grounded) {
-        //get components for entity
+        // Get components for entity
         auto& e_physics = ECSM.get_component<Physics_Component>(entity);
         auto& e_velocity = ECSM.get_component<Velocity_Component>(entity);
         auto& e_transform = ECSM.get_component<Transform2D>(entity);
         auto& e_collision = ECSM.get_component<Collision_Component>(entity);
 
-        //vent 
+        // Vent components
         auto& av_transform = ECSM.get_component<Transform2D>(vent);
         auto& av_collision = ECSM.get_component<Collision_Component>(vent);
         auto& av_velocity = ECSM.get_component<Velocity_Component>(vent);
 
-        //aabb for intersection set 
+        //get vent direction 
+        VentDirection vent_direction = get_vent_direction(vent);
+        if (vent_direction == VentDirection::NONE) return;
+
+        // AABB for intersection check
         AABB e_aabb = AABB::from_transform(e_transform, e_collision);
         AABB av_aabb = AABB::from_transform(av_transform, av_collision);
 
-        float collision_time = delta_time;
-
-        //audio 
-        EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
-        //boolean to track audio state 
-        static bool is_in_air_vent = false;
-
-        
-
-        // Calculate horizontal center distance between player and vent
-        float horizontal_distance = std::abs(e_transform.position.x - av_transform.position.x);
-        Vec2D overlap = compute_overlap(e_aabb, av_aabb);
-        bool has_vertical_overlap = overlap.y > 0;
-
-        // Define the maximum distance from vent center to activate
-        const float VENT_ACTIVATION_THRESHOLD = av_collision.width / 2.0f;
-
-        // Level grid constants (from check_scene2)
+        // Level grid constants
         const float LEFT_BOUND = -960.0f;
         const float RIGHT_BOUND = 960.0f;
         const float START_Y = -150.0f;
@@ -383,89 +476,110 @@ namespace lof {
         int player_col = static_cast<int>((e_transform.position.x - LEFT_BOUND) / CELL_WIDTH);
         int player_row = static_cast<int>((START_Y - e_transform.position.y) / CELL_HEIGHT);
 
-        // Check for collision
-        if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
-            collision_time, delta_time)) {
-
             // Check for entity in the tile above using the top collision detection logic
             player_col = std::clamp(player_col, 0, TOTAL_COLS - 1);
             player_row = std::clamp(player_row, 0, TOTAL_ROWS - 1);
 
-            bool found_top_collision = false;
-            EntityID current_top_entity = static_cast<EntityID>(-1);
+        // Check for collision
+        float collision_time = delta_time;
+        if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
+            collision_time, delta_time)) {
 
-            // Check entities near the player
-            for (auto iter2 = get_entities().begin(); iter2 != get_entities().end(); ++iter2) {
-                EntityID entity_ID2 = *iter2;
-                if (entity == entity_ID2) continue;
 
-                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
+            //calculate overlaps
+            Vec2D overlap = compute_overlap(e_aabb, av_aabb);
+            bool found_next_vent = false;
 
-                // Calculate entity2's grid position
-                int entity2_col = static_cast<int>((transform2.position.x - LEFT_BOUND) / CELL_WIDTH);
-                int entity2_row = static_cast<int>((START_Y - transform2.position.y) / CELL_HEIGHT);
+                if (vent_direction == VentDirection::UP) {
 
-                // Check if this entity is in the tile above the player
-                if (entity2_row == player_row - 1 && entity2_col == player_col) {
-                    auto* entity2 = ECSM.get_entity(entity_ID2);
-                    if (entity2 && entity2->get_name().find("vent") != std::string::npos) {
-                        found_top_collision = true;
-                        current_top_entity = entity_ID2;
-                        break;
+                    for (EntityID check_id : get_entities()) {
+                        if (entity == check_id || vent == check_id) continue;
+
+                        auto& check_transform = ECSM.get_component<Transform2D>(check_id);
+
+                        //convert to grit position
+                        int entity2_col = static_cast<int>((check_transform.position.x - LEFT_BOUND) / CELL_WIDTH);
+                        int entity2_row = static_cast<int>((START_Y - check_transform.position.y) / CELL_HEIGHT);
+
+                        //check if in grid position above player
+                        if (entity2_row == player_row - 1 && entity2_col == player_col) {
+                            if (get_vent_direction(check_id) == VentDirection::UP) {
+                                found_next_vent = true;
+                                break;
+                            }
+                        }
                     }
-                }
-            }
 
-            if (horizontal_distance <= VENT_ACTIVATION_THRESHOLD) {
+                   //static bool is_in_air_vent = false;
+                    // Calculate horizontal center distance between player and vent
+                    float horizontal_distance = std::abs(e_transform.position.x - av_transform.position.x);
+                    bool has_vertical_overlap = overlap.y > 0;
 
-                if(has_vertical_overlap){
 
-                    // Add vent force
-                    e_physics.force_helper.activate_force(VENT_FORCE);
-                    // Remove gravity while in vent
-                    e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-                    // Set upward velocity
-                    e_velocity.velocity.y = 350.0f;
+                    if (horizontal_distance <= av_collision.width / 2.0f) {
 
-                    // Play vent entry sound if we weren't already in a vent
-                    if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                        if (!is_in_air_vent) {
-                            ADM.play_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId));
-                            //ECSM.get_component<Audio_Component>(playerId).set_isactive("air vent in", true);
-                            //ECSM.get_component<Audio_Component>(playerId).increase_playcount("air vent in");
-                            is_in_air_vent = true;
+                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+
+                    }
+                    else {
+                        e_physics.force_helper.deactivate_force(VENT_FORCE);
+                        if (!is_grounded) {
+                            e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                         }
                     }
 
                 }
-                // If we're touching a vent but there's no vent above us
-                if (!found_top_collision) {
-                    // Apply stronger upward thrust for exit
-                    e_velocity.velocity.y = 800.0f; // Higher exit velocity
-                    e_physics.force_helper.deactivate_force(VENT_FORCE);
-                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                else if (vent_direction == VentDirection::LEFT) {
+                    for (EntityID check_id : get_entities()) {
+                        if (entity == check_id || vent == check_id) continue;
 
-                    // Play vent exit sound
-                    if (playerId != INVALID_ENTITY_ID && ECSM.has_component<Audio_Component>(playerId)) {
-                        if (is_in_air_vent) {
-                            ADM.stop_now(playerId, "air vent in", ECSM.get_component<Audio_Component>(playerId).get_filepath("air vent in"));
-                            ADM.play_now(playerId, "air vent out", ECSM.get_component<Audio_Component>(playerId));
-                            //ECSM.get_component<Audio_Component>(playerId).set_isactive("air vent in", false);
-                            //ECSM.get_component<Audio_Component>(playerId).set_isactive("air vent out", true);
-                            //ECSM.get_component<Audio_Component>(playerId).increase_playcount("air vent out");
-                            //ECSM.get_component<Audio_Component>(playerId).
-                            is_in_air_vent = false;
+                        auto& check_transform = ECSM.get_component<Transform2D>(check_id);
+
+                        // Convert to grid position
+                        int entity2_col = static_cast<int>((check_transform.position.x - LEFT_BOUND) / CELL_WIDTH);
+                        int entity2_row = static_cast<int>((START_Y - check_transform.position.y) / CELL_HEIGHT);
+
+                        // Check if in grid position to the left of player
+                        if (entity2_col == player_col - 1 && entity2_row == player_row) {
+                            if (get_vent_direction(check_id) == VentDirection::LEFT) {
+                                found_next_vent = true;
+                                break;
+                            }
                         }
                     }
+
+                    float vertical_distance = std::abs(e_transform.position.y - av_transform.position.y);
+                    if (vertical_distance <= av_collision.height / 5.0f) {
+                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                    }
                 }
-            }
-            else {
-                e_physics.force_helper.deactivate_force(VENT_FORCE);
-                if (!is_grounded) {
-                    e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+
+                else if (vent_direction == VentDirection::RIGHT) {
+                    for (EntityID check_id : get_entities()) {
+                        if (entity == check_id || vent == check_id) continue;
+
+                        auto& check_transform = ECSM.get_component<Transform2D>(check_id);
+
+                        // Convert to grid position
+                        int entity2_col = static_cast<int>((check_transform.position.x - LEFT_BOUND) / CELL_WIDTH);
+                        int entity2_row = static_cast<int>((START_Y - check_transform.position.y) / CELL_HEIGHT);
+
+                        // Check if in grid position to the right of player
+                        if (entity2_col == player_col + 1 && entity2_row == player_row) {
+                            if (get_vent_direction(check_id) == VentDirection::RIGHT) {
+                                found_next_vent = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    float vertical_distance = std::abs(e_transform.position.y - av_transform.position.y);
+                    if (vertical_distance <= av_collision.height / 5.0f) {
+                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                    }
                 }
+                
             
-            }
         }
 }
 
@@ -696,7 +810,8 @@ namespace lof {
 
 
                     // Check if this is a vent and handle it separately
-                    if (is_vent_entity(entity_ID2)) {
+                    VentDirection vent_dir = get_vent_direction(entity_ID2);
+                    if (vent_dir != VentDirection::NONE) {
                         handle_vent_collision(entity_ID1, entity_ID2, delta_time, is_grounded);
                         continue;
                     }
@@ -1037,13 +1152,14 @@ namespace lof {
             e_last_frame = e_press;
             e_press = IM.is_key_held(GLFW_KEY_E);
 
-
+            
             EntityID player_ID = *iter1;
             auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
 
             if (physic1.get_is_static()) {
                 continue;
             }
+           
 
             auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
             auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
@@ -1053,6 +1169,11 @@ namespace lof {
 
             auto it_2 = std::next(iter1);
 
+            std::string oxygen_tank_str = "Oxygen_Tank";
+            std::string mineral_hoppper_str = "mineral_hopper_conveyor";
+            EntityID oxygen_tank_entity = ECSM.find_entity_by_name(oxygen_tank_str);
+            EntityID mineral_hopper_str = ECSM.find_entity_by_name(mineral_hoppper_str);
+
             // Check for collisions with other entities
             for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
                 EntityID entities_ID = *iter2;
@@ -1061,7 +1182,7 @@ namespace lof {
                 {
                     continue;
                 }
-
+                
                 auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
                 auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
                 auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
@@ -1069,8 +1190,10 @@ namespace lof {
                 if (entities_collision.collidable) continue;
 
                 AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
-                if (entities_ID == 3) {
+                
+                if (entities_ID == oxygen_tank_entity) {
                     enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
+                    //std::cout << "yes!!!!\n";
                 }
 
                 float collision_time = delta_time;
@@ -1086,11 +1209,11 @@ namespace lof {
                 }
             }
 
-            if (check_non_collidable_entities == 2)
+            if (check_non_collidable_entities == mineral_hopper_str)
             {
                 mineral_tank = check_non_collidable_entities;
             }
-            else if (check_non_collidable_entities == 3)
+            else if (check_non_collidable_entities == oxygen_tank_entity)
             {
                 oxygen_tank = check_non_collidable_entities;
             }
@@ -1110,7 +1233,7 @@ namespace lof {
                 // Check mineral tank collision and handle deposit
                 if (mineral_tank_detected() != -1) {
                     gui_system->show_mineral_tank_gui();
-
+                   
                     // Debug the key state
 
                     // Try both pressed and held states
@@ -1128,7 +1251,7 @@ namespace lof {
                                 int current_minerals = std::stoi(text_comp.text);
                                 
                                 
-                                printf("current minerals is %d\n", current_minerals);
+                               // printf("current minerals is %d\n", current_minerals);
 
                                 if (current_minerals >= 100) {
                                     
@@ -1922,6 +2045,7 @@ namespace lof {
                         std::string scene_path = ASM.get_full_path(SCENES, "scene2.scn");
                         if (SM.load_scene(scene_path.c_str())) {
                             GM.set_current_scene(2);
+                            GM.reset_panic(); 
                             LM.write_log("Successfully reloaded scene2.scn");
                             is_transitioning = true;
                             return;
