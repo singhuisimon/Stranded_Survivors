@@ -645,7 +645,7 @@ namespace lof {
                                 transform.position.y, tile_height);
                         }
                     }
-                //}
+                }
 
                 
 
