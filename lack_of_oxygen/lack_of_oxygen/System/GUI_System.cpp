@@ -451,6 +451,11 @@ namespace lof {
             return;  // Don't show GUI on win screen
         }
 
+        if (GM.get_current_scene() != 2)
+        {
+            return;
+        }
+
         // Check if container already exists
         if (ecs_manager.find_entity_by_name("mineral_interaction_container") != INVALID_ENTITY_ID) {
             return; // GUI already shown
@@ -627,7 +632,10 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_oxygen_tank_gui()
     {
-
+        if (GM.get_current_scene() != 2)
+        {
+            return;
+        }
 
         // Check if the oxygen GUI is already shown
         if (!oxygen_container_name.empty()) {
