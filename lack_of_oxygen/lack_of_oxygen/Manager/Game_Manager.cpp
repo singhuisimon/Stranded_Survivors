@@ -558,51 +558,33 @@ namespace lof {
                     }
                 }
 
-                // ------------------------- TIMER UPDATE CHANGES -------------------------
-                //// 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
-                //static float timer_accumulator = 0.0f; // You can make this a class member if you like
-                //timer_accumulator += delta_time;
-                //if (timer_accumulator >= 1.0f) {
-                //    timer_accumulator = 0.0f;
-
-                //    // Only decrease if you haven't hit zero
-                //    if (timer_remaining > 0) {
-                //        timer_remaining -= 1;
-                //    }
-                //}
-
-                //if (timer_count_text_id != INVALID_ENTITY_ID &&
-                //    ECSM.has_component<Transform2D>(timer_count_text_id) &&
-                //    ECSM.has_component<Transform2D>(timer_icon_id))
-                //{
-                //    // If it has a Text_Component, update the visible text to show the integer countdown
-                //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                //        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
-                //        timer_text_comp.text = std::to_string(timer_remaining);
-                //    }
-                //}
-                // ------------------------- END TIMER UPDATE CHANGES -------------------------
-
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(goal_percentage_count_text_id) &&
                     ECSM.has_component<Text_Component>(goal_percentage_count_text_id)) {
 
-                    // Update the text value based on mineral progress
+                    // Get direct reference to the text component
                     auto& text_comp = ECSM.get_component<Text_Component>(goal_percentage_count_text_id);
 
                     // Find the GUI system to get the current stored mineral progress
                     for (auto& system : ECSM.get_systems()) {
                         if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                            if (gui_system->get_current_hopper_percentage() > 0.0f) {
-                                // Calculate and store the percentage in Game Manager
-                                float new_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
-                                GM.set_stored_goal_percentage(new_percentage);
-                            }
+                            float currentPercentage = gui_system->get_current_hopper_percentage();
 
-                            // Use the stored percentage from Game Manager
+                            // Calculate the percentage value (0-100)
+                            int percentage = static_cast<int>(currentPercentage * 100.0f);
+
+                            // Store in Game Manager for consistency
+                            GM.set_stored_goal_percentage(percentage);
+
+                            // Format the text with leading zeros
                             std::stringstream ss;
-                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(GM.get_stored_goal_percentage()) << "%";
+                            ss << std::setw(2) << std::setfill('0') << percentage << "%";
+
+                            // Update the text directly
                             text_comp.text = ss.str();
+
+                            // Log the update for debugging
+                            LM.write_log("Game_Manager::update(): Updated goal percentage text to %s", text_comp.text.c_str());
                             break;
                         }
                     }
