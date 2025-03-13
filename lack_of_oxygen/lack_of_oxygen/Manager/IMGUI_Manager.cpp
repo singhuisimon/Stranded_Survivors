@@ -217,6 +217,9 @@ namespace lof {
             else if (file_name == "win_screen.scn") {
                 GM.set_current_scene(4);
             }
+            else if (file_name == "tutorial.scn") {
+                GM.set_current_scene(5);
+            }
 
             //Reset int used for file list
             selected_object_index = -1;

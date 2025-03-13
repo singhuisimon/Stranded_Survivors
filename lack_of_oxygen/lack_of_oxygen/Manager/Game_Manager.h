@@ -230,6 +230,10 @@ namespace lof {
             current_panic_level = 0.0f;
             panic_timer = 0.0f; 
         }
+
+        bool is_player_dead = false;
+        bool get_player_dead_state() const { return is_player_dead; }
+        void set_player_dead_state(bool state) { is_player_dead = state; }
     };
 
 } // namespace lof
