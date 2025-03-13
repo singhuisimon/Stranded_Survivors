@@ -335,7 +335,7 @@ namespace lof {
 				audio_background.set_isactive("background", true);
 			}*/
 			if (current_scene == 2) {
-				std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3" };
+				std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3", "lava siren"};
 				for (const auto& layer : base_layers) {
 					if (!is_layer_playing(background_id, layer)) {
 						audio_background.set_isactive(layer, true);
