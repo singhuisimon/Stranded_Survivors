@@ -29,7 +29,7 @@
           "position": [ 0.0, -300.0 ],
           "prev_position": [ -400.0, 0.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 200.0, 80.0 ]
+          "scale": [ 240.0, 80.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",
@@ -100,7 +100,7 @@
           "position": [ 0.0, -200.0 ],
           "prev_position": [ -400.0, 0.0 ],
           "orientation": [ 0.0, 0.0 ],
-          "scale": [ 200.0, 80.0 ]
+          "scale": [ 240.0, 80.0 ]
         },
         "Graphics_Component": {
           "model_name": "square",
