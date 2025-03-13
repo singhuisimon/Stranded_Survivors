@@ -241,12 +241,15 @@ namespace lof {
         /*
         * @brief Checks if an entity is a vent type object by check its name 
         * @param id the EntityID to check
-        * @return true if the entity's name contains "vent"
-        * @return false otherwise
+        * @return VentDirection enum type (UP, LEFT, RIGHT, NONE)
         */
 
         VentDirection get_vent_direction(EntityID id) const;
-        void apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded); 
+
+        /*
+        * apply the force on the player depending on the direction. stop and play the vent audio as well
+        */
+        void apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent); 
 
         /*
         * @brief Handles collision interactions between an entity and a vent
@@ -292,6 +295,8 @@ namespace lof {
         void check_win_screen_button_collision(float delta_time);
 
         void player_interact_lava(float delta_time);
+
+        void Detect_Obsidian_Bottom(float delta_time);
     };
 
 

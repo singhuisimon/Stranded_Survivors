@@ -168,6 +168,14 @@ namespace lof {
 
         // System management
        // void add_system(std::unique_ptr<System> system);
+        /*
+        * @brief this function helps with categorizing the systems to its respective list of systems to help 
+        * the with the update to be more optimized
+        * @param pointer to the system list,
+        * @param uses_fixed_dt system with fixed dt update
+        * @param gameplay_dependent systems that need to be stopped in the level editor's performance viewer in level editor pause mode
+        * 
+        */
         void add_system(std::unique_ptr<System> system, bool uses_fixed_dt = false, bool gameplay_dependent = false);
         void update(float delta_time);
 

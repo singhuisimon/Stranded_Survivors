@@ -328,11 +328,11 @@ namespace lof {
         }
     }
 
+
+
     /*
-    * @brief Checks the entity's vent type
+    * @brief Checks the entity's vent type, stores the direction and return the vent direction type
     */
-
-
 
     VentDirection Collision_System::get_vent_direction(EntityID id) const {
         auto* entity = ECSM.get_entity(id);
@@ -362,7 +362,8 @@ namespace lof {
     }
 
 
-    void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded) {
+    void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
+        
         auto& e_physics = ECSM.get_component<Physics_Component>(id);
         auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
         EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
@@ -384,7 +385,7 @@ namespace lof {
                 //apply up movement
                 e_physics.force_helper.activate_force(VENT_FORCE);
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-                e_velocity.velocity.y = 300.0f;
+                e_velocity.velocity.y = 200.0f;
                 break;
             }
             case VentDirection::LEFT: {
@@ -396,8 +397,6 @@ namespace lof {
 
                 //apply force
                 e_physics.force_helper.activate_force(MOVE_LEFT);
-                e_velocity.velocity.x = -300.0f;
-                e_velocity.velocity.y = 0.0f;
                 break;
             }
             case VentDirection::RIGHT: {
@@ -409,8 +408,6 @@ namespace lof {
 
                 //apply force
                 e_physics.force_helper.activate_force(MOVE_RIGHT);
-                e_velocity.velocity.x = 300.0f;
-                e_velocity.velocity.y = 0.0f;
                 break;
             }
             default: 
@@ -518,7 +515,7 @@ namespace lof {
 
                     if (horizontal_distance <= av_collision.width / 2.0f) {
 
-                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent);
 
                     }
                     else {
@@ -550,7 +547,7 @@ namespace lof {
 
                     float vertical_distance = std::abs(e_transform.position.y - av_transform.position.y);
                     if (vertical_distance <= av_collision.height / 5.0f) {
-                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent);
                     }
                 }
 
@@ -575,7 +572,7 @@ namespace lof {
 
                     float vertical_distance = std::abs(e_transform.position.y - av_transform.position.y);
                     if (vertical_distance <= av_collision.height / 5.0f) {
-                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent);
                     }
                 }
                 
@@ -1589,6 +1586,8 @@ namespace lof {
 
         player_interact_lava(delta_time);
 
+        //Detect_Obsidian_Bottom(delta_time);
+
         //EntityID wormhole = ECSM.find_entity_by_name("spritesheet_map");
         //std::cout << "this is wormhole entity " << wormhole << "\n";
     
@@ -2123,17 +2122,6 @@ namespace lof {
         AABB aabb_player = AABB::from_transform(player_transform, player_collision);
         AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
 
-        float player_bottom = aabb_player.min.y + (aabb_player.max.y - aabb_player.min.y);
-        float lava_top = aabb_lava.min.y;
-
-        // Define a small threshold to account for minor floating-point errors
-        float threshold = 0.01f;
-
-        bool is_touching = std::abs(player_bottom - lava_top) < threshold;
-
-        if (is_touching) std::cout << "player in touch with lava !!!!\n";
-
-
         //std::cout << "lava pos x:" << lava_transform.position.x << "lava pos y: " << lava_transform.position.y << "\n";
         //std::cout << "lava height: " << lava_collision.height << " lava width: " << lava_collision.width << " collidable: " << lava_collision.collidable << "\n";
         //bool is_player_dead = false;
@@ -2165,15 +2153,75 @@ namespace lof {
                     break;
                 }
             }
-
-           
- 
         }
 
         
   
 
     }
+#if 1
+    void Collision_System::Detect_Obsidian_Bottom(float delta_time)
+    {
+        // only for game play scene
+        if (GM.get_current_scene() != 2) {
+            return;
+        }
+
+        // Find the obsidian entity
+        EntityID obsidian_entity = ECSM.find_entity_by_name("obsidian_bottom");
+        if (obsidian_entity == static_cast<EntityID>(-1)) {
+            return; // Obsidian entity not found, exit early
+        }
+
+        // Find the player entity
+        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        if (player_ID == static_cast<EntityID>(-1)) {
+            return; // Player entity not found, exit early
+        }
+
+        // Get player components
+        auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+        auto& player_collision = ECSM.get_component<Collision_Component>(player_ID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
+        auto& player_physic = ECSM.get_component<Physics_Component>(player_ID);
+
+        // Get obsidian components
+        auto& obsidian_transform = ECSM.get_component<Transform2D>(obsidian_entity);
+        auto& obsidian_collision = ECSM.get_component<Collision_Component>(obsidian_entity);
+
+        // Create AABBs for player and obsidian
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_obsidian = AABB::from_transform(obsidian_transform, obsidian_collision);
+
+        // Check for collision between player and obsidian
+        float collision_time = delta_time;
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_obsidian, Vec2D(0.0f, 0.0f), collision_time, delta_time)) {
+            CollisionSide side = compute_collision_side(aabb_player, aabb_obsidian);
+
+            // Handle bottom collision with obsidian
+            if (side == CollisionSide::BOTTOM) {
+                // Adjust player position to sit on top of the obsidian
+                float overlap = aabb_player.min.y - aabb_obsidian.max.y;
+                player_transform.position.y -= overlap;
+
+                // Mark player as grounded
+                player_physic.set_is_grounded(true);
+
+                // Stop vertical movement
+                player_velocity.velocity.y = 0.0f;
+
+                // Preserve horizontal movement (do not reset x-velocity)
+            }
+        }
+        else {
+            // If no collision, ensure the player is ungrounded
+            player_physic.set_is_grounded(false);
+
+            // Restore gravity if the player is not grounded
+            player_physic.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+        }
+    }
+#endif
 }
 
 

@@ -391,8 +391,8 @@ namespace lof {
                                 }
 
                                 // Sweat on the player's helmet from POV
-                                unsigned int screen_width = static_cast<float>(SM.get_scr_width()); 
-                                unsigned int screen_height = static_cast<float>(SM.get_scr_height()); 
+                                float screen_width = static_cast<float>(SM.get_scr_width()); 
+                                float screen_height = static_cast<float>(SM.get_scr_height()); 
                                 float part_x = -(screen_width / 2.0f) + (particle_system->get_rand_float() * screen_width);
                                 float part_y = player_transform.position.y + screen_height / 3.25f;
                                 particle_system->particle_emit("sweat_screen", Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
@@ -426,22 +426,18 @@ namespace lof {
             EntityID panic_meter_fill_id = ECSM.find_entity_by_name("top_ui_panik_meter_fill");
             EntityID panic_meter_id = ECSM.find_entity_by_name("top_ui_panik_meter");
 
-            //EntityID mineral_texture_id = ECSM.find_entity_by_name("top_ui_mineral_texture");
-            //EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_text");
-
             EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
             EntityID oxygen_percentage_text_id = ECSM.find_entity_by_name("top_ui_oxygen_percentage_text");
-            EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
-            //EntityID mineral_count_text_id = ECSM.find_entity_by_name("top_ui_mineral_count_text");
+            //EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
             EntityID goal_percentage_count_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
 
             if (ui_overlay_id != INVALID_ENTITY_ID) {
                 auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-                auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
+                //auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
 
                 // Define layout constants for vertical stacking
                 constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
-                constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
+                //constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
 
@@ -572,7 +568,7 @@ namespace lof {
                             int percentage = static_cast<int>(currentPercentage * 100.0f);
 
                             // Store in Game Manager for consistency
-                            GM.set_stored_goal_percentage(percentage);
+                            GM.set_stored_goal_percentage(static_cast<float>(percentage));
 
                             // Format the text with leading zeros
                             std::stringstream ss;
@@ -621,32 +617,37 @@ namespace lof {
             // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
-                // Don't process lava in level editor mode
-                //if (!level_editor_mode && game_playing) {
-                    // Update lava timer
-                    lava_timer += delta_time;
 
-                    // Debug log to verify lava timer is working
-                    LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
+                if (!get_player_dead_state()) {
+                    // Don't process lava in level editor mode
+                    if (!level_editor_mode && game_playing) {
+                        // Update lava timer
+                        lava_timer += delta_time;
 
-                    // Check if it's time to move the lava pool up
-                    if (lava_timer >= LAVA_RISE_INTERVAL) {
-                        auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
+                        // Debug log to verify lava timer is working
+                        LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
 
-                        // Log current position before moving
-                        LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
+                        // Check if it's time to move the lava pool up
+                        if (lava_timer >= LAVA_RISE_INTERVAL) {
+                            auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
 
-                        // Move lava up by exactly one tile height
-                        transform.position.y += tile_height;
-                        transform.prev_position = transform.position;
+                            // Log current position before moving
+                            LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
 
-                        // Reset timer but keep remainder for precise timing
-                        lava_timer -= LAVA_RISE_INTERVAL;
+                            // Move lava up by exactly one tile height
+                            transform.position.y += tile_height;
+                            transform.prev_position = transform.position;
 
-                        LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
-                            transform.position.y, tile_height);
+                            // Reset timer but keep remainder for precise timing
+                            lava_timer -= LAVA_RISE_INTERVAL;
+
+                            LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
+                                transform.position.y, tile_height);
+                        }
                     }
                 //}
+
+                
 
                 // Emit lava splatter particles
                 //if (static_cast<int>(lava_timer) < 1) {
@@ -747,9 +748,9 @@ namespace lof {
         //        return;
         //    }
 
-        //    auto& transform = ECSM.get_component<Transform2D>(selectedID);
-        //    GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
-        //    GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
+            //auto& transform = ECSM.get_component<Transform2D>(selectedID);
+            //GLfloat rot_change = transform.orientation.y * static_cast<GLfloat>(delta_time);
+            //GLfloat scale_change = DEFAULT_SCALE_CHANGE * static_cast<GLfloat>(delta_time);
 
         //    // Check if entity has collision component before using it
         //    bool has_collision = ECSM.has_component<Collision_Component>(selectedID);

@@ -100,8 +100,17 @@ namespace lof {
 		 */
 		EntityID get_player_id() const;
 
+		/*
+		* @brief update the player's movement speed according to the panic level
+		* @param physics_comp player's physics component
+		*/
+
 		void update_player_panic_speed(Physics_Component& physics_comp); 
 
+		/*
+		* @brief update the player's moving forces according to the panic level
+		* max speed is capped at 2 times of the original
+		*/
 		void update_movement_forces(Physics_Component& physics_comp); 
 		/**
 		 * @brief Updates player movement based on input.
