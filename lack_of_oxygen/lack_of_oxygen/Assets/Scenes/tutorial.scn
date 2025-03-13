@@ -769,8 +769,8 @@
                 "Logic_Component": {
                     "scripts": [
                         {
-                            "script_name": "tutorial_script",
-                            "is_active": true
+                          "script_name": "player_tutorial_script",
+                          "is_active": true
                         }
                     ]
                 }

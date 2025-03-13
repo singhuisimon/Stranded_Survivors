@@ -92,7 +92,7 @@ namespace lof {
         std::string wormhole_e_prompt_name; // Entity name for wormhole E prompt
         float wormhole_e_prompt_animation_timer = 0.0f; // for wormhole animation
         EntityID wormhole_e_prompt = INVALID_ENTITY_ID; // for wormhole E prompt entity 
-        float wormhole_e_prompt_x; // position x of the wormhole E prompt
+        float wormhole_e_prompt_x = 0.0f; // position x of the wormhole E prompt
         float wormhole_e_prompt_y = 5.0f; // position y of the wormhole E prompt
         //const float WORMHOLE_E_PROMPT_AMPLITUDE = 1.0f;
 
