@@ -2204,8 +2204,17 @@ namespace lof {
 
         if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_obsidian, obsidian_velocity.velocity, collisions, delta_time))
         {
+            player_physic.set_is_grounded(true);
             player_physic.set_gravity(Vec2D(0.0f, 0.0f));
             player_velocity.velocity.y = 0.0f;
+           
+            
+        }
+        else {
+            if (!player_physic.get_is_grounded()) { // Restore gravity only if the player is not grounded
+                player_physic.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+            }
+            player_physic.set_is_grounded(false);
         }
     }
 }
