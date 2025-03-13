@@ -617,32 +617,37 @@ namespace lof {
             // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
-                // Don't process lava in level editor mode
-                if (!level_editor_mode && game_playing) {
-                    // Update lava timer
-                    lava_timer += delta_time;
 
-                    // Debug log to verify lava timer is working
-                    LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
+                if (!get_player_dead_state()) {
+                    // Don't process lava in level editor mode
+                    if (!level_editor_mode && game_playing) {
+                        // Update lava timer
+                        lava_timer += delta_time;
 
-                    // Check if it's time to move the lava pool up
-                    if (lava_timer >= LAVA_RISE_INTERVAL) {
-                        auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
+                        // Debug log to verify lava timer is working
+                        LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
 
-                        // Log current position before moving
-                        LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
+                        // Check if it's time to move the lava pool up
+                        if (lava_timer >= LAVA_RISE_INTERVAL) {
+                            auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
 
-                        // Move lava up by exactly one tile height
-                        transform.position.y += tile_height;
-                        transform.prev_position = transform.position;
+                            // Log current position before moving
+                            LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
 
-                        // Reset timer but keep remainder for precise timing
-                        lava_timer -= LAVA_RISE_INTERVAL;
+                            // Move lava up by exactly one tile height
+                            transform.position.y += tile_height;
+                            transform.prev_position = transform.position;
 
-                        LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
-                            transform.position.y, tile_height);
+                            // Reset timer but keep remainder for precise timing
+                            lava_timer -= LAVA_RISE_INTERVAL;
+
+                            LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
+                                transform.position.y, tile_height);
+                        }
                     }
                 }
+
+                
 
                 // Emit lava splatter particles
                 //if (static_cast<int>(lava_timer) < 1) {
