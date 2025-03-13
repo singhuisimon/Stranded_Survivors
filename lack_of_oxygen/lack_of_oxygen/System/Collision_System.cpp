@@ -2045,6 +2045,7 @@ namespace lof {
                         std::string scene_path = ASM.get_full_path(SCENES, "scene2.scn");
                         if (SM.load_scene(scene_path.c_str())) {
                             GM.set_current_scene(2);
+                            GM.reset_panic(); 
                             LM.write_log("Successfully reloaded scene2.scn");
                             is_transitioning = true;
                             return;

@@ -560,6 +560,9 @@ namespace lof {
                 // Stop all audio first
                 ADM.stop_mastergroup();
 
+                //reset panic 
+                reset_panic();
+
                 // Find GUI System and show game over screen
                 for (auto& systems_gui : ECSM.get_systems()) {
                     if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
@@ -904,6 +907,9 @@ namespace lof {
                 // Stop all audio currently playing
                 ADM.stop_mastergroup();
 
+                //reset panic
+                reset_panic();
+
                 // Reset player position only if in scene1 or scene2
                 if (current_scene != 0) {
                     EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1059,6 +1065,11 @@ namespace lof {
 
     void Game_Manager::set_current_scene(int scene_num) {
         current_scene = scene_num;
+
+        //reset panic for gameplay when changing scenes
+        if (scene_num == 1 || scene_num == 2) {
+            reset_panic();
+        }
     }
 
     int Game_Manager::get_current_scene() {

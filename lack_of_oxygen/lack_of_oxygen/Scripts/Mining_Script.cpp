@@ -362,6 +362,9 @@ namespace lof {
                         // Stop all audio first
                         ADM.stop_mastergroup();
 
+                        //reset panic
+                        GM.reset_panic();
+
                         // Find GUI System and show game over screen
                         for (auto& systems_gui : ECSM.get_systems()) {
                             if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
