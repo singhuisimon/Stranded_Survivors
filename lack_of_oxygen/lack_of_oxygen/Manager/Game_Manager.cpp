@@ -555,51 +555,33 @@ namespace lof {
                     }
                 }
 
-                // ------------------------- TIMER UPDATE CHANGES -------------------------
-                //// 1) Accumulate delta_time into an accumulator and decrease timer by 1 when >= 1s
-                //static float timer_accumulator = 0.0f; // You can make this a class member if you like
-                //timer_accumulator += delta_time;
-                //if (timer_accumulator >= 1.0f) {
-                //    timer_accumulator = 0.0f;
-
-                //    // Only decrease if you haven't hit zero
-                //    if (timer_remaining > 0) {
-                //        timer_remaining -= 1;
-                //    }
-                //}
-
-                //if (timer_count_text_id != INVALID_ENTITY_ID &&
-                //    ECSM.has_component<Transform2D>(timer_count_text_id) &&
-                //    ECSM.has_component<Transform2D>(timer_icon_id))
-                //{
-                //    // If it has a Text_Component, update the visible text to show the integer countdown
-                //    if (ECSM.has_component<Text_Component>(timer_count_text_id)) {
-                //        auto& timer_text_comp = ECSM.get_component<Text_Component>(timer_count_text_id);
-                //        timer_text_comp.text = std::to_string(timer_remaining);
-                //    }
-                //}
-                // ------------------------- END TIMER UPDATE CHANGES -------------------------
-
                 if (goal_percentage_count_text_id != INVALID_ENTITY_ID &&
                     ECSM.has_component<Transform2D>(goal_percentage_count_text_id) &&
                     ECSM.has_component<Text_Component>(goal_percentage_count_text_id)) {
 
-                    // Update the text value based on mineral progress
+                    // Get direct reference to the text component
                     auto& text_comp = ECSM.get_component<Text_Component>(goal_percentage_count_text_id);
 
                     // Find the GUI system to get the current stored mineral progress
                     for (auto& system : ECSM.get_systems()) {
                         if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                            if (gui_system->get_current_hopper_percentage() > 0.0f) {
-                                // Calculate and store the percentage in Game Manager
-                                float new_percentage = (gui_system->get_current_hopper_percentage() * 50000.0f / 50000.0f) * 100.0f;
-                                GM.set_stored_goal_percentage(new_percentage);
-                            }
+                            float currentPercentage = gui_system->get_current_hopper_percentage();
 
-                            // Use the stored percentage from Game Manager
+                            // Calculate the percentage value (0-100)
+                            int percentage = static_cast<int>(currentPercentage * 100.0f);
+
+                            // Store in Game Manager for consistency
+                            GM.set_stored_goal_percentage(percentage);
+
+                            // Format the text with leading zeros
                             std::stringstream ss;
-                            ss << std::setw(2) << std::setfill('0') << static_cast<int>(GM.get_stored_goal_percentage()) << "%";
+                            ss << std::setw(2) << std::setfill('0') << percentage << "%";
+
+                            // Update the text directly
                             text_comp.text = ss.str();
+
+                            // Log the update for debugging
+                            LM.write_log("Game_Manager::update(): Updated goal percentage text to %s", text_comp.text.c_str());
                             break;
                         }
                     }
@@ -1047,79 +1029,6 @@ namespace lof {
     int Game_Manager::get_step_count() const {
         return m_step_count;
     }
-
-    //int Game_Manager::get_mineral_value(EntityID block_id) const {
-    //    if (!ECSM.has_component<Animation_Component>(block_id)) {
-    //        return 0;
-    //    }
-
-    //    auto* entity = ECSM.get_entity(block_id);
-    //    if (!entity) {
-    //        return 0;
-    //    }
-
-    //    const std::string& name = entity->get_name();
-    //    LM.write_log("Checking mineral value for entity with name: %s", name.c_str());
-
-    //    // Match the prefab names with their corresponding values
-    //    if (name.find("quartz") != std::string::npos) {
-    //        LM.write_log("Found quartz mineral, value: 100");
-    //        return 100;
-    //    }
-    //    if (name.find("emerald") != std::string::npos) {
-    //        LM.write_log("Found emerald mineral, value: 800");
-    //        return 800;
-    //    }
-    //    if (name.find("sapphire") != std::string::npos) {
-    //        LM.write_log("Found sapphire mineral, value: 1600");
-    //        return 1600;
-    //    }
-    //    if (name.find("amethyst") != std::string::npos) {
-    //        LM.write_log("Found amethyst mineral, value: 2400");
-    //        return 2400;
-    //    }
-    //    if (name.find("citrine") != std::string::npos) {
-    //        LM.write_log("Found citrine mineral, value: 3200");
-    //        return 3200;
-    //    }
-    //    if (name.find("alexandrite") != std::string::npos) {
-    //        LM.write_log("Found alexandrite mineral, value: 4000");
-    //        return 4000;
-    //    }
-
-    //    LM.write_log("No mineral value found for this entity");
-    //    return 0;
-    //}
-
-    //void Game_Manager::update_mineral_count_text(int value_to_add) {
-    //    EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-    //    if (text_entity == INVALID_ENTITY_ID) {
-    //        LM.write_log("Could not find mineral count text entity");
-    //        return;
-    //    }
-
-    //    if (!ECSM.has_component<Text_Component>(text_entity)) {
-    //        LM.write_log("Mineral count entity does not have Text_Component");
-    //        return;
-    //    }
-
-    //    try {
-    //        auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
-    //        // Convert current text to integer, add new value
-    //        int current_value = std::stoi(text_comp.text);
-    //        current_value += value_to_add;
-
-    //        // Format the number with leading zeros (6 digits)
-    //        std::stringstream ss;
-    //        ss << std::setw(6) << std::setfill('0') << current_value;
-    //        text_comp.text = ss.str();
-
-    //        LM.write_log("Updated mineral count to: %06d", current_value);
-    //    }
-    //    catch (const std::exception& e) {
-    //        LM.write_log("Error updating mineral count: %s", e.what());
-    //    }
-    //}
 
     void Game_Manager::set_current_scene(int scene_num) {
         current_scene = scene_num;

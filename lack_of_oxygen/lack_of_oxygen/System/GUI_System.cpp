@@ -581,7 +581,6 @@ namespace lof {
                 transform->scale.x = new_width;
                 transform->position.x = -642.0f + (new_width / 2.0f);
             }
-
             if (auto* gui = get_component_safe<GUI_Component>(progress_bar)) {
                 gui->progress = stored_mineral_progress;
             }
@@ -604,7 +603,22 @@ namespace lof {
                 text->text = std::to_string(depositCount) + " / 50000";
             }
         }
+
+        // 5) Update top UI goal percentage text
+        EntityID goal_text_id = ecs_manager.find_entity_by_name("top_ui_goal_percentage_text");
+        if (goal_text_id != INVALID_ENTITY_ID) {
+            if (auto* text = get_component_safe<Text_Component>(goal_text_id)) {
+                int percentage = static_cast<int>(stored_mineral_progress * 100);
+                std::stringstream ss;
+                ss << std::setw(2) << std::setfill('0') << percentage << "%";
+                text->text = ss.str();
+
+                // Store in Game Manager - critical for fixing the reset issue
+                GM.set_stored_goal_percentage(percentage);
+            }
+        }
     }
+
 
     // ---------------------------------------------------------
     // OXYGEN TANK GUI
@@ -1108,7 +1122,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(resume_button)) {
                 transform->position = Vec2D(0.0f, 0.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add empty Audio Component - needed for hover detection
@@ -1128,7 +1142,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(restart_button)) {
                 transform->position = Vec2D(0.0f, -100.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add empty Audio Component - needed for hover detection
@@ -1148,7 +1162,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(main_menu_button)) {
                 transform->position = Vec2D(0.0f, -200.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add empty Audio Component - needed for hover detection
@@ -1325,6 +1339,9 @@ void GUI_System::hide_wormhole_gui() {
                         // Unpause first
                         GM.set_paused(false);
 
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
+
                         // Force hide pause menu first
                         hide_pause_menu();
 
@@ -1384,6 +1401,9 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Unpause first
                         GM.set_paused(false);
+
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
 
                         // Force hide pause menu first
                         hide_pause_menu();
@@ -1493,7 +1513,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(restart_button)) {
                 transform->position = Vec2D(0.0f, -100.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add GUI Component if needed
@@ -1526,7 +1546,7 @@ void GUI_System::hide_wormhole_gui() {
             }
             if (auto* transform = get_component_safe<Transform2D>(main_menu_button)) {
                 transform->position = Vec2D(0.0f, -200.0f);
-                transform->scale = Vec2D(200.0f, 80.0f);
+                transform->scale = Vec2D(240.0f, 80.0f);
             }
 
             // Add GUI Component if needed
@@ -1747,6 +1767,9 @@ void GUI_System::hide_wormhole_gui() {
                     if (key == "restart") {
                         LM.write_log("Game over - Restart button pressed - reloading scene 2");
 
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
+
                         hide_game_over_menu();
                         reset_all_game_state();
 
@@ -1781,6 +1804,9 @@ void GUI_System::hide_wormhole_gui() {
                     }
                     else if (key == "main_menu") {
                         LM.write_log("Game over - Main Menu button pressed - returning to main menu");
+
+                        // Set player dead false
+                        GM.set_player_dead_state(false);
 
                         hide_game_over_menu();
                         reset_all_game_state();

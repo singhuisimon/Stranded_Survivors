@@ -1249,43 +1249,40 @@ namespace lof {
                             try {
                                 // Get current minerals from UI text
                                 int current_minerals = std::stoi(text_comp.text);
-                                
-                                
-                               // printf("current minerals is %d\n", current_minerals);
 
                                 if (current_minerals >= 100) {
-                                    
                                     current_minerals -= 100;
 
-                            
-                                    
                                     total_deposited_minerals += 100;
-                                    //deposit_count_bool = true;
                                     previous_minerals = current_minerals; //store previous value
-                                    if (previous_minerals -= 100)
-                                    {
+                                    if (previous_minerals -= 100) {
                                         deposit_count++;
                                     }
-                                   
-                                    
-                                  
+
                                     // Calculate progress percentage based on total deposited minerals
+                                    // This produces a value between 0.0 and 1.0
                                     float current_percentage = total_deposited_minerals / 50000.0f;
-                                    current_percentage = std::min(current_percentage, 100.0f);
+                                    current_percentage = std::min(current_percentage, 1.0f); // Clamp to 1.0, not 100.0
 
                                     // Update progress bar and its text
                                     gui_system->update_mineral_progress(current_percentage);
 
-                                    // Reset the mineral count to 0 (optional, depending on your game logic)
-                                    //text_comp.text = "0";
+                                    // IMPORTANT: Directly update the top UI goal percentage text as well
+                                    EntityID goal_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
+                                    if (goal_text_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(goal_text_id)) {
+                                        auto& goal_text = ECSM.get_component<Text_Component>(goal_text_id);
+                                        int percentage = static_cast<int>(current_percentage * 100.0f);
+                                        std::stringstream ss;
+                                        ss << std::setw(2) << std::setfill('0') << percentage << "%";
+                                        goal_text.text = ss.str();
 
+                                        // Log the update
+                                        LM.write_log("Updated top UI goal text to %s", goal_text.text.c_str());
+                                    }
+
+                                    // Update the mineral count display
                                     text_comp.text = std::to_string(current_minerals);
-
-                                    
                                 }
-                                
-                         
-
                             }
                             catch (const std::exception& e) {
                                 // Handle exception
@@ -1721,7 +1718,7 @@ namespace lof {
 
                         // Set up scene loading
                         const std::string SCENES = "Scenes";
-                        std::string scene_file = "scene2.scn";
+                        std::string scene_file = "tutorial.scn";
                         std::string scene_path = ASM.get_full_path(SCENES, scene_file);
                         LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
 
@@ -1752,7 +1749,7 @@ namespace lof {
                             }
 
                             // Update current scene in Game Manager
-                            GM.set_current_scene(2);
+                            GM.set_current_scene(5);
 
                             // Update IMGUI Manager's current file
                             IMGUIM.set_current_file_shown(scene_file);

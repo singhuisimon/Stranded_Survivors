@@ -117,6 +117,7 @@
     <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Assets\Level_Design\Level_Design_V2.csv" />
     <None Include="Assets\Level_Design\Level_Design_V5.csv" />
+    <None Include="Assets\Scenes\tutorial.scn" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -150,6 +151,11 @@
     <Media Include="Assets\Audio\sfx_tnt_boom.wav" />
     <Media Include="Assets\Audio\sfx_tnt_fuse.wav" />
     <Media Include="Assets\Audio\sfx_mineral_destroy.wav" />
+    <Media Include="Assets\Audio\sfx_empty_laser_hit.wav" />
+    <Media Include="Assets\Audio\sfx_tunneling.wav" />
+    <Media Include="Assets\Audio\sfx_tutorial_button.wav" />
+    <Media Include="Assets\Audio\sfx_tutorial_lights.wav" />
+    <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />
