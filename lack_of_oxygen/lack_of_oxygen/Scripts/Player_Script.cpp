@@ -417,7 +417,7 @@ namespace lof {
         }
 
         // Handle teleportation based on player input
-        float current_time = glfwGetTime();
+        float current_time = static_cast<float>(glfwGetTime());
         for (const auto& pair : wormhole_pairs) {
             EntityID wormhole_id = pair.first;
             EntityID linked_wormhole = pair.second;
@@ -437,7 +437,7 @@ namespace lof {
             }
         }
 
-        Cheap_Code_Teleport_Wormhole(-522.0f, -3654.0f);
+        Cheap_Code_Teleport_Wormhole(-53.0f, -9414.0f);
     }
 
     bool Player_Script::is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole)
