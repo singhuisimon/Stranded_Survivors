@@ -106,6 +106,10 @@ namespace lof {
         float current_oxygen_level = 100.0f; // Track oxygen level
         float current_mineral_count = 0.0f;  // Track mineral count
 
+        // Track oxygen trend for warnings
+        float previous_oxygen_level = 100.0f;
+        bool oxygen_decreasing = false;
+
         // == PAUSE MENU MEMBERS ==
         std::unordered_map<std::string, EntityID> pause_menu_entities;
         std::unordered_map<std::string, bool> pause_button_hover_states;

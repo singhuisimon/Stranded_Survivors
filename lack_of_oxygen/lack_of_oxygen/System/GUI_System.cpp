@@ -313,11 +313,37 @@ namespace lof {
             // Check oxygen level and update warnings
             float current_oxygen = GM.get_current_oxygen_level();
 
-            // Handle 50% warning
-            if (current_oxygen == 50.0f && !warning_50_active) {
-                show_oxygen_warning(50.0f);
-                warning_50_display_time = 0.0f;
+            // Determine if oxygen is decreasing or increasing
+            oxygen_decreasing = (current_oxygen < previous_oxygen_level);
+
+            // Only show warnings when oxygen is decreasing
+            if (oxygen_decreasing) {
+                // Handle 50% warning - only when decreasing
+                if (current_oxygen <= 50.0f && previous_oxygen_level > 50.0f && !warning_50_active) {
+                    show_oxygen_warning(50.0f);
+                    warning_50_display_time = 0.0f;
+                    warning_50_active = true;
+                    warning_50_shown = true;
+                }
+
+                // Handle 20% warning - only when decreasing
+                if (current_oxygen <= 20.0f && previous_oxygen_level > 20.0f && !warning_20_active) {
+                    show_oxygen_warning(20.0f);
+                    warning_20_display_time = 0.0f;
+                    warning_20_active = true;
+                    warning_20_shown = true;
+                }
+
+                // Handle 5% warning - only when decreasing
+                if (current_oxygen <= 5.0f && previous_oxygen_level > 5.0f && !warning_5_active) {
+                    show_oxygen_warning(5.0f);
+                    warning_5_display_time = 0.0f;
+                    warning_5_active = true;
+                    warning_5_shown = true;
+                }
             }
+
+            // Handle warning timers regardless of oxygen trend
             if (warning_50_shown) {
                 warning_50_display_time += delta_time;
                 if (warning_50_display_time >= WARNING_DURATION) {
@@ -327,11 +353,6 @@ namespace lof {
                 }
             }
 
-            // Handle 20% warning
-            if (current_oxygen == 20.0f && !warning_20_active) {
-                show_oxygen_warning(20.0f);
-                warning_20_display_time = 0.0f;
-            }
             if (warning_20_shown) {
                 warning_20_display_time += delta_time;
                 if (warning_20_display_time >= WARNING_DURATION) {
@@ -341,11 +362,6 @@ namespace lof {
                 }
             }
 
-            // Handle 5% warning
-            if (current_oxygen == 5.0f && !warning_5_active) {
-                show_oxygen_warning(5.0f);
-                warning_5_display_time = 0.0f;
-            }
             if (warning_5_shown) {
                 warning_5_display_time += delta_time;
                 if (warning_5_display_time >= WARNING_DURATION) {
@@ -354,6 +370,9 @@ namespace lof {
                     warning_5_shown = false;
                 }
             }
+
+            // Store current oxygen level for next frame comparison
+            previous_oxygen_level = current_oxygen;
         }
 
         auto* container_transform = get_component_safe<Transform2D>(container_id);
