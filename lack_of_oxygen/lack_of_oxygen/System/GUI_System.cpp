@@ -124,6 +124,8 @@ namespace lof {
         warning_20_display_time = 0.0f;
         warning_5_display_time = 0.0f;
 
+        gameover_audio_played = false;
+
         LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
     }
 
@@ -1372,7 +1374,6 @@ void GUI_System::hide_wormhole_gui() {
 
                             // Stop all audio
                             ADM.stop_mastergroup();
-                            ADM.set_yet_to_play(true);
 
                             // Reset player position
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1436,7 +1437,6 @@ void GUI_System::hide_wormhole_gui() {
 
                             // Stop all audio
                             ADM.stop_mastergroup();
-                            ADM.set_yet_to_play(true);
 
                             // Update IMGUI
                             IMGUIM.set_current_file_shown(scene_file);
@@ -1670,6 +1670,16 @@ void GUI_System::hide_wormhole_gui() {
         float center_x = static_cast<float>(window_width) / 2.0f;
         float center_y = static_cast<float>(window_height) / 2.0f;
 
+        EntityID player = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        if (player) {
+            if (ecs_manager.has_component<Audio_Component>(player) && !gameover_audio_played) {
+                auto& audio_comp = ecs_manager.get_component<Audio_Component>(player);
+                const std::string filepath = audio_comp.get_filepath("game over");
+                ADM.play_now(player, "game over", audio_comp);
+                gameover_audio_played = true;
+            }
+        }
+
         // The keys for the buttons in our game_over_entities map
         const std::vector<std::string> button_keys = { "restart", "main_menu" };
 
@@ -1787,7 +1797,6 @@ void GUI_System::hide_wormhole_gui() {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             ADM.stop_mastergroup();
-                            ADM.set_yet_to_play(true);
 
                             // Reset player
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
@@ -1826,7 +1835,7 @@ void GUI_System::hide_wormhole_gui() {
                             camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                             ADM.stop_mastergroup();
-                            ADM.set_yet_to_play(true);
+
                             IMGUIM.set_current_file_shown(scene_file);
                         }
                     }

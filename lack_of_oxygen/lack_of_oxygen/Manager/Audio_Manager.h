@@ -128,7 +128,7 @@ namespace lof {
 		 * @param audio_key The key of the audio to be muted.
 		 * @param file_path The file path of the audio to be muted.
 		 */
-		void mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
+		//void mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
 		/**
 		 * @brief Unmute the sound layer.
@@ -141,7 +141,7 @@ namespace lof {
 		 .
 		 * @param file_path The file path of the audio to be unmuted.
 		 */
-		void unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
+		//void unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
 		/**
 		 * @brief Update the layering of the background music based on the oxygen level.
@@ -272,10 +272,6 @@ namespace lof {
 
 		//flag for new scene
 		bool new_scene;
-
-		bool to_play_gameover;
-		bool yet_to_play = true;
-
 	};
 }
 
