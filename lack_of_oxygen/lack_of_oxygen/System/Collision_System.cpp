@@ -1572,6 +1572,12 @@ namespace lof {
             check_win_screen_button_collision(delta_time);
             return;  // Skip other collision checks for credits scene
         }
+
+        if (GM.get_current_scene() == 2) {
+            if (is_player_dead) {
+                is_player_dead = GM.get_player_dead_state();
+            }
+        }
        
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
  
@@ -2112,6 +2118,10 @@ namespace lof {
             return;
         }
 
+        if (is_player_dead) {
+            return;
+        }
+
         EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
         EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
 
@@ -2132,7 +2142,7 @@ namespace lof {
 
         //std::cout << "lava pos x:" << lava_transform.position.x << "lava pos y: " << lava_transform.position.y << "\n";
         //std::cout << "lava height: " << lava_collision.height << " lava width: " << lava_collision.width << " collidable: " << lava_collision.collidable << "\n";
-        bool is_player_dead = false;
+        //bool is_player_dead = false;
         if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
         {
            // std::cout << "test\n";
