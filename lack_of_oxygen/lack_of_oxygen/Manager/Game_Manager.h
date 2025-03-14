@@ -96,6 +96,7 @@ namespace lof {
 
         /**
         *@brief helper functions to increase and decrease panic 
+        *@param fixed delta time 
         * 
         */
         void add_panic(float dt); 
@@ -192,14 +193,7 @@ namespace lof {
         void set_current_panic_level(float value) { 
             current_panic_level = std::clamp(value, 0.0f, 100.0f); 
         }
-        /**
-        * @brief Get panic triggered boolean
-        * @return boolean that indicates whether panic triggered or not
-        */
-        bool get_panic_triggered() const { return panic_triggered; }
-        void set_panic_triggered(bool value) { panic_triggered = value; }
 
-        //ash
         
 
         /**
@@ -223,6 +217,9 @@ namespace lof {
         void reset_lava_timer() { lava_timer = 0.0f; }
         void set_tile_height(float height) { tile_height = height; }
 
+        /*
+        * @brief reset the variables associating with the panic mechanic for the panic meter
+        */
         void reset_panic() {
             panic_current = 0.0f; 
             panic_triggered = false; 

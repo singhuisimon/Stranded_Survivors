@@ -328,11 +328,11 @@ namespace lof {
         }
     }
 
+
+
     /*
-    * @brief Checks the entity's vent type
+    * @brief Checks the entity's vent type, stores the direction and return the vent direction type
     */
-
-
 
     VentDirection Collision_System::get_vent_direction(EntityID id) const {
         auto* entity = ECSM.get_entity(id);
@@ -362,7 +362,8 @@ namespace lof {
     }
 
 
-    void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent, bool& is_grounded) {
+    void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
+        
         auto& e_physics = ECSM.get_component<Physics_Component>(id);
         auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
         EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
@@ -384,7 +385,7 @@ namespace lof {
                 //apply up movement
                 e_physics.force_helper.activate_force(VENT_FORCE);
                 e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-                e_velocity.velocity.y = 300.0f;
+                e_velocity.velocity.y = 200.0f;
                 break;
             }
             case VentDirection::LEFT: {
@@ -396,8 +397,6 @@ namespace lof {
 
                 //apply force
                 e_physics.force_helper.activate_force(MOVE_LEFT);
-                e_velocity.velocity.x = -300.0f;
-                e_velocity.velocity.y = 0.0f;
                 break;
             }
             case VentDirection::RIGHT: {
@@ -409,8 +408,6 @@ namespace lof {
 
                 //apply force
                 e_physics.force_helper.activate_force(MOVE_RIGHT);
-                e_velocity.velocity.x = 300.0f;
-                e_velocity.velocity.y = 0.0f;
                 break;
             }
             default: 
@@ -518,7 +515,7 @@ namespace lof {
 
                     if (horizontal_distance <= av_collision.width / 2.0f) {
 
-                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent);
 
                     }
                     else {
@@ -550,7 +547,7 @@ namespace lof {
 
                     float vertical_distance = std::abs(e_transform.position.y - av_transform.position.y);
                     if (vertical_distance <= av_collision.height / 5.0f) {
-                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent);
                     }
                 }
 
@@ -575,7 +572,7 @@ namespace lof {
 
                     float vertical_distance = std::abs(e_transform.position.y - av_transform.position.y);
                     if (vertical_distance <= av_collision.height / 5.0f) {
-                        apply_vent_force(entity, vent_direction, found_next_vent, is_grounded);
+                        apply_vent_force(entity, vent_direction, found_next_vent);
                     }
                 }
                 
