@@ -87,7 +87,7 @@ namespace lof {
         std::string warning_text_5_name;
         std::string warning_container_5_name;
 
-        // Timers, positions, etc.
+       
         float e_prompt_animation_timer = 0.0f;
         float original_e_prompt_y = 30.0f;   // The base Y position for 'E' prompt
         float oxygen_e_prompt_animation_timer = 0.0f; // Separate timer if you want separate animation
