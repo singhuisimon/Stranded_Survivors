@@ -1,6 +1,11 @@
 /**
  * @file GUI_System.cpp
- * @brief Defines the definition for GUI systems.
+ * @brief Define the GUI system
+ * @author Simon Chan (95%), Saw Hui Shan (5%)
+ * @date January 15, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
 
 #include "GUI_System.h"
@@ -1016,7 +1021,7 @@ namespace lof {
     }
 
 #endif
-    void GUI_System::show_wormhole_tank_gui() {
+    void GUI_System::show_wormhole_gui() {
         // Check if the entity already exists
         if (!wormhole_e_prompt_name.empty()) {
             EntityID existing_entity = ecs_manager.find_entity_by_name(wormhole_e_prompt_name);
@@ -1472,14 +1477,6 @@ void GUI_System::hide_wormhole_gui() {
     void GUI_System::set_wormhole_e_prompt_x(float new_x_position) {
         wormhole_e_prompt_x = new_x_position;
 
-        //// Update the position of the E prompt directly
-        //if (wormhole_e_prompt != INVALID_ENTITY_ID) {
-        //    if (auto* transform = get_component_safe<Transform2D>(wormhole_e_prompt)) {
-        //        transform->position.x = wormhole_e_prompt_x; // Update the x-position immediately
-        //    }
-        //}
-
-        
     }
 
 

@@ -1,9 +1,9 @@
 /**
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class helper functions.
- * @author Simon Chan (75%), Chua Wen Bin Kenny (12%), Amanda Leow (6%), Saw Hui Shan (4%), Liliana Hanawardani (3%)
+ * @author Simon Chan (73%), Chua Wen Bin Kenny (12%), Amanda Leow (6%), Saw Hui Shan (4%), Liliana Hanawardani (3%), Wai Lwin Thit (2%)
  * @date September 21, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -404,16 +404,16 @@ namespace lof {
             }
 
             // Display red vignette based on oxygen level
-            EntityID red_vignette = ECSM.find_entity_by_name("red_vignette");
-            if (red_vignette != INVALID_ENTITY_ID) {
+            EntityID black_vignette = ECSM.find_entity_by_name("black_vignette");
+            if (black_vignette != INVALID_ENTITY_ID) {
                 
                 // Adjust alpha value of red_vignette
-                auto& red_vignette_graphics = ECSM.get_component<Graphics_Component>(red_vignette);
+                auto& black_vignette_graphics = ECSM.get_component<Graphics_Component>(black_vignette);
                 if (current_oxygen_level <= 50.0f) {
-                    red_vignette_graphics.color.a = 2 * (50.0f - current_oxygen_level)  / 100.0f;
+                    black_vignette_graphics.color.a = 2 * (50.0f - current_oxygen_level)  / 100.0f;
                 }
                 else {
-                    red_vignette_graphics.color.a = 0.0f;
+                    black_vignette_graphics.color.a = 0.0f;
                 }
             }
 

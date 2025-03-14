@@ -3,7 +3,7 @@
  * @brief Defines constant values used across the project.
  * @author Simon Chan (70%), Chua Wen Bin Kenny (10%), Wai Lwin Thit (10%), Amanda Leow Boon Suan (5%), Liliana Hanawardani (5%)
  * @date October 01, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

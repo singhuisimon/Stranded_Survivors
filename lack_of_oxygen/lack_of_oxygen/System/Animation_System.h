@@ -4,7 +4,7 @@
  * @details Updates animation of the entity based on the animation and frame data.
  * @author Chua Wen Bin Kenny (100%)
  * @date October 25, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

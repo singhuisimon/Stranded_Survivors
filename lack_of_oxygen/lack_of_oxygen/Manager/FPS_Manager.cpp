@@ -3,7 +3,7 @@
  * @brief Implements the FPS_Manager class methods for managing frame rate control in the game loop.
  * @author Simon Chan (99%), Liliana Hanawardani (1%)
  * @date September 20, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

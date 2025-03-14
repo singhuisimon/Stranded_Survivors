@@ -1,7 +1,7 @@
 /**
  * @file Collision_Syetem.cpp
  * @brief Implements the collsion system.
- * @author Saw Hui Shan (86%), Simon (3%), Ash (11%)
+ * @author Saw Hui Shan (77%), Simon (3%), Wai Lwin Thit (20%)
  * @date September 21, 2024
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -930,200 +930,6 @@ namespace lof {
 
 #endif
 
-
-#if 0
-    EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
-    EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
-    EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
-    bool Collision_System::entites_detect = false;
-
-
-    void Collision_System::Colliside_Oxygen_Mineral(float delta_time)
-    {
-        const auto& collision_entities = get_entities();
-
-        for (auto iter1 = collision_entities.begin(); iter1 != collision_entities.end(); ++iter1)
-        {
-            EntityID player_ID = *iter1;
-            auto& physic1 = ECSM.get_component<Physics_Component>(player_ID);
-
-            if (physic1.get_is_static()) {
-                continue;
-            }
-
-            auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
-            auto& player_collision1 = ECSM.get_component<Collision_Component>(player_ID);
-            auto& player_velocity1 = ECSM.get_component<Velocity_Component>(player_ID);
-
-            AABB aabb_player = AABB::from_transform(player_transform, player_collision1);
-
-            auto it_2 = std::next(iter1);
-
-            // Check for collisions with other entities
-            for (auto iter2 = collision_entities.begin(); iter2 != collision_entities.end(); ++iter2) {
-                EntityID entities_ID = *iter2;
-
-                if (player_ID == entities_ID)
-                {
-                    continue;
-                }
-
-                auto& entities_transform = ECSM.get_component<Transform2D>(entities_ID);
-                auto& entities_collision = ECSM.get_component<Collision_Component>(entities_ID);
-                auto& entities_velocity = ECSM.get_component<Velocity_Component>(entities_ID);
-
-                if (entities_collision.collidable) continue;
-
-                AABB enttities_aabb = AABB::from_transform(entities_transform, entities_collision);
-                if (entities_ID == 3) {
-                    enttities_aabb.max.x += 40.0f; // Extend right side by 20 units as the asset centre affected the detected area
-                }
-
-                float collision_time = delta_time;
-                if (collision_intersection_rect_rect(aabb_player, player_velocity1.velocity, enttities_aabb, entities_velocity.velocity, collision_time, delta_time)) {
-                    check_non_collidable_entities = entities_ID;
-                    entites_detect = true;
-                    break;
-                }
-                else
-                {
-                    check_non_collidable_entities = static_cast<EntityID>(-1);
-                    entites_detect = false;
-                }
-            }
-
-            if (check_non_collidable_entities == 2)
-            {
-                mineral_tank = check_non_collidable_entities;
-            }
-            else if (check_non_collidable_entities == 3)
-            {
-                oxygen_tank = check_non_collidable_entities;
-            }
-            else {
-                oxygen_tank = static_cast<EntityID>(-1);
-                mineral_tank = static_cast<EntityID>(-1);
-            }
-        }
-
-        // Find GUI System to trigger interface and handle mineral deposit
-        for (auto& system : ECSM.get_systems()) {
-            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                // Check mineral tank collision and handle deposit
-                if (mineral_tank_detected() != -1) {
-                    gui_system->show_mineral_tank_gui();
-
-                    // Debug the key state
-                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
-                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
-
-                    // Try both pressed and held states
-                    if (is_e_pressed || is_e_held) {
-                        EntityID text_entity = ECSM.find_entity_by_name("top_ui_mineral_count_text");
-                        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-
-                        if (text_entity != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(text_entity)) {
-                            auto& text_comp = ECSM.get_component<Text_Component>(text_entity);
-                            auto& player_audio = ECSM.get_component<Audio_Component>(player_ID);
-
-                            try {
-                                // Get current minerals from UI text
-                                int current_minerals = std::stoi(text_comp.text);
-                                //store the previous value of current minerals
-                                //int previous_minerals = current_minerals;
-
-                                // check if current minearal has decreased
-                                if (current_minerals > 0)
-                                {
-                                    if (is_e_pressed || is_e_held)
-                                    {
-                                        ADM.play_now(player_ID, "mineral deposit", player_audio);
-                                        //player_audio.increase_playcount("mineral deposit");
-                                    }
-                                }
-                                //update previous minerals 
-                                //previous_minerals = current_minerals;
-                                if (current_minerals >=  100) {
-                                    // Add current minerals to the total deposited minerals
-                                    //total_deposited_minerals += current_minerals;
-
-                                    current_minerals -= 100;
-                                    total_deposited_minerals += 100;
-                                    // Calculate progress percentage based on total deposited minerals
-                                    float current_percentage = total_deposited_minerals / 50000.0f;
-                                    current_percentage = std::min(current_percentage, 1.0f);
-
-                                    // Update progress bar and its text
-                                    gui_system->update_mineral_progress(current_percentage);
-
-                                    // Reset the mineral count to 0 (optional, depending on your game logic)
-                                    text_comp.text = "0";
-                                }
-                            }
-                            catch (const std::exception& e) {
-                                // Handle exception
-                            }
-                        }
-                    }
-                }
-                else {
-                    gui_system->hide_mineral_tank_gui();
-                }
-
-                // Check oxygen tank collision
-                if (oxygen_tank_detected() != -1)
-                {
-                    gui_system->show_oxygen_tank_gui();
-
-                    // If E is pressed or held
-                    bool is_e_pressed = IM.is_key_pressed(GLFW_KEY_E);
-                    bool is_e_held = IM.is_key_held(GLFW_KEY_E);
-
-                    if (is_e_pressed || is_e_held)
-                    {
-                        // (1) Player oxygen / Ship oxygen
-                        float playerOxy = GM.get_current_oxygen_level(); // [0..100]
-                        float shipOxy = GM.get_ship_oxygen_level();    // [0..400]
-
-                        // (2) If player not full and ship has some oxygen
-                        if (playerOxy < 100.0f && shipOxy > 0.0f)
-                        {
-                            // (3) Figure out how much the player needs
-                            float needed = 100.0f - playerOxy;
-
-                            // The ship can only give up to 'shipOxy' it has:
-                            float transfer = std::min(needed, shipOxy);
-
-                            // Transfer
-                            playerOxy += transfer;  // player goes up
-                            shipOxy -= transfer;  // ship goes down
-
-                            // (4) Store them back
-                            GM.set_current_oxygen_level(playerOxy);
-                            GM.set_ship_oxygen_level(shipOxy);
-
-                            // (5) Update the GUI bars
-                            //    - Player fraction = playerOxy / 100
-                            float playerFraction = playerOxy / 100.0f;
-                            gui_system->update_oxygen_progress1(playerFraction);
-
-                            
-                            float usedFraction = (400.0f - shipOxy) / 400.0f;
-                            gui_system->update_oxygen_progress2(usedFraction);
-                        }
-                    }
-                }
-                else {
-                    gui_system->hide_oxygen_tank_gui();
-                }
-
-                break;
-            }
-        }
-    }
-
-#endif 
-
     EntityID Collision_System::check_non_collidable_entities = static_cast<EntityID>(-1);
     EntityID Collision_System::mineral_tank = static_cast<EntityID>(-1);
     EntityID Collision_System::oxygen_tank = static_cast<EntityID>(-1);
@@ -1621,6 +1427,7 @@ namespace lof {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
@@ -1670,7 +1477,7 @@ namespace lof {
                 base_texture = "Main_Menu_Quit_Batch_14";
             }
                 
-            //dont know where this came or what it does
+            //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -1841,6 +1648,7 @@ namespace lof {
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
@@ -1875,7 +1683,7 @@ namespace lof {
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
 
-            //is this code from lily??
+            //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -1961,6 +1769,7 @@ namespace lof {
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
@@ -2003,7 +1812,7 @@ namespace lof {
             static bool clicked_played = false;
 
 
-            //lily's update/?
+            //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -2170,73 +1979,8 @@ namespace lof {
             }
         }
 
-        
-  
-
     }
-#if 1
-    void Collision_System::Detect_Obsidian_Bottom(float delta_time)
-    {
-        // only for game play scene
-        if (GM.get_current_scene() != 2) {
-            return;
-        }
 
-        // Find the obsidian entity
-        EntityID obsidian_entity = ECSM.find_entity_by_name("obsidian_bottom");
-        if (obsidian_entity == static_cast<EntityID>(-1)) {
-            return; // Obsidian entity not found, exit early
-        }
-
-        // Find the player entity
-        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        if (player_ID == static_cast<EntityID>(-1)) {
-            return; // Player entity not found, exit early
-        }
-
-        // Get player components
-        auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
-        auto& player_collision = ECSM.get_component<Collision_Component>(player_ID);
-        auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
-        auto& player_physic = ECSM.get_component<Physics_Component>(player_ID);
-
-        // Get obsidian components
-        auto& obsidian_transform = ECSM.get_component<Transform2D>(obsidian_entity);
-        auto& obsidian_collision = ECSM.get_component<Collision_Component>(obsidian_entity);
-
-        // Create AABBs for player and obsidian
-        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
-        AABB aabb_obsidian = AABB::from_transform(obsidian_transform, obsidian_collision);
-
-        // Check for collision between player and obsidian
-        float collision_time = delta_time;
-        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_obsidian, Vec2D(0.0f, 0.0f), collision_time, delta_time)) {
-            CollisionSide side = compute_collision_side(aabb_player, aabb_obsidian);
-
-            // Handle bottom collision with obsidian
-            if (side == CollisionSide::BOTTOM) {
-                // Adjust player position to sit on top of the obsidian
-                float overlap = aabb_player.min.y - aabb_obsidian.max.y;
-                player_transform.position.y -= overlap;
-
-                // Mark player as grounded
-                player_physic.set_is_grounded(true);
-
-                // Stop vertical movement
-                player_velocity.velocity.y = 0.0f;
-
-                // Preserve horizontal movement (do not reset x-velocity)
-            }
-        }
-        else {
-            // If no collision, ensure the player is ungrounded
-            player_physic.set_is_grounded(false);
-
-            // Restore gravity if the player is not grounded
-            player_physic.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-        }
-    }
-#endif
 }
 
 

@@ -3,7 +3,7 @@
  * @brief Contains all the extern declaration
  * @author Amanda Leow Boon Suan (50%), Liliana Hanawardani (50%)
  * @date October 10, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
