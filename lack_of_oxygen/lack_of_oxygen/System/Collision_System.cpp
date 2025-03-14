@@ -1427,6 +1427,7 @@ namespace lof {
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
@@ -1476,7 +1477,7 @@ namespace lof {
                 base_texture = "Main_Menu_Quit_Batch_14";
             }
                 
-            //dont know where this came or what it does
+            //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -1647,6 +1648,7 @@ namespace lof {
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
@@ -1681,7 +1683,7 @@ namespace lof {
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
 
-            //is this code from lily??
+            //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
@@ -1767,6 +1769,7 @@ namespace lof {
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
+        //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
@@ -1809,7 +1812,7 @@ namespace lof {
             static bool clicked_played = false;
 
 
-            //lily's update/?
+            //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
