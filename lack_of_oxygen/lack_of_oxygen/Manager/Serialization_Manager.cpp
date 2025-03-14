@@ -870,7 +870,6 @@ namespace lof {
                         entity_name.find("ventUp") == 0 ||
                         entity_name.find("ventLeft") == 0 ||
                         entity_name.find("ventRight") == 0 ||
-                        entity_name.find("ventUp") == 0 ||
                         entity_name.find("lava") == 0 ||
                         entity_name.find("obsidian") == 0 ||
                         entity_name.find("ventStripUp") == 0 ||
