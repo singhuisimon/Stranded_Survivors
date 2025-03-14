@@ -1226,7 +1226,7 @@
       }
     },
     {
-      "name": "red_vignette",
+      "name": "black_vignette",
       "components": {
         "Transform2D": {
           "position": [ 0.0, -102.0 ],
@@ -1237,7 +1237,7 @@
         "Graphics_Component": {
           "model_name": "square",
           "color": [ 1.0, 1.0, 1.0, 0.0 ],
-          "texture_name": "screen_vignette_red_batch_19",
+          "texture_name": "screen_vignette_black_batch_2",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [ 0, 0, 0 ],
