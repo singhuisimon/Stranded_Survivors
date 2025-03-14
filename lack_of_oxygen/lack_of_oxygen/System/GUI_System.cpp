@@ -626,7 +626,7 @@ namespace lof {
                 text->text = ss.str();
 
                 // Store in Game Manager - critical for fixing the reset issue
-                GM.set_stored_goal_percentage(percentage);
+                GM.set_stored_goal_percentage(static_cast<float>(percentage));
             }
         }
     }
@@ -1392,9 +1392,9 @@ void GUI_System::hide_wormhole_gui() {
                             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
                             if (playerId != INVALID_ENTITY_ID) {
                                 if (ecs_manager.has_component<Transform2D>(playerId)) {
-                                    auto& transform = ecs_manager.get_component<Transform2D>(playerId);
-                                    transform.position = Vec2D(0.0f, 0.0f);
-                                    transform.prev_position = transform.position;
+                                    auto& transform_player = ecs_manager.get_component<Transform2D>(playerId);
+                                    transform_player.position = Vec2D(0.0f, 0.0f);
+                                    transform_player.prev_position = transform_player.position;
                                 }
                                 if (ecs_manager.has_component<Velocity_Component>(playerId)) {
                                     auto& velocity = ecs_manager.get_component<Velocity_Component>(playerId);

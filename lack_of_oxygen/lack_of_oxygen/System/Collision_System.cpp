@@ -510,7 +510,7 @@ namespace lof {
                    //static bool is_in_air_vent = false;
                     // Calculate horizontal center distance between player and vent
                     float horizontal_distance = std::abs(e_transform.position.x - av_transform.position.x);
-                    bool has_vertical_overlap = overlap.y > 0;
+                    //bool has_vertical_overlap = overlap.y > 0;
 
 
                     if (horizontal_distance <= av_collision.width / 2.0f) {
@@ -941,7 +941,7 @@ namespace lof {
     int oxygen_count = 0; 
 
 
-    bool increasing = false;
+    //bool increasing = false;
     bool bgm_oxygen_increasing = false;  // Separate flag for BGM state
     float last_oxygen_level = 0.0f;
 
