@@ -1,3 +1,13 @@
+/**
+ * @file Tutorial_Script.cpp
+ * @brief Declare the Tutorial_Script class
+ * @author Amanda Leow Boon Suan (100%)
+ * @date March 10, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include <iostream>
 #include <string>
 #include <random>

@@ -50,9 +50,9 @@ namespace lof {
 		*@brief increase player movement speed based on the panic level
 		* @param current panic (0-100)
 		*/
-		void add_panic_movespeed(float panic_amount); 
+		//void add_panic_movespeed(float panic_amount); 
 
-		void drop_panic_movespeed(float panic_amount); 
+		//void drop_panic_movespeed(float panic_amount); 
 		std::string get_type() const override;
 
 	private:

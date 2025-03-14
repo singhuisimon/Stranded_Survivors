@@ -1,7 +1,7 @@
 /**
- * @file Player_Script.h
- * @brief Define the player_script class
- * @author Amanda Leow Boon Suan (60%), Wai Lwin Thit (20%), Chua Wen Bin Kenny (20%)
+ * @file Player_Script.cpp
+ * @brief Declare the player_script class
+ * @author Amanda Leow Boon Suan (40%), Wai Lwin Thit (20%), Chua Wen Bin Kenny (20%), Saw Hui Shan (20%)
  * @date February 2, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
