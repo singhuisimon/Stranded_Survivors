@@ -1,9 +1,9 @@
 /**
  * @file ECS_Manager.h
  * @brief Declares the ECS_Manager class for managing the ECS.
- * @author Simon Chan (100%)
+ * @author Simon Chan (96%), Saw Hui Shan (2%), Wai Lwin Thit (2%)
  * @date September 21, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

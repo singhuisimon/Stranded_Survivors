@@ -4,7 +4,7 @@
  * @author Amanda Leow Boon Suan (98%), Saw Hui Shan (2%)
  * @date created September 27, 2024 
  * @date updated February 3, 2025
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

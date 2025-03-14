@@ -419,7 +419,7 @@ namespace lof {
             gui_system->set_wormhole_e_prompt_x(player_transform.position.x);
 
             if (is_inside) {
-                gui_system->show_wormhole_tank_gui();
+                gui_system->show_wormhole_gui();
             }
             else if (was_inside) {
                 gui_system->hide_wormhole_gui();

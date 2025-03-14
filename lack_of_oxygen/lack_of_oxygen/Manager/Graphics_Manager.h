@@ -3,7 +3,7 @@
  * @brief Manages the display and rendering of image data
  * @author Chua Wen Bin Kenny (100%)
  * @date September 18, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

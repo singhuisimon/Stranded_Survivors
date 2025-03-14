@@ -3,7 +3,7 @@
  * @brief Implements the ComponentParser utility class methods.
  * @author Simon Chan (50%), Chua Wen Bin Kenny (20%), Saw Hui Shan (20%), Wai Lwin Thit (10%), Amanda Leow Boon Suan (10%)
  * @date October 1, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

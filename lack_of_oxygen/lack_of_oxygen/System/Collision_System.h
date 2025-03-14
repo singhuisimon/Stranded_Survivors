@@ -284,6 +284,10 @@ namespace lof {
           */
         std::string collisionSideToString(CollisionSide side);
 
+        /**
+         * @brief Collsiion for the oxygen and mineral together with the UI
+         * @param delta time
+         */
         void Colliside_Oxygen_Mineral(float delta_time);
 
 
@@ -294,9 +298,13 @@ namespace lof {
         // == WIN SCREEN BUTTON COLLISION ==
         void check_win_screen_button_collision(float delta_time);
 
+        /**
+         * @brief Collision for the player and lava and return to game over screen if player interact with lava pool
+         * @param delta time 
+         */
         void player_interact_lava(float delta_time);
 
-        void Detect_Obsidian_Bottom(float delta_time);
+       
     };
 
 

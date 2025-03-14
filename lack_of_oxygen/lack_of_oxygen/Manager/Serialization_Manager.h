@@ -3,7 +3,7 @@
  * @brief Defines the Serialization_Manager class for handling serialization and configuration data.
  * @author Simon Chan (100%)
  * @date September 22, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -195,6 +195,10 @@ namespace lof {
         size_t get_level_cols() const { return current_level.cols; }
         int scene_switch() const { return scene_no; }
 
+        /**
+         * @brief To get the wormhole id 
+         * @return vector of wormhole id 
+         */
         std::vector<EntityID>& get_wormholes_id() { return wormholes; }
         
         //const std::vector<EntityID> get_wormholes_id() const { return wormholes; };

@@ -1,8 +1,12 @@
 /**
  * @file GUI_System.h
- * @brief Defines the declaration for GUI systems.
+ * @brief Declare the GUI system
+ * @author Simon Chan (98%), Saw Hui Shan (2%)
+ * @date January 15, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
  */
-
 #pragma once
 #ifndef LOF_GUI_SYSTEM_H
 #define LOF_GUI_SYSTEM_H
@@ -214,8 +218,18 @@ namespace lof {
         void hide_oxygen_warning(float percent);
 
         // == WORMHOLE GUI SHOW == 
+        /**
+         * @brief Hide the wormhole e prompt UI if player not interact with wormhole
+         */
         void hide_wormhole_gui();
-        void show_wormhole_tank_gui();
+        /**
+         * @brief Show the wormhole e prompt UI if player interact with wormhole
+         */
+        void show_wormhole_gui();
+
+        /**
+        * @brief get the position of the wormhole e prompt based on the player position 
+        */
         void set_wormhole_e_prompt_x(float new_x_position);
 
         
