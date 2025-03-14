@@ -278,6 +278,9 @@ namespace lof {
          */
         void update_buttons_and_batches();
 
+        /**
+         * @brief Fill up c_str_animation_storage vector with animation names from asset manager
+         */
         void fill_up_animation_storage();
 };
 
