@@ -1112,6 +1112,7 @@ namespace lof {
                                 int index_animation = std::stoi(animation_indexes.first);
                                 if (index_animation - 1 != prev_index_check) {
                                     missing_index = prev_index_check + 1;
+                                    break;
                                 }
                                 prev_index_check = index_animation;
                             }

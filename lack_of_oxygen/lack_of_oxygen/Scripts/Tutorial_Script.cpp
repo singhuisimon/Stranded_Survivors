@@ -187,7 +187,7 @@ namespace lof {
             return;
         }
 
-        auto& transform = ECSM.get_component<Transform2D>(entity_id);
+        //auto& transform = ECSM.get_component<Transform2D>(entity_id);
         auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
         auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 

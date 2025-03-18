@@ -870,7 +870,6 @@ namespace lof {
                         entity_name.find("ventUp") == 0 ||
                         entity_name.find("ventLeft") == 0 ||
                         entity_name.find("ventRight") == 0 ||
-                        entity_name.find("ventUp") == 0 ||
                         entity_name.find("lava") == 0 ||
                         entity_name.find("obsidian") == 0 ||
                         entity_name.find("ventStripUp") == 0 ||
@@ -1178,7 +1177,7 @@ namespace lof {
         float tile_height = tile_width; // Keep tiles square
         
         bool is_wormhole = false;
-        bool is_lava_assets = false; // to get the lava assets
+        //bool is_lava_assets = false; // to get the lava assets
 
         //LM.write_log("Creating level entities with tile size: %.2f x %.2f", tile_width, tile_height);
         //LM.write_log("Level bounds: Left: %.2f, Right: %.2f, Start Y: %.2f", LEFT_BOUND, RIGHT_BOUND, START_Y);
@@ -1226,7 +1225,7 @@ namespace lof {
                 }
 
                 is_wormhole = (tile.type == 't');
-                is_lava_assets = (tile.type == 'l');
+               // is_lava_assets = (tile.type == 'l');
 
                 // Calculate world position for the tile
                 float x_pos = LEFT_BOUND + (col * tile_width) + (tile_width / 2.0f);

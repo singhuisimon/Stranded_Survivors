@@ -561,8 +561,8 @@ namespace lof {
 
                     // Find the GUI system to get the current stored mineral progress
                     for (auto& system : ECSM.get_systems()) {
-                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                            float currentPercentage = gui_system->get_current_hopper_percentage();
+                        if (auto* GUI_system = dynamic_cast<GUI_System*>(system.get())) {
+                            float currentPercentage = GUI_system->get_current_hopper_percentage();
 
                             // Calculate the percentage value (0-100)
                             int percentage = static_cast<int>(currentPercentage * 100.0f);
@@ -602,12 +602,12 @@ namespace lof {
 
                 // Find GUI System and show game over screen
                 for (auto& systems_gui : ECSM.get_systems()) {
-                    if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                    if (auto* guiSystem = dynamic_cast<GUI_System*>(systems_gui.get())) {
                         // First reset all GUI states
-                        gui_system->reset_all_game_state();
+                        guiSystem->reset_all_game_state();
 
                         // Then show the game over screen
-                        gui_system->show_game_over_menu();
+                        guiSystem->show_game_over_menu();
                         LM.write_log("Game over screen displayed - player ran out of oxygen");
                         break;
                     }
