@@ -242,8 +242,11 @@ namespace lof {
 		 */
 		void set_new_scene(bool new_scene_state);
 
+		/**
+		 * @brief Get the new_scene flag
+		 * @return a boolean value consisting the value of the new_scene flag
+		 */
 		bool get_new_scene();
-		void set_yet_to_play(bool new_bool);
 
 	private:
 

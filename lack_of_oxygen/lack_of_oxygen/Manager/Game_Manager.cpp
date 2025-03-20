@@ -1,9 +1,9 @@
 /**
  * @file Game_Manager.cpp
  * @brief Implements the Game_Manager class helper functions.
- * @author Simon Chan (75%), Chua Wen Bin Kenny (12%), Amanda Leow (6%), Saw Hui Shan (4%), Liliana Hanawardani (3%)
+ * @author Simon Chan (73%), Chua Wen Bin Kenny (12%), Amanda Leow (6%), Saw Hui Shan (4%), Liliana Hanawardani (3%), Wai Lwin Thit (2%)
  * @date September 21, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -404,16 +404,16 @@ namespace lof {
             }
 
             // Display red vignette based on oxygen level
-            EntityID red_vignette = ECSM.find_entity_by_name("red_vignette");
-            if (red_vignette != INVALID_ENTITY_ID) {
+            EntityID black_vignette = ECSM.find_entity_by_name("black_vignette");
+            if (black_vignette != INVALID_ENTITY_ID) {
                 
                 // Adjust alpha value of red_vignette
-                auto& red_vignette_graphics = ECSM.get_component<Graphics_Component>(red_vignette);
+                auto& black_vignette_graphics = ECSM.get_component<Graphics_Component>(black_vignette);
                 if (current_oxygen_level <= 50.0f) {
-                    red_vignette_graphics.color.a = 2 * (50.0f - current_oxygen_level)  / 100.0f;
+                    black_vignette_graphics.color.a = 2 * (50.0f - current_oxygen_level)  / 100.0f;
                 }
                 else {
-                    red_vignette_graphics.color.a = 0.0f;
+                    black_vignette_graphics.color.a = 0.0f;
                 }
             }
 
@@ -561,8 +561,8 @@ namespace lof {
 
                     // Find the GUI system to get the current stored mineral progress
                     for (auto& system : ECSM.get_systems()) {
-                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                            float currentPercentage = gui_system->get_current_hopper_percentage();
+                        if (auto* GUI_system = dynamic_cast<GUI_System*>(system.get())) {
+                            float currentPercentage = GUI_system->get_current_hopper_percentage();
 
                             // Calculate the percentage value (0-100)
                             int percentage = static_cast<int>(currentPercentage * 100.0f);
@@ -602,12 +602,12 @@ namespace lof {
 
                 // Find GUI System and show game over screen
                 for (auto& systems_gui : ECSM.get_systems()) {
-                    if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                    if (auto* guiSystem = dynamic_cast<GUI_System*>(systems_gui.get())) {
                         // First reset all GUI states
-                        gui_system->reset_all_game_state();
+                        guiSystem->reset_all_game_state();
 
                         // Then show the game over screen
-                        gui_system->show_game_over_menu();
+                        guiSystem->show_game_over_menu();
                         LM.write_log("Game over screen displayed - player ran out of oxygen");
                         break;
                     }
@@ -617,32 +617,37 @@ namespace lof {
             // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
-                // Don't process lava in level editor mode
-                if (!level_editor_mode && game_playing) {
-                    // Update lava timer
-                    lava_timer += delta_time;
 
-                    // Debug log to verify lava timer is working
-                    LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
+                if (!get_player_dead_state()) {
+                    // Don't process lava in level editor mode
+                    if (!level_editor_mode && game_playing) {
+                        // Update lava timer
+                        lava_timer += delta_time;
 
-                    // Check if it's time to move the lava pool up
-                    if (lava_timer >= LAVA_RISE_INTERVAL) {
-                        auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
+                        // Debug log to verify lava timer is working
+                        LM.write_log("Lava timer: %.2f of %.2f", lava_timer, LAVA_RISE_INTERVAL);
 
-                        // Log current position before moving
-                        LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
+                        // Check if it's time to move the lava pool up
+                        if (lava_timer >= LAVA_RISE_INTERVAL) {
+                            auto& transform = ECSM.get_component<Transform2D>(lava_pool_id);
 
-                        // Move lava up by exactly one tile height
-                        transform.position.y += tile_height;
-                        transform.prev_position = transform.position;
+                            // Log current position before moving
+                            LM.write_log("Current lava Y before moving: %.2f", transform.position.y);
 
-                        // Reset timer but keep remainder for precise timing
-                        lava_timer -= LAVA_RISE_INTERVAL;
+                            // Move lava up by exactly one tile height
+                            transform.position.y += tile_height;
+                            transform.prev_position = transform.position;
 
-                        LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
-                            transform.position.y, tile_height);
+                            // Reset timer but keep remainder for precise timing
+                            lava_timer -= LAVA_RISE_INTERVAL;
+
+                            LM.write_log("Game_Manager::update(): Moving lava pool up to Y=%.2f (tile height: %.2f)",
+                                transform.position.y, tile_height);
+                        }
                     }
                 }
+
+                
 
                 // Emit lava splatter particles
                 //if (static_cast<int>(lava_timer) < 1) {

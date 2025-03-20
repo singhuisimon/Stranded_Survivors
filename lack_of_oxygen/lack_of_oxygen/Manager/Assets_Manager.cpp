@@ -3,7 +3,7 @@
  * @brief Implements the Assets_Manager.
  * @author Saw Hui Shan (90%), Chua Wen Bin Kenny (10%)
  * @date September 21, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
 

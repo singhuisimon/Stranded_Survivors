@@ -1,3 +1,12 @@
+/**
+ * @file Mining_Script.cpp
+ * @brief Declare the mining_script class
+ * @author Amanda Leow Boon Suan (40%), Chua Wen Bin Kenny (30%), Wai Lwin Thit (30%)
+ * @date February 24, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #include <iostream>
 #include <string>
 #include <random>
@@ -550,7 +559,7 @@ namespace lof {
         current_mining_direction = new_direction;
     }
 
-    void Mining_Script::update_tile(int block_to_remove, Particle_System* particle_system) {
+    void Mining_Script::update_tile(EntityID block_to_remove, Particle_System* particle_system) {
         auto& animation = ECSM.get_component<Animation_Component>(block_to_remove);
         if (animation.curr_tile_health > 0) {
             if (animation.curr_tile_health <= mining_strength) {
@@ -608,7 +617,7 @@ namespace lof {
         }
     }
 
-    void Mining_Script::update_mining_audio(int block_to_remove, Audio_Component& audio_comp, const std::string key_1, const std::string key_2) {
+    void Mining_Script::update_mining_audio(EntityID block_to_remove, Audio_Component& audio_comp, const std::string key_1, const std::string key_2) {
         // Determine sound based on mineral value
         std::string sound_key = (get_mineral_value(block_to_remove) > 0) ? key_1 : key_2;
         ADM.play_now(player_id, sound_key, audio_comp);

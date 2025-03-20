@@ -1,7 +1,7 @@
 /**
  * @file Logic_Manager.h
  * @brief Define the logic manager class
- * @author Simon Chan (60%), Amanda Leow Boon Suan (40%)
+ * @author Amanda Leow Boon Suan (100%)
  * @date February 2, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -48,12 +48,29 @@ namespace lof {
 		 */
 		void shut_down();
 
+		/**
+		 * @brief Add new script  to the map
+		 * @param script consisting the shared ptr to the script for registering
+		 */
 		void add_script(std::shared_ptr<Script> script);
 
+		/**
+		 * @brief get the script from the script map
+		 * @param script_name the key to obtain the script ptr from the map
+		 * @return a shared ptr to the script
+		 */
 		std::shared_ptr<Script> get_script(const std::string& script_name);
 
+		/**
+		 * @brief Remove the script from the scripts_map
+		 * @param script_name the key to obtain the script ptr that is to be removed
+		 */
 		void remove_script(const std::string& script_name);
 
+		/**
+		 * @brief Getter for the script name for imgui usage
+		 * @return a vector of string filled with all the registered script name.
+		 */
 		std::vector<std::string> get_script_names();
 
 	private:
@@ -69,6 +86,7 @@ namespace lof {
 		 */
 		void register_all_scripts();
 
+		///@ unordered map storing the name of the script as well as the script pointer itself
 		std::unordered_map<std::string, std::shared_ptr<Script>> scripts_map;
 
 	};

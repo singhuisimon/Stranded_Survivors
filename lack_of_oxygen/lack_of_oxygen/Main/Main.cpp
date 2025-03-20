@@ -4,7 +4,7 @@
  * @details Initializes the Game_Manager, loads configurations, sets up the window, and runs the main loop.
  * @author Simon Chan (85%), Liliana Hanawardani (10%), Amanda Leow Boon Suan (5%)
  * @date September 21, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
@@ -31,7 +31,10 @@
 
 using namespace lof;
 
+//Booleans to turn on level editor
 bool level_editor_mode = false;
+
+//Booleans for playing and pausing game in level editor
 bool game_playing = true;
 GLFWwindow* window = nullptr;
 //float delta_time = 0.0f;
@@ -283,8 +286,10 @@ int main(void) {
 
             //Ensures in game GUI is disabled when in level editor
             IMGUIM.disable_GUI();
-        }
+        } 
         else if (game_playing == false) {
+            
+            //Ensuring game is playing when switching from level editor to game
             game_playing = true;
         }
 

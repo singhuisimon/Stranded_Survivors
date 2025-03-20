@@ -46,6 +46,13 @@ namespace lof {
 		 */
 		bool is_key_just_pressed(int key);
 
+		/**
+		*@brief increase player movement speed based on the panic level
+		* @param current panic (0-100)
+		*/
+		//void add_panic_movespeed(float panic_amount); 
+
+		//void drop_panic_movespeed(float panic_amount); 
 		std::string get_type() const override;
 
 	private:
@@ -152,17 +159,34 @@ namespace lof {
 
 		//bool found_wormhole = false;
 
+		// to store the pair of the wormholes
 		std::unordered_map<EntityID, EntityID> wormhole_pairs;
-		//Transform2D last_wormhole_position; // to store the last wormhole
-
-
-		//void handle_teleportation(EntityID player_id);
+		
+		/*
+		* @brief Check if player is interact with the wormholes
+		* @param player to get transfromation component of player 
+		* @param wormhole to get transfromation component of wormhole
+		* @return true if player interact with wormhole, false if not 
+		*/
 		bool is_player_inside_wormhole(Transform2D& player, Transform2D& wormhole);
 
+		/*
+		* @brief Teleport player from one wormhole to another lineked wormhole
+		* @param Player_ID pass through player id 
+		* @param linked_wormhole entity id of the linked wormhole
+		*/
 		void teleport_player(EntityID Player_ID, EntityID linked_wormhole);
 
+		/*
+		* @brief To handle how the player teleport from one wormhole to another 
+		* @param Player_ID pass through player id
+		*/
 		void handle_teleportation(EntityID Player_ID);
-
+		/*
+		* @brief Use the cheap code to teleport player for demostrate and debug purpose
+		* @param pos_x player position for the x axis 
+		* @param pos_y player position for the y axis 
+		*/
 		void Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y);
 		//void Show_E_Prompt_UI(bool show_ui, Transform2D& prompt_pos);
 	};

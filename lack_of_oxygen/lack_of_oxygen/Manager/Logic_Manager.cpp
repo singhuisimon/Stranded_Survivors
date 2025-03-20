@@ -1,7 +1,7 @@
 /**
  * @file Logic_Manager.cpp
  * @brief Declare the logic manager class
- * @author Simon Chan (60%), Amanda Leow Boon Suan (40%)
+ * @author Amanda Leow Boon Suan (80%), Simon Chan (20%)
  * @date February 2, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -60,6 +60,7 @@ namespace lof {
 
 		scripts_map.clear();
 
+		//add the script here
 		add_script(std::make_shared<Object_Moving_Script>());
 		add_script(std::make_shared<Player_Script>());
 		add_script(std::make_shared<Mining_Script>());
@@ -68,20 +69,6 @@ namespace lof {
 		add_script(std::make_shared<Tutorial_Light_Script>());
 		add_script(std::make_shared<Player_Tutorial_Script>());
 		LM.write_log("Logic_Manager::register_all_scripts(): Registered built-in scripts.");
-
-
-		// Register Object Moving Script
-		//Object_Moving_Script object_moving_script;
-		//object_moving_script.register_script();
-		//LM.write_log("Registered Object Moving Script");
-
-		//Player_Script player_script;
-		//player_script.register_script();
-		//LM.write_log("Registered Player Script");
-
-		//Mining_Script mining_script;
-		//mining_script.register_script();
-		//LM.write_log("Registered Mining Script");
 
 		// Register other scripts here as they are added.
 	}

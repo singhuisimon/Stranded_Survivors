@@ -1,3 +1,12 @@
+/**
+ * @file Tutorial_Lights_Script.cpp
+ * @brief Declare the Tutorial_Lights_Script class
+ * @author Amanda Leow Boon Suan (100%)
+ * @date March 13, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
 #include <iostream>
 #include <string>
 #include <random>
@@ -93,7 +102,6 @@ namespace lof {
         //EntityID light_right = ECSM.find_entity_by_name("siren_bulb_right");
 
         if (light_left != INVALID_ENTITY_ID){//}&& light_right != INVALID_ENTITY_ID) {
-            // Get both clouds transform
             //auto& light_right_audio = ECSM.get_component<Audio_Component>(light_right);
             auto& light_left_audio = ECSM.get_component<Audio_Component>(light_left);
 
@@ -116,10 +124,8 @@ namespace lof {
 
             light_right_graphics.texture_name = base_texture + std::to_string(current_frame_index);
             light_left_graphics.texture_name = base_texture + std::to_string(current_frame_index);
-            //std::cout << "currently both set to frame" << current_frame_index << std::endl;
             return;
         }
-        //std::cout << "didn't update animation" << std::endl;
     }
 
 } // namespace lof

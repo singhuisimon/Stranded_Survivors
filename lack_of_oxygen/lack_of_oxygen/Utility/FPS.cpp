@@ -3,7 +3,7 @@
  * @brief Implements the FPS class helper functions for calculating current FPS.
  * @author Simon Chan (85%), Liliana Hanawardani (15%)
  * @date September 15, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */

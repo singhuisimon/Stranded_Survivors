@@ -1,3 +1,13 @@
+/**
+ * @file Tutorial_Script.cpp
+ * @brief Declare the Tutorial_Script class
+ * @author Amanda Leow Boon Suan (100%)
+ * @date March 10, 2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
 #include <iostream>
 #include <string>
 #include <random>
@@ -177,7 +187,7 @@ namespace lof {
             return;
         }
 
-        auto& transform = ECSM.get_component<Transform2D>(entity_id);
+        //auto& transform = ECSM.get_component<Transform2D>(entity_id);
         auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
         auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 

@@ -824,6 +824,9 @@ namespace lof {
             }
             //throw std::runtime_error("Script not found");
             LM.write_log("get_script_data in logic component: script not found");
+
+            static ScriptData default_script_data;
+            return default_script_data;
         }
 
         /**

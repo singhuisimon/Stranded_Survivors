@@ -1,7 +1,7 @@
 /**
- * @file Player_Script.h
- * @brief Define the player_script class
- * @author Amanda Leow Boon Suan (60%), Wai Lwin Thit (20%), Chua Wen Bin Kenny (20%)
+ * @file Player_Script.cpp
+ * @brief Declare the player_script class
+ * @author Amanda Leow Boon Suan (40%), Wai Lwin Thit (20%), Chua Wen Bin Kenny (20%), Saw Hui Shan (20%)
  * @date February 2, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -419,7 +419,7 @@ namespace lof {
             gui_system->set_wormhole_e_prompt_x(player_transform.position.x);
 
             if (is_inside) {
-                gui_system->show_wormhole_tank_gui();
+                gui_system->show_wormhole_gui();
             }
             else if (was_inside) {
                 gui_system->hide_wormhole_gui();

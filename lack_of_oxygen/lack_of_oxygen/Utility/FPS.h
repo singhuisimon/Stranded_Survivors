@@ -3,7 +3,7 @@
  * @brief Defines the FPS class for calculating and retrieving the current FPS.
  * @author Simon Chan (95%), Liliana Hanawardani (5%)
  * @date September 15, 2024
- * Copyright (C) 2024 DigiPen Institute of Technology.
+ * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
  * prior written consent of DigiPen Institute of Technology is prohibited.
  */
