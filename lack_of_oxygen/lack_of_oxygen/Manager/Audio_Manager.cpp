@@ -352,6 +352,32 @@ namespace lof {
 		}
 	}
 
+	void Audio_Manager::stop_groups(GroupType grouptype) {
+
+		FMOD::ChannelGroup* selected_group = nullptr;
+
+		switch (grouptype) {
+		case TYPE_BGM:
+			selected_group = bgmgroup;
+			break;
+		case TYPE_SFX:
+			selected_group = sfxgroup;
+			break;
+		case TYPE_UI:
+			selected_group = uigroup;
+			break;
+		default:
+			break;
+		}
+
+		bool playing;
+		selected_group->isPlaying(&playing);
+		if (playing) {
+			errorcheck(selected_group->stop(), "Audio_System::selected_group", "stop master group");
+			//new_scene = true;
+		}
+	}
+
 	void Audio_Manager::pause_resume_mastergroup() {
 		//get_mastergroup;
 		bool pause;
@@ -388,9 +414,9 @@ namespace lof {
 
 		if (selected_group) {
 			bool pause = false;
-			selected_group->getPaused(&pause);
+			errorcheck(selected_group->getPaused(&pause));
 			if (!pause) {
-				errorcheck(selected_group->setPaused(true));
+				errorcheck(selected_group->setPaused(true), "Audio_System::pause_group", "pause group");
 			}
 		}
 	}
@@ -414,9 +440,9 @@ namespace lof {
 
 		if (selected_group) {
 			bool pause = false;
-			selected_group->getPaused(&pause);
-			if (!pause) {
-				errorcheck(selected_group->setPaused(false));
+			errorcheck(selected_group->getPaused(&pause));
+			if (pause) {
+				errorcheck(selected_group->setPaused(false), "Audio_System::resume_group", "resume_group");
 			}
 		}
 	}

@@ -197,15 +197,23 @@ namespace lof {
                 if (m_is_paused) {
                     gui_system->show_pause_menu();
 
+                    //pause group doesnt work
+                    ADM.pause_group(GroupType::TYPE_BGM);
+                    ADM.pause_group(GroupType::TYPE_SFX);
+
                     // Pause audio
-                    ADM.pause_resume_mastergroup();
+                    //ADM.pause_resume_mastergroup();
 
                 }
                 else {
                     gui_system->hide_pause_menu();
 
+                    //resume group doesnt work
+                    ADM.resume_group(GroupType::TYPE_BGM);
+                    ADM.resume_group(GroupType::TYPE_SFX);
+
                     // Resume audio
-                    ADM.pause_resume_mastergroup();
+                    //ADM.pause_resume_mastergroup();
                 }
                 break;
             }
@@ -595,7 +603,10 @@ namespace lof {
                 set_player_dead_state(true);
 
                 // Stop all audio first
-                ADM.stop_mastergroup();
+                //ADM.stop_mastergroup();
+
+                ADM.stop_groups(GroupType::TYPE_BGM);
+                ADM.stop_groups(GroupType::TYPE_SFX);
 
                 //reset panic 
                 reset_panic();

@@ -417,7 +417,11 @@ namespace lof {
         //handle audio 
         //audio for vent in 
         if (!is_in_vent) {
-            ADM.play_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID));
+
+            if (!GM.get_player_dead_state()) {
+                ADM.play_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID));
+            }
+
             is_in_vent = true;
         }
 
@@ -430,8 +434,11 @@ namespace lof {
             }
 
             if (is_in_vent) {
-                ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
-                ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
+
+                if (!GM.get_player_dead_state()) {
+                    ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
+                    ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
+                }
                 is_in_vent = false;
             }
         }
@@ -1959,7 +1966,10 @@ namespace lof {
         // Check if player is dead to reset the scene
         if (is_player_dead == true) {
             // Stop all audio first
-            ADM.stop_mastergroup();
+            //ADM.stop_mastergroup();
+
+            ADM.stop_groups(GroupType::TYPE_BGM);
+            ADM.stop_groups(GroupType::TYPE_SFX);
 
             //reset panic
             GM.reset_panic();

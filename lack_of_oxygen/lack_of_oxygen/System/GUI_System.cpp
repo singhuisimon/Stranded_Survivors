@@ -1142,6 +1142,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
             ecs_manager.add_component(resume_button, audio_comp);
 
             pause_menu_entities["resume"] = resume_button;
@@ -1162,6 +1163,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
             ecs_manager.add_component(restart_button, audio_comp);
 
             pause_menu_entities["restart"] = restart_button;
@@ -1182,6 +1184,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
             ecs_manager.add_component(main_menu_button, audio_comp);
 
             pause_menu_entities["main_menu"] = main_menu_button;
@@ -1288,8 +1291,6 @@ void GUI_System::hide_wormhole_gui() {
             auto& graphics = ecs_manager.get_component<Graphics_Component>(entity_id);
             auto& audio = ecs_manager.get_component<Audio_Component>(entity_id);
 
-
-
             float half_width = transform.scale.x * 0.5f;
             float half_height = transform.scale.y * 0.5f;
 
@@ -1341,7 +1342,7 @@ void GUI_System::hide_wormhole_gui() {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     // Show pressed texture
                     graphics.texture_name = base_texture + "_PRESSED";
-                    ADM.play_now(entity_id, click_sound, audio);
+                    //ADM.play_now(entity_id, click_sound, audio);
 
                     // Handle the actual button click
                     if (entity_name == "resume_button") {
@@ -1533,6 +1534,7 @@ void GUI_System::hide_wormhole_gui() {
             // Add Audio Component
             if (!ecs_manager.has_component<Audio_Component>(restart_button)) {
                 Audio_Component audio_comp;
+                audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(restart_button, audio_comp);
             }
 
@@ -1566,6 +1568,7 @@ void GUI_System::hide_wormhole_gui() {
             // Add Audio Component
             if (!ecs_manager.has_component<Audio_Component>(main_menu_button)) {
                 Audio_Component audio_comp;
+                audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(main_menu_button, audio_comp);
             }
 
@@ -1753,6 +1756,7 @@ void GUI_System::hide_wormhole_gui() {
             else if (key == "main_menu") {
                 base_texture = "Main_Menu_Batch_14";
             }
+            std::string hover_sound = "button_hover";
 
             // Ensure we have a recorded hover state
             if (game_over_button_hover_states.find(entity->get_name()) == game_over_button_hover_states.end()) {
@@ -1770,7 +1774,7 @@ void GUI_System::hide_wormhole_gui() {
 
                 // Play hover sound if newly hovering
                 if (!game_over_button_hover_states[entity->get_name()]) {
-                    ADM.play_now(button_id, "button_hover", audio);
+                    ADM.play_now(button_id, hover_sound, audio);
                     game_over_button_hover_states[entity->get_name()] = true;
                 }
 
@@ -1778,7 +1782,7 @@ void GUI_System::hide_wormhole_gui() {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     LM.write_log("CLICK DETECTED on button: %s", key.c_str());
                     graphics.texture_name = base_texture + "_PRESSED";
-                    ADM.play_now(button_id, "main_menu", audio);
+                    //ADM.play_now(button_id, "main_menu", audio);
 
                     // Handle specific button
                     if (key == "restart") {
