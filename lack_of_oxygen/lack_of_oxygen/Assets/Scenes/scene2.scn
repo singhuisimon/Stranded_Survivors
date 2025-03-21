@@ -321,20 +321,20 @@
       "components": {
         "Transform2D": {
           "position": [
-            550.0,
-            -60.0
+            540.0,
+            -54.0
           ],
           "prev_position": [
-            550.0,
-            -60.0
+            540.0,
+            -54.0
           ],
           "orientation": [
             0.0,
             0.0
           ],
           "scale": [
-            180.0,
-            180.0
+            140.0,
+            198.0
           ]
         },
         "Graphics_Component": {
