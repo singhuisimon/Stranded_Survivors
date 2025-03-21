@@ -234,7 +234,7 @@ namespace lof {
          * @param delta_time The time since the last update.
          */
         void collision_check_collide(std::vector<CollisionPair>& collisions, float delta_time);
-        void collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time);
+        //void collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time);
         void collision_check_scene2(std::vector<CollisionPair>& collisions, float delta_time);
 
 
@@ -303,6 +303,13 @@ namespace lof {
          * @param delta time 
          */
         void player_interact_lava(float delta_time);
+
+        /**
+        * @brief Detect obsidian to prevent player drop after player destroy the tiles
+        * @param side The side of the collide side
+        * @return Return the string side that is collide
+        */
+        void Detect_Obsidian_Bottom(float delta_time);
 
        
     };

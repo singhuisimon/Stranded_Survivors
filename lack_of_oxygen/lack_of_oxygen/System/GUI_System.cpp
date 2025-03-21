@@ -21,7 +21,7 @@
 #include "../System/Movement_System.h"
 #include "../System/Collision_System.h"
 #include "../Utility/Entity_Selector_Helper.h"
-
+#include "../Scripts/Mining_Script.h"
 // Include Utility headers
 #include "../Utility/Constant.h"
 
@@ -1251,6 +1251,11 @@ void GUI_System::hide_wormhole_gui() {
         // Return early if we are not actually paused
         if (!GM.is_paused()) return;
 
+
+        //get the mining script
+        auto mining_script = std::dynamic_pointer_cast<Mining_Script>(LGM.get_script("mining_script"));
+
+
         // Get the current mouse position in screen coordinates
         double screen_mouse_x, screen_mouse_y;
         IM.get_mouse_position(screen_mouse_x, screen_mouse_y);
@@ -1352,6 +1357,9 @@ void GUI_System::hide_wormhole_gui() {
                     else if (entity_name == "restart_button") {
                         LM.write_log("Restart button pressed - reloading to scene 2");
 
+
+                        mining_script->clear_tnt_to_destroy();
+
                         // Unpause first
                         GM.set_paused(false);
 
@@ -1415,8 +1423,11 @@ void GUI_System::hide_wormhole_gui() {
                     else if (entity_name == "main_menu_button") {
                         LM.write_log("Main Menu button pressed - returning to main menu");
 
+
                         // Unpause first
                         GM.set_paused(false);
+
+                        mining_script->clear_tnt_to_destroy();
 
                         // Set player dead false
                         GM.set_player_dead_state(false);
