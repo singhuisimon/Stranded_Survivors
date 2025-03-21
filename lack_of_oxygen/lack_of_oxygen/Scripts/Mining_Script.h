@@ -33,6 +33,13 @@ namespace lof {
 		 */
 		std::string get_type() const override;
 
+		/**
+		 * @brief clear the tnt_to_destroy map
+		 */
+		void clear_tnt_to_destroy() {
+			tnt_to_destroy.clear();
+		}
+
 	private:
 
 		//the name of the script
@@ -166,6 +173,7 @@ namespace lof {
 		 * @return The mineral value associated with that block type
 		 */
 		void update_mineral_count_text(int value_to_add);
+
 	};
 }
 
