@@ -231,6 +231,7 @@ namespace lof {
         * @brief get the position of the wormhole e prompt based on the player position 
         */
         void set_wormhole_e_prompt_x(float new_x_position);
+        void set_wormhole_e_prompt_y(float new_y_position);
 
         
         // == PAUSE MENU FUNCTIONS ==

@@ -1490,6 +1490,11 @@ void GUI_System::hide_wormhole_gui() {
 
     }
 
+    void GUI_System::set_wormhole_e_prompt_y(float new_y_position) {
+        wormhole_e_prompt_y = new_y_position + 102.0f;
+
+    }
+
 
     void GUI_System::show_game_over_menu() {
         // Don't show if already shown

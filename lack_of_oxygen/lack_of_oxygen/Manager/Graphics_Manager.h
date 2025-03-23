@@ -64,12 +64,13 @@ namespace lof {
         struct Camera2D {
             GLfloat pos_x, pos_y;
             glm::mat3 view_xform, camwin_to_ndc_xform, world_to_ndc_xform;
+            GLfloat velocity;
 
             // Toggle for free camera mode
             GLboolean is_free_cam;
 
             Camera2D() : pos_x(DEFAULT_CAMERA_POS_X), pos_y(DEFAULT_CAMERA_POS_Y), view_xform(0),
-                        camwin_to_ndc_xform(0), world_to_ndc_xform(0), is_free_cam(GL_FALSE) {};
+                         camwin_to_ndc_xform(0), world_to_ndc_xform(0), velocity(0.0f), is_free_cam(GL_FALSE) {};
         };
 
         std::unordered_map<std::string, Assets_Manager::Model> models;
@@ -243,6 +244,8 @@ namespace lof {
          //GLuint get_shader_program_handle(ShaderProgram shader) const;
         GLuint get_shader_program_handle(Assets_Manager::ShaderProgram shader) const;
 
+
+        float camera_damp(GLfloat current, GLfloat target, GLfloat& velocity, GLfloat damping, float delta_time, float max_speed);
       
     };
 
