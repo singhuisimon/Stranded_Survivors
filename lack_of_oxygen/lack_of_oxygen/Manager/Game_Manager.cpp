@@ -256,6 +256,11 @@ namespace lof {
             }
         }
 
+
+        mouse_left_pressed = IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT);
+        mouse_left_released = IM.is_mouse_button_released(GLFW_MOUSE_BUTTON_LEFT);
+        mouse_left_held = IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT);
+
         // 1) Obtain a pointer to the GUI_System
         GUI_System* gui_system = nullptr;
         for (auto& sys : ECSM.get_systems()) {

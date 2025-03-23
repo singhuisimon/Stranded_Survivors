@@ -144,6 +144,7 @@
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
+    <None Include="Assets\Scenes\setting.scn" />
     <None Include="Assets\Scenes\tutorial.scn" />
     <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Data\square.msh" />

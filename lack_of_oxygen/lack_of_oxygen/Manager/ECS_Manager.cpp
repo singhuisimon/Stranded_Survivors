@@ -403,6 +403,20 @@ namespace lof {
 #endif
     void ECS_Manager::update(float delta_time) {
 
+        //for debugging
+        if (GM.is_mouse_left_pressed()) {
+            std::cout << "mouse is press detected in ecs manager" << std::endl;
+        }
+
+        if (GM.is_mouse_left_released()) {
+            std::cout << "mouse is released detected in ecs manager" << std::endl;
+        }
+
+        if (GM.is_mouse_left_held()) {
+            std::cout << "mouse is held detected in ecs manager" << std::endl;
+        }
+
+
         //get the fixed time and step count
         int steps = std::min(FPSM.get_current_number_of_steps(), DEFAULT_MAX_STEPS); 
         float fixed_dt = FPSM.get_fixed_delta_time(); 

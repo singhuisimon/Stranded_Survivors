@@ -45,6 +45,7 @@ namespace lof {
             auto& graphic = ECSM.get_component<Graphics_Component>(entity_id);
 
             tutorial_script->update_button_visibility(entity_id, graphic);
+            tutorial_script->update_text_visibility();
             });
 
         tutorial_script->add_function("update", [weak_script = std::weak_ptr<Tutorial_Script>(tutorial_script)](EntityID entity_id) {
@@ -110,7 +111,7 @@ namespace lof {
 
         EntityID tutorial_text_id = ECSM.find_entity_by_name("tutorial_background_text");
         auto& tutorial_text_graphic = ECSM.get_component<Graphics_Component>(tutorial_text_id);
-        tutorial_text_graphic.texture_name = "tutorial_text_" + std::to_string(tutorial_page);
+        tutorial_text_graphic.texture_name = "Tutorial_Text_" + std::to_string(tutorial_page);
         std::cout << tutorial_text_graphic.texture_name << std::endl;
     }
 
@@ -144,6 +145,36 @@ namespace lof {
                 graphic_comp.color.a = 0;
             }
             //return;
+        }
+    }
+
+    void Tutorial_Script::update_text_visibility() {
+        EntityID previous_text_id = ECSM.find_entity_by_name("previous_text");
+        if (previous_text_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(previous_text_id)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(previous_text_id);
+            std::string text;
+            if (tutorial_page == 1) {
+                text = "";
+                text_comp.text = text.c_str();
+            }
+            else {
+                text = "PREVIOUS";
+                text_comp.text = text.c_str();
+            }
+        }
+
+        EntityID next_text_id = ECSM.find_entity_by_name("next_text");
+        if (previous_text_id != INVALID_ENTITY_ID && ECSM.has_component<Text_Component>(next_text_id)) {
+            auto& text_comp = ECSM.get_component<Text_Component>(next_text_id);
+            std::string text;
+            if (tutorial_page == 10) {
+                text = "";
+                text_comp.text = text.c_str();
+            }
+            else {
+                text = "NEXT";
+                text_comp.text = text.c_str();
+            }
         }
     }
 
@@ -192,6 +223,7 @@ namespace lof {
         auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
         update_button_visibility(entity_id, graphics);
+        update_text_visibility();
 
         std::string base_texture = button_textures.at(entity_name);
         std::string button_audio = button_sounds.at(entity_name);

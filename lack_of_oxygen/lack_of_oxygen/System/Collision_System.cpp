@@ -1441,6 +1441,7 @@ namespace lof {
 
             // Only check for main menu buttons
             if (entity_name != "play_button" &&
+                entity_name != "setting_button" &&
                 entity_name != "credit_button" &&
                 entity_name != "quit_button") continue;
 
@@ -1475,6 +1476,9 @@ namespace lof {
             }
             else if (entity_name == "quit_button") {
                 base_texture = "Main_Menu_Quit_Batch_14";
+            }
+            else if (entity_name == "setting_button") {
+                base_texture = "Settings_Batch_12";
             }
                 
             //Update button batch textures in the level editor
@@ -1570,6 +1574,48 @@ namespace lof {
                         }
                         else {
                             LM.write_log("Failed to load scene file: %s", scene_path.c_str());
+                        }
+                    }
+                    else if (entity_name == "setting_button") {
+                        LM.write_log("Setting button held - attempting scene transition");
+
+                        // Clear dynamic entities first
+                        bool found_movement_system = false;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                movement_system->clear_dynamic_entities();
+                                found_movement_system = true;
+                                LM.write_log("Found and cleared Movement System");
+                                break;
+                            }
+                        }
+                        if (!found_movement_system) {
+                            LM.write_log("Warning: Movement System not found");
+                        }
+
+                        const std::string SCENES = "Scenes";
+                        std::string scene_file = "setting.scn";
+                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+                        if (SM.load_scene(scene_path.c_str())) {
+                            LM.write_log("Credits scene loaded successfully");
+
+                            // Reset camera position - add this section
+                            auto& camera = GFXM.get_camera();
+                            camera.pos_x = DEFAULT_CAMERA_POS_X;
+                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                            // Stop all currently playing audio
+                            //ADM.stop_mastergroup();
+
+                            // Update current scene and IMGUI
+                            GM.set_current_scene(6);
+                            IMGUIM.set_current_file_shown(scene_file);
+                            is_transitioning = true;
+                            return;
+                        }
+                        else {
+                            LM.write_log("Failed to load setting scene: %s", scene_path.c_str());
                         }
                     }
                     else if (entity_name == "credit_button") {
