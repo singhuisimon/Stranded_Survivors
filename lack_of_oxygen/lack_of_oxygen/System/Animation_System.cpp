@@ -37,7 +37,7 @@ namespace lof {
 
         // Get screen height
         GLfloat screen_height = static_cast<GLfloat>(SM.get_scr_height());
-
+        
         // Loop over the entities that match the system's signature
         for (EntityID entity_id : get_entities()) {
 
@@ -47,8 +47,8 @@ namespace lof {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
-                    float render_boundary_top = player_transform.position.y + (screen_height * 0.6f);
-                    float render_boundary_bottom = player_transform.position.y - (screen_height * 0.6f);
+                    float render_boundary_top = camera.pos_y + (screen_height * 0.7f);
+                    float render_boundary_bottom = camera.pos_y - (screen_height * 0.7f);
 
                     if (transform.position.y > render_boundary_top || transform.position.y < render_boundary_bottom) {
                         continue;
