@@ -185,6 +185,7 @@ namespace lof {
 		*/
 		void stop_mastergroup();
 
+		void stop_groups(GroupType grouptype);
 
 		/**
 		 * @brief Pause the channel in the master channelgroup

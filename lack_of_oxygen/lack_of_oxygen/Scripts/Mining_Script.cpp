@@ -369,7 +369,10 @@ namespace lof {
                         tnt_to_destroy.clear();
 
                         // Stop all audio first
-                        ADM.stop_mastergroup();
+                        //ADM.stop_mastergroup();
+
+                        ADM.stop_groups(GroupType::TYPE_BGM);
+                        ADM.stop_groups(GroupType::TYPE_SFX);
 
                         //reset panic
                         GM.reset_panic();

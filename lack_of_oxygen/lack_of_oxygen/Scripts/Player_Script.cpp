@@ -417,6 +417,7 @@ namespace lof {
         if (gui_system) {
             // Update the wormhole e prompt position based on player position 
             gui_system->set_wormhole_e_prompt_x(player_transform.position.x);
+            gui_system->set_wormhole_e_prompt_y(player_transform.position.y);
 
             if (is_inside) {
                 gui_system->show_wormhole_gui();

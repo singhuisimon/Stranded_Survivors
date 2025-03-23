@@ -24,6 +24,10 @@ uniform bool uTexFlag;		// Flag for texture
 uniform bool  uAnimateFlag; // Flag for animation
 uniform int uFrameNo;
 
+
+// Testing
+//uniform bool uTestingFlag;
+
 void main() {
 	if(uTexFlag == true && uAnimateFlag == true) {
 		ivec2 tex_size;
@@ -48,6 +52,25 @@ void main() {
 		float offset_y = Pos_Y / frame_size;
 		fFragColor = texture(uTex2d, vec2(vTextCoord.x / scaling_x, vTextCoord.y / scaling_y) + vec2(offset_x / scaling_x, offset_y / scaling_y)) * uColor;
 	} else if (uTexFlag == true){
+
+//		if(uTestingFlag == true) {
+//			// Testing (texture size is 57, 74) Gonna get 7 to 49 in x axis
+//			ivec2 tex_size;
+//			tex_size = textureSize(uTex2d, 0);
+//			float scaling_x = tex_size.x / 16.0; // Scaling factor to resize TextCoord.x accordingly
+//			float scaling_y = tex_size.y / 16.0; // Scaling factor to resize TextCoord.y accordingly
+//
+//			float Pos_X = 6.0;
+//			float Pos_Y = 0.0;
+//			float offset_x = Pos_X / 16.0;  // Accounting for offset due to position in texture
+//			float offset_y = Pos_Y / 16.0;  // Accounting for offset due to position in texture
+//			//float Pos_Y = 0.0;
+//			fFragColor = texture(uTex2d, vec2(vTextCoord.x / scaling_x, vTextCoord.y / scaling_y) + vec2(offset_x / scaling_x, offset_y / scaling_y)) * uColor;
+//		} else {
+//		
+//			fFragColor = texture(uTex2d, vTextCoord) * uColor;	
+//		}
+
 		fFragColor = texture(uTex2d, vTextCoord) * uColor;	
 	} else {
 		fFragColor = uColor;

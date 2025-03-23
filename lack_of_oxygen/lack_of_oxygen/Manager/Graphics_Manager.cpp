@@ -502,6 +502,41 @@ namespace lof {
         return shader.program_handle;
     }
 
+    // Camera damping function
+    float Graphics_Manager::camera_damp(GLfloat current, GLfloat target, GLfloat& velocity, GLfloat damping, float delta_time, float max_speed) {
+
+        // Avoid division by zero
+        damping = std::max(0.0001f, damping);
+
+        // Calculate omega and exponential decay
+        float omega = 2.0f / damping;
+        float x = omega * delta_time;
+        float exp = 1.0f / (1.0f + x + 0.48f * x * x + 0.235f * x * x * x);
+
+        // Calculate distance from camera to target (player)
+        float change = current - target;
+        float original_target = target;
+
+        // Clamp maximum speed
+        float max_change = max_speed * damping;
+        change = std::clamp(change, -max_change, max_change);
+        target = current - change;
+
+        // Calculate new position
+        float temp = (velocity + omega * change) * delta_time;
+        velocity = (velocity - omega * temp) * exp;
+        float output = target + (change + temp) * exp;
+
+        // Prevent overshooting the original target position
+        if ((original_target - current > 0.0f) == (output > original_target)) {
+            output = original_target;
+            velocity = (output - original_target) / delta_time;
+        }
+
+        // Return new position
+        return output;
+    }
+
 } // namespace lof
 
 

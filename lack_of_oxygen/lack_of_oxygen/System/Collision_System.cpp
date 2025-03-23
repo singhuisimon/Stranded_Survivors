@@ -320,10 +320,10 @@ namespace lof {
         // Get current scene number
         int current_scene = GM.get_current_scene();
 
-        if (current_scene == 1) {
+      /*  if (current_scene == 1) {
             collision_check_scene1(collisions, delta_time);
-        }
-        else if (current_scene == 2) {
+        }*/
+        if (current_scene == 2) {
             collision_check_scene2(collisions, delta_time);
         }
     }
@@ -417,7 +417,11 @@ namespace lof {
         //handle audio 
         //audio for vent in 
         if (!is_in_vent) {
-            ADM.play_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID));
+
+            if (!GM.get_player_dead_state()) {
+                ADM.play_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID));
+            }
+
             is_in_vent = true;
         }
 
@@ -430,8 +434,11 @@ namespace lof {
             }
 
             if (is_in_vent) {
-                ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
-                ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
+
+                if (!GM.get_player_dead_state()) {
+                    ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
+                    ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
+                }
                 is_in_vent = false;
             }
         }
@@ -582,76 +589,76 @@ namespace lof {
 
 
 
-    void Collision_System::collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time) {
-        // Iterate over entities matching the system's signature
-        const auto& collision_entities = get_entities();
+    //void Collision_System::collision_check_scene1(std::vector<CollisionPair>& collisions, float delta_time) {
+    //    // Iterate over entities matching the system's signature
+    //    const auto& collision_entities = get_entities();
 
-        for (auto it_1 = collision_entities.begin(); it_1 != collision_entities.end(); ++it_1) {
-            EntityID entity_ID1 = *it_1;
+    //    for (auto it_1 = collision_entities.begin(); it_1 != collision_entities.end(); ++it_1) {
+    //        EntityID entity_ID1 = *it_1;
 
-            auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
+    //        auto& physic1 = ECSM.get_component<Physics_Component>(entity_ID1);
 
-            // Skip if entity is static
-            if (physic1.get_is_static())
-                continue;
+    //        // Skip if entity is static
+    //        if (physic1.get_is_static())
+    //            continue;
 
-            auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
-            auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
-            auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
-           
-             // Create AABB for object 1
-            AABB aabb1 = AABB::from_transform(transform1, collision1);
+    //        auto& transform1 = ECSM.get_component<Transform2D>(entity_ID1);
+    //        auto& collision1 = ECSM.get_component<Collision_Component>(entity_ID1);
+    //        auto& velocity1 = ECSM.get_component<Velocity_Component>(entity_ID1);
+    //       
+    //         // Create AABB for object 1
+    //        AABB aabb1 = AABB::from_transform(transform1, collision1);
 
-            bool is_grounded = false; // Track if entity is grounded
+    //        bool is_grounded = false; // Track if entity is grounded
 
-            auto it_2 = std::next(it_1); // Start from the next entity
+    //        auto it_2 = std::next(it_1); // Start from the next entity
 
-            // Check for collisions with other entities
-            for (auto iter_2 = collision_entities.begin(); iter_2 != collision_entities.end(); ++iter_2) {
-                EntityID entity_ID2 = *iter_2;
+    //        // Check for collisions with other entities
+    //        for (auto iter_2 = collision_entities.begin(); iter_2 != collision_entities.end(); ++iter_2) {
+    //            EntityID entity_ID2 = *iter_2;
 
-                if (entity_ID1 == entity_ID2)
-                {
-                    continue;
-                }
+    //            if (entity_ID1 == entity_ID2)
+    //            {
+    //                continue;
+    //            }
 
-                //auto& physic2 = ECSM.get_component<Physics_Component>(entity_ID2);
+    //            //auto& physic2 = ECSM.get_component<Physics_Component>(entity_ID2);
 
-                auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
-                auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
-                auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
-
-
-                if (!collision2.collidable) continue;
+    //            auto& transform2 = ECSM.get_component<Transform2D>(entity_ID2);
+    //            auto& collision2 = ECSM.get_component<Collision_Component>(entity_ID2);
+    //            auto& velocity2 = ECSM.get_component<Velocity_Component>(entity_ID2);
 
 
-                // Create AABB for object 2
-                AABB aabb2 = AABB::from_transform(transform2, collision2);
+    //            if (!collision2.collidable) continue;
 
-                // Check for intersection between two entities
-                float collision_time = delta_time;
-                if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
 
-                    CollisionSide side = compute_collision_side(aabb1, aabb2);
+    //            // Create AABB for object 2
+    //            AABB aabb2 = AABB::from_transform(transform2, collision2);
 
-                    if (side == CollisionSide::BOTTOM)
-                    {
-                        is_grounded = true;
-                        physic1.set_gravity(Vec2D(0.0f, 0.0f));
-                    }
+    //            // Check for intersection between two entities
+    //            float collision_time = delta_time;
+    //            if (collision_intersection_rect_rect(aabb1, velocity1.velocity, aabb2, velocity2.velocity, collision_time, delta_time)) {
 
-                    
-                    // Store collision pair and overlap information
-                    collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
-            
-                }
-            }
-            physic1.set_is_grounded(is_grounded);
-            if (!is_grounded) {
-                physic1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-            }
-        }
-    }
+    //                CollisionSide side = compute_collision_side(aabb1, aabb2);
+
+    //                if (side == CollisionSide::BOTTOM)
+    //                {
+    //                    is_grounded = true;
+    //                    physic1.set_gravity(Vec2D(0.0f, 0.0f));
+    //                }
+
+    //                
+    //                // Store collision pair and overlap information
+    //                collisions.push_back({ entity_ID1, entity_ID2, compute_overlap(aabb1, aabb2), side });
+    //        
+    //            }
+    //        }
+    //        physic1.set_is_grounded(is_grounded);
+    //        if (!is_grounded) {
+    //            physic1.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+    //        }
+    //    }
+    //}
 
 
     void Collision_System::Boundary_Check() {
@@ -1382,8 +1389,10 @@ namespace lof {
             }
         }
        
+        
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
- 
+
+        Detect_Obsidian_Bottom(delta_time);
 
         Colliside_Oxygen_Mineral(delta_time);
 
@@ -2005,7 +2014,10 @@ namespace lof {
         // Check if player is dead to reset the scene
         if (is_player_dead == true) {
             // Stop all audio first
-            ADM.stop_mastergroup();
+            //ADM.stop_mastergroup();
+
+            ADM.stop_groups(GroupType::TYPE_BGM);
+            ADM.stop_groups(GroupType::TYPE_SFX);
 
             //reset panic
             GM.reset_panic();
@@ -2027,6 +2039,53 @@ namespace lof {
 
     }
 
+#if 1
+    void Collision_System::Detect_Obsidian_Bottom(float delta_time)
+    {
+        // Only for game play scene
+        if (GM.get_current_scene() != 2) {
+            return;
+        }
+
+        // Find entities
+        EntityID obsidian_entity = ECSM.find_entity_by_name("obsidian_bottom");
+        EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        if (obsidian_entity == static_cast<EntityID>(-1) || player_ID == static_cast<EntityID>(-1)) {
+            return;
+        }
+
+        // Get components
+        auto& player_transform = ECSM.get_component<Transform2D>(player_ID);
+        auto& player_collision = ECSM.get_component<Collision_Component>(player_ID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(player_ID);
+        auto& player_physic = ECSM.get_component<Physics_Component>(player_ID);
+        auto& obsidian_transform = ECSM.get_component<Transform2D>(obsidian_entity);
+        auto& obsidian_collision = ECSM.get_component<Collision_Component>(obsidian_entity);
+
+        // Create AABBs
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_obsidian = AABB::from_transform(obsidian_transform, obsidian_collision);
+
+        // Check for collision
+        float collision_time = delta_time;
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_obsidian, Vec2D(0.0f, 0.0f), collision_time, delta_time)) {
+            CollisionSide side = compute_collision_side(aabb_player, aabb_obsidian);
+
+            // Handle bottom collision with obsidian
+            if (side == CollisionSide::BOTTOM) {
+                // Adjust player position
+                float overlap = aabb_player.min.y - aabb_obsidian.max.y;
+                player_transform.position.y -= overlap;
+
+                // Reset jump state to allow jumping again
+                player_physic.set_is_grounded(true);
+                player_physic.set_has_jumped(false);
+                player_physic.set_gravity(Vec2D(0.0f, 0.0f));
+
+            }
+        }
+    }
+#endif
 }
 
 

@@ -153,6 +153,8 @@ namespace lof {
 	constexpr float DEFAULT_CAMERA_POS_X = 0.0f;
 	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
 	constexpr float DEFAULT_ORIENTATION = 0.0f;
+	constexpr float DEFAULT_CAMERA_DAMPING = 0.5f;
+	constexpr float DEFAULT_CAMERA_MAX_SPEED = 10000.0f;
 
 	// Fonts
 	constexpr int DEFAULT_GLYPH_HEIGHT = 48;
