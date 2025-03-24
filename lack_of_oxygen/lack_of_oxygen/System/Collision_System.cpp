@@ -1454,7 +1454,7 @@ namespace lof {
                 entity_name != "quit_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id) || 
+                !ECSM.has_component<Graphics_Component>(entity_id) ||
                 !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
@@ -1485,7 +1485,7 @@ namespace lof {
             else if (entity_name == "quit_button") {
                 base_texture = "Main_Menu_Quit_Batch_14";
             }
-                
+
             //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             for (auto& base_textures : buttons_and_associated_batches) {
@@ -1494,134 +1494,57 @@ namespace lof {
                 }
             }
 
-
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
                     // Play the hover sound once when hovering
                     ADM.play_now(entity_id, hover_sound, audio);
-                    //audio.set_isactive(hover_sound, true);
-                    //audio.increase_playcount(hover_sound);
-
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
-
 
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     if (main_menu_sound_playing[entity_name] == false) {
                         // Play the main menu sound if it's not already playing
                         ADM.play_now(entity_id, main_menu_sound, audio);
-                        //audio.set_isactive(main_menu_sound, true);
                         main_menu_sound_playing[entity_name] = true;  // Mark sound as playing
-                        //audio.increase_playcount(main_menu_sound);
                     }
-
 
                     // Set pressed state texture
                     graphics.texture_name = base_texture + "_PRESSED";
-                    
+
                     // Scene Switching Logic
                     if (entity_name == "play_button") {
-                        LM.write_log("Play button held - attempting scene transition");
+                        LM.write_log("Play button held - starting fade transition to tutorial");
 
-                        // Clear dynamic entities first
-                        bool found_movement_system = false;
+                        // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
-                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                                movement_system->clear_dynamic_entities();
-                                found_movement_system = true;
-                                LM.write_log("Found and cleared Movement System");
+                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                // Start fade transition to tutorial
+                                gui_system->start_screen_fade(true, "tutorial.scn", 5);
                                 break;
                             }
                         }
-                        if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
-                        }
 
-                        // Set up scene loading
-                        const std::string SCENES = "Scenes";
-                        std::string scene_file = "tutorial.scn";
-                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-                        LM.write_log("Attempting to load scene from path: %s", scene_path.c_str());
-
-                        // Try to load scene2
-                        if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("Scene loaded successfully");
-
-                            // Reset camera position
-                            auto& camera = GFXM.get_camera();
-                            camera.pos_x = DEFAULT_CAMERA_POS_X;
-                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                            // Stop all currently playing audio
-                            // ADM.stop_mastergroup();
-
-                            // Reset player position if it exists
-                            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                            if (playerId != INVALID_ENTITY_ID) {
-                                if (ECSM.has_component<Transform2D>(playerId)) {
-                                    auto& player_transform = ECSM.get_component<Transform2D>(playerId);
-                                    player_transform.position = Vec2D(0.0f, 0.0f);
-                                    player_transform.prev_position = player_transform.position;
-                                }
-                                if (ECSM.has_component<Velocity_Component>(playerId)) {
-                                    auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                                    velocity.velocity = Vec2D(0.0f, 0.0f);
-                                }
-                            }
-
-                            // Update current scene in Game Manager
-                            GM.set_current_scene(5);
-
-                            // Update IMGUI Manager's current file
-                            IMGUIM.set_current_file_shown(scene_file);
-                            is_transitioning = true;
-                            return;
-                        }
-                        else {
-                            LM.write_log("Failed to load scene file: %s", scene_path.c_str());
-                        }
+                        // Mark as transitioning (prevents multiple clicks)
+                        is_transitioning = true;
+                        current_cooldown = transition_cooldown;
+                        return;
                     }
                     else if (entity_name == "credit_button") {
-                        LM.write_log("Credits button held - attempting scene transition");
+                        LM.write_log("Credits button held - starting fade transition to credits");
 
-                        // Clear dynamic entities first
-                        bool found_movement_system = false;
+                        // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
-                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                                movement_system->clear_dynamic_entities();
-                                found_movement_system = true;
-                                LM.write_log("Found and cleared Movement System");
+                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                // Start fade transition to credits
+                                gui_system->start_screen_fade(true, "credit.scn", 3);
                                 break;
                             }
                         }
-                        if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
-                        }
 
-                        const std::string SCENES = "Scenes";
-                        std::string scene_file = "credit.scn";
-                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-
-                        if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("Credits scene loaded successfully");
-
-                            // Reset camera position - add this section
-                            auto& camera = GFXM.get_camera();
-                            camera.pos_x = DEFAULT_CAMERA_POS_X;
-                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                            // Stop all currently playing audio
-                            //ADM.stop_mastergroup();
-
-                            // Update current scene and IMGUI
-                            GM.set_current_scene(3);
-                            IMGUIM.set_current_file_shown(scene_file);
-                            is_transitioning = true;
-                            return;
-                        }
-                        else {
-                            LM.write_log("Failed to load credits scene: %s", scene_path.c_str());
-                        }
+                        // Mark as transitioning (prevents multiple clicks)
+                        is_transitioning = true;
+                        current_cooldown = transition_cooldown;
+                        return;
                     }
                     else if (entity_name == "quit_button") {
                         LM.write_log("Quit button pressed - ending game");
@@ -1766,7 +1689,7 @@ namespace lof {
 
     void Collision_System::check_win_screen_button_collision(float delta_time) {
         if (current_cooldown > 0.0f) {
-            current_cooldown -= delta_time; 
+            current_cooldown -= delta_time;
             return;  // Still in cooldown
         }
 
@@ -1794,7 +1717,7 @@ namespace lof {
             if (entity_name != "restart_button" && entity_name != "main_menu_button") continue;
 
             if (!ECSM.has_component<Transform2D>(entity_id) ||
-                !ECSM.has_component<Graphics_Component>(entity_id) || 
+                !ECSM.has_component<Graphics_Component>(entity_id) ||
                 !ECSM.has_component<Audio_Component>(entity_id)) continue;
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
@@ -1810,16 +1733,16 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-
-            // Set base texture name based on which button we're processing
-            std::string base_texture = (entity_name == "restart_button") ?
-                "Restart_Batch_14" : "Main_Menu_Batch_14";
-
+            // Base texture name
+            std::string base_texture;
+            if (entity_name == "restart_button") {
+                base_texture = "Restart_Batch_14";
+            }
+            else if (entity_name == "main_menu_button") {
+                base_texture = "Main_Menu_Batch_14";
+            }
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
-
-            static bool clicked_played = false;
-
 
             //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
@@ -1829,91 +1752,52 @@ namespace lof {
                 }
             }
 
-           
-
             if (is_hovered) {
-
                 if (!button_hover_states[entity_name]) {
                     // Play hover sound
                     ADM.play_now(entity_id, hover_sound, audio);
-                    //audio.set_isactive(hover_sound, true);
-                    //audio.increase_playcount(hover_sound);
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
 
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
-                    //audio.increase_playcount(click_sound);
 
                     // Handle button click logic
                     if (entity_name == "restart_button") {
-                        LM.write_log("Restart button held - reloading game scene");
+                        LM.write_log("Win screen - Restart button pressed - starting fade transition to scene 2");
 
-                        // Clear dynamic entities first
-                        bool found_movement_system = false;
+                        // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
-                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                                movement_system->clear_dynamic_entities();
-                                found_movement_system = true;
+                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                // Start fade transition to scene 2
+                                gui_system->start_screen_fade(true, "scene2.scn", 2);
                                 break;
                             }
                         }
-                        if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
-                        }
 
-                        const std::string SCENES = "Scenes";
-                        std::string scene_path = ASM.get_full_path(SCENES, "scene2.scn");
-                        if (SM.load_scene(scene_path.c_str())) {
-                            GM.set_current_scene(2);
-                            GM.reset_panic(); 
-                            LM.write_log("Successfully reloaded scene2.scn");
-                            is_transitioning = true;
-                            return;
-                        }
+                        // Mark as transitioning to prevent multiple clicks
+                        is_transitioning = true;
+                        return;
                     }
                     else { // main_menu_button
-                        LM.write_log("Main menu button held - returning to main menu");
+                        LM.write_log("Win screen - Main Menu button pressed - starting fade transition to main menu");
 
-                        // Clear dynamic entities first
-                        bool found_movement_system = false;
+                        // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
-                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                                movement_system->clear_dynamic_entities();
-                                found_movement_system = true;
+                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                // Start fade transition to main menu
+                                gui_system->start_screen_fade(true, "main_menu.scn", 0);
                                 break;
                             }
                         }
-                        if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
-                        }
 
-                        const std::string SCENES = "Scenes";
-                        std::string scene_file = "main_menu.scn";  // Store filename separately
-                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-
-                        LM.write_log("Attempting to load main menu scene: %s", scene_path.c_str());  // Add debug logging
-
-                        if (SM.load_scene(scene_path.c_str())) {
-                            // Reset camera position
-                            auto& camera = GFXM.get_camera();
-                            camera.pos_x = DEFAULT_CAMERA_POS_X;
-                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                            // Stop all currently playing audio
-                            ADM.stop_mastergroup();
-
-                            GM.set_current_scene(0);
-                            IMGUIM.set_current_file_shown(scene_file);
-                            current_cooldown = transition_cooldown;
-                            grace_timer = post_transition_grace_period; // Set grace period
-                            is_transitioning = true;
-                            LM.write_log("Successfully loaded main menu scene");  // Add success logging
-                            return;
-                        }
+                        // Mark as transitioning to prevent multiple clicks
+                        is_transitioning = true;
+                        current_cooldown = transition_cooldown;
+                        grace_timer = post_transition_grace_period; // Set grace period
+                        return;
                     }
-
                 }
                 else {
                     graphics.texture_name = base_texture + "_HIGHLIGHTED";

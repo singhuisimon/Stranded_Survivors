@@ -392,11 +392,11 @@
       "components": {
         "Transform2D": {
           "position": [
-            800.0,
+            148.0,
             -100.0
           ],
           "prev_position": [
-            800.0,
+            148.0,
             -100.0
           ],
           "orientation": [

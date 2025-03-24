@@ -429,7 +429,7 @@ namespace lof {
                         // Add Graphics_Component
                         Graphics_Component graphics;
                         graphics.model_name = "square";
-                        graphics.texture_name = "Lava_Pool_Batch_19";
+                        graphics.texture_name = "Lava_Pool_Batch_26";
                         graphics.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
                         ECSM.add_component(lava_pool_id, graphics);
 

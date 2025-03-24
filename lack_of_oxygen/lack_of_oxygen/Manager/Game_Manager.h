@@ -106,7 +106,7 @@ namespace lof {
         // Lava rise related variables
         float lava_timer = 0.0f;
         float tile_height = 0.0f;
-        static constexpr float LAVA_RISE_INTERVAL = 4.5f; // 4.5 seconds per tile
+        static constexpr float LAVA_RISE_INTERVAL = 6.5f; // 6.5 seconds per tile
 
     public:
         /**
