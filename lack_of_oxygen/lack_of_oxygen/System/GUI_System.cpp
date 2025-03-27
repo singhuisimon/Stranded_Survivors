@@ -1978,7 +1978,7 @@ void GUI_System::hide_wormhole_gui() {
             // Add Transform2D component
             Transform2D transform;
             transform.position = Vec2D(0.0f, 0.0f);  // Center of screen
-            transform.scale = Vec2D(2000.0f, 1200.0f);  // Slightly larger than screen size (1920x1080)
+            transform.scale = Vec2D(2000.0f, 1400.0f);  // Slightly larger than screen size (1920x1080)
             ecs_manager.add_component(fade_entity, transform);
 
             // Add Graphics_Component
