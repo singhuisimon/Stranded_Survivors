@@ -32,7 +32,7 @@ namespace lof {
         auto tutorial_script = shared_from_this();
 
         tutorial_script->add_function("init", [weak_script = std::weak_ptr<Tutorial_Script>(tutorial_script)](EntityID entity_id) {
-            (void)entity_id;
+            //(void)entity_id;
             auto tutorial_script = weak_script.lock();
             tutorial_script->set_tutorial_page(1);
             tutorial_script->set_transitioning(false);
@@ -41,6 +41,8 @@ namespace lof {
                 ECSM.get_component<Logic_Component>(entity_id).set_state("tutorial_script", ExecutionState::Terminated);
                 return;
             }
+
+            //std::cout << "tutorial script init" << std::endl;
 
             auto& graphic = ECSM.get_component<Graphics_Component>(entity_id);
 
@@ -58,7 +60,7 @@ namespace lof {
             tutorial_script->check_keys();
             tutorial_script->check_pressing_button(entity_id);
             tutorial_script->transit_next_scene();
-
+            //std::cout << "tutorial script update" << std::endl;
             });
 
     }

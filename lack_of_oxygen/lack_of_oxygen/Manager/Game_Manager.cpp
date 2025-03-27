@@ -264,7 +264,6 @@ namespace lof {
             }
         }
 
-
         mouse_left_pressed = IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT);
         mouse_left_released = IM.is_mouse_button_released(GLFW_MOUSE_BUTTON_LEFT);
         mouse_left_held = IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT);
@@ -318,27 +317,6 @@ namespace lof {
             ADM.pause_resume_mastergroup();
             prev_pasued = false;
         }
-
-        ////commented out this is for me to test - Amanda
-        //if (IM.is_key_held(GLFW_KEY_J)) {
-        //    current_oxygen_level--;
-        //    //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-        //    //increasing = false;
-        //}
-
-        //if (IM.is_key_held(GLFW_KEY_K)) {
-        //    current_oxygen_level++;
-        //    //std::cout << "current oxygen level " << current_oxygen_level << std::endl;
-        //    //increasing = true;
-        //}
-
-        //printf("bool check: %d\n", CS.is_oxygen_increase());
-        //std::cout << "current oxygen levvel outside " << oxygen_level << std::endl;
-       /* if (current_scene == 2 || current_scene == 1)
-        {
-            ADM.update_bgm_layering(current_scene, current_oxygen_level, increasing);
-
-        }*/
 
         // Handle player movement and physics input
         EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
