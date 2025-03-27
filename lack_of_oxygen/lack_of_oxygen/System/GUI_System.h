@@ -132,6 +132,8 @@ namespace lof {
         std::string destination_scene = "";
         bool fade_in = true;  // true = fade in, false = fade out
         int destination_scene_number = -1;
+        bool transitioning_to_win_screen = false;  // Special flag for win screen transitions
+        bool win_transition_active = false;
 
         // Skip fade for certain transitions
         bool skip_fade_for_credits = true;  // No fade needed for main menu to credits
