@@ -197,23 +197,31 @@ namespace lof {
                 if (m_is_paused) {
                     gui_system->show_pause_menu();
 
-                    //pause group doesnt work
-                    ADM.pause_group(GroupType::TYPE_BGM);
-                    ADM.pause_group(GroupType::TYPE_SFX);
+                    //CASE 1 (Audio completely STOPS playing in PAUSE): Uncomment Line
+                    /*ADM.pause_group(GroupType::TYPE_BGM);
+                    ADM.pause_group(GroupType::TYPE_SFX);*/
 
-                    // Pause audio
-                    //ADM.pause_resume_mastergroup();
+                    //CASE 2: COMMENT ALL LINES FOR ALL CASES
+
+                    //CASE 3 (Audio playing at half volume in PAUSE): Uncomment Line
+                    ADM.set_group_volume(GroupType::TYPE_BGM, ADM.get_group_volume(GroupType::TYPE_BGM) / 2);
+                    ADM.set_group_volume(GroupType::TYPE_SFX, ADM.get_group_volume(GroupType::TYPE_SFX) / 2);
+
 
                 }
                 else {
                     gui_system->hide_pause_menu();
 
-                    //resume group doesnt work
-                    ADM.resume_group(GroupType::TYPE_BGM);
-                    ADM.resume_group(GroupType::TYPE_SFX);
+                    //CASE 1 (Audio completely STOPS playing in PAUSE): Uncomment Line
+                    /*ADM.resume_group(GroupType::TYPE_BGM);
+                    ADM.resume_group(GroupType::TYPE_SFX);*/
 
-                    // Resume audio
-                    //ADM.pause_resume_mastergroup();
+                    //CASE 2: COMMENT ALL LINES FOR ALL CASES
+
+                    //CASE 3 (Audio playing at half volume in PAUSE): Uncomment Line
+                    ADM.set_group_volume(GroupType::TYPE_BGM, ADM.get_group_volume(GroupType::TYPE_BGM) * 2);
+                    ADM.set_group_volume(GroupType::TYPE_SFX, ADM.get_group_volume(GroupType::TYPE_SFX) * 2);
+
                 }
                 break;
             }
