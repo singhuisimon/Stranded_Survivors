@@ -1578,72 +1578,42 @@ void GUI_System::hide_wormhole_gui() {
     void GUI_System::hide_game_over_menu() {
         LM.write_log("GUI_System::hide_game_over_menu(): Removing game over UI");
 
-        // Reset the flag
+        // Reset the flag FIRST
         game_over_shown = false;
+        gameover_audio_played = false;
 
-        // First remove the text
-        if (game_over_entities.find("text") != game_over_entities.end()) {
-            EntityID text_id = game_over_entities["text"];
-            if (text_id != INVALID_ENTITY_ID) {
-                try {
-                    ecs_manager.destroy_entity(text_id);
-                    LM.write_log("Destroyed game over text (ID: %u)", text_id);
-                }
-                catch (const std::exception& e) {
-                    LM.write_log("Error destroying game over text (ID: %u): %s", text_id, e.what());
-                }
-            }
-        }
-
-        // Then remove the overlay/background texture
-        if (game_over_entities.find("overlay") != game_over_entities.end()) {
-            EntityID overlay_id = game_over_entities["overlay"];
-            if (overlay_id != INVALID_ENTITY_ID) {
-                try {
-                    ecs_manager.destroy_entity(overlay_id);
-                    LM.write_log("Destroyed game over overlay (ID: %u)", overlay_id);
-                }
-                catch (const std::exception& e) {
-                    LM.write_log("Error destroying overlay (ID: %u): %s", overlay_id, e.what());
-                }
-            }
-        }
-
-        // Then remove buttons in specific order
-        const std::vector<std::string> button_order = {
-            "restart",
-            "main_menu"
+        // Get ALL possible button entities by name to ensure we catch everything
+        std::vector<std::string> possible_names = {
+            "game_over_overlay",
+            "restart_button",
+            "main_menu_button",
+            "game_over_text"
         };
 
-        for (const auto& button_key : button_order) {
-            if (game_over_entities.find(button_key) != game_over_entities.end()) {
-                EntityID button_id = game_over_entities[button_key];
-                if (button_id != INVALID_ENTITY_ID) {
-                    ecs_manager.destroy_entity(button_id);
-                    LM.write_log("Destroyed %s button (ID: %u)", button_key.c_str(), button_id);
-                }
-            }
-        }
-
-        // Also try to find buttons by their entity names
-        const std::vector<std::string> button_names = {
-            "game_over_restart_button",
-            "game_over_main_menu_button"
-        };
-
-        for (const auto& name : button_names) {
+        // Find and destroy all game over UI elements by name
+        for (const auto& name : possible_names) {
             EntityID entity_id = ecs_manager.find_entity_by_name(name);
             if (entity_id != INVALID_ENTITY_ID) {
                 ecs_manager.destroy_entity(entity_id);
-                LM.write_log("Destroyed %s by name (ID: %u)", name.c_str(), entity_id);
+                LM.write_log("Destroyed game over UI element: %s (ID: %u)", name.c_str(), entity_id);
             }
         }
 
-        // Clear the map after removing all entities
-        game_over_entities.clear();
+        // Also find and destroy all stored entities in the map
+        for (const auto& [key, entity_id] : game_over_entities) {
+            if (entity_id != INVALID_ENTITY_ID) {
+                if (ecs_manager.get_entity(entity_id)) { // Check if entity still exists
+                    ecs_manager.destroy_entity(entity_id);
+                    LM.write_log("Destroyed stored game over entity: %s (ID: %u)", key.c_str(), entity_id);
+                }
+            }
+        }
 
-        // Clear hover states
+        // Clear the entities map and hover states
+        game_over_entities.clear();
         game_over_button_hover_states.clear();
+
+        LM.write_log("Game over UI cleanup completed");
     }
 
     void GUI_System::check_game_over_button_collision(float delta_time) {
@@ -1771,6 +1741,8 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Hide game over menu
                         hide_game_over_menu();
+                        
+                        game_over_shown = false;  // Explicitly reset the flag
 
                         // Reset all game state
                         reset_all_game_state();
