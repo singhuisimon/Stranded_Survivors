@@ -40,7 +40,7 @@ namespace lof {
         // == OXYGEN TANK MEMBERS ==
         EntityID oxygen_e_prompt = INVALID_ENTITY_ID;  // 'E' prompt entity for Oxygen tank
         EntityID oxygen_interaction_container = INVALID_ENTITY_ID;
-        float oxygen_e_prompt_x = 800.0f;  // X position for 'E' prompt
+        float oxygen_e_prompt_x = 125.0f;  // X position for 'E' prompt
 
         std::string oxygen_e_prompt_name;            // Entity name for oxygen E prompt
         std::string oxygen_container_name;          // Entity name for oxygen container
@@ -123,6 +123,19 @@ namespace lof {
         std::unordered_map<std::string, EntityID> game_over_entities;
         std::unordered_map<std::string, bool> game_over_button_hover_states;
         bool game_over_shown = false;
+
+        // == SCREEN FADE MEMBERS ==
+        bool fade_active = false;
+        float fade_duration = 3.0f;  // 3 seconds for fade
+        float fade_timer = 0.0f;
+        std::string fade_overlay_name = "fade_overlay"; // Use a consistent name instead of tracking by ID
+        std::string destination_scene = "";
+        bool fade_in = true;  // true = fade in, false = fade out
+        int destination_scene_number = -1;
+
+        // Skip fade for certain transitions
+        bool skip_fade_for_credits = true;  // No fade needed for main menu to credits
+
 
         bool gameover_audio_played = false;
 
@@ -244,6 +257,15 @@ namespace lof {
         void hide_game_over_menu();
         void check_game_over_button_collision(float delta_time);
         bool is_game_over_shown() const { return game_over_shown; }
+
+
+        // == SCREEN FADE FUNCTIONS ==
+        void start_screen_fade(bool fade_type, const std::string& dest_scene, int dest_scene_num);
+        bool update_screen_fade(float delta_time);
+        void create_fade_overlay();
+        void remove_fade_overlay();
+
+        bool direct_scene_transition(const std::string& scene_file, int scene_num);
 
         /**
          * @brief Checks if a general container is currently visible.
