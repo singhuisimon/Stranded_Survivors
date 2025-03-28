@@ -138,7 +138,17 @@ namespace lof {
     void GUI_System::update(float delta_time) {
         // Process any active fades first
         if (fade_active) {
+
+            //ADM.stop_groups(GroupType::TYPE_SFX);
+            ADM.pause_group(GroupType::TYPE_BGM);
+            ADM.pause_group(GroupType::TYPE_SFX);
+
             bool fade_complete = update_screen_fade(delta_time);
+
+            if (fade_complete) {
+                ADM.resume_group(GroupType::TYPE_BGM);
+                ADM.resume_group(GroupType::TYPE_SFX);
+            }
 
             // If fade is still active and not complete, we still want to process other updates
             // but with this flag we know a fade is in progress
@@ -1977,7 +1987,7 @@ void GUI_System::hide_wormhole_gui() {
 
                 return false;
             }
-
+        
             // Reset fade state after completion
             fade_active = false;
             fade_timer = 0.0f;

@@ -58,6 +58,7 @@
     <ClCompile Include="Scripts\Mining_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
+    <ClCompile Include="Scripts\Sound_Setting_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
     <ClCompile Include="Scripts\Player_Tutorial_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Script.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Player_Tutorial_Script.h" />
     <ClInclude Include="Scripts\Script.h" />
+    <ClInclude Include="Scripts\Sound_Setting_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Script.h" />
     <ClInclude Include="System\Animation_System.h" />
@@ -144,6 +146,7 @@
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Scenes\scene2.scn" />
+    <None Include="Assets\Scenes\setting.scn" />
     <None Include="Assets\Scenes\tutorial.scn" />
     <None Include="Assets\Scenes\win_screen.scn" />
     <None Include="Data\square.msh" />
@@ -164,6 +167,7 @@
     <Media Include="Assets\Audio\bgm_50_digging_pulse.wav" />
     <Media Include="Assets\Audio\bgm_50_roll.wav" />
     <Media Include="Assets\Audio\bgm_80_clock_ticking.wav" />
+    <Media Include="Assets\Audio\bgm_game_over.wav" />
     <Media Include="Assets\Audio\bgm_surface_music.wav" />
     <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
     <Media Include="Assets\Audio\sfx_air_vent_in.wav" />
@@ -172,6 +176,7 @@
     <Media Include="Assets\Audio\sfx_empty_laser_hit.wav" />
     <Media Include="Assets\Audio\sfx_general_block_hit.wav" />
     <Media Include="Assets\Audio\sfx_jumping.wav" />
+    <Media Include="Assets\Audio\sfx_lava_siren.wav" />
     <Media Include="Assets\Audio\sfx_mainmenu_button.wav" />
     <Media Include="Assets\Audio\sfx_mineral_block_hit.wav" />
     <Media Include="Assets\Audio\sfx_mineral_deposit.wav" />

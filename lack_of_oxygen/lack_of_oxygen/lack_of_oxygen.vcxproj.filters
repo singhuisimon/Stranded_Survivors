@@ -52,6 +52,8 @@
     <ClCompile Include="Scripts\Cloud_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
+    <ClCompile Include="Scripts\Player_Tutorial_Script.cpp" />
+    <ClCompile Include="Scripts\Sound_Setting_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -104,6 +106,8 @@
     <ClInclude Include="Scripts\Cloud_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
+    <ClInclude Include="Scripts\Player_Tutorial_Script.h" />
+    <ClInclude Include="Scripts\Sound_Setting_Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -120,6 +124,7 @@
     <None Include="Assets\Level_Design\Level_Design_V2.csv" />
     <None Include="Assets\Level_Design\Level_Design_V5.csv" />
     <None Include="Assets\Scenes\tutorial.scn" />
+    <None Include="Assets\Scenes\setting.scn" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -237,6 +242,7 @@
     <Image Include="Assets\Textures\sweat_drop_single_batch_5.png" />
     <Image Include="Assets\Textures\foreground_clouds_batch_4.png" />
     <Image Include="Assets\Textures\screen_vignette_red_batch_19.png" />
+    <Image Include="Assets\Textures\screen_vignette_black_batch_10.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />

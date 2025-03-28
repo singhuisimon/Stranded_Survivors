@@ -467,6 +467,7 @@ namespace lof {
 
 		if (selected_group != nullptr) {
 			errorcheck(selected_group->setVolume(volume), "Audio_System::set_channelgroup_volume", "set channelgroup volume");
+			//debug_group_sound();
 		}
 	}
 

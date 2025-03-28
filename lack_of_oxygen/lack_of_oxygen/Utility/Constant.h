@@ -254,6 +254,10 @@ namespace lof {
 	constexpr const float SIREN_AUDIO_COOLDOWN = 0.4f;
 	constexpr const float TUTORIAL_COOLDOWN_TIME = 1.0f;
 
+	// --------------------------- Sound_Setting_Script.cpp ----------------------------
+	constexpr const float PER_BAR_WIDTH = 42.0f;
+	constexpr const float PER_BAR_X_AXIS = 21.0f;
+
 } // namespace lof
 
 #endif // CONSTANTS_H
