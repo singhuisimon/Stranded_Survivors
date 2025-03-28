@@ -1505,7 +1505,7 @@ namespace lof {
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
 
-                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (GM.is_mouse_left_released()) {
                     if (main_menu_sound_playing[entity_name] == false) {
                         // Play the main menu sound if it's not already playing
                         ADM.play_now(entity_id, main_menu_sound, audio);
