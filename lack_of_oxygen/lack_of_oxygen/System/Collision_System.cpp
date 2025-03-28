@@ -1565,43 +1565,57 @@ namespace lof {
         }
     }
 
-    void Collision_System::check_credits_back_button_collision(float delta_time) {
-        (void)delta_time;  // Mark as intentionally unused
+    void Collision_System::check_credits_back_button_collision(float delta_time)
+    {
+        (void)delta_time; // Mark as unused if you're not using delta_time directly
 
+        // If we still have a cooldown, don't process clicks
         if (current_cooldown > 0.0f) {
-            return;  // Still in cooldown
+            return;
         }
 
-        // Reset transition flag at start of frame
+        // Reset transition flag at the start of the frame
         is_transitioning = false;
 
-        // Return early if we're transitioning
-        if (is_transitioning) return;
+        // If already transitioning, skip
+        if (is_transitioning) {
+            return;
+        }
 
+        // Get the mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
-        //Ensure world_mouse_pos is in terms of viewport in level editor
+        // If level editor mode, override with ImGui’s mouse position
         if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
         }
 
-        for (EntityID entity_id : get_entities()) {
+        // Check all entities that this system tracks
+        for (EntityID entity_id : get_entities())
+        {
             auto* entity = ECSM.get_entity(entity_id);
             if (!entity) continue;
 
             std::string entity_name = entity->get_name();
 
-            if (entity_name != "back_button") continue;
+            // Only look for "back_button"
+            if (entity_name != "back_button")
+                continue;
 
+            // Ensure required components exist
             if (!ECSM.has_component<Transform2D>(entity_id) ||
                 !ECSM.has_component<Graphics_Component>(entity_id) ||
-                !ECSM.has_component<Audio_Component>(entity_id)) continue;
+                !ECSM.has_component<Audio_Component>(entity_id))
+            {
+                continue;
+            }
 
             auto& transform = ECSM.get_component<Transform2D>(entity_id);
             auto& graphics = ECSM.get_component<Graphics_Component>(entity_id);
             auto& audio = ECSM.get_component<Audio_Component>(entity_id);
 
+            // Check if the mouse is hovering via AABB
             bool is_hovered = ESS.Mouse_Over_AABB(
                 transform.position.x,
                 transform.position.y,
@@ -1611,81 +1625,79 @@ namespace lof {
                 world_mouse_pos.y
             );
 
-            std::string base_texture = "Back_Batch_14";
+            // Define base texture and sound names (similar to main menu code)
+            std::string base_texture;
             std::string hover_sound = "button_hover";
-            std::string click_sound = "main_menu";
+            std::string main_menu_sound = "main_menu"; // reusing the same "main_menu" sound
 
-            //Update button batch textures in the level editor
+            // Default texture name for the back button
+            base_texture = "Back_Batch_14";
+
+            // If using editor-assigned textures, check them
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
-                if (entity_name == base_textures.first) {
-                    base_texture = base_textures.second;
+            for (auto& pair : buttons_and_associated_batches) {
+                if (entity_name == pair.first) {
+                    base_texture = pair.second;
                 }
             }
 
-            if (is_hovered) {
+            if (is_hovered)
+            {
+                // Play hover sound only once when first hovering
                 if (!button_hover_states[entity_name]) {
-                    // Play hover sound
-                    ADM.play_now(entity_id, "button_hover", audio);
-                    //audio.set_isactive("button_hover", true);
-                    //audio.increase_playcount("button_hover");
-                    button_hover_states[entity_name] = true;  // Prevent playing repeatedly
+                    ADM.play_now(entity_id, hover_sound, audio);
+                    button_hover_states[entity_name] = true;
                 }
-                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
-                    graphics.texture_name = base_texture + "_PRESSED";
-                    ADM.play_now(entity_id, click_sound, audio);
-                    //audio.increase_playcount(click_sound);
-                    LM.write_log("Back button held - returning to main menu");
 
-                    // Clear dynamic entities first
-                    bool found_movement_system = false;
+                // Check if the left mouse button is held
+                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT))
+                {
+                    // Play the "click" or "main_menu" sound only once per hold
+                    if (!main_menu_sound_playing[entity_name]) {
+                        ADM.play_now(entity_id, main_menu_sound, audio);
+                        main_menu_sound_playing[entity_name] = true;
+                    }
+
+                    // Show pressed texture
+                    graphics.texture_name = base_texture + "_PRESSED";
+
+                    // Perform fade transition to the main menu scene
+                    LM.write_log("Back button held - returning to main menu from credits.");
+
                     for (auto& system : ECSM.get_systems()) {
-                        if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                            movement_system->clear_dynamic_entities();
-                            found_movement_system = true;
+                        if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                            // example fade: target "main_menu.scn", scene index 0
+                            gui_system->start_screen_fade(true, "main_menu.scn", 0);
                             break;
                         }
                     }
-                    if (!found_movement_system) {
-                        LM.write_log("Warning: Movement System not found");
-                    }
 
-                    const std::string SCENES = "Scenes";
-                    std::string scene_file = "main_menu.scn";
-                    std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-
-                    if (SM.load_scene(scene_path.c_str())) {
-                        LM.write_log("Main menu scene loaded successfully");
-
-                        // Reset camera position
-                        auto& camera = GFXM.get_camera();
-                        camera.pos_x = DEFAULT_CAMERA_POS_X;
-                        camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                        // Stop all currently playing audio
-                        //ADM.stop_mastergroup();
-
-                        // Update current scene and IMGUI
-                        GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
-                        current_cooldown = transition_cooldown;  // Set the cooldown timer
-                        is_transitioning = true;
-                        return;
-                    }
-                    else {
-                        LM.write_log("Failed to load main menu scene: %s", scene_path.c_str());
-                    }
+                    // Prevent multiple clicks
+                    is_transitioning = true;
+                    current_cooldown = transition_cooldown;
+                    return;
                 }
-                else {
+                else
+                {
+                    // If just hovering (not pressed), show highlighted
                     graphics.texture_name = base_texture + "_HIGHLIGHTED";
+
+                    // Reset the "click" sound so it can be triggered next time
+                    main_menu_sound_playing[entity_name] = false;
                 }
             }
-            else {
+            else
+            {
+                // Not hovered => normal texture
                 graphics.texture_name = base_texture + "_NORMAL";
+
+                // Reset states so they can trigger next time we hover or click
                 button_hover_states[entity_name] = false;
+                main_menu_sound_playing[entity_name] = false;
             }
         }
     }
+
 
     void Collision_System::check_win_screen_button_collision(float delta_time) {
         if (current_cooldown > 0.0f) {
