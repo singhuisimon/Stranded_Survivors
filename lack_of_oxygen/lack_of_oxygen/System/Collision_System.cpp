@@ -1419,7 +1419,6 @@ namespace lof {
 
     bool Collision_System::is_transitioning = false;
 
-
     void Collision_System::check_main_menu_button_collision(float delta_time) {
         (void)delta_time;  // Mark as intentionally unused
 
