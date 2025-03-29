@@ -62,6 +62,7 @@
     <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
     <ClCompile Include="Scripts\Player_Tutorial_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Script.cpp" />
+    <ClCompile Include="Scripts\Win_Screen_Script.cpp" />
     <ClCompile Include="System\Animation_System.cpp" />
     <ClCompile Include="System\Audio_System.cpp" />
     <ClCompile Include="System\Collision_System.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="Scripts\Sound_Setting_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Script.h" />
+    <ClInclude Include="Scripts\Win_Screen_Script.h" />
     <ClInclude Include="System\Animation_System.h" />
     <ClInclude Include="System\Audio_System.h" />
     <ClInclude Include="System\Collision_System.h" />
@@ -225,6 +227,7 @@
     <Image Include="Assets\Textures\Mineral_Deposit_UI_Text_Batch 4.png" />
     <Image Include="Assets\Textures\mineral_deposit_ui_text_batch_4.png" />
     <Image Include="Assets\Textures\mineral_hopper_conveyor_empty_batch_4.png" />
+    <Image Include="Assets\Textures\MISSION_ACCOMPLISHED_Batch_27.png" />
     <Image Include="Assets\Textures\obsidian_bottom_line_batch_19.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Green_circle.png" />
     <Image Include="Assets\Textures\Oxygen_Refill_Red_circle.png" />
@@ -249,6 +252,7 @@
     <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
     <Image Include="Assets\Textures\screen_vignette_black_batch_10.png" />
     <Image Include="Assets\Textures\screen_vignette_red_batch_19.png" />
+    <Image Include="Assets\Textures\ship_closed_batch_23.png" />
     <Image Include="Assets\Textures\ship_open_batch_15.png" />
     <Image Include="Assets\Textures\ship_open_batch_2.png" />
     <Image Include="Assets\Textures\Skybox_ALL.png" />

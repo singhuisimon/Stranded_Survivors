@@ -82,8 +82,9 @@ namespace lof {
          * @param pos Particle position
          * @param col Particle color
          * @param lifespan Particle's lifespan. Defaulted to 0.0f to take base particles' lifespan
+         * @param direction Particle's direction. Defaulted to -1.0f to take base particle direction
          */
-        void particle_emit(std::string type, Vec2D pos, Vec3D col, float lifespan = 0.0f);
+        void particle_emit(std::string type, Vec2D pos, Vec3D col, float lifespan = 0.0f, float direction = -1.0f);
 
         /**
          * @brief Destroys a particle
