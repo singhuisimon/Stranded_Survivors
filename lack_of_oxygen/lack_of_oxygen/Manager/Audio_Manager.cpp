@@ -372,6 +372,11 @@ namespace lof {
 					}
 				}
 
+				if (audio_background.get_active("bgm 20")) {
+					audio_background.set_isactive("bgm base_3", false);
+					LM.write_log("BASE_3 MELODY IS INACTIVE AS OXYGEN DROPS BELOW 20 AND IS UNDERGROUND");
+				}
+
 			}
 			else {
 				//to only play surface music
