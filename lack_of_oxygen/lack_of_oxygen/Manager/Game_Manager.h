@@ -112,6 +112,8 @@ namespace lof {
         bool mouse_left_held = false;
         bool mouse_left_released = false;
 
+        bool m_is_transitioning = false;  // Flag for scene transitions
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
@@ -240,6 +242,9 @@ namespace lof {
         bool is_mouse_left_held() const { return mouse_left_held; }
         bool is_mouse_left_released() const { return mouse_left_released; }
 
+
+        bool is_transitioning() const { return m_is_transitioning; }
+        void set_transitioning(bool state) { m_is_transitioning = state; }
     };
 
 } // namespace lof

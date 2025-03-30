@@ -38,6 +38,7 @@
 #include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Force_Helper.h"
+#include "../System/Particle_System.h"
 
 // Include standard headers
 #include <fstream>
@@ -89,7 +90,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.2.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -283,24 +284,62 @@ namespace lof {
             scene_no = 2;
             LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 2");
         }
-        // Clear all existing entities first
-        const auto& entities = ECSM.get_entities();
-        std::vector<EntityID> entities_to_remove;
+        else if (path.find("win_screen.scn") != std::string::npos) {
+            scene_no = 4;
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Win Screen");
+        }
 
-        // Collect all existing entity IDs
-        for (size_t i = 0; i < entities.size(); ++i) {
-            if (entities[i]) {  // Check if entity exists
-                entities_to_remove.push_back(static_cast<EntityID>(i));
+        // Leave entities near spaceship present
+        if (4 == scene_no) {
+            // Leave the first 200 entiites with some exceptions
+            const auto& entities = ECSM.get_entities();
+            std::vector<EntityID> entities_to_remove;
+
+            // Collect all existing entity IDs except the first 200
+            for (size_t i = 100; i < entities.size(); ++i) {
+                if (entities[i]) {  // Check if entity exists
+                    entities_to_remove.push_back(static_cast<EntityID>(i));
+                }
             }
-        }
 
-        // Remove all existing entities
-        for (EntityID eid : entities_to_remove) {
-            (void)eid;
-            ECSM.destroy_entity(0);
-        }
+            // Remove all existing entities
+            for (EntityID eid : entities_to_remove) {
+                (void)eid;
+                ECSM.destroy_entity(100);
+            }
 
-        LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+            // Exception entities to clear in this sequence: (player, oxygen tank, mineral hopper)
+            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+            EntityID oxygen_tank_id = ECSM.find_entity_by_name("Oxygen_Tank");
+            EntityID mineral_hopper_id = ECSM.find_entity_by_name("mineral_hopper_conveyor");
+            if (entities[player_id] && entities[mineral_hopper_id] && entities[oxygen_tank_id]) {  // Check if entity exists
+                (void)player_id, (void)oxygen_tank_id, (void)mineral_hopper_id;
+                ECSM.destroy_entity(player_id), ECSM.destroy_entity(oxygen_tank_id), ECSM.destroy_entity(mineral_hopper_id);
+            }
+
+            LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+
+        }
+        else {
+            // Clear all existing entities first
+            const auto& entities = ECSM.get_entities();
+            std::vector<EntityID> entities_to_remove;
+
+            // Collect all existing entity IDs
+            for (size_t i = 0; i < entities.size(); ++i) {
+                if (entities[i]) {  // Check if entity exists
+                    entities_to_remove.push_back(static_cast<EntityID>(i));
+                }
+            }
+
+            // Remove all existing entities
+            for (EntityID eid : entities_to_remove) {
+                (void)eid;
+                ECSM.destroy_entity(0);
+            }
+
+            LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+        }
 
         // Read and parse the scene file
         std::ifstream ifs(filename);
@@ -390,7 +429,7 @@ namespace lof {
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
 
             // Create level entities only for scene2
-            if (entity_name == "obsidian_bottom") {
+            if (entity_name == "obsidian_bottom" && scene_no == 2) {
                 if (is_scene2_file(filename)) {
                     LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
                     if (!create_level_entities()) {
@@ -1265,6 +1304,37 @@ namespace lof {
                             x_pos, y_pos, collision.width, collision.height);
                     }
 
+                    if (prefab_name == "dirt_prefab" || prefab_name == "rock_prefab") {
+                        if (ECSM.has_component<Animation_Component>(entity)) {
+                            auto& animation = ECSM.get_component<Animation_Component>(entity);
+                            auto& animation_list = animation.animations;
+
+                            float random = 0;
+                            for (auto& system : ECSM.get_systems()) {
+                                if (auto* particle_system = dynamic_cast<Particle_System*>(system.get())) {
+                                    random = particle_system->get_rand_float();
+                                }
+                            }
+
+                            if (prefab_name == "dirt_prefab") {
+                                if (random <= 0.5) {
+                                    animation_list.begin()->second = "dirt_1";
+                                }
+                                else {
+                                    animation_list.begin()->second = "dirt_2";
+                                }
+                            }
+                            else {
+                                if (random <= 0.5) {
+                                    animation_list.begin()->second = "rock_1";
+                                }
+                                else {
+                                    animation_list.begin()->second = "rock_2";
+                                }
+                            }
+
+                        }
+                    }
                   
                     if (is_wormhole)
                     {

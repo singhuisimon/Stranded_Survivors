@@ -126,7 +126,7 @@ namespace lof {
             if (*start == player_id && camera.is_free_cam == GL_FALSE) {
 
                 // Update camera position with respect to player position
-                camera.pos_y = GFXM.camera_damp(camera.pos_y, transform.position.y, camera.velocity, DEFAULT_DAMPING_FACTOR, delta_time, DEFAULT_CAMERA_MAX_SPEED);
+                camera.pos_y = GFXM.camera_damp(camera.pos_y, transform.position.y, camera.velocity, DEFAULT_CAMERA_DAMPING, delta_time, DEFAULT_CAMERA_MAX_SPEED);
 
                 // Update world-to-camera view transformation matrix
                 camera.view_xform = glm::mat3{ 1, 0, 0,
@@ -159,20 +159,56 @@ namespace lof {
 
             if (camera.is_free_cam == GL_FALSE && current_scene != 2) {
 
-                // Update world-to-camera view transformation matrix
-                camera.view_xform = glm::mat3{ 1, 0, 0,
-                                               0, 1, 0,
-                                               0, 0, 1 };
+                // Win scene
+                if (current_scene == 4) {
 
-                // Update window-to-NDC transformation matrix
-                camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
-                                                       0, 2.f / screen_height, 0,
-                                                       0, 0, 1 };
+                    // Get ship's id
+                    EntityID ship_id = ECSM.find_entity_by_name("ship");
 
-                // Update world-to-NDC transformation matrix
-                camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+                    // Update camera
+                    if (ship_id != INVALID_ENTITY_ID) {
+
+                        // Update camera Y position with respect to ship position
+                        if (camera.pos_y < 1920.0f) {
+                            if (*start == ship_id) {
+                                camera.pos_y = GFXM.camera_damp(camera.pos_y, transform.position.y, camera.velocity, CAMERA_DAMPING_SHIP, delta_time, DEFAULT_CAMERA_MAX_SPEED);
+                            }
+                        }
+                        else {
+                            camera.pos_y = 1920.0f;
+                        }
+
+                        // Update world-to-camera view transformation matrix
+                        camera.view_xform = glm::mat3{ 1, 0, 0,
+                                                        0, 1, 0,
+                                                        -1, -camera.pos_y, 1 };
+
+                        // Update window-to-NDC transformation matrix
+                        camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                                0, 2.f / screen_height, 0,
+                                                                0, 0, 1 };
+
+                        // Update world-to-NDC transformation matrix
+                        camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+                    }
+
+                }
+                else {
+                    // Update world-to-camera view transformation matrix
+                    camera.view_xform = glm::mat3{ 1, 0, 0,
+                                                   0, 1, 0,
+                                                   0, 0, 1 };
+
+                    // Update window-to-NDC transformation matrix
+                    camera.camwin_to_ndc_xform = glm::mat3{ 2.f / screen_width, 0, 0,
+                                                           0, 2.f / screen_height, 0,
+                                                           0, 0, 1 };
+
+                    // Update world-to-NDC transformation matrix
+                    camera.world_to_ndc_xform = camera.camwin_to_ndc_xform * camera.view_xform;
+                }
+
             }
-
 
             // Compute object scale matrix
             // Special case for text objects
@@ -1168,6 +1204,15 @@ namespace lof {
                         break;
                     case sweat_screen:
                         particle_tex = "sweat_drop_single_batch_5";
+                        break;
+                    case ship_takeoff_dirt:
+                        particle_tex = "dirt_particle_batch_14";
+                        break;
+                    case ship_takeoff_flame:
+                        particle_tex = "sparks_particle_batch_14";
+                        break;
+                    case ship_takeoff_smoke:
+                        particle_tex = "quartz_particle_batch_14";
                         break;
                     }
 
