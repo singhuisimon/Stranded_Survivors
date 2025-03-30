@@ -38,6 +38,7 @@
 #include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Force_Helper.h"
+#include "../System/Particle_System.h"
 
 // Include standard headers
 #include <fstream>
@@ -1303,6 +1304,37 @@ namespace lof {
                             x_pos, y_pos, collision.width, collision.height);
                     }
 
+                    if (prefab_name == "dirt_prefab" || prefab_name == "rock_prefab") {
+                        if (ECSM.has_component<Animation_Component>(entity)) {
+                            auto& animation = ECSM.get_component<Animation_Component>(entity);
+                            auto& animation_list = animation.animations;
+
+                            float random = 0;
+                            for (auto& system : ECSM.get_systems()) {
+                                if (auto* particle_system = dynamic_cast<Particle_System*>(system.get())) {
+                                    random = particle_system->get_rand_float();
+                                }
+                            }
+
+                            if (prefab_name == "dirt_prefab") {
+                                if (random <= 0.5) {
+                                    animation_list.begin()->second = "dirt_1";
+                                }
+                                else {
+                                    animation_list.begin()->second = "dirt_2";
+                                }
+                            }
+                            else {
+                                if (random <= 0.5) {
+                                    animation_list.begin()->second = "rock_1";
+                                }
+                                else {
+                                    animation_list.begin()->second = "rock_2";
+                                }
+                            }
+
+                        }
+                    }
                   
                     if (is_wormhole)
                     {
