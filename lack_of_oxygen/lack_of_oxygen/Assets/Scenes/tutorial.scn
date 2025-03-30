@@ -29,7 +29,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "Ship_Interior_Batch_14",
+                    "texture_name": "Ship_Interior_Batch_28",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [
@@ -714,7 +714,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "Player_Silouette_Batch_14",
+                    "texture_name": "Player_Silouette_Batch_28",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [
@@ -805,7 +805,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "Chair_Batch_14",
+                    "texture_name": "Chair_Batch_28",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [

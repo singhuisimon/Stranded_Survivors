@@ -62,7 +62,7 @@
               "filepath": "bgm_100_base_pulse",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": true,
@@ -73,7 +73,7 @@
               "filepath": "bgm_100_chords",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": true,
@@ -84,7 +84,7 @@
               "filepath": "bgm_100_melody",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": true,
@@ -106,7 +106,7 @@
               "filepath": "bgm_80_clock_ticking",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": false,
@@ -117,7 +117,7 @@
               "filepath": "bgm_50_digging_pulse",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": false,
@@ -128,7 +128,7 @@
               "filepath": "bgm_50_roll",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": false,
@@ -139,7 +139,7 @@
               "filepath": "bgm_35_stinger",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": false,
@@ -150,7 +150,7 @@
               "filepath": "bgm_25_sprint",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": false,
@@ -161,7 +161,7 @@
               "filepath": "bgm_20_tension_melody",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.5,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": true,
               "isactive": false,
@@ -175,6 +175,16 @@
           ],
           "min_distance": 1.0,
           "max_distance": 100.0
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "lava_siren_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
+          ]
         }
       }
     },
