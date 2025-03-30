@@ -19,7 +19,7 @@ namespace lof {
 		return instance;
 	}
 
-	Audio_Manager::Audio_Manager() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr), uigroup(nullptr), new_scene(true){
+	Audio_Manager::Audio_Manager() : core_system(nullptr), mastergroup(nullptr), bgmgroup(nullptr), sfxgroup(nullptr), uigroup(nullptr), new_scene(true), underground(false){
 		set_type("Audio_Manager");
 	}
 
@@ -227,7 +227,7 @@ namespace lof {
 
 					audio_system->play_bgm_sound(file_path, channel_key, audio_key, audio_component);
 				}
-				
+
 				//LM.write_log("Audio_Manager::play_now: has successfully played sound %s in entity %u", file_path.c_str(), entity_id);
 				break; //need not update other system just skip to the next command. can choose to return instead if needed
 			}
@@ -255,68 +255,145 @@ namespace lof {
 	}
 
 	void Audio_Manager::update_bgm_layering(const int current_scene, const float oxygen_level, bool increasing) {
-		
-		std::string background_name;
-		
-		if (current_scene == 1) {
-			background_name = "tutorial_background";
-		}
-		else if (current_scene == 2){
-			background_name = "background";
-		}
 
-		//EntityID background_id = ECSM.find_entity_by_name("background");
-		EntityID background_id = ECSM.find_entity_by_name(background_name);
-		
+		EntityID background_id = ECSM.find_entity_by_name("background");
+
 		if (background_id == INVALID_ENTITY_ID && !ECSM.has_component<Audio_Component>(background_id)) {
 			return;
 		}
 
 		auto& audio_background = ECSM.get_component<Audio_Component>(background_id);
 
+		float underground_criteria = -198.0f - 50.0f;
+
+		std::vector<std::string> surface_music = { "bgm surface" }; //,  "lava siren"};
+
+		std::string lava_key = "lava siren";
+
+		//float lava_timer = 0.0f;
+		LM.write_log("current scene is %d", current_scene);
+		
 		//new logic
 		if (new_scene) {
-			/*if (current_scene == 1) {
-				audio_background.set_isactive("background", true);
-			}*/
-
+			std::cout << "current scene is" << current_scene << std::endl;
 			if (current_scene == 2) {
 				//yet_to_play = true;
+				std::cout << "new scene detected?" << std::endl;
 
-				std::vector<std::string> base_layers = { "bgm surface", "bgm base_1", "bgm base_2", "bgm base_3", "lava siren"};
-				for (const auto& layer : base_layers) {
-					if (!is_layer_playing(background_id, layer)) {
+				//set the lava timer to 4min
+				//lava_timer = 400.0f;
+				//std::cout << "lava timer is set to " << lava_timer << std::endl;
+
+				//set lava audio to inactive
+				if (!is_layer_playing(background_id, lava_key)) {
+					audio_background.set_isactive(lava_key, false);
+				}
+
+				//if audio is not played yet and above ground set the bgm to true.
+				for (const auto& layer : surface_music) {
+					if (!is_layer_playing(background_id, layer) && !underground) {
 						audio_background.set_isactive(layer, true);
+						//std::cout << "player is above ground playing bgm surface" << std::endl;
 					}
 				}
 
-				std::vector<std::string> other_layers = { "bgm 80", "bgm 50_1", "bgm 50_2", "bgm 35", "bgm 25", "bgm 20" };
+				//bgm to be played affected by oxygen level and to only be played when underground
+				std::vector<std::string> other_layers = { "bgm base_1", "bgm base_2", "bgm base_3", "bgm 80", "bgm 50_1", "bgm 50_2", "bgm 35", "bgm 25", "bgm 20" };
 				for (const auto& layer : other_layers) {
-					if (!is_layer_playing(background_id, layer)) {
+					if (!is_layer_playing(background_id, layer) && underground) {
 						audio_background.set_isactive(layer, false);
 					}
 				}
 			}
+			new_scene = false;
+		}
+		else {
+			LM.write_log("new scene is false detected in update layering");
 		}
 
-		// A vector of pair for the condition and which the sound is going to be played
-		std::vector<std::pair<float, std::string>> oxygen_layers = {
-			{80, "bgm 80"}, {50, "bgm 50_1"}, {50, "bgm 50_2"},
-			{35, "bgm 35"}, {25, "bgm 25"}, {20, "bgm 20"}
-		};
+		if (current_scene == 2) {
+			//update lava timer
+			//lava_timer -= FPSM.get_delta_time();
+			//std::cout << "current lava time is " << lava_timer << "deducting through " << FPSM.get_delta_time() << std::endl;
 
-		for (const auto& [condition, audio_key] : oxygen_layers) {
-			//const std::string& filepath = audio_background.get_filepath(audio_key);
-			//if oxygen is increasing and oxygen level is above certain condition mute the bgm layers affected
-			if (increasing && oxygen_level >= condition) {
-				audio_background.set_isactive(audio_key, false);
+			/*if (lava_timer <= 0.0f) {
+				audio_background.set_isactive(lava_key, true);
+				std::cout << "lava timer has been less than or equal to 0 audio playing" << std::endl;
+				LM.write_log("lava siren is currently active");
+			}*/
+
+			// A vector of pair for the condition and which the sound is going to be played
+			std::vector<std::pair<float, std::string>> oxygen_layers = {
+				{80, "bgm 80"}, {50, "bgm 50_1"}, {50, "bgm 50_2"},
+				{35, "bgm 35"}, {25, "bgm 25"}, {20, "bgm 20"}
+			};
+
+			// A vector containing the base layer for oxygen to be played
+			std::vector<std::string> base_layers = { "bgm base_1", "bgm base_2", "bgm base_3" };
+
+			// updates underground boolean by constantly checking the audio changes.
+			if (ECSM.has_component<Transform2D>(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME))) {
+				auto& player_transform = ECSM.get_component<Transform2D>(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
+				//check if the player is above ground (Reminder underground means the player is further deeper in negative y-axis)
+				if (player_transform.position.y >= underground_criteria) {
+					underground = false;
+				}
+				else {
+					underground = true;
+				}
 			}
-			//if oxygen is decreasing and oxygen level is below certain condition unmute the bgm layers affected
-			else if (!increasing && oxygen_level <= condition) {
-				audio_background.set_isactive(audio_key, true);
+
+			if (underground) {
+
+				//player underground, surface music stops
+				for (const auto& layer : surface_music) {
+					audio_background.set_isactive(layer, false);
+					//std::cout << "player is underground ground bgm surface is inactive" << std::endl;
+				}
+
+				//disregarding the increasing and oxygen level, if player is underground base music will be played
+				for (const auto& layer : base_layers) {
+					audio_background.set_isactive(layer, true);
+					LM.write_log("Currently player is underground therefore base layer %s is being played", layer.c_str());
+				}
+
+				//this loop loops through all the layers affected by oxygen and to be only played when underground
+				for (const auto& [condition, audio_key] : oxygen_layers) {
+
+					//if oxygen is increasing and oxygen level is above certain condition mute the other bgm layers affected
+					if (increasing && oxygen_level >= condition) {
+						audio_background.set_isactive(audio_key, false);
+						LM.write_log("Currently audio_key %s, is inactive as player is underground and oxygen is increasing", audio_key.c_str());
+					}
+					//if oxygen is decreasing and oxygen level is below certain condition unmute the other bgm layers affected
+					else if (!increasing && oxygen_level <= condition) {
+						audio_background.set_isactive(audio_key, true);
+						LM.write_log("Currently audio_key %s, is active as player is underground and oxygen is decreasing", audio_key.c_str());
+					}
+				}
+
+			}
+			else {
+				//to only play surface music
+				for (const auto& layer : surface_music) {
+					audio_background.set_isactive(layer, true);
+					//std::cout << "player is above ground bgm surface is active" << std::endl;
+				}
+
+				//player is above ground pause all the following layers (base + oxygen)
+				for (const auto& layer : base_layers) {
+					audio_background.set_isactive(layer, false);
+					LM.write_log("Currently audio_key %s, is inactive as player is above ground.", layer.c_str());
+				}
+
+				for (const auto& [condition, audio_key] : oxygen_layers) {
+					//if player is above ground, inactive all audio in this loop
+					audio_background.set_isactive(audio_key, false);
+					LM.write_log("Currently audio_key %s, is inactive as player is above ground.", audio_key.c_str());
+				}
+
 			}
 		}
-
 	}
 
 	bool Audio_Manager::is_layer_playing(EntityID entity_id, const std::string& audio_key) {
@@ -545,6 +622,12 @@ namespace lof {
 
 	void Audio_Manager::set_new_scene(bool new_scene_state) {
 		new_scene = new_scene_state;
+		if (new_scene_state == true) {
+			LM.write_log("new scene is set to true");
+		}
+		else {
+			LM.write_log("new scene is set to false");
+		}
 	}
 
 	bool Audio_Manager::get_new_scene() {
