@@ -36,7 +36,7 @@ namespace lof {
 			270.0f,					// direction
 			0.1f,					// lifespan
 			0.1f					// life left
-		};				
+		};
 		particle_base.emplace("walking", walking);
 
 		// Mining particle data
@@ -232,7 +232,7 @@ namespace lof {
 			5.0f,						// lifespan
 			5.0f						// life left
 		};
-		particle_base.emplace("lava", lava); 
+		particle_base.emplace("lava", lava);
 
 		// sweat on player particle data
 		Particle_Data sweat_player = {
@@ -266,13 +266,13 @@ namespace lof {
 	}
 
 	// Returns the system's type
-    std::string Particle_System::get_type() const {
-        return "Particle_System";
-    }
+	std::string Particle_System::get_type() const {
+		return "Particle_System";
+	}
 
 	// Updates the particles' data based on time
 	void Particle_System::update(float delta_time) {
-		
+
 		// Update every particles
 		for (unsigned int i = 0; i < active_particles; i++) {
 
@@ -301,9 +301,11 @@ namespace lof {
 			float angle{};
 			if (particles_storage[i].type == mining || particles_storage[i].type == tnt_explode) { // Randomize values for mining and TNT explosion
 				angle = (particles_storage[i].direction * get_rand_float()) * (PI_VALUE / 180.0f);
-			} else if (particles_storage[i].type == lava) { // Lava's fixed movement
+			}
+			else if (particles_storage[i].type == lava) { // Lava's fixed movement
 				angle = 90.0f * (PI_VALUE / 180.0f);
-			} else {
+			}
+			else {
 				angle = particles_storage[i].direction * (PI_VALUE / 180.0f);
 			}
 
@@ -345,7 +347,7 @@ namespace lof {
 
 			// Set particle data according to type
 			particles_storage[active_particles] = particle_base[type];
-			
+
 			// Set particle id and increment active particles count
 			if (lifespan > 0.0f) {
 				particles_storage[active_particles].life_left = lifespan;
@@ -358,7 +360,8 @@ namespace lof {
 			active_particles++;
 
 			LM.write_log("Active particles count now is %d after adding particle at pos: %f, %f", active_particles, pos.x, pos.y);
-		} else {
+		}
+		else {
 			active_particles = MAX_PARTICLES;
 		}
 
@@ -381,7 +384,7 @@ namespace lof {
 
 	// Gets a random float value between 0.0f to 1.0f
 	float Particle_System::get_rand_float() {
-		return (float)rand_distribution(part_rand_engine) / (float)std::numeric_limits<uint32_t>::max(); 
+		return (float)rand_distribution(part_rand_engine) / (float)std::numeric_limits<uint32_t>::max();
 	}
 
 } // namespace lof
