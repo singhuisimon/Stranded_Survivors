@@ -1419,7 +1419,6 @@ namespace lof {
 
     bool Collision_System::is_transitioning = false;
 
-
     void Collision_System::check_main_menu_button_collision(float delta_time) {
         (void)delta_time;  // Mark as intentionally unused
 
@@ -1450,6 +1449,7 @@ namespace lof {
 
             // Only check for main menu buttons
             if (entity_name != "play_button" &&
+                entity_name != "setting_button" &&
                 entity_name != "credit_button" &&
                 entity_name != "quit_button") continue;
 
@@ -1485,6 +1485,10 @@ namespace lof {
             else if (entity_name == "quit_button") {
                 base_texture = "Main_Menu_Quit_Batch_14";
             }
+            else if (entity_name == "setting_button") {
+                base_texture = "Settings_Batch_12";
+            }
+                
 
             //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
@@ -1501,7 +1505,7 @@ namespace lof {
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
 
-                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (GM.is_mouse_left_released()) {
                     if (main_menu_sound_playing[entity_name] == false) {
                         // Play the main menu sound if it's not already playing
                         ADM.play_now(entity_id, main_menu_sound, audio);
@@ -1528,6 +1532,48 @@ namespace lof {
                         is_transitioning = true;
                         current_cooldown = transition_cooldown;
                         return;
+                    }
+                    else if (entity_name == "setting_button") {
+                        LM.write_log("Setting button held - attempting scene transition");
+
+                        // Clear dynamic entities first
+                        bool found_movement_system = false;
+                        for (auto& system : ECSM.get_systems()) {
+                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+                                movement_system->clear_dynamic_entities();
+                                found_movement_system = true;
+                                LM.write_log("Found and cleared Movement System");
+                                break;
+                            }
+                        }
+                        if (!found_movement_system) {
+                            LM.write_log("Warning: Movement System not found");
+                        }
+
+                        const std::string SCENES = "Scenes";
+                        std::string scene_file = "setting.scn";
+                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+
+                        if (SM.load_scene(scene_path.c_str())) {
+                            LM.write_log("Credits scene loaded successfully");
+
+                            // Reset camera position - add this section
+                            auto& camera = GFXM.get_camera();
+                            camera.pos_x = DEFAULT_CAMERA_POS_X;
+                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+
+                            // Stop all currently playing audio
+                            //ADM.stop_mastergroup();
+
+                            // Update current scene and IMGUI
+                            GM.set_current_scene(6);
+                            IMGUIM.set_current_file_shown(scene_file);
+                            is_transitioning = true;
+                            return;
+                        }
+                        else {
+                            LM.write_log("Failed to load setting scene: %s", scene_path.c_str());
+                        }
                     }
                     else if (entity_name == "credit_button") {
                         LM.write_log("Credits button held - starting fade transition to credits");
@@ -1631,7 +1677,7 @@ namespace lof {
                     //audio.increase_playcount("button_hover");
                     button_hover_states[entity_name] = true;  // Prevent playing repeatedly
                 }
-                if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+                if (GM.is_mouse_left_released()) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
                     //audio.increase_playcount(click_sound);

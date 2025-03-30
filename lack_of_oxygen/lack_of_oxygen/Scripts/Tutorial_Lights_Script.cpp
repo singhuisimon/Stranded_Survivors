@@ -49,17 +49,16 @@ namespace lof {
         elapsed_frames = 0;
         current_frame_index = 1;
         elapsed_frames = 0;
-        siren_cooldown = SIREN_AUDIO_COOLDOWN;
+        siren_cooldown = 0.0f;
     }
 
     void Tutorial_Light_Script::update_frame() {
         elapsed_frames++;
 
-        siren_cooldown -= FPSM.get_delta_time();
-
-        if (siren_cooldown <= 0) {
+        if (siren_cooldown <= SIREN_AUDIO_COOLDOWN) {
+            siren_cooldown += FPSM.get_delta_time();
             play_siren_audio();
-            siren_cooldown = SIREN_AUDIO_COOLDOWN;
+            //siren_cooldown = SIREN_AUDIO_COOLDOWN;
         }
 
         if (current_frame_index == 1) {

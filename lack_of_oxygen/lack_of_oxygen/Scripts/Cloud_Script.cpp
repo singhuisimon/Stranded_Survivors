@@ -48,17 +48,21 @@ namespace lof {
     // Controls the cloud movement in the foreground
     void Cloud_Script::cloud_movement_update() const {
 
-        // Get clouds ID
+        // Get clouds ID for game scene
         EntityID cloud_1_id = ECSM.find_entity_by_name("cloud_1");
         EntityID cloud_2_id = ECSM.find_entity_by_name("cloud_2");
+
+        // Get extra clouds ID for win screen
+        EntityID cloud_win_1_id = ECSM.find_entity_by_name("cloud_win_1");
+        EntityID cloud_win_2_id = ECSM.find_entity_by_name("cloud_win_2");
 
         if (cloud_1_id != INVALID_ENTITY_ID && cloud_2_id != INVALID_ENTITY_ID) {
             // Get both clouds transform
             auto& cloud_1_transform = ECSM.get_component<Transform2D>(cloud_1_id);
             auto& cloud_2_transform = ECSM.get_component<Transform2D>(cloud_2_id);
-            
+
             // Determine cloud movement by current game fps
-            float fps = FPSM.get_current_fps();  
+            float fps = FPSM.get_current_fps();
             cloud_1_transform.position.x += (moving_speed / fps);
             cloud_2_transform.position.x += (moving_speed / fps);
 
@@ -70,6 +74,28 @@ namespace lof {
 
             if (cloud_2_transform.position.x >= static_cast<float>(screen_width)) {
                 cloud_2_transform.position.x = cloud_1_transform.position.x - static_cast<float>(screen_width);
+            }
+
+            // Logic for extra clouds in win screen
+            if (cloud_win_1_id != INVALID_ENTITY_ID && cloud_win_2_id != INVALID_ENTITY_ID) {
+                // Get both clouds transform
+                auto& cloud_win_1_transform = ECSM.get_component<Transform2D>(cloud_win_1_id);
+                auto& cloud_win_2_transform = ECSM.get_component<Transform2D>(cloud_win_2_id);
+
+                // Determine cloud movement by current game fps
+                float fps = FPSM.get_current_fps();
+                cloud_win_1_transform.position.x += (moving_speed / fps);
+                cloud_win_2_transform.position.x += (moving_speed / fps);
+
+                // Reset cloud if it goes out of the screen
+                unsigned int screen_width = SM.get_scr_width();
+                if (cloud_win_1_transform.position.x >= static_cast<float>(screen_width)) {
+                    cloud_win_1_transform.position.x = cloud_win_2_transform.position.x - static_cast<float>(screen_width);
+                }
+
+                if (cloud_win_2_transform.position.x >= static_cast<float>(screen_width)) {
+                    cloud_win_2_transform.position.x = cloud_win_1_transform.position.x - static_cast<float>(screen_width);
+                }
             }
         }
     }

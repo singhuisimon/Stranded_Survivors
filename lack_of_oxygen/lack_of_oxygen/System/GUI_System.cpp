@@ -291,34 +291,58 @@ namespace lof {
             wormhole_e_prompt = INVALID_ENTITY_ID;
         }
 
-        // Check if we've reached 100% (50,000 minerals)
+        // Then update your win condition code:
         if (stored_mineral_progress * 50000 >= 50000) {
             LM.write_log("Win condition met: %f minerals collected", stored_mineral_progress * 50000.0f);
 
+            // Set flag to prevent UI from reappearing during transition
+            win_transition_active = true;
+
+            // Immediately hide all UI elements
+            hide_mineral_tank_gui();
+            hide_oxygen_tank_gui();
+            hide_oxygen_warning(50.0f);
+            hide_oxygen_warning(20.0f);
+            hide_oxygen_warning(5.0f);
+            hide_wormhole_gui();
+
+            // Clear all prompt names to prevent updates during transition
+            oxygen_e_prompt_name.clear();
+            wormhole_e_prompt_name.clear();
+
+            // Clear all entity variables to invalidate them
+            mineral_e_prompt = INVALID_ENTITY_ID;
+            mineral_interaction_container = INVALID_ENTITY_ID;
+            mineral_progress_bar = INVALID_ENTITY_ID;
+            mineral_percentage_text = INVALID_ENTITY_ID;
+            mineral_deposit_count_text = INVALID_ENTITY_ID;
+            oxygen_e_prompt = INVALID_ENTITY_ID;
+            oxygen_interaction_container = INVALID_ENTITY_ID;
+            oxygen_progress_bar1 = INVALID_ENTITY_ID;
+            oxygen_progress_bar2 = INVALID_ENTITY_ID;
+            oxygen_percentage_text1 = INVALID_ENTITY_ID;
+            oxygen_percentage_text2 = INVALID_ENTITY_ID;
+            wormhole_e_prompt = INVALID_ENTITY_ID;
+
+            // Reset all game state
             reset_all_game_state();
 
-            LM.write_log("Reset met: %f minerals collected", stored_mineral_progress * 50000.0f);
+            // Set special flag for win screen transition
+            transitioning_to_win_screen = true;
 
-            // Load win screen
-            const std::string SCENES = "Scenes";
-            std::string scene_file = "win_screen.scn";
-            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+            // Ensure fade duration is set to full 3 seconds for win screen
+            fade_duration = 3.0f;
 
-            if (SM.load_scene(scene_path.c_str())) {
-                auto& camera = GFXM.get_camera();
-                camera.pos_x = DEFAULT_CAMERA_POS_X;
-                camera.pos_y = DEFAULT_CAMERA_POS_Y;
+            // Start fade transition to win screen
+            start_screen_fade(true, "win_screen.scn", 4);
 
-                ADM.stop_mastergroup();
+            // Log the transition
+            LM.write_log("Started fade transition to win screen");
 
-                GM.set_current_scene(4);
-                IMGUIM.set_current_file_shown(scene_file);
-                return;
-            }
-            else {
-                LM.write_log("Failed to load scene file: %s", scene_path.c_str());
-            }
+            // IMPORTANT: Return here to let the fade transition handle the scene loading
+            return;
         }
+
 
         // --------------------------------------------------------
         // Update oxygen bars automatically every second
@@ -474,6 +498,11 @@ namespace lof {
     // ---------------------------------------------------------
     void GUI_System::show_mineral_tank_gui()
     {
+        // Skip if win transition is active
+        if (win_transition_active) {
+            return;
+        }
+
         // Check current scene
         if (GM.get_current_scene() == 4) {  // Win screen
             return;  // Don't show GUI on win screen
@@ -1559,72 +1588,42 @@ void GUI_System::hide_wormhole_gui() {
     void GUI_System::hide_game_over_menu() {
         LM.write_log("GUI_System::hide_game_over_menu(): Removing game over UI");
 
-        // Reset the flag
+        // Reset the flag FIRST
         game_over_shown = false;
+        gameover_audio_played = false;
 
-        // First remove the text
-        if (game_over_entities.find("text") != game_over_entities.end()) {
-            EntityID text_id = game_over_entities["text"];
-            if (text_id != INVALID_ENTITY_ID) {
-                try {
-                    ecs_manager.destroy_entity(text_id);
-                    LM.write_log("Destroyed game over text (ID: %u)", text_id);
-                }
-                catch (const std::exception& e) {
-                    LM.write_log("Error destroying game over text (ID: %u): %s", text_id, e.what());
-                }
-            }
-        }
-
-        // Then remove the overlay/background texture
-        if (game_over_entities.find("overlay") != game_over_entities.end()) {
-            EntityID overlay_id = game_over_entities["overlay"];
-            if (overlay_id != INVALID_ENTITY_ID) {
-                try {
-                    ecs_manager.destroy_entity(overlay_id);
-                    LM.write_log("Destroyed game over overlay (ID: %u)", overlay_id);
-                }
-                catch (const std::exception& e) {
-                    LM.write_log("Error destroying overlay (ID: %u): %s", overlay_id, e.what());
-                }
-            }
-        }
-
-        // Then remove buttons in specific order
-        const std::vector<std::string> button_order = {
-            "restart",
-            "main_menu"
+        // Get ALL possible button entities by name to ensure we catch everything
+        std::vector<std::string> possible_names = {
+            "game_over_overlay",
+            "restart_button",
+            "main_menu_button",
+            "game_over_text"
         };
 
-        for (const auto& button_key : button_order) {
-            if (game_over_entities.find(button_key) != game_over_entities.end()) {
-                EntityID button_id = game_over_entities[button_key];
-                if (button_id != INVALID_ENTITY_ID) {
-                    ecs_manager.destroy_entity(button_id);
-                    LM.write_log("Destroyed %s button (ID: %u)", button_key.c_str(), button_id);
-                }
-            }
-        }
-
-        // Also try to find buttons by their entity names
-        const std::vector<std::string> button_names = {
-            "game_over_restart_button",
-            "game_over_main_menu_button"
-        };
-
-        for (const auto& name : button_names) {
+        // Find and destroy all game over UI elements by name
+        for (const auto& name : possible_names) {
             EntityID entity_id = ecs_manager.find_entity_by_name(name);
             if (entity_id != INVALID_ENTITY_ID) {
                 ecs_manager.destroy_entity(entity_id);
-                LM.write_log("Destroyed %s by name (ID: %u)", name.c_str(), entity_id);
+                LM.write_log("Destroyed game over UI element: %s (ID: %u)", name.c_str(), entity_id);
             }
         }
 
-        // Clear the map after removing all entities
-        game_over_entities.clear();
+        // Also find and destroy all stored entities in the map
+        for (const auto& [key, entity_id] : game_over_entities) {
+            if (entity_id != INVALID_ENTITY_ID) {
+                if (ecs_manager.get_entity(entity_id)) { // Check if entity still exists
+                    ecs_manager.destroy_entity(entity_id);
+                    LM.write_log("Destroyed stored game over entity: %s (ID: %u)", key.c_str(), entity_id);
+                }
+            }
+        }
 
-        // Clear hover states
+        // Clear the entities map and hover states
+        game_over_entities.clear();
         game_over_button_hover_states.clear();
+
+        LM.write_log("Game over UI cleanup completed");
     }
 
     void GUI_System::check_game_over_button_collision(float delta_time) {
@@ -1752,6 +1751,8 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Hide game over menu
                         hide_game_over_menu();
+                        
+                        game_over_shown = false;  // Explicitly reset the flag
 
                         // Reset all game state
                         reset_all_game_state();
@@ -1792,6 +1793,9 @@ void GUI_System::hide_wormhole_gui() {
     }
 
     void GUI_System::start_screen_fade(bool fade_type, const std::string& dest_scene, int dest_scene_num) {
+        // Notify Game_Manager that transition is starting
+        GM.set_transitioning(true);
+
         // Skip fade for credits transitions if configured that way
         if (skip_fade_for_credits && dest_scene == "credit.scn") {
             LM.write_log("GUI_System::start_screen_fade(): Skipping fade for credits transition");
@@ -1799,29 +1803,42 @@ void GUI_System::hide_wormhole_gui() {
             return;
         }
 
+        // For win screen transition, set the special flag
+        if (dest_scene == "win_screen.scn") {
+            transitioning_to_win_screen = true;
+            LM.write_log("Setting win screen transition flag");
+        }
+
         LM.write_log("GUI_System::start_screen_fade(): Starting %s transition to scene: %s (#%d)",
             fade_type ? "fade in" : "fade out", dest_scene.c_str(), dest_scene_num);
 
-        // Make sure any existing fade is properly cleaned up
-        if (fade_active) {
-            fade_active = false;
-            fade_timer = 0.0f;
+        // For fade out, we need to ensure we have an overlay first
+        if (!fade_type) {
+            // If this is a fade out, make sure we have an overlay at full opacity
+            EntityID fade_entity = ecs_manager.find_entity_by_name(fade_overlay_name);
+            if (fade_entity == INVALID_ENTITY_ID) {
+                create_fade_overlay();
+                fade_entity = ecs_manager.find_entity_by_name(fade_overlay_name);
+
+                if (fade_entity != INVALID_ENTITY_ID &&
+                    ecs_manager.has_component<Graphics_Component>(fade_entity)) {
+                    auto& graphics = ecs_manager.get_component<Graphics_Component>(fade_entity);
+                    graphics.color.a = 1.0f;  // Start fully opaque for fade out
+                }
+            }
+        }
+        else {
+            // For fade in, clear any existing overlay
             remove_fade_overlay();
+            create_fade_overlay();  // And create a fresh one
         }
 
-        // Setup new fade
+        // Setup fade parameters
         fade_active = true;
         fade_in = fade_type;
         fade_timer = 0.0f;
         destination_scene = dest_scene;
         destination_scene_number = dest_scene_num;
-
-        //CASE 1 (Audio completely STOPS playing in FADE)
-        //ADM.stop_groups(GroupType::TYPE_BGM);
-        //ADM.stop_groups(GroupType::TYPE_SFX);
-
-        // Create the fade overlay
-        create_fade_overlay();
 
         // Set initial opacity based on fade direction
         EntityID fade_entity = ecs_manager.find_entity_by_name(fade_overlay_name);
@@ -1830,6 +1847,7 @@ void GUI_System::hide_wormhole_gui() {
             graphics.color.a = fade_in ? 0.0f : 1.0f;  // Start transparent for fade in, opaque for fade out
         }
     }
+
 
     bool GUI_System::update_screen_fade(float delta_time) {
         if (!fade_active) return false;
@@ -1888,16 +1906,20 @@ void GUI_System::hide_wormhole_gui() {
                 std::string loaded_scene = destination_scene;
                 int loaded_scene_number = destination_scene_number;
 
-                // Reset fade variables before loading scene
-                // This prevents issues with entity management during scene transitions
+                // IMPORTANT: Keep the fade overlay active and fully opaque during scene transition
+                // Instead of removing it, ensure it's at full opacity
+                if (fade_entity != INVALID_ENTITY_ID && ecs_manager.has_component<Graphics_Component>(fade_entity)) {
+                    auto& graphics = ecs_manager.get_component<Graphics_Component>(fade_entity);
+                    graphics.color.a = 1.0f;  // Ensure full opacity during transition
+                }
+
+                // Reset fade state for next phase
                 fade_active = false;
                 fade_timer = 0.0f;
                 destination_scene = "";
                 destination_scene_number = -1;
 
-                // Remove the overlay before loading the scene to avoid issues
-                remove_fade_overlay();
-
+                // Now load the scene while keeping the overlay visible
                 if (SM.load_scene(scene_path.c_str())) {
                     // Reset camera position
                     auto& camera = GFXM.get_camera();
@@ -1928,25 +1950,39 @@ void GUI_System::hide_wormhole_gui() {
                             auto& velocity = ecs_manager.get_component<Velocity_Component>(playerId);
                             velocity.velocity = Vec2D(0.0f, 0.0f);
                         }
-
-                        // Add needed components to ensure player works correctly
-                        if (!ecs_manager.has_component<Physics_Component>(playerId)) {
-                            Physics_Component physics;
-                            physics.set_mass(1.0f);
-                            physics.set_damping_factor(0.9f);
-                            physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
-                            physics.set_max_velocity(400.0f);
-                            physics.set_is_static(false);
-                            ecs_manager.add_component(playerId, physics);
-                        }
                     }
 
-                    // Start fade out transition after a small delay to ensure scene is loaded properly
-                    fade_duration = 1.5f;  // Make fade out faster
+                    // IMPORTANT: Recreate the fade overlay after loading the scene
+                    // The original overlay was likely destroyed during scene loading
+                    create_fade_overlay();
+
+                    // Get the new overlay and ensure it's fully opaque
+                    EntityID new_fade_entity = ecs_manager.find_entity_by_name(fade_overlay_name);
+                    if (new_fade_entity != INVALID_ENTITY_ID &&
+                        ecs_manager.has_component<Graphics_Component>(new_fade_entity)) {
+                        auto& graphics = ecs_manager.get_component<Graphics_Component>(new_fade_entity);
+                        graphics.color.a = 1.0f;  // Start fully opaque for fade out
+                    }
+
+                    // Handle fade out duration based on transition type
+                    if (transitioning_to_win_screen) {
+                        // Use full duration for win screen transition
+                        fade_duration = 3.0f;
+                        transitioning_to_win_screen = false;  // Reset the flag
+                        LM.write_log("Win screen transition: Using %.1f second fade-out", fade_duration);
+                    }
+                    else {
+                        // Use faster fade-out for other transitions
+                        fade_duration = 1.5f;
+                    }
+
+                    // Start fade out transition
                     start_screen_fade(false, "", -1);
                 }
                 else {
                     LM.write_log("GUI_System::update_screen_fade(): Failed to load scene: %s", loaded_scene.c_str());
+                    // Clean up fade overlay on failure
+                    remove_fade_overlay();
                 }
 
                 return false;
@@ -1959,6 +1995,11 @@ void GUI_System::hide_wormhole_gui() {
             // If this was a fade out, remove the overlay
             if (!fade_in) {
                 remove_fade_overlay();
+                // Reset win transition flag when fade out is complete
+                win_transition_active = false;
+
+                // Mark transition as complete
+                GM.set_transitioning(false);
             }
 
             return true;  // Fade is complete

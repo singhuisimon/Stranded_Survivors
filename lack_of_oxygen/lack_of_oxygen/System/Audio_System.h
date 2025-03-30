@@ -30,7 +30,7 @@
 #include "../Manager/Assets_Manager.h"
 #include "../Manager/FPS_Manager.h"
 #include "../Utility/Constant.h"
-#include "../Utility/globals.h"
+#include "../Utility/Globals.h"
 #include "../Utility/Vector3D.h"
 #include "../System/System.h"
 
