@@ -15,6 +15,7 @@
 #include "../Scripts/Tutorial_Script.h"
 #include "../Scripts/Tutorial_Lights_Script.h"
 #include "../Scripts/Player_Tutorial_Script.h"
+#include "../Scripts/Mini_Map_Script.h"
 #include "../Scripts/Sound_Setting_Script.h"
 #include "../Scripts/Lava_Siren_Script.h"
 #include "../Scripts/Win_Screen_Script.h"
@@ -71,6 +72,7 @@ namespace lof {
 		add_script(std::make_shared<Tutorial_Script>());
 		add_script(std::make_shared<Tutorial_Light_Script>());
 		add_script(std::make_shared<Player_Tutorial_Script>());
+		add_script(std::make_shared<Mini_Map_Script>());
 		add_script(std::make_shared<Sound_Setting_Script>());
 		add_script(std::make_shared<Lava_Siren_Script>());
 		add_script(std::make_shared<Win_Screen_Script>());
