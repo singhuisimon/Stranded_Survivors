@@ -132,41 +132,41 @@ EF
 EA
 name vent_strip_up
 texture Spritesheet_Map
-frame_no 20
-time_delay 100.0
-EF
-frame_no 21
-time_delay 100.0
-EF
-frame_no 22
-time_delay 100.0
-EF
-EA
-name vent_strip_left
-texture Spritesheet_Map
-frame_no 23
-time_delay 100.0
-EF
 frame_no 24
 time_delay 100.0
 EF
 frame_no 25
 time_delay 100.0
 EF
-EA
-name vent_strip_right
-texture Spritesheet_Map
 frame_no 26
 time_delay 100.0
 EF
+EA
+name vent_strip_left
+texture Spritesheet_Map
 frame_no 27
 time_delay 100.0
 EF
 frame_no 28
 time_delay 100.0
 EF
+frame_no 29
+time_delay 100.0
+EF
 EA
-name dirt
+name vent_strip_right
+texture Spritesheet_Map
+frame_no 30
+time_delay 100.0
+EF
+frame_no 31
+time_delay 100.0
+EF
+frame_no 32
+time_delay 100.0
+EF
+EA
+name dirt_1
 texture Spritesheet_Map
 frame_no 0
 time_delay 0.0
@@ -175,7 +175,7 @@ frame_no 1
 time_delay 0.0
 EF
 EA
-name rock
+name rock_1
 texture Spritesheet_Map
 frame_no 2
 time_delay 0.0
@@ -184,7 +184,7 @@ frame_no 3
 time_delay 0.0
 EF
 EA
-name quartz
+name dirt_2
 texture Spritesheet_Map
 frame_no 4
 time_delay 0.0
@@ -193,7 +193,7 @@ frame_no 5
 time_delay 0.0
 EF
 EA
-name emerald
+name rock_2
 texture Spritesheet_Map
 frame_no 6
 time_delay 0.0
@@ -202,7 +202,7 @@ frame_no 7
 time_delay 0.0
 EF
 EA
-name sapphire
+name quartz
 texture Spritesheet_Map
 frame_no 8
 time_delay 0.0
@@ -211,7 +211,7 @@ frame_no 9
 time_delay 0.0
 EF
 EA
-name amethyst
+name emerald
 texture Spritesheet_Map
 frame_no 10
 time_delay 0.0
@@ -220,7 +220,7 @@ frame_no 11
 time_delay 0.0
 EF
 EA
-name citrine
+name sapphire
 texture Spritesheet_Map
 frame_no 12
 time_delay 0.0
@@ -229,7 +229,7 @@ frame_no 13
 time_delay 0.0
 EF
 EA
-name alexandrite
+name amethyst
 texture Spritesheet_Map
 frame_no 14
 time_delay 0.0
@@ -238,42 +238,60 @@ frame_no 15
 time_delay 0.0
 EF
 EA
+name citrine
+texture Spritesheet_Map
+frame_no 16
+time_delay 0.0
+EF
+frame_no 17
+time_delay 0.0
+EF
+EA
+name alexandrite
+texture Spritesheet_Map
+frame_no 18
+time_delay 0.0
+EF
+frame_no 19
+time_delay 0.0
+EF
+EA
 name vent
 texture Spritesheet_Map
-frame_no 17
+frame_no 21
 time_delay 0.0
 EF
 EA
 name TNT
 texture Spritesheet_Map
-frame_no 18
+frame_no 22
 time_delay 0.0
 EF
-frame_no 18
+frame_no 22
 time_delay 0.0
 EF
 EA
 name wormhole
 texture Spritesheet_Map
-frame_no 19
+frame_no 23
 time_delay 0.0
 EF
 EA
 name lava
 texture Spritesheet_Map
-frame_no 31
+frame_no 35
 time_delay 0.0
 EF
 EA
 name lava_animate
 texture Spritesheet_Map
-frame_no 29
+frame_no 33
 time_delay 1000.0
 EF
-frame_no 30
+frame_no 34
 time_delay 1000.0
 EF
-frame_no 31
+frame_no 35
 time_delay 1000.0
 EF
 EA

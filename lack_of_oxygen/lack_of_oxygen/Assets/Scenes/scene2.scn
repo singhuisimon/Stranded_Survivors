@@ -342,6 +342,16 @@
               1.0
             ]
           ]
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "win_screen_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
+          ]
         }
       }
     },
@@ -651,7 +661,7 @@
               "filepath": "sfx_walking",
               "audio_type": 1,
               "max_simultaneous": 1,
-              "volume": 1.0,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": false,
               "isactive": true,

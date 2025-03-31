@@ -54,6 +54,7 @@
     <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
     <ClCompile Include="Scripts\Player_Tutorial_Script.cpp" />
     <ClCompile Include="Scripts\Mini_Map_Script.cpp" />
+    <ClCompile Include="Scripts\Sound_Setting_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -108,6 +109,7 @@
     <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
     <ClInclude Include="Scripts\Player_Tutorial_Script.h" />
     <ClInclude Include="Scripts\Mini_Map_Script.h" />
+    <ClInclude Include="Scripts\Sound_Setting_Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -124,6 +126,7 @@
     <None Include="Assets\Level_Design\Level_Design_V2.csv" />
     <None Include="Assets\Level_Design\Level_Design_V5.csv" />
     <None Include="Assets\Scenes\tutorial.scn" />
+    <None Include="Assets\Scenes\setting.scn" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />

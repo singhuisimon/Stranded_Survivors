@@ -104,6 +104,11 @@ namespace lof {
 		void update_button_visibility(EntityID entity_id, Graphics_Component& graphic_comp);
 
 		/**
+		* @brief Update the text visibility for next and previous
+		*/
+		void update_text_visibility();
+
+		/**
 		* @brief Check if the buttons are pressed from the keys
 		* @param entity_id The button entity to check
 		*/

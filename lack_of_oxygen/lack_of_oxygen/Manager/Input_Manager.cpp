@@ -9,6 +9,7 @@
  */
  // Include header
 #include "Input_Manager.h"
+#include "Game_Manager.h" // Include Game_Manager for transitioning
 
 // Include Log_Manager for logging
 #include "Log_Manager.h"
@@ -137,6 +138,35 @@ namespace lof {
 
     // Update key and mouse button states each frame
     void Input_Manager::update() {
+        // If a transition is active, clear key states to prevent movement
+        if (GM.is_transitioning()) {
+            // Only process keys for a clean input state next frame
+            for (auto& pair : key_states) {
+                KeyState& state = pair.second;
+                switch (state) {
+                case KeyState::PRESSED:
+                    state = KeyState::NONE;
+                    break;
+                case KeyState::HELD:
+                    state = KeyState::NONE;
+                    break;
+                case KeyState::RELEASED:
+                    state = KeyState::NONE;
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            // Clear mouse states similarly
+            for (auto& pair : mouse_button_states) {
+                KeyState& state = pair.second;
+                state = KeyState::NONE;
+            }
+
+            return; // Skip the rest of input processing during transitions
+        }
+
         // ------------------------ Update key states -------------------------
         for (auto& pair : key_states) {
             KeyState& state = pair.second;

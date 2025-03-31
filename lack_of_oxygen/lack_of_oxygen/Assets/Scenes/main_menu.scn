@@ -166,6 +166,115 @@
                 "Transform2D": {
                     "position": [
                         0.0,
+                        -300.0
+                    ],
+                    "prev_position": [
+                        0.0,
+                        -300.0
+                    ],
+                    "orientation": [
+                        0.0,
+                        0.0
+                    ],
+                    "scale": [
+                        240.0,
+                        80.0
+                    ]
+                },
+                "Graphics_Component": {
+                    "model_name": "square",
+                    "color": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "texture_name": "Main_Menu_Credits_Batch_14_NORMAL",
+                    "shd_ref": 0,
+                    "mdl_to_ndc_xform": [
+                        [
+                            0.25,
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.14814814925193787,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            -0.555555522441864,
+                            1.0
+                        ]
+                    ]
+                },
+                "Collision_Component": {
+                    "width": 200.0,
+                    "height": 80.0,
+                    "collidable": true
+                },
+                "Physics_Component": {
+                    "gravity": [
+                        0.0,
+                        0.0
+                    ],
+                    "damping_factor": 1.0,
+                    "max_velocity": 0.0,
+                    "mass": 1.0,
+                    "jump_force": 0.0,
+                    "is_static": true,
+                    "is_grounded": false,
+                    "has_jumped": false,
+                    "jump_requested": false,
+                    "accumulated_force": [
+                        0.0,
+                        0.0
+                    ],
+                    "force_helper": {
+                        "forces": []
+                    }
+                },
+                "Velocity_Component": {
+                    "velocity": [
+                        0.0,
+                        0.0
+                    ]
+                },
+                "Audio_Component": {
+                    "sounds": [
+                        {
+                            "key": "button_hover",
+                            "filepath": "sfx_button_hover",
+                            "audio_type": 1,
+                            "max_simultaneous": 1,
+                            "volume": 1.0,
+                            "pitch": 1.0,
+                            "islooping": false,
+                            "isactive": true,
+                            "is3d": false
+                        },
+                        {
+                            "key": "main_menu",
+                            "filepath": "sfx_mainmenu_button",
+                            "audio_type": 1,
+                            "max_simultaneous": 1,
+                            "volume": 1.0,
+                            "pitch": 1.0,
+                            "islooping": false,
+                            "isactive": true,
+                            "is3d": false
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "setting_button",
+            "components": {
+                "Transform2D": {
+                    "position": [
+                        0.0,
                         -200.0
                     ],
                     "prev_position": [
@@ -189,7 +298,7 @@
                         1.0,
                         1.0
                     ],
-                    "texture_name": "Main_Menu_Credits_Batch_14_NORMAL",
+                    "texture_name": "Settings_Batch_12_NORMAL",
                     "shd_ref": 0,
                     "mdl_to_ndc_xform": [
                         [
@@ -266,14 +375,6 @@
                             "is3d": false
                         }
                     ]
-                },
-                "Logic_Component": {
-                    "scripts": [
-                        {
-                            "script_name": "object_moving_script",
-                            "is_active": false
-                        }
-                    ]
                 }
             }
         },
@@ -283,11 +384,11 @@
                 "Transform2D": {
                     "position": [
                         0.0,
-                        -300.0
+                        -400.0
                     ],
                     "prev_position": [
                         0.0,
-                        -300.0
+                        -400.0
                     ],
                     "orientation": [
                         0.0,
@@ -321,7 +422,7 @@
                         ],
                         [
                             0.0,
-                            -0.555555522441864,
+                            -0.7407407164573669,
                             1.0
                         ]
                     ]
