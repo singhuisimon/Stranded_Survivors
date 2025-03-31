@@ -1927,7 +1927,9 @@ void GUI_System::hide_wormhole_gui() {
                     camera.pos_y = DEFAULT_CAMERA_POS_Y;
 
                     // Manage audio during transition
-                    ADM.stop_mastergroup();
+                    //ADM.stop_mastergroup();
+                    ADM.stop_groups(GroupType::TYPE_BGM);
+                    ADM.stop_groups(GroupType::TYPE_SFX);
 
                     // Update current scene in Game Manager
                     GM.set_current_scene(loaded_scene_number);

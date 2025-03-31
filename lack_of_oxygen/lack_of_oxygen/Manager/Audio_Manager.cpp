@@ -312,15 +312,6 @@ namespace lof {
 		//}
 
 		if (current_scene == 2) {
-			//update lava timer
-			//lava_timer -= FPSM.get_delta_time();
-			//std::cout << "current lava time is " << lava_timer << "deducting through " << FPSM.get_delta_time() << std::endl;
-
-			/*if (lava_timer <= 0.0f) {
-				audio_background.set_isactive(lava_key, true);
-				std::cout << "lava timer has been less than or equal to 0 audio playing" << std::endl;
-				LM.write_log("lava siren is currently active");
-			}*/
 
 			// A vector of pair for the condition and which the sound is going to be played
 			std::vector<std::pair<float, std::string>> oxygen_layers = {
@@ -430,7 +421,6 @@ namespace lof {
 		mastergroup->isPlaying(&playing);
 		if (playing) {
 			errorcheck(mastergroup->stop(), "Audio_System::stop_mastergroup", "stop master group");
-			//new_scene = true;
 		}
 	}
 
