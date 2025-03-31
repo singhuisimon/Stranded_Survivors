@@ -384,8 +384,6 @@ namespace lof {
             case VentDirection::UP: {
                 //apply up movement
                 e_physics.force_helper.activate_force(VENT_FORCE);
-                e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-                e_velocity.velocity.y = 200.0f;
                 break;
             }
             case VentDirection::LEFT: {
@@ -419,14 +417,13 @@ namespace lof {
         if (!is_in_vent) {
             ADM.play_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID));
             is_in_vent = true;
+
         }
 
         if (!found_next_vent) {
             //vent exit 
             if (direction == VentDirection::UP) {
-                e_velocity.velocity.y = 700.0f; 
-                e_physics.force_helper.deactivate_force(VENT_FORCE); 
-                e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+               // e_physics.force_helper.deactivate_force(VENT_FORCE); 
             }
 
             if (is_in_vent) {
@@ -435,6 +432,8 @@ namespace lof {
                 is_in_vent = false;
             }
         }
+
+        std::cout << "Player in the air vent? " << is_in_vent << std::endl; 
     }
 
 
@@ -479,6 +478,7 @@ namespace lof {
 
         // Check for collision
         float collision_time = delta_time;
+
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
             collision_time, delta_time)) {
 
@@ -521,7 +521,7 @@ namespace lof {
                     else {
                         e_physics.force_helper.deactivate_force(VENT_FORCE);
                         if (!is_grounded) {
-                            e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                           e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                         }
                     }
 
