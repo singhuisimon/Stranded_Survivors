@@ -134,22 +134,19 @@ namespace lof {
         LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
     }
 
+    static bool fade_complete = false;
 
     void GUI_System::update(float delta_time) {
+
+        if (fade_complete) {
+            ADM.resume_group(GroupType::TYPE_BGM);
+            ADM.resume_group(GroupType::TYPE_SFX);
+            fade_complete = false;
+        }
+        
         // Process any active fades first
         if (fade_active) {
-
-            //ADM.stop_groups(GroupType::TYPE_SFX);
-            ADM.pause_group(GroupType::TYPE_BGM);
-            ADM.pause_group(GroupType::TYPE_SFX);
-
-            bool fade_complete = update_screen_fade(delta_time);
-
-            if (fade_complete) {
-                ADM.resume_group(GroupType::TYPE_BGM);
-                ADM.resume_group(GroupType::TYPE_SFX);
-            }
-
+            fade_complete = update_screen_fade(delta_time);
             // If fade is still active and not complete, we still want to process other updates
             // but with this flag we know a fade is in progress
         }
@@ -1840,6 +1837,9 @@ void GUI_System::hide_wormhole_gui() {
         destination_scene = dest_scene;
         destination_scene_number = dest_scene_num;
 
+        ADM.stop_groups(GroupType::TYPE_BGM);
+        ADM.stop_groups(GroupType::TYPE_SFX);
+        
         // Set initial opacity based on fade direction
         EntityID fade_entity = ecs_manager.find_entity_by_name(fade_overlay_name);
         if (fade_entity != INVALID_ENTITY_ID && ecs_manager.has_component<Graphics_Component>(fade_entity)) {
