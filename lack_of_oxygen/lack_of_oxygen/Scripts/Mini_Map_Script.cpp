@@ -79,7 +79,9 @@ namespace lof
         auto& player_gauge_transform = ECSM.get_component<Transform2D>(mini_map_player_gauge);
 
 
-        if (lava_pool == INVALID_ENTITY_ID || mini_lava_icon == INVALID_ENTITY_ID) // ensure it is exist 
+        if (meter_bar == INVALID_ENTITY_ID || mini_lava_icon == INVALID_ENTITY_ID || lava_gauge == INVALID_ENTITY_ID ||
+            mini_lava_loc == INVALID_ENTITY_ID || lava_pool == INVALID_ENTITY_ID || mini_player_icon == INVALID_ENTITY_ID ||
+            player_loc == INVALID_ENTITY_ID || player == INVALID_ENTITY_ID || mini_map_player_gauge == INVALID_ENTITY_ID) // ensure it is exist 
         {
             return;
         }
