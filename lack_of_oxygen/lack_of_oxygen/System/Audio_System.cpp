@@ -28,18 +28,21 @@ namespace lof {
 	void Audio_System::new_load_scene() {
 		LM.write_log("Clearing all audio channels on scene change.");
 
+		ADM.stop_groups(GroupType::TYPE_BGM);
+		ADM.stop_groups(GroupType::TYPE_SFX);
+
+		//need change this to check if channel are still playing if not erase them.
 		// Stop all sounds before clearing
-		for (auto& [key, channels] : channel_map) {
-			for (FMOD::Channel* channel : channels) {
-				if (channel) {
-					channel->stop();
-				}
-			}
-		}
+		//for (auto& [key, channels] : channel_map) {
+		//	for (FMOD::Channel* channel : channels) {
+		//		if (channel) {
+		//			channel->stop();
+		//		}
+		//	}
+		//}
 
-		// Clear the channel map
-		channel_map.clear();
-
+		//// Clear the channel map
+		//channel_map.clear();
 	}
 
 	bool Audio_System::initialize() {
@@ -195,8 +198,8 @@ namespace lof {
 		core_system->update();
 
 		//THIS IS FOR DEBUG PURPOSE TO BE COMMENTED OUT IF NOT NEEDED (WILL OVERLOAD QUITE ABIT AS IT CHECKS FOR ACTIVE CHANNELS EVERY LOOP)
-		//get_active_channels();
-		//get_muted_channels();
+		get_active_channels();
+		get_muted_channels();
 
 		if (ADM.get_new_scene()) {
 			ADM.set_new_scene(false);
@@ -679,10 +682,10 @@ namespace lof {
 			for (FMOD::Channel* channel : channels) {
 				channel->getMute(&muted);
 				if (muted) {
-					LM.write_log("Current channek %s is muted", key.c_str());
+					LM.write_log("Current channel %s is muted", key.c_str());
 				}
 				else {
-					LM.write_log("Current channek %s is unmuted", key.c_str());
+					LM.write_log("Current channel %s is unmuted", key.c_str());
 				}
 
 			}

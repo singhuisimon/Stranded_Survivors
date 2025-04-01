@@ -88,7 +88,6 @@ namespace lof {
         signature.set(ECSM.get_component_id<Collision_Component>()); 
         signature.set(ECSM.get_component_id<Physics_Component>()); 
         signature.set(ECSM.get_component_id<Velocity_Component>()); 
-
         //LM.write_log("Collision_System initialized with signature requiring Transform2D, Collision_Component, Physics_Component, and Velocity_Component."); //simon
     }
 
@@ -1409,11 +1408,13 @@ namespace lof {
             return;  // Skip other collision checks for credits scene
         }
 
-        if (GM.get_current_scene() == 2) {
+
+        //cause exception thrown when player died in lava and main menu button is pressed
+        /*if (GM.get_current_scene() == 2) {
             if (is_player_dead) {
                 is_player_dead = GM.get_player_dead_state();
             }
-        }
+        }*/
        
         
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list

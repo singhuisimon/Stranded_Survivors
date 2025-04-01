@@ -282,6 +282,10 @@ namespace lof {
 
 		//flag for new scene
 		bool new_scene;
+
+		//flag for if player is underground 
+		bool underground;
+
 	};
 }
 
