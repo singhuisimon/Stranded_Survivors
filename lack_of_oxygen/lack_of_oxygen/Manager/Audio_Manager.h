@@ -21,7 +21,7 @@
 #include "../Component/Component.h"
 
 #include "../Utility/Constant.h"
-#include "../Utility/globals.h"
+#include "../Utility/Globals.h"
 
 #include "../System/Audio_System.h"
 
@@ -185,6 +185,7 @@ namespace lof {
 		*/
 		void stop_mastergroup();
 
+		void stop_groups(GroupType grouptype);
 
 		/**
 		 * @brief Pause the channel in the master channelgroup
@@ -247,6 +248,12 @@ namespace lof {
 		 * @return a boolean value consisting the value of the new_scene flag
 		 */
 		bool get_new_scene();
+
+		void debug_group_sound() {
+			std::cout << "Mastergroup " << get_group_volume(GroupType::TYPE_MASTER) << std::endl;
+			std::cout << "BGM group " << get_group_volume(GroupType::TYPE_BGM) << std::endl;
+			std::cout << "SFX group " << get_group_volume(GroupType::TYPE_SFX) << std::endl;
+		}
 
 	private:
 

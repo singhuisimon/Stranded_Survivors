@@ -38,6 +38,7 @@
 #include "../Utility/Force_Helper.h"
 #include "../Utility/Constant.h"
 #include "../Utility/Force_Helper.h"
+#include "../System/Particle_System.h"
 
 // Include standard headers
 #include <fstream>
@@ -89,7 +90,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.2.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -100,7 +101,7 @@ namespace lof {
         std::string loaded_scene = "main_menu.scn";
         IMGUIM.set_current_file_shown(loaded_scene);
         std::string scene_path = ASM.get_full_path(scene_folder, "main_menu.scn");
-        // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4, tutorial.scn = 5
+        // main_menu.scn = 0, scene1.scn = 1, scene2.scn = 2, credits.scn = 3, win_screen.scn = 4, tutorial.scn = 5, setting.scn = 6
         GM.set_current_scene(0);
         if (!load_scene(scene_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load scene file: %s", scene_path.c_str());
@@ -283,24 +284,62 @@ namespace lof {
             scene_no = 2;
             LM.write_log("Serialization_Manager::load_scene(): Setting to Scene 2");
         }
-        // Clear all existing entities first
-        const auto& entities = ECSM.get_entities();
-        std::vector<EntityID> entities_to_remove;
+        else if (path.find("win_screen.scn") != std::string::npos) {
+            scene_no = 4;
+            LM.write_log("Serialization_Manager::load_scene(): Setting to Win Screen");
+        }
 
-        // Collect all existing entity IDs
-        for (size_t i = 0; i < entities.size(); ++i) {
-            if (entities[i]) {  // Check if entity exists
-                entities_to_remove.push_back(static_cast<EntityID>(i));
+        // Leave entities near spaceship present
+        if (4 == scene_no) {
+            // Leave the first 200 entiites with some exceptions
+            const auto& entities = ECSM.get_entities();
+            std::vector<EntityID> entities_to_remove;
+
+            // Collect all existing entity IDs except the first 200
+            for (size_t i = 100; i < entities.size(); ++i) {
+                if (entities[i]) {  // Check if entity exists
+                    entities_to_remove.push_back(static_cast<EntityID>(i));
+                }
             }
-        }
 
-        // Remove all existing entities
-        for (EntityID eid : entities_to_remove) {
-            (void)eid;
-            ECSM.destroy_entity(0);
-        }
+            // Remove all existing entities
+            for (EntityID eid : entities_to_remove) {
+                (void)eid;
+                ECSM.destroy_entity(100);
+            }
 
-        LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+            // Exception entities to clear in this sequence: (player, oxygen tank, mineral hopper)
+            EntityID player_id = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+            EntityID oxygen_tank_id = ECSM.find_entity_by_name("Oxygen_Tank");
+            EntityID mineral_hopper_id = ECSM.find_entity_by_name("mineral_hopper_conveyor");
+            if (entities[player_id] && entities[mineral_hopper_id] && entities[oxygen_tank_id]) {  // Check if entity exists
+                (void)player_id, (void)oxygen_tank_id, (void)mineral_hopper_id;
+                ECSM.destroy_entity(player_id), ECSM.destroy_entity(oxygen_tank_id), ECSM.destroy_entity(mineral_hopper_id);
+            }
+
+            LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+
+        }
+        else {
+            // Clear all existing entities first
+            const auto& entities = ECSM.get_entities();
+            std::vector<EntityID> entities_to_remove;
+
+            // Collect all existing entity IDs
+            for (size_t i = 0; i < entities.size(); ++i) {
+                if (entities[i]) {  // Check if entity exists
+                    entities_to_remove.push_back(static_cast<EntityID>(i));
+                }
+            }
+
+            // Remove all existing entities
+            for (EntityID eid : entities_to_remove) {
+                (void)eid;
+                ECSM.destroy_entity(0);
+            }
+
+            LM.write_log("Serialization_Manager::load_scene(): Cleared %zu existing entities.", entities_to_remove.size());
+        }
 
         // Read and parse the scene file
         std::ifstream ifs(filename);
@@ -390,7 +429,7 @@ namespace lof {
             Component_Parser::add_components_from_json(ECSM, eid, merged_components);
 
             // Create level entities only for scene2
-            if (entity_name == "obsidian_bottom") {
+            if (entity_name == "obsidian_bottom" && scene_no == 2) {
                 if (is_scene2_file(filename)) {
                     LM.write_log("Serialization_Manager::load_scene(): Scene2 detected - creating level entities");
                     if (!create_level_entities()) {
@@ -405,15 +444,24 @@ namespace lof {
                     float total_width = RIGHT_BOUND - LEFT_BOUND;
                     float tile_width = total_width / current_level.cols;
                     float tile_height = tile_width; // Keep tiles square
+                    float total_height = current_level.rows * tile_height;
+
+                    //float START_Y_test = -(current_level.rows * tile_height) / 2.0f;
+                    //float START_Y_test = (total_height / 2.0f);
+                    //std::cout << "start_y: " << START_Y_test << "\n";
 
                     // Set the start Y position (top of the map)
+
                     float START_Y = -150.0f;
 
                     // Calculate the bottom of the level (where the last row of tiles ends)
-                    float level_bottom = START_Y - (current_level.rows * tile_height);
-
+                    float level_bottom = START_Y - (current_level.rows * tile_height); //-7734
+                    //std::cout << "level_bottom in sm: " <<  level_bottom << "\n";
+                    //std::cout << current_level.rows << "\n";
                     // Place lava pool 27 tiles below the bottom of the level
-                    float lava_pool_y = level_bottom - (27 * tile_height);
+                    float lava_pool_y = level_bottom - (27 * tile_height); // -7734 - (27 *96) = -10326
+                    //float lava_pool_y_test = level_bottom - (1080/2); //-8274
+                    //std::cout << lava_pool_y_test << "\n";
 
                     // Create the lava pool entity
                     EntityID lava_pool_id = ECSM.create_entity("lava_pool");
@@ -429,7 +477,7 @@ namespace lof {
                         // Add Graphics_Component
                         Graphics_Component graphics;
                         graphics.model_name = "square";
-                        graphics.texture_name = "Lava_Pool_Batch_19";
+                        graphics.texture_name = "Lava_Pool_Batch_26";
                         graphics.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
                         ECSM.add_component(lava_pool_id, graphics);
 
@@ -1265,6 +1313,37 @@ namespace lof {
                             x_pos, y_pos, collision.width, collision.height);
                     }
 
+                    if (prefab_name == "dirt_prefab" || prefab_name == "rock_prefab") {
+                        if (ECSM.has_component<Animation_Component>(entity)) {
+                            auto& animation = ECSM.get_component<Animation_Component>(entity);
+                            auto& animation_list = animation.animations;
+
+                            float random = 0;
+                            for (auto& system : ECSM.get_systems()) {
+                                if (auto* particle_system = dynamic_cast<Particle_System*>(system.get())) {
+                                    random = particle_system->get_rand_float();
+                                }
+                            }
+
+                            if (prefab_name == "dirt_prefab") {
+                                if (random <= 0.5) {
+                                    animation_list.begin()->second = "dirt_1";
+                                }
+                                else {
+                                    animation_list.begin()->second = "dirt_2";
+                                }
+                            }
+                            else {
+                                if (random <= 0.5) {
+                                    animation_list.begin()->second = "rock_1";
+                                }
+                                else {
+                                    animation_list.begin()->second = "rock_2";
+                                }
+                            }
+
+                        }
+                    }
                   
                     if (is_wormhole)
                     {

@@ -381,7 +381,10 @@ namespace lof {
                         tnt_to_destroy.clear();
 
                         // Stop all audio first
-                        ADM.stop_mastergroup();
+                        //ADM.stop_mastergroup();
+
+                        ADM.stop_groups(GroupType::TYPE_BGM);
+                        ADM.stop_groups(GroupType::TYPE_SFX);
 
                         //reset panic
                         GM.reset_panic();
@@ -651,7 +654,15 @@ namespace lof {
             // Randomize particle emit location within the tile
             float part_x = transform_comp.position.x - (transform_comp.scale.x / 2.0f) + (particle_system->get_rand_float() * transform_comp.scale.x);
             float part_y = transform_comp.position.y - (transform_comp.scale.y / 2.0f) + (particle_system->get_rand_float() * transform_comp.scale.y);
-            particle_system->particle_emit(animation_comp.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+            
+            std::string particle_name = animation_comp.animations["0"];
+            if (animation_comp.animations["0"].find("rock") != std::string::npos) {
+                particle_name = "rock";
+            }
+            else if (animation_comp.animations["0"].find("dirt") != std::string::npos) {
+                particle_name = "dirt";
+            }
+            particle_system->particle_emit(particle_name, Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
         }
     }
 
@@ -661,7 +672,15 @@ namespace lof {
             // Randomize particle emit location within the tile
             float part_x = transform_comp.position.x - (transform_comp.scale.x / 2.0f) + (particle_system->get_rand_float() * transform_comp.scale.x);
             float part_y = transform_comp.position.y - (transform_comp.scale.y / 2.0f) + (particle_system->get_rand_float() * transform_comp.scale.y);
-            particle_system->particle_emit(animation_comp.animations["0"], Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
+            
+            std::string particle_name = animation_comp.animations["0"];
+            if (animation_comp.animations["0"].find("rock") != std::string::npos) {
+                particle_name = "rock";
+            }
+            else if (animation_comp.animations["0"].find("dirt") != std::string::npos) {
+                particle_name = "dirt";
+            }
+            particle_system->particle_emit(particle_name, Vec2D(part_x, part_y), Vec3D(1.0f, 1.0f, 1.0f));
         }
     }
 

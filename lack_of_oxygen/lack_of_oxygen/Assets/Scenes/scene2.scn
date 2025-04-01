@@ -23,23 +23,28 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "skybox_batch_19",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              4.0,
+              2.0,
               0.0,
               0.0
             ],
             [
               0.0,
-              42.0,
+              22.66666603088379,
               0.0
             ],
             [
               0.0,
-              -18.908308029174805,
+              -6.543747425079346,
               1.0
             ]
           ]
@@ -51,7 +56,7 @@
               "filepath": "bgm_surface_music",
               "audio_type": 0,
               "max_simultaneous": 1,
-              "volume": 0.8,
+              "volume": 0.800000011920929,
               "pitch": 1.0,
               "islooping": true,
               "isactive": true,
@@ -109,7 +114,7 @@
               "volume": 0.5,
               "pitch": 1.0,
               "islooping": true,
-              "isactive": false,
+              "isactive": true,
               "is3d": false
             },
             {
@@ -167,28 +172,20 @@
               "isactive": false,
               "is3d": false
             }
-          ],
-          "position": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "min_distance": 1.0,
-          "max_distance": 100.0
+          ]
         }
       }
     },
-
     {
       "name": "cloud_1",
       "components": {
         "Transform2D": {
           "position": [
-            0.0,
+            -1911.818115234375,
             500.0
           ],
           "prev_position": [
-            0.0,
+            -1911.818115234375,
             500.0
           ],
           "orientation": [
@@ -202,38 +199,52 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "foreground_clouds_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ]
+            [
+              2.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.066666603088379,
+              0.0
+            ],
+            [
+              -1.9914772510528564,
+              1.104400634765625,
+              1.0
+            ]
           ]
         },
         "Logic_Component": {
           "scripts": [
             {
               "script_name": "cloud_script",
-              "data": {},
-              "state": 0,
               "is_active": true
             }
           ]
         }
       }
     },
-
     {
       "name": "cloud_2",
       "components": {
         "Transform2D": {
           "position": [
-            -1920.0,
+            8.181831359863281,
             500.0
           ],
           "prev_position": [
-            -1920.0,
+            8.181831359863281,
             500.0
           ],
           "orientation": [
@@ -247,28 +258,42 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "foreground_clouds_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ]
+            [
+              2.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.066666603088379,
+              0.0
+            ],
+            [
+              0.008522741496562958,
+              1.104400634765625,
+              1.0
+            ]
           ]
         },
         "Logic_Component": {
           "scripts": [
             {
               "script_name": "cloud_script",
-              "data": {},
-              "state": 0,
               "is_active": true
             }
           ]
         }
       }
     },
-
     {
       "name": "ship",
       "components": {
@@ -292,30 +317,44 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "ship_open_batch_15",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.6000000238418579,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              1.066666603088379,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              0.6250000596046448,
+              0.36365997791290283,
               1.0
             ]
+          ]
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "win_screen_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
           ]
         }
       }
     },
-
     {
       "name": "mineral_hopper_conveyor",
       "components": {
@@ -339,23 +378,28 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "mineral_hopper_conveyor_empty_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.1458333432674408,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              0.36666667461395264,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              0.5625,
+              0.07847478240728378,
               1.0
             ]
           ]
@@ -366,7 +410,10 @@
           "collidable": false
         },
         "Physics_Component": {
-          "gravity": [ 0.0, 0.0 ],
+          "gravity": [
+            0.0,
+            0.0
+          ],
           "damping_factor": 0.0,
           "max_velocity": 0.0,
           "mass": 0.0,
@@ -375,28 +422,32 @@
           "is_grounded": false,
           "has_jumped": false,
           "jump_requested": false,
-          "accumulated_force": [ 0.0, 0.0 ],
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
           "force_helper": {
             "forces": []
           }
         },
         "Velocity_Component": {
-          "velocity": [ 0.0, 0.0 ]
+          "velocity": [
+            0.0,
+            0.0
+          ]
         }
-
       }
     },
-
     {
       "name": "Oxygen_Tank",
       "components": {
         "Transform2D": {
           "position": [
-            800.0,
+            148.0,
             -100.0
           ],
           "prev_position": [
-            800.0,
+            148.0,
             -100.0
           ],
           "orientation": [
@@ -410,23 +461,28 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "oxygen_tank_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.1041666716337204,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              0.18518517911434174,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              0.15416666865348816,
+              -0.0067103952169418335,
               1.0
             ]
           ]
@@ -437,7 +493,10 @@
           "collidable": false
         },
         "Physics_Component": {
-          "gravity": [ 0.0, 0.0 ],
+          "gravity": [
+            0.0,
+            0.0
+          ],
           "damping_factor": 0.0,
           "max_velocity": 0.0,
           "mass": 0.0,
@@ -446,28 +505,33 @@
           "is_grounded": false,
           "has_jumped": false,
           "jump_requested": false,
-          "accumulated_force": [ 0.0, 0.0 ],
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
           "force_helper": {
             "forces": []
           }
         },
         "Velocity_Component": {
-          "velocity": [ 0.0, 0.0 ]
+          "velocity": [
+            0.0,
+            0.0
+          ]
         }
       }
     },
-
     {
       "name": "player1",
       "components": {
         "Transform2D": {
           "position": [
-            -110.5577392578125,
-            -35.20999526977539
+            0.0,
+            -0.0
           ],
           "prev_position": [
-            -110.5577392578125,
-            -35.20999526977539
+            0.0,
+            -0.0
           ],
           "orientation": [
             0.0,
@@ -480,23 +544,28 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "spritesheet_player",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.20000000298023224,
+              0.10000000894069672,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.40000003576278687,
+              0.17777776718139648,
               0.0
             ],
             [
-              -0.21593308448791504,
               0.0,
+              -0.010416001081466675,
               1.0
             ]
           ]
@@ -567,7 +636,7 @@
         },
         "Velocity_Component": {
           "velocity": [
-            11.195076942443848,
+            0.0,
             0.0
           ]
         },
@@ -589,7 +658,7 @@
               "filepath": "sfx_walking",
               "audio_type": 1,
               "max_simultaneous": 1,
-              "volume": 1.0,
+              "volume": 0.7,
               "pitch": 1.0,
               "islooping": false,
               "isactive": true,
@@ -705,69 +774,122 @@
               "isactive": true,
               "is3d": false
             }
-          ],
-          "position": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "min_distance": 1.0,
-          "max_distance": 100.0
+          ]
         },
         "Animation_Component": {
           "animations": [
-            [ "0", "prisoner_idle_left" ],
-            [ "1", "prisoner_idle_right" ],
-            [ "2", "prisoner_running_left" ],
-            [ "3", "prisoner_running_right" ],
-            [ "4", "prisoner_mining_left" ],
-            [ "5", "prisoner_mining_right" ],
-            [ "6", "prisoner_mining_up_left" ],
-            [ "7", "prisoner_mining_up_right" ],
-            [ "8", "prisoner_mining_down_left" ],
-            [ "9", "prisoner_mining_down_right" ]
+            [
+              "0",
+              "prisoner_idle_left"
+            ],
+            [
+              "1",
+              "prisoner_idle_right"
+            ],
+            [
+              "2",
+              "prisoner_running_left"
+            ],
+            [
+              "3",
+              "prisoner_running_right"
+            ],
+            [
+              "4",
+              "prisoner_mining_left"
+            ],
+            [
+              "5",
+              "prisoner_mining_right"
+            ],
+            [
+              "6",
+              "prisoner_mining_up_left"
+            ],
+            [
+              "7",
+              "prisoner_mining_up_right"
+            ],
+            [
+              "8",
+              "prisoner_mining_down_left"
+            ],
+            [
+              "9",
+              "prisoner_mining_down_right"
+            ]
           ],
           "curr_animation_idx": 0,
           "start_animation_idx": 0,
-          "curr_frame_index": 0
+          "curr_frame_index": 0,
+          "start_tile_health": 2,
+          "curr_tile_health": 2
         },
         "Logic_Component": {
           "scripts": [
             {
               "script_name": "player_script",
-              "data": {},
-              "state": 0,
               "is_active": true
             },
             {
               "script_name": "mining_script",
-              "data": {},
-              "state": 0,
+              "is_active": true
+            },
+            {
+              "script_name": "mini_map_script",
               "is_active": true
             }
           ]
         }
       }
     },
-
     {
       "name": "obsidian_bottom",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, -7783.0 ],
-          "prev_position": [ 0.0, -7783.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1920.0, 100.0 ]
+          "position": [
+            0.0,
+            -7783.0
+          ],
+          "prev_position": [
+            0.0,
+            -7783.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            100.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "obsidian_bottom_line_batch_19",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ]
+            [
+              2.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.18518517911434174,
+              0.0
+            ],
+            [
+              0.0,
+              -14.234488487243652,
+              1.0
+            ]
           ]
         },
         "Collision_Component": {
@@ -776,7 +898,10 @@
           "collidable": true
         },
         "Physics_Component": {
-          "gravity": [ 0.0, 0.0 ],
+          "gravity": [
+            0.0,
+            0.0
+          ],
           "damping_factor": 0.0,
           "max_velocity": 0.0,
           "mass": 0.0,
@@ -785,69 +910,124 @@
           "is_grounded": false,
           "has_jumped": false,
           "jump_requested": false,
-          "accumulated_force": [ 0.0, 0.0 ],
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
           "force_helper": {
             "forces": []
           }
         },
         "Velocity_Component": {
-          "velocity": [ 0.0, 0.0 ]
+          "velocity": [
+            0.0,
+            0.0
+          ]
         }
       }
     },
-
     {
       "name": "top_ui_overlay",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 398.0 ],
-          "prev_position": [ 600.0, 100.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1950.0, 178.0 ]
-        },
-        "Graphics_Component": {
-          "model_name": "square",
-          "color": [ 0.0, 0.0, 0.0, 1.0 ],
-          "shd_ref": 0
-        }
-      }
-    },
-
-    {
-      "name": "top_ui_oxygen_meter_fill",
-      "components": {
-        "Transform2D": {
           "position": [
-            800.0,
-            -100.0
+            0.0,
+            398.0
           ],
           "prev_position": [
-            800.0,
-            -100.0
+            0.0,
+            398.0
           ],
           "orientation": [
             0.0,
             0.0
           ],
           "scale": [
-            200.0,
-            30.0
+            1950.0,
+            178.0
           ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
-          "texture_name": "top_ui_o2_meter_fill_blue_batch_7",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ],
-            [ 0.0, 0.0, 0.0 ]
+            [
+              2.03125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.3296296298503876,
+              0.0
+            ],
+            [
+              -0.0010416667209938169,
+              0.9259259104728699,
+              1.0
+            ]
           ]
         }
       }
     },
-
+    {
+      "name": "top_ui_oxygen_meter_fill",
+      "components": {
+        "Transform2D": {
+          "position": [
+            -622.0,
+            398.0
+          ],
+          "prev_position": [
+            -622.0,
+            398.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            296.0,
+            40.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "O2_Fill_full_blue_Batch_7",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.3083333373069763,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.07407407462596893,
+              0.0
+            ],
+            [
+              -0.6489583253860474,
+              0.9259259104728699,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
     {
       "name": "top_ui_oxygen_meter",
       "components": {
@@ -871,77 +1051,85 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "top_ui_o2_meter_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.4166666865348816,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              0.07407407462596893,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              -0.5979166626930237,
+              0.9259259104728699,
               1.0
             ]
           ]
         }
       }
     },
-
     {
       "name": "top_ui_panik_meter_fill",
       "components": {
         "Transform2D": {
           "position": [
-            800.0,
-            -100.0
+            -772.0,
+            348.0
           ],
           "prev_position": [
-            800.0,
-            -100.0
+            -772.0,
+            348.0
           ],
           "orientation": [
             0.0,
             0.0
           ],
           "scale": [
-            200.0,
-            30.0
+            0.0,
+            40.0
           ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "top_ui_Panik_Fill_full_red_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.0,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              0.07407407462596893,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              -0.8052083849906921,
+              0.8333333134651184,
               1.0
             ]
           ]
         }
       }
     },
-
     {
       "name": "top_ui_panik_meter",
       "components": {
@@ -965,30 +1153,34 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "Panik_meter_Batch_14",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.4166666865348816,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              0.07407407462596893,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              -0.6000000238418579,
+              0.8333333134651184,
               1.0
             ]
           ]
         }
       }
     },
-
     {
       "name": "top_ui_mineral_texture",
       "components": {
@@ -1012,23 +1204,28 @@
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
           "texture_name": "top_ui_minerals_batch_4",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
-              0.1953125,
+              0.0833333358168602,
               0.0,
               0.0
             ],
             [
               0.0,
-              0.26250001788139343,
+              0.14814814925193787,
               0.0
             ],
             [
-              -1.0663578510284424,
-              1.6541926860809326,
+              0.4677083492279053,
+              0.8796296119689941,
               1.0
             ]
           ]
@@ -1039,54 +1236,127 @@
       "name": "top_ui_goal_text",
       "components": {
         "Transform2D": {
-          "position": [ 775.0, 373.0 ],
-          "prev_position": [ 775.0, 373.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            775.0,
+            373.0
+          ],
+          "prev_position": [
+            775.0,
+            373.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            120.0,
+            21.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              0.4026041626930237,
+              0.5342592597007751,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "Goal:",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
         }
       }
     },
-
     {
       "name": "top_ui_oxygen_text",
       "components": {
         "Transform2D": {
-          "position": [ -861.0, 398.0 ],
-          "prev_position": [ -861.0, 398.0 ],
-          "orientation": [ 0.0, 30.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            -861.0,
+            398.0
+          ],
+          "prev_position": [
+            -861.0,
+            398.0
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            144.0,
+            21.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              -0.44947919249534607,
+              0.5574073791503906,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "Oxygen",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
         }
       }
     },
@@ -1094,26 +1364,63 @@
       "name": "top_ui_oxygen_percentage_text",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, 0.0 ],
-          "prev_position": [ 0.0, 0.0 ],
-          "orientation": [ 0.0, 30.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            -573.0,
+            398.0
+          ],
+          "prev_position": [
+            -573.0,
+            398.0
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            72.0,
+            21.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              -0.2994791865348816,
+              0.5574073791503906,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
-          "text": "100%",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "text": "74%",
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
         }
       }
     },
@@ -1121,26 +1428,63 @@
       "name": "top_ui_panic_text",
       "components": {
         "Transform2D": {
-          "position": [ -875.0, 348.0 ],
-          "prev_position": [ -875.0, 348.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            -875.0,
+            348.0
+          ],
+          "prev_position": [
+            -875.0,
+            348.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            120.0,
+            21.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              -0.4567708671092987,
+              0.5111110806465149,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "Panic",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
         }
       }
     },
@@ -1148,26 +1492,63 @@
       "name": "top_ui_mineral_count_text",
       "components": {
         "Transform2D": {
-          "position": [ 590.0, 373.0 ],
-          "prev_position": [ 590.0, 373.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            590.0,
+            373.0
+          ],
+          "prev_position": [
+            590.0,
+            373.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            144.0,
+            21.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              0.3062500059604645,
+              0.5342592597007751,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "000000",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
         }
       }
     },
@@ -1175,26 +1556,63 @@
       "name": "top_ui_goal_percentage_text",
       "components": {
         "Transform2D": {
-          "position": [ 895.0, 373.0 ],
-          "prev_position": [ 895.0, 373.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            895.0,
+            373.0
+          ],
+          "prev_position": [
+            895.0,
+            373.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            72.0,
+            21.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              0.4651041626930237,
+              0.5342592597007751,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "00%",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
         }
       }
     },
@@ -1202,26 +1620,446 @@
       "name": "fps_counter_in_game",
       "components": {
         "Transform2D": {
-          "position": [ 830.0, 273.0 ],
-          "prev_position": [ -200.0, 364.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1.0, 1.0 ]
+          "position": [
+            830.0,
+            273.0
+          ],
+          "prev_position": [
+            830.0,
+            273.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            0.0,
+            0.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
           "shd_ref": 2,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              0.4312500059604645,
+              0.4416666626930237,
+              1.0
+            ]
           ]
         },
         "Text_Component": {
           "font_name": "PressStart2P",
           "text": "",
-          "color": [ 1.0, 1.0, 1.0 ],
-          "scale": [ 0.5, 0.5 ]
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "mini_lava_loc",
+      "components": {
+        "Transform2D": {
+          "position": [
+            882.0,
+            -600.0
+          ],
+          "prev_position": [
+            882.0,
+            -600.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            30.0,
+            30.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "Player_loc_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.03125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0555555559694767,
+              0.0
+            ],
+            [
+              0.8843750357627869,
+              -0.9222221374511719,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "player_loc",
+      "components": {
+        "Transform2D": {
+          "position": [
+            882.0,
+            -221.0
+          ],
+          "prev_position": [
+            882.0,
+            -221.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            30.0,
+            30.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "Player_loc_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.03125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0555555559694767,
+              0.0
+            ],
+            [
+              0.8843750357627869,
+              -0.9222221374511719,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "mini_map_player_gauge",
+      "components": {
+        "Transform2D": {
+          "position": [
+            905.0,
+            -216.0
+          ],
+          "prev_position": [
+            905.0,
+            -216.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            10.0,
+            15.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "Lava_Gauge_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.01145833358168602,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.5740740895271301,
+              0.0
+            ],
+            [
+              0.9156250357627869,
+              -0.36666661500930786,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "mini_map_lava_gauge",
+      "components": {
+        "Transform2D": {
+          "position": [
+            905.0,
+            -600.0
+          ],
+          "prev_position": [
+            905.0,
+            -600.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            10.0,
+            5.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.9950000047683716,
+            0.875,
+            0.08500000089406967,
+            1.0
+          ],
+          "texture_name": "Lava_Gauge_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.01145833358168602,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.5740740895271301,
+              0.0
+            ],
+            [
+              0.9156250357627869,
+              -0.36666661500930786,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "mini_lava",
+      "components": {
+        "Transform2D": {
+          "position": [
+            849.0,
+            -600.0
+          ],
+          "prev_position": [
+            849.0,
+            -600.0
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            35.0,
+            35.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "Spritesheet_Map",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.0416666679084301,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.07407407462596893,
+              0.0
+            ],
+            [
+              0.8479167222976685,
+              -0.9226111173629761,
+              1.0
+            ]
+          ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "lava"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 2,
+          "curr_tile_health": 2
+        }
+      }
+    },
+    {
+      "name": "mini_player",
+      "components": {
+        "Transform2D": {
+          "position": [
+            849.0,
+            -221.0
+          ],
+          "prev_position": [
+            849.0,
+            -221.0
+          ],
+          "orientation": [
+            0.0,
+            30.0
+          ],
+          "scale": [
+            35.0,
+            35.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "spritesheet_player",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.0416666679084301,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.07407407462596893,
+              0.0
+            ],
+            [
+              0.8479167222976685,
+              -0.9226111173629761,
+              1.0
+            ]
+          ]
+        },
+        "Animation_Component": {
+          "animations": [
+            [
+              "0",
+              "prisoner_idle_right"
+            ]
+          ],
+          "curr_animation_idx": 0,
+          "start_animation_idx": 0,
+          "curr_frame_index": 0,
+          "start_tile_health": 2,
+          "curr_tile_health": 2
+        }
+      }
+    },
+    {
+      "name": "mini_map_meter_bar",
+      "components": {
+        "Transform2D": {
+          "position": [
+            909.0,
+            -389.0
+          ],
+          "prev_position": [
+            909.0,
+            -389.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            20.0,
+            370.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "Metre_Batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.02083333395421505,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.6851851940155029,
+              0.0
+            ],
+            [
+              0.9458333849906921,
+              -0.5314814448356628,
+              1.0
+            ]
+          ]
         }
       }
     },
@@ -1229,20 +2067,49 @@
       "name": "black_vignette",
       "components": {
         "Transform2D": {
-          "position": [ 0.0, -102.0 ],
-          "prev_position": [ 0.0, -102.0 ],
-          "orientation": [ 0.0, 0.0 ],
-          "scale": [ 1920.0, 1080.0 ]
+          "position": [
+            0.0,
+            -102.0
+          ],
+          "prev_position": [
+            0.0,
+            -102.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            1080.0
+          ]
         },
         "Graphics_Component": {
           "model_name": "square",
-          "color": [ 1.0, 1.0, 1.0, 0.0 ],
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            0.0
+          ],
           "texture_name": "screen_vignette_black_batch_10",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ]
+            [
+              2.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              2.0,
+              0.0
+            ],
+            [
+              -0.0010416667209938169,
+              0.0,
+              1.0
+            ]
           ]
         }
       }

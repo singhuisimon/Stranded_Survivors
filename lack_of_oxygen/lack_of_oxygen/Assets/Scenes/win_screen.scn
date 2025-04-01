@@ -1,337 +1,428 @@
 {
-    "objects": [
-        {
-            "name": "background",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        0.0
-                    ],
-                    "prev_position": [
-                        0.0,
-                        0.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        1920.0,
-                        1080.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "MISSION_ACCOMPLISHED_Batch_14",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            2.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            2.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            1.0
-                        ]
-                    ]
-                }
-            }
+  "objects": [
+    {
+      "name": "win_background",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            3000.0
+          ],
+          "prev_position": [
+            0.0,
+            3000.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            1080.0
+          ]
         },
-        {
-            "name": "restart_button",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        -300.0
-                    ],
-                    "prev_position": [
-                        0.0,
-                        -300.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        240.0,
-                        80.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Restart_Batch_14_NORMAL",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.25,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14814814925193787,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            -0.555555522441864,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 200.0,
-                    "height": 80.0,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        0.0
-                    ],
-                    "damping_factor": 1.0,
-                    "max_velocity": 0.0,
-                    "mass": 1.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "button_hover",
-                            "filepath": "sfx_button_hover",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "main_menu",
-                            "filepath": "sfx_mainmenu_button",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "name": "main_menu_button",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        0.0,
-                        -200.0
-                    ],
-                    "prev_position": [
-                        0.0,
-                        -200.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        240.0,
-                        80.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Main_Menu_Batch_14_NORMAL",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.25,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14814814925193787,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            -0.37037035822868347,
-                            1.0
-                        ]
-                    ]
-                },
-                "Collision_Component": {
-                    "width": 200.0,
-                    "height": 80.0,
-                    "collidable": true
-                },
-                "Physics_Component": {
-                    "gravity": [
-                        0.0,
-                        0.0
-                    ],
-                    "damping_factor": 1.0,
-                    "max_velocity": 0.0,
-                    "mass": 1.0,
-                    "jump_force": 0.0,
-                    "is_static": true,
-                    "is_grounded": false,
-                    "has_jumped": false,
-                    "jump_requested": false,
-                    "accumulated_force": [
-                        0.0,
-                        0.0
-                    ],
-                    "force_helper": {
-                        "forces": []
-                    }
-                },
-                "Velocity_Component": {
-                    "velocity": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Audio_Component": {
-                    "sounds": [
-                        {
-                            "key": "button_hover",
-                            "filepath": "sfx_button_hover",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        },
-                        {
-                            "key": "main_menu",
-                            "filepath": "sfx_mainmenu_button",
-                            "audio_type": 1,
-                            "max_simultaneous": 1,
-                            "volume": 1.0,
-                            "pitch": 1.0,
-                            "islooping": false,
-                            "isactive": true,
-                            "is3d": false
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "name": "fps_counter",
-            "components": {
-                "Transform2D": {
-                    "position": [
-                        800.0,
-                        500.0
-                    ],
-                    "prev_position": [
-                        800.0,
-                        500.0
-                    ],
-                    "orientation": [
-                        0.0,
-                        0.0
-                    ],
-                    "scale": [
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "NoTexture",
-                    "shd_ref": 2,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.0005208333604969084,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0009259259095415473,
-                            0.0
-                        ],
-                        [
-                            0.4166666865348816,
-                            0.46296295523643494,
-                            1.0
-                        ]
-                    ]
-                },
-                "Text_Component": {
-                    "font_name": "PressStart2P",
-                    "text": "",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "scale": [
-                        0.5,
-                        0.5
-                    ]
-                }
-            }
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "MISSION_ACCOMPLISHED_Batch_27",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              2.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              2.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ]
         }
-    ]
+      }
+    },
+
+    {
+      "name": "cloud_win_1",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            1076.0
+          ],
+          "prev_position": [
+            0.0,
+            1076.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            576.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "foreground_clouds_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "cloud_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "cloud_win_2",
+      "components": {
+        "Transform2D": {
+          "position": [
+            -1920.0,
+            1076.0
+          ],
+          "prev_position": [
+            -1920.0,
+            1076.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1920.0,
+            576.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "texture_name": "foreground_clouds_batch_4",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ],
+            [ 0.0, 0.0, 0.0 ]
+          ]
+        },
+        "Logic_Component": {
+          "scripts": [
+            {
+              "script_name": "cloud_script",
+              "data": {},
+              "state": 0,
+              "is_active": true
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "name": "restart_button",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            1870.0
+          ],
+          "prev_position": [
+            0.0,
+            1870.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            240.0,
+            80.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            0.0
+          ],
+          "texture_name": "Restart_Batch_14_NORMAL",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.25,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.14814814925193787,
+              0.0
+            ],
+            [
+              0.0,
+              -0.555555522441864,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 200.0,
+          "height": 80.0,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            0.0
+          ],
+          "damping_factor": 1.0,
+          "max_velocity": 0.0,
+          "mass": 1.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            0.0,
+            0.0
+          ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "button_hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "main_menu_button",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            1770.0
+          ],
+          "prev_position": [
+            0.0,
+            1770.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            240.0,
+            80.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            0.0
+          ],
+          "texture_name": "Main_Menu_Batch_14_NORMAL",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              0.25,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.14814814925193787,
+              0.0
+            ],
+            [
+              0.0,
+              -0.37037035822868347,
+              1.0
+            ]
+          ]
+        },
+        "Collision_Component": {
+          "width": 200.0,
+          "height": 80.0,
+          "collidable": true
+        },
+        "Physics_Component": {
+          "gravity": [
+            0.0,
+            0.0
+          ],
+          "damping_factor": 1.0,
+          "max_velocity": 0.0,
+          "mass": 1.0,
+          "jump_force": 0.0,
+          "is_static": true,
+          "is_grounded": false,
+          "has_jumped": false,
+          "jump_requested": false,
+          "accumulated_force": [
+            0.0,
+            0.0
+          ],
+          "force_helper": {
+            "forces": []
+          }
+        },
+        "Velocity_Component": {
+          "velocity": [
+            0.0,
+            0.0
+          ]
+        },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "button_hover",
+              "filepath": "sfx_button_hover",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "main_menu",
+              "filepath": "sfx_mainmenu_button",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "fps_counter",
+      "components": {
+        "Transform2D": {
+          "position": [
+            800.0,
+            500.0
+          ],
+          "prev_position": [
+            800.0,
+            500.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            0.0,
+            0.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
+          "shd_ref": 2,
+          "mdl_to_ndc_xform": [
+            [
+              0.0005208333604969084,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0009259259095415473,
+              0.0
+            ],
+            [
+              0.4166666865348816,
+              0.46296295523643494,
+              1.0
+            ]
+          ]
+        },
+        "Text_Component": {
+          "font_name": "PressStart2P",
+          "text": "",
+          "color": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "scale": [
+            0.5,
+            0.5
+          ]
+        }
+      }
+    }
+  ]
 }

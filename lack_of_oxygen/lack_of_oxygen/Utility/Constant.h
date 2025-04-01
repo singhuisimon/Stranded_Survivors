@@ -153,6 +153,9 @@ namespace lof {
 	constexpr float DEFAULT_CAMERA_POS_X = 0.0f;
 	constexpr float DEFAULT_CAMERA_POS_Y = 0.0f;
 	constexpr float DEFAULT_ORIENTATION = 0.0f;
+	constexpr float DEFAULT_CAMERA_DAMPING = 0.5f;
+	constexpr float CAMERA_DAMPING_SHIP = 0.3f;
+	constexpr float DEFAULT_CAMERA_MAX_SPEED = 10000.0f;
 
 	// Fonts
 	constexpr int DEFAULT_GLYPH_HEIGHT = 48;
@@ -235,7 +238,10 @@ namespace lof {
 		tnt_vfx,
 		lava,
 		sweat_player,
-		sweat_screen
+		sweat_screen,
+		ship_takeoff_dirt,
+		ship_takeoff_flame,
+		ship_takeoff_smoke
 	};
 
 	// ------------------------------ Player_Script.cpp --------------------------------
@@ -251,6 +257,15 @@ namespace lof {
 	// ------------------------------ Tutorial_Script.cpp ------------------------------
 	constexpr const float SIREN_AUDIO_COOLDOWN = 0.4f;
 	constexpr const float TUTORIAL_COOLDOWN_TIME = 1.0f;
+
+	// --------------------------- Sound_Setting_Script.cpp ----------------------------
+	constexpr const float PER_BAR_WIDTH = 42.0f;
+	constexpr const float PER_BAR_X_AXIS = 21.0f;
+
+	// ------------------------------ Win_Screen_Script.cpp --------------------------------
+	constexpr const float SHIP_STARTING_SPEED = 50.0f;
+	constexpr const float DEFAULT_LAUNCH_DURATION = 8.0f;
+	constexpr const float WIN_BACKGROUND_SPEED = 2000.0f;
 
 } // namespace lof
 
