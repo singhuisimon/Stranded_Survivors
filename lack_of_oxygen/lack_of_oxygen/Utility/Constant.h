@@ -262,6 +262,9 @@ namespace lof {
 	constexpr const float PER_BAR_WIDTH = 42.0f;
 	constexpr const float PER_BAR_X_AXIS = 21.0f;
 
+	// ----------------------------- Lava_Siren_Script.cpp -----------------------------
+	constexpr const float DEFAULT_LAVA_SIREN_COUNTDOWN = 240.0f;
+
 	// ------------------------------ Win_Screen_Script.cpp --------------------------------
 	constexpr const float SHIP_STARTING_SPEED = 50.0f;
 	constexpr const float DEFAULT_LAUNCH_DURATION = 8.0f;

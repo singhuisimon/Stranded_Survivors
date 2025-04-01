@@ -139,7 +139,7 @@
                   "filepath": "sfx_button_hover",
                   "audio_type": 1,
                   "max_simultaneous": 1,
-                  "volume": 1.0,
+                  "volume": 0.7,
                   "pitch": 1.0,
                   "islooping": false,
                   "isactive": true,
@@ -148,7 +148,7 @@
                 {
                   "key": "main_menu",
                   "filepath": "sfx_mainmenu_button",
-                  "audio_type": 1,
+                  "audio_type": 2,
                   "max_simultaneous": 1,
                   "volume": 1.0,
                   "pitch": 1.0,
@@ -774,7 +774,7 @@
               ],
               "scale": [
                 334.0,
-                80.0
+                75.0
               ]
             },
             "Graphics_Component": {
