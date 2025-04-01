@@ -360,6 +360,15 @@ namespace lof {
         return VentDirection::NONE;
     }
 
+    bool is_fade_active() {
+        for (auto& system : ECSM.get_systems()) {
+            if (auto* gui_sys = dynamic_cast<GUI_System*>(system.get())) {
+
+                return gui_sys->is_fade_active();
+
+            }
+        }
+    }
 
     void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
         
@@ -434,10 +443,27 @@ namespace lof {
 
             if (is_in_vent) {
 
-                if (!GM.get_player_dead_state()) {
+                //if (!GM.get_player_dead_state()) {
+                //    ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
+                //    ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
+                //}
+
+                bool fade_active = is_fade_active();
+
+                if (!GM.get_player_dead_state() && !fade_active) {                 
                     ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                     ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
                 }
+
+                if (fade_active) {
+                            
+                    ADM.pause_group(GroupType::TYPE_BGM);
+                    ADM.pause_group(GroupType::TYPE_SFX);
+                    
+                    //ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
+                    //ADM.stop_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent out"));
+                }
+
                 is_in_vent = false;
             }
         }
@@ -1490,6 +1516,7 @@ namespace lof {
                 base_texture = "Settings_Batch_12";
             }
                 
+            audio.add_sound(main_menu_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
 
             //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();

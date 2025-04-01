@@ -117,6 +117,16 @@ namespace lof {
             GM.reset_timer();
         }
 
+        EntityID player = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        if (player != INVALID_ENTITY_ID) {
+
+            // Reset velocity
+            if (ecs_manager.has_component<Velocity_Component>(player)) {
+                auto& velocity = ecs_manager.get_component<Velocity_Component>(player);
+                velocity.velocity = Vec2D(0.0f, 0.0f);
+            }
+        }
+
         // Reset warning states
         LM.write_log("GUI_System::reset_all_game_state(): Resetting warning states...");
         warning_50_active = false;
@@ -134,22 +144,19 @@ namespace lof {
         LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
     }
 
+    static bool fade_complete = false;
 
     void GUI_System::update(float delta_time) {
+
+        if (fade_complete) {
+            ADM.resume_group(GroupType::TYPE_BGM);
+            ADM.resume_group(GroupType::TYPE_SFX);
+            fade_complete = false;
+        }
+        
         // Process any active fades first
         if (fade_active) {
-
-            //ADM.stop_groups(GroupType::TYPE_SFX);
-            ADM.pause_group(GroupType::TYPE_BGM);
-            ADM.pause_group(GroupType::TYPE_SFX);
-
-            bool fade_complete = update_screen_fade(delta_time);
-
-            if (fade_complete) {
-                ADM.resume_group(GroupType::TYPE_BGM);
-                ADM.resume_group(GroupType::TYPE_SFX);
-            }
-
+            fade_complete = update_screen_fade(delta_time);
             // If fade is still active and not complete, we still want to process other updates
             // but with this flag we know a fade is in progress
         }
@@ -1370,6 +1377,7 @@ void GUI_System::hide_wormhole_gui() {
             std::string base_texture;
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
+            audio.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 5, 1.0, 1.0, false, true, false);
 
             if (entity_name == "resume_button") {
                 base_texture = "Resume_Batch_14";
@@ -1401,6 +1409,7 @@ void GUI_System::hide_wormhole_gui() {
 
                     // Handle the actual button click
                     if (entity_name == "resume_button") {
+                        ADM.play_now(entity_id, click_sound, audio);
                         GM.set_paused(false);
                         hide_pause_menu();
                     }
@@ -1507,6 +1516,8 @@ void GUI_System::hide_wormhole_gui() {
             LM.write_log("Added overlay to GUI system: %u", overlay);
         }
 
+        std::string click_sound = "main_menu";
+
         // Create Restart button
         EntityID restart_button = ecs_manager.clone_entity_from_prefab("gui_container", "restart_button");
         if (restart_button != INVALID_ENTITY_ID) {
@@ -1531,6 +1542,7 @@ void GUI_System::hide_wormhole_gui() {
             if (!ecs_manager.has_component<Audio_Component>(restart_button)) {
                 Audio_Component audio_comp;
                 audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+                audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(restart_button, audio_comp);
             }
 
@@ -1565,6 +1577,7 @@ void GUI_System::hide_wormhole_gui() {
             if (!ecs_manager.has_component<Audio_Component>(main_menu_button)) {
                 Audio_Component audio_comp;
                 audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+                audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(main_menu_button, audio_comp);
             }
 
@@ -1748,7 +1761,7 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Set player dead false
                         GM.set_player_dead_state(false);
-
+                        
                         // Hide game over menu
                         hide_game_over_menu();
                         
@@ -1765,7 +1778,7 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Set player dead false
                         GM.set_player_dead_state(false);
-
+    
                         // Hide game over menu
                         hide_game_over_menu();
 
@@ -1840,6 +1853,9 @@ void GUI_System::hide_wormhole_gui() {
         destination_scene = dest_scene;
         destination_scene_number = dest_scene_num;
 
+        ADM.stop_groups(GroupType::TYPE_BGM);
+        ADM.stop_groups(GroupType::TYPE_SFX);
+        
         // Set initial opacity based on fade direction
         EntityID fade_entity = ecs_manager.find_entity_by_name(fade_overlay_name);
         if (fade_entity != INVALID_ENTITY_ID && ecs_manager.has_component<Graphics_Component>(fade_entity)) {
