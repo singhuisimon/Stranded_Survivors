@@ -31,6 +31,8 @@ namespace lof {
         player_id = 0;
         mining_strength = DEFAULT_STRENGTH;
         mining_cooldown = MINING_COOLDOWN_TIMER;
+
+        popup_entity_id = ECSM.find_entity_by_name("mineral_popup");
     }
 
     std::string Mining_Script::get_type() const {
@@ -82,7 +84,9 @@ namespace lof {
             //update mineral popups
            // try {
 
-                mining_script->update_mineral_popups(FPSM.get_delta_time());
+
+                   // COMMENT 
+                    mining_script->update_mineral_popups(FPSM.get_delta_time());
 
            // }
            // catch (const std::exception& e) {
@@ -761,18 +765,30 @@ namespace lof {
 
         if (mineral_value <= 0) return; 
 
-        //find the popup id 
+            //get the popup id again
             popup_entity_id = ECSM.find_entity_by_name("mineral_popup");
+
             if (popup_entity_id == INVALID_ENTITY_ID) {
                 LM.write_log("Warning: Could not find 'mineral_pop' entity");
                 return;
             
-        }
+            }
+            std::cout << "Popup_EntityID: " << popup_entity_id << std::endl;
 
         //update position
         auto& transform = ECSM.get_component<Transform2D>(popup_entity_id);
         transform.position = position;
 
+        float screen_width = static_cast<float>(SM.get_scr_width());
+        float screen_height = static_cast<float>(SM.get_scr_height());
+        
+        EntityID player = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        auto& player_transform = ECSM.get_component<Transform2D>(player);
+
+
+
+        transform.position.y = player_transform.position.y - transform.position.y; 
+        // transform.position.x = player_transform.position.x - transform.position.x;
 
         //update text 
         auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);
@@ -790,33 +806,12 @@ namespace lof {
     }
 
     void Mining_Script::update_mineral_popups(float delta_time) {
-       
-        //if (!popup_active || popup_entity_id == INVALID_ENTITY_ID) {
-        //    return;
-        //}
-
-        ////decrease the timer
-        //popup_timer -= delta_time;
-
-        ////hide popup when the timer expires
-        //if (popup_timer <= 0.0f) {
-        //    popup_active = false;
-
-        //    //set text to empty
-        //    auto& text_comp = ECSM.get_component<Text_Component>("mineral_popup");
-        //       text_comp.text = ""; //clear text
-        //   
-
-        //   LM.write_log("Hidden mineral popup");
-
-        //}
-
-        // Only update if popup is active
-
 
         if (!popup_active || popup_entity_id == INVALID_ENTITY_ID) {
             return;
         }
+        //get the entity id again 
+        popup_entity_id = ECSM.find_entity_by_name("mineral_popup");
 
         // Ensure entity still exists
         if (!ECSM.get_entity(popup_entity_id)) {
@@ -842,8 +837,6 @@ namespace lof {
             popup_active = false;
 
             try {
-                // Move popup off-screen
-                //transform.position = Vec2D(-10000.0f, -10000.0f); // Move far off-screen
 
                 auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);
                 text_comp.text = ""; // Clear text
