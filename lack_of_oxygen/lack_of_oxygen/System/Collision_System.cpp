@@ -1342,8 +1342,8 @@ namespace lof {
                 physics1.set_has_jumped(false);  // Reset jump state
                 physics1.reset_jump_request();    // Reset any pending jump request
 
-                // Reset jump-related forces
-                physics1.force_helper.deactivate_force(JUMP_UP);
+                // Reset jump-related forces this might be why there is a lag on the jump
+               // physics1.force_helper.deactivate_force(JUMP_UP);
             }
             else {
                 // Side collisions (LEFT/RIGHT)
