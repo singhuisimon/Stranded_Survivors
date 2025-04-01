@@ -146,6 +146,10 @@ namespace lof {
 
 		bool key_y_last_frame = false; // for tunnel
 		bool key_y_pressed = false;
+
+
+		bool key_u_last_frame = false;
+		bool key_u_pressed = false;
 		
 		float teleport_cooldown = 0.5f;
 		float last_teleport_time = -teleport_cooldown;

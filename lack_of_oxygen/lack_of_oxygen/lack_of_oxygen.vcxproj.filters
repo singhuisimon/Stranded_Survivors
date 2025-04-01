@@ -53,6 +53,7 @@
     <ClCompile Include="Scripts\Tutorial_Script.cpp" />
     <ClCompile Include="Scripts\Tutorial_Lights_Script.cpp" />
     <ClCompile Include="Scripts\Player_Tutorial_Script.cpp" />
+    <ClCompile Include="Scripts\Mini_Map_Script.cpp" />
     <ClCompile Include="Scripts\Sound_Setting_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +108,7 @@
     <ClInclude Include="Scripts\Tutorial_Script.h" />
     <ClInclude Include="Scripts\Tutorial_Lights_Script.h" />
     <ClInclude Include="Scripts\Player_Tutorial_Script.h" />
+    <ClInclude Include="Scripts\Mini_Map_Script.h" />
     <ClInclude Include="Scripts\Sound_Setting_Script.h" />
   </ItemGroup>
   <ItemGroup>

@@ -56,6 +56,7 @@
     <ClCompile Include="Manager\Serialization_Manager.cpp" />
     <ClCompile Include="Scripts\Cloud_Script.cpp" />
     <ClCompile Include="Scripts\Mining_Script.cpp" />
+    <ClCompile Include="Scripts\Mini_Map_Script.cpp" />
     <ClCompile Include="Scripts\Object_Moving_Script.cpp" />
     <ClCompile Include="Scripts\Player_Script.cpp" />
     <ClCompile Include="Scripts\Sound_Setting_Script.cpp" />
@@ -105,6 +106,7 @@
     <ClInclude Include="Manager\Manager.h" />
     <ClInclude Include="Scripts\Cloud_Script.h" />
     <ClInclude Include="Scripts\Mining_Script.h" />
+    <ClInclude Include="Scripts\Mini_Map_Script.h" />
     <ClInclude Include="Scripts\Object_Moving_Script.h" />
     <ClInclude Include="Scripts\Player_Script.h" />
     <ClInclude Include="Scripts\Player_Tutorial_Script.h" />

@@ -117,6 +117,16 @@ namespace lof {
             GM.reset_timer();
         }
 
+        EntityID player = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        if (player != INVALID_ENTITY_ID) {
+
+            // Reset velocity
+            if (ecs_manager.has_component<Velocity_Component>(player)) {
+                auto& velocity = ecs_manager.get_component<Velocity_Component>(player);
+                velocity.velocity = Vec2D(0.0f, 0.0f);
+            }
+        }
+
         // Reset warning states
         LM.write_log("GUI_System::reset_all_game_state(): Resetting warning states...");
         warning_50_active = false;

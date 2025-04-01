@@ -47,6 +47,10 @@ namespace lof {
 
         key_y_last_frame = false;
         key_y_pressed = false;
+
+        key_u_last_frame = false;
+        key_u_pressed = false;
+
     }
 
     std::string Player_Script::get_type() const {
@@ -117,6 +121,8 @@ namespace lof {
         key_y_last_frame = key_y_pressed;
         key_y_pressed = IM.is_key_held(GLFW_KEY_Y); //cheap code for teleport
 
+        key_u_last_frame = key_u_pressed;
+        key_u_pressed = IM.is_key_held(GLFW_KEY_U); //cheap code for teleport
 
     }
 
@@ -145,6 +151,10 @@ namespace lof {
         else if (key == GLFW_KEY_Y)
         {
             return key_y_pressed && !key_y_last_frame;
+        }
+        else if (key == GLFW_KEY_U)
+        {
+            return key_u_pressed && !key_u_last_frame;
         }
         return false;
     }
@@ -455,6 +465,10 @@ namespace lof {
         else if (is_key_just_pressed(GLFW_KEY_Y))
         {
             Cheap_Code_Teleport_Wormhole(-741.0f, -7302.0f);
+        }
+        else if (is_key_just_pressed(GLFW_KEY_U))
+        {
+            Cheap_Code_Teleport_Wormhole(0.0f, -102.0f);
         }
     }
 

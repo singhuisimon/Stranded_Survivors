@@ -444,15 +444,24 @@ namespace lof {
                     float total_width = RIGHT_BOUND - LEFT_BOUND;
                     float tile_width = total_width / current_level.cols;
                     float tile_height = tile_width; // Keep tiles square
+                    float total_height = current_level.rows * tile_height;
+
+                    //float START_Y_test = -(current_level.rows * tile_height) / 2.0f;
+                    //float START_Y_test = (total_height / 2.0f);
+                    //std::cout << "start_y: " << START_Y_test << "\n";
 
                     // Set the start Y position (top of the map)
+
                     float START_Y = -150.0f;
 
                     // Calculate the bottom of the level (where the last row of tiles ends)
-                    float level_bottom = START_Y - (current_level.rows * tile_height);
-
+                    float level_bottom = START_Y - (current_level.rows * tile_height); //-7734
+                    //std::cout << "level_bottom in sm: " <<  level_bottom << "\n";
+                    //std::cout << current_level.rows << "\n";
                     // Place lava pool 27 tiles below the bottom of the level
-                    float lava_pool_y = level_bottom - (27 * tile_height);
+                    float lava_pool_y = level_bottom - (27 * tile_height); // -7734 - (27 *96) = -10326
+                    //float lava_pool_y_test = level_bottom - (1080/2); //-8274
+                    //std::cout << lava_pool_y_test << "\n";
 
                     // Create the lava pool entity
                     EntityID lava_pool_id = ECSM.create_entity("lava_pool");
