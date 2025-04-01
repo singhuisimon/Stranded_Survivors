@@ -1548,56 +1548,17 @@ namespace lof {
                         LM.write_log("Play button held - starting fade transition to tutorial");
 
                         // Find GUI System to start the fade transition
-                        //for (auto& system : ECSM.get_systems()) {
-                        //    if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
-                        //        // Start fade transition to tutorial
-                        //        gui_system->start_screen_fade(true, "tutorial.scn", 5);
-                        //        break;
-                        //    }
-                        //}
-
-                        //// Mark as transitioning (prevents multiple clicks)
-                        //is_transitioning = true;
-                        //current_cooldown = transition_cooldown;
-
-                        // Clear dynamic entities first
-                        bool found_movement_system = false;
                         for (auto& system : ECSM.get_systems()) {
-                            if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                                movement_system->clear_dynamic_entities();
-                                found_movement_system = true;
-                                LM.write_log("Found and cleared Movement System");
+                            if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
+                                // Start fade transition to tutorial
+                                gui_system->start_screen_fade(true, "tutorial.scn", 5);
                                 break;
                             }
                         }
-                        if (!found_movement_system) {
-                            LM.write_log("Warning: Movement System not found");
-                        }
 
-                        const std::string SCENES = "Scenes";
-                        std::string scene_file = "tutorial.scn";
-                        std::string scene_path = ASM.get_full_path(SCENES, scene_file);
-
-                        if (SM.load_scene(scene_path.c_str())) {
-                            LM.write_log("tutorial scene loaded successfully");
-
-                            // Reset camera position - add this section
-                            auto& camera = GFXM.get_camera();
-                            camera.pos_x = DEFAULT_CAMERA_POS_X;
-                            camera.pos_y = DEFAULT_CAMERA_POS_Y;
-
-                            // Stop all currently playing audio
-                            //ADM.stop_mastergroup();
-
-                            // Update current scene and IMGUI
-                            GM.set_current_scene(6);
-                            IMGUIM.set_current_file_shown(scene_file);
-                            is_transitioning = true;
-                            return;
-                        }
-                        else {
-                            LM.write_log("Failed to load tutorial scene: %s", scene_path.c_str());
-                        }
+                        // Mark as transitioning (prevents multiple clicks)
+                        is_transitioning = true;
+                        current_cooldown = transition_cooldown;
                         return;
                     }
                     else if (entity_name == "setting_button") {
