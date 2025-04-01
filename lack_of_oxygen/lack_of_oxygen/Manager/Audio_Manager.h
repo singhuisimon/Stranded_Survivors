@@ -250,9 +250,9 @@ namespace lof {
 		bool get_new_scene();
 
 		void debug_group_sound() {
-			std::cout << "Mastergroup " << get_group_volume(GroupType::TYPE_MASTER) << std::endl;
+			/*std::cout << "Mastergroup " << get_group_volume(GroupType::TYPE_MASTER) << std::endl;
 			std::cout << "BGM group " << get_group_volume(GroupType::TYPE_BGM) << std::endl;
-			std::cout << "SFX group " << get_group_volume(GroupType::TYPE_SFX) << std::endl;
+			std::cout << "SFX group " << get_group_volume(GroupType::TYPE_SFX) << std::endl;*/
 		}
 
 	private:

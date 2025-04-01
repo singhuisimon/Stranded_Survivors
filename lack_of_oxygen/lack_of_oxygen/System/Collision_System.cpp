@@ -1463,10 +1463,10 @@ namespace lof {
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
         //Ensure world_mouse_pos is in terms of viewport in level editor
-        if (level_editor_mode) {
+        /*if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
-        }
+        }*/
 
         for (EntityID entity_id : get_entities()) {
             auto* entity = ECSM.get_entity(entity_id);
@@ -1519,12 +1519,12 @@ namespace lof {
             audio.add_sound(main_menu_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
 
             //Update button batch textures in the level editor
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
@@ -1595,7 +1595,7 @@ namespace lof {
 
                             // Update current scene and IMGUI
                             GM.set_current_scene(6);
-                            IMGUIM.set_current_file_shown(scene_file);
+                            //IMGUIM.set_current_file_shown(scene_file);
                             is_transitioning = true;
                             return;
                         }
@@ -1656,8 +1656,8 @@ namespace lof {
 
         //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
-            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
-            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
+            //world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
+            //world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
         }
 
         for (EntityID entity_id : get_entities()) {
@@ -1690,12 +1690,12 @@ namespace lof {
             std::string click_sound = "main_menu";
 
             //Update button batch textures in the level editor
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
@@ -1741,7 +1741,7 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
+                        //IMGUIM.set_current_file_shown(scene_file);
                         current_cooldown = transition_cooldown;  // Set the cooldown timer
                         is_transitioning = true;
                         return;
@@ -1777,8 +1777,8 @@ namespace lof {
 
         //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
-            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
-            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
+            //world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
+            //world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
         }
 
         for (EntityID entity_id : get_entities()) {
@@ -1819,12 +1819,12 @@ namespace lof {
             std::string click_sound = "main_menu";
 
             //Update button batch textures in the level editor
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
+           // auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {

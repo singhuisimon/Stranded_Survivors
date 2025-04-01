@@ -1076,7 +1076,7 @@ namespace lof {
             wormhole_e_prompt_animation_timer = 0.0f;
         }
 
-        std::cout << "update the position for x_axis " << wormhole_e_prompt_x << "\n";
+       // std::cout << "update the position for x_axis " << wormhole_e_prompt_x << "\n";
     }
 
 #endif
@@ -1951,7 +1951,7 @@ void GUI_System::hide_wormhole_gui() {
                     GM.set_current_scene(loaded_scene_number);
 
                     // Update IMGUI Manager's current file
-                    IMGUIM.set_current_file_shown(loaded_scene);
+                    //IMGUIM.set_current_file_shown(loaded_scene);
 
                     // Reset panic for gameplay
                     GM.reset_panic();
@@ -2115,7 +2115,7 @@ void GUI_System::hide_wormhole_gui() {
             GM.set_current_scene(scene_num);
 
             // Update IMGUI Manager's current file
-            IMGUIM.set_current_file_shown(scene_file);
+            //IMGUIM.set_current_file_shown(scene_file);
 
             // Reset player position if it exists
             EntityID playerId = ecs_manager.find_entity_by_name(DEFAULT_PLAYER_NAME);

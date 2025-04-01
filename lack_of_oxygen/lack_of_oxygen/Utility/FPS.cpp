@@ -53,7 +53,7 @@ namespace lof {
     void system_performance(int64_t gm_time, int64_t system_time, std::string name) {
 
         if (gm_time == 0) {
-            ImGui::Text("%s : N/A\n", name.c_str());
+            //ImGui::Text("%s : N/A\n", name.c_str());
         }
         else {
 
@@ -61,7 +61,7 @@ namespace lof {
             float percent = static_cast<float>(system_time) / static_cast<float>(gm_time) * UPON_PERCENTAGE;
 
             //Prints calculated value for system in IMGUI window
-            ImGui::Text("%s : %.3f%%\n", name.c_str(), percent);
+           // ImGui::Text("%s : %.3f%%\n", name.c_str(), percent);
         }
 
     }

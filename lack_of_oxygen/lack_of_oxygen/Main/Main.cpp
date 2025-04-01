@@ -96,12 +96,12 @@ int main(void) {
     // --------------------------- Create GLFW Window ---------------------------
 
     // Create a windowed mode window and its OpenGL context using default values
-    //window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Lack Of Oxygen", NULL, NULL);
 
 
     // Create a fullscreen window
     // Change to windowed mode window and its OpenGL context using NULL for fourth option
-    window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
+    //window = glfwCreateWindow(mode->width, mode->height, "Lack of Oxygen", monitor, NULL);
     glfwSetWindowAttrib(window, GLFW_RESIZABLE, GLFW_FALSE);
 
     if (!window) {
@@ -112,7 +112,7 @@ int main(void) {
     }
     else {
         LM.write_log("GLFW window created successfully with size %ux%u.", mode->width, mode->height);
-        std::cout << "GLFW window created successfully with size 800x600." << std::endl;
+        //std::cout << "GLFW window created successfully with size 800x600." << std::endl;
     }
 
     // register the drop call function 
@@ -135,7 +135,7 @@ int main(void) {
     }
     else {
         LM.write_log("GLAD initialized successfully.");
-        std::cout << "GLAD initialized successfully." << std::endl;
+        //std::cout << "GLAD initialized successfully." << std::endl;
     }
 
 
@@ -157,22 +157,22 @@ int main(void) {
     }
     else {
         LM.write_log("Game_Manager started up successfully.");
-        std::cout << "Game_Manager started up successfully." << std::endl;
+        //std::cout << "Game_Manager started up successfully." << std::endl;
     }
 
     // --------------------------- Start IMGUI_Manager ---------------------------
 
-    IMGUIM.start_up(window);
-    IMGUIM.init_buttons_and_batches();
+    //IMGUIM.start_up(window);
+    //IMGUIM.init_buttons_and_batches();
 
     //gets a reference to ImGui's IO structure
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+//    ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     //IMGUI configuration
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
     // Flag to prevent multiple key presses for cloning
     bool tab_key_was_pressed_last_frame = false;
@@ -187,9 +187,9 @@ int main(void) {
     // Log the configuration values
     LM.write_log("Configuration Values - SCR_WIDTH: %u, SCR_HEIGHT: %u, FPS_DISPLAY_INTERVAL: %.2f",
         SCR_WIDTH, SCR_HEIGHT, FPS_DISPLAY_INTERVAL);
-    std::cout << "Configuration Values - SCR_WIDTH: " << SCR_WIDTH
+   /* std::cout << "Configuration Values - SCR_WIDTH: " << SCR_WIDTH
         << ", SCR_HEIGHT: " << SCR_HEIGHT
-        << ", FPS_DISPLAY_INTERVAL: " << FPS_DISPLAY_INTERVAL << std::endl;
+        << ", FPS_DISPLAY_INTERVAL: " << FPS_DISPLAY_INTERVAL << std::endl;*/
 
     // -------------------------- Game Loop Setup --------------------------
 
@@ -198,7 +198,7 @@ int main(void) {
     float fps_timer = 0.0f;
 
     LM.write_log("Entering main game loop.");
-    std::cout << "Entering main game loop." << std::endl;
+    //std::cout << "Entering main game loop." << std::endl;
 
     // Game loop
     while (!glfwWindowShouldClose(window) && !GM.get_game_over()) {
@@ -236,16 +236,16 @@ int main(void) {
         glfwPollEvents();
 
         bool is_TAB_pressed = IM.is_key_held(GLFW_KEY_TAB);
-        if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
-            level_editor_mode = !level_editor_mode;
-        }
+        //if (IM.is_key_pressed(GLFW_KEY_TAB) && !tab_key_was_pressed_last_frame) {
+        //    level_editor_mode = !level_editor_mode;
+        //}
         tab_key_was_pressed_last_frame = is_TAB_pressed;
 
     
         bool is_ENTER_pressed = IM.is_key_held(GLFW_KEY_ENTER);
         if (IM.is_key_pressed(GLFW_KEY_ENTER) && !enter_key_was_pressed_last_frame) {
             WC.toggle_fullscreen(window, monitor, mode, is_full_screen, SCR_WIDTH, SCR_HEIGHT);
-            std::cout << WC.get_win_height() << "enter is pressed" << std::endl;
+            //std::cout << WC.get_win_height() << "enter is pressed" << std::endl;
         }
         enter_key_was_pressed_last_frame = is_ENTER_pressed;
 
@@ -261,20 +261,20 @@ int main(void) {
         GM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
 
         // Start the Dear ImGui frame
-        IMGUIM.start_frame();
+        //IMGUIM.start_frame();
 
 #ifndef NDEBUG
-        ImGui::Begin("Performance Viewer");
+        //ImGui::Begin("Performance Viewer");
 
         //Dispalys the % of the manager and system's time in the game loop in an IMGUI window
         system_performance(GM.get_time(), IM.get_time(), IM.get_type());
         system_performance(GM.get_time(), ECSM.get_time(), ECSM.get_type());
-        ImGui::Separator();
-        ImGui::Text("In ECS Manager: \n");
+        //ImGui::Separator();
+        //ImGui::Text("In ECS Manager: \n");
         for (auto& system : ECSM.get_systems()) {
             system_performance(GM.get_time(), system->get_time(), system->get_type());
         }
-        ImGui::End();
+        //ImGui::End();
 
 #endif
 
@@ -282,10 +282,10 @@ int main(void) {
         if (level_editor_mode) {
 
             //Renders UI and functionalities
-            IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
+            //IMGUIM.render_ui(WC.get_win_width(), WC.get_win_height());
 
             //Ensures in game GUI is disabled when in level editor
-            IMGUIM.disable_GUI();
+            //IMGUIM.disable_GUI();
         } 
         else if (game_playing == false) {
             
@@ -294,13 +294,13 @@ int main(void) {
         }
 
         // Rendering IMGUI
-        IMGUIM.render();
+        //IMGUIM.render();
 
         // Check for game_over and set window should close flag
         if (GM.get_game_over()) {
             glfwSetWindowShouldClose(window, true);
             LM.write_log("Main Loop: game_over is true. Setting GLFW window to close.");
-            std::cout << "Main Loop: game_over is true. Setting GLFW window to close." << std::endl;
+            //std::cout << "Main Loop: game_over is true. Setting GLFW window to close." << std::endl;
         }
 
         // Swap front and back buffers
@@ -309,42 +309,42 @@ int main(void) {
         // End of frame timing and FPS control
         FPSM.frame_end();
 
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+       /* if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             GLFWwindow* backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
-        }
+        }*/
 
     }
 
     //Shuts down IMGUI
-    IMGUIM.shut_down();
+    //IMGUIM.shut_down();
 
     glfwDestroyWindow(window);
     glfwTerminate();
 
     LM.write_log("Exiting main game loop.");
-    std::cout << "Exiting main game loop." << std::endl;
+    //std::cout << "Exiting main game loop." << std::endl;
 
     // --------------------------- Shutdown Sequence ---------------------------
 
     // Shutdown the Game_Manager (which shuts down all other managers)
     GM.shut_down();
     LM.write_log("Game_Manager shut down successfully.");
-    std::cout << "Game_Manager shut down successfully." << std::endl;
+    //std::cout << "Game_Manager shut down successfully." << std::endl;
 
     // Destroy the window
     glfwDestroyWindow(window);
-    std::cout << "GLFW window destroyed." << std::endl;
+    //std::cout << "GLFW window destroyed." << std::endl;
 
     // Terminate GLFW
     glfwTerminate();
-    std::cout << "GLFW terminated." << std::endl;
+    //std::cout << "GLFW terminated." << std::endl;
 
     // Application exit
-    std::cout << "Application exited successfully." << std::endl;
+    //std::cout << "Application exited successfully." << std::endl;
 
 
     return 0;

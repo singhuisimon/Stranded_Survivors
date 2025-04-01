@@ -127,9 +127,9 @@ namespace lof
         if (level_editor_mode)
         {
 
-            ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
-            isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
-            g_selected_entity_info.mousePos = mousePos;
+            //ImVec2 mousePos = IMGUIM.imgui_mouse_pos(); // for imgui
+            //isSelected = Mouse_Over_AABB(entityX, entityY, entityWidth, entityHeight, mousePos.x, mousePos.y);
+            //g_selected_entity_info.mousePos = mousePos;
         }
         else
         {

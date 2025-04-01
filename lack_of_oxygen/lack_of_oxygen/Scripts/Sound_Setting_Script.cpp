@@ -92,10 +92,10 @@ namespace lof {
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
         //Ensure world_mouse_pos is in terms of viewport in level editor
-        if (level_editor_mode) {
+        /*if (level_editor_mode) {
             world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
             world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
-        }
+        }*/
 
         std::vector<EntityID> buttons = { master_minus_id, master_plus_id, bgm_minus_id, bgm_plus_id, sfx_minus_id, sfx_plus_id };
 
@@ -260,8 +260,8 @@ namespace lof {
 
         //Ensure world_mouse_pos is in terms of viewport in level editor
         if (level_editor_mode) {
-            world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
-            world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
+            //world_mouse_pos.x = IMGUIM.imgui_mouse_pos().x;
+            //world_mouse_pos.y = IMGUIM.imgui_mouse_pos().y;
         }
 
         std::string entity_name = ECSM.get_entity(entity_id)->get_name();
@@ -291,12 +291,12 @@ namespace lof {
             std::string click_sound = "main_menu";
 
             //Update button batch textures in the level editor
-            auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
-            for (auto& base_textures : buttons_and_associated_batches) {
+            //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
+            /*for (auto& base_textures : buttons_and_associated_batches) {
                 if (entity_name == base_textures.first) {
                     base_texture = base_textures.second;
                 }
-            }
+            }*/
 
             if (is_hovered) {
                 if (!button_hover_states[entity_name]) {
@@ -343,7 +343,7 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
+                        //IMGUIM.set_current_file_shown(scene_file);
                         return;
                     }
                     else {

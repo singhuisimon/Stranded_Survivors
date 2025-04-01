@@ -103,7 +103,7 @@ namespace lof {
 
     void Tutorial_Script::set_tutorial_page(int new_page_num) {
         if (new_page_num < 1 || new_page_num > 10) {
-            std::cout << "return due to invalid page number0" << std::endl;
+            //std::cout << "return due to invalid page number0" << std::endl;
             LM.write_log("Invalid tutorial page %d", new_page_num);
             return;
         }
@@ -114,7 +114,7 @@ namespace lof {
         EntityID tutorial_text_id = ECSM.find_entity_by_name("tutorial_background_text");
         auto& tutorial_text_graphic = ECSM.get_component<Graphics_Component>(tutorial_text_id);
         tutorial_text_graphic.texture_name = "Tutorial_Text_" + std::to_string(tutorial_page);
-        std::cout << tutorial_text_graphic.texture_name << std::endl;
+        //std::cout << tutorial_text_graphic.texture_name << std::endl;
     }
 
     void Tutorial_Script::update_button_visibility(EntityID entity_id, Graphics_Component& graphic_comp) {
@@ -365,7 +365,7 @@ namespace lof {
                 GM.set_current_scene(2);
 
                 // Update IMGUI Manager's current file
-                IMGUIM.set_current_file_shown(scene_file);
+                //IMGUIM.set_current_file_shown(scene_file);
                 return;
             }
             else {

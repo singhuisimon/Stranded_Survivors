@@ -453,7 +453,7 @@ namespace lof {
 
             if (it != sounds.end()) {
                 sounds.erase(it); // Erase the found element
-                std::cout << "erase the key " << key << std::endl;
+                //std::cout << "erase the key " << key << std::endl;
             }
         }
 

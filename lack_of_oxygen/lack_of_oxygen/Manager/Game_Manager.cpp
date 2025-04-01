@@ -158,7 +158,7 @@ namespace lof {
 
         m_is_started = true;
         LM.write_log("Game_Manager::start_up(): Game_Manager started");
-        std::cout << "Game_Manager started successfully." << std::endl;
+        //std::cout << "Game_Manager started successfully." << std::endl;
 
         return 0;
     }
@@ -180,7 +180,7 @@ namespace lof {
         //ASM.shut_down();  //Assets_Manager
 
         m_is_started = false;
-        std::cout << "Game_Manager shut down successfully." << std::endl;
+        //std::cout << "Game_Manager shut down successfully." << std::endl;
     }
 
     EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info(); // for imgui
@@ -723,24 +723,24 @@ namespace lof {
 
         // Check if the left mouse button was pressed
         //EntityInfo& selectedEntityInfo = ESS.get_selected_entity_info();
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        //if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
 
-            if (selectedEntityInfo.isSelected) {
-                select_entity = true;
-                selectedID = selectedEntityInfo.selectedEntity;
+        //    if (selectedEntityInfo.isSelected) {
+        //        //select_entity = true;
+        //        selectedID = selectedEntityInfo.selectedEntity;
 
-            /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
-                std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
-                std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
-                LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
+        //    /*    std::cout << "Selected Entity ID : " << selectedEntityInfo.selectedEntity << "\n";
+        //        std::cout << "mouse position x: " << selectedEntityInfo.mousePos.x << " ,mouse position y: " << selectedEntityInfo.mousePos.y << "\n";
+        //        std::cout << "bool if is selected (1 is selected, 0 is not): " << selectedEntityInfo.isSelected << "\n";
+        //        LM.write_log("Selected Entity ID system: %d", selectedEntityInfo.selectedEntity);*/
 
-            }
-            else {
-                select_entity = false;
-                selectedID = static_cast<EntityID>(-1);
+        //    }
+        //    else {
+        //        //select_entity = false;
+        //        selectedID = static_cast<EntityID>(-1);
 
-            }
-        }
+        //    }
+        //}
 
         
         if (level_editor_mode && selectedID != -1 && selectedID < ECSM.get_entities().size())
@@ -813,7 +813,7 @@ namespace lof {
         }
         // -------------------------imgui to scale or rotate the selected entities--------------------------------------//
 #endif
-        if (IM.is_key_pressed(GLFW_KEY_TAB)) {
+        /*if (IM.is_key_pressed(GLFW_KEY_TAB)) {
             auto& camera = GFXM.get_camera();
             if (camera.is_free_cam == GL_FALSE) {
                 camera.is_free_cam = GL_TRUE;
@@ -829,7 +829,7 @@ namespace lof {
             else {
                 editor_mode = 1;
             }
-        }
+        }*/
 
         // Camera up-down scrolling when I or K pressed
         if (IM.is_key_held(GLFW_KEY_I) && !(IM.is_key_held(GLFW_KEY_K))) {
@@ -986,7 +986,7 @@ namespace lof {
                 }
             }
 
-            IMGUIM.set_current_file_shown(scene_file);
+            //IMGUIM.set_current_file_shown(scene_file);
         }
 
 
@@ -1012,7 +1012,7 @@ namespace lof {
         // Update game world state
         ECSM.update(delta_time);
 
-        IMGUIM.update_buttons_and_batches();
+        //IMGUIM.update_buttons_and_batches();
 
         end_time = std::chrono::steady_clock::now();
         ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
@@ -1024,7 +1024,7 @@ namespace lof {
     void Game_Manager::set_game_over(bool new_game_over) {
         m_game_over = new_game_over;
         LM.write_log("Game_Manager::set_game_over(): game_over set to %s", new_game_over ? "true" : "false");
-        std::cout << "Game_Manager::set_game_over(): game_over set to " << (new_game_over ? "true" : "false") << std::endl;
+        //std::cout << "Game_Manager::set_game_over(): game_over set to " << (new_game_over ? "true" : "false") << std::endl;
     }
 
     bool Game_Manager::get_game_over() const {

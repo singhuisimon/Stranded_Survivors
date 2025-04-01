@@ -744,22 +744,22 @@ namespace lof {
 		float max_dist = 0.0f;
 		channel->get3DMinMaxDistance(&min_dist, &max_dist);
 
-		std::cout << "========== Audio Debug Info ==========\n";
+		/*std::cout << "========== Audio Debug Info ==========\n";
 		std::cout << "Listener Position: (" << listener_pos.x << ", " << listener_pos.y << ", " << listener_pos.z << ")\n";
 		std::cout << "Sound Position: (" << sound_pos.x << ", " << sound_pos.y << ", " << sound_pos.z << ")\n";
 		std::cout << "Distance: " << distance << "\n";
-		std::cout << "Min Distance: " << min_dist << " | Max Distance: " << max_dist << "\n";
+		std::cout << "Min Distance: " << min_dist << " | Max Distance: " << max_dist << "\n";*/
 
 		if (distance < min_dist) {
-			std::cout << "Status: Listener is inside the min distance (full volume).\n";
+			//std::cout << "Status: Listener is inside the min distance (full volume).\n";
 		}
 		else if (distance > max_dist) {
-			std::cout << "Status: Listener is outside the max distance (sound should be silent).\n";
+			//std::cout << "Status: Listener is outside the max distance (sound should be silent).\n";
 		}
 		else {
-			std::cout << "Status: Listener is within range (volume attenuating based on distance).\n";
+			//std::cout << "Status: Listener is within range (volume attenuating based on distance).\n";
 		}
-		std::cout << "======================================\n";
+		//std::cout << "======================================\n";
 	}
 
 }
