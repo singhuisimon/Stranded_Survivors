@@ -139,7 +139,7 @@
                   "filepath": "sfx_button_hover",
                   "audio_type": 1,
                   "max_simultaneous": 1,
-                  "volume": 1.0,
+                  "volume": 0.7,
                   "pitch": 1.0,
                   "islooping": false,
                   "isactive": true,

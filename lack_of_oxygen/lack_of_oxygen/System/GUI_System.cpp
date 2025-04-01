@@ -1201,7 +1201,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
-            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 0.7, 1.0, false, true, false);
             ecs_manager.add_component(resume_button, audio_comp);
 
             pause_menu_entities["resume"] = resume_button;
@@ -1222,7 +1222,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
-            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 0.7, 1.0, false, true, false);
             ecs_manager.add_component(restart_button, audio_comp);
 
             pause_menu_entities["restart"] = restart_button;
@@ -1243,7 +1243,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
-            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 0.7, 1.0, false, true, false);
             ecs_manager.add_component(main_menu_button, audio_comp);
 
             pause_menu_entities["main_menu"] = main_menu_button;
@@ -1541,7 +1541,7 @@ void GUI_System::hide_wormhole_gui() {
             // Add Audio Component
             if (!ecs_manager.has_component<Audio_Component>(restart_button)) {
                 Audio_Component audio_comp;
-                audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+                audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 0.7, 1.0, false, true, false);
                 audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(restart_button, audio_comp);
             }
@@ -1576,7 +1576,7 @@ void GUI_System::hide_wormhole_gui() {
             // Add Audio Component
             if (!ecs_manager.has_component<Audio_Component>(main_menu_button)) {
                 Audio_Component audio_comp;
-                audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+                audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 0.7, 1.0, false, true, false);
                 audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(main_menu_button, audio_comp);
             }
