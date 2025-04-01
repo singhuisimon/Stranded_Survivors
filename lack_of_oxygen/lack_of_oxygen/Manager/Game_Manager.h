@@ -77,7 +77,7 @@ namespace lof {
         float panic_decrease_amount = 5.0f; //amount to decrease panic every 1 sec
         float panic_timer_decrease_delay = 1.0f; //delay between panic decreases
 
-        float oxygen_drain_rate = 1.0f;     // Drain 5% per second
+        float oxygen_drain_rate = 0.75f;     // Drain 5% per second
         float oxygen_update_timer = 0.0f;   // Track time for updates
         int timer_remaining = 300; // or any desired starting value
 

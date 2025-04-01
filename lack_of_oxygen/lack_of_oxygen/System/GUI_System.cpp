@@ -1313,6 +1313,9 @@ void GUI_System::hide_wormhole_gui() {
         // Skip if fade transition is in progress
         if (fade_active) return;
 
+        // NEW: Skip if game is transitioning (Game_Manager flag)
+        if (GM.is_transitioning()) return;
+
         // Get the mining script
         auto mining_script = std::dynamic_pointer_cast<Mining_Script>(LGM.get_script("mining_script"));
 
