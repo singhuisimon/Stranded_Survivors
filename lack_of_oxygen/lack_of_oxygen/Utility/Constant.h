@@ -244,7 +244,7 @@ namespace lof {
 
 	// ------------------------------ Mining_Script.cpp --------------------------------
 	constexpr const float MINING_COOLDOWN_TIMER = 0.2f;
-
+	constexpr const float POPUP_LIFETIME = 1.0f;
 	// ------------------------------ Cloud_Script.cpp --------------------------------
 	constexpr const float CLOUD_MOVING_SPEED = 32.0f;
 

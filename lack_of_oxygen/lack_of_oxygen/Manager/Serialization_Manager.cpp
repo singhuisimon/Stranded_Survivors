@@ -89,7 +89,7 @@ namespace lof {
 
         // Load level data
         const std::string level_folder = "Level_Design";
-        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_V5.csv");
+        std::string level_path = ASM.get_full_path(level_folder, "Level_Design_Small.csv");
         if (!load_level_data(level_path.c_str())) {
             LM.write_log("Serialization_Manager::start_up(): Failed to load level file: %s", level_path.c_str());
             return -4;
@@ -1295,7 +1295,6 @@ namespace lof {
         std::string path(filepath);
         return path.find("scene2.scn") != std::string::npos;
     }
-
     unsigned int Serialization_Manager::get_scr_width() const {
         //LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
         return m_scr_width;

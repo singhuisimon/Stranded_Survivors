@@ -191,7 +191,7 @@ namespace lof {
             // Update the position based on velocity
             transform.position += velocity.velocity * fixed_dt;
 #endif
-            std::cout << "Velocity Y: " << velocity.velocity.y << std::endl;
+            //std::cout << "Velocity Y: " << velocity.velocity.y << std::endl;
 
 
             // Clamp velocity to max velocity
