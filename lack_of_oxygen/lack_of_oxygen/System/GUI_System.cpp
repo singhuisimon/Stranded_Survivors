@@ -1367,6 +1367,7 @@ void GUI_System::hide_wormhole_gui() {
             std::string base_texture;
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
+            audio.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 5, 1.0, 1.0, false, true, false);
 
             if (entity_name == "resume_button") {
                 base_texture = "Resume_Batch_14";
@@ -1398,6 +1399,7 @@ void GUI_System::hide_wormhole_gui() {
 
                     // Handle the actual button click
                     if (entity_name == "resume_button") {
+                        ADM.play_now(entity_id, click_sound, audio);
                         GM.set_paused(false);
                         hide_pause_menu();
                     }
@@ -1504,6 +1506,8 @@ void GUI_System::hide_wormhole_gui() {
             LM.write_log("Added overlay to GUI system: %u", overlay);
         }
 
+        std::string click_sound = "main_menu";
+
         // Create Restart button
         EntityID restart_button = ecs_manager.clone_entity_from_prefab("gui_container", "restart_button");
         if (restart_button != INVALID_ENTITY_ID) {
@@ -1528,6 +1532,7 @@ void GUI_System::hide_wormhole_gui() {
             if (!ecs_manager.has_component<Audio_Component>(restart_button)) {
                 Audio_Component audio_comp;
                 audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+                audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(restart_button, audio_comp);
             }
 
@@ -1562,6 +1567,7 @@ void GUI_System::hide_wormhole_gui() {
             if (!ecs_manager.has_component<Audio_Component>(main_menu_button)) {
                 Audio_Component audio_comp;
                 audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, 1.0, 1.0, false, true, false);
+                audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(main_menu_button, audio_comp);
             }
 
@@ -1745,7 +1751,7 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Set player dead false
                         GM.set_player_dead_state(false);
-
+                        
                         // Hide game over menu
                         hide_game_over_menu();
                         
@@ -1762,7 +1768,7 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Set player dead false
                         GM.set_player_dead_state(false);
-
+    
                         // Hide game over menu
                         hide_game_over_menu();
 

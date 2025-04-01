@@ -1515,6 +1515,7 @@ namespace lof {
                 base_texture = "Settings_Batch_12";
             }
                 
+            audio.add_sound(main_menu_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
 
             //Update button batch textures in the level editor
             auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
