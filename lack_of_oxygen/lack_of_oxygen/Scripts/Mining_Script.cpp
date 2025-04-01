@@ -32,7 +32,6 @@ namespace lof {
         mining_strength = DEFAULT_STRENGTH;
         mining_cooldown = MINING_COOLDOWN_TIMER;
 
-        popup_entity_id = ECSM.find_entity_by_name("mineral_popup");
     }
 
     std::string Mining_Script::get_type() const {
@@ -779,16 +778,12 @@ namespace lof {
         auto& transform = ECSM.get_component<Transform2D>(popup_entity_id);
         transform.position = position;
 
-        float screen_width = static_cast<float>(SM.get_scr_width());
-        float screen_height = static_cast<float>(SM.get_scr_height());
         
         EntityID player = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
         auto& player_transform = ECSM.get_component<Transform2D>(player);
 
-
-
+        //this is so temporarily the text can be seen (not accurate)
         transform.position.y = player_transform.position.y - transform.position.y; 
-        // transform.position.x = player_transform.position.x - transform.position.x;
 
         //update text 
         auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);
