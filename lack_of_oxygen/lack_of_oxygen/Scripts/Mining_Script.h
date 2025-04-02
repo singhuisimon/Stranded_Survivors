@@ -174,6 +174,23 @@ namespace lof {
 		 */
 		void update_mineral_count_text(int value_to_add);
 
+		EntityID popup_entity_id; 
+		bool popup_active = false;
+		float popup_timer = 0.0f;
+		/**
+		* @brief Creates a Pop-up text showing the mineral value
+		* @param mineral_value The value of the mined mineral
+		* @param position The world position of the mined mineral
+		*/
+		void show_mineral_popup(int mineral_value, const Vec2D& position);
+
+		/**
+		* @brief Updates all active mineral pop-ups lifetime and removes expired ones
+		* @param delta_time time elapsed since last update
+		* 
+		*/
+		void update_mineral_popups(float delta_time); 
+
 	};
 }
 

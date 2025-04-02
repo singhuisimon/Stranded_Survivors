@@ -1374,7 +1374,6 @@ namespace lof {
         std::string path(filepath);
         return path.find("scene2.scn") != std::string::npos;
     }
-
     unsigned int Serialization_Manager::get_scr_width() const {
         //LM.write_log("Serialization_Manager::get_scr_width(): Returning SCR_WIDTH: %u", m_scr_width);
         return m_scr_width;

@@ -31,6 +31,7 @@ namespace lof {
         player_id = 0;
         mining_strength = DEFAULT_STRENGTH;
         mining_cooldown = MINING_COOLDOWN_TIMER;
+
     }
 
     std::string Mining_Script::get_type() const {
@@ -78,6 +79,20 @@ namespace lof {
 			}
 
             mining_script->increase_mineral_count_cheat();
+           
+            //update mineral popups
+           // try {
+
+
+                   // COMMENT 
+                    mining_script->update_mineral_popups(FPSM.get_delta_time());
+
+           // }
+           // catch (const std::exception& e) {
+
+           //     LM.write_log("Error updating mineral popup: %s", e.what());
+           //     mining_script->popup_active = false;
+           // }
 
         });
 
@@ -583,19 +598,28 @@ namespace lof {
         if (animation.animations["0"] != "TNT") {
             // Emit particles, destroy the block and update mineral count when health reaches 0
             if (animation.curr_tile_health != 0) {
+
                 // Randomize particle emit count
                 update_mining_particle(particle_system, block_transform, animation);
 				// Play the mining audio
                 update_mining_audio(block_to_remove, block_audio, "mining mineral" , "mining normal");
             }
-            else {
+            else { 
+
                 // Get mineral value before destroying the entity
+
                 int mineral_value = get_mineral_value(block_to_remove);
 
-                // Update the mineral count text
+                // Update the mineral count text and create the mineral pop_up
                 if (mineral_value > 0) {
+
+
+                    show_mineral_popup(mineral_value, block_transform.position);
+
                     update_mineral_count_text(mineral_value);
                 }
+
+
 
                 // Emit final particles after destroying tile
                 update_final_mining_particle(particle_system, block_transform, animation);
@@ -733,6 +757,90 @@ namespace lof {
         }
         catch (const std::exception& e) {
             LM.write_log("Error updating mineral count: %s", e.what());
+        }
+    }
+
+    void Mining_Script::show_mineral_popup(int mineral_value, const Vec2D& position) {
+
+        if (mineral_value <= 0) return; 
+
+            //get the popup id again
+            popup_entity_id = ECSM.find_entity_by_name("mineral_popup");
+
+            if (popup_entity_id == INVALID_ENTITY_ID) {
+                LM.write_log("Warning: Could not find 'mineral_pop' entity");
+                return;
+            
+            }
+            std::cout << "Popup_EntityID: " << popup_entity_id << std::endl;
+
+        //update position
+        auto& transform = ECSM.get_component<Transform2D>(popup_entity_id);
+        transform.position = position;
+
+        
+        //EntityID player = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        //auto& player_transform = ECSM.get_component<Transform2D>(player);
+
+        ////this is so temporarily the text can be seen (not accurate)
+        //transform.position.y = player_transform.position.y - transform.position.y; 
+
+        //update text 
+        auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);
+        std::stringstream ss; 
+        ss << "+" << mineral_value;
+        text_comp.text = ss.str();
+
+        //activate popup
+        popup_active = true; 
+        popup_timer = POPUP_LIFETIME;
+
+       // LM.write_log("Showing mineral popup: +%d at position (%.2f, %.2f)", mineral_value, position.x, position.y); 
+
+     
+    }
+
+    void Mining_Script::update_mineral_popups(float delta_time) {
+
+        if (!popup_active || popup_entity_id == INVALID_ENTITY_ID) {
+            return;
+        }
+        //get the entity id again 
+        popup_entity_id = ECSM.find_entity_by_name("mineral_popup");
+
+        // Ensure entity still exists
+        if (!ECSM.get_entity(popup_entity_id)) {
+            LM.write_log("Warning: Popup entity no longer exists");
+            popup_active = false;
+           return;
+        }
+
+        // Double-check components exist to prevent runtime errors
+        if (!ECSM.has_component<Transform2D>(popup_entity_id) ||
+            !ECSM.has_component<Text_Component>(popup_entity_id)) {
+            LM.write_log("Warning: Popup entity missing required components");
+            popup_active = false;
+            return;
+        }
+
+
+        // Decrease timer
+        popup_timer -= delta_time;
+
+        // Hide popup when timer expires
+        if (popup_timer <= 0.0f) {
+            popup_active = false;
+
+            try {
+
+                auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);
+                text_comp.text = ""; // Clear text
+
+                LM.write_log("Hidden mineral popup");
+            }
+            catch (const std::exception& e) {
+                LM.write_log("Error hiding popup: %s", e.what());
+            }
         }
     }
 

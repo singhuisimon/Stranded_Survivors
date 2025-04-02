@@ -75,7 +75,7 @@ namespace lof {
 	//Physics component constants 
 	constexpr float DEFAULT_GRAVITY = -980.f;
 	constexpr float DEFAULT_DAMPING_FACTOR = 0.9f;
-	constexpr float DEFAULT_MAX_VELOCITY = 30000.0f;
+	constexpr float DEFAULT_MAX_VELOCITY = 45000.0f;
 	constexpr float DEFAULT_JUMP_FORCE = 2000.0f;
 
 	// Graphics component constants
@@ -250,7 +250,7 @@ namespace lof {
 
 	// ------------------------------ Mining_Script.cpp --------------------------------
 	constexpr const float MINING_COOLDOWN_TIMER = 0.2f;
-
+	constexpr const float POPUP_LIFETIME = 0.4f;
 	// ------------------------------ Cloud_Script.cpp --------------------------------
 	constexpr const float CLOUD_MOVING_SPEED = 32.0f;
 
