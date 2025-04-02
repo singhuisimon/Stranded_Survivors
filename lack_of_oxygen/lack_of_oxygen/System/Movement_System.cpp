@@ -137,20 +137,25 @@ namespace lof {
             // Handle jumping mechanics
             if (physics.get_jump_requested() && physics.get_is_grounded() && !physics.get_has_jumped()) {
 
-                                
+
+
                 physics.force_helper.activate_force(JUMP_UP);
+
+                //DEBUG 
+
                 physics.set_is_grounded(false);
-                physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                 physics.set_has_jumped(true);
-                velocity.velocity.y = physics.get_jump_force();
+
+              //physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+             // velocity.velocity.y = physics.get_jump_force();
+            //  physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
+
+
                 //reset the jump request
                 physics.reset_jump_request();
-                physics.force_helper.deactivate_force(JUMP_UP);  // Deactivate the jump force
                 
                 auto& audio = ECSM.get_component<Audio_Component>(entity_id);
                 ADM.play_now(entity_id, "jumping", audio);
-                //audio.set_isactive("jumping", true);
-                //audio.increase_playcount("jumping");
                 
             }
 
@@ -179,12 +184,14 @@ namespace lof {
             // Update velocity according to the acceleration
             velocity.velocity += physics.get_acceleration() * fixed_dt;
 
+
             // Dampen velocity
             velocity.velocity *= physics.get_damping_factor();
 
             // Update the position based on velocity
             transform.position += velocity.velocity * fixed_dt;
 #endif
+            //std::cout << "Velocity Y: " << velocity.velocity.y << std::endl;
 
 
             // Clamp velocity to max velocity

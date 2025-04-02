@@ -28,8 +28,6 @@ namespace lof {
 		MOVE_LEFT,
 		MOVE_RIGHT,
 		JUMP_UP,
-		DRAG,
-		IMPULSE,
 		VENT_FORCE//for future purposes
 	};
 
@@ -58,9 +56,8 @@ namespace lof {
 			if (type_str == "MOVE_LEFT") return MOVE_LEFT;
 			if (type_str == "MOVE_RIGHT") return MOVE_RIGHT;
 			if (type_str == "JUMP_UP") return JUMP_UP;
-			if (type_str == "DRAG") return DRAG;
-			if (type_str == "IMPULSE") return IMPULSE;
-			return IMPULSE;
+			if (type_str == "VENT_FORCE") return VENT_FORCE;
+			return VENT_FORCE;
 		}
 
 		static std::string ftype_to_string(const ForceType type) {
@@ -76,11 +73,8 @@ namespace lof {
 			case JUMP_UP:
 				type_str = "JUMP_UP";
 				break;
-			case DRAG:
-				type_str = "DRAG";
-				break;
-			case IMPULSE:
-				type_str = "IMPULSE";
+			case VENT_FORCE:
+				type_str = "VENT_FORCE";
 				break;
 			default:
 				type_str = "UNKNOWN";

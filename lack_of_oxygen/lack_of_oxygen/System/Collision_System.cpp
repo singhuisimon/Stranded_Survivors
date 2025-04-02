@@ -23,6 +23,7 @@
 #include "../System/GUI_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Globals.h"
 #include "../Manager/Input_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Manager/Serialization_Manager.h"
@@ -392,8 +393,6 @@ namespace lof {
             case VentDirection::UP: {
                 //apply up movement
                 e_physics.force_helper.activate_force(VENT_FORCE);
-                e_physics.set_gravity(Vec2D(0.0f, 0.0f));
-                e_velocity.velocity.y = 200.0f;
                 break;
             }
             case VentDirection::LEFT: {
@@ -431,14 +430,13 @@ namespace lof {
             }
 
             is_in_vent = true;
+
         }
 
         if (!found_next_vent) {
             //vent exit 
             if (direction == VentDirection::UP) {
-                e_velocity.velocity.y = 700.0f; 
-                e_physics.force_helper.deactivate_force(VENT_FORCE); 
-                e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+               // e_physics.force_helper.deactivate_force(VENT_FORCE); 
             }
 
             if (is_in_vent) {
@@ -467,6 +465,8 @@ namespace lof {
                 is_in_vent = false;
             }
         }
+
+        std::cout << "Player in the air vent? " << is_in_vent << std::endl; 
     }
 
 
@@ -511,6 +511,7 @@ namespace lof {
 
         // Check for collision
         float collision_time = delta_time;
+
         if (collision_intersection_rect_rect(e_aabb, e_velocity.velocity, av_aabb, av_velocity.velocity,
             collision_time, delta_time)) {
 
@@ -553,7 +554,7 @@ namespace lof {
                     else {
                         e_physics.force_helper.deactivate_force(VENT_FORCE);
                         if (!is_grounded) {
-                            e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
+                           e_physics.set_gravity(Vec2D(0.0f, DEFAULT_GRAVITY));
                         }
                     }
 
@@ -1341,8 +1342,8 @@ namespace lof {
                 physics1.set_has_jumped(false);  // Reset jump state
                 physics1.reset_jump_request();    // Reset any pending jump request
 
-                // Reset jump-related forces
-                physics1.force_helper.deactivate_force(JUMP_UP);
+                // Reset jump-related forces this might be why there is a lag on the jump
+               // physics1.force_helper.deactivate_force(JUMP_UP);
             }
             else {
                 // Side collisions (LEFT/RIGHT)
@@ -1770,8 +1771,8 @@ namespace lof {
         // Reset transition flag at start of frame
         is_transitioning = false;
 
-        // Return early if we're transitioning
-        if (is_transitioning) return;
+        // Return early if we're transitioning and ship is launching
+        if (is_transitioning || ship_launching) return;
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 

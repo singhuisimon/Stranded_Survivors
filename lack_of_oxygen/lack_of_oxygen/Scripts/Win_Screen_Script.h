@@ -56,6 +56,8 @@ namespace lof {
 		bool background_landed;		// Flag for win background landing in camera
 		float time_landed;			// Track time left in launch duration when win background landed 
 
+		//Audio boolean
+		bool win_audio_played;
 
 		/**
 		 * @brief Controls the cloud movement in the foreground

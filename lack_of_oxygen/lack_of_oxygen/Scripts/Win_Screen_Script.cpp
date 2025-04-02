@@ -15,7 +15,11 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/FPS_Manager.h"
 #include "../Manager/Graphics_Manager.h"
+#include "../Manager/Audio_Manager.h"
 #include "../System/Particle_System.h"
+#include "../Utility/Globals.h"
+
+bool ship_launching = false;
 
 // TESTING
 #include "../Manager/Game_Manager.h"
@@ -28,6 +32,7 @@ namespace lof {
         background_speed = WIN_BACKGROUND_SPEED;
         launch_duration = DEFAULT_LAUNCH_DURATION;
         background_landed = false;
+        win_audio_played = false;
     }
 
     // Returns the script name as a string
@@ -164,12 +169,25 @@ namespace lof {
                     restart_graphics.color.a = 1.0f;
                     main_menu_graphics.color.a = 1.0f;
                 }
+
+                //set global boolean to false
+                ship_launching = false;
             }
 
             // Ship to launch up to the sky
             if (launch_duration > 0.0f) {
                 // Decrement duration
                 launch_duration -= delta_time;
+
+                // Update boolean
+                ship_launching = true;
+
+                // Update the win audio
+                if (!win_audio_played && ship_id != INVALID_ENTITY_ID) {
+                    auto& ship_audio = ECSM.get_component<Audio_Component>(ship_id);
+                    ADM.play_now(ship_id, "game win", ship_audio);
+                    win_audio_played = true;
+                }
 
                 // Update ship launch speed and position
                 if (7.0f >= launch_duration && launch_duration > 6.5f) { // 0.5s
@@ -288,6 +306,7 @@ namespace lof {
                 background_speed = WIN_BACKGROUND_SPEED;
                 launch_duration = DEFAULT_LAUNCH_DURATION;
                 background_landed = false;
+                win_audio_played = false;
             }
         }
 
