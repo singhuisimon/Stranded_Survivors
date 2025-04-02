@@ -406,7 +406,7 @@ namespace lof {
             glDeleteTextures(1, &pair.second);
         }*/
         texture_storage.clear();
-        std::cout << "Assets_Manager: All textures have been unloaded." << std::endl;
+       // std::cout << "Assets_Manager: All textures have been unloaded." << std::endl;
     }
 
     void Assets_Manager::unload_animations()
@@ -580,7 +580,7 @@ namespace lof {
             {
                 if (sound.filepath == target_audio)
                 {
-                    std::cout << "yes! entity " << entity << "has audio component " << "\n";
+                    //std::cout << "yes! entity " << entity << "has audio component " << "\n";
                     track_audio_usage[entity] = target_audio;
                     return true;
                 }
@@ -600,7 +600,7 @@ namespace lof {
                 const auto& sounds = audio_component.get_sounds();
                 for (const auto& sound : sounds) {
                     if (sound.filepath == target_audio) {
-                        std::cout << "Found entity " << entity << " with audio: " << target_audio << "\n";
+                       // std::cout << "Found entity " << entity << " with audio: " << target_audio << "\n";
                         track_audio_usage[entity] = target_audio;  // Store result if needed
                         return entity;
                     }
@@ -632,7 +632,7 @@ namespace lof {
         EntityID entity_with_audio = get_entity_with_audio(target_audio);
 
         if (entity_with_audio == INVALID_ENTITY_ID) {
-            std::cout << "No entity found with the audio component for: " << target_audio << std::endl;
+          //  std::cout << "No entity found with the audio component for: " << target_audio << std::endl;
             return false;
         }
 
@@ -658,16 +658,16 @@ namespace lof {
                     auto* audio_system = static_cast<Audio_System*>(system.get());
                     if (audio_system) {
                         audio_system->stop_sound(key_for_channel_map);
-                        std::cout << "Deleted " << key_for_channel_map << " from channel map\n";
+                       // std::cout << "Deleted " << key_for_channel_map << " from channel map\n";
                     }
 
                     // Remove from the sound map if it exists
                     auto& sound_map = ADM.get_sound_map();
                     if (sound_map.erase(target_audio) > 0) {
-                        std::cout << "Successfully removed from sound_map.\n";
+                       // std::cout << "Successfully removed from sound_map.\n";
                     }
                     else {
-                        std::cout << "Sound was not found in sound_map.\n";
+                       // std::cout << "Sound was not found in sound_map.\n";
                     }
                 }
             }
