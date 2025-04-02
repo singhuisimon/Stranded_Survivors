@@ -23,6 +23,7 @@
 #include "../System/GUI_System.h"
 #include "../Manager/ECS_Manager.h"
 #include "../Utility/Constant.h"
+#include "../Utility/Globals.h"
 #include "../Manager/Input_Manager.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Manager/Serialization_Manager.h"
@@ -1770,8 +1771,8 @@ namespace lof {
         // Reset transition flag at start of frame
         is_transitioning = false;
 
-        // Return early if we're transitioning
-        if (is_transitioning) return;
+        // Return early if we're transitioning and ship is launching
+        if (is_transitioning || ship_launching) return;
 
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
 
