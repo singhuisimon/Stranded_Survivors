@@ -98,13 +98,13 @@ namespace lof
         float total_map_height = START_Y - map_bottom_y; //7584 // same as total tiles * total rows
 
         //================METER BAR================//
-        std::cout << "======meter bar data======" << "\n";
+        //std::cout << "======meter bar data======" << "\n";
         float meter_bar_init_height = meter_bar_transform.scale.y; // 370
         float meter_bar_init_pos = meter_bar_transform.position.y;
         float meter_bar_top = meter_bar_init_pos + (meter_bar_init_height / 2.0f); //-204 -> -235 > different: 31
-        std::cout << "meter_bar_top: " << meter_bar_top << "\n";
+        //std::cout << "meter_bar_top: " << meter_bar_top << "\n";
         float meter_bar_bottom = meter_bar_init_pos - (meter_bar_init_height / 2.0f); //-574 -> -605 different: 31 
-        std::cout << "meter_bar_bottom: " << meter_bar_bottom << "\n";
+        //std::cout << "meter_bar_bottom: " << meter_bar_bottom << "\n";
 
         //================LAVA POOL================//
         float lava_pool_y = lava_pool_transform.position.y; // -10326
@@ -160,7 +160,7 @@ namespace lof
             // Set the position
             mini_lava_block_transform.position.y = mini_lava_position;
             mini_lava_loc_transform.position.y = mini_lava_position;
-            std::cout << "mini_lava_position: " << mini_lava_position << "\n";
+            //std::cout << "mini_lava_position: " << mini_lava_position << "\n";
             const float MAX_GAUGE_HEIGHT = 90.0f; // Adjust this to your desired max height
             float gauge_height = default_lava_gauge + (lava_ratio * (lava_indicator_range - default_lava_gauge));
 
@@ -171,9 +171,9 @@ namespace lof
         }
 
         //================PLAYER================//
-        std::cout << "======PLAYER data======" << "\n";
+        //std::cout << "======PLAYER data======" << "\n";
         float player_pos_y = player_transform.position.y;
-        std::cout << "player_pos_y: " << player_pos_y << "\n";
+        //std::cout << "player_pos_y: " << player_pos_y << "\n";
 
         static float default_player_loc_pos = player_loc_transform.position.y; //for testing
         static float default_player_guege_height = player_gauge_transform.scale.y;
