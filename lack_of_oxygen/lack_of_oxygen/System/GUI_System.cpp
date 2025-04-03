@@ -1764,6 +1764,9 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Set player dead false
                         GM.set_player_dead_state(false);
+
+                        // Set restart true
+                        GM.set_restarting(true);
                         
                         // Hide game over menu
                         hide_game_over_menu();

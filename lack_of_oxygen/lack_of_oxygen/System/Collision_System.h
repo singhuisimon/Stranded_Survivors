@@ -212,6 +212,7 @@ namespace lof {
         std::unordered_map<std::string, bool> main_menu_sound_playing;
 
         bool is_player_dead = false;
+        float cooldown_restart = COOLDOWN_TIMER_FOR_RESTART;
 
         // to get oxygen
         //static bool oxygen_increasing;

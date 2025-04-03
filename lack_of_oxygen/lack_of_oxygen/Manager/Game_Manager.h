@@ -113,6 +113,7 @@ namespace lof {
         bool mouse_left_released = false;
 
         bool m_is_transitioning = false;  // Flag for scene transitions
+        bool restarting = false;
 
     public:
         /**
@@ -245,6 +246,9 @@ namespace lof {
 
         bool is_transitioning() const { return m_is_transitioning; }
         void set_transitioning(bool state) { m_is_transitioning = state; }
+
+        bool is_restarting() const { return restarting; }
+        void set_restarting(bool new_state) { restarting = new_state; }
     };
 
 } // namespace lof

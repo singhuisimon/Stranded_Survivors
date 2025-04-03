@@ -1420,7 +1420,7 @@ namespace lof {
         
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
 
-        Detect_Obsidian_Bottom(delta_time);
+        //Detect_Obsidian_Bottom(delta_time);
 
         Colliside_Oxygen_Mineral(delta_time);
 
@@ -1459,6 +1459,8 @@ namespace lof {
 
         // Return early if we're transitioning
         if (is_transitioning) return;
+
+        if (GM.is_transitioning()) return;
 
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
@@ -1889,6 +1891,21 @@ namespace lof {
     {
         
         if (GM.get_current_scene() != 2) {
+            if (is_player_dead) {
+                is_player_dead = GM.get_player_dead_state();
+            }
+            return;
+        }
+
+        if (GM.is_restarting()) {
+            if (is_player_dead && cooldown_restart <= 0.0f) {
+                is_player_dead = false;
+                GM.set_restarting(false);
+                cooldown_restart = COOLDOWN_TIMER_FOR_RESTART;
+            }
+            else {
+                cooldown_restart -= FPSM.get_delta_time();
+            }
             return;
         }
 
@@ -1959,7 +1976,7 @@ namespace lof {
         if (GM.get_current_scene() != 2) {
             return;
         }
-
+        
         // Find entities
         EntityID obsidian_entity = ECSM.find_entity_by_name("obsidian_bottom");
         EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
