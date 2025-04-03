@@ -60,6 +60,13 @@ namespace lof {
             }
         }
 
+        // TESTING
+        bool mineral_popup_exist = false;
+        EntityID mineral_popup = ECSM.find_entity_by_name("mineral_popup");
+        if (mineral_popup != INVALID_ENTITY_ID && mineral_popup == *start) {
+            mineral_popup_exist = true;
+        }
+        
         // Loop over the entities that match the system's signature
         for (; start != end; ++start) {
             auto& graphics = ECSM.get_component<Graphics_Component>(*start);
@@ -308,7 +315,11 @@ namespace lof {
                                         translate_x, translate_y, 1 };
 
                 // Check if it's e-prompt
-                if (ECSM.find_entity_by_name("wormhole_e_prompt") == *start) {
+                if (ECSM.find_entity_by_name("wormhole_e_prompt") == *start || ECSM.find_entity_by_name("mineral_popup") == *start) {
+                    if (ECSM.find_entity_by_name("mineral_popup") == *start) {
+                        
+                        std::cout << "mineral pop up location: " << transform.position.x << " " << transform.position.y << std::endl;
+                    }
                     graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                 }
                 else {

@@ -128,7 +128,7 @@ namespace lof {
 				}
 
 				//play logic
-				if ((audio_type == AudioType::BGM && ADM.get_new_scene()) && audio.get_loop(audio_key)) {
+				if ((audio_type == AudioType::BGM && ADM.get_new_scene()) && audio.get_loop(audio_key) && GM.get_current_scene() != 4) {
 					//std::cout << "hello " << file_path << " " << audio_key << std::endl;
 					play_bgm_sound(file_path, channel_key, audio_key, audio);
 				}

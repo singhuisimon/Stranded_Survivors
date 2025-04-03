@@ -360,6 +360,21 @@
             ]
           ]
         },
+        "Audio_Component": {
+          "sounds": [
+            {
+              "key": "game win",
+              "filepath": "bgm_game_win",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            }
+          ]
+        },
         "Logic_Component": {
           "scripts": [
             {

@@ -779,11 +779,11 @@ namespace lof {
         transform.position = position;
 
         
-        EntityID player = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        auto& player_transform = ECSM.get_component<Transform2D>(player);
+        //EntityID player = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        //auto& player_transform = ECSM.get_component<Transform2D>(player);
 
-        //this is so temporarily the text can be seen (not accurate)
-        transform.position.y = player_transform.position.y - transform.position.y; 
+        ////this is so temporarily the text can be seen (not accurate)
+        //transform.position.y = player_transform.position.y - transform.position.y; 
 
         //update text 
         auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);

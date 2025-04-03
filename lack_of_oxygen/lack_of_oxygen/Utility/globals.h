@@ -16,5 +16,6 @@ extern bool is_full_screen;		// Declaration only (extern)
 extern float master_multiplier;
 extern float bgm_multiplier;
 extern float sfx_multiplier;
+extern bool ship_launching;
 
 #endif
