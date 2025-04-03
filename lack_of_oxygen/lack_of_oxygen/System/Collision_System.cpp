@@ -1420,7 +1420,7 @@ namespace lof {
         
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
 
-        //Detect_Obsidian_Bottom(delta_time);
+        Detect_Obsidian_Bottom(delta_time);
 
         Colliside_Oxygen_Mineral(delta_time);
 
