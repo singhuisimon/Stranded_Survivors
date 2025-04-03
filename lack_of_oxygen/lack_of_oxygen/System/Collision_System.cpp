@@ -1919,7 +1919,7 @@ namespace lof {
         //bool is_player_dead = false;
         if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
         {
-           // std::cout << "test\n";
+           std::cout << "test is interact\n";
             is_player_dead = true;
             GM.set_player_dead_state(true);
         }

@@ -318,7 +318,7 @@ namespace lof {
                 if (ECSM.find_entity_by_name("wormhole_e_prompt") == *start || ECSM.find_entity_by_name("mineral_popup") == *start) {
                     if (ECSM.find_entity_by_name("mineral_popup") == *start) {
                         
-                       // std::cout << "mineral pop up location: " << transform.position.x << " " << transform.position.y << std::endl;
+                        //std::cout << "mineral pop up location: " << transform.position.x << " " << transform.position.y << std::endl;
                     }
                     graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                 }
