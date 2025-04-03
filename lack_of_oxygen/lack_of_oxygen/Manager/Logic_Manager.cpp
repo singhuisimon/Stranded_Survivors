@@ -27,18 +27,19 @@
 
 namespace lof {
 
-	std::unique_ptr<Logic_Manager> Logic_Manager::instance;
-	std::once_flag Logic_Manager::once_flag;
+	//std::unique_ptr<Logic_Manager> Logic_Manager::instance;
+	//std::once_flag Logic_Manager::once_flag;
 
 	Logic_Manager::Logic_Manager() {
 		set_type("Logic_Manager");
 	}
 
 	Logic_Manager& Logic_Manager::get_instance() {
-		std::call_once(once_flag, []() {
+		/*std::call_once(once_flag, []() {
 			instance.reset(new Logic_Manager);
-			});
-		return *instance;
+			});*/
+		static Logic_Manager instance;
+		return instance;
 	}
 
 	int Logic_Manager::start_up() {
@@ -91,10 +92,10 @@ namespace lof {
 		m_is_started = false;
 
 		//LGS.cleanup();
-		if (instance) {
+		/*if (instance) {
 			instance.reset();
 			LM.write_log("Logic_Manager::shut_down(): Logic_Manager instance deleted.");
-		}
+		}*/
 
 		LM.write_log("Logic_Manager::shut_down(): Logic_Manager shut down.");
 		

@@ -28,27 +28,28 @@
 
 namespace lof {
 
-    std::unique_ptr<Logic_System> Logic_System::instance;
-    std::once_flag Logic_System::once_flag;
-
-    Logic_System& Logic_System::get_instance() {
-        std::call_once(once_flag, []() {
-            instance.reset(new Logic_System);
-        });
-        return *instance;
-    }
+    //std::unique_ptr<Logic_System> Logic_System::instance;
+    //std::once_flag Logic_System::once_flag;
 
     Logic_System::Logic_System() {
         signature.set(ECSM.get_component_id<Logic_Component>());
     }
 
-    Logic_System::~Logic_System() {
+    //Logic_System& Logic_System::get_instance() {
+    //    /*std::call_once(once_flag, []() {
+    //        instance.reset(new Logic_System);
+    //    });*/
+    //    static Logic_System instance;
+    //    return instance;
+    //}
+
+    /*Logic_System::~Logic_System() {
 
         if (instance) {
             instance.reset();
 			LM.write_log("Logic_System::instance reset");
         }
-    }
+    }*/
 
     std::string Logic_System::get_type() const {
         return "Logic_System";

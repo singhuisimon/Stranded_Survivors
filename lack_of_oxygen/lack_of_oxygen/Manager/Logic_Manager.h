@@ -78,8 +78,8 @@ namespace lof {
 		 * @brief Default constructor
 		 */
 		Logic_Manager();
-		static std::unique_ptr<Logic_Manager> instance;
-		static std::once_flag once_flag;
+		//static std::unique_ptr<Logic_Manager> instance;
+		//static std::once_flag once_flag;
 
 		/**
 		 * @brief Register all the scripts in the engine.

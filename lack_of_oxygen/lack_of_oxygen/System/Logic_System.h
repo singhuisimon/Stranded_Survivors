@@ -20,7 +20,7 @@
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
 
-#define LGS lof::Logic_System::get_instance()
+//#define LGS lof::Logic_System::get_instance()
 
 namespace lof {
 
@@ -32,7 +32,7 @@ namespace lof {
 		/**
 		 * @brief Get the unique instance of Logic_System.
 		 */
-        static Logic_System& get_instance();
+        //static Logic_System& get_instance();
 
         /**
          * @brief Constructor for Logic_System.
@@ -42,7 +42,7 @@ namespace lof {
 		/**
 		 * @brief Destructor for Logic_System.
 		 */
-        ~Logic_System();
+        //~Logic_System();
 
         /**
          * @brief Gets the type identifier for this system.
@@ -72,12 +72,12 @@ namespace lof {
         /**
 		 * @brief unique instance of Logic_System.
          */
-        static std::unique_ptr<Logic_System> instance;
+        //static std::unique_ptr<Logic_System> instance;
 
         /**
 		 * @brief set the flag to create the instance of Logic_System.
          */
-        static std::once_flag once_flag;
+        //static std::once_flag once_flag;
     };
 } // namespace lof
 #endif // LOF_LOGIC_SYSTEM_H

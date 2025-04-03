@@ -58,7 +58,9 @@ namespace lof {
                 return;
             }
             tutorial_script->check_keys();
-            tutorial_script->check_pressing_button(entity_id);
+            if (!GM.is_transitioning()) {
+                tutorial_script->check_pressing_button(entity_id);
+            }
             tutorial_script->transit_next_scene();
             //std::cout << "tutorial script update" << std::endl;
             });
