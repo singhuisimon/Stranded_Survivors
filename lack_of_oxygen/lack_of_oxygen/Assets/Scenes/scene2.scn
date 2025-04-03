@@ -1769,11 +1769,11 @@
         "Transform2D": {
           "position": [
             882.0,
-            -221.0
+            -252.0
           ],
           "prev_position": [
             882.0,
-            -221.0
+            -252.0
           ],
           "orientation": [
             0.0,
@@ -1820,11 +1820,11 @@
         "Transform2D": {
           "position": [
             905.0,
-            -216.0
+            -246.0
           ],
           "prev_position": [
             905.0,
-            -216.0
+            -246.0
           ],
           "orientation": [
             0.0,
@@ -1986,11 +1986,11 @@
         "Transform2D": {
           "position": [
             849.0,
-            -221.0
+            -252.0
           ],
           "prev_position": [
             849.0,
-            -221.0
+            -252.0
           ],
           "orientation": [
             0.0,
@@ -2050,11 +2050,11 @@
         "Transform2D": {
           "position": [
             909.0,
-            -389.0
+            -420.0
           ],
           "prev_position": [
             909.0,
-            -389.0
+            -420.0
           ],
           "orientation": [
             0.0,
@@ -2073,7 +2073,7 @@
             1.0,
             1.0
           ],
-          "texture_name": "Metre_Batch_4",
+          "texture_name": "Lava_Depth_Metre_Batch_28",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -2204,8 +2204,8 @@
             1.0
           ],
           "scale": [
-            0.5,
-            0.5
+            0.35,
+            0.35
           ]
         }
       }
