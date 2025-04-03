@@ -139,65 +139,7 @@ namespace lof
             float gauge_position = lava_start_position + (gauge_height / 2.0f) - (default_lava_gauge / 2.0f);  // Center of the gauge
             lava_gauge_transform.scale.y = gauge_height;
             lava_gauge_transform.position.y = gauge_position;
-#if 0
-            
-            float lava_rise_amount = lava_pool_interact - map_bottom_y; //keep changeeeeeeee
 
-            float total_possible_rise = (map_bottom_y + (level_rows * tiles_size)) - initial_lava_y; //10176
-
-
-            float lava_rise_ratio = std::max(0.0f, std::min(lava_rise_amount / total_possible_rise, 1.0f)); //0.12
-            //float mini_lava_position = meter_bar_bottom + (lava_rise_ratio * meter_bar_init_height) + OFFSET_METER_BAR_LAVA + 95.0f; // starting position should be -505uda
-
-            //mini_lava_block_transform.position.y = mini_lava_position;
-            //mini_lava_loc_transform.position.y = mini_lava_position;
-            //std::cout << "mini_lava_position: " << mini_lava_position << "\n";
-            //// Scale and position t
-            //// he lava gauge based on the rise ratio
-            //float gauge_height = default_lava_gauge + (lava_rise_ratio * (meter_bar_init_height - default_lava_gauge)) + 95.0f;
-            //float gauge_position = meter_bar_bottom + (gauge_height / 2.0f) + OFFSET_METER_BAR_LAVA;
-            //lava_gauge_transform.scale.y = gauge_height;
-            //lava_gauge_transform.position.y = gauge_position;
-
-
-            // Define position range (-505 at bottom to meter_bar_top with small offset)
-            const float LAVA_START_POSITION = -505.0f;  // Exact starting Y (-505)
-            const float LAVA_END_POSITION = meter_bar_top - 5.0f;  // Top with small offset
-            const float LAVA_RANGE = LAVA_END_POSITION - LAVA_START_POSITION;
-
-            // 2. Calculate world-space lava progression
-            float lava_world_start = map_bottom_y;  // When lava touches map bottom
-            float lava_world_end = START_Y;         // When lava reaches top of map
-            float lava_world_range = lava_world_end - lava_world_start;
-
-            // 3. Current lava position in world space
-            float lava_current = lava_pool_interact;  // Top of lava pool
-
-            // 4. Calculate normalized progress (0-1)
-            float lava_progress = std::clamp((lava_current - lava_world_start) / lava_world_range,0.0f, 1.0f);
-
-            // 5. Position lava icon (lerp between start/end)
-            float mini_lava_position = LAVA_START_POSITION + (lava_progress * LAVA_RANGE);
-            mini_lava_block_transform.position.y = mini_lava_position;
-            mini_lava_loc_transform.position.y = mini_lava_position;
-
-            // 6. Calculate gauge (grows from default to fill remaining space)
-            float gauge_max_height = LAVA_RANGE;  // Could adjust this if needed
-            float gauge_height = default_lava_gauge + (lava_progress * gauge_max_height);
-
-            // 7. Position gauge (anchored to lava icon position)
-            float gauge_position = mini_lava_position - (gauge_height / 2.0f);
-
-            // Apply transformations
-            lava_gauge_transform.scale.y = gauge_height;
-            lava_gauge_transform.position.y = gauge_position;
-
-            //// Debug output
-            //std::cout << "Progress: " << lava_progress << "\n"
-            //    << "Lava Position: " << mini_lava_position << "\n"
-            //    << "Gauge Height: " << gauge_height << "\n";
-
-#endif
 
         }
         else
@@ -357,4 +299,64 @@ float gauge_position = (meter_bar_top - OFFSET_GAUGE) - (gauge_height / 2.0f);
 
 lava_gauge_transform.scale.y = gauge_height;
 lava_gauge_transform.position.y = gauge_position;
+#endif
+
+#if 0
+
+float lava_rise_amount = lava_pool_interact - map_bottom_y; //keep changeeeeeeee
+
+float total_possible_rise = (map_bottom_y + (level_rows * tiles_size)) - initial_lava_y; //10176
+
+
+float lava_rise_ratio = std::max(0.0f, std::min(lava_rise_amount / total_possible_rise, 1.0f)); //0.12
+//float mini_lava_position = meter_bar_bottom + (lava_rise_ratio * meter_bar_init_height) + OFFSET_METER_BAR_LAVA + 95.0f; // starting position should be -505uda
+
+//mini_lava_block_transform.position.y = mini_lava_position;
+//mini_lava_loc_transform.position.y = mini_lava_position;
+//std::cout << "mini_lava_position: " << mini_lava_position << "\n";
+//// Scale and position t
+//// he lava gauge based on the rise ratio
+//float gauge_height = default_lava_gauge + (lava_rise_ratio * (meter_bar_init_height - default_lava_gauge)) + 95.0f;
+//float gauge_position = meter_bar_bottom + (gauge_height / 2.0f) + OFFSET_METER_BAR_LAVA;
+//lava_gauge_transform.scale.y = gauge_height;
+//lava_gauge_transform.position.y = gauge_position;
+
+
+// Define position range (-505 at bottom to meter_bar_top with small offset)
+const float LAVA_START_POSITION = -505.0f;  // Exact starting Y (-505)
+const float LAVA_END_POSITION = meter_bar_top - 5.0f;  // Top with small offset
+const float LAVA_RANGE = LAVA_END_POSITION - LAVA_START_POSITION;
+
+// 2. Calculate world-space lava progression
+float lava_world_start = map_bottom_y;  // When lava touches map bottom
+float lava_world_end = START_Y;         // When lava reaches top of map
+float lava_world_range = lava_world_end - lava_world_start;
+
+// 3. Current lava position in world space
+float lava_current = lava_pool_interact;  // Top of lava pool
+
+// 4. Calculate normalized progress (0-1)
+float lava_progress = std::clamp((lava_current - lava_world_start) / lava_world_range, 0.0f, 1.0f);
+
+// 5. Position lava icon (lerp between start/end)
+float mini_lava_position = LAVA_START_POSITION + (lava_progress * LAVA_RANGE);
+mini_lava_block_transform.position.y = mini_lava_position;
+mini_lava_loc_transform.position.y = mini_lava_position;
+
+// 6. Calculate gauge (grows from default to fill remaining space)
+float gauge_max_height = LAVA_RANGE;  // Could adjust this if needed
+float gauge_height = default_lava_gauge + (lava_progress * gauge_max_height);
+
+// 7. Position gauge (anchored to lava icon position)
+float gauge_position = mini_lava_position - (gauge_height / 2.0f);
+
+// Apply transformations
+lava_gauge_transform.scale.y = gauge_height;
+lava_gauge_transform.position.y = gauge_position;
+
+//// Debug output
+//std::cout << "Progress: " << lava_progress << "\n"
+//    << "Lava Position: " << mini_lava_position << "\n"
+//    << "Gauge Height: " << gauge_height << "\n";
+
 #endif
