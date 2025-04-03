@@ -466,7 +466,7 @@ namespace lof {
             }
         }
 
-        std::cout << "Player in the air vent? " << is_in_vent << std::endl; 
+        //std::cout << "Player in the air vent? " << is_in_vent << std::endl; 
     }
 
 
