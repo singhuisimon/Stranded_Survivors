@@ -372,10 +372,10 @@ namespace lof {
     }
 
     void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
-        
+
         auto& e_physics = ECSM.get_component<Physics_Component>(id);
         auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
-        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
         //separate audio state tracking for each type
         static bool is_in_up_vent = false;
@@ -390,35 +390,35 @@ namespace lof {
 
         switch (direction) {
 
-            case VentDirection::UP: {
-                //apply up movement
-                e_physics.force_helper.activate_force(VENT_FORCE);
-                break;
-            }
-            case VentDirection::LEFT: {
-                //update player animation 
-                int& player_direction = GFXM.get_player_direction();
-                player_direction = FACE_LEFT;
-                int& moving_status = GFXM.get_moving_status(); 
-                moving_status = RUN_LEFT;
+        case VentDirection::UP: {
+            //apply up movement
+            e_physics.force_helper.activate_force(VENT_FORCE);
+            break;
+        }
+        case VentDirection::LEFT: {
+            //update player animation 
+            int& player_direction = GFXM.get_player_direction();
+            player_direction = FACE_LEFT;
+            int& moving_status = GFXM.get_moving_status();
+            moving_status = RUN_LEFT;
 
-                //apply force
-                e_physics.force_helper.activate_force(MOVE_LEFT);
-                break;
-            }
-            case VentDirection::RIGHT: {
-                //Update player animation
-                int& player_direction = GFXM.get_player_direction();
-                player_direction = FACE_RIGHT;
-                int& moving_status = GFXM.get_moving_status();
-                moving_status = RUN_RIGHT;
+            //apply force
+            e_physics.force_helper.activate_force(MOVE_LEFT);
+            break;
+        }
+        case VentDirection::RIGHT: {
+            //Update player animation
+            int& player_direction = GFXM.get_player_direction();
+            player_direction = FACE_RIGHT;
+            int& moving_status = GFXM.get_moving_status();
+            moving_status = RUN_RIGHT;
 
-                //apply force
-                e_physics.force_helper.activate_force(MOVE_RIGHT);
-                break;
-            }
-            default: 
-                return;
+            //apply force
+            e_physics.force_helper.activate_force(MOVE_RIGHT);
+            break;
+        }
+        default:
+            return;
         }
 
         //handle audio 
@@ -436,7 +436,7 @@ namespace lof {
         if (!found_next_vent) {
             //vent exit 
             if (direction == VentDirection::UP) {
-               // e_physics.force_helper.deactivate_force(VENT_FORCE); 
+                // e_physics.force_helper.deactivate_force(VENT_FORCE); 
             }
 
             if (is_in_vent) {
@@ -448,16 +448,16 @@ namespace lof {
 
                 bool fade_active = is_fade_active();
 
-                if (!GM.get_player_dead_state() && !fade_active) {                 
+                if (!GM.get_player_dead_state() && !fade_active) {
                     ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                     ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
                 }
 
                 if (fade_active) {
-                            
+
                     ADM.pause_group(GroupType::TYPE_BGM);
                     ADM.pause_group(GroupType::TYPE_SFX);
-                    
+
                     //ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                     //ADM.stop_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent out"));
                 }
@@ -466,7 +466,7 @@ namespace lof {
             }
         }
 
-        std::cout << "Player in the air vent? " << is_in_vent << std::endl; 
+        std::cout << "Player in the air vent? " << is_in_vent << std::endl;
     }
 
 
@@ -1420,7 +1420,7 @@ namespace lof {
         
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
 
-       // Detect_Obsidian_Bottom(delta_time);
+        Detect_Obsidian_Bottom(delta_time);
 
         Colliside_Oxygen_Mineral(delta_time);
 

@@ -22,6 +22,7 @@
 #include "../System/Collision_System.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Scripts/Mining_Script.h"
+#include "../Scripts/Tutorial_Script.h"
 // Include Utility headers
 #include "../Utility/Constant.h"
 
@@ -372,7 +373,7 @@ namespace lof {
         // --------------------------------------------------------
 
         // Only check oxygen warnings if player is not dead
-        //if (!GM.get_player_dead_state()) {
+        if (!GM.get_player_dead_state()) {
             // Check oxygen level and update warnings
             float current_oxygen = GM.get_current_oxygen_level();
             
@@ -436,7 +437,7 @@ namespace lof {
 
             // Store current oxygen level for next frame comparison
             previous_oxygen_level = current_oxygen;
-        //}
+        }
 
         auto* container_transform = get_component_safe<Transform2D>(container_id);
         if (!container_transform) {
@@ -1320,6 +1321,7 @@ void GUI_System::hide_wormhole_gui() {
 
         // Get the mining script
         auto mining_script = std::dynamic_pointer_cast<Mining_Script>(LGM.get_script("mining_script"));
+        auto tutorial_script = std::dynamic_pointer_cast<Tutorial_Script>(LGM.get_script("tutorial_script"));
 
         // Get the current mouse position in screen coordinates
         double screen_mouse_x, screen_mouse_y;
@@ -1430,7 +1432,7 @@ void GUI_System::hide_wormhole_gui() {
                         GM.set_paused(false);
 
                         // Set player dead false
-                       // GM.set_player_dead_state(false);
+                        GM.set_player_dead_state(false);
 
                         // Force hide pause menu first
                         hide_pause_menu();
@@ -1452,8 +1454,10 @@ void GUI_System::hide_wormhole_gui() {
 
                         mining_script->clear_tnt_to_destroy();
 
+                      
+
                         // Set player dead false
-                        //GM.set_player_dead_state(false);
+                        GM.set_player_dead_state(false);
 
                         // Force hide pause menu first
                         hide_pause_menu();
@@ -1520,7 +1524,7 @@ void GUI_System::hide_wormhole_gui() {
             add_entity(overlay);
             LM.write_log("Added overlay to GUI system: %u", overlay);
 
-            std::cout << game_over_shown << " game over in gui system^^^^^^^^^^^^^^^^^^^^^^\n";
+            //std::cout << game_over_shown << " game over in gui system^^^^^^^^^^^^^^^^^^^^^^\n";
         }
 
         std::string click_sound = "main_menu";
@@ -1744,7 +1748,7 @@ void GUI_System::hide_wormhole_gui() {
 
             if (is_hovered) {
 
-                std::cout << "yes !!! is hovered====================\n";
+                //std::cout << "yes !!! is hovered====================\n";
                 // Change texture to highlighted if not pressed
                 if (graphics.texture_name != base_texture + "_HIGHLIGHTED" &&
                     graphics.texture_name != base_texture + "_PRESSED")
@@ -1767,10 +1771,10 @@ void GUI_System::hide_wormhole_gui() {
                     // Handle specific button
                     if (key == "restart") {
                         LM.write_log("Game over - Restart button pressed - starting fade transition to scene 2");
-                        std::cout << GM.get_player_dead_state() << " in GUI system restart b4 set\n";
+                        //std::cout << GM.get_player_dead_state() << " in GUI system restart b4 set\n";
                         // Set player dead false
                         GM.set_player_dead_state(false);
-                        std::cout << GM.get_player_dead_state() << " in GUI system restart ----------------- after set" << "\n";
+                        //std::cout << GM.get_player_dead_state() << " in GUI system restart ----------------- after set" << "\n";
                         // Set restart true
                         //GM.set_restarting(true);
                         
@@ -1789,7 +1793,7 @@ void GUI_System::hide_wormhole_gui() {
                         LM.write_log("Game over - Main Menu button pressed - starting fade transition to main menu");
 
                         // Set player dead false
-                       // GM.set_player_dead_state(false);
+                        GM.set_player_dead_state(false);
     
                         // Hide game over menu
                         hide_game_over_menu();

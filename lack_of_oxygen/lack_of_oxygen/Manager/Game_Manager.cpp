@@ -623,7 +623,7 @@ namespace lof {
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
               
-                //if (!get_player_dead_state()) {
+                if (!get_player_dead_state()) {
 
                     // Don't process lava in level editor mode
                     if (!level_editor_mode && game_playing) {
@@ -651,7 +651,7 @@ namespace lof {
                                 transform.position.y, tile_height);
                         }
                     }
-                //}
+                }
 
                 
 

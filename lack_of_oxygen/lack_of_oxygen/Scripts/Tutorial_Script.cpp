@@ -62,7 +62,7 @@ namespace lof {
                 tutorial_script->check_pressing_button(entity_id);
             }
             tutorial_script->transit_next_scene();
-            //std::cout << "tutorial script update" << std::endl;
+            //std::cout << "tutorial script update^^^^^^^^^^^^^^^^^^^^" << std::endl;
             });
 
     }
@@ -105,7 +105,7 @@ namespace lof {
 
     void Tutorial_Script::set_tutorial_page(int new_page_num) {
         if (new_page_num < 1 || new_page_num > 10) {
-            std::cout << "return due to invalid page number0" << std::endl;
+            //std::cout << "return due to invalid page number0" << std::endl;
             LM.write_log("Invalid tutorial page %d", new_page_num);
             return;
         }
@@ -116,7 +116,7 @@ namespace lof {
         EntityID tutorial_text_id = ECSM.find_entity_by_name("tutorial_background_text");
         auto& tutorial_text_graphic = ECSM.get_component<Graphics_Component>(tutorial_text_id);
         tutorial_text_graphic.texture_name = "Tutorial_Text_" + std::to_string(tutorial_page);
-        std::cout << tutorial_text_graphic.texture_name << std::endl;
+        //std::cout << tutorial_text_graphic.texture_name << std::endl;
     }
 
     void Tutorial_Script::update_button_visibility(EntityID entity_id, Graphics_Component& graphic_comp) {
@@ -243,14 +243,14 @@ namespace lof {
         if (entity_name == "a_button") {
 
             if (is_key_just_released(GLFW_KEY_A)) {
-                //std::cout << "a is released" << std::endl;
+                //std::cout << "a is released====================" << std::endl;
                 set_tutorial_page(tutorial_page - 1);
                 tutorial_button_playing[entity_name] = false;
                 graphics.texture_name = base_texture + "_NORMAL";
                 return;
             }
             else if (key_a_pressed) {
-                //std::cout << "a is held" << std::endl;
+                //std::cout << "a is held=======================" << std::endl;
                 if (!tutorial_button_playing[entity_name]) {
                     ADM.play_now(entity_id, button_audio, audio);
                     tutorial_button_playing[entity_name] = true;
@@ -268,14 +268,14 @@ namespace lof {
         else if (entity_name == "d_button") {
             //std::cout << "correct entity " << entity_name << std::endl;
             if (is_key_just_released(GLFW_KEY_D)) {
-                //std::cout << "d released" << std::endl;
+                std::cout << "d released+++++++++++++++" << std::endl;
                 set_tutorial_page(tutorial_page + 1);
                 tutorial_button_playing[entity_name] = false;
                 graphics.texture_name = base_texture + "_NORMAL";
                 return;
             }
             else if (key_d_pressed) {
-                //std::cout << "d is held" << std::endl;
+                //std::cout << "d is held+++++++++++++++++" << std::endl;
                 if (!tutorial_button_playing[entity_name]) {
                     ADM.play_now(entity_id, button_audio, audio);
                     tutorial_button_playing[entity_name] = true;

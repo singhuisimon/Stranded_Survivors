@@ -518,8 +518,6 @@ namespace lof {
 #if 1
     void Player_Script::check_player_fall_into_lava() {
 
-     
-
         EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
         EntityID lavaID = ECSM.find_entity_by_name("lava_pool");
 
@@ -531,85 +529,22 @@ namespace lof {
         bool player_dead = false;
         //std::cout << "checking outside if transform " << "\n";
         // Check if the player is inside the lava pool area
-
-       /* if (player_dead)
+        if (player_transform.position.y <= lava_transform.position.y + LAVA_HEIGHT && !checked_once)
         {
-            GM.set_player_dead_state(true);
-            return;
-        }*/
-        // Check if the player is inside the lava pool area
-        if (//player_transform.position.x >= lava_transform.position.x - LAVA_WIDTH &&
-            //player_transform.position.x <= lava_transform.position.x + LAVA_WIDTH &&
-            //player_transform.position.y >= lava_transform.position.y - LAVA_HEIGHT &&
-            player_transform.position.y <= lava_transform.position.y + LAVA_HEIGHT && !checked_once)
-        {
-            std::cout << "Player fell into lava!\n";
+           // std::cout << "Player fell into lava!\n";
             player_dead = true;
-			std::cout << GM.get_player_dead_state() << " in player script getting death state before setting" << std::endl;
+			//std::cout << GM.get_player_dead_state() << " in player script getting death state before setting" << std::endl;
             GM.set_player_dead_state(true);
-            std::cout << GM.get_player_dead_state() << " in player script getting death state after setting" << std::endl;
+            //std::cout << GM.get_player_dead_state() << " in player script getting death state after setting" << std::endl;
             // Trigger player death
         }
         else
         {
             player_dead = false;
-            std::cout << "player not into lava\n";
-
-       /*     std::cout << "||||||||||||||||||||||||||||" << std::endl;
-            std::cout << "Player not fell into lava!\n" << std::endl;
-            std::cout << "player_transform.position: " << player_transform.position.x << ", " << player_transform.position.y << std::endl;
-            std::cout << "lava_transform.position: " << lava_transform.position.x << ", " << lava_transform.position.y << std::endl;
-            std::cout << "Lava width and height: " << LAVA_WIDTH << ", " << LAVA_HEIGHT << std::endl;
-            std::cout << "----------------------------" << std::endl;*/
+           
         }
 
-        //std::cout << player_transform.position.x << " >= " << lava_transform.position.x 
-      
-
-       /* if (CS.get_player_interacts_with_lava())
-        {
-            std::cout << "Player fell into lava!\n";
-            is_player_dead = true;
-            GM.set_player_dead_state(true);
-        }
-        else
-        {
-            std::cout << "nottttt\n";
-        }
-        */
-#if 0
-        if (player_dead)
-        {
-       /*     ECSM.destroy_entity(lavaID);
-            
-            if (lavaID == INVALID_ENTITY_ID)
-            {
-                return;
-            }*/
-            // Stop sounds
-            ADM.stop_groups(GroupType::TYPE_BGM);
-            ADM.stop_groups(GroupType::TYPE_SFX);
-
-            GM.set_player_dead_state(true);
-
-            // Reset panic state if applicable
-            GM.reset_panic();
-            // Show the game over screen
-            for (auto& systems_gui : ECSM.get_systems()) {
-                if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
-
-                    gui_system->reset_all_game_state();
-                    // GM.set_player_dead_state(false);
-                    gui_system->show_game_over_menu();
-                    LM.write_log("Game over screen displayed - player died in lava");
-                    break;
-                }
-            }
-        }
-
-        std::cout << GM.get_player_dead_state() << " in player script\n";
-#endif
-
+   
         if (player_dead && !checked_once) {
             // Stop sounds
             ADM.stop_groups(GroupType::TYPE_BGM);
@@ -630,62 +565,8 @@ namespace lof {
                 }
             }
 
-            // Explicitly reset player state
-           // GM.set_player_dead_state(false);  // Add this line
-           //return;  // Exit early
         }
 
-    }
-#endif
-
-#if 0
-    void Player_Script::check_player_fall_into_lava() {
-        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        EntityID lavaID = ECSM.find_entity_by_name("lava_pool");
-
-        if (!playerID || !lavaID) {
-            LM.write_log("Error: Player or Lava entity not found.");
-            return;
-        }
-
-        auto& player_transform = ECSM.get_component<Transform2D>(playerID);
-        auto& lava_transform = ECSM.get_component<Transform2D>(lavaID);
-
-        float lava_width = lava_transform.scale.x;
-        float lava_height = lava_transform.scale.y;
-
-        if (player_transform.position.x >= lava_transform.position.x &&
-            player_transform.position.x <= lava_transform.position.x + lava_width &&
-            player_transform.position.y >= lava_transform.position.y &&
-            player_transform.position.y <= lava_transform.position.y + lava_height) {
-
-            std::cout << "Player fell into lava!\n";
-            handle_player_death();
-        }
-    }
-
-
-    void Player_Script::handle_player_death() {
-        std::cout << "Handling player death...\n";
-
-        GM.set_player_dead_state(true);
-
-        // Stop all sounds
-        ADM.stop_groups(GroupType::TYPE_BGM);
-        ADM.stop_groups(GroupType::TYPE_SFX);
-
-        // Reset panic state if applicable
-        GM.reset_panic();
-
-        // Show the game over screen
-        for (auto& systems_gui : ECSM.get_systems()) {
-            if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
-                gui_system->reset_all_game_state();
-                gui_system->show_game_over_menu();
-                LM.write_log("Game over screen displayed - player died in lava");
-                break;
-            }
-        }
     }
 #endif
 
