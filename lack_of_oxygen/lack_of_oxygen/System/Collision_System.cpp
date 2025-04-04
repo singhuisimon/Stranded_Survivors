@@ -1860,11 +1860,10 @@ namespace lof {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
-
                     // Handle button click logic
                     if (entity_name == "restart_button") {
                         LM.write_log("Win screen - Restart button pressed - starting fade transition to scene 2");
-
+                        
                         // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
                             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
@@ -1880,7 +1879,7 @@ namespace lof {
                     }
                     else { // main_menu_button
                         LM.write_log("Win screen - Main Menu button pressed - starting fade transition to main menu");
-
+                        
                         // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
                             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
