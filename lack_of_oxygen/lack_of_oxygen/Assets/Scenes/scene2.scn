@@ -372,6 +372,17 @@
               "islooping": false,
               "isactive": true,
               "is3d": false
+            },
+            {
+              "key": "blast off",
+              "filepath": "sfx_blast_off",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
             }
           ]
         },
@@ -745,7 +756,7 @@
               "filepath": "sfx_empty_laser_hit",
               "audio_type": 1,
               "max_simultaneous": 5,
-              "volume": 1.0,
+              "volume": 0.5,
               "pitch": 1.0,
               "islooping": false,
               "isactive": true,

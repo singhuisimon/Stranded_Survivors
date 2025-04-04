@@ -1447,6 +1447,10 @@ namespace lof {
 
     bool Collision_System::is_transitioning = false;
 
+    //Static variable to hold timer for clicking sound for quit button
+    static float timer = 0.0f;
+    static bool stop_playing = false; 
+
     void Collision_System::check_main_menu_button_collision(float delta_time) {
         (void)delta_time;  // Mark as intentionally unused
 
@@ -1516,9 +1520,7 @@ namespace lof {
             else if (entity_name == "setting_button") {
                 base_texture = "Settings_Batch_12";
             }
-                
-            audio.add_sound(main_menu_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
-
+           
             //Update button batch textures in the level editor
             //auto& buttons_and_associated_batches = IMGUIM.return_buttons_and_batches();
             /*for (auto& base_textures : buttons_and_associated_batches) {
@@ -1622,11 +1624,15 @@ namespace lof {
                         return;
                     }
                     else if (entity_name == "quit_button") {
-                        LM.write_log("Quit button pressed - ending game");
-                        GM.set_game_over(true);
+                        
+                        is_transitioning = true;
+                        current_cooldown = transition_cooldown;
+                        stop_playing = true;
+
                     }
                 }
                 else {
+                    main_menu_sound_playing[entity_name] = false; //reset
                     // Set highlighted state when just hovering
                     graphics.texture_name = base_texture + "_HIGHLIGHTED";
                 }
@@ -1636,6 +1642,23 @@ namespace lof {
                 graphics.texture_name = base_texture + "_NORMAL";
                 button_hover_states[entity_name] = false; //reset
                 main_menu_sound_playing[entity_name] = false;
+            }
+        }
+
+        if (stop_playing) {
+
+            //Time per frame
+            float delta_time = FPSM.get_delta_time();
+
+            //Progress in timer
+            timer += delta_time;
+
+            //Switching direction
+            if (timer >= 0.03f) {
+
+                LM.write_log("Quit button pressed - ending game");
+                GM.set_game_over(true);
+
             }
         }
     }
@@ -1837,11 +1860,10 @@ namespace lof {
                 if (IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT)) {
                     graphics.texture_name = base_texture + "_PRESSED";
                     ADM.play_now(entity_id, click_sound, audio);
-
                     // Handle button click logic
                     if (entity_name == "restart_button") {
                         LM.write_log("Win screen - Restart button pressed - starting fade transition to scene 2");
-
+                        
                         // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
                             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {
@@ -1857,7 +1879,7 @@ namespace lof {
                     }
                     else { // main_menu_button
                         LM.write_log("Win screen - Main Menu button pressed - starting fade transition to main menu");
-
+                        
                         // Find GUI System to start the fade transition
                         for (auto& system : ECSM.get_systems()) {
                             if (auto* gui_system = dynamic_cast<GUI_System*>(system.get())) {

@@ -216,9 +216,9 @@ int main(void) {
         std::stringstream ss;
         ss << "Lack Of Oxygen"; 
 //#ifndef NDEBUG
-        ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
+        //ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
 //#endif
-        glfwSetWindowTitle(window, ss.str().c_str());
+        // glfwSetWindowTitle(window, ss.str().c_str());
 
        /* const GLubyte* renderer = glGetString(GL_RENDERER);
         printf("GL Renderer  : %s\n", renderer);*/

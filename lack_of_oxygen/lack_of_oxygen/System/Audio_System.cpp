@@ -302,7 +302,7 @@ namespace lof {
 			channel->setChannelGroup(ADM.get_sfxgroup());
 			LM.write_log("audio added into SFX Group");
 		}
-		else {
+		else if (audio.get_audio_type(audio_key) == UI) {
 			channel->setChannelGroup(ADM.get_uigroup());
 			LM.write_log("audio added into UI Group");
 		}
