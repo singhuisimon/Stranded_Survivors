@@ -772,7 +772,7 @@ namespace lof {
                 return;
             
             }
-            std::cout << "Popup_EntityID: " << popup_entity_id << std::endl;
+            //std::cout << "Popup_EntityID: " << popup_entity_id << std::endl;
 
         //update position
         auto& transform = ECSM.get_component<Transform2D>(popup_entity_id);
