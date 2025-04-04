@@ -356,8 +356,8 @@ namespace lof {
         // --------------------------------------------------------
         // Only update if the game is not paused and player is not dead
         // Add check for GM.get_player_dead_state() here
-       // if (!GM.is_paused() && !GM.get_player_dead_state() && oxygen_interaction_container != INVALID_ENTITY_ID) {
-        if (!GM.is_paused() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+        if (!GM.is_paused() && !GM.get_player_dead_state() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+        //if (!GM.is_paused() && oxygen_interaction_container != INVALID_ENTITY_ID) {
             
             oxygen_update_accumulator += delta_time;
             if (oxygen_update_accumulator >= 1.0f) {
@@ -1767,10 +1767,10 @@ void GUI_System::hide_wormhole_gui() {
                     // Handle specific button
                     if (key == "restart") {
                         LM.write_log("Game over - Restart button pressed - starting fade transition to scene 2");
-
+                        std::cout << GM.get_player_dead_state() << " in GUI system restart b4 set\n";
                         // Set player dead false
-                       // GM.set_player_dead_state(false);
-                        //std::cout << GM.get_player_dead_state() << " in GUI system restart -----------------" << "\n";
+                        GM.set_player_dead_state(false);
+                        std::cout << GM.get_player_dead_state() << " in GUI system restart ----------------- after set" << "\n";
                         // Set restart true
                         //GM.set_restarting(true);
                         

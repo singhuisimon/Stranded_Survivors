@@ -66,6 +66,7 @@ namespace lof {
             auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);
+            player_script->set_once_flag(false);
             });
 
         player_script->add_function("update", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
@@ -540,11 +541,13 @@ namespace lof {
         if (//player_transform.position.x >= lava_transform.position.x - LAVA_WIDTH &&
             //player_transform.position.x <= lava_transform.position.x + LAVA_WIDTH &&
             //player_transform.position.y >= lava_transform.position.y - LAVA_HEIGHT &&
-            player_transform.position.y <= lava_transform.position.y + LAVA_HEIGHT)
+            player_transform.position.y <= lava_transform.position.y + LAVA_HEIGHT && !checked_once)
         {
             std::cout << "Player fell into lava!\n";
             player_dead = true;
-            //GM.set_player_dead_state(true);
+			std::cout << GM.get_player_dead_state() << " in player script getting death state before setting" << std::endl;
+            GM.set_player_dead_state(true);
+            std::cout << GM.get_player_dead_state() << " in player script getting death state after setting" << std::endl;
             // Trigger player death
         }
         else
@@ -607,12 +610,13 @@ namespace lof {
         std::cout << GM.get_player_dead_state() << " in player script\n";
 #endif
 
-        if (player_dead) {
+        if (player_dead && !checked_once) {
             // Stop sounds
             ADM.stop_groups(GroupType::TYPE_BGM);
             ADM.stop_groups(GroupType::TYPE_SFX);
 
             // Reset game state
+            checked_once = true;
            // GM.set_player_dead_state(true);
             GM.reset_panic();
 

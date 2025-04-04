@@ -374,7 +374,7 @@ namespace lof {
                         std::cout << "Player triggle tnt!\n";
                         // Player is caught in the TNT blast - show game over screen
                         is_player_dead = true;
-                        //GM.set_player_dead_state(true);  // Use the setter for better encapsulation
+                        GM.set_player_dead_state(true);  // Use the setter for better encapsulation
                     }
 
                     // Check if player is dead to reset the scene

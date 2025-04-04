@@ -115,6 +115,8 @@ namespace lof {
         bool m_is_transitioning = false;  // Flag for scene transitions
         bool restarting = false;
 
+        bool is_player_dead = false;
+
     public:
         /**
          * @brief Get the singleton instance of the Game_Manager.
@@ -235,9 +237,9 @@ namespace lof {
             panic_timer = 0.0f; 
         }
 
-        bool is_player_dead = false;
+        
         bool get_player_dead_state() const { return is_player_dead; }
-        //void set_player_dead_state(bool state) { is_player_dead = state; }
+        void set_player_dead_state(bool state) { is_player_dead = state; }
 
         bool is_mouse_left_pressed() const { return mouse_left_pressed; }
         bool is_mouse_left_held() const { return mouse_left_held; }

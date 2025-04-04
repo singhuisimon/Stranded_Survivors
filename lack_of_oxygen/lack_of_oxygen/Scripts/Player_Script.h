@@ -74,11 +74,14 @@ namespace lof {
 		bool key_a_last_frame = false;
 		bool key_d_last_frame = false;
 
+		bool checked_once = false;
+
 
 		//for panic 
 		float panic_level; 
 		float f_mag_original; 
 
+		void set_once_flag(bool flag) { checked_once = flag; }
 
 		/**
 		 * @brief Set the force flag for the player.
