@@ -135,7 +135,8 @@ namespace lof {
 		 */
 		void update_player_walking_particle();
 
-
+		void check_player_fall_into_lava();
+		void handle_player_death();
 		//---------------------------------------------------------------------------//
 		bool key_e_last_frame = false; // for tunnel
 		bool key_e_pressed = false;

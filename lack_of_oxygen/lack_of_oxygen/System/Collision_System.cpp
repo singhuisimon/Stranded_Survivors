@@ -1420,15 +1420,16 @@ namespace lof {
         
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
 
-        Detect_Obsidian_Bottom(delta_time);
+       // Detect_Obsidian_Bottom(delta_time);
 
         Colliside_Oxygen_Mineral(delta_time);
 
  
         resolve_collision_event(collisions);
 
-        player_interact_lava(delta_time);
-
+        //player_interact_lava(delta_time);
+       // player_interact_lava_test(delta_time);
+      
         //Detect_Obsidian_Bottom(delta_time);
 
         //EntityID wormhole = ECSM.find_entity_by_name("spritesheet_map");
@@ -1887,6 +1888,83 @@ namespace lof {
         }
     }
 
+#if 0
+    bool Collision_System::player_interact_lava_test(float delta_time)
+    {
+
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
+
+        if (playerID == INVALID_ENTITY_ID || lava_pool_ID == INVALID_ENTITY_ID) {
+            return false; // Entities not found
+        }
+
+
+
+        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player 
+        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
+        //auto& player_physic = ECSM.get_component<Physics_Component>(playerID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
+
+        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
+        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID); // get the position of the player 
+        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID); // get the position of the player 
+
+        float collisions = delta_time;
+        // AABB for player
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
+
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
+        {
+            std::cout << "yes!!!!\n";
+            return true;
+        }
+        else {
+            std::cout << "noo!!!\n";
+        }
+        return false;
+    }
+
+#endif
+
+#if 0
+    bool Collision_System::player_interact_lava_test(float delta_time)
+    {
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
+
+        if (playerID == INVALID_ENTITY_ID || lava_pool_ID == INVALID_ENTITY_ID) {
+            return false; // Entities not found
+        }
+
+        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player
+        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
+
+        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
+        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID);
+        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID);
+
+        float collisions = delta_time;
+        // AABB for player
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
+
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time)) {
+            std::cout << "Player interacts with lava! (with delta_time)\n";
+            return true;
+        }
+        else {
+            std::cout << "No interaction with lava. (with delta_time)\n";
+        }
+
+        return false;
+    }
+#endif
+
+
+#if 0
     void Collision_System::player_interact_lava(float delta_time)
     {
         
@@ -1968,6 +2046,8 @@ namespace lof {
         }
 
     }
+
+#endif 
 
 #if 1
     void Collision_System::Detect_Obsidian_Bottom(float delta_time)

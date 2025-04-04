@@ -356,7 +356,9 @@ namespace lof {
         // --------------------------------------------------------
         // Only update if the game is not paused and player is not dead
         // Add check for GM.get_player_dead_state() here
-        if (!GM.is_paused() && !GM.get_player_dead_state() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+       // if (!GM.is_paused() && !GM.get_player_dead_state() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+        if (!GM.is_paused() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+            
             oxygen_update_accumulator += delta_time;
             if (oxygen_update_accumulator >= 1.0f) {
                 oxygen_update_accumulator = 0.0f;
@@ -370,10 +372,10 @@ namespace lof {
         // --------------------------------------------------------
 
         // Only check oxygen warnings if player is not dead
-        if (!GM.get_player_dead_state()) {
+        //if (!GM.get_player_dead_state()) {
             // Check oxygen level and update warnings
             float current_oxygen = GM.get_current_oxygen_level();
-
+            
             // Determine if oxygen is decreasing or increasing
             oxygen_decreasing = (current_oxygen < previous_oxygen_level);
 
@@ -434,7 +436,7 @@ namespace lof {
 
             // Store current oxygen level for next frame comparison
             previous_oxygen_level = current_oxygen;
-        }
+        //}
 
         auto* container_transform = get_component_safe<Transform2D>(container_id);
         if (!container_transform) {
@@ -1428,7 +1430,7 @@ void GUI_System::hide_wormhole_gui() {
                         GM.set_paused(false);
 
                         // Set player dead false
-                        GM.set_player_dead_state(false);
+                       // GM.set_player_dead_state(false);
 
                         // Force hide pause menu first
                         hide_pause_menu();
@@ -1451,7 +1453,7 @@ void GUI_System::hide_wormhole_gui() {
                         mining_script->clear_tnt_to_destroy();
 
                         // Set player dead false
-                        GM.set_player_dead_state(false);
+                        //GM.set_player_dead_state(false);
 
                         // Force hide pause menu first
                         hide_pause_menu();
@@ -1517,6 +1519,8 @@ void GUI_System::hide_wormhole_gui() {
             // Explicitly add to system
             add_entity(overlay);
             LM.write_log("Added overlay to GUI system: %u", overlay);
+
+            std::cout << game_over_shown << " game over in gui system^^^^^^^^^^^^^^^^^^^^^^\n";
         }
 
         std::string click_sound = "main_menu";
@@ -1739,6 +1743,8 @@ void GUI_System::hide_wormhole_gui() {
             }
 
             if (is_hovered) {
+
+                std::cout << "yes !!! is hovered====================\n";
                 // Change texture to highlighted if not pressed
                 if (graphics.texture_name != base_texture + "_HIGHLIGHTED" &&
                     graphics.texture_name != base_texture + "_PRESSED")
@@ -1763,10 +1769,10 @@ void GUI_System::hide_wormhole_gui() {
                         LM.write_log("Game over - Restart button pressed - starting fade transition to scene 2");
 
                         // Set player dead false
-                        GM.set_player_dead_state(false);
-
+                       // GM.set_player_dead_state(false);
+                        //std::cout << GM.get_player_dead_state() << " in GUI system restart -----------------" << "\n";
                         // Set restart true
-                        GM.set_restarting(true);
+                        //GM.set_restarting(true);
                         
                         // Hide game over menu
                         hide_game_over_menu();
@@ -1783,7 +1789,7 @@ void GUI_System::hide_wormhole_gui() {
                         LM.write_log("Game over - Main Menu button pressed - starting fade transition to main menu");
 
                         // Set player dead false
-                        GM.set_player_dead_state(false);
+                       // GM.set_player_dead_state(false);
     
                         // Hide game over menu
                         hide_game_over_menu();

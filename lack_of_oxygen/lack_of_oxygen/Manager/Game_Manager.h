@@ -237,7 +237,7 @@ namespace lof {
 
         bool is_player_dead = false;
         bool get_player_dead_state() const { return is_player_dead; }
-        void set_player_dead_state(bool state) { is_player_dead = state; }
+        //void set_player_dead_state(bool state) { is_player_dead = state; }
 
         bool is_mouse_left_pressed() const { return mouse_left_pressed; }
         bool is_mouse_left_held() const { return mouse_left_held; }
@@ -247,8 +247,8 @@ namespace lof {
         bool is_transitioning() const { return m_is_transitioning; }
         void set_transitioning(bool state) { m_is_transitioning = state; }
 
-        bool is_restarting() const { return restarting; }
-        void set_restarting(bool new_state) { restarting = new_state; }
+ /*       bool is_restarting() const { return restarting; }
+        void set_restarting(bool new_state) { restarting = new_state; }*/
     };
 
 } // namespace lof

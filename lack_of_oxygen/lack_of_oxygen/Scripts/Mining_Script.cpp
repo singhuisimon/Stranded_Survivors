@@ -154,6 +154,7 @@ namespace lof {
     }
 
     void Mining_Script::update_surrounding_blocks(Particle_System* particle_system) {
+
         // Loop through the TNT to destroy and update it 
         for (auto start = tnt_to_destroy.begin(), end = tnt_to_destroy.end(); start != end;) {
 
@@ -370,10 +371,10 @@ namespace lof {
                     auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     if ((boundary_left <= player_transform.position.x && player_transform.position.x <= boundary_right) &&
                         (boundary_bottom <= player_transform.position.y && player_transform.position.y <= boundary_top)) {
-
+                        std::cout << "Player triggle tnt!\n";
                         // Player is caught in the TNT blast - show game over screen
                         is_player_dead = true;
-                        GM.set_player_dead_state(true);  // Use the setter for better encapsulation
+                        //GM.set_player_dead_state(true);  // Use the setter for better encapsulation
                     }
 
                     // Check if player is dead to reset the scene
