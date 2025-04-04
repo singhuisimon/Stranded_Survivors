@@ -55,6 +55,8 @@
     <ClCompile Include="Scripts\Player_Tutorial_Script.cpp" />
     <ClCompile Include="Scripts\Mini_Map_Script.cpp" />
     <ClCompile Include="Scripts\Sound_Setting_Script.cpp" />
+    <ClCompile Include="Scripts\Lava_Siren_Script.cpp" />
+    <ClCompile Include="Scripts\Win_Screen_Script.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Glad\glad.h" />
@@ -110,6 +112,8 @@
     <ClInclude Include="Scripts\Player_Tutorial_Script.h" />
     <ClInclude Include="Scripts\Mini_Map_Script.h" />
     <ClInclude Include="Scripts\Sound_Setting_Script.h" />
+    <ClInclude Include="Scripts\Lava_Siren_Script.h" />
+    <ClInclude Include="Scripts\Win_Screen_Script.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\square.msh" />
@@ -165,6 +169,8 @@
     <Media Include="Assets\Audio\sfx_tutorial_button.wav" />
     <Media Include="Assets\Audio\sfx_tutorial_lights.wav" />
     <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
+    <Media Include="Assets\Audio\bgm_game_over.wav" />
+    <Media Include="Assets\Audio\sfx_lava_siren.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />
@@ -214,9 +220,7 @@
     <Image Include="Assets\Textures\oxygen_refill_ui_text_batch_4.png" />
     <Image Include="Assets\Textures\oxygen_tank_batch_4.png" />
     <Image Include="Assets\Textures\rock.png" />
-    <Image Include="Assets\Textures\ship_open_batch_2.png" />
     <Image Include="Assets\Textures\skybox_batch_4.png" />
-    <Image Include="Assets\Textures\snowflake.png" />
     <Image Include="Assets\Textures\spritesheet_map.png" />
     <Image Include="Assets\Textures\spritesheet_player.png" />
     <Image Include="Assets\Textures\sun.png" />
@@ -238,13 +242,15 @@
     <Image Include="Assets\Textures\sapphire_particle_batch_14.png" />
     <Image Include="Assets\Textures\sparks_particle_batch_14.png" />
     <Image Include="Assets\Textures\Purple_Oxy_Warning_Batch_14.png" />
-    <Image Include="Assets\Textures\ship_open_batch_15.png" />
     <Image Include="Assets\Textures\skybox_batch_19.png" />
     <Image Include="Assets\Textures\obsidian_bottom_line_batch_19.png" />
     <Image Include="Assets\Textures\sweat_drop_single_batch_5.png" />
     <Image Include="Assets\Textures\foreground_clouds_batch_4.png" />
     <Image Include="Assets\Textures\screen_vignette_red_batch_19.png" />
     <Image Include="Assets\Textures\screen_vignette_black_batch_10.png" />
+    <Image Include="Assets\Textures\MISSION_ACCOMPLISHED_Batch_27.png" />
+    <Image Include="Assets\Textures\ship_closed_batch_23.png" />
+    <Image Include="Assets\Textures\main_menu_bg_batch_23_1.png" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Textures\Texture_Names.txt" />
