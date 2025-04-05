@@ -171,6 +171,8 @@
     <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
     <Media Include="Assets\Audio\bgm_game_over.wav" />
     <Media Include="Assets\Audio\sfx_lava_siren.wav" />
+    <Media Include="Assets\Audio\bgm_game_win.wav" />
+    <Media Include="Assets\Audio\sfx_blast_off.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />

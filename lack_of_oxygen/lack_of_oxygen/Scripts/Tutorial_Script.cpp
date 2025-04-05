@@ -268,7 +268,7 @@ namespace lof {
         else if (entity_name == "d_button") {
             //std::cout << "correct entity " << entity_name << std::endl;
             if (is_key_just_released(GLFW_KEY_D)) {
-                std::cout << "d released+++++++++++++++" << std::endl;
+                //std::cout << "d released+++++++++++++++" << std::endl;
                 set_tutorial_page(tutorial_page + 1);
                 tutorial_button_playing[entity_name] = false;
                 graphics.texture_name = base_texture + "_NORMAL";
