@@ -1329,6 +1329,9 @@ namespace lof {
         pause_menu_entities.clear();
     }
 
+    //Static variable to hold timer for clicking sound for quit button
+    static float timer = 0.0f;
+    static bool stop_playing = false;
 
     void GUI_System::check_pause_menu_button_collision(float delta_time) {
         (void)delta_time;  // Unused parameter
@@ -1496,10 +1499,12 @@ namespace lof {
                         start_screen_fade(true, "main_menu.scn", 0);
                     }
                     else if (entity_name == "quit_button") {
-                        ADM.play_now(entity_id, click_sound, audio);
 
-                        LM.write_log("Quit button pressed - ending game");
-                        GM.set_game_over(true);
+                        if (!stop_playing) {  //Only play sound once
+                            ADM.play_now(entity_id, click_sound, audio);
+                            stop_playing = true;
+                        }
+
                     }
                     // Return now so we do not process more than one button
                     return;
@@ -1513,6 +1518,23 @@ namespace lof {
                 // Mouse is not over the button, set back to normal
                 graphics.texture_name = base_texture + "_NORMAL";
                 pause_button_hover_states[entity_name] = false;
+            }
+        }
+
+        if (stop_playing) {
+
+            //Time per frame
+            float delta_time = FPSM.get_delta_time();
+
+            //Progress in timer
+            timer += delta_time;
+
+            //Switching direction
+            if (timer >= 0.4f) {
+
+                LM.write_log("Quit button pressed - ending game");
+                GM.set_game_over(true);
+
             }
         }
     }
