@@ -72,6 +72,8 @@ namespace lof {
             EntityID ship_id = ECSM.find_entity_by_name(ship_name);
             EntityID restart_id = ECSM.find_entity_by_name(restart_button_name);
             EntityID main_menu_id = ECSM.find_entity_by_name(main_menu_button_name);
+            EntityID top_ui_id = ECSM.find_entity_by_name(top_camera_ui);
+            EntityID bottom_ui_id = ECSM.find_entity_by_name(bottom_camera_ui);
 
             // Change asset for ship
             if (ship_id != INVALID_ENTITY_ID) {
@@ -176,6 +178,7 @@ namespace lof {
 
             // Ship to launch up to the sky
             if (launch_duration > 0.0f) {
+
                 // Decrement duration
                 launch_duration -= delta_time;
 
@@ -194,6 +197,30 @@ namespace lof {
                 if (7.0f >= launch_duration && launch_duration > 6.5f) { // 0.5s
                     ship_transform.position.y += delta_time * ship_launching_speed;
                     ship_launching_speed += ship_launching_speed * delta_time;
+
+                    // Also update top and bottom UI
+                    if (top_ui_id != INVALID_ENTITY_ID && bottom_ui_id != INVALID_ENTITY_ID &&
+                        ECSM.has_component<Transform2D>(top_ui_id) && ECSM.has_component<Transform2D>(bottom_ui_id)) {
+
+                        auto& top_ui_transform = ECSM.get_component<Transform2D>(top_ui_id);
+                        auto& bottom_ui_transform = ECSM.get_component<Transform2D>(bottom_ui_id);
+
+                        // Update top ui
+                        if (top_ui_transform.position.y > top_cap) {
+                            top_ui_transform.position.y -= delta_time * DEFAULT_UI_MOVING_SPEED;
+                        }
+                        else {
+                            top_ui_transform.position.y = top_cap;
+                        }
+
+                        // Update bottom ui
+                        if (bottom_ui_transform.position.y < bottom_cap) {
+                            bottom_ui_transform.position.y += delta_time * DEFAULT_UI_MOVING_SPEED;
+                        }
+                        else {
+                            bottom_ui_transform.position.y = bottom_cap;
+                        }
+                    }
                 }
                 else if (6.5f >= launch_duration && launch_duration > 6.2f) { // 0.3s
                     ship_transform.position.y -= delta_time * ship_launching_speed;

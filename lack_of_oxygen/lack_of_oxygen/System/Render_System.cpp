@@ -58,6 +58,14 @@ namespace lof {
             if (ui_overlay != INVALID_ENTITY_ID) {
                 end = std::prev(end, entities_size - ui_overlay);
             }
+        } else if (current_scene == 4) {
+
+            // Find position of top camera ui to indicate end of first iteration of objects
+            EntityID top_camera_ui = ECSM.find_entity_by_name("top_camera_ui");
+            size_t entities_size = all_entities.size();
+            if (top_camera_ui != INVALID_ENTITY_ID) {
+                end = std::prev(end, entities_size - top_camera_ui);
+            }
         }
 
         // TESTING
@@ -256,7 +264,7 @@ namespace lof {
         }
 
         // Update the UI entities 
-        if (current_scene == 2) {
+        if (current_scene == 2 || current_scene == 4) {
             start = end;
             end = all_entities.end();
 
@@ -316,10 +324,6 @@ namespace lof {
 
                 // Check if it's e-prompt
                 if (ECSM.find_entity_by_name("wormhole_e_prompt") == *start || ECSM.find_entity_by_name("mineral_popup") == *start) {
-                    if (ECSM.find_entity_by_name("mineral_popup") == *start) {
-                        
-                        //std::cout << "mineral pop up location: " << transform.position.x << " " << transform.position.y << std::endl;
-                    }
                     graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                 }
                 else {

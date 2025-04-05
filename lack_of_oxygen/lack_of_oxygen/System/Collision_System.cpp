@@ -1095,6 +1095,24 @@ namespace lof {
                                         deposit_count++;
                                     }
 
+                                    // Change mineral hopper texture and position
+                                    if (total_deposited_minerals >= 40000) {
+                                        EntityID mineral_hopper_id = ECSM.find_entity_by_name("mineral_hopper_conveyor");
+                                        
+                                        // Update texture
+                                        if (mineral_hopper_id != INVALID_ENTITY_ID && ECSM.has_component<Graphics_Component>(mineral_hopper_id)) {
+                                            auto& mineral_hopper_graphics = ECSM.get_component<Graphics_Component>(mineral_hopper_id);
+                                            mineral_hopper_graphics.texture_name = "mineral_hopper_conveyor_filled_batch_4";
+                                        }
+
+                                        // Update position
+                                        if (mineral_hopper_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(mineral_hopper_id)) {
+                                            auto& mineral_hopper_transform= ECSM.get_component<Transform2D>(mineral_hopper_id);
+                                            mineral_hopper_transform.position.y = -36.0f;
+                                            mineral_hopper_transform.scale.y = 238.0f;
+                                        }
+                                    } 
+
                                     // Calculate progress percentage based on total deposited minerals
                                     // This produces a value between 0.0 and 1.0
                                     float current_percentage = total_deposited_minerals / 50000.0f;
