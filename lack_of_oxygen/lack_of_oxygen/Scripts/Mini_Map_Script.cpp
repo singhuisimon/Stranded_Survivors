@@ -102,7 +102,7 @@ namespace lof
         float meter_bar_init_height = meter_bar_transform.scale.y; // 370
         float meter_bar_init_pos = meter_bar_transform.position.y;
         float meter_bar_top = meter_bar_init_pos + (meter_bar_init_height / 2.0f); //-204 -> -235 > different: 31
-       // std::cout << "meter_bar_top: " << meter_bar_top << "\n";
+        //std::cout << "meter_bar_top: " << meter_bar_top << "\n";
         float meter_bar_bottom = meter_bar_init_pos - (meter_bar_init_height / 2.0f); //-574 -> -605 different: 31 
         //std::cout << "meter_bar_bottom: " << meter_bar_bottom << "\n";
 
@@ -171,7 +171,7 @@ namespace lof
         }
 
         //================PLAYER================//
-       // std::cout << "======PLAYER data======" << "\n";
+        //std::cout << "======PLAYER data======" << "\n";
         float player_pos_y = player_transform.position.y;
         //std::cout << "player_pos_y: " << player_pos_y << "\n";
 

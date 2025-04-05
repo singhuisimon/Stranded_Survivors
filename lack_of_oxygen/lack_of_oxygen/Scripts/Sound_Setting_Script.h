@@ -42,11 +42,11 @@ namespace lof {
 
 		void init_entity();
 
-		void update_setting(EntityID entity_id);
+		void update_setting();
 
 		void update_multiplier();
 
-		void update_audio_bar(EntityID entity_id);
+		void update_audio_bar();
 
 		void update_audio_group();
 

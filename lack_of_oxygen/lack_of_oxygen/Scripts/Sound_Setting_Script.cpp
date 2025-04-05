@@ -47,16 +47,16 @@ namespace lof {
         auto sound_setting_script = shared_from_this();
 
         sound_setting_script->add_function("init", [weak_script = std::weak_ptr<Sound_Setting_Script>(sound_setting_script)](EntityID entity_id) {
-            //(void)entity_id;
+            (void)entity_id;
             auto sound_setting_script = weak_script.lock();
             sound_setting_script->init_entity();
-            sound_setting_script->update_setting(entity_id);
+            sound_setting_script->update_setting();
             });
 
         sound_setting_script->add_function("update", [weak_script = std::weak_ptr<Sound_Setting_Script>(sound_setting_script)](EntityID entity_id) {
             //(void)entity_id;
             auto sound_setting_script = weak_script.lock();
-            sound_setting_script->update_setting(entity_id);
+            sound_setting_script->update_setting();
             sound_setting_script->check_back_press(entity_id);
 
             });
@@ -74,9 +74,9 @@ namespace lof {
         back_button = ECSM.find_entity_by_name("back_button");
     }
 
-    void Sound_Setting_Script::update_setting(EntityID entity_id) {
+    void Sound_Setting_Script::update_setting() {
         update_multiplier();
-        update_audio_bar(entity_id);
+        update_audio_bar();
         update_audio_group();
     }
 
@@ -192,7 +192,7 @@ namespace lof {
         }
     }
 
-    void Sound_Setting_Script::update_audio_bar(EntityID entity_id) {
+    void Sound_Setting_Script::update_audio_bar() {
 
         //update x_setting and bar width
         if (master_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(master_id)) {
