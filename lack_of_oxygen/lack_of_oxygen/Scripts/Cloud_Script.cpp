@@ -83,12 +83,10 @@ namespace lof {
                 auto& cloud_win_2_transform = ECSM.get_component<Transform2D>(cloud_win_2_id);
 
                 // Determine cloud movement by current game fps
-                float fps = FPSM.get_current_fps();
                 cloud_win_1_transform.position.x += (moving_speed / fps);
                 cloud_win_2_transform.position.x += (moving_speed / fps);
 
                 // Reset cloud if it goes out of the screen
-                unsigned int screen_width = SM.get_scr_width();
                 if (cloud_win_1_transform.position.x >= static_cast<float>(screen_width)) {
                     cloud_win_1_transform.position.x = cloud_win_2_transform.position.x - static_cast<float>(screen_width);
                 }

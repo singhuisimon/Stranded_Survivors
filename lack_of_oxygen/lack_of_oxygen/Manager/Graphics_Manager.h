@@ -227,7 +227,6 @@ namespace lof {
          *
          *.@param shader The shader program that is to be started
          */
-         //void program_use(ShaderProgram shader);
         void program_use(GLuint program_handle);
 
         /**
@@ -241,10 +240,19 @@ namespace lof {
          * @param shader The shader program that is to return its program handle
          * @return The program handle
          */
-         //GLuint get_shader_program_handle(ShaderProgram shader) const;
         GLuint get_shader_program_handle(Assets_Manager::ShaderProgram shader) const;
 
-
+        /**
+         * @brief Calculate the Y position of the camera with damping effect
+         *
+         * @param current The current camera position 
+         * @param target The target camera position 
+         * @param velocity The camera velocity 
+         * @param damping The camera damping value
+         * @param delta_time Delta time value
+         * @param max_speed Maximum speed the camera can move at
+         * @return The final Y position value
+         */
         float camera_damp(GLfloat current, GLfloat target, GLfloat& velocity, GLfloat damping, float delta_time, float max_speed);
       
     };

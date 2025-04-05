@@ -21,9 +21,6 @@
 
 bool ship_launching = false;
 
-// TESTING
-#include "../Manager/Game_Manager.h"
-
 namespace lof {
 
     // Constructor for Win_Screen_Script
@@ -141,19 +138,11 @@ namespace lof {
                         background_speed -= background_speed * delta_time;
                     }
                 }
-                else if ((time_landed - 0.6f) >= launch_duration &&
-                    launch_duration > 0.0f &&
+                else if ((time_landed - 0.6f) >= launch_duration && launch_duration > 0.0f &&
                     win_background_transform.position.y > 1920.0f) { // Until end of launch
 
                     win_background_transform.position.y -= background_speed / 2.0f * delta_time;
-
-                    // Accelerate at the start and decelerate at the end (Smooth out the movement)
-                    //if (((time_landed - 0.4f) - launch_duration) < 0.05f) { // Accelerate
-                        //background_speed += background_speed * delta_time;
-                    //}
-                    //else { // Decelerate
                     background_speed -= background_speed * delta_time;
-                    //}
                 }
                 else if (launch_duration <= 0.0f) {
                     win_background_transform.position.y = 1920.0f;
