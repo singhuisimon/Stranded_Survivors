@@ -272,6 +272,8 @@ namespace lof {
             }
         }
 
+      
+
         mouse_left_pressed = IM.is_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT);
         mouse_left_released = IM.is_mouse_button_released(GLFW_MOUSE_BUTTON_LEFT);
         mouse_left_held = IM.is_mouse_button_held(GLFW_MOUSE_BUTTON_LEFT);
@@ -591,7 +593,7 @@ namespace lof {
             // Check for oxygen level first - if it reaches zero, show game over screen
             if (current_oxygen_level <= 0.0f) {
                 // Player is out of oxygen - show game over screen
-                set_player_dead_state(true);
+                //set_player_dead_state(true);
 
                 // Stop all audio first
                 //ADM.stop_mastergroup();
@@ -615,12 +617,14 @@ namespace lof {
                     }
                 }
             }
-
+        
+            std::cout << "Is Player Dead: " << (is_player_dead ? "YES" : "NO") << std::endl;
             // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
-
+              
                 if (!get_player_dead_state()) {
+
                     // Don't process lava in level editor mode
                     if (!level_editor_mode && game_playing) {
                         // Update lava timer

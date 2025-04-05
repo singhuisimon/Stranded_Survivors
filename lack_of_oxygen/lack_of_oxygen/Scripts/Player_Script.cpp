@@ -14,7 +14,7 @@
 #include "../Manager/ECS_Manager.h"
 #include "../Manager/Graphics_Manager.h"
 #include "../System/GUI_System.h"
-
+#include "../System/Collision_System.h"
 #include <GLFW/glfw3.h>
 
 namespace lof {
@@ -32,7 +32,7 @@ namespace lof {
 
         f_mag_original = DEFAULT_LR_FORCE_MAG;
         panic_level = 0.0f;
-        
+
         key_e_last_frame = false;
         key_e_pressed = false;
 
@@ -66,6 +66,7 @@ namespace lof {
             auto player_script = weak_script.lock();
             player_script->set_player_id(ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME));
             player_script->set_force_flag(-1);
+            player_script->set_once_flag(false);
             });
 
         player_script->add_function("update", [weak_script = std::weak_ptr<Player_Script>(player_script)](EntityID entity_id) {
@@ -93,6 +94,7 @@ namespace lof {
             player_script->update_player_movement(physics_comp);
             player_script->update_player_audio(physics_comp, audio_comp);
             player_script->update_player_animation();
+            player_script->check_player_fall_into_lava();
             //std::cout << "Wormhole pair erased for entity " << entity_id << "\n";
 
 
@@ -368,9 +370,9 @@ namespace lof {
     }
 
     void Player_Script::update_movement_forces(Physics_Component& physics_comp) {
-       
+
         float panic_multiplier = 1.0f + (panic_level / 100.0f);
-        float new_force_magnitude = f_mag_original * panic_multiplier; 
+        float new_force_magnitude = f_mag_original * panic_multiplier;
 
         //update force magnitudes for movement
         for (auto& force : physics_comp.force_helper.get_forces()) {
@@ -487,7 +489,7 @@ namespace lof {
             player.position.y <= wormhole.position.y + wormhole_half_height);
     }
 
-    void Player_Script::teleport_player( EntityID Player_ID, EntityID to_wormhole) {
+    void Player_Script::teleport_player(EntityID Player_ID, EntityID to_wormhole) {
         auto& player_transform = ECSM.get_component<Transform2D>(Player_ID);
         auto& to_wormhole_transform = ECSM.get_component<Transform2D>(to_wormhole);
 
@@ -495,7 +497,7 @@ namespace lof {
         player_transform.position = to_wormhole_transform.position;
 
 
-       // std::cout << "Player teleported to wormhole: " << to_wormhole << "\n";
+        // std::cout << "Player teleported to wormhole: " << to_wormhole << "\n";
     }
 
     void Player_Script::Cheap_Code_Teleport_Wormhole(float pos_x, float pos_y)
@@ -503,14 +505,69 @@ namespace lof {
         // cheap code for teleport 
         //if (is_key_just_pressed(GLFW_KEY_T))
         //{
-            auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-            player_transform.position.x = pos_x;
-            player_transform.position.y = pos_y;
+        auto& player_transform = ECSM.get_component<Transform2D>(player_id);
+        player_transform.position.x = pos_x;
+        player_transform.position.y = pos_y;
 
         //}
-       
+
     }
+   
 
+   
+#if 1
+    void Player_Script::check_player_fall_into_lava() {
 
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        EntityID lavaID = ECSM.find_entity_by_name("lava_pool");
+
+        auto& player_transform = ECSM.get_component<Transform2D>(playerID);
+        auto& lava_transform = ECSM.get_component<Transform2D>(lavaID);
+        float LAVA_WIDTH = lava_transform.scale.x / 2;
+        float LAVA_HEIGHT = lava_transform.scale.y / 2;
+
+        bool player_dead = false;
+        //std::cout << "checking outside if transform " << "\n";
+        // Check if the player is inside the lava pool area
+        if (player_transform.position.y <= lava_transform.position.y + LAVA_HEIGHT && !checked_once)
+        {
+           // std::cout << "Player fell into lava!\n";
+            player_dead = true;
+			//std::cout << GM.get_player_dead_state() << " in player script getting death state before setting" << std::endl;
+            GM.set_player_dead_state(true);
+            //std::cout << GM.get_player_dead_state() << " in player script getting death state after setting" << std::endl;
+            // Trigger player death
+        }
+        else
+        {
+            player_dead = false;
+           
+        }
+
+   
+        if (player_dead && !checked_once) {
+            // Stop sounds
+            ADM.stop_groups(GroupType::TYPE_BGM);
+            ADM.stop_groups(GroupType::TYPE_SFX);
+
+            // Reset game state
+            checked_once = true;
+           // GM.set_player_dead_state(true);
+            GM.reset_panic();
+
+            // Show game over screen
+            for (auto& systems_gui : ECSM.get_systems()) {
+                if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
+                    gui_system->reset_all_game_state();
+                    gui_system->show_game_over_menu();
+                    LM.write_log("Game over screen displayed - player died in lava");
+                    break;
+                }
+            }
+
+        }
+
+    }
+#endif
 
 }

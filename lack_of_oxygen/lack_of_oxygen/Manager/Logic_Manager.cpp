@@ -38,6 +38,7 @@ namespace lof {
 		std::call_once(once_flag, []() {
 			instance.reset(new Logic_Manager);
 			});
+		//static Logic_Manager instance;
 		return *instance;
 	}
 

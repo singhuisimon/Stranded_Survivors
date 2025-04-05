@@ -372,10 +372,10 @@ namespace lof {
     }
 
     void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
-        
+
         auto& e_physics = ECSM.get_component<Physics_Component>(id);
         auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
-        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME); 
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
         //separate audio state tracking for each type
         static bool is_in_up_vent = false;
@@ -390,35 +390,35 @@ namespace lof {
 
         switch (direction) {
 
-            case VentDirection::UP: {
-                //apply up movement
-                e_physics.force_helper.activate_force(VENT_FORCE);
-                break;
-            }
-            case VentDirection::LEFT: {
-                //update player animation 
-                int& player_direction = GFXM.get_player_direction();
-                player_direction = FACE_LEFT;
-                int& moving_status = GFXM.get_moving_status(); 
-                moving_status = RUN_LEFT;
+        case VentDirection::UP: {
+            //apply up movement
+            e_physics.force_helper.activate_force(VENT_FORCE);
+            break;
+        }
+        case VentDirection::LEFT: {
+            //update player animation 
+            int& player_direction = GFXM.get_player_direction();
+            player_direction = FACE_LEFT;
+            int& moving_status = GFXM.get_moving_status();
+            moving_status = RUN_LEFT;
 
-                //apply force
-                e_physics.force_helper.activate_force(MOVE_LEFT);
-                break;
-            }
-            case VentDirection::RIGHT: {
-                //Update player animation
-                int& player_direction = GFXM.get_player_direction();
-                player_direction = FACE_RIGHT;
-                int& moving_status = GFXM.get_moving_status();
-                moving_status = RUN_RIGHT;
+            //apply force
+            e_physics.force_helper.activate_force(MOVE_LEFT);
+            break;
+        }
+        case VentDirection::RIGHT: {
+            //Update player animation
+            int& player_direction = GFXM.get_player_direction();
+            player_direction = FACE_RIGHT;
+            int& moving_status = GFXM.get_moving_status();
+            moving_status = RUN_RIGHT;
 
-                //apply force
-                e_physics.force_helper.activate_force(MOVE_RIGHT);
-                break;
-            }
-            default: 
-                return;
+            //apply force
+            e_physics.force_helper.activate_force(MOVE_RIGHT);
+            break;
+        }
+        default:
+            return;
         }
 
         //handle audio 
@@ -436,7 +436,7 @@ namespace lof {
         if (!found_next_vent) {
             //vent exit 
             if (direction == VentDirection::UP) {
-               // e_physics.force_helper.deactivate_force(VENT_FORCE); 
+                // e_physics.force_helper.deactivate_force(VENT_FORCE); 
             }
 
             if (is_in_vent) {
@@ -448,16 +448,16 @@ namespace lof {
 
                 bool fade_active = is_fade_active();
 
-                if (!GM.get_player_dead_state() && !fade_active) {                 
+                if (!GM.get_player_dead_state() && !fade_active) {
                     ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                     ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
                 }
 
                 if (fade_active) {
-                            
+
                     ADM.pause_group(GroupType::TYPE_BGM);
                     ADM.pause_group(GroupType::TYPE_SFX);
-                    
+
                     //ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                     //ADM.stop_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent out"));
                 }
@@ -1427,8 +1427,9 @@ namespace lof {
  
         resolve_collision_event(collisions);
 
-        player_interact_lava(delta_time);
-
+        //player_interact_lava(delta_time);
+       // player_interact_lava_test(delta_time);
+      
         //Detect_Obsidian_Bottom(delta_time);
 
         //EntityID wormhole = ECSM.find_entity_by_name("spritesheet_map");
@@ -1463,6 +1464,8 @@ namespace lof {
 
         // Return early if we're transitioning
         if (is_transitioning) return;
+
+        if (GM.is_transitioning()) return;
 
         // Get mouse position in world coordinates
         Vec2D world_mouse_pos = ESS.Get_World_MousePos();
@@ -1515,7 +1518,7 @@ namespace lof {
                 base_texture = "Main_Menu_Credits_Batch_14";
             }
             else if (entity_name == "quit_button") {
-                base_texture = "Main_Menu_Quit_Batch_14";
+                base_texture = "Quit_Game_Batch_30";
             }
             else if (entity_name == "setting_button") {
                 base_texture = "Settings_Batch_12";
@@ -1765,7 +1768,11 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        //IMGUIM.set_current_file_shown(scene_file);
+                        IMGUIM.set_current_file_shown(scene_file);
+
+                        // Set the transitioning to false for Game Manager as there is no fadeout here.
+						GM.set_transitioning(false);
+
                         current_cooldown = transition_cooldown;  // Set the cooldown timer
                         is_transitioning = true;
                         return;
@@ -1907,10 +1914,102 @@ namespace lof {
         }
     }
 
+#if 0
+    bool Collision_System::player_interact_lava_test(float delta_time)
+    {
+
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
+
+        if (playerID == INVALID_ENTITY_ID || lava_pool_ID == INVALID_ENTITY_ID) {
+            return false; // Entities not found
+        }
+
+
+
+        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player 
+        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
+        //auto& player_physic = ECSM.get_component<Physics_Component>(playerID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
+
+        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
+        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID); // get the position of the player 
+        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID); // get the position of the player 
+
+        float collisions = delta_time;
+        // AABB for player
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
+
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
+        {
+            std::cout << "yes!!!!\n";
+            return true;
+        }
+        else {
+            std::cout << "noo!!!\n";
+        }
+        return false;
+    }
+
+#endif
+
+#if 0
+    bool Collision_System::player_interact_lava_test(float delta_time)
+    {
+        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
+
+        if (playerID == INVALID_ENTITY_ID || lava_pool_ID == INVALID_ENTITY_ID) {
+            return false; // Entities not found
+        }
+
+        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player
+        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
+        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
+
+        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
+        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID);
+        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID);
+
+        float collisions = delta_time;
+        // AABB for player
+        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
+        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
+
+        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time)) {
+            std::cout << "Player interacts with lava! (with delta_time)\n";
+            return true;
+        }
+        else {
+            std::cout << "No interaction with lava. (with delta_time)\n";
+        }
+
+        return false;
+    }
+#endif
+
+
+#if 0
     void Collision_System::player_interact_lava(float delta_time)
     {
         
         if (GM.get_current_scene() != 2) {
+            if (is_player_dead) {
+                is_player_dead = GM.get_player_dead_state();
+            }
+            return;
+        }
+
+        if (GM.is_restarting()) {
+            if (is_player_dead && cooldown_restart <= 0.0f) {
+                is_player_dead = false;
+                GM.set_restarting(false);
+                cooldown_restart = COOLDOWN_TIMER_FOR_RESTART;
+            }
+            else {
+                cooldown_restart -= FPSM.get_delta_time();
+            }
             return;
         }
 
@@ -1974,6 +2073,8 @@ namespace lof {
 
     }
 
+#endif 
+
 #if 1
     void Collision_System::Detect_Obsidian_Bottom(float delta_time)
     {
@@ -1981,7 +2082,7 @@ namespace lof {
         if (GM.get_current_scene() != 2) {
             return;
         }
-
+        
         // Find entities
         EntityID obsidian_entity = ECSM.find_entity_by_name("obsidian_bottom");
         EntityID player_ID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);

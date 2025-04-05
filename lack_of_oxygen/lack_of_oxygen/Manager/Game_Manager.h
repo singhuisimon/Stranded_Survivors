@@ -113,6 +113,9 @@ namespace lof {
         bool mouse_left_released = false;
 
         bool m_is_transitioning = false;  // Flag for scene transitions
+        bool restarting = false;
+
+        bool is_player_dead = false;
 
     public:
         /**
@@ -234,7 +237,7 @@ namespace lof {
             panic_timer = 0.0f; 
         }
 
-        bool is_player_dead = false;
+        
         bool get_player_dead_state() const { return is_player_dead; }
         void set_player_dead_state(bool state) { is_player_dead = state; }
 
@@ -245,6 +248,9 @@ namespace lof {
 
         bool is_transitioning() const { return m_is_transitioning; }
         void set_transitioning(bool state) { m_is_transitioning = state; }
+
+ /*       bool is_restarting() const { return restarting; }
+        void set_restarting(bool new_state) { restarting = new_state; }*/
     };
 
 } // namespace lof

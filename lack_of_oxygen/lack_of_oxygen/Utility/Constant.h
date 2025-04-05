@@ -197,6 +197,7 @@ namespace lof {
 	constexpr unsigned int	COLLISION_RIGHT = 0x00000002;	//0010
 	constexpr const unsigned int	COLLISION_TOP = 0x00000004;	//0100
 	constexpr const unsigned int	COLLISION_BOTTOM = 0x00000008;	//1000
+	constexpr const float			COOLDOWN_TIMER_FOR_RESTART = 2.0f;
 
 	// ------------------------------- Logic_System.cpp -----------------------------------
 

@@ -22,6 +22,7 @@
 #include "../System/Collision_System.h"
 #include "../Utility/Entity_Selector_Helper.h"
 #include "../Scripts/Mining_Script.h"
+#include "../Scripts/Tutorial_Script.h"
 // Include Utility headers
 #include "../Utility/Constant.h"
 
@@ -357,6 +358,8 @@ namespace lof {
         // Only update if the game is not paused and player is not dead
         // Add check for GM.get_player_dead_state() here
         if (!GM.is_paused() && !GM.get_player_dead_state() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+        //if (!GM.is_paused() && oxygen_interaction_container != INVALID_ENTITY_ID) {
+            
             oxygen_update_accumulator += delta_time;
             if (oxygen_update_accumulator >= 1.0f) {
                 oxygen_update_accumulator = 0.0f;
@@ -373,7 +376,7 @@ namespace lof {
         if (!GM.get_player_dead_state()) {
             // Check oxygen level and update warnings
             float current_oxygen = GM.get_current_oxygen_level();
-
+            
             // Determine if oxygen is decreasing or increasing
             oxygen_decreasing = (current_oxygen < previous_oxygen_level);
 
@@ -1326,6 +1329,9 @@ namespace lof {
         pause_menu_entities.clear();
     }
 
+    //Static variable to hold timer for clicking sound for quit button
+    static float timer = 0.0f;
+    static bool stop_playing = false;
 
     void GUI_System::check_pause_menu_button_collision(float delta_time) {
         (void)delta_time;  // Unused parameter
@@ -1341,6 +1347,7 @@ namespace lof {
 
         // Get the mining script
         auto mining_script = std::dynamic_pointer_cast<Mining_Script>(LGM.get_script("mining_script"));
+        auto tutorial_script = std::dynamic_pointer_cast<Tutorial_Script>(LGM.get_script("tutorial_script"));
 
         // Get the current mouse position in screen coordinates
         double screen_mouse_x, screen_mouse_y;
@@ -1477,6 +1484,8 @@ namespace lof {
 
                         mining_script->clear_tnt_to_destroy();
 
+                      
+
                         // Set player dead false
                         GM.set_player_dead_state(false);
 
@@ -1490,10 +1499,12 @@ namespace lof {
                         start_screen_fade(true, "main_menu.scn", 0);
                     }
                     else if (entity_name == "quit_button") {
-                        ADM.play_now(entity_id, click_sound, audio);
 
-                        LM.write_log("Quit button pressed - ending game");
-                        GM.set_game_over(true);
+                        if (!stop_playing) {  //Only play sound once
+                            ADM.play_now(entity_id, click_sound, audio);
+                            stop_playing = true;
+                        }
+
                     }
                     // Return now so we do not process more than one button
                     return;
@@ -1507,6 +1518,23 @@ namespace lof {
                 // Mouse is not over the button, set back to normal
                 graphics.texture_name = base_texture + "_NORMAL";
                 pause_button_hover_states[entity_name] = false;
+            }
+        }
+
+        if (stop_playing) {
+
+            //Time per frame
+            float delta_time = FPSM.get_delta_time();
+
+            //Progress in timer
+            timer += delta_time;
+
+            //Switching direction
+            if (timer >= 0.4f) {
+
+                LM.write_log("Quit button pressed - ending game");
+                GM.set_game_over(true);
+
             }
         }
     }
@@ -1550,6 +1578,8 @@ namespace lof {
             // Explicitly add to system
             add_entity(overlay);
             LM.write_log("Added overlay to GUI system: %u", overlay);
+
+            //std::cout << game_over_shown << " game over in gui system^^^^^^^^^^^^^^^^^^^^^^\n";
         }
 
         std::string click_sound = "main_menu";
@@ -1772,6 +1802,8 @@ namespace lof {
             }
 
             if (is_hovered) {
+
+                //std::cout << "yes !!! is hovered====================\n";
                 // Change texture to highlighted if not pressed
                 if (graphics.texture_name != base_texture + "_HIGHLIGHTED" &&
                     graphics.texture_name != base_texture + "_PRESSED")
@@ -1794,9 +1826,12 @@ namespace lof {
                     // Handle specific button
                     if (key == "restart") {
                         LM.write_log("Game over - Restart button pressed - starting fade transition to scene 2");
-
+                        //std::cout << GM.get_player_dead_state() << " in GUI system restart b4 set\n";
                         // Set player dead false
                         GM.set_player_dead_state(false);
+                        //std::cout << GM.get_player_dead_state() << " in GUI system restart ----------------- after set" << "\n";
+                        // Set restart true
+                        //GM.set_restarting(true);
                         
                         // Hide game over menu
                         hide_game_over_menu();

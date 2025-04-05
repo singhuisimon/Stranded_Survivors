@@ -58,9 +58,11 @@ namespace lof {
                 return;
             }
             tutorial_script->check_keys();
-            tutorial_script->check_pressing_button(entity_id);
+            if (!GM.is_transitioning()) {
+                tutorial_script->check_pressing_button(entity_id);
+            }
             tutorial_script->transit_next_scene();
-            //std::cout << "tutorial script update" << std::endl;
+            //std::cout << "tutorial script update^^^^^^^^^^^^^^^^^^^^" << std::endl;
             });
 
     }
@@ -241,14 +243,14 @@ namespace lof {
         if (entity_name == "a_button") {
 
             if (is_key_just_released(GLFW_KEY_A)) {
-                //std::cout << "a is released" << std::endl;
+                //std::cout << "a is released====================" << std::endl;
                 set_tutorial_page(tutorial_page - 1);
                 tutorial_button_playing[entity_name] = false;
                 graphics.texture_name = base_texture + "_NORMAL";
                 return;
             }
             else if (key_a_pressed) {
-                //std::cout << "a is held" << std::endl;
+                //std::cout << "a is held=======================" << std::endl;
                 if (!tutorial_button_playing[entity_name]) {
                     ADM.play_now(entity_id, button_audio, audio);
                     tutorial_button_playing[entity_name] = true;
@@ -266,14 +268,14 @@ namespace lof {
         else if (entity_name == "d_button") {
             //std::cout << "correct entity " << entity_name << std::endl;
             if (is_key_just_released(GLFW_KEY_D)) {
-                //std::cout << "d released" << std::endl;
+                std::cout << "d released+++++++++++++++" << std::endl;
                 set_tutorial_page(tutorial_page + 1);
                 tutorial_button_playing[entity_name] = false;
                 graphics.texture_name = base_texture + "_NORMAL";
                 return;
             }
             else if (key_d_pressed) {
-                //std::cout << "d is held" << std::endl;
+                //std::cout << "d is held+++++++++++++++++" << std::endl;
                 if (!tutorial_button_playing[entity_name]) {
                     ADM.play_now(entity_id, button_audio, audio);
                     tutorial_button_playing[entity_name] = true;

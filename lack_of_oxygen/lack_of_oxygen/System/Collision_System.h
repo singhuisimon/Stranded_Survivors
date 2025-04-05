@@ -169,6 +169,20 @@ namespace lof {
             total_deposited_minerals = 0;
         }
 
+#if 0
+        bool player_interact_lava_test(float delta_time);
+
+        bool player_interacts_with_lava = false;
+
+        void update_player_lava_interaction(float delta_time) {
+            // Store the result from the test function
+            player_interacts_with_lava = player_interact_lava_test(delta_time);
+        }
+
+        bool get_player_interacts_with_lava() const {
+            return player_interacts_with_lava;
+        }
+#endif
 
     private:
         static std::unique_ptr<Collision_System> instance;
@@ -212,6 +226,7 @@ namespace lof {
         std::unordered_map<std::string, bool> main_menu_sound_playing;
 
         bool is_player_dead = false;
+        float cooldown_restart = COOLDOWN_TIMER_FOR_RESTART;
 
         // to get oxygen
         //static bool oxygen_increasing;
@@ -310,6 +325,10 @@ namespace lof {
         * @return Return the string side that is collide
         */
         void Detect_Obsidian_Bottom(float delta_time);
+
+       
+
+
 
        
     };
