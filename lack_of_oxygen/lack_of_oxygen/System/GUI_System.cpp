@@ -1140,28 +1140,28 @@ namespace lof {
     }
 
 #endif
-void GUI_System::hide_wormhole_gui() {
-    const std::vector<std::string*> entity_names = {
-        &wormhole_e_prompt_name
-    };
+    void GUI_System::hide_wormhole_gui() {
+        const std::vector<std::string*> entity_names = {
+            &wormhole_e_prompt_name
+        };
 
-    for (auto* name_ptr : entity_names) {
-        if (!name_ptr->empty()) {
-            EntityID entity = ecs_manager.find_entity_by_name(*name_ptr);
-            if (entity != INVALID_ENTITY_ID) {
-                ecs_manager.destroy_entity(entity);
+        for (auto* name_ptr : entity_names) {
+            if (!name_ptr->empty()) {
+                EntityID entity = ecs_manager.find_entity_by_name(*name_ptr);
+                if (entity != INVALID_ENTITY_ID) {
+                    ecs_manager.destroy_entity(entity);
 
-                // Reset the wormhole_e_prompt ID after destroying the entity
-                if (name_ptr == &wormhole_e_prompt_name) {
-                    wormhole_e_prompt = INVALID_ENTITY_ID;
+                    // Reset the wormhole_e_prompt ID after destroying the entity
+                    if (name_ptr == &wormhole_e_prompt_name) {
+                        wormhole_e_prompt = INVALID_ENTITY_ID;
+                    }
                 }
-            }
 
-            // Always clear the name, even if the entity is not found
-            name_ptr->clear();
+                // Always clear the name, even if the entity is not found
+                name_ptr->clear();
+            }
         }
     }
-}
 
     void GUI_System::show_pause_menu() {
         // Don't show if already shown
@@ -1176,7 +1176,7 @@ void GUI_System::hide_wormhole_gui() {
         if (overlay != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(overlay)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Pause_Screen_Batch_26";
+                graphics->texture_name = "pause_screen_updated";
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(overlay)) {
@@ -1186,7 +1186,7 @@ void GUI_System::hide_wormhole_gui() {
             pause_menu_entities["overlay"] = overlay;
         }
 
-        // Create Resume button
+        // Create Resume button - positioned higher
         EntityID resume_button = ecs_manager.clone_entity_from_prefab("gui_container", "resume_button");
         if (resume_button != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(resume_button)) {
@@ -1195,7 +1195,7 @@ void GUI_System::hide_wormhole_gui() {
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(resume_button)) {
-                transform->position = Vec2D(0.0f, 0.0f);
+                transform->position = Vec2D(0.0f, 0.0f);  // Moved up significantly
                 transform->scale = Vec2D(240.0f, 80.0f);
             }
 
@@ -1207,7 +1207,7 @@ void GUI_System::hide_wormhole_gui() {
             pause_menu_entities["resume"] = resume_button;
         }
 
-        // Create Restart button
+        // Create Restart button - keeping original spacing but moved up
         EntityID restart_button = ecs_manager.clone_entity_from_prefab("gui_container", "restart_button");
         if (restart_button != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(restart_button)) {
@@ -1216,7 +1216,7 @@ void GUI_System::hide_wormhole_gui() {
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(restart_button)) {
-                transform->position = Vec2D(0.0f, -100.0f);
+                transform->position = Vec2D(0.0f, -100.0f);  // Moved up to 0
                 transform->scale = Vec2D(240.0f, 80.0f);
             }
 
@@ -1228,7 +1228,7 @@ void GUI_System::hide_wormhole_gui() {
             pause_menu_entities["restart"] = restart_button;
         }
 
-        // Create Main Menu button
+        // Create Main Menu button - keeping original spacing but moved up
         EntityID main_menu_button = ecs_manager.clone_entity_from_prefab("gui_container", "main_menu_button");
         if (main_menu_button != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(main_menu_button)) {
@@ -1237,7 +1237,7 @@ void GUI_System::hide_wormhole_gui() {
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(main_menu_button)) {
-                transform->position = Vec2D(0.0f, -200.0f);
+                transform->position = Vec2D(0.0f, -200.0f);  // Moved up relative to previous positions
                 transform->scale = Vec2D(240.0f, 80.0f);
             }
 
@@ -1247,6 +1247,27 @@ void GUI_System::hide_wormhole_gui() {
             ecs_manager.add_component(main_menu_button, audio_comp);
 
             pause_menu_entities["main_menu"] = main_menu_button;
+        }
+
+        // Create Quit button - keeping original spacing but moved up
+        EntityID quit_button = ecs_manager.clone_entity_from_prefab("gui_container", "quit_button");
+        if (quit_button != INVALID_ENTITY_ID) {
+            if (auto* graphics = get_component_safe<Graphics_Component>(quit_button)) {
+                graphics->model_name = "square";
+                graphics->texture_name = "Main_Menu_Quit_Batch_14_NORMAL";
+                graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            if (auto* transform = get_component_safe<Transform2D>(quit_button)) {
+                transform->position = Vec2D(0.0f, -300.0f);  // Moved up relative to previous positions
+                transform->scale = Vec2D(240.0f, 80.0f);
+            }
+
+            // Add empty Audio Component - needed for hover detection
+            Audio_Component audio_comp;
+            audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
+            ecs_manager.add_component(quit_button, audio_comp);
+
+            pause_menu_entities["quit"] = quit_button;
         }
     }
 
@@ -1271,7 +1292,8 @@ void GUI_System::hide_wormhole_gui() {
         const std::vector<std::string> button_order = {
             "resume",
             "restart",
-            "main_menu"
+            "main_menu",
+            "quit"
         };
 
         for (const auto& button_key : button_order) {
@@ -1288,7 +1310,8 @@ void GUI_System::hide_wormhole_gui() {
         const std::vector<std::string> button_names = {
             "resume_button",
             "restart_button",
-            "main_menu_button"
+            "main_menu_button",
+            "quit_button"
         };
 
         for (const auto& name : button_names) {
@@ -1338,13 +1361,14 @@ void GUI_System::hide_wormhole_gui() {
 
             const std::string& entity_name = entity->get_name();
 
-            // We only care about these three named entities in the pause menu
             if (entity_name != "resume_button" &&
                 entity_name != "restart_button" &&
-                entity_name != "main_menu_button")
+                entity_name != "main_menu_button" &&
+                entity_name != "quit_button")
             {
                 continue;
             }
+
 
             // Ensure required components are present
             if (!ecs_manager.has_component<Transform2D>(entity_id) ||
@@ -1364,7 +1388,7 @@ void GUI_System::hide_wormhole_gui() {
 
             // NOTE the subtraction for Y:
             float button_screen_x = center_x + transform.position.x;
-            float button_screen_y = center_y - transform.position.y - 95.0f;
+            float button_screen_y = center_y - transform.position.y - 75.0f;
 
             float screen_left = button_screen_x - half_width;
             float screen_right = button_screen_x + half_width;
@@ -1390,6 +1414,9 @@ void GUI_System::hide_wormhole_gui() {
             }
             else if (entity_name == "main_menu_button") {
                 base_texture = "Main_Menu_Batch_14";
+            }
+            else if (entity_name == "quit_button") {
+                base_texture = "Main_Menu_Quit_Batch_14";
             }
 
             // Ensure we have a recorded hover state for this button
@@ -1461,6 +1488,12 @@ void GUI_System::hide_wormhole_gui() {
 
                         // Start the fade transition to main menu
                         start_screen_fade(true, "main_menu.scn", 0);
+                    }
+                    else if (entity_name == "quit_button") {
+                        ADM.play_now(entity_id, click_sound, audio);
+
+                        LM.write_log("Quit button pressed - ending game");
+                        GM.set_game_over(true);
                     }
                     // Return now so we do not process more than one button
                     return;
