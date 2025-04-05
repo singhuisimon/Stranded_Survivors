@@ -91,8 +91,8 @@ namespace lof {
 	void Force_Helper::add_force(const Force& force) {
 		forces.push_back(force);
 		//std::cout << "Pushing Forces to the forces list" << std::endl
-		//	<< force.type << ": Force Type " << std::endl
-		//	<< force.magnitude << ": Force Magnitude " << std::endl; 
+			//<< force.type << ": Force Type " << std::endl
+			//<< force.magnitude << ": Force Magnitude " << std::endl; 
 	}
 
 	/**

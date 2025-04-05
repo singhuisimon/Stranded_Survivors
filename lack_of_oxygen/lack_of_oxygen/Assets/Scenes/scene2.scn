@@ -340,7 +340,7 @@
             1.0,
             1.0
           ],
-          "texture_name": "ship_open_batch_15",
+          "texture_name": "ship_open_batch_23",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -2135,7 +2135,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "screen_vignette_black_batch_10",
+          "texture_name": "screen_vignette_black_batch_26",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
