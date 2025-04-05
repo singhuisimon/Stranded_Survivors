@@ -340,7 +340,7 @@
             1.0,
             1.0
           ],
-          "texture_name": "ship_open_batch_15",
+          "texture_name": "ship_open_batch_23",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [
@@ -365,6 +365,17 @@
             {
               "key": "game win",
               "filepath": "bgm_game_win",
+              "audio_type": 1,
+              "max_simultaneous": 1,
+              "volume": 1.0,
+              "pitch": 1.0,
+              "islooping": false,
+              "isactive": true,
+              "is3d": false
+            },
+            {
+              "key": "blast off",
+              "filepath": "sfx_blast_off",
               "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 1.0,
@@ -745,7 +756,7 @@
               "filepath": "sfx_empty_laser_hit",
               "audio_type": 1,
               "max_simultaneous": 5,
-              "volume": 1.0,
+              "volume": 0.5,
               "pitch": 1.0,
               "islooping": false,
               "isactive": true,
@@ -2124,7 +2135,7 @@
             1.0,
             0.0
           ],
-          "texture_name": "screen_vignette_black_batch_10",
+          "texture_name": "screen_vignette_black_batch_26",
           "shd_ref": 0,
           "mdl_to_ndc_xform": [
             [

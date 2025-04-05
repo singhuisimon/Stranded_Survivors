@@ -527,7 +527,7 @@
               "filepath": "sfx_tnt_boom",
               "audio_type": 1,
               "max_simultaneous": 1,
-              "volume": 1.0,
+              "volume": 0.9,
               "pitch": 1.0,
               "islooping": false,
               "is3d": false

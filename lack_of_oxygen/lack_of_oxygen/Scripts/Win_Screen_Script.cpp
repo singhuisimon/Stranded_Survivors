@@ -186,6 +186,7 @@ namespace lof {
                 if (!win_audio_played && ship_id != INVALID_ENTITY_ID) {
                     auto& ship_audio = ECSM.get_component<Audio_Component>(ship_id);
                     ADM.play_now(ship_id, "game win", ship_audio);
+					ADM.play_now(ship_id, "blast off", ship_audio);
                     win_audio_played = true;
                 }
 
