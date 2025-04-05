@@ -1524,10 +1524,10 @@ namespace lof {
         if (stop_playing) {
 
             //Time per frame
-            float delta_time = FPSM.get_delta_time();
+            float d_time = FPSM.get_delta_time();
 
             //Progress in timer
-            timer += delta_time;
+            timer += d_time;
 
             //Switching direction
             if (timer >= 0.4f) {

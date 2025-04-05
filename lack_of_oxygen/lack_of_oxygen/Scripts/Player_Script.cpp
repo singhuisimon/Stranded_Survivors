@@ -523,7 +523,7 @@ namespace lof {
 
         auto& player_transform = ECSM.get_component<Transform2D>(playerID);
         auto& lava_transform = ECSM.get_component<Transform2D>(lavaID);
-        float LAVA_WIDTH = lava_transform.scale.x / 2;
+        //float LAVA_WIDTH = lava_transform.scale.x / 2;
         float LAVA_HEIGHT = lava_transform.scale.y / 2;
 
         bool player_dead = false;

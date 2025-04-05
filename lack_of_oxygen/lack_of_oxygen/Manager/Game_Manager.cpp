@@ -298,7 +298,9 @@ namespace lof {
                 // Only toggle pause in gameplay scenes
                 if (current_scene == 1 || current_scene == 2) {
                     LM.write_log("ESC pressed, current pause state: %d", m_is_paused);
-                    toggle_pause();
+                    if (!is_transitioning()) {
+                        toggle_pause();
+                    }
                     LM.write_log("New pause state: %d", m_is_paused);
                 }
                 else {

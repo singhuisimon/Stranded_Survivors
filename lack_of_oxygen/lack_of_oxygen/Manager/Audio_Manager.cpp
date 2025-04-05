@@ -273,44 +273,6 @@ namespace lof {
 		//float lava_timer = 0.0f;
 		LM.write_log("current scene is %d", current_scene);
 		
-		//new logic
-		//if (new_scene) {
-		//	std::cout << "current scene is" << current_scene << std::endl;
-		//	if (current_scene == 2) {
-		//		//yet_to_play = true;
-		//		std::cout << "new scene detected?" << std::endl;
-
-		//		//set the lava timer to 4min
-		//		//lava_timer = 400.0f;
-		//		//std::cout << "lava timer is set to " << lava_timer << std::endl;
-
-		//		//set lava audio to inactive
-		//		//if (!is_layer_playing(background_id, lava_key)) {
-		//		//	audio_background.set_isactive(lava_key, false);
-		//		//}
-
-		//		//if audio is not played yet and above ground set the bgm to true.
-		//		for (const auto& layer : surface_music) {
-		//			if (!is_layer_playing(background_id, layer) && !underground) {
-		//				audio_background.set_isactive(layer, true);
-		//				//std::cout << "player is above ground playing bgm surface" << std::endl;
-		//			}
-		//		}
-
-		//		//bgm to be played affected by oxygen level and to only be played when underground
-		//		std::vector<std::string> other_layers = { "bgm base_1", "bgm base_2", "bgm base_3", "bgm 80", "bgm 50_1", "bgm 50_2", "bgm 35", "bgm 25", "bgm 20" };
-		//		for (const auto& layer : other_layers) {
-		//			if (!is_layer_playing(background_id, layer) && underground) {
-		//				audio_background.set_isactive(layer, false);
-		//			}
-		//		}
-		//	}
-		//	new_scene = false;
-		//}
-		//else {
-		//	LM.write_log("new scene is false detected in update layering");
-		//}
-
 		if (current_scene == 2) {
 
 			// A vector of pair for the condition and which the sound is going to be played

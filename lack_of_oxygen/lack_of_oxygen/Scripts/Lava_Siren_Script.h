@@ -36,13 +36,23 @@ namespace lof {
 		 */
 		std::string get_type() const override;
 
+		/**
+		 * @brief Updates the lava timer
+		 * @param entityid The ID of the entity to update.
+		 */
 		void update_lava_timer(EntityID entityid);
 
 	private:
+		// Variables (name of script, timer, and lava key for audio)
 		const std::string script_name = "lava_siren_script";
 		float timer = DEFAULT_LAVA_SIREN_COUNTDOWN;
 		const std::string lava_key = "lava siren";
 
+		/**
+		 * @brief Sets the lava timer for the entity.
+		 * @param timer The timer value to set.
+		 * @param entity_id The ID of the entity to set the timer for.
+		 */
 		void set_lava_timer(float timer, EntityID entity_id);
 
 	};
