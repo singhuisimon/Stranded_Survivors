@@ -1768,7 +1768,7 @@ namespace lof {
 
                         // Update current scene and IMGUI
                         GM.set_current_scene(0);
-                        IMGUIM.set_current_file_shown(scene_file);
+                        //IMGUIM.set_current_file_shown(scene_file);
 
                         // Set the transitioning to false for Game Manager as there is no fadeout here.
 						GM.set_transitioning(false);
