@@ -477,7 +477,7 @@
                             "filepath": "sfx_mainmenu_button",
                             "audio_type": 2,
                             "max_simultaneous": 3,
-                            "volume": 1.0,
+                            "volume": 0.7,
                             "pitch": 1.0,
                             "islooping": false,
                             "isactive": true,
