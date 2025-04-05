@@ -66,6 +66,13 @@ namespace lof {
 		*/
 		void shutdown();
 
+		/**
+		 * @brief Load the sound file and play it.
+		 * @param filepath The filepath to the audio
+		 * @param cskey The unique id of filepath + entity id to be used as the channel key
+		 * @param audio_key The unique identifier of the soundconfig
+		 * @param entity A reference to a Audio Component.
+		 */
 		static std::string generate_channel_key(EntityID entity_id, const std::string& file_path, const std::string& audio_key);
 
 		/**
@@ -113,8 +120,18 @@ namespace lof {
 		*/
 		void set_channel_volume(const std::string& channel_key, float volume);
 
+		/**
+		* @brief Setter to mute channel
+		* @param channel_key The unique identifier of the channel in the map
+		* @param mute The new boolean value
+		*/
 		void set_channel_mute(const std::string& channel_key, bool mute);
 
+		/**
+		* @brief Getter for the channel volume
+		* @param channel_key The unique identifier of the channel in the map
+		* @param muted The reference boolean
+		*/
 		void get_channel_mute(const std::string& channel_key, bool& muted);
 
 		//retrive the core_system
@@ -126,10 +143,25 @@ namespace lof {
 		void update_audio_for_listener(const Vec3D& listener_pos);
 		void set_sound_position(const std::string& channel_key, const Vec3D position);
 
+		/**
+		* @brief Getter for the active channels
+		*/
 		void get_active_channels();
+
+		/**
+		* @brief Getter for the muted channels
+		*/
 		void get_muted_channels();
+
+		/**
+		* @brief Prints out the list of active sounds
+		*/
 		void debug_list_active_sounds();
 
+		/**
+		* @brief Checks if sound is playing from the specific channel
+		* @param channel_key The unique identifier of the channel in the map
+		*/
 		bool is_sound_playing(std::string& channel_key);
 
 		/**
@@ -139,11 +171,20 @@ namespace lof {
 		std::string get_type() const override;
 
 		std::unordered_map<std::string, std::vector<FMOD::Channel*>>& get_channel_map() { return channel_map; }
+
+		/**
+		* @brief Debug and print the audio positioning
+		* @param sound_pos The position of the sound
+		* @param channel The channel to be debugged
+		*/
 		void debugAudioPosition(const Vec3D& sound_pos, FMOD::Channel* channel);
 		
 
 	private:
 
+		/**
+		* @brief Ensure when its new scene stop all bgm and sfx not ui
+		*/
 		void new_load_scene();
 
 		FMOD::System* core_system;	///<Core audio system
