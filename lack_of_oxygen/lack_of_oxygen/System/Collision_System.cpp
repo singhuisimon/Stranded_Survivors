@@ -1518,7 +1518,7 @@ namespace lof {
                 base_texture = "Main_Menu_Credits_Batch_14";
             }
             else if (entity_name == "quit_button") {
-                base_texture = "Main_Menu_Quit_Batch_14";
+                base_texture = "Quit_Game_Batch_30";
             }
             else if (entity_name == "setting_button") {
                 base_texture = "Settings_Batch_12";

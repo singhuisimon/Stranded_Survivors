@@ -399,34 +399,34 @@
                         80.0
                     ]
                 },
-                "Graphics_Component": {
-                    "model_name": "square",
-                    "color": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "texture_name": "Main_Menu_Quit_Batch_14_NORMAL",
-                    "shd_ref": 0,
-                    "mdl_to_ndc_xform": [
-                        [
-                            0.25,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.14814814925193787,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            -0.7407407164573669,
-                            1.0
-                        ]
-                    ]
-                },
+              "Graphics_Component": {
+                "model_name": "square",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "texture_name": "Quit_Game_Batch_30_NORMAL",
+                "shd_ref": 0,
+                "mdl_to_ndc_xform": [
+                  [
+                    0.25,
+                    0.0,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    0.14814814925193787,
+                    0.0
+                  ],
+                  [
+                    0.0,
+                    -0.7407407164573669,
+                    1.0
+                  ]
+                ]
+              },
                 "Collision_Component": {
                     "width": 200.0,
                     "height": 80.0,
