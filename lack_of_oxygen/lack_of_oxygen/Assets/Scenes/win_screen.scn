@@ -361,6 +361,108 @@
       }
     },
     {
+      "name": "top_camera_ui",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            530.0
+          ],
+          "prev_position": [
+            0.0,
+            530.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1950.0,
+            178.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              2.03125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.3296296298503876,
+              0.0
+            ],
+            [
+              -0.0010416667209938169,
+              0.9259259104728699,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "bottom_camera_ui",
+      "components": {
+        "Transform2D": {
+          "position": [
+            0.0,
+            -731.0
+          ],
+          "prev_position": [
+            0.0,
+            -731.0
+          ],
+          "orientation": [
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1950.0,
+            178.0
+          ]
+        },
+        "Graphics_Component": {
+          "model_name": "square",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "texture_name": "NoTexture",
+          "shd_ref": 0,
+          "mdl_to_ndc_xform": [
+            [
+              2.03125,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.3296296298503876,
+              0.0
+            ],
+            [
+              -0.0010416667209938169,
+              0.9259259104728699,
+              1.0
+            ]
+          ]
+        }
+      }
+    },
+    {
       "name": "fps_counter",
       "components": {
         "Transform2D": {

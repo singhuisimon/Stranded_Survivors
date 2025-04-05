@@ -47,6 +47,14 @@ namespace lof {
 		const std::string restart_button_name = "restart_button";
 		const std::string main_menu_button_name = "main_menu_button";
 
+		// Camera top and bottom ui name
+		const std::string top_camera_ui = "top_camera_ui";
+		const std::string bottom_camera_ui = "bottom_camera_ui";
+
+		// Cap for top and bottom UI
+		const float top_cap = 420.0f;
+		const float bottom_cap = -630.0f;
+
 		// Ship's parameters
 		float ship_launching_speed;
 		float launch_duration;

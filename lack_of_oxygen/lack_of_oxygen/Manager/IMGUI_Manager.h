@@ -76,7 +76,7 @@ namespace lof {
         std::vector<std::string> batches {
             {"Main_Menu_Play_Batch_14"},
             {"Main_Menu_Credits_Batch_14"},
-            {"Main_Menu_Quit_Batch_14"},
+            {"Quit_Game_Batch_30"},
             {"Back_Batch_14"},
             {"Restart_Batch_14"},
             {"Main_Menu_Batch_14"}

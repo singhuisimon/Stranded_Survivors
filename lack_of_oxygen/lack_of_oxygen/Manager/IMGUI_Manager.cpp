@@ -2146,7 +2146,7 @@ namespace lof {
 
         batch_and_button = { {"play_button", "Main_Menu_Play_Batch_14"},
         { "credit_button", "Main_Menu_Credits_Batch_14" },
-        { "quit_button", "Main_Menu_Quit_Batch_14" },
+        { "quit_button", "Quit_Game_Batch_30" },
         { "back_button", "Back_Batch_14" },
         { "restart_button", "Restart_Batch_14" },
         { "main_menu_button", "Main_Menu_Batch_14" } };

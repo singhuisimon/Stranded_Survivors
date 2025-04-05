@@ -270,6 +270,7 @@ namespace lof {
 	constexpr const float SHIP_STARTING_SPEED = 50.0f;
 	constexpr const float DEFAULT_LAUNCH_DURATION = 8.0f;
 	constexpr const float WIN_BACKGROUND_SPEED = 2000.0f;
+	constexpr const float DEFAULT_UI_MOVING_SPEED = 300.0f;
 
 } // namespace lof
 
