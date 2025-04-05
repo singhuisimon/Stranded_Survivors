@@ -1191,7 +1191,7 @@ namespace lof {
         if (resume_button != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(resume_button)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Resume_Batch_14_NORMAL";
+                graphics->texture_name = "Resume_Game_Batch_30_NORMAL";
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(resume_button)) {
@@ -1254,7 +1254,7 @@ namespace lof {
         if (quit_button != INVALID_ENTITY_ID) {
             if (auto* graphics = get_component_safe<Graphics_Component>(quit_button)) {
                 graphics->model_name = "square";
-                graphics->texture_name = "Main_Menu_Quit_Batch_14_NORMAL";
+                graphics->texture_name = "Quit_Game_Batch_30_NORMAL";
                 graphics->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
             if (auto* transform = get_component_safe<Transform2D>(quit_button)) {
@@ -1407,7 +1407,7 @@ namespace lof {
             audio.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 5, 1.0, 1.0, false, true, false);
 
             if (entity_name == "resume_button") {
-                base_texture = "Resume_Batch_14";
+                base_texture = "Resume_Game_Batch_30";
             }
             else if (entity_name == "restart_button") {
                 base_texture = "Restart_Batch_14";
@@ -1416,7 +1416,7 @@ namespace lof {
                 base_texture = "Main_Menu_Batch_14";
             }
             else if (entity_name == "quit_button") {
-                base_texture = "Main_Menu_Quit_Batch_14";
+                base_texture = "Quit_Game_Batch_30";
             }
 
             // Ensure we have a recorded hover state for this button
