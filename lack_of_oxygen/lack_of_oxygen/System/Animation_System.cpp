@@ -44,7 +44,6 @@ namespace lof {
             // Update only what is on the viewport
             if (camera.is_free_cam == GL_FALSE) {
                 if (entity_id != 0 && entity_id != player_id && player_id != INVALID_ENTITY_ID) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     auto& transform = ECSM.get_component<Transform2D>(entity_id);
 
                     float render_boundary_top = camera.pos_y + (screen_height * 0.7f);

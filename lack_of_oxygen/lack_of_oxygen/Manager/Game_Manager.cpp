@@ -355,6 +355,7 @@ namespace lof {
                 if (no_panic) {
                     drop_panic(DEFAULT_FIXED_DELTA_TIME);
                 }
+
                 //update the current panic level
                 current_panic_level = panic_current;
 
@@ -418,7 +419,7 @@ namespace lof {
                 }
             }
 
-            // Update top UI overlay position to follow player
+            // Get IDs of ui game objects
             EntityID ui_overlay_id = ECSM.find_entity_by_name("top_ui_overlay");
 
             EntityID oxygen_meter_fill_id = ECSM.find_entity_by_name("top_ui_oxygen_meter_fill");
@@ -429,16 +430,14 @@ namespace lof {
 
             EntityID oxygen_text_id = ECSM.find_entity_by_name("top_ui_oxygen_text");
             EntityID oxygen_percentage_text_id = ECSM.find_entity_by_name("top_ui_oxygen_percentage_text");
-            //EntityID panic_text_id = ECSM.find_entity_by_name("top_ui_panic_text");
+
             EntityID goal_percentage_count_text_id = ECSM.find_entity_by_name("top_ui_goal_percentage_text");
 
             if (ui_overlay_id != INVALID_ENTITY_ID) {
                 auto& player_transform = ECSM.get_component<Transform2D>(player_id);
-                //auto& ui_transform = ECSM.get_component<Transform2D>(ui_overlay_id);
 
                 // Define layout constants for vertical stacking
                 constexpr float VERTICAL_OFFSET = 500.0f;        // Distance above player
-                //constexpr float METER_SPACING = 50.0f;           // Vertical space between meters
                 constexpr float METER_WIDTH = 400.0f;            // Width of the meters
                 constexpr float METER_HEIGHT = 40.0f;            // Height of each meter bar
 
@@ -1003,11 +1002,6 @@ namespace lof {
 
         auto end_time = std::chrono::steady_clock::now();
         IM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
-
-        //No Graphics Manager Update
-        //// Getting delta time for Graphics Manager
-        //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());
-        //GFXM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - GFXM.get_time());
 
         // Getting delta time for ECS Manager
         //ECSM.set_time(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

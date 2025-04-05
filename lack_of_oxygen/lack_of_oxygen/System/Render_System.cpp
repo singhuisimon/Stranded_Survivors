@@ -67,13 +67,6 @@ namespace lof {
                 end = std::prev(end, entities_size - top_camera_ui);
             }
         }
-
-        // TESTING
-        bool mineral_popup_exist = false;
-        EntityID mineral_popup = ECSM.find_entity_by_name("mineral_popup");
-        if (mineral_popup != INVALID_ENTITY_ID && mineral_popup == *start) {
-            mineral_popup_exist = true;
-        }
         
         // Loop over the entities that match the system's signature
         for (; start != end; ++start) {
@@ -395,7 +388,6 @@ namespace lof {
             int current_scene = GM.get_current_scene(); // Get the current scene number
             if (camera.is_free_cam == GL_FALSE && current_scene == 2) {
                 if (*itr != 0) { // Skip background
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     float render_boundary_top = camera.pos_y + (screen_height * 0.7f);
                     float render_boundary_bottom = camera.pos_y - (screen_height * 0.7f);
 
@@ -715,7 +707,6 @@ namespace lof {
                     lava_pool != INVALID_ENTITY_ID 
                     && entity_id != lava_pool 
                     && (entity_id < UI_start)) {
-                    auto& player_transform = ECSM.get_component<Transform2D>(player_id);
                     float render_boundary_top = camera.pos_y + (screen_height * 0.7f);
                     float render_boundary_bottom = camera.pos_y - (screen_height * 0.7f);
 
@@ -1315,32 +1306,3 @@ namespace lof {
         }
     }
 } // namespace lof
-
-
-                ////////////////////////// TESTING //////////////////////
-                //// Check if mineral entity is true
-                //if (ECSM.find_entity_by_name("top_ui_mineral_texture") == entity_id) {
-                //    GLuint testing_true_flag = glGetUniformLocation(shader->program_handle, "uTestingFlag");
-                //    if (testing_true_flag >= 0) {
-                //        glUniform1ui(testing_true_flag, GL_TRUE);
-                //    }
-                //    else {
-                //        LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
-                //        std::exit(EXIT_FAILURE);
-                //    }
-                //}
-                //else {
-                //    GLuint testing_false_flag = glGetUniformLocation(shader->program_handle, "uTestingFlag");
-                //    if (testing_false_flag >= 0) {
-                //        glUniform1ui(testing_false_flag, GL_FALSE);
-                //    }
-                //    else {
-                //        LM.write_log("Render_System::draw(): Texture flag uniform variable doesn't exist.");
-                //        std::exit(EXIT_FAILURE);
-                //    }
-                //}
-
-
-
-
-                ////////////////////////// TESTING //////////////////////

@@ -339,7 +339,7 @@ namespace lof {
 					3) sweat screen: Decrease in size over time, down to half its original size
 			*/
 			// Decrease particle size by lifespan (For all particles except TNT VFX and lava)
-			if (particles_storage[i].type != tnt_vfx && particles_storage[i].type != sweat_screen /*&& particles_storage[i].type != lava*/) {
+			if (particles_storage[i].type != tnt_vfx && particles_storage[i].type != sweat_screen) {
 				particles_storage[i].curr_size = particles_storage[i].start_size * (particles_storage[i].life_left / particles_storage[i].life_span);
 			}
 			else if (particles_storage[i].type == sweat_screen) {
