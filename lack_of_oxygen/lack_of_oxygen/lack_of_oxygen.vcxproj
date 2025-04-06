@@ -173,8 +173,8 @@
     <Media Include="Assets\Audio\bgm_50_digging_pulse.wav" />
     <Media Include="Assets\Audio\bgm_50_roll.wav" />
     <Media Include="Assets\Audio\bgm_80_clock_ticking.wav" />
-    <Media Include="Assets\Audio\bgm_game_over.wav" />
-    <Media Include="Assets\Audio\bgm_game_win.wav" />
+    <Media Include="Assets\Audio\sfx_game_over.wav" />
+    <Media Include="Assets\Audio\sfx_game_win.wav" />
     <Media Include="Assets\Audio\bgm_surface_music.wav" />
     <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
     <Media Include="Assets\Audio\sfx_air_vent_in.wav" />

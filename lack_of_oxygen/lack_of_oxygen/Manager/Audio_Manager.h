@@ -123,27 +123,6 @@ namespace lof {
 		void stop_now(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
 
 		/**
-		 * @brief Mute the sound layer.
-		 * @param entity_id The entity id of the entity playing the sound.
-		 * @param audio_key The key of the audio to be muted.
-		 * @param file_path The file path of the audio to be muted.
-		 */
-		//void mute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
-
-		/**
-		 * @brief Unmute the sound layer.
-		 * @param entity_id The entity id of the entity playing the sound.
-		 * @param audio_key The key of the audio to be 
-		 
-		 
-		 
-		 
-		 .
-		 * @param file_path The file path of the audio to be unmuted.
-		 */
-		//void unmute_layer(EntityID entity_id, const std::string& audio_key, const std::string& file_path);
-
-		/**
 		 * @brief Update the layering of the background music based on the oxygen level.
 		 * @param current_scene The current scene number.
 		 * @param oxygen_level The current oxygen level.
@@ -179,12 +158,15 @@ namespace lof {
 		 */
 		FMOD::ChannelGroup* get_uigroup() const;
 
-		//stop all audio -> to be called before each scene change!
 		/**
 		* @brief Stop all the channel in the master channelgroup
 		*/
 		void stop_mastergroup();
 
+		/**
+		 * @brief Pause a specific group
+		 * @param grouptype The type of group to stop
+		 */
 		void stop_groups(GroupType grouptype);
 
 		/**

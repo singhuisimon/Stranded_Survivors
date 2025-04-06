@@ -20,8 +20,6 @@
 #include "../Entity/Entity.h"
 #include "../Component/Component.h"
 
-//#define LGS lof::Logic_System::get_instance()
-
 namespace lof {
 
     class Script;
@@ -29,20 +27,10 @@ namespace lof {
     class Logic_System : public System {
     public:
 
-		/**
-		 * @brief Get the unique instance of Logic_System.
-		 */
-        //static Logic_System& get_instance();
-
         /**
          * @brief Constructor for Logic_System.
          */
         Logic_System();
-
-		/**
-		 * @brief Destructor for Logic_System.
-		 */
-        //~Logic_System();
 
         /**
          * @brief Gets the type identifier for this system.
@@ -61,23 +49,32 @@ namespace lof {
          */
         void process_script();
 
+        /**
+		* @brief Initializes the scripts for all relevant entities.
+		* @param entity_id The ID of the entity to initialize the script for.
+		* @param logic_data The logic data associated with the entity.
+		* @param script The script to be initialized.
+        */
         void initialize_script(EntityID entity_id, std::shared_ptr<Logic_Component::LogicData> logic_data, std::shared_ptr<Script> script);
         
+		/**
+		 * @brief Updates the script for all relevant entities.
+		 * @param entity_id The ID of the entity to update the script for.
+		 * @param logic_data The logic data associated with the entity.
+		 * @param script The script to be updated.
+		 */
         void update_script(EntityID entity_id, std::shared_ptr<Logic_Component::LogicData> logic_data, std::shared_ptr<Script> script);
 
+		/**
+		 * @brief Terminates the script for all relevant entities.
+		 * @param entity_id The ID of the entity to terminate the script for.
+		 * @param logic_data The logic data associated with the entity.
+		 * @param script The script to be terminated.
+		 */
         void terminate_script(EntityID entity_id, std::shared_ptr<Logic_Component::LogicData> logic_data, std::shared_ptr<Script> script);
 
     private:
 
-        /**
-		 * @brief unique instance of Logic_System.
-         */
-        //static std::unique_ptr<Logic_System> instance;
-
-        /**
-		 * @brief set the flag to create the instance of Logic_System.
-         */
-        //static std::once_flag once_flag;
     };
 } // namespace lof
 #endif // LOF_LOGIC_SYSTEM_H

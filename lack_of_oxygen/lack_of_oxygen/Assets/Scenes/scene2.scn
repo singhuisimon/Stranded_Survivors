@@ -98,7 +98,7 @@
             {
               "key": "lava siren",
               "filepath": "sfx_lava_siren",
-              "audio_type": 0,
+              "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 1.0,
               "pitch": 1.0,
@@ -364,7 +364,7 @@
           "sounds": [
             {
               "key": "game win",
-              "filepath": "bgm_game_win",
+              "filepath": "sfx_game_win",
               "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 1.0,
@@ -808,7 +808,7 @@
             },
             {
               "key": "game over",
-              "filepath": "bgm_game_over",
+              "filepath": "sfx_game_over",
               "audio_type": 1,
               "max_simultaneous": 1,
               "volume": 0.5,

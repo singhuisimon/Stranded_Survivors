@@ -13,9 +13,9 @@
 extern bool level_editor_mode;  // Declaration only (extern)
 extern bool game_playing;  // Declaration only (extern)
 extern bool is_full_screen;		// Declaration only (extern)
-extern float master_multiplier;
-extern float bgm_multiplier;
-extern float sfx_multiplier;
-extern bool ship_launching;
+extern float master_multiplier; // Declaration only (extern)
+extern float bgm_multiplier; // Declaration only (extern)
+extern float sfx_multiplier; // Declaration only (extern)
+extern bool ship_launching; // Declaration only (extern)
 
 #endif

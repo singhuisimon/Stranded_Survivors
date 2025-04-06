@@ -197,28 +197,15 @@ namespace lof {
                 if (m_is_paused) {
                     gui_system->show_pause_menu();
 
-                    //CASE 1 (Audio completely STOPS playing in PAUSE): Uncomment Line
-                    /*ADM.pause_group(GroupType::TYPE_BGM);
-                    ADM.pause_group(GroupType::TYPE_SFX);*/
-
-                    //CASE 2: COMMENT ALL LINES FOR ALL CASES
-
-                    //CASE 3 (Audio playing at half volume in PAUSE): Uncomment Line
+                    //Audio playing at half volume in pause
                     ADM.set_group_volume(GroupType::TYPE_BGM, ADM.get_group_volume(GroupType::TYPE_BGM) / 2);
                     ADM.set_group_volume(GroupType::TYPE_SFX, ADM.get_group_volume(GroupType::TYPE_SFX) / 2);
-
 
                 }
                 else {
                     gui_system->hide_pause_menu();
 
-                    //CASE 1 (Audio completely STOPS playing in PAUSE): Uncomment Line
-                    /*ADM.resume_group(GroupType::TYPE_BGM);
-                    ADM.resume_group(GroupType::TYPE_SFX);*/
-
-                    //CASE 2: COMMENT ALL LINES FOR ALL CASES
-
-                    //CASE 3 (Audio playing at half volume in PAUSE): Uncomment Line
+                    //Audio resumes playing at full volume after pause
                     ADM.set_group_volume(GroupType::TYPE_BGM, ADM.get_group_volume(GroupType::TYPE_BGM) * 2);
                     ADM.set_group_volume(GroupType::TYPE_SFX, ADM.get_group_volume(GroupType::TYPE_SFX) * 2);
 
@@ -298,7 +285,9 @@ namespace lof {
                 // Only toggle pause in gameplay scenes
                 if (current_scene == 1 || current_scene == 2) {
                     LM.write_log("ESC pressed, current pause state: %d", m_is_paused);
-                    toggle_pause();
+                    if (!is_transitioning()) {
+                        toggle_pause();
+                    }
                     LM.write_log("New pause state: %d", m_is_paused);
                 }
                 else {
@@ -309,9 +298,9 @@ namespace lof {
         }
 
         //to pause all the sound that is playing
-        if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
+        /*if (IM.is_key_pressed(GLFW_KEY_5) && !level_editor_mode) {
             ADM.pause_resume_mastergroup();
-        }
+        }*/
 
         ////to ensure sound pause during level_editor_mode
         //if (IM.is_key_pressed(GLFW_KEY_TAB)) {
@@ -593,9 +582,6 @@ namespace lof {
             if (current_oxygen_level <= 0.0f) {
                 // Player is out of oxygen - show game over screen
                 //set_player_dead_state(true);
-
-                // Stop all audio first
-                //ADM.stop_mastergroup();
 
                 ADM.stop_groups(GroupType::TYPE_BGM);
                 ADM.stop_groups(GroupType::TYPE_SFX);
@@ -906,91 +892,91 @@ namespace lof {
             camera_left_right_scroll_flag = 0;
         }
 
-        if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
-            LM.write_log("Game_Manager::update(): Toggling between scenes");
+        //if (IM.is_key_pressed(GLFW_KEY_0) && !level_editor_mode) {
+        //    LM.write_log("Game_Manager::update(): Toggling between scenes");
 
-            // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
-            if (current_scene == 0) {
-                current_scene = 1; // Switch to scene1
-            }
-            else if (current_scene == 1) {
-                current_scene = 2; // Switch to scene2
-            }
-            else {
-                current_scene = 0; // Switch back to main_menu
-            }
+        //    // Cycle through scenes: main_menu -> scene1 -> scene2 -> back to main_menu
+        //    if (current_scene == 0) {
+        //        current_scene = 1; // Switch to scene1
+        //    }
+        //    else if (current_scene == 1) {
+        //        current_scene = 2; // Switch to scene2
+        //    }
+        //    else {
+        //        current_scene = 0; // Switch back to main_menu
+        //    }
 
-            for (auto& system : ECSM.get_systems()) {
-                if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
-                    movement_system->clear_dynamic_entities();
-                    break;
-                }
-            }
+        //    for (auto& system : ECSM.get_systems()) {
+        //        if (auto* movement_system = dynamic_cast<Movement_System*>(system.get())) {
+        //            movement_system->clear_dynamic_entities();
+        //            break;
+        //        }
+        //    }
 
-            // Define scene file names
-            const std::string SCENES = "Scenes";
-            std::string scene_file;
+        //    // Define scene file names
+        //    const std::string SCENES = "Scenes";
+        //    std::string scene_file;
 
-            if (current_scene == 0) {
-                scene_file = "main_menu.scn";
-            }
-            else {
-                scene_file = "scene" + std::to_string(current_scene) + ".scn";
-            }
+        //    if (current_scene == 0) {
+        //        scene_file = "main_menu.scn";
+        //    }
+        //    else {
+        //        scene_file = "scene" + std::to_string(current_scene) + ".scn";
+        //    }
 
-            // Create full path to the scene file
-            std::string scene_path = ASM.get_full_path(SCENES, scene_file);
+        //    // Create full path to the scene file
+        //    std::string scene_path = ASM.get_full_path(SCENES, scene_file);
 
-            // Try to load the new scene
-            if (SM.load_scene(scene_path.c_str())) {
-                LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
+        //    // Try to load the new scene
+        //    if (SM.load_scene(scene_path.c_str())) {
+        //        LM.write_log("Game_Manager::update(): Successfully loaded %s", scene_file.c_str());
 
-                // Reset camera position only if not in main menu
-                auto& camera = GFXM.get_camera();
-                if (current_scene != 0) {
-                    camera.pos_x = DEFAULT_CAMERA_POS_X;
-                    camera.pos_y = DEFAULT_CAMERA_POS_Y;
-                }
+        //        // Reset camera position only if not in main menu
+        //        auto& camera = GFXM.get_camera();
+        //        if (current_scene != 0) {
+        //            camera.pos_x = DEFAULT_CAMERA_POS_X;
+        //            camera.pos_y = DEFAULT_CAMERA_POS_Y;
+        //        }
 
-                // Stop all audio currently playing
-                ADM.stop_mastergroup();
+        //        // Stop all audio currently playing
+        //        ADM.stop_mastergroup();
 
-                //reset panic
-                reset_panic();
+        //        //reset panic
+        //        reset_panic();
 
-                // Reset player position only if in scene1 or scene2
-                if (current_scene != 0) {
-                    EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-                    if (playerId != INVALID_ENTITY_ID) {
-                        if (ECSM.has_component<Transform2D>(playerId)) {
-                            auto& transform = ECSM.get_component<Transform2D>(playerId);
-                            transform.position = Vec2D(0.0f, 0.0f);
-                            transform.prev_position = transform.position;
-                        }
-                        if (ECSM.has_component<Velocity_Component>(playerId)) {
-                            auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
-                            velocity.velocity = Vec2D(0.0f, 0.0f);
-                        }
-                    }
-                }
-            }
-            else {
-                LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
+        //        // Reset player position only if in scene1 or scene2
+        //        if (current_scene != 0) {
+        //            EntityID playerId = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
+        //            if (playerId != INVALID_ENTITY_ID) {
+        //                if (ECSM.has_component<Transform2D>(playerId)) {
+        //                    auto& transform = ECSM.get_component<Transform2D>(playerId);
+        //                    transform.position = Vec2D(0.0f, 0.0f);
+        //                    transform.prev_position = transform.position;
+        //                }
+        //                if (ECSM.has_component<Velocity_Component>(playerId)) {
+        //                    auto& velocity = ECSM.get_component<Velocity_Component>(playerId);
+        //                    velocity.velocity = Vec2D(0.0f, 0.0f);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else {
+        //        LM.write_log("Game_Manager::update(): Failed to load %s", scene_file.c_str());
 
-                // Revert scene number since load failed
-                if (current_scene == 0) {
-                    current_scene = 2;
-                }
-                else if (current_scene == 1) {
-                    current_scene = 0;
-                }
-                else {
-                    current_scene = 1;
-                }
-            }
+        //        // Revert scene number since load failed
+        //        if (current_scene == 0) {
+        //            current_scene = 2;
+        //        }
+        //        else if (current_scene == 1) {
+        //            current_scene = 0;
+        //        }
+        //        else {
+        //            current_scene = 1;
+        //        }
+        //    }
 
-            //IMGUIM.set_current_file_shown(scene_file);
-        }
+        //    IMGUIM.set_current_file_shown(scene_file);
+        //}
 
 
         // Getting delta time for Input Manager

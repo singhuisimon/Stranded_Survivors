@@ -40,29 +40,57 @@ namespace lof {
 		 */
 		std::string get_type() const override;
 
+		/**
+		 * @brief Initialize the bar entity.
+		 */
 		void init_entity();
 
+		/**
+		 * @brief Updates the sound setting .
+		 */
 		void update_setting();
 
+		/**
+		 * @brief Updates the multiplier for BGM SFX UI
+		 */
 		void update_multiplier();
 
+		/**
+		 * @brief Updates the position and width of the audio bar
+		 */
 		void update_audio_bar();
 
+		/**
+		 * @brief Updates the volume for the respective group
+		 */
 		void update_audio_group();
 
+		/**
+		 * @brief Checks if the back button is press
+		 * @param entity_id The ID of the entity to check
+		 */
 		void check_back_press(EntityID entity_id);
 
 	private:
+		// Script name identifier
 		const std::string script_name = "sound_setting_script";
+
+		// Map holding the hover state
 		std::unordered_map<std::string, bool> button_hover_states;
 
+		/**
+		 * @brief Checks if entity is the entity of interest
+		 * @param entity_id The ID of the entity to check
+		 */
 		bool check_entity(EntityID entity_id);
 
+		// EntityID of the important entity in sound setting
 		EntityID master_id;
 		EntityID bgm_id;
 		EntityID sfx_id;
 		EntityID back_button;
 
+		//float values for the size and x pos and width modifier
 		float master_size;
 		float bgm_size;
 		float sfx_size;

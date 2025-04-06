@@ -31,18 +31,6 @@ namespace lof {
 		ADM.stop_groups(GroupType::TYPE_BGM);
 		ADM.stop_groups(GroupType::TYPE_SFX);
 
-		//need change this to check if channel are still playing if not erase them.
-		// Stop all sounds before clearing
-		//for (auto& [key, channels] : channel_map) {
-		//	for (FMOD::Channel* channel : channels) {
-		//		if (channel) {
-		//			channel->stop();
-		//		}
-		//	}
-		//}
-
-		//// Clear the channel map
-		//channel_map.clear();
 	}
 
 	bool Audio_System::initialize() {
