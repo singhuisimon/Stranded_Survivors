@@ -101,6 +101,7 @@ namespace lof {
 
     void Mining_Script::set_player_id(EntityID entityid) {
         player_id = entityid;
+		mining_strength = DEFAULT_STRENGTH;
     }
 
     EntityID Mining_Script::get_player_id() const {
