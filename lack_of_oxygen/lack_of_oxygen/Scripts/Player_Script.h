@@ -138,8 +138,10 @@ namespace lof {
 		 */
 		void update_player_walking_particle();
 
+		/**
+		* @brief Collision for the player and lava and return to game over screen if player interact with lava pool
+		*/
 		void check_player_fall_into_lava();
-		void handle_player_death();
 		//---------------------------------------------------------------------------//
 		bool key_e_last_frame = false; // for tunnel
 		bool key_e_pressed = false;

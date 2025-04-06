@@ -444,7 +444,7 @@ namespace lof {
                     float total_width = RIGHT_BOUND - LEFT_BOUND;
                     float tile_width = total_width / current_level.cols;
                     float tile_height = tile_width; // Keep tiles square
-                    float total_height = current_level.rows * tile_height;
+                    //float total_height = current_level.rows * tile_height;
 
                     //float START_Y_test = -(current_level.rows * tile_height) / 2.0f;
                     //float START_Y_test = (total_height / 2.0f);

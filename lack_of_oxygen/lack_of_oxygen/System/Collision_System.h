@@ -169,20 +169,6 @@ namespace lof {
             total_deposited_minerals = 0;
         }
 
-#if 0
-        bool player_interact_lava_test(float delta_time);
-
-        bool player_interacts_with_lava = false;
-
-        void update_player_lava_interaction(float delta_time) {
-            // Store the result from the test function
-            player_interacts_with_lava = player_interact_lava_test(delta_time);
-        }
-
-        bool get_player_interacts_with_lava() const {
-            return player_interacts_with_lava;
-        }
-#endif
 
     private:
         static std::unique_ptr<Collision_System> instance;
@@ -314,26 +300,13 @@ namespace lof {
         void check_win_screen_button_collision(float delta_time);
 
         /**
-         * @brief Collision for the player and lava and return to game over screen if player interact with lava pool
-         * @param delta time 
-         */
-        void player_interact_lava(float delta_time);
-
-        /**
         * @brief Detect obsidian to prevent player drop after player destroy the tiles
         * @param side The side of the collide side
         * @return Return the string side that is collide
         */
         void Detect_Obsidian_Bottom(float delta_time);
 
-       
-
-
-
-       
     };
-
-
 
 } // namespace lof
 

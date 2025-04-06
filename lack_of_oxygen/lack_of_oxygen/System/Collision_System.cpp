@@ -374,7 +374,7 @@ namespace lof {
     void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
 
         auto& e_physics = ECSM.get_component<Physics_Component>(id);
-        auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
+       // auto& e_velocity = ECSM.get_component<Velocity_Component>(id);
         EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
 
         //separate audio state tracking for each type
@@ -1426,15 +1426,6 @@ namespace lof {
             check_win_screen_button_collision(delta_time);
             return;  // Skip other collision checks for credits scene
         }
-
-
-        //cause exception thrown when player died in lava and main menu button is pressed
-        /*if (GM.get_current_scene() == 2) {
-            if (is_player_dead) {
-                is_player_dead = GM.get_player_dead_state();
-            }
-        }*/
-       
         
         collision_check_collide(collisions, delta_time); // Check for collisions and fill the collision list
 
@@ -1442,17 +1433,7 @@ namespace lof {
 
         Colliside_Oxygen_Mineral(delta_time);
 
- 
-        resolve_collision_event(collisions);
-
-        //player_interact_lava(delta_time);
-       // player_interact_lava_test(delta_time);
-      
-        //Detect_Obsidian_Bottom(delta_time);
-
-        //EntityID wormhole = ECSM.find_entity_by_name("spritesheet_map");
-        //std::cout << "this is wormhole entity " << wormhole << "\n";
-    
+        resolve_collision_event(collisions);  
     }
 
     bool Collision_System::isInterseptBox(float box_x, float box_y, float width, float height, int mouseX, int mouseY)
@@ -1932,168 +1913,6 @@ namespace lof {
         }
     }
 
-#if 0
-    bool Collision_System::player_interact_lava_test(float delta_time)
-    {
-
-        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
-
-        if (playerID == INVALID_ENTITY_ID || lava_pool_ID == INVALID_ENTITY_ID) {
-            return false; // Entities not found
-        }
-
-
-
-        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player 
-        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
-        //auto& player_physic = ECSM.get_component<Physics_Component>(playerID);
-        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
-
-        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
-        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID); // get the position of the player 
-        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID); // get the position of the player 
-
-        float collisions = delta_time;
-        // AABB for player
-        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
-        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
-
-        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
-        {
-            std::cout << "yes!!!!\n";
-            return true;
-        }
-        else {
-            std::cout << "noo!!!\n";
-        }
-        return false;
-    }
-
-#endif
-
-#if 0
-    bool Collision_System::player_interact_lava_test(float delta_time)
-    {
-        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
-
-        if (playerID == INVALID_ENTITY_ID || lava_pool_ID == INVALID_ENTITY_ID) {
-            return false; // Entities not found
-        }
-
-        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player
-        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
-        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
-
-        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
-        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID);
-        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID);
-
-        float collisions = delta_time;
-        // AABB for player
-        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
-        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
-
-        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time)) {
-            std::cout << "Player interacts with lava! (with delta_time)\n";
-            return true;
-        }
-        else {
-            std::cout << "No interaction with lava. (with delta_time)\n";
-        }
-
-        return false;
-    }
-#endif
-
-
-#if 0
-    void Collision_System::player_interact_lava(float delta_time)
-    {
-        
-        if (GM.get_current_scene() != 2) {
-            if (is_player_dead) {
-                is_player_dead = GM.get_player_dead_state();
-            }
-            return;
-        }
-
-        if (GM.is_restarting()) {
-            if (is_player_dead && cooldown_restart <= 0.0f) {
-                is_player_dead = false;
-                GM.set_restarting(false);
-                cooldown_restart = COOLDOWN_TIMER_FOR_RESTART;
-            }
-            else {
-                cooldown_restart -= FPSM.get_delta_time();
-            }
-            return;
-        }
-
-        if (is_player_dead) {
-            return;
-        }
-
-        EntityID playerID = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        EntityID lava_pool_ID = ECSM.find_entity_by_name("lava_pool");
-
-     
-        auto& player_transform = ECSM.get_component<Transform2D>(playerID); // get the position of the player 
-        auto& player_collision = ECSM.get_component<Collision_Component>(playerID);
-        //auto& player_physic = ECSM.get_component<Physics_Component>(playerID);
-        auto& player_velocity = ECSM.get_component<Velocity_Component>(playerID);
-
-        auto& lava_collision = ECSM.get_component<Collision_Component>(lava_pool_ID);
-        auto& lava_transform = ECSM.get_component<Transform2D>(lava_pool_ID); // get the position of the player 
-        auto& lava_velocity = ECSM.get_component<Velocity_Component>(lava_pool_ID); // get the position of the player 
-
-        float collisions = delta_time;
-        // AABB for player
-        AABB aabb_player = AABB::from_transform(player_transform, player_collision);
-        AABB aabb_lava = AABB::from_transform(lava_transform, lava_collision);
-
-        //std::cout << "lava pos x:" << lava_transform.position.x << "lava pos y: " << lava_transform.position.y << "\n";
-        //std::cout << "lava height: " << lava_collision.height << " lava width: " << lava_collision.width << " collidable: " << lava_collision.collidable << "\n";
-        //bool is_player_dead = false;
-        if (collision_intersection_rect_rect(aabb_player, player_velocity.velocity, aabb_lava, lava_velocity.velocity, collisions, delta_time))
-        {
-           std::cout << "test is interact\n";
-            is_player_dead = true;
-            GM.set_player_dead_state(true);
-        }
-
-        // Check if player is dead to reset the scene
-        if (is_player_dead == true) {
-            // Stop all audio first
-            //ADM.stop_mastergroup();
-
-            ADM.stop_groups(GroupType::TYPE_BGM);
-            ADM.stop_groups(GroupType::TYPE_SFX);
-
-            //reset panic
-            GM.reset_panic();
-
-            // Find GUI System and show game over screen
-            for (auto& systems_gui : ECSM.get_systems()) {
-                if (auto* gui_system = dynamic_cast<GUI_System*>(systems_gui.get())) {
-                    // First reset all GUI states
-                    gui_system->reset_all_game_state();
-
-                    // Then show the game over screen
-                    gui_system->show_game_over_menu();
-
-                    LM.write_log("Game over screen displayed - player killed by Lava");
-                    break;
-                }
-            }
-        }
-
-    }
-
-#endif 
-
-#if 1
     void Collision_System::Detect_Obsidian_Bottom(float delta_time)
     {
         // Only for game play scene
@@ -2139,7 +1958,7 @@ namespace lof {
             }
         }
     }
-#endif
+
 }
 
 

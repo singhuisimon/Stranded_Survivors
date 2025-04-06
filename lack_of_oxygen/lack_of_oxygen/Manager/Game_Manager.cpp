@@ -619,7 +619,7 @@ namespace lof {
                 }
             }
         
-            std::cout << "Is Player Dead: " << (is_player_dead ? "YES" : "NO") << std::endl;
+            //std::cout << "Is Player Dead: " << (is_player_dead ? "YES" : "NO") << std::endl;
             // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {
