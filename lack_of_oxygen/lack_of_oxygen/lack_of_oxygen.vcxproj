@@ -143,10 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Config\config.json" />
-    <None Include="Assets\Level_Design\Level_Design.csv" />
-    <None Include="Assets\Level_Design\Level_Design_Small.csv" />
-    <None Include="Assets\Level_Design\Level_Design_V2.csv" />
-    <None Include="Assets\Level_Design\Level_Design_V5.csv" />
+    <None Include="Assets\Level_Design\Level_Design_V5.2.csv" />
     <None Include="Assets\Prefab\prefab.json" />
     <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\main_menu.scn" />

@@ -120,17 +120,14 @@
     <None Include="Data\triangle.msh" />
     <None Include="Assets\Scenes\scene1.scn" />
     <None Include="Assets\Config\config.json" />
-    <None Include="Assets\Level_Design\Level_Design.csv" />
     <None Include="Assets\Prefab\prefab.json" />
-    <None Include="Assets\Level_Design\Level_Design_Small.csv" />
     <None Include="Assets\Scenes\scene2.scn" />
     <None Include="Assets\Scenes\main_menu.scn" />
     <None Include="Assets\Scenes\credit.scn" />
     <None Include="Assets\Scenes\win_screen.scn" />
-    <None Include="Assets\Level_Design\Level_Design_V2.csv" />
-    <None Include="Assets\Level_Design\Level_Design_V5.csv" />
     <None Include="Assets\Scenes\tutorial.scn" />
     <None Include="Assets\Scenes\setting.scn" />
+    <None Include="Assets\Level_Design\Level_Design_V5.2.csv" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Data\TapTapHeroes_Level 3&amp;4_BGM_Linear_85-BPM.wav" />
@@ -169,10 +166,10 @@
     <Media Include="Assets\Audio\sfx_tutorial_button.wav" />
     <Media Include="Assets\Audio\sfx_tutorial_lights.wav" />
     <Media Include="Assets\Audio\bgm_tutorial_music.wav" />
-    <Media Include="Assets\Audio\bgm_game_over.wav" />
     <Media Include="Assets\Audio\sfx_lava_siren.wav" />
-    <Media Include="Assets\Audio\bgm_game_win.wav" />
     <Media Include="Assets\Audio\sfx_blast_off.wav" />
+    <Media Include="Assets\Audio\sfx_game_over.wav" />
+    <Media Include="Assets\Audio\sfx_game_win.wav" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\Air_1.png" />
