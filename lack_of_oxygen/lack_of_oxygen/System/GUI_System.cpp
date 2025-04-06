@@ -337,6 +337,10 @@ namespace lof {
             // Reset all game state
             reset_all_game_state();
 
+            // Get the mining script
+            auto mining_script = std::dynamic_pointer_cast<Mining_Script>(LGM.get_script("mining_script"));
+            mining_script->clear_tnt_to_destroy();
+
             // Set special flag for win screen transition
             transitioning_to_win_screen = true;
 
