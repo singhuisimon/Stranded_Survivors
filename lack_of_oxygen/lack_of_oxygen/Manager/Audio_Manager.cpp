@@ -408,7 +408,6 @@ namespace lof {
 		selected_group->isPlaying(&playing);
 		if (playing) {
 			errorcheck(selected_group->stop(), "Audio_System::selected_group", "stop master group");
-			//new_scene = true;
 		}
 	}
 

@@ -276,6 +276,9 @@ namespace lof {
 
         void reset_all_game_state();
 
+        /**
+         * @brief Function to retrieve the fade_active's state
+         */
         bool is_fade_active() { return fade_active; }
     };
 

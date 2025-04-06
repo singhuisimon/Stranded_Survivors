@@ -145,10 +145,12 @@ namespace lof {
         LM.write_log("GUI_System::reset_all_game_state(): Reset complete");
     }
 
+    //Boolean to track if the fade is complete
     static bool fade_complete = false;
 
     void GUI_System::update(float delta_time) {
 
+        //If the fade is complete, resume audio
         if (fade_complete) {
             ADM.resume_group(GroupType::TYPE_BGM);
             ADM.resume_group(GroupType::TYPE_SFX);
@@ -1204,6 +1206,8 @@ namespace lof {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+
+            //Add button_hover to Audio Component
             audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
             ecs_manager.add_component(resume_button, audio_comp);
 
@@ -1225,6 +1229,8 @@ namespace lof {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+
+            //Add button_hover to Audio Component
             audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
             ecs_manager.add_component(restart_button, audio_comp);
 
@@ -1246,6 +1252,8 @@ namespace lof {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+
+            //Add button_hover to Audio Component
             audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
             ecs_manager.add_component(main_menu_button, audio_comp);
 
@@ -1267,6 +1275,8 @@ namespace lof {
 
             // Add empty Audio Component - needed for hover detection
             Audio_Component audio_comp;
+
+            //Add button_hover to Audio Component
             audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
             ecs_manager.add_component(quit_button, audio_comp);
 
@@ -1329,7 +1339,7 @@ namespace lof {
         pause_menu_entities.clear();
     }
 
-    //Static variable to hold timer for clicking sound for quit button
+    //Static variables to hold timer and boolean for clicking sound for quit button
     static float timer = 0.0f;
     static bool stop_playing = false;
 
@@ -1411,6 +1421,8 @@ namespace lof {
             std::string base_texture;
             std::string hover_sound = "button_hover";
             std::string click_sound = "main_menu";
+
+            //Add button clicking sound to Audio Component
             audio.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 5, 1.0, 1.0, false, true, false);
 
             if (entity_name == "resume_button") {
@@ -1500,7 +1512,8 @@ namespace lof {
                     }
                     else if (entity_name == "quit_button") {
 
-                        if (!stop_playing) {  //Only play sound once
+                        //Ensures the sound only plays once
+                        if (!stop_playing) {
                             ADM.play_now(entity_id, click_sound, audio);
                             stop_playing = true;
                         }
@@ -1521,6 +1534,7 @@ namespace lof {
             }
         }
 
+        //Timer for clicking sound for quit button 
         if (stop_playing) {
 
             //Time per frame
@@ -1529,7 +1543,7 @@ namespace lof {
             //Progress in timer
             timer += d_time;
 
-            //Switching direction
+            //Once sound is played, quit game
             if (timer >= 0.4f) {
 
                 LM.write_log("Quit button pressed - ending game");
@@ -1582,6 +1596,7 @@ namespace lof {
             //std::cout << game_over_shown << " game over in gui system^^^^^^^^^^^^^^^^^^^^^^\n";
         }
 
+        //key of the clicking sound sfx
         std::string click_sound = "main_menu";
 
         // Create Restart button
@@ -1607,7 +1622,11 @@ namespace lof {
             // Add Audio Component
             if (!ecs_manager.has_component<Audio_Component>(restart_button)) {
                 Audio_Component audio_comp;
+
+                //Add button_hover to Audio Component
                 audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
+
+                //Add button clicking sound to Audio Component
                 audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(restart_button, audio_comp);
             }
@@ -1642,7 +1661,11 @@ namespace lof {
             // Add Audio Component
             if (!ecs_manager.has_component<Audio_Component>(main_menu_button)) {
                 Audio_Component audio_comp;
+
+                //Add button_hover to Audio Component
                 audio_comp.add_sound("button_hover", "sfx_button_hover", AudioType::UI, 1, static_cast<float>(0.7), 1.0, false, true, false);
+
+                //Add button clicking to Audio Component
                 audio_comp.add_sound(click_sound, "sfx_mainmenu_button", AudioType::UI, 1, 1.0, 1.0, false, true, false);
                 ecs_manager.add_component(main_menu_button, audio_comp);
             }
@@ -1924,6 +1947,7 @@ namespace lof {
         destination_scene = dest_scene;
         destination_scene_number = dest_scene_num;
 
+        //Completely stops the BGM and SFX audio from playing
         ADM.stop_groups(GroupType::TYPE_BGM);
         ADM.stop_groups(GroupType::TYPE_SFX);
         
