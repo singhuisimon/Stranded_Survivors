@@ -1572,6 +1572,10 @@ namespace lof {
 
         LM.write_log("GUI_System::show_game_over_menu(): Creating game over UI");
 
+        // Get the mining script
+        auto mining_script = std::dynamic_pointer_cast<Mining_Script>(LGM.get_script("mining_script"));
+        mining_script->clear_tnt_to_destroy();
+
         // Set the flag
         game_over_shown = true;
 
