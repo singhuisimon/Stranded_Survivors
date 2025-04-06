@@ -31,7 +31,7 @@ namespace lof {
         player_id = 0;
         mining_strength = DEFAULT_STRENGTH;
         mining_cooldown = MINING_COOLDOWN_TIMER;
-
+        popup_entity_id = INVALID_ENTITY_ID;
     }
 
     std::string Mining_Script::get_type() const {
@@ -79,20 +79,10 @@ namespace lof {
 			}
 
             mining_script->increase_mineral_count_cheat();
-           
-            //update mineral popups
-           // try {
+
+            mining_script->update_mineral_popups(FPSM.get_delta_time());
 
 
-                   // COMMENT 
-                    mining_script->update_mineral_popups(FPSM.get_delta_time());
-
-           // }
-           // catch (const std::exception& e) {
-
-           //     LM.write_log("Error updating mineral popup: %s", e.what());
-           //     mining_script->popup_active = false;
-           // }
 
         });
 
@@ -775,18 +765,11 @@ namespace lof {
                 return;
             
             }
-            //std::cout << "Popup_EntityID: " << popup_entity_id << std::endl;
 
         //update position
         auto& transform = ECSM.get_component<Transform2D>(popup_entity_id);
         transform.position = position;
 
-        
-        //EntityID player = ECSM.find_entity_by_name(DEFAULT_PLAYER_NAME);
-        //auto& player_transform = ECSM.get_component<Transform2D>(player);
-
-        ////this is so temporarily the text can be seen (not accurate)
-        //transform.position.y = player_transform.position.y - transform.position.y; 
 
         //update text 
         auto& text_comp = ECSM.get_component<Text_Component>(popup_entity_id);
