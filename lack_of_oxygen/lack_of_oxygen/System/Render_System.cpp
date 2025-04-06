@@ -319,6 +319,9 @@ namespace lof {
                 if (ECSM.find_entity_by_name("wormhole_e_prompt") == *start || ECSM.find_entity_by_name("mineral_popup") == *start) {
                     graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                 }
+                else if (camera.is_free_cam == GL_TRUE) {
+                    graphics.mdl_to_ndc_xform = camera.world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
+                }
                 else {
                     graphics.mdl_to_ndc_xform = ui_world_to_ndc_xform * trans_mat * rot_mat * scale_mat;
                 }

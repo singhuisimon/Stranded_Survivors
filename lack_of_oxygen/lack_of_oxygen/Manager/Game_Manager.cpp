@@ -197,28 +197,15 @@ namespace lof {
                 if (m_is_paused) {
                     gui_system->show_pause_menu();
 
-                    //CASE 1 (Audio completely STOPS playing in PAUSE): Uncomment Line
-                    /*ADM.pause_group(GroupType::TYPE_BGM);
-                    ADM.pause_group(GroupType::TYPE_SFX);*/
-
-                    //CASE 2: COMMENT ALL LINES FOR ALL CASES
-
-                    //CASE 3 (Audio playing at half volume in PAUSE): Uncomment Line
+                    //Audio playing at half volume in pause
                     ADM.set_group_volume(GroupType::TYPE_BGM, ADM.get_group_volume(GroupType::TYPE_BGM) / 2);
                     ADM.set_group_volume(GroupType::TYPE_SFX, ADM.get_group_volume(GroupType::TYPE_SFX) / 2);
-
 
                 }
                 else {
                     gui_system->hide_pause_menu();
 
-                    //CASE 1 (Audio completely STOPS playing in PAUSE): Uncomment Line
-                    /*ADM.resume_group(GroupType::TYPE_BGM);
-                    ADM.resume_group(GroupType::TYPE_SFX);*/
-
-                    //CASE 2: COMMENT ALL LINES FOR ALL CASES
-
-                    //CASE 3 (Audio playing at half volume in PAUSE): Uncomment Line
+                    //Audio resumes playing at full volume after pause
                     ADM.set_group_volume(GroupType::TYPE_BGM, ADM.get_group_volume(GroupType::TYPE_BGM) * 2);
                     ADM.set_group_volume(GroupType::TYPE_SFX, ADM.get_group_volume(GroupType::TYPE_SFX) * 2);
 
@@ -596,9 +583,6 @@ namespace lof {
                 // Player is out of oxygen - show game over screen
                 //set_player_dead_state(true);
 
-                // Stop all audio first
-                //ADM.stop_mastergroup();
-
                 ADM.stop_groups(GroupType::TYPE_BGM);
                 ADM.stop_groups(GroupType::TYPE_SFX);
 
@@ -619,7 +603,7 @@ namespace lof {
                 }
             }
         
-            std::cout << "Is Player Dead: " << (is_player_dead ? "YES" : "NO") << std::endl;
+            //std::cout << "Is Player Dead: " << (is_player_dead ? "YES" : "NO") << std::endl;
             // Lava update logic
             EntityID lava_pool_id = ECSM.find_entity_by_name("lava_pool");
             if (lava_pool_id != INVALID_ENTITY_ID && ECSM.has_component<Transform2D>(lava_pool_id)) {

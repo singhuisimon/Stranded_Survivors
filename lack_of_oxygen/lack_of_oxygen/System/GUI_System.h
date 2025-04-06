@@ -1,7 +1,7 @@
 /**
  * @file GUI_System.h
  * @brief Declare the GUI system
- * @author Simon Chan (98%), Saw Hui Shan (2%)
+ * @author Simon Chan (97%), Saw Hui Shan (2%), Liliana Hanawardani (1%)
  * @date January 15, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -276,6 +276,9 @@ namespace lof {
 
         void reset_all_game_state();
 
+        /**
+         * @brief Function to retrieve the fade_active's state
+         */
         bool is_fade_active() { return fade_active; }
     };
 

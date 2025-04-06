@@ -213,12 +213,12 @@ int main(void) {
         fps = FPSM.get_current_fps();
 
         // Update window title with FPS
+#ifndef NDEBUG
         std::stringstream ss;
         ss << "Lack Of Oxygen"; 
-//#ifndef NDEBUG
-        //ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
-//#endif
-        // glfwSetWindowTitle(window, ss.str().c_str());
+        ss << ", FPS: " << std::fixed << std::setprecision(2) << fps;
+        glfwSetWindowTitle(window, ss.str().c_str());
+#endif
 
        /* const GLubyte* renderer = glGetString(GL_RENDERER);
         printf("GL Renderer  : %s\n", renderer);*/
