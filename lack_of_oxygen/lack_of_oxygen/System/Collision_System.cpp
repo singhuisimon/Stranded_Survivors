@@ -1,7 +1,7 @@
 /**
  * @file Collision_Syetem.cpp
  * @brief Implements the collsion system.
- * @author Saw Hui Shan (77%), Simon (3%), Wai Lwin Thit (20%)
+ * @author Saw Hui Shan (76%), Simon (3%), Wai Lwin Thit (20%), Liliana Hanawardani (1%) 
  * @date September 21, 2024
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the

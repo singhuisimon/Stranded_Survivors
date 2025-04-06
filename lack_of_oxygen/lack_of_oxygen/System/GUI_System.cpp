@@ -1,7 +1,7 @@
 /**
  * @file GUI_System.cpp
  * @brief Define the GUI system
- * @author Simon Chan (95%), Saw Hui Shan (5%)
+ * @author Simon Chan (94%), Saw Hui Shan (5%), Liliana Hanawardani (1%)
  * @date January 15, 2025
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
