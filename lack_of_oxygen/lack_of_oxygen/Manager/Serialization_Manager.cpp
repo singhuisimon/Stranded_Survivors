@@ -1313,11 +1313,13 @@ namespace lof {
                             x_pos, y_pos, collision.width, collision.height);
                     }
 
+                    //If the entity is a dirt or rock, randomise the tiles
                     if (prefab_name == "dirt_prefab" || prefab_name == "rock_prefab") {
                         if (ECSM.has_component<Animation_Component>(entity)) {
                             auto& animation = ECSM.get_component<Animation_Component>(entity);
                             auto& animation_list = animation.animations;
 
+                            //Get a random number from 0 to 1 using the particle system's function
                             float random = 0;
                             for (auto& system : ECSM.get_systems()) {
                                 if (auto* particle_system = dynamic_cast<Particle_System*>(system.get())) {
@@ -1325,6 +1327,7 @@ namespace lof {
                                 }
                             }
 
+                            //Based on the random number, different sprites of respective entity are assigned
                             if (prefab_name == "dirt_prefab") {
                                 if (random <= 0.5) {
                                     animation_list.begin()->second = "dirt_1";

@@ -385,8 +385,6 @@ namespace lof {
                         tnt_to_destroy.clear();
 
                         // Stop all audio first
-                        //ADM.stop_mastergroup();
-
                         ADM.stop_groups(GroupType::TYPE_BGM);
                         ADM.stop_groups(GroupType::TYPE_SFX);
 
@@ -660,6 +658,8 @@ namespace lof {
             float part_y = transform_comp.position.y - (transform_comp.scale.y / 2.0f) + (particle_system->get_rand_float() * transform_comp.scale.y);
             
             std::string particle_name = animation_comp.animations["0"];
+
+            //Due to the different sprites of the tiles to accommodate randomisation, extract the type of tile from the sprite as the particle name 
             if (animation_comp.animations["0"].find("rock") != std::string::npos) {
                 particle_name = "rock";
             }
@@ -678,6 +678,8 @@ namespace lof {
             float part_y = transform_comp.position.y - (transform_comp.scale.y / 2.0f) + (particle_system->get_rand_float() * transform_comp.scale.y);
             
             std::string particle_name = animation_comp.animations["0"];
+
+            //Due to the different sprites of the tiles to accommodate randomisation, extract the type of tile from the sprite as the particle name 
             if (animation_comp.animations["0"].find("rock") != std::string::npos) {
                 particle_name = "rock";
             }

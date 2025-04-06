@@ -1,7 +1,7 @@
 /**
  * @file Collision_Syetem.cpp
  * @brief Implements the collsion system.
- * @author Saw Hui Shan (77%), Simon (3%), Wai Lwin Thit (20%)
+ * @author Saw Hui Shan (76%), Simon (3%), Wai Lwin Thit (20%), Liliana Hanawardani (1%) 
  * @date September 21, 2024
  * Copyright (C) 2025 DigiPen Institute of Technology.
  * Reproduction or disclosure of this file or its contents without the
@@ -361,6 +361,10 @@ namespace lof {
         return VentDirection::NONE;
     }
 
+    /**
+    * @brief Local helper function to retrieve the value of fade_active in the GUI System
+    * @return Boolean value of fade_active
+    */
     bool is_fade_active() {
         for (auto& system : ECSM.get_systems()) {
             if (auto* gui_sys = dynamic_cast<GUI_System*>(system.get())) {
@@ -369,6 +373,8 @@ namespace lof {
 
             }
         }
+
+        return false;
     }
 
     void Collision_System::apply_vent_force(EntityID id, VentDirection direction, bool found_next_vent) {
@@ -422,7 +428,7 @@ namespace lof {
         }
 
         //handle audio 
-        //audio for vent in 
+        //If player is not in vent and is alive, play air vent sound
         if (!is_in_vent) {
 
             if (!GM.get_player_dead_state()) {
@@ -439,27 +445,24 @@ namespace lof {
                 // e_physics.force_helper.deactivate_force(VENT_FORCE); 
             }
 
+            //If player is in vent
             if (is_in_vent) {
 
-                //if (!GM.get_player_dead_state()) {
-                //    ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
-                //    ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
-                //}
-
+                //Get the value of fade_active from the GUI system via the helper function
                 bool fade_active = is_fade_active();
 
+                //If player is not dead and fade had not started, play air vent sound
                 if (!GM.get_player_dead_state() && !fade_active) {
                     ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
                     ADM.play_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID));
                 }
 
+                //If fade started, stop all BGM and SFX
                 if (fade_active) {
 
                     ADM.pause_group(GroupType::TYPE_BGM);
                     ADM.pause_group(GroupType::TYPE_SFX);
 
-                    //ADM.stop_now(playerID, "air vent in", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent in"));
-                    //ADM.stop_now(playerID, "air vent out", ECSM.get_component<Audio_Component>(playerID).get_filepath("air vent out"));
                 }
 
                 is_in_vent = false;
@@ -1447,7 +1450,7 @@ namespace lof {
 
     bool Collision_System::is_transitioning = false;
 
-    //Static variable to hold timer for clicking sound for quit button
+    //Static variables to hold timer and boolean for clicking sound for quit button
     static float timer = 0.0f;
     static bool stop_playing = false; 
 
@@ -1629,6 +1632,8 @@ namespace lof {
                         
                         is_transitioning = true;
                         current_cooldown = transition_cooldown;
+
+                        //Start timer for clicking sound for quit button 
                         stop_playing = true;
 
                     }
@@ -1647,6 +1652,7 @@ namespace lof {
             }
         }
 
+        //Timer for clicking sound for quit button
         if (stop_playing) {
 
             //Time per frame
@@ -1655,7 +1661,7 @@ namespace lof {
             //Progress in timer
             timer += d_time;
 
-            //Switching direction
+            //Once sound is played, quit game
             if (timer >= 0.03f) {
 
                 LM.write_log("Quit button pressed - ending game");

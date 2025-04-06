@@ -158,12 +158,15 @@ namespace lof {
 		 */
 		FMOD::ChannelGroup* get_uigroup() const;
 
-		//stop all audio -> to be called before each scene change!
 		/**
 		* @brief Stop all the channel in the master channelgroup
 		*/
 		void stop_mastergroup();
 
+		/**
+		 * @brief Pause a specific group
+		 * @param grouptype The type of group to stop
+		 */
 		void stop_groups(GroupType grouptype);
 
 		/**
